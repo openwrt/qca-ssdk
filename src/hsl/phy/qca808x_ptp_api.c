@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +13,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -133,123 +134,165 @@ qca808x_ptp_main_conf_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
 }
 
 sw_error_t
-qca808x_ptp_rx_seqid0_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid0_reg_u *value)
+qca808x_ptp_seqid_get(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint32_t *value)
 {
+	a_uint32_t reg = 0;
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_SEQID0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_SEQID1_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_SEQID2_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_SEQID3_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_SEQID_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
 	return qca808x_phy_ptp_mmd_read(
 			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID0_REG_ADDRESS,
-			&value->val);
+			phy_id, QCA808X_PHY_MMD3_NUM, reg,
+			value);
 }
 
 sw_error_t
-qca808x_ptp_rx_seqid0_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid0_reg_u *value)
+qca808x_ptp_seqid_set(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint32_t value)
 {
+	a_uint32_t reg = 0;
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_SEQID0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_SEQID1_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_SEQID2_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_SEQID3_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_SEQID_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
 	return qca808x_phy_ptp_mmd_write(
 			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID0_REG_ADDRESS,
-			value->val);
+			phy_id, QCA808X_PHY_MMD3_NUM, reg,
+			value);
 }
 
 sw_error_t
-qca808x_ptp_rx_portid0_0_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_0_reg_u *value)
+qca808x_ptp_portid_get(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint64_t *clock_id, a_uint32_t *port_num)
 {
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_0_REG_ADDRESS,
-			&value->val);
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg = 0;
+	a_uint32_t port_id0, port_id1, port_id2, port_id3;
+
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_PORTID0_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_PORTID1_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_PORTID2_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_PORTID3_0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_PORTID0_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg, &port_id0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 1, &port_id1);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 2, &port_id2);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 3, &port_id3);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 4, port_num);
+	SW_RTN_ON_ERROR(rv);
+
+	*clock_id = ((a_uint64_t)port_id0 << 48) | ((a_uint64_t)port_id1 << 32) |
+		((a_uint64_t)port_id2 << 16) | port_id3;
+
+	return rv;
 }
 
 sw_error_t
-qca808x_ptp_rx_portid0_0_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_0_reg_u *value)
+qca808x_ptp_portid_set(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint64_t clock_id, a_uint32_t port_num)
 {
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_0_REG_ADDRESS,
-			value->val);
-}
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg = 0;
+	a_uint32_t port_id0, port_id1, port_id2, port_id3;
 
-sw_error_t
-qca808x_ptp_rx_portid0_1_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_1_REG_ADDRESS,
-			&value->val);
-}
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_PORTID0_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_PORTID1_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_PORTID2_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_PORTID3_0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_PORTID0_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
 
-sw_error_t
-qca808x_ptp_rx_portid0_1_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_1_REG_ADDRESS,
-			value->val);
-}
+	port_id0 = (clock_id >> 48) & 0xffff;
+	port_id1 = (clock_id >> 32) & 0xffff;
+	port_id2 = (clock_id >> 16) & 0xffff;
+	port_id3 = clock_id & 0xffff;
 
-sw_error_t
-qca808x_ptp_rx_portid0_2_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_2_REG_ADDRESS,
-			&value->val);
-}
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg, port_id0);
+	SW_RTN_ON_ERROR(rv);
 
-sw_error_t
-qca808x_ptp_rx_portid0_2_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_2_REG_ADDRESS,
-			value->val);
-}
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 1, port_id1);
+	SW_RTN_ON_ERROR(rv);
 
-sw_error_t
-qca808x_ptp_rx_portid0_3_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_3_REG_ADDRESS,
-			&value->val);
-}
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 2, port_id2);
+	SW_RTN_ON_ERROR(rv);
 
-sw_error_t
-qca808x_ptp_rx_portid0_3_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_3_REG_ADDRESS,
-			value->val);
-}
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 3, port_id3);
+	SW_RTN_ON_ERROR(rv);
 
-sw_error_t
-qca808x_ptp_rx_portid0_4_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_4_REG_ADDRESS,
-			&value->val);
-}
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 4, port_num);
+	SW_RTN_ON_ERROR(rv);
 
-sw_error_t
-qca808x_ptp_rx_portid0_4_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid0_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID0_4_REG_ADDRESS,
-			value->val);
+	return rv;
 }
 
 sw_error_t
@@ -273,403 +316,205 @@ qca808x_ptp_rtc_clk_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
 }
 
 sw_error_t
-qca808x_ptp_rx_ts0_0_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_0_reg_u *value)
+qca808x_ptp_ts_get(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint64_t *sec, a_uint32_t *nsec, a_uint32_t *fsec)
 {
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_0_REG_ADDRESS,
-			&value->val);
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg = 0;
+	a_uint32_t sec0, sec1, sec2, nsec0, nsec1;
+	union ptp_ts5_reg_u ts5 = {0};
+	union ptp_ts6_reg_u ts6 = {0};
+
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_TS0_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_TS1_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_TS2_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_TS3_0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_TS0_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg, &sec0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 1, &sec1);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 2, &sec2);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 3, &nsec0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 4, &nsec1);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 5, &ts5.val);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 6, &ts6.val);
+	SW_RTN_ON_ERROR(rv);
+
+	*sec = ((a_int64_t)sec0 << 32) | ((a_int64_t)sec1 << 16) | sec2;
+	*nsec = ((a_int32_t)nsec0 << 16) | nsec1;
+	*fsec = ((a_int32_t)ts5.bf.rx_ts_nfsec << 8) | ts6.bf.rx_ts_nfsec;
+
+	return rv;
 }
 
 sw_error_t
-qca808x_ptp_rx_ts0_0_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_0_reg_u *value)
+qca808x_ptp_ts_set(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint64_t sec, a_uint32_t nsec, a_uint32_t fsec)
 {
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_0_REG_ADDRESS,
-			value->val);
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg = 0;
+	a_uint32_t sec0, sec1, sec2, nsec0, nsec1;
+	union ptp_ts5_reg_u ts5 = {0};
+	union ptp_ts6_reg_u ts6 = {0};
+
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_TS0_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_TS1_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_TS2_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_TS3_0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_TS0_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	sec0 = (sec >> 32) & 0xffff;
+	sec1 = (sec >> 16) & 0xffff;
+	sec2 = sec & 0xffff;
+
+	nsec0 = (nsec >> 16) & 0xffff;
+	nsec1 = nsec & 0xffff;
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg, sec0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 1, sec1);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 2, sec2);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 3, nsec0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 4, nsec1);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 5, &ts5.val);
+	SW_RTN_ON_ERROR(rv);
+
+	ts5.bf.rx_ts_nfsec = (fsec >> 8) & 0xfff;
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 5, ts5.val);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 6, &ts6.val);
+	SW_RTN_ON_ERROR(rv);
+
+	ts6.bf.rx_ts_nfsec = fsec & 0xff;
+
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 6, ts6.val);
+
+	return rv;
 }
 
 sw_error_t
-qca808x_ptp_rx_ts0_1_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_1_reg_u *value)
+qca808x_ptp_msg_type_get(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint32_t *msg_type)
 {
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_1_REG_ADDRESS,
-			&value->val);
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg = 0;
+	union ptp_ts5_reg_u ts5 = {0};
+
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_TS0_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_TS1_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_TS2_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_TS3_0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_TS0_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 5, &ts5.val);
+	SW_RTN_ON_ERROR(rv);
+
+	*msg_type = ts5.bf.rx_msg_type;
+
+	return rv;
 }
 
 sw_error_t
-qca808x_ptp_rx_ts0_1_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_1_reg_u *value)
+qca808x_ptp_msg_type_set(a_uint32_t dev_id, a_uint32_t phy_id,
+		ptp_ts_type_t ts_type, a_uint32_t msg_type)
 {
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_1_REG_ADDRESS,
-			value->val);
-}
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg = 0;
+	union ptp_ts5_reg_u ts5 = {0}; 
 
-sw_error_t
-qca808x_ptp_rx_ts0_2_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_2_REG_ADDRESS,
-			&value->val);
-}
+	switch (ts_type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX_TS0_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX_TS1_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX_TS2_0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX_TS3_0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX_TS0_REG_ADDRESS;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
 
-sw_error_t
-qca808x_ptp_rx_ts0_2_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_2_REG_ADDRESS,
-			value->val);
-}
+	rv = qca808x_phy_ptp_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 5, &ts5.val);
+	SW_RTN_ON_ERROR(rv);
 
-sw_error_t
-qca808x_ptp_rx_ts0_3_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_3_REG_ADDRESS,
-			&value->val);
-}
+	ts5.bf.rx_msg_type = msg_type;
 
-sw_error_t
-qca808x_ptp_rx_ts0_3_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_3_REG_ADDRESS,
-			value->val);
-}
+	rv = qca808x_phy_ptp_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD3_NUM, reg + 5, ts5.val);
 
-sw_error_t
-qca808x_ptp_rx_ts0_4_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_4_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_5_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_5_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_5_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_5_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_6_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_6_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_6_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts0_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS0_6_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_seqid_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_seqid_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_SEQID_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_seqid_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_seqid_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_SEQID_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid0_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid0_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid1_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid1_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid2_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid2_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid3_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid3_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid4_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_portid4_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_portid4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_PORTID4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts0_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts0_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts1_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts1_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts2_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts2_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts3_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts3_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts4_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts4_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts5_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS5_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts5_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS5_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts6_reg_get(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS6_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_tx_ts6_reg_set(a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_tx_ts6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_TX_TS6_REG_ADDRESS,
-			value->val);
+	return rv;
 }
 
 sw_error_t
@@ -2221,864 +2066,6 @@ qca808x_ptp_event1_timestamp4_reg_set(
 }
 
 sw_error_t
-qca808x_ptp_rx_seqid1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_0_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_0_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_4_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_4_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid1_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID1_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_0_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_0_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_4_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_4_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_5_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_5_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_5_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_5_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_6_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_6_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_6_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts1_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS1_6_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_0_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_0_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_4_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_4_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid2_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID2_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_0_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_0_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_4_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_4_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_5_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_5_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_5_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_5_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_6_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_6_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_6_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts2_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS2_6_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_seqid3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_SEQID3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_0_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_0_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_4_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_4_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_portid3_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_PORTID3_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_0_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_0_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_0_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_0_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_0_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_1_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_1_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_1_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_1_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_1_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_2_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_2_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_2_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_2_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_2_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_3_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_3_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_3_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_3_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_3_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_4_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_4_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_4_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_4_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_4_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_5_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_5_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_5_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_5_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_5_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_6_reg_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_read(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_6_REG_ADDRESS,
-			&value->val);
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_6_reg_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		union ptp_rx_ts3_6_reg_u *value)
-{
-	return qca808x_phy_ptp_mmd_write(
-			dev_id,
-			phy_id, QCA808X_PHY_MMD3_NUM, PTP_RX_TS3_6_REG_ADDRESS,
-			value->val);
-}
-
-sw_error_t
 qca808x_ptp_imr_reg_mask_bmp_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		a_uint32_t *value)
@@ -3427,180 +2414,6 @@ qca808x_ptp_main_conf_reg_ptp_clock_mode_set(
 }
 
 sw_error_t
-qca808x_ptp_rx_seqid0_reg_rx_seqid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_seqid0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_seqid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid0_reg_rx_seqid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_seqid0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_seqid = value;
-	ret = qca808x_ptp_rx_seqid0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_0_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid0_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_0_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid0_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid0_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_1_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid0_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_1_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid0_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid0_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_2_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid0_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_2_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid0_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid0_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_3_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid0_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_3_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid0_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid0_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_4_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid0_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid0_4_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid0_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid0_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid0_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
 qca808x_ptp_rtc_clk_reg_rtc_clk_selection_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		a_uint32_t *value)
@@ -3626,644 +2439,6 @@ qca808x_ptp_rtc_clk_reg_rtc_clk_selection_set(
 		return ret;
 	reg_val.bf.rtc_clk_selection = value;
 	ret = qca808x_ptp_rtc_clk_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_0_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_0_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts0_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_1_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_1_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts0_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_2_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_2_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts0_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_3_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_3_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts0_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_4_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_4_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts0_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_5_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_5_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts0_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_5_reg_rx_msg_type_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_msg_type;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_5_reg_rx_msg_type_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_msg_type = value;
-	ret = qca808x_ptp_rx_ts0_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_6_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts0_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_6_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts0_6_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts0_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts0_6_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts0_6_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_seqid_reg_tx_seqid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_seqid_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_seqid_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_seqid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_seqid_reg_tx_seqid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_seqid_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_seqid_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_seqid = value;
-	ret = qca808x_ptp_tx_seqid_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid0_reg_tx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_portid0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid0_reg_tx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_portid0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_portid = value;
-	ret = qca808x_ptp_tx_portid0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid1_reg_tx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_portid1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid1_reg_tx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_portid1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_portid = value;
-	ret = qca808x_ptp_tx_portid1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid2_reg_tx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_portid2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid2_reg_tx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_portid2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_portid = value;
-	ret = qca808x_ptp_tx_portid2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid3_reg_tx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_portid3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid3_reg_tx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_portid3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_portid = value;
-	ret = qca808x_ptp_tx_portid3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid4_reg_tx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_portid4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_portid4_reg_tx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_portid4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_portid4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_portid = value;
-	ret = qca808x_ptp_tx_portid4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts0_reg_tx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts0_reg_tx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_sec = value;
-	ret = qca808x_ptp_tx_ts0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts1_reg_tx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts1_reg_tx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_sec = value;
-	ret = qca808x_ptp_tx_ts1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts2_reg_tx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts2_reg_tx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_sec = value;
-	ret = qca808x_ptp_tx_ts2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts3_reg_tx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts3_reg_tx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_nsec = value;
-	ret = qca808x_ptp_tx_ts3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts4_reg_tx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts4_reg_tx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_nsec = value;
-	ret = qca808x_ptp_tx_ts4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts5_reg_tx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts5_reg_tx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_nfsec = value;
-	ret = qca808x_ptp_tx_ts5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts5_reg_tx_msg_type_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_msg_type;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts5_reg_tx_msg_type_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_msg_type = value;
-	ret = qca808x_ptp_tx_ts5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts6_reg_tx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_tx_ts6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts6_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.tx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_tx_ts6_reg_tx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_tx_ts6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_tx_ts6_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.tx_ts_nfsec = value;
-	ret = qca808x_ptp_tx_ts6_reg_set(dev_id, phy_id, &reg_val);
 	return ret;
 }
 
@@ -7831,1224 +6006,6 @@ qca808x_ptp_event1_timestamp4_reg_ts_nsec_set(
 		return ret;
 	reg_val.bf.ts_nsec = value;
 	ret = qca808x_ptp_event1_timestamp4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid1_reg_rx_seqid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_seqid1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_seqid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid1_reg_rx_seqid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_seqid1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_seqid = value;
-	ret = qca808x_ptp_rx_seqid1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_0_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid1_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_0_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid1_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid1_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_1_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid1_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_1_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid1_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid1_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_2_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid1_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_2_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid1_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid1_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_3_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid1_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_3_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid1_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid1_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_4_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid1_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid1_4_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid1_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid1_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid1_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_0_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_0_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts1_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_1_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_1_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts1_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_2_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_2_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts1_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_3_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_3_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts1_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_4_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_4_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts1_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_5_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_5_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts1_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_5_reg_rx_msg_type_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_msg_type;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_5_reg_rx_msg_type_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_msg_type = value;
-	ret = qca808x_ptp_rx_ts1_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_6_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts1_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_6_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts1_6_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts1_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts1_6_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts1_6_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid2_reg_rx_seqid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_seqid2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_seqid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid2_reg_rx_seqid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_seqid2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_seqid = value;
-	ret = qca808x_ptp_rx_seqid2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_0_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid2_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_0_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid2_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid2_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_1_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid2_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_1_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid2_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid2_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_2_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid2_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_2_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid2_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid2_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_3_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid2_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_3_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid2_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid2_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_4_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid2_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid2_4_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid2_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid2_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid2_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_0_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_0_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts2_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_1_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_1_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts2_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_2_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_2_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts2_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_3_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_3_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts2_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_4_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_4_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts2_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_5_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_5_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts2_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_5_reg_rx_msg_type_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_msg_type;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_5_reg_rx_msg_type_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_msg_type = value;
-	ret = qca808x_ptp_rx_ts2_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_6_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts2_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_6_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts2_6_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts2_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts2_6_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts2_6_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid3_reg_rx_seqid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_seqid3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_seqid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_seqid3_reg_rx_seqid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_seqid3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_seqid3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_seqid = value;
-	ret = qca808x_ptp_rx_seqid3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_0_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid3_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_0_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid3_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid3_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_1_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid3_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_1_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid3_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid3_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_2_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid3_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_2_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid3_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid3_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_3_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid3_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_3_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid3_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid3_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_4_reg_rx_portid_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_portid3_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_portid;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_portid3_4_reg_rx_portid_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_portid3_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_portid3_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_portid = value;
-	ret = qca808x_ptp_rx_portid3_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_0_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_0_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_0_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_0_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_0_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts3_0_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_1_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_1_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_1_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_1_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_1_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts3_1_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_2_reg_rx_ts_sec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_2_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_sec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_2_reg_rx_ts_sec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_2_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_2_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_sec = value;
-	ret = qca808x_ptp_rx_ts3_2_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_3_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_3_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_3_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_3_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_3_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts3_3_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_4_reg_rx_ts_nsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_4_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_4_reg_rx_ts_nsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_4_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_4_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nsec = value;
-	ret = qca808x_ptp_rx_ts3_4_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_5_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_5_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts3_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_5_reg_rx_msg_type_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_5_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_msg_type;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_5_reg_rx_msg_type_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_5_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_5_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_msg_type = value;
-	ret = qca808x_ptp_rx_ts3_5_reg_set(dev_id, phy_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_6_reg_rx_ts_nfsec_get(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *value)
-{
-	union ptp_rx_ts3_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_6_reg_get(dev_id, phy_id, &reg_val);
-	*value = reg_val.bf.rx_ts_nfsec;
-	return ret;
-}
-
-sw_error_t
-qca808x_ptp_rx_ts3_6_reg_rx_ts_nfsec_set(
-		a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t value)
-{
-	union ptp_rx_ts3_6_reg_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = qca808x_ptp_rx_ts3_6_reg_get(dev_id, phy_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.rx_ts_nfsec = value;
-	ret = qca808x_ptp_rx_ts3_6_reg_set(dev_id, phy_id, &reg_val);
 	return ret;
 }
 

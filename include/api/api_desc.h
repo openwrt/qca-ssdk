@@ -4952,7 +4952,8 @@ extern "C" {
     SW_PARAM_DEF(SW_API_PTP_TIMESTAMP_GET, SW_PTP_DIRECTION, \
 		    sizeof(fal_ptp_direction_t), SW_PARAM_IN, "Direction"), \
     SW_PARAM_DEF(SW_API_PTP_TIMESTAMP_GET, SW_PTP_PKT_INFO, \
-		    sizeof(fal_ptp_pkt_info_t), SW_PARAM_PTR|SW_PARAM_IN, "Pkt Info"), \
+		    sizeof(fal_ptp_pkt_info_t), \
+		    SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Pkt Info"), \
     SW_PARAM_DEF(SW_API_PTP_TIMESTAMP_GET, SW_PTP_TIME, \
 		    sizeof(fal_ptp_time_t), SW_PARAM_PTR|SW_PARAM_OUT, "Time"),
 

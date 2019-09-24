@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,6 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /*qca808x_start*/
 #include "sw.h"
 #include "ssdk_init.h"
@@ -83,9 +87,6 @@
 #endif
 
 #include "hsl_phy.h"
-#ifdef IN_LINUX_STD_PTP
-#include "qca808x_ptp.h"
-#endif
 
 #ifdef IN_IP
 #if defined (CONFIG_NF_FLOW_COOKIE)
@@ -107,6 +108,10 @@
 #endif
 
 #include "adpt.h"
+
+#ifdef IN_LINUX_STD_PTP
+#include "hsl_ptp.h"
+#endif
 /*qca808x_start*/
 
 extern struct qca_phy_priv **qca_phy_priv_global;
@@ -1190,10 +1195,14 @@ static ssize_t ssdk_ptp_counter_get(struct device *dev,
 		struct device_attribute *attr,
 		char *buf)
 {
-	ssize_t count;
+	ssize_t count = 0;
 
-	count = snprintf(buf, (ssize_t)PAGE_SIZE, "\n");
-	qca808x_ptp_stat_get();
+	snprintf(buf + PAGE_SIZE - 5, 5, "%zd", count);
+	hsl_ptp_event_stat_operation("QCA808X ethernet", buf);
+
+	/* the last 5 bytes save the length of data bytes */
+	sscanf(buf + PAGE_SIZE - 5, "%zd", &count);
+
 	return count;
 }
 
@@ -1201,7 +1210,9 @@ static ssize_t ssdk_ptp_counter_set(struct device *dev,
 		struct device_attribute *attr,
 		const char *buf, size_t count)
 {
-	qca808x_ptp_stat_set();
+	char *op_set = "set";
+	hsl_ptp_event_stat_operation("QCA808X ethernet", op_set);
+
 	return count;
 }
 #endif

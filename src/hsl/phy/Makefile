@@ -70,6 +70,7 @@ ifeq (TRUE, $(IN_PTP))
     SRC_LIST += qca808x_ptp.c
     SRC_LIST += qca808x_ptp_api.c
 ifeq ($(CONFIG_PTP_1588_CLOCK), y)
+    SRC_LIST += hsl_ptp.c
     SRC_LIST += qca808x_phc.c
 endif
 endif

@@ -25,7 +25,7 @@
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 #include <linux/switch.h>
 #else
-#include <net/switch.h>
+//#include <net/switch.h>
 #endif
 #endif
 /*qca808x_start*/

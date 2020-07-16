@@ -12,6 +12,7 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#if 0
 /*qca808x_start*/
 #include "sw.h"
 #include "ssdk_init.h"
@@ -3637,6 +3638,146 @@ regi_exit(void)
 	unregister_netdevice_notifier(&ssdk_dev_notifier);
 /*qca808x_start*/
 	ssdk_free_priv();
+}
+#endif
+
+#include "sw.h"
+#include "ssdk_init.h"
+#include "fal_init.h"
+#include "fal.h"
+#include "hsl.h"
+#include "hsl_dev.h"
+#include "hsl_phy.h"
+/*qca808x_end*/
+#include "ssdk_dts.h"
+#include "ssdk_plat.h"
+
+struct qca_phy_priv **qca_phy_priv_global;
+
+sw_error_t
+ssdk_init(a_uint32_t dev_id, ssdk_init_cfg * cfg)
+{
+	sw_error_t rv;
+
+	rv = fal_init(dev_id, cfg);
+	if (rv != SW_OK)
+		SSDK_ERROR("ssdk fal init failed: %d. \r\n", rv);
+
+
+	return rv;
+}
+
+sw_error_t
+ssdk_cleanup(void)
+{
+	sw_error_t rv;
+
+	rv = fal_cleanup();
+
+	return rv;
+}
+
+static void ssdk_cfg_default_init(ssdk_init_cfg *cfg)
+{
+	memset(cfg, 0, sizeof(ssdk_init_cfg));
+	cfg->cpu_mode = HSL_CPU_1;
+	cfg->nl_prot = 30;
+
+
+	cfg->reg_func.header_reg_set = qca_switch_reg_write;
+	cfg->reg_func.header_reg_get = qca_switch_reg_read;
+
+
+}
+
+static int chip_ver_get(a_uint32_t dev_id, ssdk_init_cfg* cfg)
+{
+	cfg->chip_type = CHIP_HPPE;
+	cfg->port_cfg.cpu_bmp = 1;
+	cfg->port_cfg.inner_bmp= 0;
+	cfg->port_cfg.lan_bmp= 0x3e;
+	return 0;
+}
+
+static int ssdk_alloc_priv(a_uint32_t dev_num)
+{
+	int rev = SW_OK;
+	a_uint32_t dev_id = 0;
+
+	qca_phy_priv_global = kzalloc(dev_num * sizeof(struct qca_phy_priv *), GFP_KERNEL);
+	if (qca_phy_priv_global == NULL) {
+		return -ENOMEM;
+	}
+
+	for (dev_id = 0; dev_id < dev_num; dev_id++) {
+		qca_phy_priv_global[dev_id] = kzalloc(sizeof(struct qca_phy_priv), GFP_KERNEL);
+		if (qca_phy_priv_global[dev_id] == NULL) {
+			return -ENOMEM;
+		}
+/*qca808x_end*/
+		qca_phy_priv_global[dev_id]->qca_ssdk_sw_dev_registered = A_FALSE;
+		qca_phy_priv_global[dev_id]->ess_switch_flag = A_FALSE;
+/*qca808x_start*/
+		qca_ssdk_port_bmp_init(dev_id);
+		qca_ssdk_phy_info_init(dev_id);
+	}
+
+	return rev;
+}
+
+static void ssdk_free_priv(void)
+{
+	a_uint32_t dev_id, dev_num = 1;
+
+	if(!qca_phy_priv_global) {
+		return;
+	}
+
+	dev_num = 1;
+
+	for (dev_id = 0; dev_id < dev_num; dev_id++) {
+		if (qca_phy_priv_global[dev_id]) {
+			kfree(qca_phy_priv_global[dev_id]);
+		}
+
+		qca_phy_priv_global[dev_id] = NULL;
+	}
+
+	kfree(qca_phy_priv_global);
+
+	qca_phy_priv_global = NULL;
+
+}
+
+static int __init regi_init(void)
+{
+	ssdk_init_cfg cfg;
+
+	ssdk_alloc_priv(1);
+	ssdk_cfg_default_init(&cfg);
+
+	qca_phy_priv_global[0]->device_id = 0;
+	qca_phy_priv_global[0]->ess_switch_flag = A_TRUE;
+
+	ssdk_plat_init(&cfg, 0);
+
+	chip_ver_get(0, &cfg);
+	ssdk_init(0, &cfg);
+	ssdk_sysfs_init();
+
+        printk(KERN_ERR "ssdk module init succeeded!\n");
+
+	return 0;
+}
+
+static void __exit
+regi_exit(void)
+{
+	ssdk_sysfs_exit();
+	ssdk_cleanup();
+	ssdk_free_priv();
+
+        printk(KERN_ERR "ssdk module exit succeeded!\n");
 }
 
 module_init(regi_init);

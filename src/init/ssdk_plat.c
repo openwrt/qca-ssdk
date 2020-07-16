@@ -11,6 +11,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
+#if 0
 /*qca808x_start*/
 #include "sw.h"
 #include "ssdk_init.h"
@@ -1391,4 +1393,164 @@ ssdk_plat_exit(a_uint32_t dev_id)
 /*qca808x_start*/
 }
 /*qca808x_end*/
+#endif
+
+#include "sw.h"
+#include "ssdk_init.h"
+#include "fal_init.h"
+#include "fal.h"
+#include "hsl.h"
+#include "hsl_dev.h"
+#include "ssdk_init.h"
+/*qca808x_end*/
+#include "ssdk_dts.h"
+#include <linux/delay.h>
+
+a_uint32_t ssdk_log_level = 2;
+
+sw_error_t
+qca_uniphy_reg_write(a_uint32_t dev_id, a_uint32_t uniphy_index,
+				a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len)
+{
+	return SW_OK;
+}
+
+sw_error_t
+qca_uniphy_reg_read(a_uint32_t dev_id, a_uint32_t uniphy_index,
+				a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len)
+{
+	return SW_OK;
+}
+
+ssdk_dt_scheduler_cfg* ssdk_bootup_shceduler_cfg_get(a_uint32_t dev_id)
+{
+	return NULL;
+}
+
+a_uint32_t ssdk_dt_global_get_mac_mode(a_uint32_t dev_id, a_uint32_t index)
+{
+	return 0;
+}
+
+
+struct kobject *ssdk_sys = NULL;
+a_uint32_t rw[4] = {0};
+a_uint32_t cm_data = 0;
+
+static ssize_t ssdk_cm_rw_get(struct device *dev,
+		struct device_attribute *attr,
+		char *buf)
+{
+	ssize_t count;
+
+	count = snprintf(buf, (ssize_t)PAGE_SIZE, "%x:%x:%x", rw[0], rw[1], rw[2]);
+	return count;
+}
+
+static ssize_t ssdk_cm_data_get(struct device *dev,
+		struct device_attribute *attr,
+		char *buf)
+{
+	return snprintf(buf, (ssize_t)PAGE_SIZE, "%x", cm_data);
+}
+
+static ssize_t ssdk_cm_data_set(struct device *dev,
+		struct device_attribute *attr,
+		const char *buf, size_t count)
+{
+	int err;
+	err = kstrtou32(buf, 16, &cm_data);
+
+	if (err < 0)
+		return err;
+
+	return count;
+}
+
+static const struct device_attribute ssdk_rw_attr =
+	__ATTR(cm_rw, 0664, ssdk_cm_rw_get, NULL);
+
+static const struct device_attribute ssdk_cm_data_attr =
+	__ATTR(cm_data, 0664, ssdk_cm_data_get, ssdk_cm_data_set);
+
+
+
+int ssdk_sysfs_init (void)
+{
+	int ret = 0;
+
+	/* create /sys/ssdk/ dir */
+	ssdk_sys = kobject_create_and_add("ssdk", NULL);
+	if (!ssdk_sys) {
+		printk("Failed to register SSDK sysfs\n");
+		return ret;
+	}
+
+	ret = sysfs_create_file(ssdk_sys, &ssdk_rw_attr.attr);
+	if (ret) {
+		printk("Failed to register SSDK dev id SysFS file\n");
+		goto CLEANUP_1;
+	}
+
+	ret = sysfs_create_file(ssdk_sys, &ssdk_cm_data_attr.attr);
+	if (ret) {
+		printk("Failed to register SSDK dev id SysFS file\n");
+		goto CLEANUP_2;
+	}
+
+	return 0;
+
+CLEANUP_2:
+        sysfs_remove_file(ssdk_sys, &ssdk_rw_attr.attr);
+CLEANUP_1:
+        kobject_put(ssdk_sys);
+	return ret;
+}
+
+void ssdk_sysfs_exit (void)
+{
+	sysfs_remove_file(ssdk_sys, &ssdk_rw_attr.attr);
+	sysfs_remove_file(ssdk_sys, &ssdk_cm_data_attr.attr);
+	kobject_put(ssdk_sys);
+}
+
+sw_error_t
+qca_switch_reg_write(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len)
+{
+	rw[0] = 1;
+	rw[1] = reg_addr;
+	rw[2] = *(a_uint32_t*)reg_data;
+
+	if (ssdk_sys)
+		sysfs_notify(ssdk_sys, NULL, "cm_rw");
+        msleep(20);
+	return SW_OK;
+}
+
+sw_error_t
+qca_switch_reg_read(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len)
+{
+	rw[0] = 0;
+	rw[1] = reg_addr;
+
+	if (len != 4)
+		return SW_FAIL;
+
+	if (ssdk_sys)
+		sysfs_notify(ssdk_sys, NULL, "cm_rw");
+	msleep(20);
+
+	memcpy(reg_data, &cm_data, 4);
+
+	return SW_OK;
+}
+
+int
+ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
+{
+
+	cfg->reg_mode = HSL_HEADER;
+	return 0;
+}
+
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -93,6 +93,50 @@ typedef struct{
 	a_uint32_t is_fake_mac_header_mask:1;
 }ADPT_HPPE_ACL_MAC_RULE_MASK;
 
+#if defined(APPE)
+#define VLAN_RULE_SPCP_0_LEN 1
+#define VLAN_RULE_SPCP_MASK_0_LEN 1
+
+typedef struct{
+        a_uint32_t cvid:12;/*it is min cvid when range is enable*/
+        a_uint32_t reserved:3;
+        a_uint32_t cpcp:3;
+        a_uint32_t cdei:1;
+        a_uint32_t svid:12;
+        a_uint32_t spcp_0:1;
+        a_uint32_t spcp_1:2;
+        a_uint32_t sdei:1;
+        a_uint32_t ctag_fmt:3;
+        a_uint32_t stag_fmt:3;
+        a_uint32_t vsi:6;
+        a_uint32_t vsi_valid:1;
+        a_uint32_t is_ip:1;
+        a_uint32_t is_ipv6:1;
+        a_uint32_t is_ethernet:1;
+        a_uint32_t is_snap:1;
+        a_uint32_t is_fake_mac_header:1;
+}ADPT_HPPE_ACL_VLAN_RULE;
+
+typedef struct{
+        a_uint32_t cvid_mask:12;/*it is max cvid when range is enable*/
+        a_uint32_t reserved:3;
+        a_uint32_t cpcp_mask:3;
+        a_uint32_t cdei_mask:1;
+        a_uint32_t svid_mask:12;
+        a_uint32_t spcp_mask_0:1;
+        a_uint32_t spcp_mask_1:2;
+        a_uint32_t sdei_mask:1;
+        a_uint32_t ctag_fmt_mask:3;
+        a_uint32_t stag_fmt_mask:3;
+        a_uint32_t vsi_mask:6;
+        a_uint32_t vsi_valid_mask:1;
+        a_uint32_t is_ip_mask:1;
+        a_uint32_t is_ipv6_mask:1;
+        a_uint32_t is_ethernet_mask:1;
+        a_uint32_t is_snap_mask:1;
+        a_uint32_t is_fake_mac_header_mask:1;
+}ADPT_HPPE_ACL_VLAN_RULE_MASK;
+#else
 typedef struct{
 	a_uint32_t cvid:12;/*it is min cvid when range is enable*/
 	a_uint32_t reserved:4;
@@ -130,6 +174,7 @@ typedef struct{
 	a_uint32_t is_snap_mask:1;
 	a_uint32_t is_fake_mac_header_mask:1;
 }ADPT_HPPE_ACL_VLAN_RULE_MASK;
+#endif
 
 typedef struct{
 	a_uint32_t svid:12;/*it is min svid when range is enable*/
@@ -563,13 +608,15 @@ _adpt_hppe_acl_rule_bind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW
 		else if(hw_srctype == HPPE_ACL_TYPE_PORTBITMAP &&
 			hw_reg.bf.src_type == HPPE_ACL_TYPE_PORTBITMAP)
 		{
-			hw_reg.bf.src_0 |= obj_idx&0x7;
-			hw_reg.bf.src_1 |= (obj_idx>>3)&0x1f;
+			hw_reg.bf.src_0 |= obj_idx;
+			hw_reg.bf.src_1 |= obj_idx>>
+				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET);
 		}
 		else
 		{
-			hw_reg.bf.src_0 = obj_idx&0x7;
-			hw_reg.bf.src_1 = (obj_idx>>3)&0x1f;
+			hw_reg.bf.src_0 = obj_idx;
+			hw_reg.bf.src_1 = obj_idx>>
+				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET);
 		}
 		hw_reg.bf.src_type = hw_srctype;
 
@@ -793,12 +840,23 @@ static sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg,
 		rule->stag_vid_val = vlanrule->svid;
 		rule->stag_vid_mask = vlanrule_mask->svid_mask;
 	}
+#if defined(APPE)
+	if(vlanrule_mask->spcp_mask_0 || vlanrule_mask->spcp_mask_1)
+	{
+		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
+		rule->stag_pri_val = (vlanrule->spcp_1<<VLAN_RULE_SPCP_0_LEN)
+						|vlanrule->spcp_0;
+		rule->stag_pri_mask = (vlanrule_mask->spcp_mask_1<<VLAN_RULE_SPCP_MASK_0_LEN)
+						|vlanrule_mask->spcp_mask_0;
+	}
+#else
 	if(vlanrule_mask->spcp_mask)
 	{
 		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
 		rule->stag_pri_val = vlanrule->spcp;
 		rule->stag_pri_mask = vlanrule_mask->spcp_mask;
 	}
+#endif
 	if(vlanrule_mask->sdei_mask)
 	{
 		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_DEI);
@@ -1518,8 +1576,9 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 	{
 		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_REMARK_DSCP);
 		rule->dscp = hw_act->bf.dscp_tc;
-#if defined(CPPE)
-		if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+#if defined(CPPE) || defined(APPE)
+		if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+						adpt_chip_type_get(dev_id) == CHIP_APPE)
 		{
 			rule->dscp_mask = hw_act->bf.dscp_tc_mask;
 		}
@@ -1563,8 +1622,9 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 	{
 		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_METADATA_EN);
 	}
-#if defined(CPPE)
-	if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+#if defined(CPPE) || defined(APPE)
+	if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+					adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rule->qos_res_prec = hw_act->bf.qos_res_prec;
 	}
@@ -1761,8 +1821,9 @@ _adpt_hppe_acl_rule_unbind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_
 		}
 		if(hw_reg.bf.src_type == HPPE_ACL_TYPE_PORTBITMAP)
 		{
-			hw_reg.bf.src_0 &= ((~obj_idx)&0x7);
-			hw_reg.bf.src_1 &= ((~(obj_idx>>3))&0x1f);
+			hw_reg.bf.src_0 &= ~obj_idx;
+			hw_reg.bf.src_1 &= ~(obj_idx>>
+				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET));
 		}
 		else
 		{
@@ -2312,9 +2373,16 @@ static sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 		vlanrule_mask->svid_mask = rule->stag_vid_mask;
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI))
-	{
+        {
+#if defined(APPE)
+		vlanrule->spcp_0 = rule->stag_pri_val;
+		vlanrule->spcp_1 = rule->stag_pri_val>>VLAN_RULE_SPCP_0_LEN;
+		vlanrule_mask->spcp_mask_0 = rule->stag_pri_mask;
+		vlanrule_mask->spcp_mask_1 = rule->stag_pri_mask>>VLAN_RULE_SPCP_MASK_0_LEN;
+#else
 		vlanrule->spcp = rule->stag_pri_val;
 		vlanrule_mask->spcp_mask = rule->stag_pri_mask;
+#endif
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_DEI))
 	{
@@ -3091,8 +3159,9 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 	{
 		hw_act->bf.dscp_tc_change_en = 1;
 		hw_act->bf.dscp_tc = rule->dscp;
-#if defined(CPPE)
-		if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+#if defined(CPPE) || defined(APPE)
+		if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+						adpt_chip_type_get(dev_id) == CHIP_APPE)
 		{
 			hw_act->bf.dscp_tc_mask = rule->dscp_mask;
 		}
@@ -3137,8 +3206,9 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 	{
 		hw_act->bf.metadata_en = 1;
 	}
-#if defined(CPPE)
-	if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+#if defined(CPPE) || defined(APPE)
+	if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+					adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		hw_act->bf.qos_res_prec = rule->qos_res_prec;
 	}

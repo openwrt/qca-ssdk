@@ -36,24 +36,47 @@ enum{
 };
 
 static a_bool_t _adpt_hppe_vsi_xlt_match(a_uint32_t dev_id, fal_port_t port_id,
-				a_uint32_t stag_vid, a_uint32_t ctag_vid, union xlt_rule_tbl_u *xlt_rule)
+		a_uint32_t stag_vid, a_uint32_t ctag_vid, union xlt_rule_tbl_u *xlt_rule)
 {
+	struct xlt_rule_tbl bf = xlt_rule->bf;
+#if defined(APPE)
+	if (bf.port_type != adpt_port_type_convert(A_TRUE, FAL_PORT_ID_TYPE(port_id))) {
+		return A_FALSE;
+	}
+#endif
+	switch (FAL_PORT_ID_TYPE(port_id)) {
+		case FAL_PORT_TYPE_VPORT:
+			if (bf.port_bitmap != FAL_PORT_ID_VALUE(port_id)) {
+				return A_FALSE;
+			}
+			break;
+		case FAL_PORT_TYPE_PPORT:
+			if (!SW_IS_PBMP_MEMBER(bf.port_bitmap,
+						FAL_PORT_ID_VALUE(port_id))) {
+				return A_FALSE;
+			}
+			break;
+		default:
+			SSDK_ERROR("Unsupported port type");
+			return A_FALSE;
+	}
+
 	if(stag_vid != FAL_VLAN_INVALID)
 	{
-		if((xlt_rule->bf.skey_vid_incl) &&
-			(xlt_rule->bf.skey_vid == stag_vid))
+		if((bf.skey_vid_incl) &&
+			(bf.skey_vid == stag_vid))
 		{
 			if(ctag_vid != FAL_VLAN_INVALID)
 			{
-				if((xlt_rule->bf.ckey_vid_incl) &&
-					(xlt_rule->bf.ckey_vid == ctag_vid))
+				if((bf.ckey_vid_incl) &&
+					(bf.ckey_vid == ctag_vid))
 				{
 					return A_TRUE;
 				}
 			}
 			else
 			{
-				if(!(xlt_rule->bf.ckey_vid_incl))
+				if(!(bf.ckey_vid_incl))
 				{
 					return A_TRUE;
 				}
@@ -62,19 +85,19 @@ static a_bool_t _adpt_hppe_vsi_xlt_match(a_uint32_t dev_id, fal_port_t port_id,
 	}
 	else
 	{
-		if(!(xlt_rule->bf.skey_vid_incl))
+		if(!(bf.skey_vid_incl))
 		{
 			if(ctag_vid != FAL_VLAN_INVALID)
 			{
-				if((xlt_rule->bf.ckey_vid_incl) &&
-					(xlt_rule->bf.ckey_vid == ctag_vid))
+				if((bf.ckey_vid_incl) &&
+					(bf.ckey_vid == ctag_vid))
 				{
 					return A_TRUE;
 				}
 			}
 			else
 			{
-				if(!(xlt_rule->bf.ckey_vid_incl))
+				if(!(bf.ckey_vid_incl))
 				{
 					return A_TRUE;
 				}
@@ -94,6 +117,7 @@ static sw_error_t _adpt_hppe_vsi_xlt_update(a_uint32_t dev_id,
 	sw_error_t rv;
 	union xlt_rule_tbl_u xlt_rule;
 	union xlt_action_tbl_u xlt_action;
+	struct xlt_rule_tbl bf;
 
 	/*printk("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d op %d\n",
 			__FUNCTION__, __LINE__, port_id, stag_vid, ctag_vid, vsi_id, op);*/
@@ -106,11 +130,13 @@ static sw_error_t _adpt_hppe_vsi_xlt_update(a_uint32_t dev_id,
 		rv = hppe_xlt_action_tbl_get(dev_id, index, &xlt_action);
 		if( rv != SW_OK )
 			return rv;
-		if(xlt_rule.bf.valid == A_FALSE && index >= new_entry)
+		bf = xlt_rule.bf;
+
+		if(bf.valid == A_FALSE && index >= new_entry)
 		{
 			new_entry = index;
 		}
-		if(xlt_rule.bf.valid == A_TRUE)
+		if(bf.valid == A_TRUE)
 		{
 			if(_adpt_hppe_vsi_xlt_match(dev_id, port_id,
 				stag_vid, ctag_vid, &xlt_rule))
@@ -128,11 +154,11 @@ static sw_error_t _adpt_hppe_vsi_xlt_update(a_uint32_t dev_id,
 		{
 			/*printk("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d op %d\n",
 				__FUNCTION__, __LINE__, port_id, stag_vid, ctag_vid, vsi_id, op);*/
-			if(!(xlt_rule.bf.port_bitmap & (1<<port_id)))
-				return SW_OK;
-			xlt_rule.bf.port_bitmap &= (~(1<<port_id));
-			if(xlt_rule.bf.port_bitmap == 0)
-			{
+			if (FAL_PORT_ID_TYPE(port_id) == FAL_PORT_TYPE_PPORT) {
+				SW_PBMP_DEL_PORT(bf.port_bitmap, FAL_PORT_ID_VALUE(port_id));
+			}
+			if(bf.port_bitmap == 0 ||
+					FAL_PORT_ID_TYPE(port_id) == FAL_PORT_TYPE_VPORT) {
 				rv= hppe_xlt_rule_tbl_valid_set(dev_id, index, A_FALSE);
 				return rv;
 			}
@@ -141,11 +167,11 @@ static sw_error_t _adpt_hppe_vsi_xlt_update(a_uint32_t dev_id,
 		{
 			/*printk("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d op %d\n",
 				__FUNCTION__, __LINE__, port_id, stag_vid, ctag_vid, vsi_id, op);*/
-			xlt_rule.bf.port_bitmap |= (1<<port_id);
+			SW_PBMP_ADD_PORT(bf.port_bitmap, FAL_PORT_ID_VALUE(port_id));
 		}
-		/*printk("%s,%d: port_map 0x%x svlan %d cvlan %d vsi %d xlt table update index %d\n",
-				__FUNCTION__, __LINE__, xlt_rule.bf.port_bitmap, stag_vid, ctag_vid, vsi_id, index);*/
-		rv = hppe_xlt_rule_tbl_port_bitmap_set(dev_id, index, xlt_rule.bf.port_bitmap);
+		/*printk("%s,%d: port_map 0x%x svlan %d cvlan %d vsi %d xlt update index %d\n",
+		  __FUNCTION__, __LINE__, bf.port_bitmap, stag_vid, ctag_vid, vsi_id, index);*/
+		rv = hppe_xlt_rule_tbl_port_bitmap_set(dev_id, index, bf.port_bitmap);
 		return rv;
 	}
 	else/*not found*/
@@ -154,15 +180,28 @@ static sw_error_t _adpt_hppe_vsi_xlt_update(a_uint32_t dev_id,
 			return SW_OK;
 		if(new_entry >= XLT_RULE_TBL_NUM)
 		{
-			printk("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d xlt table is full\n",
-					__FUNCTION__, __LINE__, port_id, stag_vid, ctag_vid, vsi_id);
+			SSDK_ERROR("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d table is full\n",
+					__FUNCTION__, __LINE__,
+					port_id, stag_vid, ctag_vid, vsi_id);
 			return SW_NO_RESOURCE;
 		}
 		else/*new entry exist*/
 		{
 			aos_mem_zero(&xlt_rule, sizeof(union xlt_rule_tbl_u));
-			/*printk("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d xlt table add index %d\n",
-					__FUNCTION__, __LINE__, port_id, stag_vid, ctag_vid, vsi_id, new_entry);*/
+			/*printk("%s,%d: port_id 0x%x svlan %d cvlan %d vsi %d add index %d\n",
+			  __FUNCTION__, __LINE__,
+			  port_id, stag_vid, ctag_vid, vsi_id, new_entry);*/
+#if defined(APPE)
+			xlt_rule.bf.port_type = adpt_port_type_convert(A_TRUE,
+					FAL_PORT_ID_TYPE(port_id));
+			if (FAL_PORT_ID_TYPE(port_id) == FAL_PORT_TYPE_VPORT) {
+				xlt_rule.bf.port_bitmap = FAL_PORT_ID_VALUE(port_id);
+			} else {
+				xlt_rule.bf.port_bitmap = BIT(FAL_PORT_ID_VALUE(port_id));
+			}
+#else
+			xlt_rule.bf.port_bitmap = BIT(FAL_PORT_ID_VALUE(port_id));
+#endif
 			xlt_rule.bf.valid = A_TRUE;
 			if(ctag_vid != FAL_VLAN_INVALID)
 			{
@@ -186,7 +225,7 @@ static sw_error_t _adpt_hppe_vsi_xlt_update(a_uint32_t dev_id,
 			}
 			else
 					xlt_rule.bf.skey_fmt = 0x1;
-			xlt_rule.bf.port_bitmap = (1<<port_id);
+
 			rv = hppe_xlt_rule_tbl_set(dev_id, new_entry, &xlt_rule);
 			if( rv != SW_OK )
 				return rv;
@@ -215,6 +254,14 @@ adpt_hppe_port_vlan_vsi_get(a_uint32_t dev_id, fal_port_t port_id,
 	sw_error_t rv;
 	union xlt_rule_tbl_u xlt_rule;
 	union xlt_action_tbl_u xlt_action;
+
+#if defined(APPE)
+	if (FAL_PORT_ID_TYPE(port_id) != FAL_PORT_TYPE_VPORT &&
+			FAL_PORT_ID_TYPE(port_id) != FAL_PORT_TYPE_PPORT) {
+		SSDK_ERROR("Unsuppoted port type\n");
+		return SW_NOT_SUPPORTED;
+	}
+#endif
 	for(index = 0; index < XLT_RULE_TBL_NUM; index++)
 	{
 		rv = hppe_xlt_rule_tbl_get(dev_id, index, &xlt_rule);
@@ -223,14 +270,13 @@ adpt_hppe_port_vlan_vsi_get(a_uint32_t dev_id, fal_port_t port_id,
 		rv = hppe_xlt_action_tbl_get(dev_id, index, &xlt_action);
 		if( rv != SW_OK )
 			return rv;
+
 		if(xlt_rule.bf.valid == A_TRUE)
 		{
 			if(_adpt_hppe_vsi_xlt_match(dev_id, port_id,
 					stag_vid, ctag_vid, &xlt_rule))
 			{
-				if((xlt_rule.bf.port_bitmap&(1<<port_id))&&
-					(xlt_action.bf.vsi_cmd == A_TRUE))
-				{
+				if (xlt_action.bf.vsi_cmd == A_TRUE) {
 					*vsi_id = xlt_action.bf.vsi;
 					return SW_OK;
 				}
@@ -252,9 +298,17 @@ adpt_hppe_port_vlan_vsi_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
-	if((stag_vid != FAL_VLAN_INVALID && stag_vid > FAL_VLAN_MAX)||
-	    (ctag_vid != FAL_VLAN_INVALID && ctag_vid > FAL_VLAN_MAX))
-	    return SW_OUT_OF_RANGE;
+	if((stag_vid != FAL_VLAN_INVALID && stag_vid > FAL_VLAN_MAX) ||
+			(ctag_vid != FAL_VLAN_INVALID && ctag_vid > FAL_VLAN_MAX))
+		return SW_OUT_OF_RANGE;
+
+#if defined(APPE)
+	if (FAL_PORT_ID_TYPE(port_id) != FAL_PORT_TYPE_VPORT &&
+			FAL_PORT_ID_TYPE(port_id) != FAL_PORT_TYPE_PPORT) {
+		SSDK_ERROR("Unsuppoted port type\n");
+		return SW_NOT_SUPPORTED;
+	}
+#endif
 
 	adpt_hppe_port_vlan_vsi_get(dev_id, port_id, stag_vid, ctag_vid, &org_vsi);
 

@@ -602,6 +602,12 @@ enum {
 		a_bool_t	vsi_valid; /* check if rule will include vsi value valid */
 		a_bool_t	vsi_enable; /* check if rule will include vsi value */
 		a_uint32_t	vsi; /* vsi value */
+
+		/*vni fields match for ingress added by appe*/
+		a_bool_t	vni_resv_enable; /* check vni resv or not, added for ipq90xx */
+		a_bool_t	vni_resv_type;  /* 0 for vni only, 1 for vni and reserver,
+						   added for ipq90xx */
+		a_uint32_t	vni_resv;	/* vni or gre key filed value, added for ipq90xx*/
 	} fal_vlan_trans_adv_rule_t;
 
 	typedef struct
@@ -631,6 +637,16 @@ enum {
 		/* these two fields just for vlan ingress action */
 		a_bool_t	vsi_xlt_enable; /* check if action will enable vsi xlt */
 		a_uint8_t	vsi_xlt; /* vsi xlt value */
+
+		/*src info fields for ingress added by appe*/
+		a_bool_t	src_info_enable; /* src info xlt or not, added for ipq90xx*/
+		a_bool_t	src_info_type; /* 0 virtual port, 1 l3_if for tunnel payload,
+						  added for ipq90xx */
+		a_uint32_t	src_info;      /* src info value, added for ipq90xx */
+
+		/*vni fields for egress added by appe*/
+		a_bool_t	vni_resv_enable; /* vni xlat or not, added for ipq90xx*/
+		a_uint32_t	vni_resv;	/* vni xlt value, added for ipq90xx*/
 	} fal_vlan_trans_adv_action_t;
 
 	typedef struct

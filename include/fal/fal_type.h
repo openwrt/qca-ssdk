@@ -27,11 +27,12 @@ extern "C" {
     typedef a_uint32_t fal_port_t;
 
 /*fal_port_t definition,
-	bit31-bit24: port_type, 0-physical port, 1-trunk port, 2-virtual port
+	bit31-bit24: port_type, 0-physical port, 1-trunk port, 2-virtual port, 3-virtual port group
 	bit23-bit0: physical port id or trunk id or virtual port id*/
 #define FAL_PORT_TYPE_PPORT 0
 #define FAL_PORT_TYPE_TRUNK 1
 #define FAL_PORT_TYPE_VPORT 2
+#define FAL_PORT_TYPE_VP_GROUP 3
 
 #define FAL_PORT_ID_TYPE(port_id) (((port_id)>>24)&0xff)
 #define FAL_PORT_ID_VALUE(port_id) ((port_id)&0xffffff)
@@ -40,7 +41,7 @@ extern "C" {
 #define FAL_IS_PPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_PPORT)?1:0)
 #define FAL_IS_TRUNK(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_TRUNK)?1:0)
 #define FAL_IS_VPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VPORT)?1:0)
-
+#define FAL_IS_VP_GROUP(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VP_GROUP)?1:0)
 
 #if (SW_MAX_NR_PORT <= 32)
     typedef a_uint32_t fal_pbmp_t;

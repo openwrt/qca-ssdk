@@ -1581,6 +1581,43 @@ typedef struct
 	adpt_led_ctrl_source_set_func adpt_led_ctrl_source_set;
 }adpt_api_t;
 
+static inline a_uint32_t adpt_port_type_convert(a_bool_t to_hsl, a_uint32_t port_type) {
+	a_uint32_t ptype = 0;
+
+	if (to_hsl == A_TRUE) {
+		switch (port_type) {
+			case FAL_PORT_TYPE_PPORT:
+				ptype = 0;
+				break;
+			case FAL_PORT_TYPE_VPORT:
+				ptype = 1;
+				break;
+			case FAL_PORT_TYPE_VP_GROUP:
+				ptype = 2;
+				break;
+			default:
+				ptype = 0;
+				break;
+		}
+	} else {
+		switch (port_type) {
+			case 0:
+				ptype = FAL_PORT_TYPE_PPORT;
+				break;
+			case 1:
+				ptype = FAL_PORT_TYPE_VPORT;
+				break;
+			case 2:
+				ptype = FAL_PORT_TYPE_VP_GROUP;
+				break;
+			default:
+				ptype = FAL_PORT_TYPE_PPORT;
+				break;
+		}
+	}
+	return ptype;
+}
+
 
 adpt_api_t *adpt_api_ptr_get(a_uint32_t dev_id);
 sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);

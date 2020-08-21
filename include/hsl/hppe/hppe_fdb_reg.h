@@ -788,6 +788,47 @@ union rfdb_tbl_u {
 	#define FDB_TBL_LOOKUP_VALID_OFFSET  49
 	#define FDB_TBL_LOOKUP_VALID_LEN     1
 	#define FDB_TBL_LOOKUP_VALID_DEFAULT 0x0
+#ifdef APPE
+	/*[field] VSI*/
+	#define FDB_TBL_VSI
+	#define FDB_TBL_VSI_OFFSET  50
+	#define FDB_TBL_VSI_LEN     6
+	#define FDB_TBL_VSI_DEFAULT 0x0
+	/*[field] DST_INFO*/
+	#define FDB_TBL_DST_INFO
+	#define FDB_TBL_DST_INFO_OFFSET  56
+	#define FDB_TBL_DST_INFO_LEN     14
+	#define FDB_TBL_DST_INFO_DEFAULT 0x0
+	/*[field] SA_CMD*/
+	#define FDB_TBL_SA_CMD
+	#define FDB_TBL_SA_CMD_OFFSET  70
+	#define FDB_TBL_SA_CMD_LEN     2
+	#define FDB_TBL_SA_CMD_DEFAULT 0x0
+	/*[field] DA_CMD*/
+	#define FDB_TBL_DA_CMD
+	#define FDB_TBL_DA_CMD_OFFSET  72
+	#define FDB_TBL_DA_CMD_LEN     2
+	#define FDB_TBL_DA_CMD_DEFAULT 0x0
+	/*[field] HIT_AGE*/
+	#define FDB_TBL_HIT_AGE
+	#define FDB_TBL_HIT_AGE_OFFSET  74
+	#define FDB_TBL_HIT_AGE_LEN     2
+	#define FDB_TBL_HIT_AGE_DEFAULT 0x0
+
+struct fdb_tbl {
+	a_uint32_t  mac_addr_0:32;
+	a_uint32_t  mac_addr_1:16;
+	a_uint32_t  entry_valid:1;
+	a_uint32_t  lookup_valid:1;
+	a_uint32_t  vsi:6;
+	a_uint32_t  dst_info_0:8;
+	a_uint32_t  dst_info_1:6;
+	a_uint32_t  sa_cmd:2;
+	a_uint32_t  da_cmd:2;
+	a_uint32_t  hit_age:2;
+	a_uint32_t  _reserved0:20;
+};
+#else
 	/*[field] VSI*/
 	#define FDB_TBL_VSI
 	#define FDB_TBL_VSI_OFFSET  50
@@ -827,7 +868,7 @@ struct fdb_tbl {
 	a_uint32_t  hit_age:2;
 	a_uint32_t  _reserved0:21;
 };
-
+#endif
 union fdb_tbl_u {
 	a_uint32_t val[3];
 	struct fdb_tbl bf;

@@ -202,10 +202,15 @@ _adpt_hppe_fdb_tbl_op_data_reg_set(a_uint32_t dev_id, fal_fdb_entry_t * entry)
 	rv = hppe_fdb_tbl_op_data1_data_set(dev_id, reg_value[1]);
 	if (rv != SW_OK)
 		return rv;
-
+#ifdef APPE
+	reg_value[2] = ((port_value >> 0x8) & 0x7) + ((dst_type & 0x3) << 4) +
+			((entry->sacmd & 0x3) << (FDB_TBL_SA_CMD_OFFSET - 64)) +
+			((entry->dacmd & 0x3) << (FDB_TBL_DA_CMD_OFFSET - 64));
+#else
 	reg_value[2] = ((port_value >> 0x9) & 0x7) + ((dst_type & 0x3) << 3) +
 			((entry->sacmd & 0x3) << (FDB_TBL_SA_CMD_OFFSET - 64)) +
 			((entry->dacmd & 0x3) << (FDB_TBL_DA_CMD_OFFSET - 64));
+#endif
 	if (entry->static_en == A_TRUE)
 		reg_value[2] += (0x3 << (FDB_TBL_HIT_AGE_OFFSET - 64));
 	else
@@ -279,7 +284,12 @@ _adpt_hppe_fdb_tbl_rd_op_rslt_data_reg_get(a_uint32_t dev_id, fal_fdb_entry_t * 
 			entry->lookup_valid = A_TRUE;
 		else
 			entry->lookup_valid = A_FALSE;
-		entry->fid = (rslt_data[1] >> (FDB_TBL_VSI_OFFSET - 32)) & 0x1f;
+#ifdef APPE
+				entry->fid = (rslt_data[1] >> (FDB_TBL_VSI_OFFSET - 32)) & 0x3f;
+#else
+				entry->fid = (rslt_data[1] >> (FDB_TBL_VSI_OFFSET - 32)) & 0x1f;
+#endif
+
 		entry->sacmd = (rslt_data[2] >> (FDB_TBL_SA_CMD_OFFSET - 64)) & 0x3;
 		entry->dacmd = (rslt_data[2] >> (FDB_TBL_DA_CMD_OFFSET - 64)) & 0x3;
 		if (((rslt_data[2] >> (FDB_TBL_HIT_AGE_OFFSET - 64)) & 0x3) == 0x3)

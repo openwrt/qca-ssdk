@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -128,7 +128,7 @@ hppe_l0_shp_cfg_tbl_get(
 				TRAFFIC_MANAGER_BASE_ADDR + L0_SHP_CFG_TBL_ADDRESS + \
 				index * L0_SHP_CFG_TBL_INC,
 				value->val,
-				3);
+				(sizeof(union l0_shp_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
 sw_error_t
@@ -142,7 +142,7 @@ hppe_l0_shp_cfg_tbl_set(
 				TRAFFIC_MANAGER_BASE_ADDR + L0_SHP_CFG_TBL_ADDRESS + \
 				index * L0_SHP_CFG_TBL_INC,
 				value->val,
-				3);
+				(sizeof(union l0_shp_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
 #ifndef IN_SHAPER_MINI
@@ -239,7 +239,7 @@ hppe_l1_shp_cfg_tbl_get(
 				TRAFFIC_MANAGER_BASE_ADDR + L1_SHP_CFG_TBL_ADDRESS + \
 				index * L1_SHP_CFG_TBL_INC,
 				value->val,
-				3);
+				(sizeof(union l1_shp_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 #endif
 
@@ -254,7 +254,7 @@ hppe_l1_shp_cfg_tbl_set(
 				TRAFFIC_MANAGER_BASE_ADDR + L1_SHP_CFG_TBL_ADDRESS + \
 				index * L1_SHP_CFG_TBL_INC,
 				value->val,
-				3);
+				(sizeof(union l1_shp_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
 

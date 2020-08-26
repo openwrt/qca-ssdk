@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -102,7 +102,11 @@ union pc_spare_reg_u {
 	#define TIME_SLOT_REG_TIME_SLOT_DEFAULT 0x0
 
 struct time_slot_reg {
+#ifdef APPE
+	a_uint32_t  time_slot:12;
+#else
 	a_uint32_t  time_slot:10;
+#endif
 	a_uint32_t  _reserved0:22;
 };
 
@@ -159,7 +163,11 @@ union pc_dbg_data_reg_u {
 #define IN_ACL_METER_CFG_TBL
 #define IN_ACL_METER_CFG_TBL_ADDRESS 0x4000
 #define IN_ACL_METER_CFG_TBL_NUM     512
+#ifdef APPE
+#define IN_ACL_METER_CFG_TBL_INC     0x20
+#else
 #define IN_ACL_METER_CFG_TBL_INC     0x10
+#endif
 #define IN_ACL_METER_CFG_TBL_TYPE    REG_TYPE_RW
 #define IN_ACL_METER_CFG_TBL_DEFAULT 0x0
 	/*[field] METER_EN*/
@@ -297,6 +305,63 @@ union pc_dbg_data_reg_u {
 	#define IN_ACL_METER_CFG_TBL_VIOLATE_DEI_OFFSET  104
 	#define IN_ACL_METER_CFG_TBL_VIOLATE_DEI_LEN     1
 	#define IN_ACL_METER_CFG_TBL_VIOLATE_DEI_DEFAULT 0x0
+#ifdef APPE
+	/*[field] EXCEED_CHG_DSCP_CMD*/
+	#define IN_ACL_METER_CFG_TBL_EXCEED_CHG_DSCP_CMD
+	#define IN_ACL_METER_CFG_TBL_EXCEED_CHG_DSCP_CMD_OFFSET  105
+	#define IN_ACL_METER_CFG_TBL_EXCEED_CHG_DSCP_CMD_LEN	 1
+	#define IN_ACL_METER_CFG_TBL_EXCEED_CHG_DSCP_CMD_DEFAULT 0x0
+	/*[field] EXCEED_DSCP*/
+	#define IN_ACL_METER_CFG_TBL_EXCEED_DSCP
+	#define IN_ACL_METER_CFG_TBL_EXCEED_DSCP_OFFSET  106
+	#define IN_ACL_METER_CFG_TBL_EXCEED_DSCP_LEN	 6
+	#define IN_ACL_METER_CFG_TBL_EXCEED_DSCP_DEFAULT 0x0
+	/*[field] VIOLATE_CHG_DSCP_CMD*/
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_CHG_DSCP_CMD
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_CHG_DSCP_CMD_OFFSET  112
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_CHG_DSCP_CMD_LEN	  1
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_CHG_DSCP_CMD_DEFAULT 0x0
+	/*[field] VIOLATE_DSCP*/
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_DSCP
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_DSCP_OFFSET  113
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_DSCP_LEN	  6
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_DSCP_DEFAULT 0x0
+	/*[field] VIOLATE_REMAP_CMD*/
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_REMAP_CMD
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_REMAP_CMD_OFFSET  119
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_REMAP_CMD_LEN     1
+	#define IN_ACL_METER_CFG_TBL_VIOLATE_REMAP_CMD_DEFAULT 0x0
+	/*[field] EXCEED_REMAP_CMD*/
+	#define IN_ACL_METER_CFG_TBL_EXCEED_REMAP_CMD
+	#define IN_ACL_METER_CFG_TBL_EXCEED_REMAP_CMD_OFFSET  120
+	#define IN_ACL_METER_CFG_TBL_EXCEED_REMAP_CMD_LEN     1
+	#define IN_ACL_METER_CFG_TBL_EXCEED_REMAP_CMD_DEFAULT 0x0
+	/*[field] CIR_MAX*/
+	#define IN_ACL_METER_CFG_TBL_CIR_MAX
+	#define IN_ACL_METER_CFG_TBL_CIR_MAX_OFFSET  121
+	#define IN_ACL_METER_CFG_TBL_CIR_MAX_LEN     18
+	#define IN_ACL_METER_CFG_TBL_CIR_MAX_DEFAULT 0x0
+	/*[field] EIR_MAX*/
+	#define IN_ACL_METER_CFG_TBL_EIR_MAX
+	#define IN_ACL_METER_CFG_TBL_EIR_MAX_OFFSET  139
+	#define IN_ACL_METER_CFG_TBL_EIR_MAX_LEN     18
+	#define IN_ACL_METER_CFG_TBL_EIR_MAX_DEFAULT 0x0
+	/*[field] GRP_END*/
+	#define IN_ACL_METER_CFG_TBL_GRP_END
+	#define IN_ACL_METER_CFG_TBL_GRP_END_OFFSET  157
+	#define IN_ACL_METER_CFG_TBL_GRP_END_LEN     1
+	#define IN_ACL_METER_CFG_TBL_GRP_END_DEFAULT 0x0
+	/*[field] GRP_CF*/
+	#define IN_ACL_METER_CFG_TBL_GRP_CF
+	#define IN_ACL_METER_CFG_TBL_GRP_CF_OFFSET  158
+	#define IN_ACL_METER_CFG_TBL_GRP_CF_LEN     1
+	#define IN_ACL_METER_CFG_TBL_GRP_CF_DEFAULT 0x0
+	/*[field] NXT_PTR*/
+	#define IN_ACL_METER_CFG_TBL_NXT_PTR
+	#define IN_ACL_METER_CFG_TBL_NXT_PTR_OFFSET  159
+	#define IN_ACL_METER_CFG_TBL_NXT_PTR_LEN     9
+	#define IN_ACL_METER_CFG_TBL_NXT_PTR_DEFAULT 0x0
+#endif
 
 struct in_acl_meter_cfg_tbl {
 	a_uint32_t  meter_en:1;
@@ -329,11 +394,32 @@ struct in_acl_meter_cfg_tbl {
 	a_uint32_t  violate_dp:2;
 	a_uint32_t  violate_pcp:3;
 	a_uint32_t  violate_dei:1;
+#ifdef APPE
+	a_uint32_t  exceed_chg_dscp_cmd:1;
+	a_uint32_t  exceed_dscp:6;
+	a_uint32_t  violate_chg_dscp_cmd:1;
+	a_uint32_t  violate_dscp:6;
+	a_uint32_t  violate_remap_cmd:1;
+	a_uint32_t  exceed_remap_cmd:1;
+	a_uint32_t  cir_max_0:7;
+	a_uint32_t  cir_max_1:11;
+	a_uint32_t  eir_max:18;
+	a_uint32_t  grp_end:1;
+	a_uint32_t  grp_cf:1;
+	a_uint32_t  nxt_ptr_0:1;
+	a_uint32_t  nxt_ptr_1:8;
+	a_uint32_t  _reserved0:24;
+#else
 	a_uint32_t  _reserved0:23;
+#endif
 };
 
 union in_acl_meter_cfg_tbl_u {
+#ifdef APPE
+	a_uint32_t val[6];
+#else
 	a_uint32_t val[4];
+#endif
 	struct in_acl_meter_cfg_tbl bf;
 };
 

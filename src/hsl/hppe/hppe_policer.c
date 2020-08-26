@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -172,7 +172,7 @@ hppe_in_acl_meter_cfg_tbl_get(
 				INGRESS_POLICER_BASE_ADDR + IN_ACL_METER_CFG_TBL_ADDRESS + \
 				index * IN_ACL_METER_CFG_TBL_INC,
 				value->val,
-				4);
+				(sizeof(union in_acl_meter_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
 sw_error_t
@@ -186,7 +186,7 @@ hppe_in_acl_meter_cfg_tbl_set(
 				INGRESS_POLICER_BASE_ADDR + IN_ACL_METER_CFG_TBL_ADDRESS + \
 				index * IN_ACL_METER_CFG_TBL_INC,
 				value->val,
-				4);
+				(sizeof(union in_acl_meter_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
 sw_error_t

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -183,6 +183,33 @@ union l0_shp_credit_tbl_u {
 	#define L0_SHP_CFG_TBL_CF_OFFSET  70
 	#define L0_SHP_CFG_TBL_CF_LEN     1
 	#define L0_SHP_CFG_TBL_CF_DEFAULT 0x0
+#ifdef APPE
+	/*[field] GRP_CF*/
+	#define L0_SHP_CFG_TBL_GRP_CF
+	#define L0_SHP_CFG_TBL_GRP_CF_OFFSET  71
+	#define L0_SHP_CFG_TBL_GRP_CF_LEN     1
+	#define L0_SHP_CFG_TBL_GRP_CF_DEFAULT 0x0
+	/*[field] GRP_END*/
+	#define L0_SHP_CFG_TBL_GRP_END
+	#define L0_SHP_CFG_TBL_GRP_END_OFFSET  72
+	#define L0_SHP_CFG_TBL_GRP_END_LEN     1
+	#define L0_SHP_CFG_TBL_GRP_END_DEFAULT 0x0
+	/*[field] SHP_REFRESH_NXT_PTR*/
+	#define L0_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR
+	#define L0_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR_OFFSET  73
+	#define L0_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR_LEN	   9
+	#define L0_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR_DEFAULT 0x0
+	/*[field] CIR_MAX*/
+	#define L0_SHP_CFG_TBL_CIR_MAX
+	#define L0_SHP_CFG_TBL_CIR_MAX_OFFSET  82
+	#define L0_SHP_CFG_TBL_CIR_MAX_LEN     18
+	#define L0_SHP_CFG_TBL_CIR_MAX_DEFAULT 0x0
+	/*[field] EIR_MAX*/
+	#define L0_SHP_CFG_TBL_EIR_MAX
+	#define L0_SHP_CFG_TBL_EIR_MAX_OFFSET  100
+	#define L0_SHP_CFG_TBL_EIR_MAX_LEN     18
+	#define L0_SHP_CFG_TBL_EIR_MAX_DEFAULT 0x0
+#endif
 
 struct l0_shp_cfg_tbl {
 	a_uint32_t  cir:18;
@@ -194,11 +221,25 @@ struct l0_shp_cfg_tbl {
 	a_uint32_t  c_shaper_enable:1;
 	a_uint32_t  e_shaper_enable:1;
 	a_uint32_t  cf:1;
+#ifdef APPE
+	a_uint32_t  grp_cf:1;
+	a_uint32_t  grp_end:1;
+	a_uint32_t  shp_refresh_nxt_ptr:9;
+	a_uint32_t  cir_max_0:14;
+	a_uint32_t  cir_max_1:4;
+	a_uint32_t  eir_max:18;
+	a_uint32_t  _reserved0:10;
+#else
 	a_uint32_t  _reserved0:25;
+#endif
 };
 
 union l0_shp_cfg_tbl_u {
+#ifdef APPE
+	a_uint32_t val[4];
+#else
 	a_uint32_t val[3];
+#endif
 	struct l0_shp_cfg_tbl bf;
 };
 
@@ -415,6 +456,33 @@ union l1_shp_credit_tbl_u {
 	#define L1_SHP_CFG_TBL_CF_OFFSET  70
 	#define L1_SHP_CFG_TBL_CF_LEN     1
 	#define L1_SHP_CFG_TBL_CF_DEFAULT 0x0
+#ifdef APPE
+	/*[field] GRP_CF*/
+	#define L1_SHP_CFG_TBL_GRP_CF
+	#define L1_SHP_CFG_TBL_GRP_CF_OFFSET  71
+	#define L1_SHP_CFG_TBL_GRP_CF_LEN     1
+	#define L1_SHP_CFG_TBL_GRP_CF_DEFAULT 0x0
+	/*[field] GRP_END*/
+	#define L1_SHP_CFG_TBL_GRP_END
+	#define L1_SHP_CFG_TBL_GRP_END_OFFSET  72
+	#define L1_SHP_CFG_TBL_GRP_END_LEN     1
+	#define L1_SHP_CFG_TBL_GRP_END_DEFAULT 0x0
+	/*[field] SHP_REFRESH_NXT_PTR*/
+	#define L1_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR
+	#define L1_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR_OFFSET  73
+	#define L1_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR_LEN	   6
+	#define L1_SHP_CFG_TBL_SHP_REFRESH_NXT_PTR_DEFAULT 0x0
+	/*[field] CIR_MAX*/
+	#define L1_SHP_CFG_TBL_CIR_MAX
+	#define L1_SHP_CFG_TBL_CIR_MAX_OFFSET  79
+	#define L1_SHP_CFG_TBL_CIR_MAX_LEN     18
+	#define L1_SHP_CFG_TBL_CIR_MAX_DEFAULT 0x0
+	/*[field] EIR_MAX*/
+	#define L1_SHP_CFG_TBL_EIR_MAX
+	#define L1_SHP_CFG_TBL_EIR_MAX_OFFSET  97
+	#define L1_SHP_CFG_TBL_EIR_MAX_LEN     18
+	#define L1_SHP_CFG_TBL_EIR_MAX_DEFAULT 0x0
+#endif
 
 struct l1_shp_cfg_tbl {
 	a_uint32_t  cir:18;
@@ -426,11 +494,25 @@ struct l1_shp_cfg_tbl {
 	a_uint32_t  c_shaper_enable:1;
 	a_uint32_t  e_shaper_enable:1;
 	a_uint32_t  cf:1;
+#ifdef APPE
+	a_uint32_t  grp_cf:1;
+	a_uint32_t  grp_end:1;
+	a_uint32_t  shp_refresh_nxt_ptr:6;
+	a_uint32_t  cir_max_0:17;
+	a_uint32_t  cir_max_1:1;
+	a_uint32_t  eir_max:18;
+	a_uint32_t  _reserved0:13;
+#else
 	a_uint32_t  _reserved0:25;
+#endif
 };
 
 union l1_shp_cfg_tbl_u {
+#ifdef APPE
+	a_uint32_t val[4];
+#else
 	a_uint32_t val[3];
+#endif
 	struct l1_shp_cfg_tbl bf;
 };
 

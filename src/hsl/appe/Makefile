@@ -45,9 +45,18 @@ ifeq (TRUE, $(IN_QM))
 	SRC_LIST+=appe_qm.c
 endif
 
+ifeq (TRUE, $(IN_SHAPER))
+	SRC_LIST+=appe_shaper.c
+endif
+
+ifeq (TRUE, $(IN_POLICER))
+	SRC_LIST+=appe_policer.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif
+
 include $(PRJ_PATH)/make/components.mk
 include $(PRJ_PATH)/make/defs.mk
 include $(PRJ_PATH)/make/target.mk

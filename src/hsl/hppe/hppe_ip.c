@@ -1086,7 +1086,7 @@ hppe_l3_vp_port_tbl_get(
 				IPE_L3_BASE_ADDR + L3_VP_PORT_TBL_ADDRESS + \
 				index * L3_VP_PORT_TBL_INC,
 				value->val,
-				3);
+				sizeof(union l3_vp_port_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -1100,7 +1100,7 @@ hppe_l3_vp_port_tbl_set(
 				IPE_L3_BASE_ADDR + L3_VP_PORT_TBL_ADDRESS + \
 				index * L3_VP_PORT_TBL_INC,
 				value->val,
-				3);
+				sizeof(union l3_vp_port_tbl_u)/sizeof(a_uint32_t));
 }
 #if ((!defined IN_IP_MINI) || (defined IN_PPPOE))
 sw_error_t

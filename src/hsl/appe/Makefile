@@ -5,6 +5,10 @@ include $(PRJ_PATH)/make/config.mk
 
 SRC_LIST=appe_global.c
 
+ifeq (TRUE, $(IN_PORTVLAN))
+	SRC_LIST+=appe_portvlan.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

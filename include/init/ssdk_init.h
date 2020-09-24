@@ -28,6 +28,10 @@ extern "C" {
 /*qca808x_start*/
 #define SSDK_MAX_PORT_NUM               8
 /*qca808x_end*/
+#define SSDK_MIN_VIRTUAL_PORT_ID	64
+#define SSDK_MAX_VIRTUAL_PORT_ID	255
+#define SSDK_MIN_TRUNK_PORT_ID	        32
+#define SSDK_MAX_VP_GROUP_ID	        255
 #define SSDK_MAX_VIRTUAL_PORT_NUM       256
 #define SSDK_MAX_SERVICE_CODE_NUM       256
 #define SSDK_MAX_CPU_CODE_NUM           256

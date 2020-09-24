@@ -18,6 +18,10 @@
  * @{
  */
 #include "sw.h"
+#if defined(APPE)
+#include "appe_portvlan_reg.h"
+#include "appe_portvlan.h"
+#endif
 #include "hppe_portvlan_reg.h"
 #include "hppe_portvlan.h"
 #include "hppe_portctrl_reg.h"
@@ -619,14 +623,33 @@ adpt_hppe_port_qinq_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
-	if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_INGRESS_EN)) {
-		SW_RTN_ON_ERROR(hppe_port_parsing_reg_port_role_set(dev_id, port_id,
-					(a_uint32_t)mode->ingress_port_role));
-	}
+#if defined(APPE)
+	if (ADPT_IS_VPORT(port_id)) {
+		if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_INGRESS_EN)) {
+			rtn = appe_vport_parsing_port_role_set(dev_id,
+					(port_id - SSDK_MIN_VIRTUAL_PORT_ID),
+					(a_uint32_t)mode->ingress_port_role);
+			SW_RTN_ON_ERROR(rtn);
+		}
 
-	if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_EGRESS_EN)) {
-		SW_RTN_ON_ERROR(hppe_port_eg_vlan_port_vlan_type_set(dev_id, port_id,
-					(a_uint32_t)mode->egress_port_role));
+		if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_EGRESS_EN)) {
+			rtn = appe_eg_vp_tbl_port_vlan_type_set(dev_id,
+					(port_id - SSDK_MIN_VIRTUAL_PORT_ID),
+					(a_uint32_t)mode->egress_port_role);
+			SW_RTN_ON_ERROR(rtn);
+		}
+	} else
+#endif
+	if (ADPT_IS_PPORT(port_id)) {
+		if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_INGRESS_EN)) {
+			SW_RTN_ON_ERROR(hppe_port_parsing_reg_port_role_set(dev_id, port_id,
+						(a_uint32_t)mode->ingress_port_role));
+		}
+
+		if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_EGRESS_EN)) {
+			SW_RTN_ON_ERROR(hppe_port_eg_vlan_port_vlan_type_set(dev_id, port_id,
+						(a_uint32_t)mode->egress_port_role));
+		}
 	}
 
 	return rtn;
@@ -640,11 +663,26 @@ adpt_hppe_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mode);
 
-	SW_RTN_ON_ERROR(hppe_port_parsing_reg_port_role_get(dev_id, port_id,
-				(a_uint32_t *)&mode->ingress_port_role));
+#if defined(APPE)
+	if (ADPT_IS_VPORT(port_id)) {
+		rtn = appe_vport_parsing_port_role_get(dev_id,
+				(port_id - SSDK_MIN_VIRTUAL_PORT_ID),
+				(a_uint32_t *)&mode->ingress_port_role);
+		SW_RTN_ON_ERROR(rtn);
 
-	SW_RTN_ON_ERROR(hppe_port_eg_vlan_port_vlan_type_get(dev_id, port_id,
-				(a_uint32_t *)&mode->egress_port_role));
+		rtn = appe_eg_vp_tbl_port_vlan_type_get(dev_id,
+				(port_id - SSDK_MIN_VIRTUAL_PORT_ID),
+				(a_uint32_t *)&mode->egress_port_role);
+		SW_RTN_ON_ERROR(rtn);
+	} else
+#endif
+	if (ADPT_IS_PPORT(port_id)) {
+		SW_RTN_ON_ERROR(hppe_port_parsing_reg_port_role_get(dev_id, port_id,
+					(a_uint32_t *)&mode->ingress_port_role));
+
+		SW_RTN_ON_ERROR(hppe_port_eg_vlan_port_vlan_type_get(dev_id, port_id,
+					(a_uint32_t *)&mode->egress_port_role));
+	}
 
 	return rtn;
 }
@@ -782,57 +820,114 @@ adpt_hppe_port_default_vlantag_set(a_uint32_t dev_id,
 
 	if (direction == FAL_PORT_VLAN_ALL || direction == FAL_PORT_VLAN_INGRESS)
 	{
-		SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_en_set(dev_id, port_id,
-					(a_uint32_t)default_vid_en->default_cvid_en));
-		SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_en_set(dev_id, port_id,
-					(a_uint32_t)default_vid_en->default_svid_en));
+#if defined(APPE)
+		if (ADPT_IS_VPORT(port_id)) {
+			union vlan_port_vp_tbl_u vlan_port_vp;
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CVID_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_set(dev_id, port_id,
-						(a_uint32_t)default_tag->cvid));
-		}
+			rtn = appe_vlan_port_vp_tbl_get(dev_id, port_id, &vlan_port_vp);
+			SW_RTN_ON_ERROR(rtn);
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SVID_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_set(dev_id, port_id,
-						(a_uint32_t)default_tag->svid));
-		}
+			vlan_port_vp.bf.port_def_svid_en = default_vid_en->default_svid_en;
+			vlan_port_vp.bf.port_def_cvid_en = default_vid_en->default_cvid_en;
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CPCP_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cpcp_set(dev_id, port_id,
-						(a_uint32_t)default_tag->cpri));
-		}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CVID_EN)) {
+				vlan_port_vp.bf.port_def_cvid = default_tag->cvid;
+			}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SVID_EN)) {
+				vlan_port_vp.bf.port_def_svid = default_tag->svid;
+			}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CPCP_EN)) {
+				vlan_port_vp.bf.port_def_cpcp_0 = default_tag->cpri & 0x3;
+				vlan_port_vp.bf.port_def_cpcp_1 = (default_tag->cpri & 0x4) >> 2;
+			}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SPCP_EN)) {
+				vlan_port_vp.bf.port_def_spcp = default_tag->spri;
+			}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CDEI_EN)) {
+				vlan_port_vp.bf.port_def_cdei = default_tag->cdei;
+			}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SDEI_EN)) {
+				vlan_port_vp.bf.port_def_sdei = default_tag->sdei;
+			}
+			rtn = appe_vlan_port_vp_tbl_set(dev_id, port_id, &vlan_port_vp);
+			SW_RTN_ON_ERROR(rtn);
+		} else
+#endif
+		if (ADPT_IS_PPORT(port_id)) {
+			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_en_set(dev_id, port_id,
+						(a_uint32_t)default_vid_en->default_cvid_en));
+			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_en_set(dev_id, port_id,
+						(a_uint32_t)default_vid_en->default_svid_en));
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SPCP_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_spcp_set(dev_id, port_id,
-						(a_uint32_t)default_tag->spri));
-		}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CVID_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_set(dev_id, port_id,
+							(a_uint32_t)default_tag->cvid));
+			}
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CDEI_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cdei_set(dev_id, port_id,
-						(a_uint32_t)default_tag->cdei));
-		}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SVID_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_set(dev_id, port_id,
+							(a_uint32_t)default_tag->svid));
+			}
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SDEI_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_sdei_set(dev_id, port_id,
-						(a_uint32_t)default_tag->sdei));
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CPCP_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cpcp_set(dev_id, port_id,
+							(a_uint32_t)default_tag->cpri));
+			}
+
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SPCP_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_spcp_set(dev_id, port_id,
+							(a_uint32_t)default_tag->spri));
+			}
+
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CDEI_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cdei_set(dev_id, port_id,
+							(a_uint32_t)default_tag->cdei));
+			}
+
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SDEI_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_sdei_set(dev_id, port_id,
+							(a_uint32_t)default_tag->sdei));
+			}
 		}
 	}
 
 	if (direction == FAL_PORT_VLAN_ALL || direction == FAL_PORT_VLAN_EGRESS)
 	{
-		SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_en_set(dev_id,
-					port_id, (a_uint32_t)default_vid_en->default_cvid_en));
-		SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_en_set(dev_id,
-					port_id, (a_uint32_t)default_vid_en->default_svid_en));
+#if defined(APPE)
+		if (ADPT_IS_VPORT(port_id)) {
+			union eg_vp_tbl_u eg_vp;
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CVID_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_set(dev_id, port_id,
-						(a_uint32_t)default_tag->cvid));
-		}
+			rtn = appe_egress_vp_tbl_get(dev_id, port_id, &eg_vp);
+			SW_RTN_ON_ERROR(rtn);
 
-		if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SVID_EN)) {
-			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_set(dev_id, port_id,
-						(a_uint32_t)default_tag->svid));
+			eg_vp.bf.port_def_svid_en = default_vid_en->default_svid_en;
+			eg_vp.bf.port_def_cvid_en = default_vid_en->default_cvid_en;
+
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CVID_EN)) {
+				eg_vp.bf.port_def_cvid = default_tag->cvid;
+			}
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SVID_EN)) {
+				eg_vp.bf.port_def_svid = default_tag->svid;
+			}
+			rtn = appe_egress_vp_tbl_set(dev_id, port_id, &eg_vp);
+			SW_RTN_ON_ERROR(rtn);
+		} else
+#endif
+		if (ADPT_IS_PPORT(port_id)) {
+			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_en_set(dev_id,
+						port_id, (a_uint32_t)default_vid_en->default_cvid_en));
+			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_en_set(dev_id,
+						port_id, (a_uint32_t)default_vid_en->default_svid_en));
+
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_CVID_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_set(dev_id, port_id,
+							(a_uint32_t)default_tag->cvid));
+			}
+
+			if (FAL_FLG_TST(default_tag->mask, FAL_PORT_VLAN_TAG_SVID_EN)) {
+				SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_set(dev_id, port_id,
+							(a_uint32_t)default_tag->svid));
+			}
 		}
 	}
 
@@ -854,43 +949,80 @@ adpt_hppe_port_default_vlantag_get(a_uint32_t dev_id,
 		return SW_NOT_SUPPORTED;
 
 	if (direction == FAL_PORT_VLAN_INGRESS) {
-		SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_en_get(dev_id, port_id,
-					(a_uint32_t *)&default_vid_en->default_cvid_en));
+#if defined(APPE)
+		if (ADPT_IS_VPORT(port_id)) {
+			union vlan_port_vp_tbl_u vlan_port_vp;
 
-		SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_en_get(dev_id, port_id,
-					(a_uint32_t *)&default_vid_en->default_svid_en));
+			rtn = appe_vlan_port_vp_tbl_get(dev_id, port_id, &vlan_port_vp);
+			SW_RTN_ON_ERROR(rtn);
 
-		SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->cvid));
+			default_vid_en->default_cvid_en = vlan_port_vp.bf.port_def_cvid_en;
+			default_vid_en->default_svid_en = vlan_port_vp.bf.port_def_svid_en;
 
-		SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->svid));
+			default_tag->cvid = vlan_port_vp.bf.port_def_cvid;
+			default_tag->svid = vlan_port_vp.bf.port_def_svid;
+			default_tag->cpri = vlan_port_vp.bf.port_def_cpcp_1 << 2 |
+				vlan_port_vp.bf.port_def_cpcp_0;
+			default_tag->spri = vlan_port_vp.bf.port_def_spcp;
+			default_tag->cdei = vlan_port_vp.bf.port_def_cdei;
+			default_tag->sdei = vlan_port_vp.bf.port_def_sdei;
+		} else
+#endif
+		if (ADPT_IS_PPORT(port_id)) {
+			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_en_get(dev_id, port_id,
+						(a_uint32_t *)&default_vid_en->default_cvid_en));
 
-		SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cpcp_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->cpri));
+			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_en_get(dev_id, port_id,
+						(a_uint32_t *)&default_vid_en->default_svid_en));
 
-		SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_spcp_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->spri));
+			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_cvid_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->cvid));
 
-		SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cdei_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->cdei));
+			SW_RTN_ON_ERROR(hppe_port_def_vid_port_def_svid_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->svid));
 
-		SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_sdei_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->sdei));
+			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cpcp_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->cpri));
+
+			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_spcp_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->spri));
+
+			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_cdei_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->cdei));
+
+			SW_RTN_ON_ERROR(hppe_port_def_pcp_port_def_sdei_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->sdei));
+		}
 	}
 	else if (direction == FAL_PORT_VLAN_EGRESS) {
-		SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_en_get(dev_id, port_id,
-					(a_uint32_t *)&default_vid_en->default_cvid_en));
+#if defined(APPE)
+		if (ADPT_IS_VPORT(port_id)) {
+			union eg_vp_tbl_u eg_vp;
 
-		SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_en_get(dev_id, port_id,
-					(a_uint32_t *)&default_vid_en->default_svid_en));
+			rtn = appe_egress_vp_tbl_get(dev_id, port_id, &eg_vp);
+			SW_RTN_ON_ERROR(rtn);
 
-		SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->cvid));
+			default_vid_en->default_cvid_en = eg_vp.bf.port_def_cvid_en;
+			default_vid_en->default_svid_en = eg_vp.bf.port_def_svid_en;
 
-		SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_get(dev_id, port_id,
-					(a_uint32_t *)&default_tag->svid));
+			default_tag->cvid = eg_vp.bf.port_def_cvid;
+			default_tag->svid = eg_vp.bf.port_def_svid;
+		} else
+#endif
+		if (ADPT_IS_PPORT(port_id)) {
 
+			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_en_get(dev_id, port_id,
+						(a_uint32_t *)&default_vid_en->default_cvid_en));
+
+			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_en_get(dev_id, port_id,
+						(a_uint32_t *)&default_vid_en->default_svid_en));
+
+			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_cvid_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->cvid));
+
+			SW_RTN_ON_ERROR(hppe_port_eg_def_vid_port_def_svid_get(dev_id, port_id,
+						(a_uint32_t *)&default_tag->svid));
+		}
 	}
 	else
 		return SW_NOT_SUPPORTED;

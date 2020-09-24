@@ -1581,6 +1581,17 @@ typedef struct
 	adpt_led_ctrl_source_set_func adpt_led_ctrl_source_set;
 }adpt_api_t;
 
+#define ADPT_IS_PPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_PPORT && \
+			FAL_PORT_ID_VALUE(port_id) < SSDK_MAX_PORT_NUM)?1:0)
+#define ADPT_IS_TRUNK(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_TRUNK && \
+			FAL_PORT_ID_VALUE(port_id) >= SSDK_MIN_TRUNK_PORT_ID && \
+			FAL_PORT_ID_VALUE(port_id) < SSDK_MIN_VIRTUAL_PORT_ID)?1:0)
+#define ADPT_IS_VPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VPORT && \
+			FAL_PORT_ID_VALUE(port_id) >= SSDK_MIN_VIRTUAL_PORT_ID && \
+			FAL_PORT_ID_VALUE(port_id) <= SSDK_MAX_VIRTUAL_PORT_ID)?1:0)
+#define ADPT_IS_VP_GROUP(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VP_GROUP && \
+			FAL_PORT_ID_VALUE(port_id) <= SSDK_MAX_VP_GROUP_ID)?1:0)
+
 static inline a_uint32_t adpt_port_type_convert(a_bool_t to_hsl, a_uint32_t port_type) {
 	a_uint32_t ptype = 0;
 

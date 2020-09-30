@@ -29,6 +29,14 @@ ifeq (TRUE, $(IN_ACL))
 	SRC_LIST+=appe_acl.c
 endif
 
+ifeq (TRUE, $(IN_VXLAN))
+	SRC_LIST+=appe_vxlan.c
+endif
+
+ifeq (TRUE, $(IN_GENEVE))
+	SRC_LIST+=appe_geneve.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

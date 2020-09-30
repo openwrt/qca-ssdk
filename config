@@ -354,4 +354,5 @@ endif
 
 ifneq (, $(filter APPE , $(CHIP_TYPE)))
 IN_VPORT=TRUE
+IN_TUNNEL=TRUE
 endif

@@ -239,6 +239,10 @@ ifeq (TRUE, $(IN_VPORT))
   MODULE_CFLAG += -DIN_VPORT
 endif
 
+ifeq (TRUE, $(IN_TUNNEL))
+  MODULE_CFLAG += -DIN_TUNNEL
+endif
+
 ifneq (TRUE, $(FAL))
   MODULE_CFLAG += -DHSL_STANDALONG
 endif

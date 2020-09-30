@@ -49,6 +49,7 @@ extern "C" {
 #define NSS_GLOBAL_BASE_ADDR    	 0x0
 #define NSS_UNIPHY_BASE_ADDR    0x0
 #define NSS_LPI_BASE_ADDR    0x400
+#define TUNNEL_LOOKUP_BASE_ADDR      0x300000
 
 sw_error_t hppe_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint32_t *val);
 sw_error_t hppe_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint32_t val);

@@ -13,6 +13,10 @@ ifeq (TRUE, $(IN_VSI))
 	SRC_LIST+=appe_vsi.c
 endif
 
+ifeq (TRUE, $(IN_TUNNEL))
+	SRC_LIST+=appe_tunnel.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

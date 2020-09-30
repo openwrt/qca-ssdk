@@ -838,6 +838,10 @@ typedef sw_error_t (*adpt_queue_shaper_set_func)(a_uint32_t dev_id,a_uint32_t qu
 typedef sw_error_t (*adpt_queue_shaper_time_slot_set_func)(a_uint32_t dev_id, a_uint32_t time_slot);
 typedef sw_error_t (*adpt_shaper_ipg_preamble_length_get_func)(a_uint32_t dev_id, a_uint32_t *ipg_pre_length);
 typedef sw_error_t (*adpt_shaper_ipg_preamble_length_set_func)(a_uint32_t dev_id, a_uint32_t ipg_pre_length);
+typedef sw_error_t (*adpt_queue_shaper_ctrl_set_func)(a_uint32_t dev_id, fal_shaper_ctrl_t *queue_shaper_ctrl);
+typedef sw_error_t (*adpt_queue_shaper_ctrl_get_func)(a_uint32_t dev_id, fal_shaper_ctrl_t *queue_shaper_ctrl);
+typedef sw_error_t (*adpt_flow_shaper_ctrl_set_func)(a_uint32_t dev_id, fal_shaper_ctrl_t *flow_shaper_ctrl);
+typedef sw_error_t (*adpt_flow_shaper_ctrl_get_func)(a_uint32_t dev_id, fal_shaper_ctrl_t *flow_shaper_ctrl);
 
 typedef sw_error_t (*adpt_tdm_tick_num_set_func)(a_uint32_t dev_id, a_uint32_t tick_num);
 typedef sw_error_t (*adpt_tdm_tick_num_get_func)(a_uint32_t dev_id, a_uint32_t *tick_num);
@@ -1669,7 +1673,10 @@ typedef struct
 	adpt_flow_shaper_get_func adpt_flow_shaper_get;
 	adpt_queue_shaper_set_func adpt_queue_shaper_set;
 	adpt_queue_shaper_time_slot_set_func adpt_queue_shaper_time_slot_set;
-
+	adpt_queue_shaper_ctrl_set_func adpt_queue_shaper_ctrl_set;
+	adpt_queue_shaper_ctrl_get_func adpt_queue_shaper_ctrl_get;
+	adpt_flow_shaper_ctrl_set_func adpt_flow_shaper_ctrl_set;
+	adpt_flow_shaper_ctrl_get_func adpt_flow_shaper_ctrl_get;
 //policer
 	a_uint32_t adpt_policer_func_bitmap;
 	adpt_acl_policer_counter_get_func adpt_acl_policer_counter_get;

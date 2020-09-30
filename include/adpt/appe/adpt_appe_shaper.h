@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,30 +14,36 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef _SSDK_APPE_H_
-#define _SSDK_APPE_H_
+#ifndef _ADPT_APPE_SHAPER_H_
+#define _ADPT_APPE_SHAPER_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */
 
-#include "ssdk_init.h"
+#define APPE_SHAPER_FLOW_ID_MIN           0
+#define APPE_SHAPER_FLOW_ID_MAX           63
+#define APPE_SHAPER_QUEUE_ID_MIN          0
+#define APPE_SHAPER_QUEUE_ID_MAX          299
 
-sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
+sw_error_t
+adpt_appe_queue_shaper_ctrl_set(a_uint32_t dev_id,
+	fal_shaper_ctrl_t *queue_shaper_ctrl);
 
-#define APPE_MAX_C_TOKEN_NUM                0x3fffffff
-#define APPE_MAX_E_TOKEN_NUM                0x3fffffff
-#define APPE_PORT_SHAPER_TIMESLOT_DFT       8
-#define APPE_FLOW_SHAPER_TIMESLOT_DFT       128
-#define APPE_QUEUE_SHAPER_TIMESLOT_DFT      600
-#define APPE_SHAPER_IPG_PREAMBLE_LEN_DFT    20
-#define APPE_QUEUE_SHAPER_HEAD              0
-#define APPE_QUEUE_SHAPER_TAIL              299
-#define APPE_FLOW_SHAPER_HEAD               0
-#define APPE_FLOW_SHAPER_TAIL               63
+sw_error_t
+adpt_appe_flow_shaper_ctrl_set(a_uint32_t dev_id,
+	fal_shaper_ctrl_t *flow_shaper_ctrl);
 
+#ifndef IN_SHAPER_MINI
+sw_error_t
+adpt_appe_queue_shaper_ctrl_get(a_uint32_t dev_id,
+	fal_shaper_ctrl_t *queue_shaper_ctrl);
+
+sw_error_t
+adpt_appe_flow_shaper_ctrl_get(a_uint32_t dev_id,
+	fal_shaper_ctrl_t *flow_shaper_ctrl);
+#endif
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */
-#endif                          /* _SSDK_APPE_H */
-
+#endif

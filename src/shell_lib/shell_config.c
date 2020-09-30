@@ -1218,6 +1218,8 @@ struct sub_cmd_des_t g_shaper_des[] =
 	{"flowshaper", "set",   SW_API_FLOW_SHAPER_SET, NULL},
 	{"queueshaper", "set",   SW_API_QUEUE_SHAPER_SET, NULL},
 	{"ipgcompensation", "set",   SW_API_SHAPER_IPG_PRE_SET, NULL},
+	{"queueshaperctrl", "set",   SW_API_QUEUE_SHAPER_CTRL_SET, NULL},
+	{"flowshaperctrl", "set",   SW_API_FLOW_SHAPER_CTRL_SET, NULL},
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif

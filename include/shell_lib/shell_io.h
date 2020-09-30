@@ -443,6 +443,12 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size);
 
+sw_error_t
+cmd_data_check_queue_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_flow_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
 #endif
 
 #ifdef IN_SERVCODE

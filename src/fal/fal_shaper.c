@@ -313,6 +313,36 @@ _fal_shaper_ipg_preamble_length_set(a_uint32_t dev_id, a_uint32_t ipg_pre_length
     return rv;
 }
 
+sw_error_t
+_fal_queue_shaper_ctrl_set(a_uint32_t dev_id, fal_shaper_ctrl_t *queue_shaper_ctrl)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_queue_shaper_ctrl_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_queue_shaper_ctrl_set(dev_id, queue_shaper_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_flow_shaper_ctrl_set(a_uint32_t dev_id, fal_shaper_ctrl_t *flow_shaper_ctrl)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_flow_shaper_ctrl_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_flow_shaper_ctrl_set(dev_id, flow_shaper_ctrl);
+    return rv;
+}
+
 #ifndef IN_SHAPER_MINI
 sw_error_t
 _fal_shaper_ipg_preamble_length_get(a_uint32_t dev_id, a_uint32_t *ipg_pre_length)
@@ -326,6 +356,36 @@ _fal_shaper_ipg_preamble_length_get(a_uint32_t dev_id, a_uint32_t *ipg_pre_lengt
         return SW_NOT_SUPPORTED;
 
     rv = p_api->adpt_shaper_ipg_preamble_length_get(dev_id, ipg_pre_length);
+    return rv;
+}
+
+sw_error_t
+_fal_queue_shaper_ctrl_get(a_uint32_t dev_id, fal_shaper_ctrl_t *queue_shaper_ctrl)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_queue_shaper_ctrl_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_queue_shaper_ctrl_get(dev_id, queue_shaper_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_flow_shaper_ctrl_get(a_uint32_t dev_id, fal_shaper_ctrl_t *flow_shaper_ctrl)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_flow_shaper_ctrl_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_flow_shaper_ctrl_get(dev_id, flow_shaper_ctrl);
     return rv;
 }
 #endif
@@ -542,6 +602,29 @@ fal_shaper_ipg_preamble_length_set(a_uint32_t dev_id, a_uint32_t ipg_pre_length)
     FAL_API_UNLOCK;
     return rv;
 }
+
+sw_error_t
+fal_queue_shaper_ctrl_set(a_uint32_t dev_id, fal_shaper_ctrl_t *queue_shaper_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_queue_shaper_ctrl_set(dev_id, queue_shaper_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_flow_shaper_ctrl_set(a_uint32_t dev_id, fal_shaper_ctrl_t *flow_shaper_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_flow_shaper_ctrl_set(dev_id, flow_shaper_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
 #ifndef IN_SHAPER_MINI
 sw_error_t
 fal_shaper_ipg_preamble_length_get(a_uint32_t dev_id, a_uint32_t *ipg_pre_length)
@@ -553,6 +636,29 @@ fal_shaper_ipg_preamble_length_get(a_uint32_t dev_id, a_uint32_t *ipg_pre_length
     FAL_API_UNLOCK;
     return rv;
 }
+
+sw_error_t
+fal_queue_shaper_ctrl_get(a_uint32_t dev_id, fal_shaper_ctrl_t *queue_shaper_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_queue_shaper_ctrl_get(dev_id, queue_shaper_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_flow_shaper_ctrl_get(a_uint32_t dev_id, fal_shaper_ctrl_t *flow_shaper_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_flow_shaper_ctrl_get(dev_id, flow_shaper_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
 #endif
 
 EXPORT_SYMBOL(fal_flow_shaper_token_number_set);
@@ -577,6 +683,10 @@ EXPORT_SYMBOL(fal_queue_shaper_set);
 
 EXPORT_SYMBOL(fal_flow_shaper_set);
 
+EXPORT_SYMBOL(fal_queue_shaper_ctrl_set);
+
+EXPORT_SYMBOL(fal_flow_shaper_ctrl_set);
+
 #ifndef IN_SHAPER_MINI
 
 EXPORT_SYMBOL(fal_port_shaper_get);
@@ -596,6 +706,11 @@ EXPORT_SYMBOL(fal_queue_shaper_timeslot_get);
 EXPORT_SYMBOL(fal_flow_shaper_timeslot_get);
 
 EXPORT_SYMBOL(fal_shaper_ipg_preamble_length_get);
+
+EXPORT_SYMBOL(fal_queue_shaper_ctrl_get);
+
+EXPORT_SYMBOL(fal_flow_shaper_ctrl_get);
+
 #endif
 
 /*insert flag for outter fal, don't remove it*/

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -21,12 +21,20 @@
 #include "hppe_shaper_reg.h"
 #include "hppe_shaper.h"
 #include "adpt.h"
+#include "adpt_hppe.h"
+#ifdef APPE
+#include "adpt_appe_shaper.h"
+#endif
 
 #define NR_ADPT_HPPE_SHAPER_METER_UNIT         2
 #define NR_ADPT_HPPE_SHAPER_METER_TOKEN_UNIT         8
 #define ADPT_HPPE_SHAPER_METER_UNIT_BYTE       0
 #define ADPT_HPPE_SHAPER_METER_UNIT_FRAME      1
+#ifdef APPE
+#define ADPT_HPPE_FREQUENCY      353  /*MHZ*/
+#else
 #define ADPT_HPPE_FREQUENCY      300  /*MHZ*/
+#endif
 #define ADPT_HPPE_SHAPER_BURST_SIZE_UNIT      65536
 #define ADPT_HPPE_SHAPER_REFRESH_BITS  18
 #define ADPT_HPPE_SHAPER_BUCKET_SIZE_BITS  14
@@ -34,14 +42,17 @@
 #define ADPT_HPPE_SHAPER_BUCKET_SIZE_MAX  ((1 << ADPT_HPPE_SHAPER_BUCKET_SIZE_BITS) - 1)
 #define ADPT_HPPE_PORT_SHAPER         0
 #define ADPT_HPPE_FLOW_SHAPER         1
-#define ADPT_HPPE_QUEUE_SHAPER       2
-#define BYTE_SHAPER_MAX_RATE 10000000
-#define BYTE_SHAPER_MIN_RATE 64
-#define FRAME_SHAPER_MAX_RATE 14881000
-#define FRAME_SHAPER_MIN_RATE 6
+#define ADPT_HPPE_QUEUE_SHAPER        2
+#define ADPT_HPPE_SHAPER_MAX          0x3ffff
+#define BYTE_SHAPER_MAX_RATE          10000000
+#define BYTE_SHAPER_MIN_RATE          64
+#define FRAME_SHAPER_MAX_RATE         14881000
+#define FRAME_SHAPER_MIN_RATE         6
 
-
-
+#ifdef APPE
+static a_uint32_t appe_flow_shaper_type[SW_MAX_NR_DEV][APPE_SHAPER_FLOW_ID_MAX + 1] = {0};
+static a_uint32_t appe_queue_shaper_type[SW_MAX_NR_DEV][APPE_SHAPER_QUEUE_ID_MAX + 1] = {0};
+#endif
 static a_uint32_t hppe_shaper_token_unit[NR_ADPT_HPPE_SHAPER_METER_UNIT]
 	[NR_ADPT_HPPE_SHAPER_METER_TOKEN_UNIT] = {{2048 * 8,
 	512 * 8,128 * 8,32 * 8,8 * 8,2 * 8, 4, 1},
@@ -268,7 +279,6 @@ __adpt_hppe_queue_shaper_max_rate(a_uint32_t time_slot)
 	a_uint32_t i = 0, j = 0;
 	a_uint32_t time_cycle;
 	a_uint64_t temp, temp1,temp2;
-
 
 	/* time_cycle is ns*/
 	time_cycle = ( time_slot * 8) /ADPT_HPPE_FREQUENCY;
@@ -602,6 +612,9 @@ adpt_hppe_queue_shaper_get(a_uint32_t dev_id, a_uint32_t queue_id,
 	union l0_shp_cfg_tbl_u l0_shp_cfg_tbl;
 	union l0_comp_cfg_tbl_u l0_comp_cfg_tbl;
 	a_uint32_t hppe_cir =0, hppe_cbs = 0, hppe_eir = 0, hppe_ebs = 0;
+#ifdef APPE
+	a_uint32_t hppe_cir_max = 0, hppe_eir_max= 0;
+#endif
 
 	memset(&l0_shp_cfg_tbl, 0, sizeof(l0_shp_cfg_tbl));
 	memset(&l0_comp_cfg_tbl, 0, sizeof(l0_comp_cfg_tbl));
@@ -623,37 +636,62 @@ adpt_hppe_queue_shaper_get(a_uint32_t dev_id, a_uint32_t queue_id,
 	hppe_cbs = l0_shp_cfg_tbl.bf.cbs;
 	hppe_eir = l0_shp_cfg_tbl.bf.eir;
 	hppe_ebs = l0_shp_cfg_tbl.bf.ebs;
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		hppe_cir_max = (l0_shp_cfg_tbl.bf.cir_max_1 << 14) |
+				l0_shp_cfg_tbl.bf.cir_max_0;
+		hppe_eir_max = l0_shp_cfg_tbl.bf.eir_max;
+	}
+#endif
+	__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_QUEUE_SHAPER,
+				hppe_cir,
+				&shaper->cir,
+				l0_shp_cfg_tbl.bf.meter_unit,
+				l0_shp_cfg_tbl.bf.token_unit);
 
 	__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_QUEUE_SHAPER,
-								hppe_cir,
-								&shaper->cir,
-								l0_shp_cfg_tbl.bf.meter_unit,
-								l0_shp_cfg_tbl.bf.token_unit);
+				hppe_eir,
+				&shaper->eir,
+				l0_shp_cfg_tbl.bf.meter_unit,
+				l0_shp_cfg_tbl.bf.token_unit);
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_QUEUE_SHAPER,
+				hppe_cir_max,
+				&shaper->cir_max,
+				l0_shp_cfg_tbl.bf.meter_unit,
+				l0_shp_cfg_tbl.bf.token_unit);
 
-	__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_QUEUE_SHAPER,
-								hppe_eir,
-								&shaper->eir,
-								l0_shp_cfg_tbl.bf.meter_unit,
-								l0_shp_cfg_tbl.bf.token_unit);
-
-
+		__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_QUEUE_SHAPER,
+				hppe_eir_max,
+				&shaper->eir_max,
+				l0_shp_cfg_tbl.bf.meter_unit,
+				l0_shp_cfg_tbl.bf.token_unit);
+	}
+#endif
 	__adpt_hppe_shaper_bucket_size_to_burst_size(hppe_cbs,
-								&shaper->cbs,
-								l0_shp_cfg_tbl.bf.meter_unit,
-								l0_shp_cfg_tbl.bf.token_unit);
+				&shaper->cbs,
+				l0_shp_cfg_tbl.bf.meter_unit,
+				l0_shp_cfg_tbl.bf.token_unit);
 
 	__adpt_hppe_shaper_bucket_size_to_burst_size(hppe_ebs,
-								&shaper->ebs,
-								l0_shp_cfg_tbl.bf.meter_unit,
-								l0_shp_cfg_tbl.bf.token_unit);
-
+				&shaper->ebs,
+				l0_shp_cfg_tbl.bf.meter_unit,
+				l0_shp_cfg_tbl.bf.token_unit);
 
 	shaper->couple_en = l0_shp_cfg_tbl.bf.cf;
 	shaper->meter_unit = l0_shp_cfg_tbl.bf.meter_unit;
 	shaper->c_shaper_en = l0_shp_cfg_tbl.bf.c_shaper_enable;
 	shaper->e_shaper_en = l0_shp_cfg_tbl.bf.e_shaper_enable;
 	shaper->shaper_frame_mode = l0_comp_cfg_tbl.bf.shaper_meter_len;
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		shaper->meter_type = appe_queue_shaper_type[dev_id][queue_id];
+		shaper->next_ptr = l0_shp_cfg_tbl.bf.shp_refresh_nxt_ptr;
+		shaper->grp_end = l0_shp_cfg_tbl.bf.grp_end;
+		shaper->grp_couple_en = l0_shp_cfg_tbl.bf.grp_cf;
+	}
+#endif
 	return SW_OK;
 }
 
@@ -793,7 +831,6 @@ adpt_hppe_flow_shaper_time_slot_set(a_uint32_t dev_id, a_uint32_t time_slot)
 	__adpt_hppe_flow_shaper_max_rate(time_slot);
 
 	return SW_OK;
-
 }
 sw_error_t
 adpt_hppe_port_shaper_token_number_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -967,6 +1004,10 @@ adpt_hppe_flow_shaper_set(a_uint32_t dev_id, a_uint32_t flow_id,
 	a_uint64_t temp_cir = 0, temp_eir =0, temp_cbs =0, temp_ebs = 0;
 	a_uint32_t token_unit = 0;
 	fal_shaper_token_number_t token_number;
+#ifdef APPE
+	a_uint64_t temp_cir_max = 0, temp_eir_max =0;
+	a_uint32_t hppe_cir_max = 0, hppe_eir_max= 0;
+#endif
 
 	memset(&l1_shp_cfg_tbl, 0, sizeof(l1_shp_cfg_tbl));
 	memset(&l1_comp_cfg_tbl, 0, sizeof(l1_comp_cfg_tbl));
@@ -984,6 +1025,14 @@ adpt_hppe_flow_shaper_set(a_uint32_t dev_id, a_uint32_t flow_id,
 			return SW_BAD_PARAM;
 		if ((shaper->eir < BYTE_SHAPER_MIN_RATE) && (shaper->eir != 0))
 			return SW_BAD_PARAM;
+#ifdef APPE
+		if ((shaper->cir_max > BYTE_SHAPER_MAX_RATE) || (shaper->eir_max > BYTE_SHAPER_MAX_RATE))
+			return SW_BAD_PARAM;
+		if ((shaper->cir_max < BYTE_SHAPER_MIN_RATE) && (shaper->cir_max != 0))
+			return SW_BAD_PARAM;
+		if ((shaper->eir_max < BYTE_SHAPER_MIN_RATE) && (shaper->eir_max != 0))
+			return SW_BAD_PARAM;
+#endif
 	}
 	if(ADPT_HPPE_SHAPER_METER_UNIT_FRAME == shaper->meter_unit)
 	{
@@ -993,6 +1042,14 @@ adpt_hppe_flow_shaper_set(a_uint32_t dev_id, a_uint32_t flow_id,
 			return SW_BAD_PARAM;
 		if ((shaper->eir < FRAME_SHAPER_MIN_RATE) && (shaper->eir != 0))
 			return SW_BAD_PARAM;
+#ifdef APPE
+		if ((shaper->cir_max > FRAME_SHAPER_MAX_RATE) || (shaper->eir_max > FRAME_SHAPER_MAX_RATE))
+			return SW_BAD_PARAM;
+		if ((shaper->cir_max < FRAME_SHAPER_MIN_RATE) && (shaper->cir_max != 0))
+			return SW_BAD_PARAM;
+		if ((shaper->eir_max < FRAME_SHAPER_MIN_RATE) && (shaper->eir_max != 0))
+			return SW_BAD_PARAM;
+#endif
 	}
 
 	hppe_l1_comp_cfg_tbl_get(dev_id, flow_id, &l1_comp_cfg_tbl);
@@ -1001,40 +1058,82 @@ adpt_hppe_flow_shaper_set(a_uint32_t dev_id, a_uint32_t flow_id,
 	temp_cbs = ((a_uint64_t)shaper->cbs) * 1000;
 	temp_eir = ((a_uint64_t)shaper->eir) * 1000;
 	temp_ebs = ((a_uint64_t)shaper->ebs) * 1000;
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+			if (shaper->meter_type == FAL_SHAPER_METER_MEF10_3) {
+			temp_cir_max = ((a_uint64_t)shaper->cir_max) * 1000;
+			temp_eir_max = ((a_uint64_t)shaper->eir_max) * 1000;
 
+			if (temp_cir_max >= temp_cir) {
+				temp_cir = temp_cir_max;
+			}
+			if (temp_eir_max >= temp_eir) {
+				temp_eir = temp_eir_max;
+			}
+		}
+	}
+#endif
 	rv = __adpt_hppe_shaper_two_bucket_parameter_select(ADPT_HPPE_FLOW_SHAPER,
-								temp_cir,
-								temp_cbs,
-								temp_eir,
-								temp_ebs,
-								shaper->meter_unit,
-								&token_unit);
+				temp_cir,
+				temp_cbs,
+				temp_eir,
+				temp_ebs,
+				shaper->meter_unit,
+				&token_unit);
 	if( rv != SW_OK )
 		return rv;
-	//printk("flow shaper meter unit is = %d\n", shaper->meter_unit);
-	//printk("flow shaper token unit is = %d\n", token_unit);
+	SSDK_DEBUG("flow shaper meter unit is = %d\n", shaper->meter_unit);
+	SSDK_DEBUG("flow shaper token unit is = %d\n", token_unit);
 
-		__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_FLOW_SHAPER,
-									shaper->cir,
-									&hppe_cir,
-									shaper->meter_unit,
-									token_unit);
+	__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_FLOW_SHAPER,
+				shaper->cir,
+				&hppe_cir,
+				shaper->meter_unit,
+				token_unit);
 
-		__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_FLOW_SHAPER,
-									shaper->eir,
-									&hppe_eir,
-									shaper->meter_unit,
-									token_unit);
+	__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_FLOW_SHAPER,
+				shaper->eir,
+				&hppe_eir,
+				shaper->meter_unit,
+				token_unit);
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (shaper->meter_type == FAL_SHAPER_METER_MEF10_3) {
+			__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_FLOW_SHAPER,
+				shaper->cir_max,
+				&hppe_cir_max,
+				shaper->meter_unit,
+				token_unit);
 
-		__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->cbs,
-									&hppe_cbs,
-									shaper->meter_unit,
-									token_unit);
+			__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_FLOW_SHAPER,
+				shaper->eir_max,
+				&hppe_eir_max,
+				shaper->meter_unit,
+				token_unit);
+		}
+		if (shaper->meter_type == FAL_SHAPER_METER_RFC) {
+			if (shaper->couple_en == A_FALSE) {
+				hppe_cir_max = hppe_cir;
+				hppe_eir_max = hppe_eir;
+			} else {
+				hppe_cir_max = hppe_cir;
+				hppe_eir_max = ADPT_HPPE_SHAPER_MAX;
+			}
+		}
+	}
+#endif
+	__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->cbs,
+				&hppe_cbs,
+				shaper->meter_unit,
+				token_unit);
 
-		__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->ebs,
-									&hppe_ebs,
-									shaper->meter_unit,
-									token_unit);
+	__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->ebs,
+				&hppe_ebs,
+				shaper->meter_unit,
+				token_unit);
+
+	hppe_l1_shp_cfg_tbl_get(dev_id, flow_id, &l1_shp_cfg_tbl);
+	SW_RTN_ON_ERROR (rv);
 
 	l1_shp_cfg_tbl.bf.cf = shaper->couple_en;
 	l1_shp_cfg_tbl.bf.meter_unit = shaper->meter_unit;
@@ -1046,7 +1145,21 @@ adpt_hppe_flow_shaper_set(a_uint32_t dev_id, a_uint32_t flow_id,
 	l1_shp_cfg_tbl.bf.eir = hppe_eir;
 	l1_shp_cfg_tbl.bf.token_unit = token_unit;
 	l1_comp_cfg_tbl.bf.shaper_meter_len = shaper->shaper_frame_mode;
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		l1_shp_cfg_tbl.bf.cir_max_0 = hppe_cir_max & 0x1ffff;
+		l1_shp_cfg_tbl.bf.cir_max_1 = hppe_cir_max >> 17;
+		l1_shp_cfg_tbl.bf.eir_max = hppe_eir_max;
+		if (shaper->meter_type == FAL_SHAPER_METER_MEF10_3) {
+			l1_shp_cfg_tbl.bf.shp_refresh_nxt_ptr = shaper->next_ptr;
+			l1_shp_cfg_tbl.bf.grp_end = shaper->grp_end;
+			l1_shp_cfg_tbl.bf.grp_cf = shaper->grp_couple_en;
+		} else {
+			l1_shp_cfg_tbl.bf.grp_end = 0x1;
+		}
+		appe_flow_shaper_type[dev_id][flow_id] = shaper->meter_type;
+	}
+#endif
 	hppe_l1_shp_cfg_tbl_set(dev_id, flow_id, &l1_shp_cfg_tbl);
 
 	hppe_l1_comp_cfg_tbl_set(dev_id, flow_id, &l1_comp_cfg_tbl);
@@ -1183,6 +1296,9 @@ adpt_hppe_flow_shaper_get(a_uint32_t dev_id, a_uint32_t flow_id,
 	union l1_shp_cfg_tbl_u l1_shp_cfg_tbl;
 	union l1_comp_cfg_tbl_u l1_comp_cfg_tbl;
 	a_uint32_t hppe_cir =0, hppe_cbs = 0, hppe_eir = 0, hppe_ebs = 0;
+#ifdef APPE
+	a_uint32_t hppe_cir_max = 0, hppe_eir_max= 0;
+#endif
 
 	memset(&l1_shp_cfg_tbl, 0, sizeof(l1_shp_cfg_tbl));
 	memset(&l1_comp_cfg_tbl, 0, sizeof(l1_comp_cfg_tbl));
@@ -1204,29 +1320,48 @@ adpt_hppe_flow_shaper_get(a_uint32_t dev_id, a_uint32_t flow_id,
 	hppe_cbs = l1_shp_cfg_tbl.bf.cbs;
 	hppe_eir = l1_shp_cfg_tbl.bf.eir;
 	hppe_ebs= l1_shp_cfg_tbl.bf.ebs;
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		hppe_cir_max = (l1_shp_cfg_tbl.bf.cir_max_1 << 17) |
+				l1_shp_cfg_tbl.bf.cir_max_0;
+		hppe_eir_max = l1_shp_cfg_tbl.bf.eir_max;
+	}
+#endif
+	__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_FLOW_SHAPER,
+				hppe_cir,
+				&shaper->cir,
+				l1_shp_cfg_tbl.bf.meter_unit,
+				l1_shp_cfg_tbl.bf.token_unit);
 
 	__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_FLOW_SHAPER,
-								hppe_cir,
-								&shaper->cir,
-								l1_shp_cfg_tbl.bf.meter_unit,
-								l1_shp_cfg_tbl.bf.token_unit);
+				hppe_eir,
+				&shaper->eir,
+				l1_shp_cfg_tbl.bf.meter_unit,
+				l1_shp_cfg_tbl.bf.token_unit);
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_FLOW_SHAPER,
+				hppe_cir_max,
+				&shaper->cir_max,
+				l1_shp_cfg_tbl.bf.meter_unit,
+				l1_shp_cfg_tbl.bf.token_unit);
 
-	__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_FLOW_SHAPER,
-								hppe_eir,
-								&shaper->eir,
-								l1_shp_cfg_tbl.bf.meter_unit,
-								l1_shp_cfg_tbl.bf.token_unit);
-
-
+		__adpt_hppe_shaper_refresh_to_rate(ADPT_HPPE_FLOW_SHAPER,
+				hppe_eir_max,
+				&shaper->eir_max,
+				l1_shp_cfg_tbl.bf.meter_unit,
+				l1_shp_cfg_tbl.bf.token_unit);
+	}
+#endif
 	__adpt_hppe_shaper_bucket_size_to_burst_size(hppe_cbs,
-								&shaper->cbs,
-								l1_shp_cfg_tbl.bf.meter_unit,
-								l1_shp_cfg_tbl.bf.token_unit);
+				&shaper->cbs,
+				l1_shp_cfg_tbl.bf.meter_unit,
+				l1_shp_cfg_tbl.bf.token_unit);
 
 	__adpt_hppe_shaper_bucket_size_to_burst_size(hppe_ebs,
-								&shaper->ebs,
-								l1_shp_cfg_tbl.bf.meter_unit,
-								l1_shp_cfg_tbl.bf.token_unit);
+				&shaper->ebs,
+				l1_shp_cfg_tbl.bf.meter_unit,
+				l1_shp_cfg_tbl.bf.token_unit);
 
 	shaper->couple_en = l1_shp_cfg_tbl.bf.cf;
 	shaper->meter_unit = l1_shp_cfg_tbl.bf.meter_unit;
@@ -1234,7 +1369,14 @@ adpt_hppe_flow_shaper_get(a_uint32_t dev_id, a_uint32_t flow_id,
 	shaper->e_shaper_en = l1_shp_cfg_tbl.bf.e_shaper_enable;
 
 	shaper->shaper_frame_mode = l1_comp_cfg_tbl.bf.shaper_meter_len;
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		shaper->meter_type = appe_flow_shaper_type[dev_id][flow_id];
+		shaper->next_ptr = l1_shp_cfg_tbl.bf.shp_refresh_nxt_ptr;
+		shaper->grp_end = l1_shp_cfg_tbl.bf.grp_end;
+		shaper->grp_couple_en = l1_shp_cfg_tbl.bf.grp_cf;
+	}
+#endif
 	return SW_OK;
 }
 #endif
@@ -1250,6 +1392,10 @@ adpt_hppe_queue_shaper_set(a_uint32_t dev_id,a_uint32_t queue_id,
 	a_uint32_t token_unit = 0;
 	a_uint64_t temp_cir = 0, temp_eir =0, temp_cbs =0, temp_ebs = 0;
 	fal_shaper_token_number_t token_number;
+#ifdef APPE
+	a_uint64_t temp_cir_max = 0, temp_eir_max =0;
+	a_uint32_t hppe_cir_max = 0, hppe_eir_max= 0;
+#endif
 
 	memset(&l0_shp_cfg_tbl, 0, sizeof(l0_shp_cfg_tbl));
 	memset(&l0_comp_cfg_tbl, 0, sizeof(l0_comp_cfg_tbl));
@@ -1267,6 +1413,14 @@ adpt_hppe_queue_shaper_set(a_uint32_t dev_id,a_uint32_t queue_id,
 			return SW_BAD_PARAM;
 		if ((shaper->eir < BYTE_SHAPER_MIN_RATE) && (shaper->eir != 0))
 			return SW_BAD_PARAM;
+#ifdef APPE
+		if ((shaper->cir_max > BYTE_SHAPER_MAX_RATE) || (shaper->eir_max > BYTE_SHAPER_MAX_RATE))
+			return SW_BAD_PARAM;
+		if ((shaper->cir_max < BYTE_SHAPER_MIN_RATE) && (shaper->cir_max != 0))
+			return SW_BAD_PARAM;
+		if ((shaper->eir_max < BYTE_SHAPER_MIN_RATE) && (shaper->eir_max != 0))
+			return SW_BAD_PARAM;
+#endif
 	}
 	if(ADPT_HPPE_SHAPER_METER_UNIT_FRAME == shaper->meter_unit)
 	{
@@ -1276,6 +1430,14 @@ adpt_hppe_queue_shaper_set(a_uint32_t dev_id,a_uint32_t queue_id,
 			return SW_BAD_PARAM;
 		if ((shaper->eir < FRAME_SHAPER_MIN_RATE) && (shaper->eir != 0))
 			return SW_BAD_PARAM;
+#ifdef APPE
+		if ((shaper->cir_max > FRAME_SHAPER_MAX_RATE) || (shaper->eir_max > FRAME_SHAPER_MAX_RATE))
+			return SW_BAD_PARAM;
+		if ((shaper->cir_max < FRAME_SHAPER_MIN_RATE) && (shaper->cir_max != 0))
+			return SW_BAD_PARAM;
+		if ((shaper->eir_max < FRAME_SHAPER_MIN_RATE) && (shaper->eir_max != 0))
+			return SW_BAD_PARAM;
+#endif
 	}
 
 	hppe_l0_comp_cfg_tbl_get(dev_id, queue_id, &l0_comp_cfg_tbl);
@@ -1284,40 +1446,80 @@ adpt_hppe_queue_shaper_set(a_uint32_t dev_id,a_uint32_t queue_id,
 	temp_cbs = ((a_uint64_t)shaper->cbs) * 1000;
 	temp_eir = ((a_uint64_t)shaper->eir) * 1000;
 	temp_ebs = ((a_uint64_t)shaper->ebs) * 1000;
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (shaper->meter_type == FAL_SHAPER_METER_MEF10_3) {
+			temp_cir_max = ((a_uint64_t)shaper->cir_max) * 1000;
+			temp_eir_max = ((a_uint64_t)shaper->eir_max) * 1000;
+			if (temp_cir_max >= temp_cir) {
+				temp_cir = temp_cir_max;
+			}
+			if (temp_eir_max >= temp_eir) {
+				temp_eir = temp_eir_max;
+			}
+		}
+	}
+#endif
 	rv = __adpt_hppe_shaper_two_bucket_parameter_select(ADPT_HPPE_QUEUE_SHAPER,
-								temp_cir,
-								temp_cbs,
-								temp_eir,
-								temp_ebs,
-								shaper->meter_unit,
-								&token_unit);
+				temp_cir,
+				temp_cbs,
+				temp_eir,
+				temp_ebs,
+				shaper->meter_unit,
+				&token_unit);
 	if( rv != SW_OK )
 		return rv;
-	//printk("queue shaper meter unit is = %d\n", shaper->meter_unit);
-	//printk("queue shaper token unit is = %d\n", token_unit);
+	SSDK_DEBUG("queue shaper meter unit is = %d\n", shaper->meter_unit);
+	SSDK_DEBUG("queue shaper token unit is = %d\n", token_unit);
 
-		__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_QUEUE_SHAPER,
-									shaper->cir,
-									&hppe_cir,
-									shaper->meter_unit,
-									token_unit);
+	__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_QUEUE_SHAPER,
+				shaper->cir,
+				&hppe_cir,
+				shaper->meter_unit,
+				token_unit);
 
-		__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_QUEUE_SHAPER,
-									shaper->eir,
-									&hppe_eir,
-									shaper->meter_unit,
-									token_unit);
+	__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_QUEUE_SHAPER,
+				shaper->eir,
+				&hppe_eir,
+				shaper->meter_unit,
+				token_unit);
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (shaper->meter_type == FAL_SHAPER_METER_MEF10_3) {
+			__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_QUEUE_SHAPER,
+				shaper->cir_max,
+				&hppe_cir_max,
+				shaper->meter_unit,
+				token_unit);
 
-		__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->cbs,
-									&hppe_cbs,
-									shaper->meter_unit,
-									token_unit);
+			__adpt_hppe_shaper_rate_to_refresh(ADPT_HPPE_QUEUE_SHAPER,
+				shaper->eir_max,
+				&hppe_eir_max,
+				shaper->meter_unit,
+				token_unit);
+		}
+		if (shaper->meter_type == FAL_SHAPER_METER_RFC) {
+			if (shaper->couple_en == A_FALSE) {
+				hppe_cir_max = hppe_cir;
+				hppe_eir_max = hppe_eir;
+			} else {
+				hppe_cir_max = hppe_cir;
+				hppe_eir_max = ADPT_HPPE_SHAPER_MAX;
+			}
+		}
+	}
+#endif
+	__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->cbs,
+				&hppe_cbs,
+				shaper->meter_unit,
+				token_unit);
 
-		__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->ebs,
-									&hppe_ebs,
-									shaper->meter_unit,
-									token_unit);
+	__adpt_hppe_shaper_burst_size_to_bucket_size(shaper->ebs,
+				&hppe_ebs,
+				shaper->meter_unit,
+				token_unit);
+	rv = hppe_l0_shp_cfg_tbl_get(dev_id, queue_id, &l0_shp_cfg_tbl);
+	SW_RTN_ON_ERROR (rv);
 
 	l0_shp_cfg_tbl.bf.cf = shaper->couple_en;
 	l0_shp_cfg_tbl.bf.meter_unit = shaper->meter_unit;
@@ -1329,7 +1531,21 @@ adpt_hppe_queue_shaper_set(a_uint32_t dev_id,a_uint32_t queue_id,
 	l0_shp_cfg_tbl.bf.eir = hppe_eir;
 	l0_shp_cfg_tbl.bf.token_unit = token_unit;
 	l0_comp_cfg_tbl.bf.shaper_meter_len = shaper->shaper_frame_mode;
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		l0_shp_cfg_tbl.bf.cir_max_0 = hppe_cir_max & 0x3fff;
+		l0_shp_cfg_tbl.bf.cir_max_1 = hppe_cir_max >> 14;
+		l0_shp_cfg_tbl.bf.eir_max = hppe_eir_max;
+		if (shaper->meter_type == FAL_SHAPER_METER_MEF10_3) {
+			l0_shp_cfg_tbl.bf.shp_refresh_nxt_ptr = shaper->next_ptr;
+			l0_shp_cfg_tbl.bf.grp_end = shaper->grp_end;
+			l0_shp_cfg_tbl.bf.grp_cf = shaper->grp_couple_en;
+		} else {
+			l0_shp_cfg_tbl.bf.grp_end = 0x1;
+		}
+		appe_queue_shaper_type[dev_id][queue_id] = shaper->meter_type;
+	}
+#endif
 	hppe_l0_shp_cfg_tbl_set(dev_id, queue_id, &l0_shp_cfg_tbl);
 
 	hppe_l0_comp_cfg_tbl_set(dev_id, queue_id, &l0_comp_cfg_tbl);
@@ -1373,7 +1589,6 @@ adpt_hppe_queue_shaper_time_slot_set(a_uint32_t dev_id, a_uint32_t time_slot)
 	__adpt_hppe_queue_shaper_max_rate(time_slot);
 
 	return SW_OK;
-
 }
 
 sw_error_t
@@ -1445,7 +1660,11 @@ void adpt_hppe_shaper_func_bitmap_init(a_uint32_t dev_id)
 						(1 << FUNC_ADPT_QUEUE_SHAPER_SET)|
 						(1 << FUNC_ADPT_QUEUE_SHAPER_TIME_SLOT_SET)|
 						(1 << FUNC_ADPT_SHAPER_IPG_PREAMBLE_LENGTH_SET)|
-						(1 << FUNC_ADPT_SHAPER_IPG_PREAMBLE_LENGTH_GET));
+						(1 << FUNC_ADPT_SHAPER_IPG_PREAMBLE_LENGTH_GET)|
+						(1 << FUNC_ADPT_QUEUE_SHAPER_CTRL_SET)|
+						(1 << FUNC_ADPT_QUEUE_SHAPER_CTRL_GET)|
+						(1 << FUNC_ADPT_FLOW_SHAPER_CTRL_SET)|
+						(1 << FUNC_ADPT_FLOW_SHAPER_CTRL_GET));
 
 	return;
 
@@ -1476,6 +1695,10 @@ static void adpt_hppe_shaper_func_unregister(a_uint32_t dev_id, adpt_api_t *p_ad
 	p_adpt_api->adpt_queue_shaper_time_slot_set = NULL;
 	p_adpt_api->adpt_shaper_ipg_preamble_length_set = NULL;
 	p_adpt_api->adpt_shaper_ipg_preamble_length_get = NULL;
+	p_adpt_api->adpt_queue_shaper_ctrl_set = NULL;
+	p_adpt_api->adpt_queue_shaper_ctrl_get = NULL;
+	p_adpt_api->adpt_flow_shaper_ctrl_set = NULL;
+	p_adpt_api->adpt_flow_shaper_ctrl_get = NULL;
 
 	return;
 
@@ -1533,6 +1756,16 @@ sw_error_t adpt_hppe_shaper_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_shaper_ipg_preamble_length_get =
 			adpt_hppe_shaper_ipg_preamble_length_get;
 	}
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if(p_adpt_api->adpt_shaper_func_bitmap & (1 << FUNC_ADPT_QUEUE_SHAPER_CTRL_GET)) {
+			p_adpt_api->adpt_queue_shaper_ctrl_get = adpt_appe_queue_shaper_ctrl_get;
+		}
+		if(p_adpt_api->adpt_shaper_func_bitmap & (1 << FUNC_ADPT_FLOW_SHAPER_CTRL_GET)) {
+			p_adpt_api->adpt_flow_shaper_ctrl_get = adpt_appe_flow_shaper_ctrl_get;
+		}
+	}
+#endif
 #endif
 	if(p_adpt_api->adpt_shaper_func_bitmap & (1 << FUNC_ADPT_FLOW_SHAPER_SET))
 	{
@@ -1582,7 +1815,16 @@ sw_error_t adpt_hppe_shaper_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_queue_shaper_time_slot_set = adpt_hppe_queue_shaper_time_slot_set;
 	}
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if(p_adpt_api->adpt_shaper_func_bitmap & (1 << FUNC_ADPT_QUEUE_SHAPER_CTRL_SET)) {
+			p_adpt_api->adpt_queue_shaper_ctrl_set = adpt_appe_queue_shaper_ctrl_set;
+		}
+		if(p_adpt_api->adpt_shaper_func_bitmap & (1 << FUNC_ADPT_FLOW_SHAPER_CTRL_SET)) {
+			p_adpt_api->adpt_flow_shaper_ctrl_set = adpt_appe_flow_shaper_ctrl_set;
+		}
+	}
+#endif
 	return SW_OK;
 }
 

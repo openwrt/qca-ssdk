@@ -16,6 +16,7 @@
 
 #include "ssdk_init.h"
 #include "ssdk_hppe.h"
+#include "ssdk_appe.h"
 #include "ssdk_clk.h"
 #include "ssdk_dts.h"
 #include "adpt.h"
@@ -359,6 +360,73 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 }
 #endif
 
+#if defined(IN_SHAPER)
+static sw_error_t
+qca_appe_shaper_hw_init(a_uint32_t dev_id)
+{
+	fal_shaper_token_number_t port_token_number, queue_token_number;
+	fal_shaper_token_number_t flow_token_number;
+	fal_shaper_config_t queue_shaper, flow_shaper;
+	fal_shaper_ctrl_t queue_shaper_ctrl, flow_shaper_ctrl;
+	a_uint32_t i = 0;
+
+	memset(&queue_shaper, 0, sizeof(queue_shaper));
+	memset(&flow_shaper, 0, sizeof(flow_shaper));
+
+	port_token_number.c_token_number_negative_en = A_FALSE;
+	port_token_number.c_token_number = APPE_MAX_C_TOKEN_NUM;
+	queue_token_number.c_token_number_negative_en = A_FALSE;
+	queue_token_number.c_token_number = APPE_MAX_C_TOKEN_NUM;
+	queue_token_number.e_token_number_negative_en = A_FALSE;
+	queue_token_number.e_token_number = APPE_MAX_E_TOKEN_NUM;
+	flow_token_number.c_token_number_negative_en = A_FALSE;
+	flow_token_number.c_token_number = APPE_MAX_C_TOKEN_NUM;
+	flow_token_number.e_token_number_negative_en = A_FALSE;
+	flow_token_number.e_token_number = APPE_MAX_E_TOKEN_NUM;
+
+	for (i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT7; i++) {
+		fal_port_shaper_token_number_set(dev_id, i, &port_token_number);
+	}
+
+	for(i = 0; i < SSDK_L0SCHEDULER_CFG_MAX; i ++) {
+		fal_queue_shaper_token_number_set(dev_id, i, &queue_token_number);
+		queue_shaper.meter_type = FAL_SHAPER_METER_MEF10_3;
+		queue_shaper.next_ptr = i + 1;
+		if (queue_shaper.next_ptr == SSDK_L0SCHEDULER_CFG_MAX) {
+			queue_shaper.next_ptr = 0;
+		}
+		queue_shaper.grp_end = A_TRUE;
+		fal_queue_shaper_set(dev_id, i, &queue_shaper);
+	}
+
+	for(i = 0; i < SSDK_L1SCHEDULER_CFG_MAX; i ++) {
+		fal_flow_shaper_token_number_set(dev_id, i, &flow_token_number);
+		flow_shaper.meter_type = FAL_SHAPER_METER_MEF10_3;
+		flow_shaper.next_ptr = i + 1;
+		if (flow_shaper.next_ptr == SSDK_L1SCHEDULER_CFG_MAX) {
+			flow_shaper.next_ptr = 0;
+		}
+		flow_shaper.grp_end = A_TRUE;
+		fal_flow_shaper_set(dev_id, i, &flow_shaper);
+	}
+
+	fal_port_shaper_timeslot_set(dev_id, APPE_PORT_SHAPER_TIMESLOT_DFT);
+	fal_flow_shaper_timeslot_set(dev_id, APPE_FLOW_SHAPER_TIMESLOT_DFT);
+	fal_queue_shaper_timeslot_set(dev_id, APPE_QUEUE_SHAPER_TIMESLOT_DFT);
+	fal_shaper_ipg_preamble_length_set(dev_id,
+				APPE_SHAPER_IPG_PREAMBLE_LEN_DFT);
+	queue_shaper_ctrl.head = APPE_QUEUE_SHAPER_HEAD;
+	queue_shaper_ctrl.tail = APPE_QUEUE_SHAPER_TAIL;
+	fal_queue_shaper_ctrl_set(dev_id, &queue_shaper_ctrl);
+
+	flow_shaper_ctrl.head = APPE_FLOW_SHAPER_HEAD;
+	flow_shaper_ctrl.tail = APPE_FLOW_SHAPER_TAIL;
+	fal_flow_shaper_ctrl_set(dev_id, &flow_shaper_ctrl);
+
+	return SW_OK;
+}
+#endif
+
 sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
@@ -418,11 +486,13 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	rv = qca_appe_policer_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
+#endif
+
 #if defined(IN_SHAPER)
 	rv = qca_appe_shaper_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
-#endif
+
 #if defined(IN_FLOW)
 	rv = qca_hppe_flow_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);

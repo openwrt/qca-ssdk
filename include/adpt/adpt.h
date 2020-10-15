@@ -1589,6 +1589,7 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
 		a_uint32_t module, fal_func_ctrl_t *func_ctrl);
 sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
+a_uint32_t adpt_chip_type_get(a_uint32_t dev_id);
 #ifdef SCOMPHY
 a_uint32_t adapt_scomphy_revision_get(a_uint32_t dev_id);
 #endif

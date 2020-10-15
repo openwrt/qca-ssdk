@@ -22,14 +22,14 @@
 #include "hsl_phy.h"
 
 #if defined(IN_VSI)
-static sw_error_t qca_hppe_vsi_hw_init(a_uint32_t dev_id)
+sw_error_t qca_hppe_vsi_hw_init(a_uint32_t dev_id)
 {
        return ppe_vsi_init(dev_id);
 }
 #endif
 
 #if defined(IN_FDB)
-static sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
+sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t port = 0;
 	adpt_api_t *p_api;
@@ -58,7 +58,7 @@ static sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 
 #if defined(IN_CTRLPKT)
 #define RFDB_PROFILE_ID_STP 31
-static sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
+sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 {
 	fal_mac_addr_t mcast_mac_addr;
 	fal_ctrlpkt_action_t ctrlpkt_action;
@@ -139,7 +139,7 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_POLICER)
-static sw_error_t
+sw_error_t
 qca_hppe_policer_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
@@ -196,7 +196,7 @@ qca_hppe_shaper_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_PORTVLAN)
-static sw_error_t
+sw_error_t
 qca_hppe_portvlan_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t port_id = 0, vsi_idx = 0;
@@ -877,7 +877,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_QOS)
-static sw_error_t
+sw_error_t
 qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
@@ -1130,7 +1130,7 @@ sw_error_t qca_hppe_acl_remark_ptp_servcode(a_uint32_t dev_id) {
 #endif
 #endif
 
-static sw_error_t
+sw_error_t
 qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mode1, a_uint32_t mode2)
 {
 
@@ -1174,7 +1174,7 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 
 
 #if defined(IN_FLOW)
-static sw_error_t
+sw_error_t
 qca_hppe_flow_hw_init(a_uint32_t dev_id)
 {
 	fal_flow_direction_t dir, dir_max;

@@ -171,6 +171,7 @@ enum ssdk_port_wrapper_cfg {
         CHIP_DESS,
         CHIP_HPPE,
 	CHIP_SCOMPHY,
+        CHIP_APPE,
     } ssdk_chip_type;
 /*qca808x_end*/
 	typedef struct

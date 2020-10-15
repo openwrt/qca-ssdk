@@ -184,6 +184,7 @@ enum {
 	QCA_VER_AR8337 = 0x13,
 	QCA_VER_DESS = 0x14,
 	QCA_VER_HPPE = 0x15,
+	QCA_VER_APPE = 0x20,
 	QCA_VER_SCOMPHY = 0xEE
 };
 /*qca808x_end*/

@@ -188,7 +188,6 @@ sw_error_t hppe_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 {
     HSL_DEV_ID_CHECK(dev_id);
 
-    printk("HPPE initializing...\n");
     if (NULL == hppe_cfg[dev_id])
     {
         hppe_cfg[dev_id] = aos_mem_alloc(sizeof (ssdk_init_cfg));

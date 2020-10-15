@@ -68,6 +68,10 @@ else
      SUPPORT_CHIP = SCOMPHY MP
   endif
 
+  ifeq (APPE, $(CHIP_TYPE))
+     SUPPORT_CHIP = HPPE APPE
+  endif
+
   ifeq ($(ISISC_ENABLE), enable)
       SUPPORT_CHIP += ISISC
   endif

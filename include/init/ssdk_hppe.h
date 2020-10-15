@@ -25,6 +25,18 @@ extern "C" {
 
 sw_error_t qca_hppe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 
+sw_error_t qca_hppe_vsi_hw_init(a_uint32_t dev_id);
+sw_error_t qca_hppe_portvlan_hw_init(a_uint32_t dev_id);
+sw_error_t qca_hppe_flow_hw_init(a_uint32_t dev_id);
+sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id);
+sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id);
+sw_error_t qca_hppe_acl_byp_intf_mac_learn(a_uint32_t dev_id);
+sw_error_t qca_hppe_acl_remark_ptp_servcode(a_uint32_t dev_id);
+sw_error_t qca_hppe_interface_mode_init(a_uint32_t dev_id,
+		a_uint32_t mode0, a_uint32_t mode1, a_uint32_t mode2);
+sw_error_t
+qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id);
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

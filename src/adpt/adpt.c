@@ -42,6 +42,12 @@ a_uint32_t adapt_scomphy_revision_get(a_uint32_t dev_id)
 	return g_chip_ver[dev_id].chip_revision;
 }
 #endif
+
+a_uint32_t adpt_chip_type_get(a_uint32_t dev_id)
+{
+	return g_chip_ver[dev_id].chip_type;
+}
+
 #if defined(HPPE)
 a_uint32_t adpt_hppe_chip_revision_get(a_uint32_t dev_id)
 {
@@ -328,12 +334,29 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 	switch (cfg->chip_type)
 	{
+#if defined(APPE)
+		case CHIP_APPE:
+			/* APPE specific module initialization */
+			if (g_adpt_api[dev_id] == NULL) {
+				g_adpt_api[dev_id] = aos_mem_alloc(sizeof(adpt_api_t));
+			}
+
+			if(!g_adpt_api[dev_id]) {
+				SSDK_ERROR("%s, %d:malloc fail for adpt api\n",
+						__FUNCTION__, __LINE__);
+				return SW_FAIL;
+			}
+#endif
 #if defined(HPPE)
 		case CHIP_HPPE:
-			g_adpt_api[dev_id] = aos_mem_alloc(sizeof(adpt_api_t));
+			if (g_adpt_api[dev_id] == NULL) {
+				g_adpt_api[dev_id] = aos_mem_alloc(sizeof(adpt_api_t));
+			}
+
 			if(g_adpt_api[dev_id] == NULL)
 			{
-				printk("%s, %d:malloc fail for adpt api\n", __FUNCTION__, __LINE__);
+				SSDK_ERROR("%s, %d:malloc fail for adpt api\n",
+						__FUNCTION__, __LINE__);
 				return SW_FAIL;
 			}
 			aos_mem_zero(g_adpt_api[dev_id], sizeof(adpt_api_t));
@@ -493,7 +516,10 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 	switch (cfg->chip_type)
 	{
-		#if defined(HPPE)
+#if defined(APPE)
+		case CHIP_APPE:
+#endif
+#if defined(HPPE)
 		case CHIP_HPPE:
 			g_adpt_api[dev_id]->adpt_mirror_func_bitmap = 0;
 #if defined(IN_MIRROR)

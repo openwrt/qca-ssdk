@@ -91,6 +91,8 @@ static sw_error_t hsl_set_current_chip_type(ssdk_chip_type chip_type)
         SSDK_CURRENT_CHIP_TYPE = CHIP_ISISC;
 #elif defined DESS
         SSDK_CURRENT_CHIP_TYPE = CHIP_DESS;
+#elif defined APPE
+        SSDK_CURRENT_CHIP_TYPE = CHIP_APPE;
 #elif defined HPPE
         SSDK_CURRENT_CHIP_TYPE = CHIP_HPPE;
 #elif defined SCOMPHY
@@ -226,6 +228,7 @@ hsl_dev_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
             rv = dess_init(dev_id, cfg);
 #endif
             break;
+        case CHIP_APPE:
         case CHIP_HPPE:
 #if defined HPPE
             rv = hppe_init(dev_id, cfg);
@@ -317,6 +320,10 @@ hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg)
 
         case CHIP_HPPE:
             aos_mem_copy(ssdk_cfg->chip_type, "hppe", sizeof("hppe"));
+            break;
+
+        case CHIP_APPE:
+            aos_mem_copy(ssdk_cfg->chip_type, "appe", sizeof("appe"));
             break;
 
         case CHIP_SCOMPHY:

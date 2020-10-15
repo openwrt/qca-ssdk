@@ -133,6 +133,9 @@
 #ifdef HPPE
 #include "ssdk_hppe.h"
 #endif
+#ifdef APPE
+#include "ssdk_appe.h"
+#endif
 #ifdef SCOMPHY
 #include "ssdk_scomphy.h"
 #endif
@@ -1525,6 +1528,10 @@ static int qca_switchdev_register(struct qca_phy_priv *priv)
 			sw_dev->name = "QCA DESS";
 			sw_dev->alias = "QCA DESS";
 			break;
+		case QCA_VER_APPE:
+			sw_dev->name = "QCA APPE";
+			sw_dev->alias = "QCA APPE";
+			break;
 		case QCA_VER_HPPE:
 			sw_dev->name = "QCA HPPE";
 			sw_dev->alias = "QCA HPPE";
@@ -1750,7 +1757,8 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 #endif
 #endif
 #ifdef HPPE
-	if (priv->version == QCA_VER_HPPE) {
+	if (priv->version == QCA_VER_HPPE ||
+			priv->version == QCA_VER_APPE) {
 		ret = qca_mac_sw_sync_work_start(priv);
 		if (ret != 0) {
 			SSDK_ERROR("qca_mac_sw_sync_work_start failed for chip 0x%02x%02x\n",
@@ -2025,6 +2033,7 @@ static const struct of_device_id ssdk_of_mtable[] = {
 	{.compatible = "qcom,ess-switch" },
 	{.compatible = "qcom,ess-switch-ipq60xx" },
 	{.compatible = "qcom,ess-switch-ipq807x" },
+	{.compatible = "qcom,ess-switch-ipq90xx" },
 	{.compatible = "qcom,ess-instance" },
 	{}
 };
@@ -2661,6 +2670,10 @@ static int chip_ver_get(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 		cfg->chip_type = CHIP_DESS;
 	else if(chip_ver == QCA_VER_HPPE) {
 		cfg->chip_type = CHIP_HPPE;
+		cfg->chip_revision = chip_revision;
+	}
+	else if(chip_ver == QCA_VER_APPE) {
+		cfg->chip_type = CHIP_APPE;
 		cfg->chip_revision = chip_revision;
 	}
 	else {
@@ -3519,6 +3532,15 @@ static int __init regi_init(void)
 					rv = qca_ar8327_hw_init(qca_phy_priv_global[dev_id]);
 					SSDK_INFO("Initializing ISISC Done!!\n");
 				}
+#endif
+				break;
+			case CHIP_APPE:
+#if defined(APPE)
+				SSDK_INFO("Initializing APPE!!\n");
+				qca_appe_hw_init(&cfg, dev_id);
+				rv = ssdk_switch_register(dev_id, cfg.chip_type);
+				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
+				SSDK_INFO("Initializing APPE Done!!\n");
 #endif
 				break;
 			case CHIP_HPPE:

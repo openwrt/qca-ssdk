@@ -21,6 +21,9 @@
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
 #include "adpt.h"
+#ifdef APPE
+#include "adpt_appe_fdb.h"
+#endif
 
 #define OP_TYPE_ADD	0x0
 #define OP_TYPE_DEL	0x1
@@ -909,6 +912,17 @@ adpt_hppe_fdb_port_maclimit_ctrl_set(a_uint32_t dev_id, fal_port_t port_id, fal_
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_maclimit_ctrl_set(dev_id, port_id,
+				maclimit_ctrl);
+			return rv;
+		}
+	}
+#endif
 	rv = hppe_port_lrn_limit_ctrl_get(dev_id, port_id, &port_lrn_limit_ctrl);
 
 	if( rv != SW_OK )
@@ -929,6 +943,18 @@ adpt_hppe_fdb_port_maclimit_ctrl_get(a_uint32_t dev_id, fal_port_t port_id, fal_
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(maclimit_ctrl);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_maclimit_ctrl_get(dev_id, port_id,
+				maclimit_ctrl);
+			return rv;
+		}
+	}
+#endif
 
 	rv = hppe_port_lrn_limit_ctrl_get(dev_id, port_id, &port_lrn_limit_ctrl);
 
@@ -951,6 +977,17 @@ adpt_hppe_port_fdb_learn_limit_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_vport_fdb_learn_limit_set(dev_id, port_id, enable, cnt);
+			return rv;
+		}
+	}
+#endif
+
 	rv = adpt_hppe_fdb_port_maclimit_ctrl_get(dev_id, port_id, &maclimit_ctrl);
 	if( rv != SW_OK )
 		return rv;
@@ -971,6 +1008,17 @@ adpt_hppe_port_fdb_learn_limit_get(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(enable);
 	ADPT_NULL_POINT_CHECK(cnt);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_vport_fdb_learn_limit_get(dev_id, port_id, enable, cnt);
+			return rv;
+		}
+	}
+#endif
 
 	rv = adpt_hppe_fdb_port_maclimit_ctrl_get(dev_id, port_id, &maclimit_ctrl);
 	if( rv != SW_OK )
@@ -1089,6 +1137,17 @@ adpt_hppe_fdb_port_learn_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t ena
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_learn_set(dev_id, port_id, enable);
+			return rv;
+		}
+	}
+#endif
+
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
 	if( rv != SW_OK )
@@ -1109,6 +1168,17 @@ adpt_hppe_fdb_port_learn_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *en
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(enable);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_learn_get(dev_id, port_id, enable);
+			return rv;
+		}
+	}
+#endif
+
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
 	if( rv != SW_OK )
@@ -1127,6 +1197,17 @@ adpt_hppe_fdb_port_newaddr_lrn_set(a_uint32_t dev_id, fal_port_t port_id, a_bool
 
 	memset(&port_bridge_ctrl, 0, sizeof(port_bridge_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_newaddr_lrn_set(dev_id, port_id, enable, cmd);
+			return rv;
+		}
+	}
+#endif
 
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
@@ -1150,6 +1231,17 @@ adpt_hppe_fdb_port_newaddr_lrn_get(a_uint32_t dev_id, fal_port_t port_id, a_bool
 	ADPT_NULL_POINT_CHECK(enable);
 	ADPT_NULL_POINT_CHECK(cmd);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_newaddr_lrn_get(dev_id, port_id, enable, cmd);
+			return rv;
+		}
+	}
+#endif
+
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
 	if( rv != SW_OK )
@@ -1169,6 +1261,17 @@ adpt_hppe_fdb_port_stamove_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t e
 
 	memset(&port_bridge_ctrl, 0, sizeof(port_bridge_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_stamove_set(dev_id, port_id, enable, cmd);
+			return rv;
+		}
+	}
+#endif
 
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
@@ -1192,6 +1295,17 @@ adpt_hppe_fdb_port_stamove_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *
 	ADPT_NULL_POINT_CHECK(enable);
 	ADPT_NULL_POINT_CHECK(cmd);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_fdb_vport_stamove_get(dev_id, port_id, enable, cmd);
+			return rv;
+		}
+	}
+#endif
+
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
 	if( rv != SW_OK )
@@ -1213,6 +1327,17 @@ adpt_hppe_port_fdb_learn_counter_get(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(cnt);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_vport_fdb_learn_counter_get(dev_id, port_id, cnt);
+			return rv;
+		}
+	}
+#endif
+
 	rv = hppe_port_lrn_limit_counter_get(dev_id, port_id, &port_lrn_limit_counter);
 
 	if( rv != SW_OK )
@@ -1232,6 +1357,17 @@ adpt_hppe_port_fdb_learn_exceed_cmd_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_vport_fdb_learn_exceed_cmd_set(dev_id, port_id, cmd);
+			return rv;
+		}
+	}
+#endif
+
 	rv = adpt_hppe_fdb_port_maclimit_ctrl_get(dev_id, port_id, &maclimit_ctrl);
 	if( rv != SW_OK )
 		return rv;
@@ -1250,6 +1386,17 @@ adpt_hppe_port_fdb_learn_exceed_cmd_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(cmd);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			rv = adpt_appe_vport_fdb_learn_exceed_cmd_get(dev_id, port_id, cmd);
+			return rv;
+		}
+	}
+#endif
 
 	rv = adpt_hppe_fdb_port_maclimit_ctrl_get(dev_id, port_id, &maclimit_ctrl);
 	if( rv != SW_OK )

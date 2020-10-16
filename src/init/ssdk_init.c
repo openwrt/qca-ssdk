@@ -1759,11 +1759,13 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 #ifdef HPPE
 	if (priv->version == QCA_VER_HPPE ||
 			priv->version == QCA_VER_APPE) {
-		ret = qca_mac_sw_sync_work_start(priv);
-		if (ret != 0) {
-			SSDK_ERROR("qca_mac_sw_sync_work_start failed for chip 0x%02x%02x\n",
-				priv->version, priv->revision);
-			return ret;
+		if(!ssdk_is_emulation(dev_id)) {
+			ret = qca_mac_sw_sync_work_start(priv);
+			if (ret != 0) {
+				SSDK_ERROR("qca_mac_sw_sync_work_start failed for chip 0x%02x%02x\n",
+						priv->version, priv->revision);
+				return ret;
+			}
 		}
 	}
 #endif
@@ -1777,7 +1779,9 @@ static int ssdk_switch_unregister(a_uint32_t dev_id)
 	qca_phy_mib_work_stop(qca_phy_priv_global[dev_id]);
 	qm_err_check_work_stop(qca_phy_priv_global[dev_id]);
 #ifdef HPPE
-	qca_mac_sw_sync_work_stop(qca_phy_priv_global[dev_id]);
+	if(!ssdk_is_emulation(dev_id)) {
+		qca_mac_sw_sync_work_stop(qca_phy_priv_global[dev_id]);
+	}
 #endif
 #if defined(IN_SWCONFIG)
 	unregister_switch(&qca_phy_priv_global[dev_id]->sw_dev);
@@ -2395,9 +2399,14 @@ ssdk_init(a_uint32_t dev_id, ssdk_init_cfg * cfg)
 	if (rv != SW_OK)
 		SSDK_ERROR("ssdk fal init failed: %d. \r\n", rv);
 
-	rv = ssdk_phy_driver_init(dev_id, cfg);
-	if (rv != SW_OK)
-		SSDK_ERROR("ssdk phy init failed: %d. \r\n", rv);
+/*qca808x_end*/
+	if(!ssdk_is_emulation(dev_id))
+/*qca808x_start*/
+	{
+		rv = ssdk_phy_driver_init(dev_id, cfg);
+		if (rv != SW_OK)
+			SSDK_ERROR("ssdk phy init failed: %d. \r\n", rv);
+	}
 
 	return rv;
 }
@@ -2408,7 +2417,12 @@ ssdk_cleanup(a_uint32_t dev_id)
 	sw_error_t rv;
 
 	rv = fal_cleanup(dev_id);
-	rv = ssdk_phy_driver_cleanup(dev_id);
+/*qca808x_end*/
+	if(!ssdk_is_emulation(dev_id))
+/*qca808x_start*/
+	{
+		rv = ssdk_phy_driver_cleanup(dev_id);
+	}
 
 	return rv;
 }

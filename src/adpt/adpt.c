@@ -24,6 +24,7 @@
 #include "adpt_mp.h"
 #endif
 #include "hsl_phy.h"
+#include "ssdk_dts.h"
 
 adpt_api_t *g_adpt_api[SW_MAX_NR_DEV] = {NULL};
 
@@ -462,10 +463,11 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			rv = adpt_hppe_module_func_register(dev_id, FAL_MODULE_SFP);
 			SW_RTN_ON_ERROR(rv);
 
-			/* uniphy */
-			rv = adpt_hppe_uniphy_init(dev_id);
-			SW_RTN_ON_ERROR(rv);
-
+			if(!ssdk_is_emulation(dev_id)) {
+				/* uniphy */
+				rv = adpt_hppe_uniphy_init(dev_id);
+				SW_RTN_ON_ERROR(rv);
+			}
 			break;
 #endif
 #if defined (SCOMPHY)

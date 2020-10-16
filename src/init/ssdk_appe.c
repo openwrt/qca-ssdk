@@ -17,13 +17,16 @@
 #include "ssdk_init.h"
 #include "ssdk_hppe.h"
 #include "ssdk_clk.h"
+#include "ssdk_dts.h"
 
 sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 
-	/* reset ppe */
-	ssdk_ppe_reset_init();
+	if(!ssdk_is_emulation(dev_id)) {
+		/* reset ppe */
+		ssdk_ppe_reset_init();
+	}
 
 	rv = qca_switch_init(dev_id);
 	SW_RTN_ON_ERROR(rv);

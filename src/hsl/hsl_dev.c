@@ -452,27 +452,23 @@ hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg)
 }
 /*qca808x_start*/
 sw_error_t
-hsl_dev_cleanup(void)
+hsl_dev_cleanup(a_uint32_t dev_id)
 {
     sw_error_t rv = SW_OK;
-    a_uint32_t dev_id;
 
-    for (dev_id = 0; dev_id < SW_MAX_NR_DEV; dev_id++)
+    if (dev_ssdk_cfg[dev_id])
     {
-        if (dev_ssdk_cfg[dev_id])
-        {
-            hsl_api_t *p_api;
+	    hsl_api_t *p_api;
 
-            SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-            if (p_api->dev_clean)
-            {
-                rv = p_api->dev_clean(dev_id);
-                SW_RTN_ON_ERROR(rv);
-            }
+	    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
+	    if (p_api->dev_clean)
+	    {
+		    rv = p_api->dev_clean(dev_id);
+		    SW_RTN_ON_ERROR(rv);
+	    }
 
-            aos_mem_free(dev_ssdk_cfg[dev_id]);
-            dev_ssdk_cfg[dev_id] = NULL;
-        }
+	    aos_mem_free(dev_ssdk_cfg[dev_id]);
+	    dev_ssdk_cfg[dev_id] = NULL;
     }
 
 #ifdef UK_IF

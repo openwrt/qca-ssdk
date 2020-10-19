@@ -696,7 +696,7 @@ void
 hsl_port_phy_dac_set(a_uint32_t dev_id, a_uint32_t port_id,
 	phy_dac_t phy_dac);
 /*qca808x_start*/
-sw_error_t ssdk_phy_driver_cleanup(void);
+sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id);
 /*qca808x_end*/
 sw_error_t
 hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id,

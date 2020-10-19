@@ -787,31 +787,26 @@ hsl_port_phydev_adv_update(a_uint32_t dev_id, a_uint32_t port_id,
 #endif
 
 /*qca808x_start*/
-sw_error_t ssdk_phy_driver_cleanup(void)
+sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)
 {
-	a_uint32_t i = 0, j = 0;
+	a_uint32_t i = 0;
 
 	for (i = 0; i < MAX_PHY_CHIP;i++) {
-		for (j = 0; j < SW_MAX_NR_DEV; j++) {
-			if (ssdk_phy_driver[i].port_bmp[j] != 0 &&
-			    ssdk_phy_driver[i].exit != NULL) {
-				ssdk_phy_driver[i].exit(j, ssdk_phy_driver[i].port_bmp[j]);
-			}
+		if (ssdk_phy_driver[i].port_bmp[dev_id] != 0 &&
+				ssdk_phy_driver[i].exit != NULL) {
+			ssdk_phy_driver[i].exit(dev_id,
+					ssdk_phy_driver[i].port_bmp[dev_id]);
 		}
-		if(ssdk_phy_driver[i].phy_ops != NULL)
-		{
+		if(ssdk_phy_driver[i].phy_ops != NULL) {
 			kfree(ssdk_phy_driver[i].phy_ops);
 			ssdk_phy_driver[i].phy_ops = NULL;
 		}
 	}
 
-	for(i = 0; i < SW_MAX_NR_DEV;i++) {
-
-		if(phy_info[i] != NULL)
-		{
-			kfree(phy_info[i]);
-			phy_info[i] = NULL;
-		}
+	if(phy_info[dev_id] != NULL)
+	{
+		kfree(phy_info[dev_id]);
+		phy_info[dev_id] = NULL;
 	}
 	return SW_OK;
 }

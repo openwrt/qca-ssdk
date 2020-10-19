@@ -661,32 +661,27 @@ fal_vlan_init(a_uint32_t dev_id)
 }
 
 sw_error_t
-fal_vlan_cleanup(void)
+fal_vlan_cleanup(a_uint32_t dev_id)
 {
-    a_uint32_t dev_id;
+	if (vlan_db[dev_id])
+	{
+		aos_mem_free(vlan_db[dev_id]);
+		vlan_db[dev_id] = NULL;
+	}
 
-    for (dev_id = 0; dev_id < SW_MAX_NR_DEV; dev_id++)
-    {
-        if (vlan_db[dev_id])
-        {
-            aos_mem_free(vlan_db[dev_id]);
-            vlan_db[dev_id] = NULL;
-        }
+	if (vlan_pool[dev_id])
+	{
+		sid_pool_destroy(vlan_pool[dev_id]);
+		vlan_pool[dev_id] = NULL;
+	}
 
-        if (vlan_pool[dev_id])
-        {
-            sid_pool_destroy(vlan_pool[dev_id]);
-            vlan_pool[dev_id] = NULL;
-        }
+	if (vlan_list[dev_id])
+	{
+		sll_destroy(vlan_list[dev_id]);
+		vlan_list[dev_id] = NULL;
+	}
 
-        if (vlan_list[dev_id])
-        {
-            sll_destroy(vlan_list[dev_id]);
-            vlan_list[dev_id] = NULL;
-        }
-    }
-
-    return SW_OK;
+	return SW_OK;
 }
 
 /**

@@ -102,15 +102,15 @@ _fal_module_func_ctrl_get(a_uint32_t dev_id, a_uint32_t module, fal_func_ctrl_t 
 }
 /*qca808x_start*/
 sw_error_t
-fal_cleanup(void)
+fal_cleanup(a_uint32_t dev_id)
 {
     sw_error_t rv;
 
-    rv = hsl_dev_cleanup();
+    rv = hsl_dev_cleanup(dev_id);
     SW_RTN_ON_ERROR(rv);
 /*qca808x_end*/
 #ifdef IN_VLAN
-    rv = fal_vlan_cleanup();
+    rv = fal_vlan_cleanup(dev_id);
     SW_RTN_ON_ERROR(rv);
 #endif
 /*qca808x_start*/

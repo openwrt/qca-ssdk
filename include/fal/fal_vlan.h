@@ -89,7 +89,7 @@ extern "C" {
 
 
     sw_error_t
-    fal_vlan_cleanup(void);
+    fal_vlan_cleanup(a_uint32_t dev_id);
 
 
     sw_error_t

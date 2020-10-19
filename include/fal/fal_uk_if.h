@@ -32,7 +32,7 @@ extern "C" {
     ssdk_init(a_uint32_t dev_id, ssdk_init_cfg * cfg);
 
     sw_error_t
-    ssdk_cleanup(void);
+    ssdk_cleanup(a_uint32_t dev_id);
 
 #ifdef __cplusplus
 }

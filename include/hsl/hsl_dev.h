@@ -58,7 +58,7 @@ do { \
     hsl_dev_init(a_uint32_t dev_id, ssdk_init_cfg * cfg);
 
     sw_error_t
-    hsl_dev_cleanup(void);
+    hsl_dev_cleanup(a_uint32_t dev_id);
 
 /*qca808x_end*/
     sw_error_t

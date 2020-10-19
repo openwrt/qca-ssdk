@@ -2394,12 +2394,12 @@ ssdk_init(a_uint32_t dev_id, ssdk_init_cfg * cfg)
 }
 
 sw_error_t
-ssdk_cleanup(void)
+ssdk_cleanup(a_uint32_t dev_id)
 {
 	sw_error_t rv;
 
-	rv = fal_cleanup();
-	rv = ssdk_phy_driver_cleanup();
+	rv = fal_cleanup(dev_id);
+	rv = ssdk_phy_driver_cleanup(dev_id);
 
 	return rv;
 }
@@ -3604,10 +3604,8 @@ out:
 static void __exit
 regi_exit(void)
 {
-/*qca808x_end*/
 	a_uint32_t dev_id, dev_num = 1;
-/*qca808x_start*/
-	sw_error_t rv;
+	sw_error_t rv = SW_OK;
 /*qca808x_end*/
 	dev_num = ssdk_switch_device_num_get();
 	for (dev_id = 0; dev_id < dev_num; dev_id++) {
@@ -3618,9 +3616,11 @@ regi_exit(void)
 #endif
 	}
 /*qca808x_start*/
-	rv = ssdk_cleanup();
+	for (dev_id = 0; dev_id < dev_num; dev_id++) {
+		rv = ssdk_cleanup(dev_id);
+	}
 
-	if (rv == 0)
+	if (rv == SW_OK)
 		SSDK_INFO("qca-%s module exit  done!\n", SSDK_STR);
 	else
 		SSDK_ERROR("qca-%s module exit failed! (code: %d)\n", SSDK_STR, rv);

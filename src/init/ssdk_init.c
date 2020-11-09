@@ -2427,7 +2427,7 @@ void switch_cpuport_setup(a_uint32_t dev_id)
 	fal_port_rxmac_status_set(dev_id, 0, A_TRUE);
 #endif
 }
-
+#ifdef IN_AQUANTIA_PHY
 #ifdef CONFIG_MDIO
 static struct mdio_if_info ssdk_mdio_ctl;
 #endif
@@ -2529,7 +2529,7 @@ static void ssdk_miireg_ioctrl_unregister(void)
 		ssdk_miireg_netdev = NULL;
 	}
 }
-
+#endif
 static void ssdk_driver_register(a_uint32_t dev_id)
 {
 	hsl_reg_mode reg_mode;
@@ -3407,7 +3407,9 @@ static int ssdk_alloc_priv(a_uint32_t dev_num)
 #if defined (ISISC) || defined (ISIS)
 static void qca_ar8327_gpio_reset(struct qca_phy_priv *priv)
 {
-	struct device_node *mdio_node = NULL, *np = NULL;
+	struct device_node *np = NULL;
+	const __be32 *reset_gpio;
+	a_int32_t len;
 	int gpio_num = 0, ret = 0;
 
 	if (priv->ess_switch_flag == A_TRUE)
@@ -3421,20 +3423,20 @@ static void qca_ar8327_gpio_reset(struct qca_phy_priv *priv)
 	if(!np)
 		return;
 
-	mdio_node = of_parse_phandle(np, "mdio-bus", 0);
-	if(!mdio_node)
+	reset_gpio = of_get_property(np, "reset_gpio", &len);
+	if (!reset_gpio )
 	{
-		SSDK_INFO("mdio node doesn't exist\n");
+		SSDK_INFO("reset_gpio node does not exist\n");
 		return;
 	}
-	gpio_num = of_get_named_gpio(mdio_node, "phy-reset-gpio",
-					SSDK_PHY_RESET_GPIO_INDEX);
+
+	gpio_num = be32_to_cpup(reset_gpio);
 	if(gpio_num <= 0)
 	{
 		SSDK_INFO("reset gpio doesn't exist\n ");
 		return;
 	}
-	ret = gpio_request(gpio_num, "phy-reset-gpio");
+	ret = gpio_request(gpio_num, "reset_gpio");
 	if(ret)
 	{
 		SSDK_ERROR("gpio%d request failed, ret:%d\n", gpio_num, ret);
@@ -3493,8 +3495,9 @@ static int __init regi_init(void)
 		rv = chip_ver_get(dev_id, &cfg);
 		SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 /*qca808x_end*/
+#ifdef IN_AQUANTIA_PHY
 		ssdk_miireg_ioctrl_register();
-
+#endif
 		memset(&chip_spec_cfg, 0, sizeof(garuda_init_spec_cfg));
 		cfg.chip_spec_cfg = &chip_spec_cfg;
 /*qca808x_start*/
@@ -3628,8 +3631,9 @@ regi_exit(void)
 #endif
 
 	ssdk_sysfs_exit();
+#ifdef IN_AQUANTIA_PHY
 	ssdk_miireg_ioctrl_unregister();
-
+#endif
 	for (dev_id = 0; dev_id < dev_num; dev_id++) {
 		ssdk_plat_exit(dev_id);
 	}

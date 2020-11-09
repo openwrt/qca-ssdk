@@ -438,11 +438,10 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 			rv = adpt_hppe_module_func_register(dev_id, FAL_MODULE_SFP);
 			SW_RTN_ON_ERROR(rv);
-#if 0
+
 			/* uniphy */
 			rv = adpt_hppe_uniphy_init(dev_id);
 			SW_RTN_ON_ERROR(rv);
-#endif
 
 			break;
 #endif

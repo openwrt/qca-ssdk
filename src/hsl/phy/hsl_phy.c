@@ -171,11 +171,9 @@ a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 	a_uint32_t reg_pad = 0, phy_id = 0;
 
 /*qca808x_end*/
-#if 0
 	if(ssdk_is_emulation(dev_id) && ssdk_emu_chip_ver_get(dev_id) == MP_GEPHY){
 		return MP_GEPHY;
 	}
-#endif
 /*qca808x_start*/
 	if (hsl_port_is_sfp(dev_id, port_id, cfg)){
 		return SFP_PHY;
@@ -315,11 +313,9 @@ int ssdk_phy_driver_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 		if (port_bmp[dev_id] & (0x1 << i))
 		{
 /*qca808x_end*/
-#if 0
 			if(ssdk_port_feature_get(dev_id, i, PHY_F_FORCE)) {
 				continue;
 			}
-#endif
 /*qca808x_start*/
 			phy_id = hsl_phyid_get(dev_id, i, cfg);
 			phytype = hsl_phytype_get_by_phyid(dev_id, phy_id);

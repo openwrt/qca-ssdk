@@ -27,7 +27,11 @@ extern "C" {
 #include "init/ssdk_init.h"
 
 #define HPPE_GCC_UNIPHY_REG_INC 0x100
+#ifdef APPE
+#define HPPE_TO_XGMAC_PORT_ID(port_id) (port_id -1)
+#else
 #define HPPE_TO_XGMAC_PORT_ID(port_id)  (port_id - 5)
+#endif
 #define HPPE_TO_GMAC_PORT_ID(port_id) (port_id -1)
 #define HPPE_FCS_LEN  4
 

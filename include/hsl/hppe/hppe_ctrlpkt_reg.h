@@ -50,7 +50,11 @@ union ethertype_ctrl_u {
 
 /*[table] APP_CTRL*/
 #define APP_CTRL
+#ifdef APPE
+#define APP_CTRL_ADDRESS 0x3400
+#else
 #define APP_CTRL_ADDRESS 0x1400
+#endif
 #define APP_CTRL_NUM     32
 #define APP_CTRL_INC     0x10
 #define APP_CTRL_TYPE    REG_TYPE_RW

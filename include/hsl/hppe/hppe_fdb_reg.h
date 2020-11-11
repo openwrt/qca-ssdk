@@ -738,7 +738,11 @@ union port_lrn_limit_counter_u {
 
 /*[table] RFDB_TBL*/
 #define RFDB_TBL
+#ifdef APPE
+#define RFDB_TBL_ADDRESS 0x3000
+#else
 #define RFDB_TBL_ADDRESS 0x1000
+#endif
 #define RFDB_TBL_NUM     32
 #define RFDB_TBL_INC     0x8
 #define RFDB_TBL_TYPE    REG_TYPE_RW

@@ -237,6 +237,7 @@ adpt_ppe_mib_status_set(a_uint32_t dev_id, a_bool_t enable)
 	a_uint32_t port_id = 0, xg_port_id = 0, g_port_id = 0;
 	a_uint32_t port_num = SSDK_PHYSICAL_PORT6;
 	union mmc_control_u mmc_control;
+	a_uint32_t xg_port_index = SSDK_PHYSICAL_PORT5;
 	sw_error_t rv = SW_OK;
 
 	memset(&mmc_control, 0, sizeof(mmc_control));
@@ -254,7 +255,13 @@ adpt_ppe_mib_status_set(a_uint32_t dev_id, a_bool_t enable)
 		hppe_mac_mib_ctrl_mib_en_set(dev_id, g_port_id, (a_uint32_t)enable);
 	}
 
-	for (port_id = SSDK_PHYSICAL_PORT5; port_id <= port_num; port_id++) {
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		xg_port_index = SSDK_PHYSICAL_PORT1;
+	}
+#endif
+	for (port_id = xg_port_index; port_id <= port_num; port_id++) {
 		xg_port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
 		hppe_mmc_control_get(dev_id, xg_port_id, &mmc_control);
 

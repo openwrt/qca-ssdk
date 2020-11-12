@@ -18,6 +18,249 @@
 #include "ssdk_hppe.h"
 #include "ssdk_clk.h"
 #include "ssdk_dts.h"
+#include "adpt.h"
+#include "fal.h"
+
+#if defined(IN_BM) && defined(IN_QOS)
+fal_port_scheduler_cfg_t appe_port_scheduler0_tbl[] = {
+	{0xcf, 6, 5},
+	{0x9f, 7, 6},
+	{0x3f, 1, 7},
+	{0x3f, 5, 6},
+	{0xbd, 0, 1},
+	{0xdd, 6, 5},
+	{0xde, 2, 0},
+	{0xde, 6, 5},
+	{0x9f, 0, 6},
+	{0xbb, 5, 2},
+	{0xfa, 6, 0},
+	{0xbe, 5, 6},
+	{0x9f, 0, 5},
+	{0xde, 6, 0},
+	{0x7e, 5, 7},
+	{0x5f, 6, 5},
+	{0x9f, 7, 6},
+	{0xbe, 3, 0},
+	{0xbe, 5, 6},
+	{0xb7, 0, 3},
+	{0xd7, 6, 5},
+	{0xde, 4, 0},
+	{0xde, 6, 5},
+	{0x9f, 0, 6},
+	{0xaf, 5, 4},
+	{0xee, 6, 0},
+	{0xbe, 1, 6},
+	{0x9f, 2, 5},
+	{0xde, 6, 0},
+	{0x7e, 5, 7},
+	{0x5f, 0, 5},
+	{0x9f, 3, 6},
+	{0xbe, 5, 0},
+	{0xbe, 7, 6},
+	{0xbd, 0, 1},
+	{0xdd, 6, 5},
+	{0x9f, 0, 6},
+	{0x9f, 7, 5},
+	{0xde, 6, 0},
+	{0xfa, 5, 2},
+	{0xdb, 0, 5},
+	{0x9f, 7, 6},
+	{0x9f, 0, 5},
+	{0x9f, 1, 6},
+	{0xbe, 5, 0},
+	{0xde, 6, 5},
+	{0x9f, 0, 6},
+	{0x9f, 2, 5},
+	{0x9f, 0, 6},
+	{0xbe, 5, 0},
+	{0xbe, 6, 5},
+	{0x9f, 3, 6},
+	{0x9f, 0, 5},
+	{0x9f, 4, 6},
+	{0xbe, 5, 0},
+	{0x7e, 6, 7},
+	{0x77, 5, 3},
+	{0xf6, 6, 0},
+	{0xee, 5, 4},
+};
+
+fal_port_tdm_tick_cfg_t appe_port_tdm0_tbl[] = {
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 4},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 3},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 3},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 4},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 4},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS,0},
+	{0, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 3},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 3},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 4},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 4},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{0, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 7},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 3},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 5},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 6},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 3},
+	{1, FAL_PORT_TDB_DIR_INGRESS, 4},
+	{1, FAL_PORT_TDB_DIR_EGRESS, 6},
+};
+
+static sw_error_t
+qca_appe_tdm_hw_init(a_uint32_t dev_id)
+{
+	adpt_api_t *p_api;
+	a_uint32_t i = 0;
+	a_uint32_t num;
+	fal_port_tdm_ctrl_t tdm_ctrl;
+	fal_port_scheduler_cfg_t *scheduler_cfg;
+	fal_port_tdm_tick_cfg_t *bm_cfg;
+	a_uint8_t tm_tick_mode, bm_tick_mode;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+	SW_RTN_ON_NULL(p_api->adpt_port_scheduler_cfg_set);
+	SW_RTN_ON_NULL(p_api->adpt_tdm_tick_num_set);
+
+	tm_tick_mode = ssdk_tm_tick_mode_get(dev_id);
+	bm_tick_mode = ssdk_bm_tick_mode_get(dev_id);
+
+	if (tm_tick_mode == 0) {
+		num = sizeof(appe_port_scheduler0_tbl) /
+				sizeof(fal_port_scheduler_cfg_t);
+		scheduler_cfg = appe_port_scheduler0_tbl;
+
+	} else {
+		return SW_BAD_VALUE;
+	}
+
+	for (i = 0; i < num; i++) {
+		p_api->adpt_port_scheduler_cfg_set(dev_id, i, &scheduler_cfg[i]);
+	}
+	p_api->adpt_tdm_tick_num_set(dev_id, num);
+	SSDK_INFO("appe scheduler tdm setup num=%d\n", num);
+
+	SW_RTN_ON_NULL(p_api->adpt_port_tdm_tick_cfg_set);
+	SW_RTN_ON_NULL(p_api->adpt_port_tdm_ctrl_set);
+
+	if (bm_tick_mode == 0) {
+		num = sizeof(appe_port_tdm0_tbl) /
+				sizeof(fal_port_tdm_tick_cfg_t);
+		bm_cfg = appe_port_tdm0_tbl;
+	} else {
+		return SW_BAD_VALUE;
+	}
+
+	for (i = 0; i < num; i++) {
+		p_api->adpt_port_tdm_tick_cfg_set(dev_id, i, &bm_cfg[i]);
+	}
+	tdm_ctrl.enable = A_TRUE;
+	tdm_ctrl.offset = A_FALSE;
+	tdm_ctrl.depth = num;
+	p_api->adpt_port_tdm_ctrl_set(dev_id, &tdm_ctrl);
+	SSDK_INFO("appe tdm setup num=%d\n", num);
+
+	return SW_OK;
+}
+#endif
 
 sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
@@ -45,11 +288,10 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	rv = qca_hppe_qos_scheduler_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
-#if 0
+
 #if defined(IN_BM) && defined(IN_QOS)
 	rv = qca_appe_tdm_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
-#endif
 #endif
 
 #if defined(IN_FDB)

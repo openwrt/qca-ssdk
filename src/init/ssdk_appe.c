@@ -262,6 +262,37 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 }
 #endif
 
+#if defined(IN_PORTCONTROL)
+static sw_error_t
+qca_appe_portctrl_hw_init(a_uint32_t dev_id)
+{
+	a_uint32_t i = 0;
+	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
+	a_bool_t force_port;
+
+	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
+		force_port = ssdk_port_feature_get(dev_id, i,
+			PHY_F_FORCE);
+		if (force_port == A_TRUE) {
+			fal_port_txmac_status_set(dev_id, i, A_TRUE);
+			fal_port_rxmac_status_set(dev_id, i, A_TRUE);
+			fal_port_rxfc_status_set(dev_id, i, A_TRUE);
+			fal_port_txfc_status_set(dev_id, i, A_TRUE);
+			SSDK_INFO("appe port %d is force port\n", i);
+		} else {
+			fal_port_txmac_status_set(dev_id, i, A_FALSE);
+			fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
+			fal_port_txfc_status_set(dev_id, i, A_FALSE);
+		}
+		fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
+	}
+	SSDK_INFO("appe portctrl initialization\n");
+
+	return SW_OK;
+}
+#endif
+
 sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
@@ -306,11 +337,17 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	rv = qca_hppe_portvlan_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
-#if 0
+
+	rv = qca_hppe_interface_mode_init(dev_id, cfg->mac_mode,
+		cfg->mac_mode1, cfg->mac_mode2);
+	SW_RTN_ON_ERROR(rv);
+
 #if defined(IN_PORTCONTROL)
 	rv = qca_appe_portctrl_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
+
+#if 0
 #if defined(IN_POLICER)
 	rv = qca_appe_policer_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
@@ -334,9 +371,7 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 #endif
 #endif
 #endif
-	rv = qca_hppe_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1,
-				cfg->mac_mode2);
-	SW_RTN_ON_ERROR(rv);
+
 #if defined(IN_CTRLPKT)
 	rv = qca_hppe_ctlpkt_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);

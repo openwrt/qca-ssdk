@@ -287,7 +287,7 @@ adpt_hppe_mib_port_flush_counters(a_uint32_t dev_id, fal_port_t port_id)
 	if(port_id < SSDK_PHYSICAL_PORT1 || port_id > SSDK_PHYSICAL_PORT6)
 		return SW_BAD_PARAM;
 	/*GMAC*/
-	if(!hppe_xgmac_port_check(port_id))
+	if(!hppe_xgmac_port_check(dev_id, port_id))
 	{
 		port_id = HPPE_TO_GMAC_PORT_ID(port_id);
 		hppe_mac_mib_ctrl_mib_reset_set(dev_id, port_id, A_TRUE);
@@ -455,9 +455,9 @@ adpt_hppe_get_xgmib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_NULL_POINT_CHECK(mib_info);
 	memset(mib_info, 0, sizeof( * mib_info ));
 
-	if(!(hppe_xgmac_port_check(port_id)))
+	if(!(hppe_xgmac_port_check(dev_id, port_id)))
 	{
-		printk("this port is not xg port!\n");
+		SSDK_DEBUG("port %d is not xg port!\n", port_id);
 		return SW_FAIL;
 	}
 	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
@@ -704,9 +704,9 @@ adpt_hppe_get_tx_xgmib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_NULL_POINT_CHECK(mib_info);
 	memset(mib_info, 0, sizeof(* mib_info));
 
-	if(!(hppe_xgmac_port_check(port_id)))
+	if(!(hppe_xgmac_port_check(dev_id, port_id)))
 	{
-		printk("this port is not xg port!\n");
+		SSDK_ERROR("port %d is not xg port!\n", port_id);
 		return SW_FAIL;
 	}
 	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
@@ -823,9 +823,9 @@ adpt_hppe_get_rx_xgmib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_NULL_POINT_CHECK(mib_info);
 	memset(mib_info, 0, sizeof(* mib_info));
 
-	if(!(hppe_xgmac_port_check(port_id)))
+	if(!(hppe_xgmac_port_check(dev_id, port_id)))
 	{
-		printk("this port is not xg port!\n");
+		SSDK_ERROR("port %id is not xg port!\n", port_id);
 		return SW_FAIL;
 	}
 	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);

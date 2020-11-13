@@ -585,7 +585,6 @@ fal_get_xgmib_info(a_uint32_t dev_id, fal_port_t port_id,
     FAL_API_LOCK;
     rv = _fal_get_xgmib_info(dev_id, port_id, mib_Info);
     FAL_API_UNLOCK;
-    SW_RTN_ON_ERROR(rv);
 
     rv = fal_mib_counter_get(dev_id, port_id, &gmac_mib);
     SW_RTN_ON_ERROR(rv);

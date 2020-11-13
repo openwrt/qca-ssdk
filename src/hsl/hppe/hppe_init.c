@@ -27,9 +27,14 @@
 
 static ssdk_init_cfg * hppe_cfg[SW_MAX_NR_DEV] = { 0 };
 
-a_bool_t hppe_xgmac_port_check(fal_port_t port_id)
+a_bool_t hppe_xgmac_port_check(a_uint32_t dev_id, fal_port_t port_id)
 {
-	return ((port_id == 5) ||( port_id == 6));
+	if(qca_hppe_port_mac_type_get(dev_id, port_id) == PORT_XGMAC_TYPE)
+	{
+		return A_TRUE;
+	}
+
+	return A_FALSE;
 }
 a_bool_t hppe_mac_port_valid_check(a_uint32_t dev_id, fal_port_t port_id)
 {

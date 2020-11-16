@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017, 2020, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -36,6 +36,10 @@ sw_error_t qca_hppe_interface_mode_init(a_uint32_t dev_id,
 		a_uint32_t mode0, a_uint32_t mode1, a_uint32_t mode2);
 sw_error_t
 qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id);
+sw_error_t
+qca_hppe_bm_hw_init(a_uint32_t dev_id);
+sw_error_t
+qca_hppe_qm_hw_init(a_uint32_t dev_id);
 
 #ifdef __cplusplus
 }

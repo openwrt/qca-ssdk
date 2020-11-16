@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2014-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2014-2020, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -678,7 +678,7 @@ qca_hppe_tdm_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_BM)
-static sw_error_t
+sw_error_t
 qca_hppe_bm_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
@@ -694,10 +694,17 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 		fal_port_bufgroup_map_set(0, i, 0);
 	}
 
-	if (chip_ver == CPPE_REVISION) {
-		fal_bm_bufgroup_buffer_set(dev_id, 0, 1024);
-	} else {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
 		fal_bm_bufgroup_buffer_set(dev_id, 0, 1400);
+		SSDK_INFO("appe bm initialization\n");
+#endif
+	} else {
+		if (chip_ver == CPPE_REVISION) {
+			fal_bm_bufgroup_buffer_set(dev_id, 0, 1024);
+		} else {
+			fal_bm_bufgroup_buffer_set(dev_id, 0, 1400);
+		}
 	}
 
 	/* set reserved buffer */
@@ -707,20 +714,33 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 	for (i = HPPE_BM_PHY_PORT_OFFSET; i < HPPE_BM_PORT_NUM-1; i++) {
 		fal_bm_port_reserved_buffer_set(dev_id, i, 0, 128);
 	}
-	if (chip_ver == CPPE_REVISION) {
-		fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM -2,
-					0, 40);
+
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
+		fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM-1, 0, 40);
+#endif
+	} else {
+		if (chip_ver == CPPE_REVISION) {
+			fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM -2,
+				0, 40);
+		}
+		fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM-1, 0, 40);
 	}
-	fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM-1, 0, 40);
 
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.resume_min_thresh = 0;
 	cfg.resume_off = 36;
 	cfg.weight= 4;
-	if (chip_ver == CPPE_REVISION) {
-		cfg.shared_ceiling = 216;
-	} else {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
 		cfg.shared_ceiling = 250;
+#endif
+	} else {
+		if (chip_ver == CPPE_REVISION) {
+			cfg.shared_ceiling = 216;
+		} else {
+			cfg.shared_ceiling = 250;
+		}
 	}
 	for (i = 0; i < HPPE_BM_PORT_NUM; i++) {
 		fal_bm_port_dynamic_thresh_set(dev_id, i, &cfg);
@@ -730,7 +750,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_QM)
-static sw_error_t
+sw_error_t
 qca_hppe_qm_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i;
@@ -840,19 +860,32 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	}
 
 	group_buff.prealloc_buffer = 0;
-	if (chip_ver == CPPE_REVISION) {
-		group_buff.total_buffer = 1506;
-	} else {
+	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
+#if defined(APPE)
 		group_buff.total_buffer = 2000;
+		SSDK_INFO("appe qm initialization\n");
+#endif
+	} else {
+		if (chip_ver == CPPE_REVISION) {
+			group_buff.total_buffer = 1506;
+		} else {
+			group_buff.total_buffer = 2000;
+		}
 	}
 	fal_ac_group_buffer_set(dev_id, 0, &group_buff);
 
 	memset(&dthresh_cfg, 0, sizeof(dthresh_cfg));
 	dthresh_cfg.shared_weight = 4;
-	if (chip_ver == CPPE_REVISION) {
-		dthresh_cfg.ceiling = 216;
-	} else {
+	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
+#if defined(APPE)
 		dthresh_cfg.ceiling = 400;
+#endif
+	} else {
+		if (chip_ver == CPPE_REVISION) {
+			dthresh_cfg.ceiling = 216;
+		} else {
+			dthresh_cfg.ceiling = 400;
+		}
 	}
 	dthresh_cfg.green_resume_off = 36;
 	for (i = 0; i < SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i++) {
@@ -860,10 +893,16 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	}
 
 	memset(&sthresh_cfg, 0, sizeof(sthresh_cfg));
-	if (chip_ver == CPPE_REVISION) {
-		sthresh_cfg.green_max = 144;
-	} else {
+	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
+#if defined(APPE)
 		sthresh_cfg.green_max = 250;
+#endif
+	} else {
+		if (chip_ver == CPPE_REVISION) {
+			sthresh_cfg.green_max = 144;
+		} else {
+			sthresh_cfg.green_max = 250;
+		}
 	}
 	sthresh_cfg.green_resume_off = 36;
 	for (i = SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i < SSDK_L0SCHEDULER_CFG_MAX;

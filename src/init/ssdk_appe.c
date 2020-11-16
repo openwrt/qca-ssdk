@@ -305,16 +305,16 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	rv = qca_switch_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 
-#if 0
 #if defined(IN_BM)
-	rv = qca_appe_bm_hw_init(dev_id);
+	rv = qca_hppe_bm_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
+
 #if defined(IN_QM)
-	rv = qca_appe_qm_hw_init(dev_id);
+	rv = qca_hppe_qm_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
-#endif
+
 #if defined(IN_QOS)
 	rv = qca_hppe_qos_scheduler_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);

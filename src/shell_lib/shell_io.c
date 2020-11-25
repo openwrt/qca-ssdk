@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2015-2017, 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013, 2015-2017, 2019, 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -9809,6 +9809,48 @@ cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size)
 	rv = __cmd_data_check_complex("broadcast_membership", 0,
                         "usage: Bit0-port0 Bit1-port1 ....\n",
                         cmd_data_check_pbmp, &(entry.bc_ports),
+                        sizeof (a_uint32_t));
+	if (rv)
+		return rv;
+
+	rv = __cmd_data_check_complex("vports_bitmap(port64-port95)", 0,
+                        "usage: Bit0-port64 Bit1-port65 ....\n",
+                        cmd_data_check_pbmp, &(entry.member_vports[0]),
+                        sizeof (a_uint32_t));
+	if (rv)
+		return rv;
+
+	rv = __cmd_data_check_complex("vports_bitmap(port96-port127)", 0,
+                        "usage: Bit0-port96 Bit1-port97 ....\n",
+                        cmd_data_check_pbmp, &(entry.member_vports[1]),
+                        sizeof (a_uint32_t));
+	if (rv)
+		return rv;
+
+	rv = __cmd_data_check_complex("vports_bitmap(por128-port159)", 0,
+                        "usage: Bit0-port128 Bit1-port129 ....\n",
+                        cmd_data_check_pbmp, &(entry.member_vports[2]),
+                        sizeof (a_uint32_t));
+	if (rv)
+		return rv;
+
+	rv = __cmd_data_check_complex("vports_bitmap(port160-port191)", 0,
+                        "usage: Bit0-port160 Bit1-port161 ....\n",
+                        cmd_data_check_pbmp, &(entry.member_vports[3]),
+                        sizeof (a_uint32_t));
+	if (rv)
+		return rv;
+
+	rv = __cmd_data_check_complex("vports_bitmap(port192-port223)", 0,
+                        "usage: Bit0-port192 Bit1-port193 ...\n",
+                        cmd_data_check_pbmp, &(entry.member_vports[4]),
+                        sizeof (a_uint32_t));
+	if (rv)
+		return rv;
+
+	rv = __cmd_data_check_complex("vports_bitmap(port224-port255)", 0,
+                        "usage: Bit0-port224 Bit1-port225 ....\n",
+                        cmd_data_check_pbmp, &(entry.member_vports[5]),
                         sizeof (a_uint32_t));
 	if (rv)
 		return rv;

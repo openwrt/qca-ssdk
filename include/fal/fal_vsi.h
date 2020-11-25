@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -26,6 +26,7 @@ extern "C" {
 
 #include "sw.h"
 #include "fal/fal_type.h"
+#include "init/ssdk_init.h"
 
 #define FAL_VSI_INVALID 0xffff
 #define FAL_VLAN_INVALID 0xffff
@@ -51,6 +52,8 @@ typedef struct{
 	a_uint32_t uuc_ports;/*VSI member ports for unknown unicast*/
 	a_uint32_t umc_ports;/*VSI member ports for unknown multicast*/
 	a_uint32_t bc_ports;/*VSI member ports for broadcast*/
+	a_uint32_t member_vports[SSDK_MAX_VIRTUAL_PORT_NUM/32];/*VSI member vports for known unicast
+		packets, add it for ipq90xx*/
 }fal_vsi_member_t;
 
 

@@ -22,7 +22,7 @@ extern "C" {
 #endif                          /* __cplusplus */
 
 #include "sw.h"
-#include "fal_type.h"
+#include "fal/fal_type.h"
 /*qca808x_end*/
 #include "fal/fal_led.h"
 /*qca808x_start*/

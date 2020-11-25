@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -26,7 +26,9 @@
 #include "hppe_portvlan.h"
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
-
+#ifdef APPE
+#include "adpt_appe_vsi.h"
+#endif
 #define ADPT_VSI_MAX FAL_VSI_MAX
 #define ADPT_VSI_STRIP_VLAN_TAG 2
 
@@ -494,7 +496,13 @@ adpt_hppe_vsi_member_set(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_member_t 
 	rv = hppe_vsi_tbl_set(dev_id, vsi_id, &vsi_tbl);
 	if( rv != SW_OK )
 		return rv;
-
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_vsi_vp_member_set(dev_id, vsi_id, vsi_member);
+		return rv;
+	}
+#endif
 	return SW_OK;
 
 }
@@ -520,6 +528,14 @@ adpt_hppe_vsi_member_get(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_member_t 
 	rv = hppe_vsi_tbl_set(dev_id, vsi_id, &vsi_tbl);
 	if( rv != SW_OK )
 		return rv;
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_vsi_vp_member_get(dev_id, vsi_id, vsi_member);
+		return rv;
+	}
+#endif
 
 	return SW_OK;
 

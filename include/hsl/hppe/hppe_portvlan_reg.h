@@ -772,7 +772,11 @@ union port_eg_def_vid_u {
 
 /*[register] PORT_EG_VLAN*/
 #define PORT_EG_VLAN
+#if defined (APPE)
+#define PORT_EG_VLAN_ADDRESS 0x20
+#else
 #define PORT_EG_VLAN_ADDRESS 0x420
+#endif
 #define PORT_EG_VLAN_NUM     8
 #define PORT_EG_VLAN_INC     0x4
 #define PORT_EG_VLAN_TYPE    REG_TYPE_RW

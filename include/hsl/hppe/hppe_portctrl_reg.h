@@ -776,7 +776,11 @@ union drop_stat_u {
 
 /*[register] PORT_TX_COUNTER_TBL_REG*/
 #define PORT_TX_COUNTER_TBL_REG
+#if defined (APPE)
+#define PORT_TX_COUNTER_TBL_REG_ADDRESS 0x25000
+#else
 #define PORT_TX_COUNTER_TBL_REG_ADDRESS 0x900
+#endif
 #define PORT_TX_COUNTER_TBL_REG_NUM     8
 #define PORT_TX_COUNTER_TBL_REG_INC     0x10
 #define PORT_TX_COUNTER_TBL_REG_TYPE    REG_TYPE_RW
@@ -806,7 +810,11 @@ union port_tx_counter_tbl_reg_u {
 
 /*[register] VP_TX_COUNTER_TBL_REG*/
 #define VP_TX_COUNTER_TBL_REG
+#if defined (APPE)
+#define VP_TX_COUNTER_TBL_REG_ADDRESS 0x27000
+#else
 #define VP_TX_COUNTER_TBL_REG_ADDRESS 0x1000
+#endif
 #define VP_TX_COUNTER_TBL_REG_NUM     256
 #define VP_TX_COUNTER_TBL_REG_INC     0x10
 #define VP_TX_COUNTER_TBL_REG_TYPE    REG_TYPE_RW

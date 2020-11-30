@@ -363,12 +363,23 @@ adpt_hppe_ip_port_macaddr_set(a_uint32_t dev_id, fal_port_t port_id,
 	hppe_l3_vp_port_tbl_get(dev_id, port_id, &l3_vp_port_tbl);
 
 	l3_vp_port_tbl.bf.mac_valid = macaddr->valid;
+#if defined(APPE)
+	l3_vp_port_tbl.bf.mac_da_0 =  ((macaddr->mac_addr.uc[4] & 0x7f) << 8) | \
+							macaddr->mac_addr.uc[5];
+	l3_vp_port_tbl.bf.mac_da_1 =  ((macaddr->mac_addr.uc[0] & 0x7f) << 25) | \
+							macaddr->mac_addr.uc[1] << 17 | \
+							macaddr->mac_addr.uc[2] << 9 | \
+							macaddr->mac_addr.uc[3] << 1 | \
+							((macaddr->mac_addr.uc[4] >> 7) & 0x1);
+	l3_vp_port_tbl.bf.mac_da_2 =  (macaddr->mac_addr.uc[0] >> 7) & 0x1;
+#elif defined(HPPE)
 	l3_vp_port_tbl.bf.mac_da_0 =  macaddr->mac_addr.uc[4] << 8 | \
 							macaddr->mac_addr.uc[5];
 	l3_vp_port_tbl.bf.mac_da_1 =  macaddr->mac_addr.uc[0] << 24 | \
 							macaddr->mac_addr.uc[1] << 16 | \
 							macaddr->mac_addr.uc[2] << 8 | \
 							macaddr->mac_addr.uc[3];
+#endif
 	
 	return hppe_l3_vp_port_tbl_set(dev_id, port_id, &l3_vp_port_tbl);
 }
@@ -1067,12 +1078,23 @@ adpt_hppe_ip_port_macaddr_get(a_uint32_t dev_id, fal_port_t port_id,
 		return rv;
 
 	macaddr->valid = l3_vp_port_tbl.bf.mac_valid;
+#if defined(APPE)
+	macaddr->mac_addr.uc[5] = l3_vp_port_tbl.bf.mac_da_0;
+	macaddr->mac_addr.uc[4] = l3_vp_port_tbl.bf.mac_da_0 >> 8 | \
+				  (l3_vp_port_tbl.bf.mac_da_1 & 0x1 << 7);
+	macaddr->mac_addr.uc[3] = l3_vp_port_tbl.bf.mac_da_1 >> 1;
+	macaddr->mac_addr.uc[2] = l3_vp_port_tbl.bf.mac_da_1 >> 9;
+	macaddr->mac_addr.uc[1] = l3_vp_port_tbl.bf.mac_da_1 >> 17;
+	macaddr->mac_addr.uc[0] = (l3_vp_port_tbl.bf.mac_da_2 & 0x1) << 7 | \
+				  (l3_vp_port_tbl.bf.mac_da_1 >> 25);
+#elif defined(HPPE)
 	macaddr->mac_addr.uc[5] = l3_vp_port_tbl.bf.mac_da_0;
 	macaddr->mac_addr.uc[4] = l3_vp_port_tbl.bf.mac_da_0 >> 8;
 	macaddr->mac_addr.uc[3] = l3_vp_port_tbl.bf.mac_da_1;
 	macaddr->mac_addr.uc[2] = l3_vp_port_tbl.bf.mac_da_1 >> 8;
 	macaddr->mac_addr.uc[1] = l3_vp_port_tbl.bf.mac_da_1 >> 16;
 	macaddr->mac_addr.uc[0] = l3_vp_port_tbl.bf.mac_da_1 >> 24;
+#endif
 
 	return SW_OK;
 }

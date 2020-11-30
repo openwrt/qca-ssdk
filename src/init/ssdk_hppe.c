@@ -41,7 +41,8 @@ sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 		fal_fdb_port_learning_ctrl_set(dev_id, port, A_TRUE, FAL_MAC_FRWRD);
 		fal_fdb_port_stamove_ctrl_set(dev_id, port, A_TRUE, FAL_MAC_FRWRD);
 		fal_portvlan_member_update(dev_id, port, 0x7f);
-		if (port == SSDK_PHYSICAL_PORT0 || port == SSDK_PHYSICAL_PORT7) {
+		if (port == SSDK_PHYSICAL_PORT0 || port == SSDK_PHYSICAL_PORT7 ||
+		(ssdk_port_feature_get(dev_id, port, PHY_F_FORCE) == A_TRUE)) {
 			p_api->adpt_port_bridge_txmac_set(dev_id, port, A_TRUE);
 		} else {
 			p_api->adpt_port_bridge_txmac_set(dev_id, port, A_FALSE);

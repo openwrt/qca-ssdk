@@ -29,7 +29,11 @@ extern "C" {
 
 #define FAL_VSI_INVALID 0xffff
 #define FAL_VLAN_INVALID 0xffff
+#if defined(APPE)
+#define FAL_VSI_MAX 63
+#else
 #define FAL_VSI_MAX 31
+#endif
 #define FAL_VLAN_MAX 4095
 
 typedef struct{

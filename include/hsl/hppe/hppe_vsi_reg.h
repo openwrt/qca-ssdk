@@ -22,8 +22,13 @@
 
 /*[table] VSI_TBL*/
 #define VSI_TBL
+#if defined(APPE)
+#define VSI_TBL_ADDRESS 0x3800
+#define VSI_TBL_NUM     64
+#else
 #define VSI_TBL_ADDRESS 0x1800
 #define VSI_TBL_NUM     32
+#endif
 #define VSI_TBL_INC     0x10
 #define VSI_TBL_TYPE    REG_TYPE_RW
 #define VSI_TBL_DEFAULT 0x0

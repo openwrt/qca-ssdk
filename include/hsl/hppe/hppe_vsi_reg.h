@@ -117,8 +117,13 @@ union vlan_cnt_tbl_u {
 
 /*[table] EG_VSI_COUNTER_TBL*/
 #define EG_VSI_COUNTER_TBL
+#if defined (APPE)
+#define EG_VSI_COUNTER_TBL_ADDRESS 0x21000
+#define EG_VSI_COUNTER_TBL_NUM     64
+#else
 #define EG_VSI_COUNTER_TBL_ADDRESS 0x600
 #define EG_VSI_COUNTER_TBL_NUM     32
+#endif
 #define EG_VSI_COUNTER_TBL_INC     0x10
 #define EG_VSI_COUNTER_TBL_TYPE    REG_TYPE_RW
 #define EG_VSI_COUNTER_TBL_DEFAULT 0x0

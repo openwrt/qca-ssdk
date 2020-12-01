@@ -35,7 +35,11 @@ extern "C" {
 #define NSS_PRX_CSR_BASE_ADDR        0x00b000
 #define NSS_PTX_CSR_BASE_ADDR        0x020000
 #define NSS_BM_CSR_BASE_ADDR         0x600000
+#ifdef APPE
+#define NSS_XGMAC_CSR_BASE_ADDR      0x500000
+#else
 #define NSS_XGMAC_CSR_BASE_ADDR      0x003000
+#endif
 #define NSS_GLOBAL_BASE_ADDR    	 0x0
 #define NSS_UNIPHY_BASE_ADDR    0x0
 #define NSS_LPI_BASE_ADDR    0x400

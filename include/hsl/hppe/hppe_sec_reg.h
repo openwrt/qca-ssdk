@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -23,7 +23,11 @@
 
 /*[register] L3_EXCEPTION_CMD*/
 #define L3_EXCEPTION_CMD
+#if defined(APPE)
+#define L3_EXCEPTION_CMD_ADDRESS 0x81c
+#else
 #define L3_EXCEPTION_CMD_ADDRESS 0x544
+#endif
 #define L3_EXCEPTION_CMD_NUM     72
 #define L3_EXCEPTION_CMD_INC     0x4
 #define L3_EXCEPTION_CMD_TYPE    REG_TYPE_RW
@@ -52,7 +56,11 @@ union l3_exception_cmd_u {
 
 /*[register] L3_EXP_L3_ONLY_CTRL*/
 #define L3_EXP_L3_ONLY_CTRL
+#if defined(APPE)
+#define L3_EXP_L3_ONLY_CTRL_ADDRESS 0x94c
+#else
 #define L3_EXP_L3_ONLY_CTRL_ADDRESS 0x664
+#endif
 #define L3_EXP_L3_ONLY_CTRL_NUM     72
 #define L3_EXP_L3_ONLY_CTRL_INC     0x4
 #define L3_EXP_L3_ONLY_CTRL_TYPE    REG_TYPE_RW
@@ -75,7 +83,11 @@ union l3_exp_l3_only_ctrl_u {
 
 /*[register] L3_EXP_L2_ONLY_CTRL*/
 #define L3_EXP_L2_ONLY_CTRL
+#if defined(APPE)
+#define L3_EXP_L2_ONLY_CTRL_ADDRESS 0xa7c
+#else
 #define L3_EXP_L2_ONLY_CTRL_ADDRESS 0x784
+#endif
 #define L3_EXP_L2_ONLY_CTRL_NUM     72
 #define L3_EXP_L2_ONLY_CTRL_INC     0x4
 #define L3_EXP_L2_ONLY_CTRL_TYPE    REG_TYPE_RW
@@ -98,7 +110,11 @@ union l3_exp_l2_only_ctrl_u {
 
 /*[register] L3_EXP_L2_FLOW_CTRL*/
 #define L3_EXP_L2_FLOW_CTRL
+#if defined(APPE)
+#define L3_EXP_L2_FLOW_CTRL_ADDRESS 0xbac
+#else
 #define L3_EXP_L2_FLOW_CTRL_ADDRESS 0x8a4
+#endif
 #define L3_EXP_L2_FLOW_CTRL_NUM     72
 #define L3_EXP_L2_FLOW_CTRL_INC     0x4
 #define L3_EXP_L2_FLOW_CTRL_TYPE    REG_TYPE_RW
@@ -121,7 +137,11 @@ union l3_exp_l2_flow_ctrl_u {
 
 /*[register] L3_EXP_L3_FLOW_CTRL*/
 #define L3_EXP_L3_FLOW_CTRL
+#if defined(APPE)
+#define L3_EXP_L3_FLOW_CTRL_ADDRESS 0xcdc
+#else
 #define L3_EXP_L3_FLOW_CTRL_ADDRESS 0x9c4
+#endif
 #define L3_EXP_L3_FLOW_CTRL_NUM     72
 #define L3_EXP_L3_FLOW_CTRL_INC     0x4
 #define L3_EXP_L3_FLOW_CTRL_TYPE    REG_TYPE_RW
@@ -144,7 +164,11 @@ union l3_exp_l3_flow_ctrl_u {
 
 /*[register] L3_EXP_MULTICAST_CTRL*/
 #define L3_EXP_MULTICAST_CTRL
+#if defined(APPE)
+#define L3_EXP_MULTICAST_CTRL_ADDRESS 0xe0c
+#else
 #define L3_EXP_MULTICAST_CTRL_ADDRESS 0xae4
+#endif
 #define L3_EXP_MULTICAST_CTRL_NUM     72
 #define L3_EXP_MULTICAST_CTRL_INC     0x4
 #define L3_EXP_MULTICAST_CTRL_TYPE    REG_TYPE_RW

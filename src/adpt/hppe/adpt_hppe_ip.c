@@ -152,11 +152,13 @@ adpt_hppe_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry)
 		entry.bf.syn_toggle = host_entry->syn_toggle;
 		entry.bf.dst_info = host_entry->dst_info;
 		entry.bf.lan_wan = host_entry->lan_wan;
-		entry.bf.gip_addr_0 = host_entry->ip4_addr;
-		entry.bf.gip_addr_1 = host_entry->ip4_addr >> 11;
 		entry.bf.vsi = host_entry->mcast_info.vsi;
+		entry.bf.gip_addr_0 = host_entry->ip4_addr;
+		entry.bf.gip_addr_1 = host_entry->ip4_addr >>
+			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_GIP_ADDR_OFFSET);
 		entry.bf.sip_addr_0 = host_entry->mcast_info.sip4_addr;
-		entry.bf.sip_addr_1 = host_entry->mcast_info.sip4_addr >> 11;
+		entry.bf.sip_addr_1 = host_entry->mcast_info.sip4_addr >>
+			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_SIP_ADDR_OFFSET);
 		rv = hppe_host_ipv4_mcast_add(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP6_ADDR_MCAST) == FAL_IP_IP6_ADDR_MCAST) {
 		union host_ipv6_mcast_tbl_u entry;
@@ -641,11 +643,13 @@ adpt_hppe_ip_host_del(a_uint32_t dev_id, a_uint32_t del_mode,
 		entry.bf.syn_toggle = host_entry->syn_toggle;
 		entry.bf.dst_info = host_entry->dst_info;
 		entry.bf.lan_wan = host_entry->lan_wan;
-		entry.bf.gip_addr_0 = host_entry->ip4_addr;
-		entry.bf.gip_addr_1 = host_entry->ip4_addr >> 11;
 		entry.bf.vsi = host_entry->mcast_info.vsi;
+		entry.bf.gip_addr_0 = host_entry->ip4_addr;
+		entry.bf.gip_addr_1 = host_entry->ip4_addr >>
+			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_GIP_ADDR_OFFSET);
 		entry.bf.sip_addr_0 = host_entry->mcast_info.sip4_addr;
-		entry.bf.sip_addr_1 = host_entry->mcast_info.sip4_addr >> 11;
+		entry.bf.sip_addr_1 = host_entry->mcast_info.sip4_addr >>
+			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_SIP_ADDR_OFFSET);
 		rv = hppe_host_ipv4_mcast_del(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP6_ADDR_MCAST) == FAL_IP_IP6_ADDR_MCAST) {
 		union host_ipv6_mcast_tbl_u entry;
@@ -896,7 +900,8 @@ adpt_hppe_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 		entry.bf.vsi = host_entry->mcast_info.vsi;
 		entry.bf.sip_addr_0 = host_entry->mcast_info.sip4_addr;
 		entry.bf.sip_addr_1 = host_entry->mcast_info.sip4_addr >> 11;
-		rv = hppe_host_ipv4_mcast_get(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
+		rv = hppe_host_ipv4_mcast_get(dev_id, (a_uint32_t)mode,
+				&host_entry->entry_id, &entry);
 		if (!rv && (entry.bf.key_type != 1))
 			rv = SW_FAIL;
 		host_entry->lan_wan = entry.bf.lan_wan;
@@ -904,9 +909,11 @@ adpt_hppe_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 		host_entry->syn_toggle = entry.bf.syn_toggle;
 		host_entry->action = entry.bf.fwd_cmd;
 		host_entry->status = entry.bf.valid;
-		host_entry->ip4_addr = entry.bf.gip_addr_0 | entry.bf.gip_addr_1 << 11;
 		host_entry->mcast_info.vsi = entry.bf.vsi;
-		host_entry->mcast_info.sip4_addr = entry.bf.sip_addr_0 | entry.bf.sip_addr_1 << 11;
+		host_entry->ip4_addr = entry.bf.gip_addr_0 | entry.bf.gip_addr_1 <<
+			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_GIP_ADDR_OFFSET);
+		host_entry->mcast_info.sip4_addr = entry.bf.sip_addr_0 | entry.bf.sip_addr_1 <<
+			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_SIP_ADDR_OFFSET);
 	} else if ((type & FAL_IP_IP6_ADDR_MCAST) == FAL_IP_IP6_ADDR_MCAST) {
 		union host_ipv6_mcast_tbl_u entry;
 		entry.bf.key_type = 3;

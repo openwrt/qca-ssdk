@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -1114,7 +1114,7 @@ hppe_in_l3_if_tbl_get(
 				IPE_L3_BASE_ADDR + IN_L3_IF_TBL_ADDRESS + \
 				index * IN_L3_IF_TBL_INC,
 				value->val,
-				2);
+				sizeof(union in_l3_if_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -1128,7 +1128,7 @@ hppe_in_l3_if_tbl_set(
 				IPE_L3_BASE_ADDR + IN_L3_IF_TBL_ADDRESS + \
 				index * IN_L3_IF_TBL_INC,
 				value->val,
-				2);
+				sizeof(union in_l3_if_tbl_u)/sizeof(a_uint32_t));
 }
 #endif
 #ifndef IN_IP_MINI

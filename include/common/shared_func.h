@@ -101,6 +101,8 @@ extern "C" {
     SW_FIELD_GET_BY_REG_U32(reg_value, field_value, reg##_##field##_BOFFSET, \
                             reg##_##field##_BLEN)
 
+#define SW_FIELD_OFFSET_IN_WORD(N) (32 - N % 32)
+
     /* port bitmap functions */
 #define SW_IS_PBMP_MEMBER(pbm, port)  ((pbm & (1 << port)) ? A_TRUE: A_FALSE)
 #define SW_IS_PBMP_EQ(pbm0, pbm1)  ((pbm0 == pbm1) ? A_TRUE: A_FALSE)

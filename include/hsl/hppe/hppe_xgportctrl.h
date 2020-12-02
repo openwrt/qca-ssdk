@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -20,6 +20,29 @@
 #ifndef _HPPE_XGPORTCTRL_H_
 #define _HPPE_XGPORTCTRL_H_
 
+#ifdef APPE
+#define MAC_TX_CONFIGURATION_MAX_ENTRY	0x6
+#define MAC_RX_CONFIGURATION_MAX_ENTRY	0x6
+#define MAC_PACKET_FILTER_MAX_ENTRY	0x6
+#define MAC_WATCHDOG_TIMEOUT_MAX_ENTRY	0x6
+#define MAC_VLAN_TAG_MAX_ENTRY	0x6
+#define MAC_RX_ETH_TYPE_MATCH_MAX_ENTRY	0x6
+#define MAC_Q0_TX_FLOW_CTRL_MAX_ENTRY	0x6
+#define MAC_RX_FLOW_CTRL_MAX_ENTRY	0x6
+#define MAC_INTERRUPT_STATUS_MAX_ENTRY	0x6
+#define MAC_INTERRUPT_ENABLE_MAX_ENTRY	0x6
+#define MAC_RX_TX_STATUS_MAX_ENTRY	0x6
+#define MAC_LPI_CONTROL_STATUS_MAX_ENTRY	0x6
+#define MAC_LPI_TIMERS_CONTROL_MAX_ENTRY	0x6
+#define MAC_LPI_AUTO_ENTRY_TIMER_MAX_ENTRY	0x6
+#define MAC_1US_TIC_COUNTER_MAX_ENTRY	0x6
+#define MAC_ADDRESS0_HIGH_MAX_ENTRY	0x6
+#define MAC_ADDRESS0_LOW_MAX_ENTRY	0x6
+#define MMC_RECEIVE_INTERRUPT_MAX_ENTRY	0x6
+#define MMC_TRANSMIT_INTERRUPT_MAX_ENTRY	0x6
+#define MMC_RECEIVE_INTERRUPT_ENABLE_MAX_ENTRY	0x6
+#define MMC_TRANSMIT_INTERRUPT_ENABLE_MAX_ENTRY	0x6
+#else
 #define MAC_TX_CONFIGURATION_MAX_ENTRY	2
 #define MAC_RX_CONFIGURATION_MAX_ENTRY	2
 #define MAC_PACKET_FILTER_MAX_ENTRY	2
@@ -41,6 +64,7 @@
 #define MMC_TRANSMIT_INTERRUPT_MAX_ENTRY	2
 #define MMC_RECEIVE_INTERRUPT_ENABLE_MAX_ENTRY	2
 #define MMC_TRANSMIT_INTERRUPT_ENABLE_MAX_ENTRY	2
+#endif
 
 sw_error_t
 hppe_mac_tx_configuration_get(

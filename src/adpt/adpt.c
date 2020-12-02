@@ -254,11 +254,14 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 
 	switch (g_chip_ver[dev_id].chip_type)
 	{
-		#if defined(HPPE)
+#if defined(APPE)
+		case CHIP_APPE:
+#endif
+#if defined(HPPE)
 		case CHIP_HPPE:
 			rv = adpt_hppe_module_func_register(dev_id, module);
 			break;
-		#endif
+#endif
 		default:
 			break;
 	}

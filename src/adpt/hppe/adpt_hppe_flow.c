@@ -263,6 +263,11 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -303,6 +308,11 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -349,6 +359,11 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -387,6 +402,11 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf0.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf0.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -466,6 +486,11 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->route_port = entry.bf2.port_vp1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf1.port_vp2;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -520,6 +545,11 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->route_port = entry.bf2.port_vp1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf1.port_vp2;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -572,6 +602,11 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->route_port = entry.bf2.port_vp1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf1.port_vp2;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -622,6 +657,11 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->route_port = entry.bf2.port_vp1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf0.port_vp2;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf0.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf0.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf0.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -697,6 +737,11 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -736,6 +781,11 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -781,6 +831,11 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -818,6 +873,11 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf2.port_vp1 = flow_entry->route_port;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf0.port_vp2 = flow_entry->bridge_port;
+#if defined(APPE)
+			entry.bf0.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -962,6 +1022,11 @@ adpt_hppe_flow_entry_get(
 			flow_entry->bridge_port = entry.bf1.port_vp2;
 			if (entry.bf1.port_vp2 >= 64)
 				flow_entry->bridge_port |= 0x1000000;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1022,6 +1087,11 @@ adpt_hppe_flow_entry_get(
 			flow_entry->bridge_port = entry.bf1.port_vp2;
 			if (entry.bf1.port_vp2 >= 64)
 				flow_entry->bridge_port |= 0x1000000;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1081,6 +1151,11 @@ adpt_hppe_flow_entry_get(
 			flow_entry->bridge_port = entry.bf1.port_vp2;
 			if (entry.bf1.port_vp2 >= 64)
 				flow_entry->bridge_port |= 0x1000000;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1137,6 +1212,11 @@ adpt_hppe_flow_entry_get(
 			flow_entry->bridge_port = entry.bf0.port_vp2;
 			if (entry.bf0.port_vp2 >= 64)
 				flow_entry->bridge_port |= 0x1000000;
+#if defined(APPE)
+			flow_entry->vlan_fmt_valid = entry.bf0.vlan_fmt_valid;
+			flow_entry->svlan_fmt = entry.bf0.svlan_fmt;
+			flow_entry->cvlan_fmt = entry.bf0.cvlan_fmt;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1251,6 +1331,11 @@ adpt_hppe_flow_entry_del(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1290,6 +1375,11 @@ adpt_hppe_flow_entry_del(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1335,6 +1425,11 @@ adpt_hppe_flow_entry_del(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1372,6 +1467,11 @@ adpt_hppe_flow_entry_del(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf0.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf0.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1623,6 +1723,11 @@ adpt_hppe_flow_entry_add(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1663,6 +1768,11 @@ adpt_hppe_flow_entry_add(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1709,6 +1819,11 @@ adpt_hppe_flow_entry_add(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf1.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1747,6 +1862,11 @@ adpt_hppe_flow_entry_add(
 			entry.bf2.port_vp1 = flow_entry->route_port & 0xffffff;
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			entry.bf0.port_vp2 = flow_entry->bridge_port & 0xffffff;
+#if defined(APPE)
+			entry.bf0.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
+			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
+			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;

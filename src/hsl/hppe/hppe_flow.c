@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -1582,6 +1582,37 @@ hppe_in_flow_tbl_set(
 				5);
 }
 
+#if defined(APPE)
+sw_error_t
+hppe_eg_flow_tree_map_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_flow_tree_map_tbl_u *value)
+{
+	if (index >= EG_FLOW_TREE_MAP_TBL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_tbl_get(
+				dev_id,
+				NSS_PTX_CSR_BASE_ADDR + EG_FLOW_TREE_MAP_TBL_ADDRESS + \
+				index * EG_FLOW_TREE_MAP_TBL_INC,
+				value->val,
+				sizeof(union eg_flow_tree_map_tbl_u)/sizeof(a_uint32_t));
+}
+
+sw_error_t
+hppe_eg_flow_tree_map_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_flow_tree_map_tbl_u *value)
+{
+	return hppe_reg_tbl_set(
+				dev_id,
+				NSS_PTX_CSR_BASE_ADDR + EG_FLOW_TREE_MAP_TBL_ADDRESS + \
+				index * EG_FLOW_TREE_MAP_TBL_INC,
+				value->val,
+				sizeof(union eg_flow_tree_map_tbl_u)/sizeof(a_uint32_t));
+}
+#elif defined(HPPE)
 sw_error_t
 hppe_eg_flow_tree_map_tbl_get(
 		a_uint32_t dev_id,
@@ -1609,6 +1640,7 @@ hppe_eg_flow_tree_map_tbl_set(
 				index * EG_FLOW_TREE_MAP_TBL_INC,
 				value->val);
 }
+#endif
 
 sw_error_t
 hppe_flow_ctrl0_flow_hash_mode_0_get(
@@ -5733,7 +5765,8 @@ hppe_flow_ipv4_5tuple_get(
 		hppe_in_flow_tbl_rd_op_data4_set(dev_id,
 				(union in_flow_tbl_rd_op_data4_u *)(&entry->val[4]));
 	}
-	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry, 5);
+	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry,
+			sizeof(union in_flow_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -5753,7 +5786,8 @@ hppe_flow_ipv4_3tuple_get(
 		hppe_in_flow_tbl_rd_op_data4_set(dev_id,
 				(union in_flow_tbl_rd_op_data4_u *)(&entry->val[4]));
 	}
-	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry, 5);
+	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry,
+			sizeof(union in_flow_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -5781,7 +5815,8 @@ hppe_flow_ipv6_5tuple_get(
 		hppe_in_flow_tbl_rd_op_data8_set(dev_id,
 				(union in_flow_tbl_rd_op_data8_u *)(&entry->val[8]));
 	}
-	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry, 9);
+	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry,
+			sizeof(union in_flow_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -5809,6 +5844,7 @@ hppe_flow_ipv6_3tuple_get(
 		hppe_in_flow_tbl_rd_op_data8_set(dev_id,
 				(union in_flow_tbl_rd_op_data8_u *)(&entry->val[8]));
 	}
-	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry, 9);
+	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry,
+			sizeof(union in_flow_tbl_u)/sizeof(a_uint32_t));
 }
 #endif

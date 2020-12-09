@@ -559,9 +559,14 @@ union port_in_forward_u {
 
 /*[table] MRU_MTU_CTRL_TBL*/
 #define MRU_MTU_CTRL_TBL
+#if defined(APPE)
+#define MRU_MTU_CTRL_TBL_ADDRESS 0x5000
+#define MRU_MTU_CTRL_TBL_INC     0x10
+#else
 #define MRU_MTU_CTRL_TBL_ADDRESS 0x3000
-#define MRU_MTU_CTRL_TBL_NUM     256
 #define MRU_MTU_CTRL_TBL_INC     0x8
+#endif
+#define MRU_MTU_CTRL_TBL_NUM     256
 #define MRU_MTU_CTRL_TBL_TYPE    REG_TYPE_RW
 #define MRU_MTU_CTRL_TBL_DEFAULT 0x0
 	/*[field] MRU*/
@@ -599,6 +604,78 @@ union port_in_forward_u {
 	#define MRU_MTU_CTRL_TBL_SRC_PROFILE_OFFSET  34
 	#define MRU_MTU_CTRL_TBL_SRC_PROFILE_LEN     2
 	#define MRU_MTU_CTRL_TBL_SRC_PROFILE_DEFAULT 0x0
+#if defined(APPE)
+	/*[field] PCP_QOS_GROUP_ID*/
+	#define MRU_MTU_CTRL_TBL_PCP_QOS_GROUP_ID
+	#define MRU_MTU_CTRL_TBL_PCP_QOS_GROUP_ID_OFFSET  36
+	#define MRU_MTU_CTRL_TBL_PCP_QOS_GROUP_ID_LEN     1
+	#define MRU_MTU_CTRL_TBL_PCP_QOS_GROUP_ID_DEFAULT 0x0
+	/*[field] DSCP_QOS_GROUP_ID*/
+	#define MRU_MTU_CTRL_TBL_DSCP_QOS_GROUP_ID
+	#define MRU_MTU_CTRL_TBL_DSCP_QOS_GROUP_ID_OFFSET  37
+	#define MRU_MTU_CTRL_TBL_DSCP_QOS_GROUP_ID_LEN     1
+	#define MRU_MTU_CTRL_TBL_DSCP_QOS_GROUP_ID_DEFAULT 0x0
+	/*[field] PCP_RES_PREC_FORCE*/
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_FORCE
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_FORCE_OFFSET  38
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_FORCE_LEN     1
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_FORCE_DEFAULT 0x0
+	/*[field] DSCP_RES_PREC_FORCE*/
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_FORCE
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_FORCE_OFFSET  39
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_FORCE_LEN     1
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_FORCE_DEFAULT 0x0
+	/*[field] PREHEADER_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_PREHEADER_RES_PREC
+	#define MRU_MTU_CTRL_TBL_PREHEADER_RES_PREC_OFFSET  40
+	#define MRU_MTU_CTRL_TBL_PREHEADER_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_PREHEADER_RES_PREC_DEFAULT 0x0
+	/*[field] PCP_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_OFFSET  43
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_PCP_RES_PREC_DEFAULT 0x0
+	/*[field] DSCP_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_OFFSET  46
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_DSCP_RES_PREC_DEFAULT 0x0
+	/*[field] FLOW_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_FLOW_RES_PREC
+	#define MRU_MTU_CTRL_TBL_FLOW_RES_PREC_OFFSET  49
+	#define MRU_MTU_CTRL_TBL_FLOW_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_FLOW_RES_PREC_DEFAULT 0x0
+	/*[field] PRE_ACL_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_PRE_ACL_RES_PREC
+	#define MRU_MTU_CTRL_TBL_PRE_ACL_RES_PREC_OFFSET  52
+	#define MRU_MTU_CTRL_TBL_PRE_ACL_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_PRE_ACL_RES_PREC_DEFAULT 0x0
+	/*[field] POST_ACL_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_POST_ACL_RES_PREC
+	#define MRU_MTU_CTRL_TBL_POST_ACL_RES_PREC_OFFSET  55
+	#define MRU_MTU_CTRL_TBL_POST_ACL_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_POST_ACL_RES_PREC_DEFAULT 0x0
+	/*[field] SOURCE_FILTERING_BYPASS*/
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_BYPASS
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_BYPASS_OFFSET  58
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_BYPASS_LEN     1
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_BYPASS_DEFAULT 0x0
+	/*[field] SOURCE_FILTERING_MODE*/
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE_OFFSET  59
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE_LEN     1
+	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE_DEFAULT 0x0
+	/*[field] PRE_IPO_OUTER_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_OUTER_RES_PREC
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_OUTER_RES_PREC_OFFSET  60
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_OUTER_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_OUTER_RES_PREC_DEFAULT 0x0
+	/*[field] PRE_IPO_INNER_RES_PREC*/
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_OFFSET  63
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_LEN     3
+	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_DEFAULT 0x0
+#endif
 
 struct mru_mtu_ctrl_tbl {
 	a_uint32_t  mru:14;
@@ -608,11 +685,34 @@ struct mru_mtu_ctrl_tbl {
 	a_uint32_t  rx_cnt_en:1;
 	a_uint32_t  tx_cnt_en:1;
 	a_uint32_t  src_profile:2;
+#if defined(APPE)
+	a_uint32_t  pcp_qos_group_id:1;
+	a_uint32_t  dscp_qos_group_id:1;
+	a_uint32_t  pcp_res_prec_force:1;
+	a_uint32_t  dscp_res_prec_force:1;
+	a_uint32_t  preheader_res_prec:3;
+	a_uint32_t  pcp_res_prec:3;
+	a_uint32_t  dscp_res_prec:3;
+	a_uint32_t  flow_res_prec:3;
+	a_uint32_t  pre_acl_res_prec:3;
+	a_uint32_t  post_acl_res_prec:3;
+	a_uint32_t  source_filtering_bypass:1;
+	a_uint32_t  source_filtering_mode:1;
+	a_uint32_t  pre_ipo_outer_res_prec:3;
+	a_uint32_t  pre_ipo_inner_res_prec_0:1;
+	a_uint32_t  pre_ipo_inner_res_prec_1:2;
+	a_uint32_t  _reserved0:30;
+#else
 	a_uint32_t  _reserved0:28;
+#endif
 };
 
 union mru_mtu_ctrl_tbl_u {
+#if defined(APPE)
+	a_uint32_t val[3];
+#else
 	a_uint32_t val[2];
+#endif
 	struct mru_mtu_ctrl_tbl bf;
 };
 

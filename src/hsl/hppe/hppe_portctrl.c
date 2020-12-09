@@ -339,7 +339,7 @@ hppe_mru_mtu_ctrl_tbl_get(
 				IPE_L2_BASE_ADDR + MRU_MTU_CTRL_TBL_ADDRESS + \
 				index * MRU_MTU_CTRL_TBL_INC,
 				value->val,
-				2);
+				sizeof(union mru_mtu_ctrl_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -353,7 +353,7 @@ hppe_mru_mtu_ctrl_tbl_set(
 				IPE_L2_BASE_ADDR + MRU_MTU_CTRL_TBL_ADDRESS + \
 				index * MRU_MTU_CTRL_TBL_INC,
 				value->val,
-				2);
+				sizeof(union mru_mtu_ctrl_tbl_u)/sizeof(a_uint32_t));
 }
 
 #if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))

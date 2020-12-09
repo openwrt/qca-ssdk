@@ -2032,7 +2032,9 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t
 	}
 
 	if((FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_ETHTYPE)) ||
-		(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID)))
+		(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID)) ||
+		((FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID)) &&
+		(rule->stag_vid_op != FAL_ACL_FIELD_MASK)))
 	{
 		SSDK_DEBUG("select L2 MISC rule\n");
 		l2_rule_type_map |= (1<<ADPT_ACL_HPPE_L2_MISC_RULE);
@@ -2043,16 +2045,8 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 		{
-			if(rule->stag_vid_op == FAL_ACL_FIELD_MASK)
-			{
 				SSDK_DEBUG("select VLAN rule\n");
 				l2_rule_type_map |= (1<<ADPT_ACL_HPPE_VLAN_RULE);
-			}
-			else
-			{
-				SSDK_DEBUG("select L2 MISC rule\n");
-				l2_rule_type_map |= (1<<ADPT_ACL_HPPE_L2_MISC_RULE);
-			}
 		}
 	}
 
@@ -2367,7 +2361,8 @@ static sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 		vlanrule_mask->ctag_fmt_mask = rule->ctagged_mask;
 	}
 	/*stag*/
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID) &&
+		(rule->stag_vid_op == FAL_ACL_FIELD_MASK))
 	{
 		vlanrule->svid = rule->stag_vid_val;
 		vlanrule_mask->svid_mask = rule->stag_vid_mask;

@@ -1152,17 +1152,28 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 		rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode1);
 		SW_RTN_ON_ERROR(rv);
 
-		if(adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
+		if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 			rv = p_api->adpt_uniphy_mode_set(dev_id,
 					SSDK_UNIPHY_INSTANCE2, mode2);
 			SW_RTN_ON_ERROR(rv);
+		} else {
+			if(adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
+				rv = p_api->adpt_uniphy_mode_set(dev_id,
+						SSDK_UNIPHY_INSTANCE2, mode2);
+				SW_RTN_ON_ERROR(rv);
+			}
 		}
 	}
 
-	if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
-		port_max = SSDK_PHYSICAL_PORT6;
-	} else {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		port_max = SSDK_PHYSICAL_PORT7;
+		SSDK_INFO("appe interface mode initialization\n");
+	} else {
+		if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+			port_max = SSDK_PHYSICAL_PORT6;
+		} else {
+			port_max = SSDK_PHYSICAL_PORT7;
+		}
 	}
 	for(port_id = SSDK_PHYSICAL_PORT1; port_id < port_max; port_id++) {
 		rv = p_api->adpt_port_mux_mac_type_set(dev_id, port_id, mode0, mode1, mode2);

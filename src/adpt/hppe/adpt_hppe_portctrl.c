@@ -43,6 +43,9 @@
 #include "cppe_portctrl.h"
 #endif
 #include "sfp_phy.h"
+#if defined(APPE)
+#include "adpt_appe_portctrl.h"
+#endif
 
 #define PORT4_PCS_SEL_GMII_FROM_PCS0 1
 #define PORT4_PCS_SEL_RGMII 0
@@ -2530,12 +2533,18 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id,
 		}
 	}
 	if ((port_type == PORT_GMAC_TYPE) ||(port_type == PORT_XGMAC_TYPE)) {
-		if (adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
-		 	rv = _adpt_hppe_port_mux_mac_set(dev_id, port_id, port_type);
-		} else if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
-#if defined(CPPE)
-			rv = _adpt_cppe_port_mux_mac_set(dev_id, port_id, port_type);
+		if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
+#if defined(APPE)
+			rv = _adpt_appe_port_mux_mac_set(dev_id, port_id, port_type);
 #endif
+		} else {
+			if (adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
+			 	rv = _adpt_hppe_port_mux_mac_set(dev_id, port_id, port_type);
+			} else if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+#if defined(CPPE)
+				rv = _adpt_cppe_port_mux_mac_set(dev_id, port_id, port_type);
+#endif
+			}
 		}
 	}
 

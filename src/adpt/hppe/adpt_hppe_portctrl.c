@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -62,6 +62,7 @@
 #define MAC_SPEED_100M 1
 #define MAC_SPEED_1000M 2
 #define MAC_SPEED_10000M 3
+#define MAC_SPEED_2500M 4
 
 #define XGMAC_USXGMII_ENABLE 1
 #define XGMAC_USXGMII_CLEAR 0
@@ -92,7 +93,6 @@ static a_uint32_t port_interface_mode[SW_MAX_NR_DEV][SW_MAX_NR_PORT] = {0};
 static a_bool_t
 _adpt_hppe_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 {
-	a_uint32_t mode1, mode2;
 	a_bool_t force_port = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
@@ -103,18 +103,17 @@ _adpt_hppe_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 		SSDK_DEBUG("port_id %d is a force port!\n", port_id);
 		return A_FALSE;
 	}
-
-	mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
-	mode2 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE2);
-
-	if ((SSDK_PHYSICAL_PORT0 == port_id) || (SSDK_PHYSICAL_PORT7 == port_id)||
-	((SSDK_PHYSICAL_PORT5 == port_id) && ((mode1 == PORT_WRAPPER_10GBASE_R) ||
-		mode1 == PORT_WRAPPER_SGMII_FIBER)) ||
-	((SSDK_PHYSICAL_PORT6 == port_id) && ((mode2 == PORT_WRAPPER_10GBASE_R) ||
-		mode2 == PORT_WRAPPER_SGMII_FIBER)))
+	/* sfp port which connect a sfp module*/
+	if (A_TRUE == hsl_port_is_sfp(dev_id, port_id)) {
+		SSDK_DEBUG("port_id %d is a SFP port!\n", port_id);
 		return A_FALSE;
-	else
+	}
+	/* cpu port and other ethernet port */
+	if ((SSDK_PHYSICAL_PORT0 == port_id) || (SSDK_PHYSICAL_PORT7 == port_id)) {
+		return A_FALSE;
+	} else {
 		return hppe_mac_port_valid_check (dev_id, port_id);
+	}
 }
 
 static sw_error_t
@@ -144,12 +143,22 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 			SW_RTN_ON_ERROR (rv);
 		}
 #endif
-	}
-	else
-	{
+	} else if (port_id == SSDK_PHYSICAL_PORT1) {
+		/*mac0 port1 as 1G sfp mode*/
+		rv = hppe_port_phy_status_0_port1_phy_status_get(dev_id,
+				&reg_field);
+		SW_RTN_ON_ERROR (rv);
+	} else if (port_id == SSDK_PHYSICAL_PORT2) {
+		/*mac1 port2 as 1G sfp mode*/
+		rv = hppe_port_phy_status_0_port2_phy_status_get(dev_id,
+				&reg_field);
+		SW_RTN_ON_ERROR (rv);
+	} else if (port_id == SSDK_PHYSICAL_PORT6) {
 		rv = hppe_port_phy_status_1_port6_phy_status_get(dev_id,
 						&reg_field);
 		SW_RTN_ON_ERROR (rv);
+	} else {
+		return SW_NOT_SUPPORTED;
 	}
 
 	phy_status->tx_flowctrl = A_TRUE;
@@ -171,6 +180,9 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 				break;
 			case MAC_SPEED_10000M:
 				phy_status->speed = FAL_SPEED_10000;
+				break;
+			case MAC_SPEED_2500M:
+				phy_status->speed = FAL_SPEED_2500;
 				break;
 			default:
 				phy_status->speed = FAL_SPEED_BUTT;
@@ -2501,7 +2513,8 @@ adpt_hppe_port_interface_mode_switch_mac_reset(a_uint32_t dev_id,
 		(mode == PORT_WRAPPER_SGMII_CHANNEL0) ||
 		(mode == PORT_WRAPPER_SGMII0_RGMII4) ||
 		(mode == PORT_WRAPPER_SGMII_FIBER) ||
-		(mode == PORT_WRAPPER_10GBASE_R)) {
+		(mode == PORT_WRAPPER_10GBASE_R) ||
+		(mode == PORT_WRAPPER_SGMII_PLUS)) {
 		ssdk_port_mac_clock_reset(dev_id, port_id);
 		port_mac_type = qca_hppe_port_mac_type_get(dev_id, port_id);
 		if (port_mac_type == PORT_XGMAC_TYPE) {
@@ -4798,55 +4811,62 @@ adpt_hppe_gcc_uniphy_clock_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 }
 
 static sw_error_t
-adpt_hppe_sfp_interface_mode_switch(a_uint32_t dev_id,
-	a_uint32_t port_id)
-{
-	sw_error_t rv = SW_OK;
-	fal_port_interface_mode_t port_mode_old = PORT_INTERFACE_MODE_MAX,
-		port_mode_new= PORT_INTERFACE_MODE_MAX;
-
-	if (A_FALSE == _adpt_hppe_port_phy_connected(dev_id, port_id))
-	{
-		rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode_old);
-		SW_RTN_ON_ERROR(rv);
-		rv = adpt_hppe_port_interface_mode_status_get(dev_id, port_id,
-			&port_mode_new);
-		SW_RTN_ON_ERROR (rv);
-		if(port_mode_old != port_mode_new)
-		{
-			SSDK_DEBUG("Port %d change interface mode to %d from %d\n", port_id,
-				port_mode_new, port_mode_old);
-			rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id, port_mode_new);
-			SW_RTN_ON_ERROR(rv);
-			rv = _adpt_hppe_port_interface_mode_apply(dev_id, A_FALSE);
-			SW_RTN_ON_ERROR(rv);
-		}
-	}
-
-	return rv;
-}
-
-static sw_error_t
 adpt_hppe_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	sw_error_t rv = SW_OK;
 	fal_port_interface_mode_t port_mode_old = PORT_INTERFACE_MODE_MAX;
 	fal_port_interface_mode_t port_mode_new = PORT_INTERFACE_MODE_MAX;
 
-	rv = adpt_hppe_port_interface_mode_status_get(dev_id,
-		port_id, &port_mode_new);
+	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id,
+				&port_mode_old);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode_old);
+	port_mode_new = port_mode_old;
+	rv = adpt_hppe_port_interface_mode_status_get(dev_id, port_id,
+				&port_mode_new);
 	SW_RTN_ON_ERROR(rv);
 
 	if (port_mode_new != port_mode_old) {
-		rv = _adpt_hppe_port_interface_mode_set(dev_id,
-			port_id, port_mode_new);
+		SSDK_DEBUG("Port %d change interface mode to %d from %d\n", port_id,
+				port_mode_new, port_mode_old);
+		rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id,
+				port_mode_new);
 		SW_RTN_ON_ERROR(rv);
 		rv = _adpt_hppe_port_interface_mode_apply(dev_id, A_FALSE);
+		SW_RTN_ON_ERROR(rv);
 	}
+
 	return rv;
+}
+
+static sw_error_t
+adpt_hppe_sfp_interface_mode_switch(a_uint32_t dev_id,
+	a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+
+	if (A_TRUE == hsl_port_is_sfp(dev_id, port_id)) {
+		SSDK_DEBUG("sfp port %d change interface mode!\n", port_id);
+		rv = adpt_hppe_port_interface_mode_switch(dev_id, port_id);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+
+static sw_error_t
+adpt_hppe_phy_interface_mode_switch(a_uint32_t dev_id,
+	a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+
+	if (A_TRUE == _adpt_hppe_port_phy_connected(dev_id, port_id)) {
+		SSDK_DEBUG("phy port %d change interface mode!\n", port_id);
+		rv = adpt_hppe_port_interface_mode_switch(dev_id, port_id);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
 }
 
 void
@@ -4888,16 +4908,16 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 		if(!(portbmp[priv->device_id] & (0x1 << port_id)))
 			continue;
 
+		rv = adpt_hppe_sfp_interface_mode_switch(priv->device_id, port_id);
+		if(rv) {
+			SSDK_DEBUG("port %d sfp interface mode change failed\n", port_id);
+		}
 		rv = adpt_hppe_port_phy_status_get(priv->device_id,
 				port_id, &phy_status);
 		if (rv != SW_OK) {
 			SSDK_DEBUG("failed to get port %d status return value is %d\n",
 					port_id, rv);
 			continue;
-		}
-		rv = adpt_hppe_sfp_interface_mode_switch(priv->device_id, port_id);
-		if(rv) {
-			SSDK_DEBUG("port %d sfp interface mode change failed\n", port_id);
 		}
 		SSDK_DEBUG("polling task external phy %d link status is %d and speed is %d\n",
 				port_id, phy_status.link_status, phy_status.speed);
@@ -4912,7 +4932,7 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 			adpt_hppe_port_rxmac_status_set(priv->device_id, port_id, A_FALSE);
 			priv->port_old_link[port_id - 1] = phy_status.link_status;
 			/* switch interface mode if necessary */
-			if (adpt_hppe_port_interface_mode_switch(priv->device_id,
+			if (adpt_hppe_phy_interface_mode_switch(priv->device_id,
 					port_id) == SW_OK) {
 				SSDK_DEBUG("Port %d the interface mode switched\n",
 						port_id);
@@ -4931,7 +4951,7 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 			/*disable tx mac*/
 			adpt_hppe_port_txmac_status_set(priv->device_id, port_id, A_FALSE);
 			/* switch interface mode if necessary */
-			if (adpt_hppe_port_interface_mode_switch(priv->device_id,
+			if (adpt_hppe_phy_interface_mode_switch(priv->device_id,
 					port_id) == SW_OK) {
 				SSDK_DEBUG("Port %d the interface mode switched\n",
 						port_id);

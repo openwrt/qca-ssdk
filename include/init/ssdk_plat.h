@@ -198,6 +198,8 @@ enum {
 #define SSDK_UNIPHY_INSTANCE2           2
 #define SSDK_UNIPHY_CHANNEL0            0
 #define SSDK_UNIPHY_CHANNEL1            1
+#define SSDK_UNIPHY_CHANNEL2            2
+#define SSDK_UNIPHY_CHANNEL3            3
 #define SSDK_UNIPHY_CHANNEL4            4
 
 /*qca808x_start*/

@@ -21,6 +21,7 @@ extern "C" {
 
 #include "fal.h"
 #include <linux/version.h>
+#include <linux/phy.h>
 
 	/** Phy function reset type */
 	typedef enum {
@@ -695,6 +696,8 @@ hsl_port_phy_dac_get(a_uint32_t dev_id, a_uint32_t port_id,
 void
 hsl_port_phy_dac_set(a_uint32_t dev_id, a_uint32_t port_id,
 	phy_dac_t phy_dac);
+
+a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id);
 /*qca808x_start*/
 sw_error_t ssdk_phy_driver_cleanup(void);
 /*qca808x_end*/
@@ -708,6 +711,10 @@ qca_ssdk_phy_address_set(a_uint32_t dev_id, a_uint32_t port_id,
 
 sw_error_t
 hsl_port_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_id);
+
+sw_error_t
+hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
+	struct phy_device **phydev);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
 sw_error_t

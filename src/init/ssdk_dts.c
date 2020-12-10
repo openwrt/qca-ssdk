@@ -667,8 +667,8 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 			}
 
 			if (!of_property_read_string(port_node, "media-type", &media_type)) {
-				if (!strncmp("fiber", media_type, strlen(media_type))) {
-					port_phyinfo->phy_features |= PHY_F_FIBER;
+				if (!strncmp("sfp", media_type, strlen(media_type))) {
+					port_phyinfo->phy_features |= PHY_F_SFP;
 					SSDK_INFO("[PORT %d] media type is %s\n", port_id, media_type);
 				}
 			}

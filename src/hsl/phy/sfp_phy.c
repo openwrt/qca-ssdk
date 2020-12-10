@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2018, 2020-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -26,6 +26,7 @@
 #include <linux/phy.h>
 #include "ssdk_plat.h"
 #include "ssdk_phy_i2c.h"
+#include "ssdk_dts.h"
 
 /******************************************************************************
 *
@@ -37,7 +38,8 @@
                                 SUPPORTED_1000baseT_Full | \
                                 SUPPORTED_10000baseT_Full | \
                                 SUPPORTED_Pause | \
-                                SUPPORTED_Asym_Pause)
+                                SUPPORTED_Asym_Pause) | \
+                                SUPPORTED_2500baseX_Full
 #else
 __ETHTOOL_DECLARE_LINK_MODE_MASK(SFP_PHY_FEATURES) __ro_after_init;
 #endif
@@ -45,6 +47,7 @@ __ETHTOOL_DECLARE_LINK_MODE_MASK(SFP_PHY_FEATURES) __ro_after_init;
 static int
 sfp_phy_probe(struct phy_device *pdev)
 {
+	pdev->autoneg = AUTONEG_DISABLE;
 	SSDK_INFO("sfp phy is probed!\n");
 	return 0;
 }
@@ -72,12 +75,9 @@ sfp_phy_aneg_done(struct phy_device *pdev)
 static int
 sfp_read_status(struct phy_device *pdev)
 {
-	sw_error_t rv;
 	fal_port_t port;
 	a_uint32_t addr;
 	struct qca_phy_priv *priv = pdev->priv;
-	struct port_phy_status phy_status;
-	adpt_api_t *p_api;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
 	addr = pdev->mdio.addr;
@@ -85,14 +85,24 @@ sfp_read_status(struct phy_device *pdev)
 	addr = pdev->addr;
 #endif
 	port = qca_ssdk_phy_addr_to_port(priv->device_id, addr);
-	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(priv->device_id));
-	rv = p_api->adpt_port_phy_status_get(priv->device_id, port, &phy_status);
-	pdev->link = phy_status.link_status;
-	pdev->speed = phy_status.speed;
-	pdev->duplex = phy_status.duplex;
+	pdev->link = priv->port_old_link[port - 1];
+	pdev->speed = priv->port_old_speed[port - 1];
+	pdev->duplex = priv->port_old_duplex[port - 1];
 
-	return rv;
+	return 0;
 }
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
+static int
+sfp_phy_update_link(struct phy_device *pdev)
+{
+	int ret;
+
+	ret = sfp_read_status(pdev);
+
+	return ret;
+}
+#endif
 
 static struct phy_driver sfp_phy_driver = {
 	.name		= "QCA SFP",
@@ -104,6 +114,9 @@ static struct phy_driver sfp_phy_driver = {
 	.aneg_done	= sfp_phy_aneg_done,
 	.read_status	= sfp_read_status,
 	.features	= SFP_PHY_FEATURES,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
+	.update_link	= sfp_phy_update_link,
+#endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
 	.mdiodrv.driver	= { .owner = THIS_MODULE },
 #else
@@ -224,8 +237,9 @@ void sfp_phy_exit(a_uint32_t dev_id, a_uint32_t port_bmp)
 	}
 
 }
+
 sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
-	a_uint32_t phy_id, fal_port_interface_mode_t *interface_mode_status)
+	a_uint32_t port_id, fal_port_interface_mode_t *interface_mode_status)
 {
 	sw_error_t rv = SW_OK;
 	a_uint16_t reg_data = 0, sfp_speed = 0;
@@ -235,6 +249,7 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 	SW_RTN_ON_ERROR(rv);
 	sfp_speed = SFP_TO_SFP_SPEED(reg_data);
 	SSDK_DEBUG("sfp_speed:%d\n", sfp_speed);
+
 	if(sfp_speed >= SFP_SPEED_1000M &&
 		sfp_speed < SFP_SPEED_2500M)
 	{
@@ -244,10 +259,47 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 	{
 		*interface_mode_status =  PORT_10GBASE_R;
 	}
+	else if(sfp_speed >= SFP_SPEED_2500M &&
+		sfp_speed < SFP_SPEED_5000M)
+	{
+		struct port_phy_status sfp_status= {0};
+		adpt_api_t *p_api;
+		struct phy_device *phydev;
+
+		rv = hsl_port_phydev_get(dev_id, port_id, &phydev);
+		SW_RTN_ON_ERROR(rv);
+		SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+		rv = p_api->adpt_port_phy_status_get(dev_id, port_id, &sfp_status);
+		SW_RTN_ON_ERROR(rv);
+
+		if (sfp_status.link_status == PORT_LINK_DOWN) {
+			/*autoneg is for different speed switching on one SFP module*/
+			if (phydev->autoneg == AUTONEG_ENABLE) {
+				if (sfp_status.link_status == PORT_LINK_DOWN) {
+					if (*interface_mode_status == PHY_SGMII_BASET) {
+						*interface_mode_status = PORT_SGMII_PLUS;
+					} else {
+						*interface_mode_status = PHY_SGMII_BASET;
+					}
+				}
+			} else {
+				*interface_mode_status = PORT_SGMII_PLUS;
+			}
+			return SW_OK;
+		}
+		if (sfp_status.link_status == PORT_LINK_UP) {
+			/*solution for SFP link up case under 10G-R mode*/
+			if ((*interface_mode_status != PHY_SGMII_BASET) &&
+				(*interface_mode_status != PORT_SGMII_PLUS)) {
+				*interface_mode_status = PORT_SGMII_PLUS;
+			}
+			return SW_OK;
+		}
+	}
 	else
 	{
 		return SW_NOT_SUPPORTED;
 	}
 
-	return rv;
+	return SW_OK;
 }

@@ -149,21 +149,31 @@ sw_error_t phy_api_ops_init(phy_type_t phy_type)
 	}
 	return SW_OK;
 }
-
-a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id, ssdk_init_cfg *cfg)
+/*qca808x_end*/
+a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 {
-	if ((cfg->chip_type == CHIP_HPPE) &&
-	    (((SSDK_PHYSICAL_PORT5 == port_id) &&
-			((cfg->mac_mode1 == PORT_WRAPPER_10GBASE_R) ||
-			(cfg->mac_mode1 == PORT_WRAPPER_SGMII_FIBER))) ||
+	a_bool_t sfp_port = 0;
+	a_uint32_t mode1, mode2;
+
+	sfp_port = ssdk_port_feature_get(dev_id, port_id, PHY_F_SFP);
+	if (sfp_port == A_TRUE) {
+		return A_TRUE;
+	}
+
+	mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
+	mode2 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE2);
+
+	if (((SSDK_PHYSICAL_PORT5 == port_id) &&
+			((mode1 == PORT_WRAPPER_10GBASE_R) ||
+			(mode1 == PORT_WRAPPER_SGMII_FIBER))) ||
 	    ((SSDK_PHYSICAL_PORT6 == port_id) &&
-			((cfg->mac_mode2 == PORT_WRAPPER_10GBASE_R) ||
-			(cfg->mac_mode2 == PORT_WRAPPER_SGMII_FIBER)))))
+			((mode2 == PORT_WRAPPER_10GBASE_R) ||
+			(mode2 == PORT_WRAPPER_SGMII_FIBER))))
 		return A_TRUE;
 	else
 		return A_FALSE;
 }
-
+/*qca808x_start*/
 a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 		a_uint32_t port_id, ssdk_init_cfg *cfg)
 {
@@ -174,11 +184,10 @@ a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 	if(ssdk_is_emulation(dev_id) && ssdk_emu_chip_ver_get(dev_id) == MP_GEPHY){
 		return MP_GEPHY;
 	}
-/*qca808x_start*/
-	if (hsl_port_is_sfp(dev_id, port_id, cfg)){
+	if (hsl_port_is_sfp(dev_id, port_id)){
 		return SFP_PHY;
 	}
-
+/*qca808x_start*/
 	if (phy_info[dev_id]->phy_c45[port_id] == A_TRUE){
 		reg_pad = BIT(30) | BIT(16);
 	}
@@ -709,6 +718,51 @@ hsl_port_phy_dac_set(a_uint32_t dev_id, a_uint32_t port_id,
 	return;
 }
 
+sw_error_t
+hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
+	struct phy_device **phydev)
+{
+	struct qca_phy_priv *priv;
+	a_uint32_t phy_addr, pdev_addr;
+	const char *pdev_name;
+
+	priv = ssdk_phy_priv_data_get(dev_id);
+	SW_RTN_ON_NULL(priv);
+
+#if defined(IN_PHY_I2C_MODE)
+	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS)
+	{
+		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
+	}
+	else
+#endif
+	{
+		phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
+	}
+	SW_RTN_ON_NULL(phydev);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
+	*phydev = priv->miibus->phy_map[phy_addr];
+	SW_RTN_ON_NULL(*phydev);
+	pdev_addr = (*phydev)->addr;
+	pdev_name = dev_name(&((*phydev)->dev));
+#else
+	*phydev = mdiobus_get_phy(priv->miibus, phy_addr);
+	SW_RTN_ON_NULL(*phydev);
+	pdev_addr = (*phydev)->mdio.addr;
+	pdev_name = phydev_name(*phydev);
+#endif
+	if(*phydev == NULL)
+	{
+		SSDK_ERROR("port %d phydev is NULL\n", port_id);
+		return SW_NOT_INITIALIZED;
+	}
+	SSDK_DEBUG("phy[%d]: device %s, driver %s\n",
+		pdev_addr, pdev_name,
+		(*phydev)->drv ? (*phydev)->drv->name : "unknown");
+
+	return SW_OK;
+}
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
 static sw_error_t
 hsl_phy_adv_to_linkmode_adv(a_uint32_t autoadv, a_ulong_t *advertising)
@@ -742,40 +796,6 @@ hsl_phy_adv_to_linkmode_adv(a_uint32_t autoadv, a_ulong_t *advertising)
 
 	SSDK_DEBUG("autoadv:0x%x, advertising::0x%lx\n",
 		autoadv, *advertising);
-
-	return SW_OK;
-}
-
-static sw_error_t
-hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
-	struct phy_device **phydev)
-{
-	struct qca_phy_priv *priv;
-	a_uint32_t phy_addr;
-
-	priv = ssdk_phy_priv_data_get(dev_id);
-	SW_RTN_ON_NULL(priv);
-
-#if defined(IN_PHY_I2C_MODE)
-	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS)
-	{
-		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
-	}
-	else
-#endif
-	{
-		phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
-	}
-	SW_RTN_ON_NULL(phydev);
-	*phydev = mdiobus_get_phy(priv->miibus, phy_addr);
-	if(*phydev == NULL)
-	{
-		SSDK_ERROR("port %d phydev is NULL\n", port_id);
-		return SW_NOT_INITIALIZED;
-	}
-	SSDK_DEBUG("phy[%d]: device %s, driver %s\n",
-		(*phydev)->mdio.addr, phydev_name(*phydev),
-		(*phydev)->drv ? (*phydev)->drv->name : "unknown");
 
 	return SW_OK;
 }

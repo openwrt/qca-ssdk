@@ -97,7 +97,7 @@ union bridge_config_u {
 /*[register] PORT_DEF_VID*/
 #define PORT_DEF_VID
 #define PORT_DEF_VID_ADDRESS 0x10
-#define PORT_DEF_VID_NUM     1
+#define PORT_DEF_VID_NUM     8
 #define PORT_DEF_VID_INC     0x4
 #define PORT_DEF_VID_TYPE    REG_TYPE_RW
 #define PORT_DEF_VID_DEFAULT 0x0
@@ -139,7 +139,7 @@ union port_def_vid_u {
 /*[register] PORT_DEF_PCP*/
 #define PORT_DEF_PCP
 #define PORT_DEF_PCP_ADDRESS 0x30
-#define PORT_DEF_PCP_NUM     1
+#define PORT_DEF_PCP_NUM     8
 #define PORT_DEF_PCP_INC     0x4
 #define PORT_DEF_PCP_TYPE    REG_TYPE_RW
 #define PORT_DEF_PCP_DEFAULT 0x0
@@ -180,7 +180,7 @@ union port_def_pcp_u {
 /*[register] PORT_VLAN_CONFIG*/
 #define PORT_VLAN_CONFIG
 #define PORT_VLAN_CONFIG_ADDRESS 0x50
-#define PORT_VLAN_CONFIG_NUM     1
+#define PORT_VLAN_CONFIG_NUM     8
 #define PORT_VLAN_CONFIG_INC     0x4
 #define PORT_VLAN_CONFIG_TYPE    REG_TYPE_RW
 #define PORT_VLAN_CONFIG_DEFAULT 0x0
@@ -236,6 +236,37 @@ union port_vlan_config_u {
 	struct port_vlan_config bf;
 };
 
+#if defined(APPE)
+/*[register] IV_DBG_ADDR*/
+#define IV_DBG_ADDR
+#define IV_DBG_ADDR_ADDRESS 0x70
+#define IV_DBG_ADDR_NUM     1
+#define IV_DBG_ADDR_INC     0x4
+#define IV_DBG_ADDR_TYPE    REG_TYPE_RW
+#define IV_DBG_ADDR_DEFAULT 0x0
+	/*[field] DBG_ADDR*/
+	#define IV_DBG_ADDR_DBG_ADDR
+	#define IV_DBG_ADDR_DBG_ADDR_OFFSET  0
+	#define IV_DBG_ADDR_DBG_ADDR_LEN     16
+	#define IV_DBG_ADDR_DBG_ADDR_DEFAULT 0x0
+	/*[field] DBG_TYPE*/
+	#define IV_DBG_ADDR_DBG_TYPE
+	#define IV_DBG_ADDR_DBG_TYPE_OFFSET  16
+	#define IV_DBG_ADDR_DBG_TYPE_LEN     16
+	#define IV_DBG_ADDR_DBG_TYPE_DEFAULT 0x0
+
+struct iv_dbg_addr {
+	a_uint32_t  dbg_addr:16;
+	a_uint32_t  dbg_type:16;
+};
+
+union iv_dbg_addr_u {
+	a_uint32_t val;
+	struct iv_dbg_addr bf;
+};
+
+#else
+
 /*[register] IV_DBG_ADDR*/
 #define IV_DBG_ADDR
 #define IV_DBG_ADDR_ADDRESS 0x70
@@ -258,6 +289,7 @@ union iv_dbg_addr_u {
 	a_uint32_t val;
 	struct iv_dbg_addr bf;
 };
+#endif
 
 /*[register] IV_DBG_DATA*/
 #define IV_DBG_DATA
@@ -306,7 +338,13 @@ union eco_reserve_u {
 /*[table] XLT_RULE_TBL*/
 #define XLT_RULE_TBL
 #define XLT_RULE_TBL_ADDRESS 0x2000
+
+#if defined(APPE)
+#define XLT_RULE_TBL_NUM     128
+#else
 #define XLT_RULE_TBL_NUM     64
+#endif
+
 #define XLT_RULE_TBL_INC     0x10
 #define XLT_RULE_TBL_TYPE    REG_TYPE_RW
 #define XLT_RULE_TBL_DEFAULT 0x0
@@ -315,11 +353,29 @@ union eco_reserve_u {
 	#define XLT_RULE_TBL_VALID_OFFSET  0
 	#define XLT_RULE_TBL_VALID_LEN     1
 	#define XLT_RULE_TBL_VALID_DEFAULT 0x0
+#if defined(APPE)
+	/*[field] PORT_VP_ID reuse PORT_TYPE[0]*/
+	#define XLT_RULE_TBL_PORT_VP_ID
+	#define XLT_RULE_TBL_PORT_VP_ID_OFFSET  1
+	#define XLT_RULE_TBL_PORT_VP_ID_LEN     8
+	#define XLT_RULE_TBL_PORT_VP_ID_DEFAULT 0x0
+	/*[field] PORT_BITMAP reuse PORT_TYPE[1]*/
+	#define XLT_RULE_TBL_PORT_BITMAP
+	#define XLT_RULE_TBL_PORT_BITMAP_OFFSET  1
+	#define XLT_RULE_TBL_PORT_BITMAP_LEN     8
+	#define XLT_RULE_TBL_PORT_BITMAP_DEFAULT 0x0
+	/*[field] VP_PROFILE reuse PORT_TYPE[2]*/
+	#define XLT_RULE_TBL_VP_PROFILE
+	#define XLT_RULE_TBL_VP_PROFILE_OFFSET  1
+	#define XLT_RULE_TBL_VP_PROFILE_LEN     8
+	#define XLT_RULE_TBL_VP_PROFILE_DEFAULT 0x0
+#else
 	/*[field] PORT_BITMAP*/
 	#define XLT_RULE_TBL_PORT_BITMAP
 	#define XLT_RULE_TBL_PORT_BITMAP_OFFSET  1
 	#define XLT_RULE_TBL_PORT_BITMAP_LEN     8
 	#define XLT_RULE_TBL_PORT_BITMAP_DEFAULT 0x0
+#endif
 	/*[field] SKEY_FMT*/
 	#define XLT_RULE_TBL_SKEY_FMT
 	#define XLT_RULE_TBL_SKEY_FMT_OFFSET  9
@@ -410,6 +466,130 @@ union eco_reserve_u {
 	#define XLT_RULE_TBL_PROT_VALUE_OFFSET  57
 	#define XLT_RULE_TBL_PROT_VALUE_LEN     16
 	#define XLT_RULE_TBL_PROT_VALUE_DEFAULT 0x0
+#if defined(APPE)
+	/*[field] PORT_TYPE*/
+	#define XLT_RULE_TBL_PORT_TYPE
+	#define XLT_RULE_TBL_PORT_TYPE_OFFSET  73
+	#define XLT_RULE_TBL_PORT_TYPE_LEN     2
+	#define XLT_RULE_TBL_PORT_TYPE_DEFAULT 0x0
+	/*[field] VNI_RESV_INCL*/
+	#define XLT_RULE_TBL_VNI_RESV_INCL
+	#define XLT_RULE_TBL_VNI_RESV_INCL_OFFSET  75
+	#define XLT_RULE_TBL_VNI_RESV_INCL_LEN     1
+	#define XLT_RULE_TBL_VNI_RESV_INCL_DEFAULT 0x0
+	/*[field] VNI_RESV_TYPE*/
+	#define XLT_RULE_TBL_VNI_RESV_TYPE
+	#define XLT_RULE_TBL_VNI_RESV_TYPE_OFFSET  76
+	#define XLT_RULE_TBL_VNI_RESV_TYPE_LEN     1
+	#define XLT_RULE_TBL_VNI_RESV_TYPE_DEFAULT 0x0
+	/*[field] VNI_RESV*/
+	#define XLT_RULE_TBL_VNI_RESV
+	#define XLT_RULE_TBL_VNI_RESV_OFFSET  77
+	#define XLT_RULE_TBL_VNI_RESV_LEN     32
+	#define XLT_RULE_TBL_VNI_RESV_DEFAULT 0x0
+#endif
+
+#if defined(APPE)
+struct xlt_rule_tbl_2 {
+	a_uint32_t  valid:1;
+	a_uint32_t  vp_profile:8;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  ckey_fmt_0:1;
+	a_uint32_t  ckey_fmt_1:2;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  frm_type_incl:1;
+	a_uint32_t  frm_type:2;
+	a_uint32_t  prot_incl:1;
+	a_uint32_t  prot_value_0:7;
+	a_uint32_t  prot_value_1:9;
+	a_uint32_t  port_type:2;
+	a_uint32_t  vni_resv_incl:1;
+	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  vni_resv_0:19;
+	a_uint32_t  vni_resv_1:13;
+	a_uint32_t  _reserved0:19;
+};
+
+struct xlt_rule_tbl_1 {
+	a_uint32_t  valid:1;
+	a_uint32_t  port_vp_id:8;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  ckey_fmt_0:1;
+	a_uint32_t  ckey_fmt_1:2;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  frm_type_incl:1;
+	a_uint32_t  frm_type:2;
+	a_uint32_t  prot_incl:1;
+	a_uint32_t  prot_value_0:7;
+	a_uint32_t  prot_value_1:9;
+	a_uint32_t  port_type:2;
+	a_uint32_t  vni_resv_incl:1;
+	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  vni_resv_0:19;
+	a_uint32_t  vni_resv_1:13;
+	a_uint32_t  _reserved0:19;
+};
+
+struct xlt_rule_tbl {
+	a_uint32_t  valid:1;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  ckey_fmt_0:1;
+	a_uint32_t  ckey_fmt_1:2;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  frm_type_incl:1;
+	a_uint32_t  frm_type:2;
+	a_uint32_t  prot_incl:1;
+	a_uint32_t  prot_value_0:7;
+	a_uint32_t  prot_value_1:9;
+	a_uint32_t  port_type:2;
+	a_uint32_t  vni_resv_incl:1;
+	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  vni_resv_0:19;
+	a_uint32_t  vni_resv_1:13;
+	a_uint32_t  _reserved0:19;
+};
+
+union xlt_rule_tbl_u {
+	a_uint32_t val[4];
+	struct xlt_rule_tbl bf;
+	struct xlt_rule_tbl_1 bf1;
+	struct xlt_rule_tbl_2 bf2;
+};
+#else
 
 struct xlt_rule_tbl {
 	a_uint32_t  valid:1;
@@ -441,11 +621,18 @@ union xlt_rule_tbl_u {
 	a_uint32_t val[3];
 	struct xlt_rule_tbl bf;
 };
+#endif
 
 /*[table] XLT_ACTION_TBL*/
 #define XLT_ACTION_TBL
 #define XLT_ACTION_TBL_ADDRESS 0x4000
+
+#if defined(APPE)
+#define XLT_ACTION_TBL_NUM     128
+#else
 #define XLT_ACTION_TBL_NUM     64
+#endif
+
 #define XLT_ACTION_TBL_INC     0x10
 #define XLT_ACTION_TBL_TYPE    REG_TYPE_RW
 #define XLT_ACTION_TBL_DEFAULT 0x0
@@ -529,6 +716,39 @@ union xlt_rule_tbl_u {
 	#define XLT_ACTION_TBL_VSI_CMD_OFFSET  43
 	#define XLT_ACTION_TBL_VSI_CMD_LEN     1
 	#define XLT_ACTION_TBL_VSI_CMD_DEFAULT 0x0
+#if defined(APPE)
+	/*[field] VSI*/
+	#define XLT_ACTION_TBL_VSI
+	#define XLT_ACTION_TBL_VSI_OFFSET  44
+	#define XLT_ACTION_TBL_VSI_LEN     6
+	#define XLT_ACTION_TBL_VSI_DEFAULT 0x0
+	/*[field] SRC_INFO_VALID*/
+	#define XLT_ACTION_TBL_SRC_INFO_VALID
+	#define XLT_ACTION_TBL_SRC_INFO_VALID_OFFSET  50
+	#define XLT_ACTION_TBL_SRC_INFO_VALID_LEN     1
+	#define XLT_ACTION_TBL_SRC_INFO_VALID_DEFAULT 0x0
+	/*[field] SRC_INFO_TYPE*/
+	#define XLT_ACTION_TBL_SRC_INFO_TYPE
+	#define XLT_ACTION_TBL_SRC_INFO_TYPE_OFFSET  51
+	#define XLT_ACTION_TBL_SRC_INFO_TYPE_LEN     1
+	#define XLT_ACTION_TBL_SRC_INFO_TYPE_DEFAULT 0x0
+	/*[field] SRC_INFO*/
+	#define XLT_ACTION_TBL_SRC_INFO
+	#define XLT_ACTION_TBL_SRC_INFO_OFFSET  52
+	#define XLT_ACTION_TBL_SRC_INFO_LEN     8
+	#define XLT_ACTION_TBL_SRC_INFO_DEFAULT 0x0
+	/*[field] COUNTER_EN*/
+	#define XLT_ACTION_TBL_COUNTER_EN
+	#define XLT_ACTION_TBL_COUNTER_EN_OFFSET  60
+	#define XLT_ACTION_TBL_COUNTER_EN_LEN     1
+	#define XLT_ACTION_TBL_COUNTER_EN_DEFAULT 0x0
+	/*[field] COUNTER_ID*/
+	#define XLT_ACTION_TBL_COUNTER_ID
+	#define XLT_ACTION_TBL_COUNTER_ID_OFFSET  61
+	#define XLT_ACTION_TBL_COUNTER_ID_LEN     7
+	#define XLT_ACTION_TBL_COUNTER_ID_DEFAULT 0x0
+#else
+
 	/*[field] VSI*/
 	#define XLT_ACTION_TBL_VSI
 	#define XLT_ACTION_TBL_VSI_OFFSET  44
@@ -544,6 +764,7 @@ union xlt_rule_tbl_u {
 	#define XLT_ACTION_TBL_COUNTER_ID_OFFSET  50
 	#define XLT_ACTION_TBL_COUNTER_ID_LEN     6
 	#define XLT_ACTION_TBL_COUNTER_ID_DEFAULT 0x0
+#endif
 
 struct xlt_action_tbl {
 	a_uint32_t  vid_swap_cmd:1;
@@ -563,16 +784,172 @@ struct xlt_action_tbl {
 	a_uint32_t  xlt_cdei_cmd:1;
 	a_uint32_t  xlt_cdei:1;
 	a_uint32_t  vsi_cmd:1;
+#if defined(APPE)
+	a_uint32_t  vsi:6;
+	a_uint32_t  src_info_valid:1;
+	a_uint32_t  src_info_type:1;
+	a_uint32_t  src_info:8;
+	a_uint32_t  counter_en:1;
+	a_uint32_t  counter_id_0:3;
+	a_uint32_t  counter_id_1:4;
+	a_uint32_t  _reserved0:28;
+#else
 	a_uint32_t  vsi:5;
 	a_uint32_t  counter_en:1;
 	a_uint32_t  counter_id:6;
 	a_uint32_t  _reserved0:8;
+#endif
 };
 
 union xlt_action_tbl_u {
+#if defined(APPE)
+	a_uint32_t val[3];
+#else
 	a_uint32_t val[2];
+#endif
 	struct xlt_action_tbl bf;
 };
+
+#if defined(APPE)
+/*[table] EG_VLAN_XLT_RULE*/
+#define EG_VLAN_XLT_RULE
+#define EG_VLAN_XLT_RULE_ADDRESS 0x7000
+#define EG_VLAN_XLT_RULE_NUM     128
+#define EG_VLAN_XLT_RULE_INC     0x10
+#define EG_VLAN_XLT_RULE_TYPE    REG_TYPE_RW
+#define EG_VLAN_XLT_RULE_DEFAULT 0x0
+	/*[field] VALID*/
+	#define EG_VLAN_XLT_RULE_VALID
+	#define EG_VLAN_XLT_RULE_VALID_OFFSET  0
+	#define EG_VLAN_XLT_RULE_VALID_LEN     1
+	#define EG_VLAN_XLT_RULE_VALID_DEFAULT 0x0
+	/*[field] PORT_BITMAP*/
+	#define EG_VLAN_XLT_RULE_PORT_BITMAP
+	#define EG_VLAN_XLT_RULE_PORT_BITMAP_OFFSET  1
+	#define EG_VLAN_XLT_RULE_PORT_BITMAP_LEN     8
+	#define EG_VLAN_XLT_RULE_PORT_BITMAP_DEFAULT 0x0
+	/*[field] VSI_INCL*/
+	#define EG_VLAN_XLT_RULE_VSI_INCL
+	#define EG_VLAN_XLT_RULE_VSI_INCL_OFFSET  9
+	#define EG_VLAN_XLT_RULE_VSI_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_VSI_INCL_DEFAULT 0x0
+	/*[field] VSI*/
+	#define EG_VLAN_XLT_RULE_VSI
+	#define EG_VLAN_XLT_RULE_VSI_OFFSET  10
+	#define EG_VLAN_XLT_RULE_VSI_LEN     6
+	#define EG_VLAN_XLT_RULE_VSI_DEFAULT 0x0
+	/*[field] VSI_VALID*/
+	#define EG_VLAN_XLT_RULE_VSI_VALID
+	#define EG_VLAN_XLT_RULE_VSI_VALID_OFFSET  16
+	#define EG_VLAN_XLT_RULE_VSI_VALID_LEN     1
+	#define EG_VLAN_XLT_RULE_VSI_VALID_DEFAULT 0x0
+	/*[field] SKEY_FMT*/
+	#define EG_VLAN_XLT_RULE_SKEY_FMT
+	#define EG_VLAN_XLT_RULE_SKEY_FMT_OFFSET  17
+	#define EG_VLAN_XLT_RULE_SKEY_FMT_LEN     3
+	#define EG_VLAN_XLT_RULE_SKEY_FMT_DEFAULT 0x0
+	/*[field] SKEY_VID_INCL*/
+	#define EG_VLAN_XLT_RULE_SKEY_VID_INCL
+	#define EG_VLAN_XLT_RULE_SKEY_VID_INCL_OFFSET  20
+	#define EG_VLAN_XLT_RULE_SKEY_VID_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_SKEY_VID_INCL_DEFAULT 0x0
+	/*[field] SKEY_VID*/
+	#define EG_VLAN_XLT_RULE_SKEY_VID
+	#define EG_VLAN_XLT_RULE_SKEY_VID_OFFSET  21
+	#define EG_VLAN_XLT_RULE_SKEY_VID_LEN     12
+	#define EG_VLAN_XLT_RULE_SKEY_VID_DEFAULT 0x0
+	/*[field] SKEY_PCP_INCL*/
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_INCL
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_INCL_OFFSET  33
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_INCL_DEFAULT 0x0
+	/*[field] SKEY_PCP*/
+	#define EG_VLAN_XLT_RULE_SKEY_PCP
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_OFFSET  34
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_LEN     3
+	#define EG_VLAN_XLT_RULE_SKEY_PCP_DEFAULT 0x0
+	/*[field] SKEY_DEI_INCL*/
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_INCL
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_INCL_OFFSET  37
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_INCL_DEFAULT 0x0
+	/*[field] SKEY_DEI*/
+	#define EG_VLAN_XLT_RULE_SKEY_DEI
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_OFFSET  38
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_LEN     1
+	#define EG_VLAN_XLT_RULE_SKEY_DEI_DEFAULT 0x0
+	/*[field] CKEY_FMT*/
+	#define EG_VLAN_XLT_RULE_CKEY_FMT
+	#define EG_VLAN_XLT_RULE_CKEY_FMT_OFFSET  39
+	#define EG_VLAN_XLT_RULE_CKEY_FMT_LEN     3
+	#define EG_VLAN_XLT_RULE_CKEY_FMT_DEFAULT 0x0
+	/*[field] CKEY_VID_INCL*/
+	#define EG_VLAN_XLT_RULE_CKEY_VID_INCL
+	#define EG_VLAN_XLT_RULE_CKEY_VID_INCL_OFFSET  42
+	#define EG_VLAN_XLT_RULE_CKEY_VID_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_CKEY_VID_INCL_DEFAULT 0x0
+	/*[field] CKEY_VID*/
+	#define EG_VLAN_XLT_RULE_CKEY_VID
+	#define EG_VLAN_XLT_RULE_CKEY_VID_OFFSET  43
+	#define EG_VLAN_XLT_RULE_CKEY_VID_LEN     12
+	#define EG_VLAN_XLT_RULE_CKEY_VID_DEFAULT 0x0
+	/*[field] CKEY_PCP_INCL*/
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_INCL
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_INCL_OFFSET  55
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_INCL_DEFAULT 0x0
+	/*[field] CKEY_PCP*/
+	#define EG_VLAN_XLT_RULE_CKEY_PCP
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_OFFSET  56
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_LEN     3
+	#define EG_VLAN_XLT_RULE_CKEY_PCP_DEFAULT 0x0
+	/*[field] CKEY_DEI_INCL*/
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_INCL
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_INCL_OFFSET  59
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_INCL_LEN     1
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_INCL_DEFAULT 0x0
+	/*[field] CKEY_DEI*/
+	#define EG_VLAN_XLT_RULE_CKEY_DEI
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_OFFSET  60
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_LEN     1
+	#define EG_VLAN_XLT_RULE_CKEY_DEI_DEFAULT 0x0
+	/*[field] PORT_TYPE*/
+	#define EG_VLAN_XLT_RULE_PORT_TYPE
+	#define EG_VLAN_XLT_RULE_PORT_TYPE_OFFSET  61
+	#define EG_VLAN_XLT_RULE_PORT_TYPE_LEN     2
+	#define EG_VLAN_XLT_RULE_PORT_TYPE_DEFAULT 0x0
+
+struct eg_vlan_xlt_rule {
+	a_uint32_t  valid:1;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  vsi_incl:1;
+	a_uint32_t  vsi:6;
+	a_uint32_t  vsi_valid:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid_0:11;
+	a_uint32_t  skey_vid_1:1;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  port_type:2;
+	a_uint32_t  _reserved0:1;
+};
+
+union eg_vlan_xlt_rule_u {
+	a_uint32_t val[2];
+	struct eg_vlan_xlt_rule bf;
+};
+
+#else
 
 /*[table] EG_VLAN_XLT_RULE*/
 #define EG_VLAN_XLT_RULE
@@ -704,12 +1081,19 @@ union eg_vlan_xlt_rule_u {
 	a_uint32_t val[2];
 	struct eg_vlan_xlt_rule bf;
 };
+#endif
 
 /*[register] EG_VSI_TAG*/
 #define EG_VSI_TAG
+#if defined(APPE)
+#define EG_VSI_TAG_ADDRESS 0x800
+#define EG_VSI_TAG_NUM     64
+#define EG_VSI_TAG_INC     0x10
+#else
 #define EG_VSI_TAG_ADDRESS	0x0
 #define EG_VSI_TAG_NUM		32
 #define EG_VSI_TAG_INC		0x4
+#endif
 #define EG_VSI_TAG_TYPE		REG_TYPE_RW
 #define EG_VSI_TAG_DEFAULT	0xaaaa
 	/*[field] TAGGED_MODE_PORT_BITMAP*/
@@ -730,7 +1114,13 @@ union eg_vsi_tag_u {
 
 /*[register] PORT_EG_DEF_VID*/
 #define PORT_EG_DEF_VID
+
+#if defined(APPE)
+#define PORT_EG_DEF_VID_ADDRESS 0x0
+#else
 #define PORT_EG_DEF_VID_ADDRESS 0x400
+#endif
+
 #define PORT_EG_DEF_VID_NUM     8
 #define PORT_EG_DEF_VID_INC     0x4
 #define PORT_EG_DEF_VID_TYPE    REG_TYPE_RW
@@ -772,7 +1162,7 @@ union port_eg_def_vid_u {
 
 /*[register] PORT_EG_VLAN*/
 #define PORT_EG_VLAN
-#if defined (APPE)
+#if defined(APPE)
 #define PORT_EG_VLAN_ADDRESS 0x20
 #else
 #define PORT_EG_VLAN_ADDRESS 0x420
@@ -780,7 +1170,11 @@ union port_eg_def_vid_u {
 #define PORT_EG_VLAN_NUM     8
 #define PORT_EG_VLAN_INC     0x4
 #define PORT_EG_VLAN_TYPE    REG_TYPE_RW
+#if defined(APPE)
+#define PORT_EG_VLAN_DEFAULT 0x34
+#else
 #define PORT_EG_VLAN_DEFAULT 0x14
+#endif
 	/*[field] PORT_VLAN_TYPE*/
 	#define PORT_EG_VLAN_PORT_VLAN_TYPE
 	#define PORT_EG_VLAN_PORT_VLAN_TYPE_OFFSET  0
@@ -835,7 +1229,13 @@ union port_eg_vlan_u {
 
 /*[register] EG_VLAN_TPID*/
 #define EG_VLAN_TPID
+
+#if defined(APPE)
+#define EG_VLAN_TPID_ADDRESS 0x40
+#else
 #define EG_VLAN_TPID_ADDRESS 0x440
+#endif
+
 #define EG_VLAN_TPID_NUM     1
 #define EG_VLAN_TPID_INC     0x4
 #define EG_VLAN_TPID_TYPE    REG_TYPE_RW
@@ -863,7 +1263,13 @@ union eg_vlan_tpid_u {
 
 /*[register] EG_BRIDGE_CONFIG*/
 #define EG_BRIDGE_CONFIG
+
+#if defined(APPE)
+#define EG_BRIDGE_CONFIG_ADDRESS 0x44
+#else
 #define EG_BRIDGE_CONFIG_ADDRESS 0x6000
+#endif
+
 #define EG_BRIDGE_CONFIG_NUM     1
 #define EG_BRIDGE_CONFIG_INC     0x4
 #define EG_BRIDGE_CONFIG_TYPE    REG_TYPE_RW
@@ -883,12 +1289,31 @@ union eg_vlan_tpid_u {
 	#define EG_BRIDGE_CONFIG_QUEUE_CNT_EN_OFFSET  2
 	#define EG_BRIDGE_CONFIG_QUEUE_CNT_EN_LEN     1
 	#define EG_BRIDGE_CONFIG_QUEUE_CNT_EN_DEFAULT 0x0
+#if defined(APPE)
+	/*[field] PPE_EIP_RSV_W4_3130*/
+	#define EG_BRIDGE_CONFIG_PPE_EIP_RSV_W4_3130
+	#define EG_BRIDGE_CONFIG_PPE_EIP_RSV_W4_3130_OFFSET  8
+	#define EG_BRIDGE_CONFIG_PPE_EIP_RSV_W4_3130_LEN     2
+	#define EG_BRIDGE_CONFIG_PPE_EIP_RSV_W4_3130_DEFAULT 0x0
+	/*[field] FIELD_UPDATE_ENABLE*/
+	#define EG_BRIDGE_CONFIG_FIELD_UPDATE_ENABLE
+	#define EG_BRIDGE_CONFIG_FIELD_UPDATE_ENABLE_OFFSET  10
+	#define EG_BRIDGE_CONFIG_FIELD_UPDATE_ENABLE_LEN     1
+	#define EG_BRIDGE_CONFIG_FIELD_UPDATE_ENABLE_DEFAULT 0x0
+#endif
 
 struct eg_bridge_config {
 	a_uint32_t  bridge_type:1;
 	a_uint32_t  pkt_le_edit_bypass:1;
 	a_uint32_t  queue_cnt_en:1;
+#if defined(APPE)
+	a_uint32_t  _reserved0:5;
+	a_uint32_t  ppe_eip_rsv_w4_3130:2;
+	a_uint32_t  field_update_enable:1;
+	a_uint32_t  _reserved1:21;
+#else
 	a_uint32_t  _reserved0:29;
+#endif
 };
 
 union eg_bridge_config_u {
@@ -898,9 +1323,17 @@ union eg_bridge_config_u {
 
 /*[table] EG_VLAN_XLT_ACTION*/
 #define EG_VLAN_XLT_ACTION
+
+#if defined(APPE)
+#define EG_VLAN_XLT_ACTION_ADDRESS 0x1000
+#define EG_VLAN_XLT_ACTION_NUM     128
+#define EG_VLAN_XLT_ACTION_INC     0x10
+#else
 #define EG_VLAN_XLT_ACTION_ADDRESS 0xd000
 #define EG_VLAN_XLT_ACTION_NUM     64
 #define EG_VLAN_XLT_ACTION_INC     0x8
+#endif
+
 #define EG_VLAN_XLT_ACTION_TYPE    REG_TYPE_RW
 #define EG_VLAN_XLT_ACTION_DEFAULT 0x0
 	/*[field] VID_SWAP_CMD*/
@@ -983,11 +1416,29 @@ union eg_bridge_config_u {
 	#define EG_VLAN_XLT_ACTION_COUNTER_EN_OFFSET  43
 	#define EG_VLAN_XLT_ACTION_COUNTER_EN_LEN     1
 	#define EG_VLAN_XLT_ACTION_COUNTER_EN_DEFAULT 0x0
+#if defined(APPE)
+	/*[field] COUNTER_ID*/
+	#define EG_VLAN_XLT_ACTION_COUNTER_ID
+	#define EG_VLAN_XLT_ACTION_COUNTER_ID_OFFSET  44
+	#define EG_VLAN_XLT_ACTION_COUNTER_ID_LEN     7
+	#define EG_VLAN_XLT_ACTION_COUNTER_ID_DEFAULT 0x0
+	/*[field] VNI_RESV_EN*/
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_EN
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_EN_OFFSET  51
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_EN_LEN     1
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_EN_DEFAULT 0x0
+	/*[field] VNI_RESV*/
+	#define EG_VLAN_XLT_ACTION_VNI_RESV
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_OFFSET  52
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_LEN     32
+	#define EG_VLAN_XLT_ACTION_VNI_RESV_DEFAULT 0x0
+#else
 	/*[field] COUNTER_ID*/
 	#define EG_VLAN_XLT_ACTION_COUNTER_ID
 	#define EG_VLAN_XLT_ACTION_COUNTER_ID_OFFSET  44
 	#define EG_VLAN_XLT_ACTION_COUNTER_ID_LEN     6
 	#define EG_VLAN_XLT_ACTION_COUNTER_ID_DEFAULT 0x0
+#endif
 
 struct eg_vlan_xlt_action {
 	a_uint32_t  vid_swap_cmd:1;
@@ -1007,19 +1458,38 @@ struct eg_vlan_xlt_action {
 	a_uint32_t  xlt_cdei_cmd:1;
 	a_uint32_t  xlt_cdei:1;
 	a_uint32_t  counter_en:1;
+#if defined(APPE)
+	a_uint32_t  counter_id:7;
+	a_uint32_t  vni_resv_en:1;
+	a_uint32_t  vni_resv_0:12;
+	a_uint32_t  vni_resv_1:20;
+	a_uint32_t  _reserved0:12;
+#else
 	a_uint32_t  counter_id:6;
 	a_uint32_t  _reserved0:14;
+#endif
 };
 
 union eg_vlan_xlt_action_u {
+#if defined(APPE)
+	a_uint32_t val[3];
+#else
 	a_uint32_t val[2];
+#endif
 	struct eg_vlan_xlt_action bf;
 };
 
 /*[table] VLAN_DEV_TX_COUNTER_TBL*/
 #define VLAN_DEV_TX_COUNTER_TBL
+
+#if defined(APPE)
+#define VLAN_DEV_TX_COUNTER_TBL_ADDRESS 0x29000
+#define VLAN_DEV_TX_COUNTER_TBL_NUM     128
+#else
 #define VLAN_DEV_TX_COUNTER_TBL_ADDRESS 0x2000
 #define VLAN_DEV_TX_COUNTER_TBL_NUM     64
+#endif
+
 #define VLAN_DEV_TX_COUNTER_TBL_INC     0x10
 #define VLAN_DEV_TX_COUNTER_TBL_TYPE    REG_TYPE_RW
 #define VLAN_DEV_TX_COUNTER_TBL_DEFAULT 0x0

@@ -338,7 +338,7 @@ hppe_xlt_rule_tbl_get(
 				INGRESS_VLAN_BASE_ADDR + XLT_RULE_TBL_ADDRESS + \
 				index * XLT_RULE_TBL_INC,
 				value->val,
-				3);
+				sizeof(union xlt_rule_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -352,7 +352,7 @@ hppe_xlt_rule_tbl_set(
 				INGRESS_VLAN_BASE_ADDR + XLT_RULE_TBL_ADDRESS + \
 				index * XLT_RULE_TBL_INC,
 				value->val,
-				3);
+				sizeof(union xlt_rule_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -366,7 +366,7 @@ hppe_xlt_action_tbl_get(
 				INGRESS_VLAN_BASE_ADDR + XLT_ACTION_TBL_ADDRESS + \
 				index * XLT_ACTION_TBL_INC,
 				value->val,
-				2);
+				sizeof(union xlt_action_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -380,7 +380,7 @@ hppe_xlt_action_tbl_set(
 				INGRESS_VLAN_BASE_ADDR + XLT_ACTION_TBL_ADDRESS + \
 				index * XLT_ACTION_TBL_INC,
 				value->val,
-				2);
+				sizeof(union xlt_action_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -1312,6 +1312,7 @@ hppe_xlt_rule_tbl_port_bitmap_get(
 
 	ret = hppe_xlt_rule_tbl_get(dev_id, index, &reg_val);
 	*value = reg_val.bf.port_bitmap;
+
 	return ret;
 }
 
@@ -1328,6 +1329,7 @@ hppe_xlt_rule_tbl_port_bitmap_set(
 	if (SW_OK != ret)
 		return ret;
 	reg_val.bf.port_bitmap = value;
+
 	ret = hppe_xlt_rule_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
@@ -1832,6 +1834,7 @@ hppe_xlt_action_tbl_xlt_spcp_set(
 	return ret;
 }
 
+#if !defined(APPE)
 sw_error_t
 hppe_xlt_action_tbl_counter_id_get(
 		a_uint32_t dev_id,
@@ -1862,6 +1865,7 @@ hppe_xlt_action_tbl_counter_id_set(
 	ret = hppe_xlt_action_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_xlt_action_tbl_vid_swap_cmd_get(
@@ -2184,7 +2188,7 @@ hppe_eg_vlan_xlt_rule_get(
 				NSS_PTX_CSR_BASE_ADDR + EG_VLAN_XLT_RULE_ADDRESS + \
 				index * EG_VLAN_XLT_RULE_INC,
 				value->val,
-				2);
+				sizeof(union eg_vlan_xlt_rule_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -2198,7 +2202,7 @@ hppe_eg_vlan_xlt_rule_set(
 				NSS_PTX_CSR_BASE_ADDR + EG_VLAN_XLT_RULE_ADDRESS + \
 				index * EG_VLAN_XLT_RULE_INC,
 				value->val,
-				2);
+				sizeof(union eg_vlan_xlt_rule_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -2340,7 +2344,7 @@ hppe_eg_vlan_xlt_action_get(
 				NSS_PTX_CSR_BASE_ADDR + EG_VLAN_XLT_ACTION_ADDRESS + \
 				index * EG_VLAN_XLT_ACTION_INC,
 				value->val,
-				2);
+				sizeof(union eg_vlan_xlt_action_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -2354,7 +2358,7 @@ hppe_eg_vlan_xlt_action_set(
 				NSS_PTX_CSR_BASE_ADDR + EG_VLAN_XLT_ACTION_ADDRESS + \
 				index * EG_VLAN_XLT_ACTION_INC,
 				value->val,
-				2);
+				sizeof(union eg_vlan_xlt_action_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -2760,6 +2764,7 @@ hppe_eg_vlan_xlt_rule_ckey_fmt_set(
 	return ret;
 }
 
+#if !defined(APPE)
 sw_error_t
 hppe_eg_vlan_xlt_rule_skey_vid_get(
 		a_uint32_t dev_id,
@@ -2790,6 +2795,7 @@ hppe_eg_vlan_xlt_rule_skey_vid_set(
 	ret = hppe_eg_vlan_xlt_rule_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_eg_vlan_xlt_rule_skey_fmt_get(

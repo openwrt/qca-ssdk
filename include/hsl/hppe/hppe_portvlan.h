@@ -741,6 +741,7 @@ hppe_xlt_action_tbl_xlt_spcp_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#if !defined(APPE)
 sw_error_t
 hppe_xlt_action_tbl_counter_id_get(
 		a_uint32_t dev_id,
@@ -752,6 +753,7 @@ hppe_xlt_action_tbl_counter_id_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 sw_error_t
 hppe_xlt_action_tbl_vid_swap_cmd_get(
@@ -1109,6 +1111,7 @@ hppe_eg_vlan_xlt_rule_ckey_fmt_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#if !defined(APPE)
 sw_error_t
 hppe_eg_vlan_xlt_rule_skey_vid_get(
 		a_uint32_t dev_id,
@@ -1120,6 +1123,7 @@ hppe_eg_vlan_xlt_rule_skey_vid_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 sw_error_t
 hppe_eg_vlan_xlt_rule_skey_fmt_get(

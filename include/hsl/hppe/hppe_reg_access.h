@@ -30,7 +30,13 @@ extern "C" {
 #define INGRESS_VLAN_BASE_ADDR       0x00f000
 #define IPE_L2_BASE_ADDR             0x060000
 #define IPO_CSR_BASE_ADDR            0x0b0000
+
+#if defined(APPE)
+#define IPR_CSR_BASE_ADDR            0x1e0000
+#else
 #define IPR_CSR_BASE_ADDR            0x002000
+#endif
+
 #define NSS_MAC_CSR_BASE_ADDR        0x001000
 #define NSS_PRX_CSR_BASE_ADDR        0x00b000
 #define NSS_PTX_CSR_BASE_ADDR        0x020000

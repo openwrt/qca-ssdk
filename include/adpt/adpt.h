@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -912,6 +912,16 @@ typedef sw_error_t (*adpt_policer_time_slot_set_func)(a_uint32_t dev_id, a_uint3
 
 typedef sw_error_t (*adpt_policer_global_counter_get_func)(a_uint32_t dev_id,
 		fal_policer_global_counter_t *counter);
+typedef sw_error_t (*adpt_policer_bypass_en_set_func)(a_uint32_t dev_id,
+	fal_policer_frame_type_t frame_type, a_bool_t enable);
+typedef sw_error_t (*adpt_policer_bypass_en_get_func)(a_uint32_t dev_id,
+	fal_policer_frame_type_t frame_type, a_bool_t *enable);
+typedef sw_error_t (*adpt_policer_priority_remap_get_func)(a_uint32_t dev_id, fal_policer_priority_t *priority,
+		fal_policer_remap_t *remap);
+typedef sw_error_t (*adpt_policer_priority_remap_set_func)(a_uint32_t dev_id, fal_policer_priority_t *priority,
+		fal_policer_remap_t *remap);
+typedef sw_error_t (*adpt_policer_ctrl_set_func)(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_policer_ctrl_get_func)(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 /* misc */
 typedef sw_error_t (*adpt_debug_port_counter_enable_func)(a_uint32_t dev_id,
@@ -1708,6 +1718,12 @@ typedef struct
 	adpt_port_compensation_byte_set_func adpt_port_compensation_byte_set;
 	adpt_policer_time_slot_set_func adpt_policer_time_slot_set;
 	adpt_policer_global_counter_get_func adpt_policer_global_counter_get;
+	adpt_policer_bypass_en_set_func adpt_policer_bypass_en_set;
+	adpt_policer_bypass_en_get_func adpt_policer_bypass_en_get;
+	adpt_policer_priority_remap_set_func adpt_policer_priority_remap_set;
+	adpt_policer_priority_remap_get_func adpt_policer_priority_remap_get;
+	adpt_policer_ctrl_set_func adpt_policer_ctrl_set;
+	adpt_policer_ctrl_get_func adpt_policer_ctrl_get;
 
 	/* misc */
 	adpt_debug_port_counter_enable_func adpt_debug_port_counter_enable;

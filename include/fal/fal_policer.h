@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -27,6 +27,12 @@ extern "C" {
 #include "sw.h"
 #include "fal/fal_type.h"
 
+typedef enum
+{
+	FAL_POLICER_METER_RFC = 0, /* legacy feature, add it for ipq95xx */
+	FAL_POLICER_METER_MEF10_3 /* mef10-3 feature, add it for ipq95xx */
+} fal_policer_meter_type_t;
+
 typedef struct
 {
 	a_bool_t		meter_en;	/* meter enable or disable */
@@ -39,6 +45,13 @@ typedef struct
 	a_uint32_t	cbs;	/* committed burst size */
 	a_uint32_t	eir; /* excess information rate */
 	a_uint32_t	ebs; /* excess burst size */
+	a_uint32_t	cir_max; /* max committed information rate, add it for ipq95xx */
+	a_uint32_t	eir_max; /* max excess information rate, add it for ipq95xx */
+	a_uint32_t	next_ptr; /* next entry, add it for ipq95xx */
+	a_bool_t	grp_end; /* last entry or not in current group, add it for ipq95xx */
+	a_bool_t	grp_couple_en; /* group coupled not, add it for ipq95xx */
+	a_uint32_t	vp_meter_index; /* vp port meter index, add it for ipq95xx*/
+	fal_policer_meter_type_t meter_type; /*legacy or mef10-3,add it for ipq95xx */
 } fal_policer_config_t;
 
 typedef struct
@@ -60,6 +73,12 @@ typedef struct
 	a_uint32_t red_drop_priority; /* red traffic internal drop priority value*/
 	a_uint32_t red_pcp; /* red traffic pcp value*/
 	a_uint32_t red_dei;  /* red traffic dei value*/
+	a_bool_t yellow_dscp_en; /* yellow traffic dscp change enable, add it for ipq95xx*/
+	a_uint32_t yellow_dscp; /* yellow traffic dscp value, add it for ipq95xx*/
+	a_bool_t red_dscp_en; /* red traffic dscp change enable, add it for ipq95xx*/
+	a_uint32_t red_dscp; /* red traffic dscp value, add it for ipq95xx*/
+	a_bool_t yellow_remap_en; /* yellow traffic remap enable, add it for ipq95xx*/
+	a_bool_t red_remap_en; /* red traffic remap enable, add it for ipq95xx*/
 }fal_policer_action_t;
 
 typedef struct
@@ -82,6 +101,12 @@ typedef struct
     a_uint64_t policer_bypass_byte_counter; /*bypass byte counter by policer */
 } fal_policer_global_counter_t;
 
+typedef struct
+{
+	a_uint32_t head; /* linklist head, add it for ipq95xx */
+	a_uint32_t tail; /* linklist tail, add it for ipq95xx */
+} fal_policer_ctrl_t;
+
 enum
 {
 	FUNC_ADPT_ACL_POLICER_COUNTER_GET = 0,
@@ -95,8 +120,36 @@ enum
 	FUNC_ADPT_PORT_COMPENSATION_BYTE_SET,
 	FUNC_ADPT_POLICER_TIME_SLOT_SET,
 	FUNC_ADPT_POLICER_GLOBAL_COUNTER_GET,
+	FUNC_ADPT_POLICER_BYPASS_EN_SET,
+	FUNC_ADPT_POLICER_BYPASS_EN_GET,
+	FUNC_ADPT_POLICER_PRIORITY_REMAP_SET,
+	FUNC_ADPT_POLICER_PRIORITY_REMAP_GET,
+	FUNC_ADPT_POLICER_CTRL_SET,
+	FUNC_ADPT_POLICER_CTRL_GET,
 };
 
+typedef struct
+{
+	a_uint32_t dscp; /*remap new dscp value, add it for ipq95xx */
+	a_uint32_t pcp; /*remap new pcp value, add it for ipq95xx */
+	a_uint32_t dei; /*remap new dei value, add it for ipq95xx */
+} fal_policer_remap_t;
+
+typedef enum {
+	FAL_POLICER_METER_YELLOW = 0, /* meter yellow traffic, add it for ipq95xx */
+	FAL_POLICER_METER_RED /* meter red traffic, add it for ipq95xx */
+} fal_policer_meter_color_t;
+
+typedef struct
+{
+	a_uint32_t internal_pri; /*internal prioirty, add it for ipq95xx */
+	a_uint32_t internal_dp; /*internal drop priority, add it for ipq95xx */
+	fal_policer_meter_color_t meter_color; /*meter color value, add it for ipq95xx */
+} fal_policer_priority_t;
+
+typedef enum {
+	FAL_FRAME_DROPPED = 0,
+} fal_policer_frame_type_t;
 
 #ifndef IN_POLICER_MINI
 sw_error_t
@@ -134,6 +187,20 @@ sw_error_t
 fal_policer_global_counter_get(a_uint32_t dev_id,
 		fal_policer_global_counter_t *counter);
 
+sw_error_t
+fal_policer_bypass_en_get(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
+	a_bool_t *enable);
+
+sw_error_t
+fal_policer_ctrl_get(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
+
+sw_error_t
+fal_policer_priority_remap_get(a_uint32_t dev_id, fal_policer_priority_t *priority,
+	fal_policer_remap_t *remap);
+
+sw_error_t
+fal_policer_priority_remap_set(a_uint32_t dev_id, fal_policer_priority_t *priority,
+	fal_policer_remap_t *remap);
 #endif
 
 sw_error_t
@@ -142,6 +209,13 @@ fal_port_policer_compensation_byte_set(a_uint32_t dev_id, fal_port_t port_id,
 
 sw_error_t
 fal_policer_timeslot_set(a_uint32_t dev_id, a_uint32_t timeslot);
+
+sw_error_t
+fal_policer_bypass_en_set(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
+	a_bool_t enable);
+
+sw_error_t
+fal_policer_ctrl_set(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 #ifdef __cplusplus
 }

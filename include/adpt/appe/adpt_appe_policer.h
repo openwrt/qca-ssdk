@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,33 +14,34 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef _SSDK_APPE_H_
-#define _SSDK_APPE_H_
+#ifndef _ADPT_APPE_POLICER_H_
+#define _ADPT_APPE_POLICER_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */
 
-#include "ssdk_init.h"
+#define APPE_POLICER_ID_MIN                  0
+#define APPE_POLICER_ID_MAX                  511
+#define APPE_POLICER_TIME_SLOT_MAX           4095
+#define APPE_POLICER_TIME_SLOT_MIN           1024
 
-sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
+sw_error_t
+adpt_appe_policer_ctrl_set(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
-#define APPE_MAX_C_TOKEN_NUM                0x3fffffff
-#define APPE_MAX_E_TOKEN_NUM                0x3fffffff
-#define APPE_PORT_SHAPER_TIMESLOT_DFT       8
-#define APPE_FLOW_SHAPER_TIMESLOT_DFT       128
-#define APPE_QUEUE_SHAPER_TIMESLOT_DFT      600
-#define APPE_SHAPER_IPG_PREAMBLE_LEN_DFT    20
-#define APPE_QUEUE_SHAPER_HEAD              0
-#define APPE_QUEUE_SHAPER_TAIL              299
-#define APPE_FLOW_SHAPER_HEAD               0
-#define APPE_FLOW_SHAPER_TAIL               63
-#define APPE_POLICER_TIMESLOT_DFT           1200
-#define APPE_POLICER_HEAD                   0
-#define APPE_POLICER_TAIL                   511
+#ifndef IN_POLICER_MINI
+sw_error_t
+adpt_appe_policer_ctrl_get(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
+sw_error_t
+adpt_appe_policer_priority_remap_get(a_uint32_t dev_id,
+	fal_policer_priority_t *priority, fal_policer_remap_t *remap);
+
+sw_error_t
+adpt_appe_policer_priority_remap_set(a_uint32_t dev_id,
+	fal_policer_priority_t *priority, fal_policer_remap_t *remap);
+#endif
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */
-#endif                          /* _SSDK_APPE_H */
-
+#endif

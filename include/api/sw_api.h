@@ -272,6 +272,9 @@ typedef enum
 	SW_ENQUEUE_CFG,
 	SW_QUEUE_SHAPER_CTRL,
 	SW_FLOW_SHAPER_CTRL,
+	SW_POLICER_PRIORITY,
+	SW_POLICER_REMAP,
+	SW_POLICER_CTRL,
 /* auto_insert_flag */
 } sw_data_type_e;
 

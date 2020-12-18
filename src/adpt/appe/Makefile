@@ -57,6 +57,10 @@ ifeq (TRUE, $(IN_SHAPER))
   SRC_LIST += adpt_appe_shaper.c
 endif
 
+ifeq (TRUE, $(IN_POLICER))
+  SRC_LIST += adpt_appe_policer.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

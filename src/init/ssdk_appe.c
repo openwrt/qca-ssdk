@@ -427,6 +427,48 @@ qca_appe_shaper_hw_init(a_uint32_t dev_id)
 }
 #endif
 
+#if defined(IN_POLICER)
+static sw_error_t
+qca_appe_policer_hw_init(a_uint32_t dev_id)
+{
+	a_uint32_t i = 0;
+	fal_policer_config_t policer;
+	fal_policer_action_t action;
+	fal_policer_ctrl_t policer_ctrl;
+	fal_policer_frame_type_t frame_type;
+
+	memset(&policer, 0, sizeof(policer));
+	memset(&action, 0, sizeof(action));
+	memset(&policer_ctrl, 0, sizeof(policer_ctrl));
+
+	fal_policer_timeslot_set(dev_id, APPE_POLICER_TIMESLOT_DFT);
+
+	for (i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT7; i++) {
+		fal_port_policer_compensation_byte_set(dev_id, i, 4);
+	}
+
+	for (i = 0; i < SSDK_ACL_POLICER_CFG_MAX; i++) {
+		policer.meter_type = FAL_POLICER_METER_MEF10_3;
+		policer.next_ptr = i + 1;
+		if (policer.next_ptr == SSDK_ACL_POLICER_CFG_MAX) {
+			policer.next_ptr = 0;
+		}
+		policer.grp_end = A_TRUE;
+		fal_acl_policer_entry_set(dev_id, i, &policer, &action);
+	}
+
+	policer_ctrl.head = APPE_POLICER_HEAD;
+	policer_ctrl.tail = APPE_POLICER_TAIL;
+	fal_policer_ctrl_set(dev_id, &policer_ctrl);
+
+	/* bypass policer for dropped frame */
+	frame_type = FAL_FRAME_DROPPED;
+	fal_policer_bypass_en_set(dev_id, frame_type, A_TRUE);
+
+	return SW_OK;
+}
+#endif
+
 sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
@@ -481,11 +523,9 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 #endif
 
-#if 0
 #if defined(IN_POLICER)
 	rv = qca_appe_policer_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
-#endif
 #endif
 
 #if defined(IN_SHAPER)

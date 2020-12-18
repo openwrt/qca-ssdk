@@ -140,7 +140,7 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_POLICER)
-sw_error_t
+static sw_error_t
 qca_hppe_policer_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;

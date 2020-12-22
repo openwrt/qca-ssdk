@@ -372,6 +372,9 @@ cmd_data_check_stamove(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size);
 
+sw_error_t
+cmd_data_check_vsi_bridge_vsi(char *cmd_str, void * arg_val, a_uint32_t size);
+
 #endif
 #ifdef IN_BM
 sw_error_t

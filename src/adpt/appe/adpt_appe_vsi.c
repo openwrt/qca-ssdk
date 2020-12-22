@@ -18,6 +18,42 @@
 #include "adpt_appe_vsi.h"
 #include "appe_vsi.h"
 
+sw_error_t
+adpt_appe_vsi_bridge_vsi_get(a_uint32_t dev_id, a_uint32_t vsi_id,
+	fal_vsi_bridge_vsi_t *bridge_vsi)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(bridge_vsi);
+
+	rv = appe_vsi_remap_tbl_vsi_remap_en_get(dev_id, vsi_id,
+		&(bridge_vsi->bridge_vsi_enable));
+	SW_RTN_ON_ERROR(rv);
+
+	rv = appe_vsi_remap_tbl_br_vsi_get(dev_id, vsi_id,
+		&(bridge_vsi->bridge_vsi_id));
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
+	fal_vsi_bridge_vsi_t *bridge_vsi)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	rv = appe_vsi_remap_tbl_vsi_remap_en_set(dev_id, vsi_id,
+		bridge_vsi->bridge_vsi_enable);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = appe_vsi_remap_tbl_br_vsi_set(dev_id, vsi_id,
+		bridge_vsi->bridge_vsi_id);
+
+	return rv;
+}
 
 sw_error_t
 adpt_appe_vsi_vp_member_set(a_uint32_t dev_id, a_uint32_t vsi_id,

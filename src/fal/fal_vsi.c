@@ -192,6 +192,37 @@ _fal_vsi_counter_cleanup(a_uint32_t dev_id, a_uint32_t vsi_id)
     return rv;
 }
 #endif
+static sw_error_t
+_fal_vsi_bridge_vsi_get(a_uint32_t dev_id, a_uint32_t vsi_id,
+    fal_vsi_bridge_vsi_t *bridge_vsi)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_vsi_bridge_vsi_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_vsi_bridge_vsi_get(dev_id, vsi_id, bridge_vsi);
+    return rv;
+}
+
+static sw_error_t
+_fal_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
+    fal_vsi_bridge_vsi_t *bridge_vsi)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_vsi_bridge_vsi_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_vsi_bridge_vsi_set(dev_id, vsi_id, bridge_vsi);
+    return rv;
+}
 
 /*insert flag for inner fal, don't remove it*/
 
@@ -325,6 +356,30 @@ fal_vsi_counter_cleanup(a_uint32_t dev_id, a_uint32_t vsi_id)
     return rv;
 }
 #endif
+sw_error_t
+fal_vsi_bridge_vsi_get(a_uint32_t dev_id, a_uint32_t vsi_id,
+    fal_vsi_bridge_vsi_t *bridge_vsi)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_vsi_bridge_vsi_get(dev_id, vsi_id, bridge_vsi);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
+    fal_vsi_bridge_vsi_t *bridge_vsi)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_vsi_bridge_vsi_set(dev_id, vsi_id, bridge_vsi);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 
 #ifndef IN_VSI_MINI
@@ -341,3 +396,5 @@ EXPORT_SYMBOL(fal_vsi_stamove_set);
 EXPORT_SYMBOL(fal_vsi_newaddr_lrn_set);
 EXPORT_SYMBOL(fal_vsi_member_set);
 EXPORT_SYMBOL(fal_vsi_member_get);
+EXPORT_SYMBOL(fal_vsi_bridge_vsi_get);
+EXPORT_SYMBOL(fal_vsi_bridge_vsi_set);

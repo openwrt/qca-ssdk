@@ -25,4 +25,11 @@ sw_error_t
 adpt_appe_vsi_vp_member_get(a_uint32_t dev_id, a_uint32_t vsi_id,
 	fal_vsi_member_t *vsi_member);
 
+sw_error_t
+adpt_appe_vsi_bridge_vsi_get(a_uint32_t dev_id, a_uint32_t vsi_id,
+	fal_vsi_bridge_vsi_t *bridge_vsi);
+
+sw_error_t
+adpt_appe_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
+	fal_vsi_bridge_vsi_t *bridge_vsi);
 #endif

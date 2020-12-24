@@ -52,6 +52,28 @@ hppe_port_parsing_reg_set(
 }
 
 sw_error_t
+hppe_edma_vlan_tpid_reg_get(
+		a_uint32_t dev_id,
+		union edma_vlan_tpid_reg_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				EDMA_CSR_BASE_ADDR + EDMA_VLAN_TPID_REG_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+hppe_edma_vlan_tpid_reg_set(
+		a_uint32_t dev_id,
+		union edma_vlan_tpid_reg_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				EDMA_CSR_BASE_ADDR + EDMA_VLAN_TPID_REG_ADDRESS,
+				value->val);
+}
+
+sw_error_t
 hppe_vlan_tpid_reg_get(
 		a_uint32_t dev_id,
 		union vlan_tpid_reg_u *value)

@@ -44,6 +44,16 @@ hppe_port_parsing_reg_set(
 		union port_parsing_reg_u *value);
 
 sw_error_t
+hppe_edma_vlan_tpid_reg_get(
+		a_uint32_t dev_id,
+		union edma_vlan_tpid_reg_u *value);
+
+sw_error_t
+hppe_edma_vlan_tpid_reg_set(
+		a_uint32_t dev_id,
+		union edma_vlan_tpid_reg_u *value);
+
+sw_error_t
 hppe_vlan_tpid_reg_get(
 		a_uint32_t dev_id,
 		union vlan_tpid_reg_u *value);

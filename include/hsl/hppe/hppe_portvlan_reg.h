@@ -43,6 +43,34 @@ union port_parsing_reg_u {
 	struct port_parsing_reg bf;
 };
 
+/*[register] EDMA_VLAN_TPID_REG*/
+#define EDMA_VLAN_TPID_REG
+#define EDMA_VLAN_TPID_REG_ADDRESS 0x8
+#define EDMA_VLAN_TPID_REG_NUM     1
+#define EDMA_VLAN_TPID_REG_INC     0x4
+#define EDMA_VLAN_TPID_REG_TYPE    REG_TYPE_RW
+#define EDMA_VLAN_TPID_REG_DEFAULT 0x810088a8
+	/*[field] STAG_TPID*/
+	#define EDMA_VLAN_TPID_REG_STAG_TPID
+	#define EDMA_VLAN_TPID_REG_STAG_TPID_OFFSET  0
+	#define EDMA_VLAN_TPID_REG_STAG_TPID_LEN     16
+	#define EDMA_VLAN_TPID_REG_STAG_TPID_DEFAULT 0x88a8
+	/*[field] CTAG_TPID*/
+	#define EDMA_VLAN_TPID_REG_CTAG_TPID
+	#define EDMA_VLAN_TPID_REG_CTAG_TPID_OFFSET  16
+	#define EDMA_VLAN_TPID_REG_CTAG_TPID_LEN     16
+	#define EDMA_VLAN_TPID_REG_CTAG_TPID_DEFAULT 0x8100
+
+struct edma_vlan_tpid_reg {
+	a_uint32_t  stag_tpid:16;
+	a_uint32_t  ctag_tpid:16;
+};
+
+union edma_vlan_tpid_reg_u {
+	a_uint32_t val;
+	struct edma_vlan_tpid_reg bf;
+};
+
 /*[register] VLAN_TPID_REG*/
 #define VLAN_TPID_REG
 #define VLAN_TPID_REG_ADDRESS 0x20

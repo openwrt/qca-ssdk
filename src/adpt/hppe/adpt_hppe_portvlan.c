@@ -722,20 +722,31 @@ sw_error_t
 adpt_hppe_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid)
 {
 	sw_error_t rtn = SW_OK;
+	union edma_vlan_tpid_reg_u edma_tpid;
+	union vlan_tpid_reg_u ppe_tpid;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+	rtn = hppe_edma_vlan_tpid_reg_get(dev_id, &edma_tpid);
+	SW_RTN_ON_ERROR(rtn);
+
+	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
+	SW_RTN_ON_ERROR(rtn);
+
 	if (FAL_FLG_TST(tpid->mask, FAL_TPID_CTAG_EN)) {
-		rtn = hppe_vlan_tpid_reg_ctag_tpid_set(dev_id,
-				(a_uint32_t)tpid->ctpid);
-		SW_RTN_ON_ERROR(rtn);
+		edma_tpid.bf.ctag_tpid = tpid->ctpid;
+		ppe_tpid.bf.ctag_tpid = tpid->ctpid;
 	}
 
 	if (FAL_FLG_TST(tpid->mask, FAL_TPID_STAG_EN)) {
-		rtn = hppe_vlan_tpid_reg_stag_tpid_set(dev_id,
-				(a_uint32_t)tpid->stpid);
-		SW_RTN_ON_ERROR(rtn);
+		edma_tpid.bf.stag_tpid = tpid->stpid;
+		ppe_tpid.bf.stag_tpid = tpid->stpid;
 	}
+
+	rtn = hppe_edma_vlan_tpid_reg_set(dev_id, &edma_tpid);
+	SW_RTN_ON_ERROR(rtn);
+
+	rtn = hppe_vlan_tpid_reg_set(dev_id, &ppe_tpid);
 
 	return rtn;
 }
@@ -744,16 +755,16 @@ sw_error_t
 adpt_hppe_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid)
 {
 	sw_error_t rtn = SW_OK;
+	union vlan_tpid_reg_u ppe_tpid;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(tpid);
 
-	rtn = hppe_vlan_tpid_reg_ctag_tpid_get(dev_id,
-			(a_uint32_t *)&tpid->ctpid);
+	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
 	SW_RTN_ON_ERROR(rtn);
 
-	rtn = hppe_vlan_tpid_reg_stag_tpid_get(dev_id,
-			(a_uint32_t *)&tpid->stpid);
+	tpid->ctpid = ppe_tpid.bf.ctag_tpid;
+	tpid->stpid = ppe_tpid.bf.stag_tpid;
 
 	return rtn;
 }

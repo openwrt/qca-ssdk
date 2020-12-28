@@ -107,6 +107,12 @@ typedef struct {
 	a_uint32_t tree_id; /*for qos*/
 	a_uint32_t pkt_counter; /*flow packet counter*/
 	a_uint64_t byte_counter; /*flow byte counter*/
+	a_bool_t pmtu_check_l3; /* compare pmtu with paket length of L3 or L2, added for ipq90xx */
+	a_uint32_t pmtu; /*path mtu length, added for ipq90xx */
+	a_uint32_t vpn_id; /*vpn id, added for ipq90xx */
+	a_bool_t vlan_fmt_valid; /*egress with vlan format of bridge, added for ipq90xx */
+	a_bool_t svlan_fmt; /*egress with svlan tag of bridge, added for ipq90xx */
+	a_bool_t cvlan_fmt; /*egress with cvlan tag of bridge, added for ipq90xx */
 } fal_flow_entry_t;
 
 typedef struct {

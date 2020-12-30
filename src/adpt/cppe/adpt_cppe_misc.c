@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -38,9 +38,7 @@ adpt_cppe_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(cnt_en);
 
-	port_id = FAL_PORT_ID_VALUE(port_id);
-
-	if (port_id < SSDK_MAX_PORT_NUM) {
+	if (ADPT_IS_PPORT(port_id)) {
 		rv = cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
 		SW_RTN_ON_ERROR(rv);
 		rv = hppe_mc_mtu_ctrl_tbl_get(dev_id, port_id, &mc_mtu_ctrl_tbl);
@@ -59,8 +57,7 @@ adpt_cppe_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id,
 		SW_RTN_ON_ERROR(rv);
 		rv = hppe_port_eg_vlan_set(dev_id, port_id, &port_eg_vlan);
 		SW_RTN_ON_ERROR(rv);
-	} else if (port_id >= SSDK_MAX_PORT_NUM &&
-			port_id < SSDK_MAX_VIRTUAL_PORT_NUM) {
+	} else if (ADPT_IS_VPORT(port_id)) {
 		rv = cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
 		SW_RTN_ON_ERROR(rv);
 
@@ -88,9 +85,7 @@ adpt_cppe_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(cnt_en);
 
-	port_id = FAL_PORT_ID_VALUE(port_id);
-
-	if (port_id < SSDK_MAX_PORT_NUM) {
+	if (ADPT_IS_PPORT(port_id)) {
 		rv = cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
 		SW_RTN_ON_ERROR(rv);
 		rv = hppe_mc_mtu_ctrl_tbl_get(dev_id, port_id, &mc_mtu_ctrl_tbl);
@@ -102,8 +97,7 @@ adpt_cppe_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id,
 		cnt_en->vp_uni_tx_counter_en = mru_mtu_ctrl_tbl.bf.tx_cnt_en;
 		cnt_en->port_mc_tx_counter_en = mc_mtu_ctrl_tbl.bf.tx_cnt_en;
 		cnt_en->port_tx_counter_en = port_eg_vlan.bf.tx_counting_en;
-	} else if (port_id >= SSDK_MAX_PORT_NUM &&
-			port_id < SSDK_MAX_VIRTUAL_PORT_NUM) {
+	} else if (ADPT_IS_VPORT(port_id)) {
 		rv = cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
 		SW_RTN_ON_ERROR(rv);
 

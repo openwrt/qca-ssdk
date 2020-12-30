@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2015-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2015-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -32,7 +32,8 @@ extern "C" {
 #define SSDK_MAX_VIRTUAL_PORT_ID	255
 #define SSDK_MIN_TRUNK_PORT_ID	        32
 #define SSDK_MAX_VP_GROUP_ID	        255
-#define SSDK_MAX_VIRTUAL_PORT_NUM       256
+#define SSDK_MAX_VIRTUAL_PORT_NUM	\
+	(SSDK_MAX_VIRTUAL_PORT_ID-SSDK_MIN_VIRTUAL_PORT_ID+1)
 #define SSDK_MAX_SERVICE_CODE_NUM       256
 #define SSDK_MAX_CPU_CODE_NUM           256
 #define SSDK_L0SCHEDULER_CFG_MAX        300

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2014-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -842,7 +842,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, qbase, i);
 	}
 
-	for (i = SSDK_MAX_PORT_NUM; i < SSDK_MAX_VIRTUAL_PORT_NUM; i++) {
+	for (i = SSDK_MAX_PORT_NUM; i <= SSDK_MAX_VIRTUAL_PORT_ID; i++) {
 		queue_dst.dst_port = i;
 		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 4, 0);
 	}

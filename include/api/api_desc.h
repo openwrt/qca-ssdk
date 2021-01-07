@@ -4749,6 +4749,7 @@ extern "C" {
     SW_PARAM_DEF(SW_API_SFP_CHECKCODE_GET, SW_UINT8, \
 		    sizeof(a_uint8_t), SW_PARAM_PTR|SW_PARAM_OUT, "Check Code"),
 
+/* auto_insert_flag */
 /*qca808x_start*/
 
 #define SW_API_DESC(api_id) api_id##_DESC

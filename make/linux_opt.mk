@@ -351,6 +351,7 @@ ifeq (TRUE, $(IN_SFP))
   MODULE_CFLAG += -DIN_SFP
 endif
 
+#auto_insert_flag
 # check for GCC version
 ifeq (4, $(GCC_VER))
   MODULE_CFLAG += -DGCCV4

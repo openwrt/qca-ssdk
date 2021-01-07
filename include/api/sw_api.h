@@ -245,6 +245,7 @@ typedef enum
 	SW_SFP_CTRL_STATUS,
 	SW_SFP_ALARM_WARN_FLAG,
 	SW_SFP_CCODE_TYPE,
+/* auto_insert_flag */
 } sw_data_type_e;
 
     typedef struct

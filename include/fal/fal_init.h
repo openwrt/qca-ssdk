@@ -51,7 +51,6 @@ enum{
 	FAL_MODULE_MISC,
 	FAL_MODULE_PTP,
 	FAL_MODULE_SFP,
-/* auto_insert_flag */
 	FAL_MODULE_MAX,
 };
 

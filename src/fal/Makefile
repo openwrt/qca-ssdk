@@ -133,7 +133,6 @@ ifeq (TRUE, $(IN_SFP))
   SRC_LIST += fal_sfp.c
 endif
 
-#auto_insert_flag
 include $(PRJ_PATH)/make/components.mk
 include $(PRJ_PATH)/make/defs.mk
 include $(PRJ_PATH)/make/target.mk

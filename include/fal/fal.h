@@ -59,7 +59,6 @@ extern "C" {
 #include "fal_policer.h"
 #include "fal_ptp.h"
 #include "fal_sfp.h"
-/* auto_insert_flag */
 
 /*qca808x_start*/
 #ifdef __cplusplus

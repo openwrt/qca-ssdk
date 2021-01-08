@@ -2308,7 +2308,6 @@ extern "C" {
 #define SFP_API_PARAM
 #endif
 
-/* auto_insert_flag */
 /*qca808x_start*/
 #define SSDK_API \
 /*qca808x_end*/\
@@ -2353,7 +2352,6 @@ extern "C" {
     SHAPER_API \
     PTP_API \
     SFP_API \
-/* auto_insert_flag_1 */ \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_MAX, NULL),
 
@@ -2409,7 +2407,6 @@ extern "C" {
     SHAPER_API_PARAM \
     PTP_API_PARAM \
     SFP_API_PARAM \
-/* auto_insert_flag_2 */ \
 /*qca808x_start*/\
     SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),
 

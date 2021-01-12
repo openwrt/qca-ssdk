@@ -21,6 +21,10 @@ ifeq (TRUE, $(IN_VPORT))
   SRC_LIST += adpt_appe_vport.c
 endif
 
+ifeq (TRUE, $(IN_PPPOE))
+  SRC_LIST += adpt_appe_pppoe.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

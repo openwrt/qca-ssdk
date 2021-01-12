@@ -42,11 +42,13 @@ typedef struct
 	a_bool_t   multi_session; /* matched multicast session */
 	a_bool_t   uni_session; /* matched unicast session */
 	a_uint32_t vrf_id; /* vrf id, HPPE not supported */
-	a_uint32_t port_bitmap; /* matched ports */
+	fal_pbmp_t port_bitmap; /* matched ports */
 	a_uint32_t l3_if_index; /* if matched, this l3 interface index will remove pppoe header */
 	a_bool_t   l3_if_valid; /* this l3 interface index valid or not */
 	a_bool_t   smac_valid; /* if matched source mac address */
 	fal_mac_addr_t smac_addr; /* matched source mac address */
+	a_uint32_t tl_l3_if_index; /* tunnel pppoe l3_if check, added for ipq90xx */
+	a_bool_t   tl_l3_if_valid; /* tunnel l3 interface index valid or not, added for ipq90xx */
 } fal_pppoe_session_t;
 
 sw_error_t

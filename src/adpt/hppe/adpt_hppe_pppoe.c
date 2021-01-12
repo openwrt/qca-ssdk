@@ -23,6 +23,9 @@
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
 #include "adpt.h"
+#if defined(APPE)
+#include "adpt_appe_pppoe.h"
+#endif
 
 #define MAX_SESSION_ID 0xffff
 
@@ -229,6 +232,54 @@ adpt_hppe_pppoe_session_table_get(a_uint32_t dev_id, fal_pppoe_session_t * sessi
 }
 
 sw_error_t
+adpt_ppe_pppoe_session_table_add(a_uint32_t dev_id, fal_pppoe_session_t *session_tbl) {
+	sw_error_t rv = SW_OK;
+
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		rv = adpt_appe_pppoe_session_table_add(dev_id, session_tbl);
+	} else
+#endif
+	{
+		rv = adpt_hppe_pppoe_session_table_add(dev_id, session_tbl);
+	}
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_pppoe_session_table_del(a_uint32_t dev_id, fal_pppoe_session_t *session_tbl) {
+	sw_error_t rv = SW_OK;
+
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		rv = adpt_appe_pppoe_session_table_del(dev_id, session_tbl);
+	} else
+#endif
+	{
+		rv = adpt_hppe_pppoe_session_table_del(dev_id, session_tbl);
+	}
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_pppoe_session_table_get(a_uint32_t dev_id, fal_pppoe_session_t *session_tbl) {
+	sw_error_t rv = SW_OK;
+
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		rv = adpt_appe_pppoe_session_table_get(dev_id, session_tbl);
+	} else
+#endif
+	{
+		rv = adpt_hppe_pppoe_session_table_get(dev_id, session_tbl);
+	}
+
+	return rv;
+}
+
+sw_error_t
 adpt_hppe_pppoe_en_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t enable)
 {
 	sw_error_t rv = SW_OK;
@@ -311,11 +362,11 @@ sw_error_t adpt_hppe_pppoe_init(a_uint32_t dev_id)
 	adpt_hppe_pppoe_func_unregister(dev_id, p_adpt_api);
 
 	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_SESSION_TABLE_ADD))
-		p_adpt_api->adpt_pppoe_session_table_add = adpt_hppe_pppoe_session_table_add;
+		p_adpt_api->adpt_pppoe_session_table_add = adpt_ppe_pppoe_session_table_add;
 	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_SESSION_TABLE_DEL))
-		p_adpt_api->adpt_pppoe_session_table_del = adpt_hppe_pppoe_session_table_del;
+		p_adpt_api->adpt_pppoe_session_table_del = adpt_ppe_pppoe_session_table_del;
 	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_SESSION_TABLE_GET))
-		p_adpt_api->adpt_pppoe_session_table_get = adpt_hppe_pppoe_session_table_get;
+		p_adpt_api->adpt_pppoe_session_table_get = adpt_ppe_pppoe_session_table_get;
 	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_EN_SET))
 		p_adpt_api->adpt_pppoe_en_set = adpt_hppe_pppoe_en_set;
 	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_EN_GET))

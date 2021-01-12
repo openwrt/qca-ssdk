@@ -33,19 +33,17 @@ extern "C" {
 
 #if defined(APPE)
 #define IPR_CSR_BASE_ADDR            0x1e0000
+#define NSS_XGMAC_CSR_BASE_ADDR      0x500000
+#define TUNNEL_LOOKUP_BASE_ADDR      0x300000
 #else
 #define IPR_CSR_BASE_ADDR            0x002000
+#define NSS_XGMAC_CSR_BASE_ADDR      0x003000
 #endif
 
 #define NSS_MAC_CSR_BASE_ADDR        0x001000
 #define NSS_PRX_CSR_BASE_ADDR        0x00b000
 #define NSS_PTX_CSR_BASE_ADDR        0x020000
 #define NSS_BM_CSR_BASE_ADDR         0x600000
-#ifdef APPE
-#define NSS_XGMAC_CSR_BASE_ADDR      0x500000
-#else
-#define NSS_XGMAC_CSR_BASE_ADDR      0x003000
-#endif
 #define NSS_GLOBAL_BASE_ADDR    	 0x0
 #define NSS_UNIPHY_BASE_ADDR    0x0
 #define NSS_LPI_BASE_ADDR    0x400

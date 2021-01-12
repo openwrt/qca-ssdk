@@ -21,6 +21,10 @@ ifeq (TRUE, $(IN_TUNNEL_MAP))
 	SRC_LIST+=appe_tunnel_map.c
 endif
 
+ifeq (TRUE, $(IN_PPPOE))
+	SRC_LIST+=appe_pppoe.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

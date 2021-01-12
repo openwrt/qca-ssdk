@@ -1629,6 +1629,39 @@ static inline a_uint32_t adpt_port_type_convert(a_bool_t to_hsl, a_uint32_t port
 	return ptype;
 }
 
+#define ADPT_PORT_ID_EQUAL    0
+#define ADPT_PORT_ID_INCLD    1
+#define ADPT_PORT_ID_EXCLD    2
+#define ADPT_PORT_ID_NOEQUAL  3
+
+static inline a_uint32_t adpt_port_id_compare(fal_pbmp_t port_bmap, fal_port_t port_id) {
+	a_uint32_t result = ADPT_PORT_ID_NOEQUAL;
+
+	if (FAL_PORT_ID_TYPE(port_bmap) != FAL_PORT_ID_TYPE(port_id)) {
+		return ADPT_PORT_ID_NOEQUAL;
+	}
+	switch (FAL_PORT_ID_TYPE(port_id)) {
+		case FAL_PORT_TYPE_PPORT:
+			if (port_bmap == BIT(port_id)) {
+				result = ADPT_PORT_ID_EQUAL;
+			} else if (SW_IS_PBMP_MEMBER(port_bmap, port_id)) {
+				result = ADPT_PORT_ID_INCLD;
+			} else {
+				result = ADPT_PORT_ID_EXCLD;
+			}
+			break;
+		case FAL_PORT_TYPE_VPORT:
+		case FAL_PORT_TYPE_VP_GROUP:
+			if (port_bmap == port_id) {
+				result = ADPT_PORT_ID_EQUAL;
+			}
+			break;
+		default:
+			result = ADPT_PORT_ID_NOEQUAL;
+			SSDK_ERROR("Unsupported port type to compare\n");
+	}
+	return result;
+}
 
 adpt_api_t *adpt_api_ptr_get(a_uint32_t dev_id);
 sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);

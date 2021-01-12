@@ -446,6 +446,11 @@ _insert_vlan_trans_adv_rule_action(a_uint32_t dev_id, a_uint32_t index,
 		in_vlan_xlt_rule.bf.port_bitmap = FAL_PORT_ID_VALUE(rule->port_bitmap);
 		in_vlan_xlt_rule.bf.port_type = adpt_port_type_convert(A_TRUE,
 				FAL_PORT_ID_TYPE(rule->port_bitmap));
+		in_vlan_xlt_rule.bf.vni_resv_incl = rule->vni_resv_enable;
+		in_vlan_xlt_rule.bf.vni_resv_type = rule->vni_resv_type;
+		in_vlan_xlt_rule.bf.vni_resv_0 = rule->vni_resv;
+		in_vlan_xlt_rule.bf.vni_resv_1 = rule->vni_resv >>
+			SW_FIELD_OFFSET_IN_WORD(XLT_RULE_TBL_VNI_RESV_OFFSET);
 #else
 		in_vlan_xlt_rule.bf.port_bitmap = rule->port_bitmap;
 #endif
@@ -1838,45 +1843,14 @@ adpt_hppe_port_invlan_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_pt_inv
 }
 #endif
 
-#define PORT_ID_NOEQUAL  0
-#define PORT_ID_EQUAL    1
-#define PORT_ID_INCLD    2
-a_uint32_t
-_adpt_port_vlan_port_compare(fal_port_t port_bmap, fal_port_t port_id) {
-	a_uint32_t result = PORT_ID_NOEQUAL;
-
-	if (FAL_PORT_ID_TYPE(port_bmap) != FAL_PORT_ID_TYPE(port_id)) {
-		return PORT_ID_NOEQUAL;
-	}
-	switch (FAL_PORT_ID_TYPE(port_id)) {
-		case FAL_PORT_TYPE_PPORT:
-			if (port_bmap == BIT(port_id)) {
-				result = PORT_ID_EQUAL;
-			} else if (SW_IS_PBMP_MEMBER(port_bmap, port_id)) {
-				result = PORT_ID_INCLD;
-			}
-			break;
-		case FAL_PORT_TYPE_VPORT:
-		case FAL_PORT_TYPE_VP_GROUP:
-			if (port_bmap == port_id) {
-				result = PORT_ID_EQUAL;
-			}
-			break;
-		default:
-			result = PORT_ID_NOEQUAL;
-			SSDK_ERROR("Unsupported port type by portvlan\n");
-	}
-	return result;
-}
-
 sw_error_t
 adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 		fal_port_t port_id, fal_port_vlan_direction_t direction,
 		fal_vlan_trans_adv_rule_t * rule, fal_vlan_trans_adv_action_t * action)
 {
 	sw_error_t rtn = SW_OK;
-	a_uint32_t entry_idx, rule_valid, entry_found;
-	a_int32_t idx;
+	a_uint32_t entry_idx = XLT_RULE_TBL_NUM;
+	a_int32_t idx, rule_valid, entry_found;
 	fal_vlan_trans_adv_rule_t temp_rule;
 	fal_vlan_trans_adv_action_t temp_action;
 	a_bool_t entry_sign, insert_entry_ready;
@@ -1911,28 +1885,27 @@ adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 			/* rule equal */
 			if (!_check_if_action_equal(direction, &temp_action, action)) {
 				/* action equal */
-				entry_found = _adpt_port_vlan_port_compare(temp_rule.port_bitmap,
+				entry_found = adpt_port_id_compare(temp_rule.port_bitmap,
 						port_id);
-				if (entry_found == PORT_ID_EQUAL || entry_found == PORT_ID_INCLD) {
+				if (entry_found == ADPT_PORT_ID_EQUAL ||
+						entry_found == ADPT_PORT_ID_INCLD) {
 					return SW_ALREADY_EXIST;
-				} else if (entry_found == PORT_ID_NOEQUAL) {
-					if (FAL_IS_PPORT(temp_rule.port_bitmap)) {
-						SW_PBMP_ADD_PORT(temp_rule.port_bitmap, port_id);
-						_insert_vlan_trans_adv_rule_action(
-								dev_id,
-								idx, direction,
-								&temp_rule,
-								&temp_action);
-						return SW_OK;
-					} else {
-						/* need to insert a new portvlan entry */
-						insert_entry_ready = A_TRUE;
-					}
+				} else if (entry_found == ADPT_PORT_ID_EXCLD) {
+					SW_PBMP_ADD_PORT(temp_rule.port_bitmap, port_id);
+					_insert_vlan_trans_adv_rule_action(
+							dev_id,
+							idx, direction,
+							&temp_rule,
+							&temp_action);
+					return SW_OK;
+				} else {
+					/* need to insert a new portvlan entry */
+					insert_entry_ready = A_TRUE;
 				}
 			} else { /* action not equal */
-				entry_found = _adpt_port_vlan_port_compare(temp_rule.port_bitmap,
+				entry_found = adpt_port_id_compare(temp_rule.port_bitmap,
 						port_id);
-				if (entry_found == PORT_ID_EQUAL) {
+				if (entry_found == ADPT_PORT_ID_EQUAL) {
 					/* port equal, need update action */
 					_insert_vlan_trans_adv_rule_action(dev_id,
 							idx, direction,
@@ -1940,8 +1913,8 @@ adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 							action);
 					return SW_OK;
 				} else {
-					if (FAL_IS_PPORT(port_id)) {
-						/* port not equal, need remove port from
+					if (entry_found == ADPT_PORT_ID_INCLD) {
+						/* port included, need remove port from
 						 * existing rule bitmap, insert new rule
 						 * and action later */
 						SW_PBMP_DEL_PORT(temp_rule.port_bitmap, port_id);
@@ -1950,6 +1923,7 @@ adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 								&temp_rule,
 								&temp_action);
 					}
+
 					/* need to insert a new portvlan entry */
 					insert_entry_ready = A_TRUE;
 				}
@@ -1961,11 +1935,13 @@ adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 		}
 	}
 
-	if (entry_sign == A_FALSE)
+	if (entry_idx == XLT_RULE_TBL_NUM) {
 		return SW_NO_RESOURCE;
-
-	/* insert new rule and action */
-	_insert_vlan_trans_adv_rule_action(dev_id, entry_idx, direction, rule, action);
+	} else {
+		/* insert new rule and action */
+		rtn = _insert_vlan_trans_adv_rule_action(dev_id, entry_idx,
+				direction, rule, action);
+	}
 
 	return rtn;
 }
@@ -2015,10 +1991,10 @@ adpt_hppe_port_vlan_trans_adv_del(a_uint32_t dev_id,
 		{ /* rule equal */
 			if (!_check_if_action_equal(direction, &temp_action, action))
 			{ /* action equal */
-				entry_found = _adpt_port_vlan_port_compare(temp_rule.port_bitmap,
+				entry_found = adpt_port_id_compare(temp_rule.port_bitmap,
 						port_id);
 
-				if (entry_found == PORT_ID_EQUAL) {
+				if (entry_found == ADPT_PORT_ID_EQUAL) {
 					/* port equal, need delete existing rule and action */
 					if (direction == FAL_PORT_VLAN_INGRESS) {
 						rtn = hppe_xlt_rule_tbl_set(dev_id,
@@ -2035,7 +2011,7 @@ adpt_hppe_port_vlan_trans_adv_del(a_uint32_t dev_id,
 								idx, &eg_vlan_xlt_action);
 						SW_RTN_ON_ERROR(rtn);
 					}
-				} else if (entry_found == PORT_ID_INCLD) {
+				} else if (entry_found == ADPT_PORT_ID_INCLD) {
 					/* current port_bitmap includes this port_id,
 					   remove port from port_bitmap and update rule
 					   and action */
@@ -2084,9 +2060,10 @@ adpt_hppe_port_vlan_trans_adv_getfirst(a_uint32_t dev_id,
 		rule_valid = _get_port_vlan_trans_adv_rule_by_index(dev_id,
 				idx, direction, &temp_rule, &temp_action);
 		if (rule_valid == 1) {
-			entry_found = _adpt_port_vlan_port_compare(temp_rule.port_bitmap, port_id);
+			entry_found = adpt_port_id_compare(temp_rule.port_bitmap, port_id);
 
-			if (entry_found != PORT_ID_NOEQUAL) {
+			if (entry_found == ADPT_PORT_ID_EQUAL ||
+					entry_found == ADPT_PORT_ID_INCLD) {
 				aos_mem_copy(rule, &temp_rule,
 						sizeof(fal_vlan_trans_adv_rule_t));
 				aos_mem_copy(action, &temp_action,
@@ -2133,9 +2110,10 @@ adpt_hppe_port_vlan_trans_adv_getnext(a_uint32_t dev_id,
 				direction, &temp_rule, &temp_action);
 		if (rule_valid == 1)
 		{ /* existing rule */
-			entry_found = _adpt_port_vlan_port_compare(temp_rule.port_bitmap,
+			entry_found = adpt_port_id_compare(temp_rule.port_bitmap,
 					port_id);
-			if (sign_tag == A_TRUE && entry_found != PORT_ID_NOEQUAL)
+			if (sign_tag == A_TRUE && (entry_found == ADPT_PORT_ID_EQUAL ||
+						entry_found == ADPT_PORT_ID_INCLD))
 			{
 				aos_mem_copy(rule, &temp_rule,
 						sizeof (fal_vlan_trans_adv_rule_t));
@@ -2147,8 +2125,10 @@ adpt_hppe_port_vlan_trans_adv_getnext(a_uint32_t dev_id,
 			{ /* rule equal */
 				if (!_check_if_action_equal(direction, &temp_action, action))
 				{ /* action equal */
-					if (entry_found != PORT_ID_NOEQUAL)
+					if (entry_found == ADPT_PORT_ID_EQUAL ||
+							entry_found == ADPT_PORT_ID_INCLD) {
 						sign_tag = A_TRUE;
+					}
 				}
 			}
 		}

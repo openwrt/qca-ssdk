@@ -574,7 +574,7 @@ enum {
 
 	typedef struct
 	{
-		a_uint32_t	port_bitmap; /* rule need know which ports matched this rule */
+		fal_pbmp_t	port_bitmap; /* rule need know which ports matched this rule */
 
 		a_uint8_t	s_tagged; /* rule need know stag type(untagged/pri_tagged/tagged) */
 		a_bool_t	s_vid_enable; /* check if rule will include service vid value */
@@ -605,7 +605,7 @@ enum {
 
 		/*vni fields match for ingress added by appe*/
 		a_bool_t	vni_resv_enable; /* check vni resv or not, added for ipq90xx */
-		a_bool_t	vni_resv_type;  /* 0 for vni only, 1 for vni and reserver,
+		a_uint8_t	vni_resv_type;  /* 0 for vni only, 1 for vni and reserver,
 						   added for ipq90xx */
 		a_uint32_t	vni_resv;	/* vni or gre key filed value, added for ipq90xx*/
 	} fal_vlan_trans_adv_rule_t;
@@ -640,7 +640,7 @@ enum {
 
 		/*src info fields for ingress added by appe*/
 		a_bool_t	src_info_enable; /* src info xlt or not, added for ipq90xx*/
-		a_bool_t	src_info_type; /* 0 virtual port, 1 l3_if for tunnel payload,
+		a_uint8_t	src_info_type; /* 0 virtual port, 1 l3_if for tunnel payload,
 						  added for ipq90xx */
 		a_uint32_t	src_info;      /* src info value, added for ipq90xx */
 

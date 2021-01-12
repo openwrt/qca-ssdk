@@ -763,7 +763,11 @@ union vp_tx_drop_cnt_tbl_u {
 /*[table] VLAN_DEV_CNT_TBL*/
 #define VLAN_DEV_CNT_TBL
 #define VLAN_DEV_CNT_TBL_ADDRESS 0x7f000
+#if defined(APPE)
+#define VLAN_DEV_CNT_TBL_NUM     128
+#else
 #define VLAN_DEV_CNT_TBL_NUM     64
+#endif
 #define VLAN_DEV_CNT_TBL_INC     0x10
 #define VLAN_DEV_CNT_TBL_TYPE    REG_TYPE_RW
 #define VLAN_DEV_CNT_TBL_DEFAULT 0x0

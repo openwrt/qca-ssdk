@@ -5,6 +5,10 @@ include $(PRJ_PATH)/make/config.mk
 
 SRC_LIST=
 
+ifeq (TRUE, $(IN_FDB))
+  SRC_LIST += adpt_appe_fdb.c
+endif
+
 ifeq (TRUE, $(IN_PORTCONTROL))
   SRC_LIST += adpt_appe_portctrl.c
 endif

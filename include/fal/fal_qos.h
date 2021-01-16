@@ -153,6 +153,7 @@ enum {
 	FUNC_QOS_PORT_MODE_PRI_SET,
 	FUNC_QOS_PORT_SCHEDULER_CFG_RESET,
 	FUNC_QOS_PORT_SCHEDULER_RESOURCE_GET,
+	FUNC_QOS_RESERVEDPOOL_SCHEDULER_RESOURCE_GET,
 };
 
 typedef struct {
@@ -431,6 +432,11 @@ sw_error_t
 fal_port_scheduler_resource_get(
 		a_uint32_t dev_id,
 		fal_port_t port_id,
+		fal_portscheduler_resource_t *cfg);
+
+sw_error_t
+fal_reservedpool_scheduler_resource_get(
+		a_uint32_t dev_id,
 		fal_portscheduler_resource_t *cfg);
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -1080,6 +1080,39 @@ adpt_hppe_port_scheduler_resource_get(a_uint32_t dev_id,
 	return SW_OK;
 }
 
+sw_error_t
+adpt_ppe_reservedpool_scheduler_resource_get(a_uint32_t dev_id,
+				fal_portscheduler_resource_t *cfg)
+{
+	ssdk_dt_scheduler_cfg *dt_cfg;
+	ssdk_dt_portscheduler_cfg *reserved_resource;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cfg);
+
+	dt_cfg = ssdk_bootup_shceduler_cfg_get(dev_id);
+	if (!dt_cfg)
+		return SW_NOT_SUPPORTED;
+
+	reserved_resource = &dt_cfg->reserved_pool;
+	cfg->ucastq_start = reserved_resource->ucastq_start;
+	cfg->ucastq_num = reserved_resource->ucastq_end - reserved_resource->ucastq_start + 1;
+	cfg->mcastq_start = reserved_resource->mcastq_start;
+	cfg->mcastq_num = reserved_resource->mcastq_end - reserved_resource->mcastq_start + 1;
+	cfg->l0sp_start = reserved_resource->l0sp_start;
+	cfg->l0sp_num = reserved_resource->l0sp_end - reserved_resource->l0sp_start + 1;
+	cfg->l0cdrr_start = reserved_resource->l0cdrr_start;
+	cfg->l0cdrr_num = reserved_resource->l0cdrr_end - reserved_resource->l0cdrr_start + 1;
+	cfg->l0edrr_start = reserved_resource->l0edrr_start;
+	cfg->l0edrr_num = reserved_resource->l0edrr_end - reserved_resource->l0edrr_start + 1;
+	cfg->l1cdrr_start = reserved_resource->l1cdrr_start;
+	cfg->l1cdrr_num = reserved_resource->l1cdrr_end - reserved_resource->l1cdrr_start + 1;
+	cfg->l1edrr_start = reserved_resource->l1edrr_start;
+	cfg->l1edrr_num = reserved_resource->l1edrr_end - reserved_resource->l1edrr_start + 1;
+
+	return SW_OK;
+}
+
 void adpt_hppe_qos_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -1115,7 +1148,9 @@ void adpt_hppe_qos_func_bitmap_init(a_uint32_t dev_id)
 						(1 << FUNC_QOS_PORT_MODE_PRI_GET) |
 						(1 << FUNC_QOS_PORT_MODE_PRI_SET) |
 						(1 << FUNC_QOS_PORT_SCHEDULER_CFG_RESET) |
-						(1 << FUNC_QOS_PORT_SCHEDULER_RESOURCE_GET));
+						(1 << FUNC_QOS_PORT_SCHEDULER_RESOURCE_GET) |
+						(1 << FUNC_QOS_RESERVEDPOOL_SCHEDULER_RESOURCE_GET)
+						);
 	return;
 }
 
@@ -1151,6 +1186,7 @@ static void adpt_hppe_qos_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_
 	p_adpt_api->adpt_qos_port_mode_pri_set = NULL;
 	p_adpt_api->adpt_port_scheduler_cfg_reset = NULL;
 	p_adpt_api->adpt_port_scheduler_resource_get = NULL;
+	p_adpt_api->adpt_reservedpool_scheduler_resource_get = NULL;
 
 	return;
 }
@@ -1225,7 +1261,11 @@ sw_error_t adpt_hppe_qos_init(a_uint32_t dev_id)
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_SCHEDULER_CFG_RESET))
 		p_adpt_api->adpt_port_scheduler_cfg_reset = adpt_hppe_port_scheduler_cfg_reset;
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_SCHEDULER_RESOURCE_GET))
-		p_adpt_api->adpt_port_scheduler_resource_get = adpt_hppe_port_scheduler_resource_get;
+		p_adpt_api->adpt_port_scheduler_resource_get =
+			adpt_hppe_port_scheduler_resource_get;
+	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_RESERVEDPOOL_SCHEDULER_RESOURCE_GET))
+		p_adpt_api->adpt_reservedpool_scheduler_resource_get =
+			adpt_ppe_reservedpool_scheduler_resource_get;
 
 	return SW_OK;
 }

@@ -843,6 +843,8 @@ typedef sw_error_t (*adpt_qos_port_mode_pri_set_func)(a_uint32_t dev_id, fal_por
 					fal_qos_mode_t mode, a_uint32_t pri);
 typedef sw_error_t (*adpt_port_scheduler_resource_get_func)(a_uint32_t dev_id, fal_port_t port_id,
 					fal_portscheduler_resource_t *cfg);
+typedef sw_error_t (*adpt_reservedpool_scheduler_resource_get_func)(a_uint32_t dev_id,
+		fal_portscheduler_resource_t *cfg);
 typedef sw_error_t (*adpt_port_bufgroup_map_get_func)(a_uint32_t dev_id, fal_port_t port,
 			a_uint8_t *group);
 typedef sw_error_t (*adpt_bm_port_reserved_buffer_get_func)(a_uint32_t dev_id, fal_port_t port,
@@ -1458,6 +1460,7 @@ typedef struct
 	adpt_qos_port_mode_pri_set_func adpt_qos_port_mode_pri_set;
 	adpt_port_scheduler_cfg_reset_func adpt_port_scheduler_cfg_reset;
 	adpt_port_scheduler_resource_get_func adpt_port_scheduler_resource_get;
+	adpt_reservedpool_scheduler_resource_get_func adpt_reservedpool_scheduler_resource_get;
 
 	/* bm */
 	a_uint32_t adpt_bm_func_bitmap;

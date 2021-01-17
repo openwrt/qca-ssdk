@@ -25,6 +25,10 @@ ifeq (TRUE, $(IN_PPPOE))
 	SRC_LIST+=appe_pppoe.c
 endif
 
+ifeq (TRUE, $(IN_ACL))
+	SRC_LIST+=appe_acl.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

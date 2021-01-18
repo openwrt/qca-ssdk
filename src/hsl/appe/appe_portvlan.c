@@ -110,6 +110,34 @@ appe_egress_vp_tbl_set(
 }
 
 sw_error_t
+appe_eg_vsi_vp_tag_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_vsi_vp_tag_u *value)
+{
+	if (index >= EG_VSI_VP_TAG_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_get(
+				dev_id,
+				NSS_PTX_CSR_BASE_ADDR + EG_VSI_VP_TAG_ADDRESS + \
+				index * EG_VSI_VP_TAG_INC,
+				&value->val);
+}
+
+sw_error_t
+appe_eg_vsi_vp_tag_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_vsi_vp_tag_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				NSS_PTX_CSR_BASE_ADDR + EG_VSI_VP_TAG_ADDRESS + \
+				index * EG_VSI_VP_TAG_INC,
+				value->val);
+}
+
+sw_error_t
 appe_vport_parsing_port_role_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -1165,3 +1193,33 @@ appe_eg_vp_tbl_port_def_cvid_set(
 	return ret;
 }
 
+sw_error_t
+appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vsi_vp_tag_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_eg_vsi_vp_tag_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.tagged_mode_vp_bitmap;
+	return ret;
+}
+
+sw_error_t
+appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vsi_vp_tag_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_eg_vsi_vp_tag_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.tagged_mode_vp_bitmap = value;
+	ret = appe_eg_vsi_vp_tag_set(dev_id, index, &reg_val);
+	return ret;
+}

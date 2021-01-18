@@ -278,4 +278,27 @@ union eg_vp_tbl_u {
 	struct eg_vp_tbl bf;
 };
 
+/*[table] EG_VSI_VP_TAG*/
+#define EG_VSI_VP_TAG
+#define EG_VSI_VP_TAG_ADDRESS 0x8000
+#define EG_VSI_VP_TAG_NUM     2048
+#define EG_VSI_VP_TAG_INC     0x10
+#define EG_VSI_VP_TAG_TYPE    REG_TYPE_RW
+#define EG_VSI_VP_TAG_DEFAULT 0x0
+	/*[field] TAGGED_MODE_VP_BITMAP*/
+	#define EG_VSI_VP_TAG_TAGGED_MODE_VP_BITMAP
+	#define EG_VSI_VP_TAG_TAGGED_MODE_VP_BITMAP_OFFSET  0
+	#define EG_VSI_VP_TAG_TAGGED_MODE_VP_BITMAP_LEN     16
+	#define EG_VSI_VP_TAG_TAGGED_MODE_VP_BITMAP_DEFAULT 0x0
+
+struct eg_vsi_vp_tag {
+	a_uint32_t  tagged_mode_vp_bitmap:16;
+	a_uint32_t  _reserved0:16;
+};
+
+union eg_vsi_vp_tag_u {
+	a_uint32_t val;
+	struct eg_vsi_vp_tag bf;
+};
+
 #endif

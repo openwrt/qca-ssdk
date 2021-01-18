@@ -1667,6 +1667,52 @@ static inline a_uint32_t adpt_port_id_compare(fal_pbmp_t port_bmap, fal_port_t p
 	return result;
 }
 
+static inline sw_error_t
+adpt_forward_action_convert(fal_fwd_cmd_t *fwd_cmd, a_uint32_t *value, a_bool_t to_hsl)
+{
+	sw_error_t rv = SW_OK;
+	if (to_hsl) {
+		switch (*fwd_cmd) {
+			case FAL_MAC_FRWRD:
+				*value = 0;
+				break;
+			case FAL_MAC_DROP:
+				*value = 1;
+				break;
+			case FAL_MAC_CPY_TO_CPU:
+				*value = 2;
+				break;
+			case FAL_MAC_RDT_TO_CPU:
+				*value = 3;
+				break;
+			default:
+				SSDK_ERROR("Unsupported fal fwd_type to convert\n");
+				rv = SW_FAIL;
+				break;
+		}
+	} else {
+		switch (*value) {
+			case 0:
+				*fwd_cmd = FAL_MAC_FRWRD;
+				break;
+			case 1:
+				*fwd_cmd = FAL_MAC_DROP;
+				break;
+			case 2:
+				*fwd_cmd = FAL_MAC_CPY_TO_CPU;
+				break;
+			case 3:
+				*fwd_cmd = FAL_MAC_RDT_TO_CPU;
+				break;
+			default:
+				SSDK_ERROR("Unsupported hsl fwd_type to convert\n");
+				rv = SW_FAIL;
+				break;
+		}
+	}
+	return rv;
+}
+
 adpt_api_t *adpt_api_ptr_get(a_uint32_t dev_id);
 sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
 sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,

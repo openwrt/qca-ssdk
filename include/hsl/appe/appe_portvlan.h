@@ -26,6 +26,7 @@
 
 #define IPR_VP_PARSING_MAX_ENTRY	192
 #define VLAN_PORT_VP_TBL_MAX_ENTRY	256
+#define EG_VSI_VP_TAG_MAX_ENTRY         2048
 
 sw_error_t
 appe_ipr_vp_parsing_get(
@@ -62,6 +63,18 @@ appe_egress_vp_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union eg_vp_tbl_u *value);
+
+sw_error_t
+appe_eg_vsi_vp_tag_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_vsi_vp_tag_u *value);
+
+sw_error_t
+appe_eg_vsi_vp_tag_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_vsi_vp_tag_u *value);
 
 sw_error_t
 appe_vport_parsing_port_role_get(
@@ -471,4 +484,15 @@ appe_eg_vp_tbl_port_def_cvid_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+sw_error_t
+appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
 #endif

@@ -352,6 +352,102 @@ _fal_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type,a_ui
     rv = p_api->adpt_acl_udf_profile_get(dev_id, pkt_type, udf_idx, udf_type, offset);
     return rv;
 }
+
+sw_error_t
+_fal_acl_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_udf_profile_entry_add)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_udf_profile_entry_add(dev_id, profile_id, entry);
+    return rv;
+}
+
+sw_error_t
+_fal_acl_udf_profile_entry_del(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_udf_profile_entry_del)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_udf_profile_entry_del(dev_id, profile_id, entry);
+    return rv;
+}
+
+sw_error_t
+_fal_acl_udf_profile_entry_getfirst(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_udf_profile_entry_getfirst)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_udf_profile_entry_getfirst(dev_id, profile_id, entry);
+    return rv;
+}
+
+sw_error_t
+_fal_acl_udf_profile_entry_getnext(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_udf_profile_entry_getnext)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_udf_profile_entry_getnext(dev_id, profile_id, entry);
+    return rv;
+}
+
+sw_error_t
+_fal_acl_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t udf_type, a_uint32_t offset)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_udf_profile_cfg_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_udf_profile_cfg_set(dev_id, profile_id, udf_idx, udf_type, offset);
+    return rv;
+}
+
+sw_error_t
+_fal_acl_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
+                a_uint32_t udf_idx, fal_acl_udf_type_t * udf_type, a_uint32_t * offset)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_udf_profile_cfg_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset);
+    return rv;
+}
 /*insert flag for inner fal, don't remove it*/
 
 sw_error_t
@@ -719,6 +815,124 @@ fal_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type,a_uin
     return rv;
 }
 
+/**
+ * @brief add one udf profile entry
+ * @param[in] dev_id device id
+ * @param[in] profile_id udf profile id
+ * @param[in] entry udf profile entry
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_udf_profile_entry_add(dev_id, profile_id, entry);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+/**
+ * @brief delete one udf profile entry
+ * @param[in] dev_id device id
+ * @param[in] profile_id udf profile id
+ * @param[in] entry udf profile entry
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_udf_profile_entry_del(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_udf_profile_entry_del(dev_id, profile_id, entry);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+/**
+ * @brief get first udf profile entry
+ * @param[in] dev_id device id
+ * @param[in] profile_id udf profile id
+ * @param[out] entry udf profile entry
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_udf_profile_entry_getfirst(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_udf_profile_entry_getfirst(dev_id, profile_id, entry);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+/**
+ * @brief get next udf profile entry
+ * @param[in] dev_id device id
+ * @param[in] profile_id udf profile id
+ * @param[in|out] entry udf profile entry
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_udf_profile_entry_getnext(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_udf_profile_entry_getnext(dev_id, profile_id, entry);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+/**
+ * @brief set udf base and offset cfg
+ * @param[in] dev_id device id
+ * @param[in] profile_id udf profile id
+ * @param[in] udf_idx udf index 0-3
+ * @param[in] udf_type udf base
+ * @param[in] offset udf offset
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t udf_type, a_uint32_t offset)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_udf_profile_cfg_set(dev_id, profile_id, udf_idx, udf_type, offset)
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+/**
+ * @brief get udf base and offset cfg
+ * @param[in] dev_id device id
+ * @param[in] profile_id udf profile id
+ * @param[in] udf_idx udf index 0-3
+ * @param[out] udf_type udf base
+ * @param[out] offset udf offset
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t * udf_type, a_uint32_t * offset)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset)
+    FAL_API_UNLOCK;
+    return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 
 EXPORT_SYMBOL(fal_acl_list_creat);
@@ -738,4 +952,10 @@ EXPORT_SYMBOL(fal_acl_rule_src_filter_sts_set);
 EXPORT_SYMBOL(fal_acl_rule_src_filter_sts_get);
 EXPORT_SYMBOL(fal_acl_udf_profile_set);
 EXPORT_SYMBOL(fal_acl_udf_profile_get);
+EXPORT_SYMBOL(fal_acl_udf_profile_entry_add);
+EXPORT_SYMBOL(fal_acl_udf_profile_entry_del);
+EXPORT_SYMBOL(fal_acl_udf_profile_entry_getfirst);
+EXPORT_SYMBOL(fal_acl_udf_profile_entry_getnext);
+EXPORT_SYMBOL(fal_acl_udf_profile_cfg_set);
+EXPORT_SYMBOL(fal_acl_udf_profile_cfg_get);
 

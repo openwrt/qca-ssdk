@@ -23,6 +23,9 @@
 #include "hppe_acl_reg.h"
 #include "hppe_acl.h"
 #include <linux/list.h>
+#if defined(APPE)
+#include "adpt_appe_acl.h"
+#endif
 
 #define ADPT_ACL_HPPE_MAC_DA_RULE 0
 #define ADPT_ACL_HPPE_MAC_SA_RULE 1
@@ -3959,6 +3962,40 @@ adpt_hppe_acl_udf_profile_set(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type
 	return g_udf_set_func[pkt_type][udf_idx](dev_id, &udf_ctrl);
 }
 
+sw_error_t
+adpt_ppe_acl_udf_profile_set(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type, a_uint32_t udf_idx,
+			fal_acl_udf_type_t udf_type, a_uint32_t offset)
+{
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+#if defined(APPE)
+		return adpt_appe_acl_udf_profile_set(dev_id, pkt_type, udf_idx, udf_type, offset);
+#endif
+	}
+	else
+	{
+		return adpt_hppe_acl_udf_profile_set(dev_id, pkt_type, udf_idx, udf_type, offset);
+	}
+	return SW_NOT_SUPPORTED;
+}
+
+sw_error_t
+adpt_ppe_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type, a_uint32_t udf_idx,
+			fal_acl_udf_type_t * udf_type, a_uint32_t * offset)
+{
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+#if defined(APPE)
+		return adpt_appe_acl_udf_profile_get(dev_id, pkt_type, udf_idx, udf_type, offset);
+#endif
+	}
+	else
+	{
+		return adpt_hppe_acl_udf_profile_get(dev_id, pkt_type, udf_idx, udf_type, offset);
+	}
+	return SW_NOT_SUPPORTED;
+}
+
 void adpt_hppe_acl_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -3978,6 +4015,17 @@ void adpt_hppe_acl_func_bitmap_init(a_uint32_t dev_id)
 						(1<<FUNC_ACL_LIST_UNBIND)|
 						(1<<FUNC_ACL_UDF_PROFILE_SET)|
 						(1<<FUNC_ACL_UDF_PROFILE_GET));
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		p_adpt_api->adpt_acl_func_bitmap |= ((1<<FUNC_ACL_UDF_PROFILE_ENTRY_ADD)|
+							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_DEL)|
+							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETFIRST)|
+							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETNEXT)|
+							(1<<FUNC_ACL_UDF_PROFILE_CFG_SET)|
+							(1<<FUNC_ACL_UDF_PROFILE_CFG_GET));
+	}
+#endif
 	return;
 }
 
@@ -3997,6 +4045,12 @@ static void adpt_hppe_acl_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_
 	p_adpt_api->adpt_acl_list_unbind = NULL;
 	p_adpt_api->adpt_acl_udf_profile_set = NULL;
 	p_adpt_api->adpt_acl_udf_profile_get = NULL;
+	p_adpt_api->adpt_acl_udf_profile_entry_add = NULL;
+	p_adpt_api->adpt_acl_udf_profile_entry_del = NULL;
+	p_adpt_api->adpt_acl_udf_profile_entry_getfirst = NULL;
+	p_adpt_api->adpt_acl_udf_profile_entry_getnext = NULL;
+	p_adpt_api->adpt_acl_udf_profile_cfg_set = NULL;
+	p_adpt_api->adpt_acl_udf_profile_cfg_get = NULL;
 
 	return;
 }
@@ -4066,12 +4120,48 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 	}
 	if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_SET))
 	{
-		p_adpt_api->adpt_acl_udf_profile_set = adpt_hppe_acl_udf_profile_set;
+		p_adpt_api->adpt_acl_udf_profile_set = adpt_ppe_acl_udf_profile_set;
 	}
 	if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_GET))
 	{
-		p_adpt_api->adpt_acl_udf_profile_get = adpt_hppe_acl_udf_profile_get;
+		p_adpt_api->adpt_acl_udf_profile_get = adpt_ppe_acl_udf_profile_get;
 	}
+
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_ENTRY_ADD))
+		{
+			p_adpt_api->adpt_acl_udf_profile_entry_add =
+					adpt_appe_acl_udf_profile_entry_add;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_ENTRY_DEL))
+		{
+			p_adpt_api->adpt_acl_udf_profile_entry_del =
+					adpt_appe_acl_udf_profile_entry_del;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETFIRST))
+		{
+			p_adpt_api->adpt_acl_udf_profile_entry_getfirst =
+					adpt_appe_acl_udf_profile_entry_getfirst;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETNEXT))
+		{
+			p_adpt_api->adpt_acl_udf_profile_entry_getnext =
+					adpt_appe_acl_udf_profile_entry_getnext;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_CFG_SET))
+		{
+			p_adpt_api->adpt_acl_udf_profile_cfg_set =
+					adpt_appe_acl_udf_profile_cfg_set;
+                }
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_UDF_PROFILE_CFG_GET))
+		{
+			p_adpt_api->adpt_acl_udf_profile_cfg_get =
+					adpt_appe_acl_udf_profile_cfg_get;
+		}
+	}
+#endif
 
 	aos_lock_init(&hppe_acl_lock[dev_id]);
 

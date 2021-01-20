@@ -765,6 +765,24 @@ typedef sw_error_t (*adpt_acl_rule_dump_func)(a_uint32_t dev_id);
 typedef sw_error_t (*adpt_acl_udf_profile_get_func)(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type,a_uint32_t udf_idx, fal_acl_udf_type_t *udf_type, a_uint32_t *offset);
 typedef sw_error_t (*adpt_acl_list_creat_func)(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t list_pri);
 typedef sw_error_t (*adpt_acl_list_destroy_func)(a_uint32_t dev_id, a_uint32_t list_id);
+typedef sw_error_t
+(*adpt_acl_udf_profile_entry_add_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_acl_udf_profile_entry_del_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_acl_udf_profile_entry_getfirst_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_acl_udf_profile_entry_getnext_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_acl_udf_profile_cfg_set_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t udf_type, a_uint32_t offset);
+typedef sw_error_t
+(*adpt_acl_udf_profile_cfg_get_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t * udf_type, a_uint32_t * offset);
 
 typedef sw_error_t (*adpt_qos_port_pri_set_func)(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_pri_precedence_t *pri);
@@ -1635,6 +1653,12 @@ typedef struct
 	adpt_acl_udf_profile_get_func adpt_acl_udf_profile_get;
 	adpt_acl_list_creat_func adpt_acl_list_creat;
 	adpt_acl_list_destroy_func adpt_acl_list_destroy;
+	adpt_acl_udf_profile_entry_add_func adpt_acl_udf_profile_entry_add;
+	adpt_acl_udf_profile_entry_del_func adpt_acl_udf_profile_entry_del;
+	adpt_acl_udf_profile_entry_getfirst_func adpt_acl_udf_profile_entry_getfirst;
+	adpt_acl_udf_profile_entry_getnext_func adpt_acl_udf_profile_entry_getnext;
+	adpt_acl_udf_profile_cfg_set_func adpt_acl_udf_profile_cfg_set;
+	adpt_acl_udf_profile_cfg_get_func adpt_acl_udf_profile_cfg_get;
 
 	/* qos */
 	a_uint32_t adpt_qos_func_bitmap;

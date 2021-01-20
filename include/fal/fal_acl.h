@@ -94,6 +94,13 @@ extern "C" {
         FAL_ACL_UDF_BUTT,
     }fal_acl_udf_pkt_type_t;
 
+    typedef a_uint32_t fal_acl_udf_profile_entry_field_map_t[1];
+    typedef struct {
+	fal_acl_udf_profile_entry_field_map_t field_flag; /*Indicate which fields are included*/
+	fal_l3_type_t l3_type;
+	fal_l4_type_t l4_type;
+    } fal_acl_udf_profile_entry_t;
+
 typedef enum {
 	FAL_ACL_DEST_PORT_BMP = 0, /*dest info is bitmap*/
 	FAL_ACL_DEST_NEXTHOP, /*dest info is nexthop*/
@@ -103,6 +110,9 @@ typedef enum {
 #define FAL_ACL_DEST_OFFSET(type,value) (((type)<<24)|(value))
 #define FAL_ACL_DEST_TYPE(dest) (((dest)>>24)&0xff)
 #define FAL_ACL_DEST_VALUE(dest) ((dest)&0xffffff)
+
+#define FAL_ACL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE 0
+#define FAL_ACL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE 1
 
 #define    FAL_ACL_FIELD_MAC_DA         0
 #define    FAL_ACL_FIELD_MAC_SA         1
@@ -550,6 +560,12 @@ enum
 	FUNC_ACL_LIST_DUMP,
 	FUNC_ACL_UDF_PROFILE_SET,
 	FUNC_ACL_UDF_PROFILE_GET,
+	FUNC_ACL_UDF_PROFILE_ENTRY_ADD,
+	FUNC_ACL_UDF_PROFILE_ENTRY_DEL,
+	FUNC_ACL_UDF_PROFILE_ENTRY_GETFIRST,
+	FUNC_ACL_UDF_PROFILE_ENTRY_GETNEXT,
+	FUNC_ACL_UDF_PROFILE_CFG_SET,
+	FUNC_ACL_UDF_PROFILE_CFG_GET,
 };
 
 
@@ -606,6 +622,29 @@ fal_acl_rule_src_filter_sts_set(a_uint32_t dev_id, a_uint32_t rule_id, a_bool_t 
 sw_error_t
 fal_acl_rule_src_filter_sts_get(a_uint32_t dev_id, a_uint32_t rule_id, a_bool_t* enable);
 
+sw_error_t
+fal_acl_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+
+sw_error_t
+fal_acl_udf_profile_entry_del(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+
+sw_error_t
+fal_acl_udf_profile_entry_getfirst(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+
+sw_error_t
+fal_acl_udf_profile_entry_getnext(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_acl_udf_profile_entry_t * entry);
+
+sw_error_t
+fal_acl_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t udf_type, a_uint32_t offset);
+
+sw_error_t
+fal_acl_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_acl_udf_type_t * udf_type, a_uint32_t * offset);
 
 #ifdef __cplusplus
 }

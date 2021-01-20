@@ -351,3 +351,7 @@ IN_SHAPER=FALSE
 IN_POLICER=FALSE
 endif
 endif
+
+ifneq (, $(filter APPE , $(CHIP_TYPE)))
+IN_VPORT=TRUE
+endif

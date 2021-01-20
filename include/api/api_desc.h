@@ -4781,6 +4781,22 @@ extern "C" {
     SW_PARAM_DEF(SW_API_SFP_CHECKCODE_GET, SW_UINT8, \
 		    sizeof(a_uint8_t), SW_PARAM_PTR|SW_PARAM_OUT, "Check Code"),
 
+#define SW_API_VPORT_PHYSICAL_PORT_GET_DESC \
+    SW_PARAM_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Virtual Port ID"), \
+    SW_PARAM_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "Physical Port ID"),
+
+#define SW_API_VPORT_PHYSICAL_PORT_SET_DESC \
+    SW_PARAM_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Virtual Port ID"), \
+    SW_PARAM_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Physical Port ID"),
+
 /*qca808x_start*/
 
 #define SW_API_DESC(api_id) api_id##_DESC

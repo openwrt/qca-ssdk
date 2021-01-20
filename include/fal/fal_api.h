@@ -2319,6 +2319,18 @@ extern "C" {
 #define SFP_API_PARAM
 #endif
 
+#ifdef IN_VPORT
+#define VPORT_API \
+    SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, fal_vport_physical_port_id_set), \
+    SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, fal_vport_physical_port_id_get),
+#define VPORT_API_PARAM \
+    SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_SET) \
+    SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_GET)
+#else
+#define VPORT_API
+#define VPORT_API_PARAM
+#endif
+
 /*qca808x_start*/
 #define SSDK_API \
 /*qca808x_end*/\
@@ -2363,6 +2375,7 @@ extern "C" {
     SHAPER_API \
     PTP_API \
     SFP_API \
+    VPORT_API \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_MAX, NULL),
 
@@ -2418,6 +2431,7 @@ extern "C" {
     SHAPER_API_PARAM \
     PTP_API_PARAM \
     SFP_API_PARAM \
+    VPORT_API_PARAM \
 /*qca808x_start*/\
     SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),
 

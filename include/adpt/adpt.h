@@ -1048,6 +1048,12 @@ typedef sw_error_t (*adpt_led_ctrl_pattern_get_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_led_ctrl_source_set_func)(a_uint32_t dev_id,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
 
+/* vport */
+typedef sw_error_t (*adpt_vport_physical_port_id_set_func)(a_uint32_t dev_id,
+		fal_port_t vport, fal_port_t pport);
+typedef sw_error_t (*adpt_vport_physical_port_id_get_func)(a_uint32_t dev_id,
+		fal_port_t vport, fal_port_t *pport);
+
 typedef struct
 {
 	ssdk_chip_type chip_type;
@@ -1589,6 +1595,11 @@ typedef struct
 	adpt_led_ctrl_pattern_set_func adpt_led_ctrl_pattern_set;
 	adpt_led_ctrl_pattern_get_func adpt_led_ctrl_pattern_get;
 	adpt_led_ctrl_source_set_func adpt_led_ctrl_source_set;
+
+	/* vport */
+	a_uint32_t adpt_vport_func_bitmap;
+	adpt_vport_physical_port_id_set_func adpt_vport_physical_port_id_set;
+	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 }adpt_api_t;
 
 #define ADPT_IS_PPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_PPORT && \

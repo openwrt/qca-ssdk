@@ -23,6 +23,9 @@
 #if defined(MP)
 #include "adpt_mp.h"
 #endif
+#if defined(APPE)
+#include "adpt_appe.h"
+#endif
 #include "hsl_phy.h"
 #include "ssdk_dts.h"
 
@@ -48,6 +51,26 @@ a_uint32_t adpt_chip_type_get(a_uint32_t dev_id)
 {
 	return g_chip_ver[dev_id].chip_type;
 }
+
+#if defined(APPE)
+static sw_error_t adpt_appe_module_func_register(a_uint32_t dev_id, a_uint32_t module)
+{
+	sw_error_t rv= SW_OK;
+
+	switch (module)
+	{
+		case FAL_MODULE_VPORT:
+#if defined(IN_VPORT)
+			rv = adpt_appe_vport_init(dev_id);
+#endif
+			break;
+		default:
+			break;
+	}
+
+	return rv;
+}
+#endif
 
 #if defined(HPPE)
 a_uint32_t adpt_hppe_chip_revision_get(a_uint32_t dev_id)
@@ -249,6 +272,8 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 		p_adpt_api->adpt_sec_func_bitmap = func_ctrl->bitmap[0];
 	} else if(module == FAL_MODULE_POLICER){
 		p_adpt_api->adpt_policer_func_bitmap = func_ctrl->bitmap[0];
+	} else if(module == FAL_MODULE_VPORT){
+		p_adpt_api->adpt_vport_func_bitmap = func_ctrl->bitmap[0];
 	}
 
 
@@ -256,6 +281,7 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 	{
 #if defined(APPE)
 		case CHIP_APPE:
+			rv = adpt_appe_module_func_register(dev_id, module);
 #endif
 #if defined(HPPE)
 		case CHIP_HPPE:
@@ -327,6 +353,8 @@ sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_sec_func_bitmap;
 	} else if(module == FAL_MODULE_POLICER) {
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_policer_func_bitmap;
+	} else if(module == FAL_MODULE_VPORT) {
+		func_ctrl->bitmap[0] = p_adpt_api->adpt_vport_func_bitmap;
 	}
 
 	return SW_OK;
@@ -350,6 +378,10 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 						__FUNCTION__, __LINE__);
 				return SW_FAIL;
 			}
+
+			g_adpt_api[dev_id]->adpt_vport_func_bitmap = 0xffffffff;
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VPORT);
+			SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(HPPE)
 		case CHIP_HPPE:
@@ -523,6 +555,12 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 	{
 #if defined(APPE)
 		case CHIP_APPE:
+			g_adpt_api[dev_id]->adpt_vport_func_bitmap = 0;
+#if defined(IN_VPORT)
+			adpt_appe_vport_func_bitmap_init(dev_id);
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VPORT);
+			SW_RTN_ON_ERROR(rv);
+#endif
 #endif
 #if defined(HPPE)
 		case CHIP_HPPE:

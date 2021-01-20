@@ -958,6 +958,11 @@ extern "C" {
 #define SW_API_SFP_DIAG_ALARM_WARN_FLAG_GET       (15  + SW_API_SFP_OFFSET)
 #define SW_API_SFP_CHECKCODE_GET                  (16  + SW_API_SFP_OFFSET)
 
+/* vp */
+#define SW_API_VPORT_OFFSET			3300
+#define SW_API_VPORT_PHYSICAL_PORT_SET		(0  + SW_API_VPORT_OFFSET)
+#define SW_API_VPORT_PHYSICAL_PORT_GET		(1  + SW_API_VPORT_OFFSET)
+
 /*qca808x_start*/
     /*debug*/
 #define SW_API_DEBUG_OFFSET        10000

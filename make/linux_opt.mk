@@ -235,6 +235,10 @@ ifeq (TRUE, $(IN_PTP))
   MODULE_CFLAG += -DIN_PTP
 endif
 
+ifeq (TRUE, $(IN_VPORT))
+  MODULE_CFLAG += -DIN_VPORT
+endif
+
 ifneq (TRUE, $(FAL))
   MODULE_CFLAG += -DHSL_STANDALONG
 endif

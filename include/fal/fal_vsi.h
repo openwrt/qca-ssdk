@@ -83,6 +83,8 @@ enum{
 	FUNC_VSI_MEMBER_GET,
 	FUNC_VSI_COUNTER_GET,
 	FUNC_VSI_COUNTER_CLEANUP,
+	FUNC_VSI_INVALIDVSI_CTRL_SET,
+	FUNC_VSI_INVALIDVSI_CTRL_GET,
 	FUNC_VSI_BRIDGE_VSI_SET,
 	FUNC_VSI_BRIDGE_VSI_GET,
 };
@@ -92,6 +94,12 @@ typedef struct
 	a_bool_t bridge_vsi_enable;
 	a_uint32_t bridge_vsi_id;
 }fal_vsi_bridge_vsi_t;
+
+typedef struct
+{
+	a_bool_t dest_en;
+	fal_dest_info_t dest_info;
+} fal_vsi_invalidvsi_ctrl_t;
 
 sw_error_t
 fal_vsi_alloc(a_uint32_t dev_id, a_uint32_t *vsi);
@@ -147,6 +155,14 @@ fal_vsi_bridge_vsi_get(a_uint32_t dev_id, a_uint32_t vsi_id,
 sw_error_t
 fal_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
 	fal_vsi_bridge_vsi_t *bridge_vsi);
+
+sw_error_t
+fal_vsi_invalidvsi_ctrl_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl);
+
+sw_error_t
+fal_vsi_invalidvsi_ctrl_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl);
 
 #ifdef __cplusplus
 }

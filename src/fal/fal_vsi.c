@@ -224,6 +224,38 @@ _fal_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
     return rv;
 }
 
+sw_error_t
+_fal_vsi_invalidvsi_ctrl_get(a_uint32_t dev_id, fal_port_t port_id,
+    fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_vsi_invalidvsi_ctrl_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_vsi_invalidvsi_ctrl_get(dev_id, port_id, invalidvsi_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_vsi_invalidvsi_ctrl_set(a_uint32_t dev_id, fal_port_t port_id,
+    fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_vsi_invalidvsi_ctrl_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_vsi_invalidvsi_ctrl_set(dev_id, port_id, invalidvsi_ctrl);
+    return rv;
+}
+
 /*insert flag for inner fal, don't remove it*/
 
 sw_error_t
@@ -380,6 +412,30 @@ fal_vsi_bridge_vsi_set(a_uint32_t dev_id, a_uint32_t vsi_id,
     return rv;
 }
 
+sw_error_t
+fal_vsi_invalidvsi_ctrl_get(a_uint32_t dev_id, fal_port_t port_id,
+    fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_vsi_invalidvsi_ctrl_get(dev_id, port_id, invalidvsi_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_vsi_invalidvsi_ctrl_set(a_uint32_t dev_id, fal_port_t port_id,
+    fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_vsi_invalidvsi_ctrl_set(dev_id, port_id, invalidvsi_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 
 #ifndef IN_VSI_MINI
@@ -398,3 +454,5 @@ EXPORT_SYMBOL(fal_vsi_member_set);
 EXPORT_SYMBOL(fal_vsi_member_get);
 EXPORT_SYMBOL(fal_vsi_bridge_vsi_get);
 EXPORT_SYMBOL(fal_vsi_bridge_vsi_set);
+EXPORT_SYMBOL(fal_vsi_invalidvsi_ctrl_get);
+EXPORT_SYMBOL(fal_vsi_invalidvsi_ctrl_set);

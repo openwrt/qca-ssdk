@@ -1716,7 +1716,9 @@ extern "C" {
     SW_API_DEF(SW_API_VSI_COUNTER_GET,fal_vsi_counter_get),  \
     SW_API_DEF(SW_API_VSI_COUNTER_CLEANUP,fal_vsi_counter_cleanup), \
     SW_API_DEF(SW_API_VSI_BRIDGE_VSI_GET,fal_vsi_bridge_vsi_get), \
-    SW_API_DEF(SW_API_VSI_BRIDGE_VSI_SET,fal_vsi_bridge_vsi_set),
+    SW_API_DEF(SW_API_VSI_BRIDGE_VSI_SET,fal_vsi_bridge_vsi_set), \
+    SW_API_DEF(SW_API_VSI_INVALIDVSI_CTRL_GET,fal_vsi_invalidvsi_ctrl_get), \
+    SW_API_DEF(SW_API_VSI_INVALIDVSI_CTRL_SET,fal_vsi_invalidvsi_ctrl_set),
 
 
 #define VSI_API_PARAM \
@@ -1736,7 +1738,9 @@ extern "C" {
     SW_API_DESC(SW_API_VSI_COUNTER_GET) \
     SW_API_DESC(SW_API_VSI_COUNTER_CLEANUP) \
     SW_API_DESC(SW_API_VSI_BRIDGE_VSI_GET) \
-    SW_API_DESC(SW_API_VSI_BRIDGE_VSI_SET)
+    SW_API_DESC(SW_API_VSI_BRIDGE_VSI_SET) \
+    SW_API_DESC(SW_API_VSI_INVALIDVSI_CTRL_GET) \
+    SW_API_DESC(SW_API_VSI_INVALIDVSI_CTRL_SET)
 #else
 #define VSI_API \
     SW_API_DEF(SW_API_VSI_ALLOC, ppe_vsi_alloc), \
@@ -1750,7 +1754,9 @@ extern "C" {
     SW_API_DEF(SW_API_VSI_MEMBER_SET, fal_vsi_member_set), \
     SW_API_DEF(SW_API_VSI_MEMBER_GET, fal_vsi_member_get), \
     SW_API_DEF(SW_API_VSI_BRIDGE_VSI_GET,fal_vsi_bridge_vsi_get), \
-    SW_API_DEF(SW_API_VSI_BRIDGE_VSI_SET,fal_vsi_bridge_vsi_set),
+    SW_API_DEF(SW_API_VSI_BRIDGE_VSI_SET,fal_vsi_bridge_vsi_set), \
+    SW_API_DEF(SW_API_VSI_INVALIDVSI_CTRL_GET,fal_vsi_invalidvsi_ctrl_get), \
+    SW_API_DEF(SW_API_VSI_INVALIDVSI_CTRL_SET,fal_vsi_invalidvsi_ctrl_set),
 
 #define VSI_API_PARAM \
     SW_API_DESC(SW_API_VSI_ALLOC)  \
@@ -1764,7 +1770,9 @@ extern "C" {
     SW_API_DESC(SW_API_VSI_MEMBER_SET) \
     SW_API_DESC(SW_API_VSI_MEMBER_GET) \
     SW_API_DESC(SW_API_VSI_BRIDGE_VSI_GET) \
-    SW_API_DESC(SW_API_VSI_BRIDGE_VSI_SET)
+    SW_API_DESC(SW_API_VSI_BRIDGE_VSI_SET) \
+    SW_API_DESC(SW_API_VSI_INVALIDVSI_CTRL_GET) \
+    SW_API_DESC(SW_API_VSI_INVALIDVSI_CTRL_SET)
 #endif
 #else
 #define VSI_API

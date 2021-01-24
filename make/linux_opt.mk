@@ -247,6 +247,14 @@ ifeq (TRUE, $(IN_TUNNEL_MAP))
   MODULE_CFLAG += -DIN_TUNNEL_MAP
 endif
 
+ifeq (TRUE, $(IN_VXLAN))
+  MODULE_CFLAG += -DIN_VXLAN
+endif
+
+ifeq (TRUE, $(IN_GENEVE))
+  MODULE_CFLAG += -DIN_GENEVE
+endif
+
 ifneq (TRUE, $(FAL))
   MODULE_CFLAG += -DHSL_STANDALONG
 endif

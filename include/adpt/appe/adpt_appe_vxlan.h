@@ -19,27 +19,32 @@
  * @defgroup
  * @{
  */
-#ifndef _ADPT_APPE_H_
-#define _ADPT_APPE_H_
+#ifndef _ADPT_APPE_VXLAN_H_
+#define _ADPT_APPE_VXLAN_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */
 
-sw_error_t adpt_appe_vport_init(a_uint32_t dev_id);
-void adpt_appe_vport_func_bitmap_init(a_uint32_t dev_id);
+sw_error_t
+adpt_appe_get_udp_entry_by_index(a_uint32_t dev_id,
+		a_uint32_t index, fal_tunnel_udp_entry_t *entry);
 
-sw_error_t adpt_appe_tunnel_init(a_uint32_t dev_id);
-void adpt_appe_tunnel_func_bitmap_init(a_uint32_t dev_id);
+sw_error_t
+adpt_appe_set_udp_entry_by_index(a_uint32_t dev_id,
+		a_uint32_t index, fal_tunnel_udp_entry_t *entry);
 
-void adpt_appe_vxlan_func_bitmap_init(a_uint32_t dev_id);
-sw_error_t adpt_appe_vxlan_init(a_uint32_t dev_id);
+a_bool_t
+adpt_appe_is_udp_entry_equal(a_uint32_t dev_id,
+		fal_tunnel_udp_entry_t * entry1, fal_tunnel_udp_entry_t * entry2);
 
-void adpt_appe_geneve_func_bitmap_init(a_uint32_t dev_id);
-sw_error_t adpt_appe_geneve_init(a_uint32_t dev_id);
-
+a_bool_t
+adpt_appe_is_udp_entry_inuse(a_uint32_t dev_id, a_uint32_t index);
 
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */
 #endif
+/**
+ * @}
+ */

@@ -69,6 +69,16 @@ static sw_error_t adpt_appe_module_func_register(a_uint32_t dev_id, a_uint32_t m
 			rv = adpt_appe_tunnel_init(dev_id);
 #endif
 			break;
+		case FAL_MODULE_VXLAN:
+#if defined(IN_VXLAN)
+			rv = adpt_appe_vxlan_init(dev_id);
+#endif
+			break;
+		case FAL_MODULE_GENEVE:
+#if defined(IN_GENEVE)
+			rv = adpt_appe_geneve_init(dev_id);
+#endif
+			break;
 		default:
 			break;
 	}
@@ -281,6 +291,10 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 		p_adpt_api->adpt_vport_func_bitmap = func_ctrl->bitmap[0];
 	} else if(module == FAL_MODULE_TUNNEL){
 		p_adpt_api->adpt_tunnel_func_bitmap = func_ctrl->bitmap[0];
+	} else if(module == FAL_MODULE_VXLAN){
+		p_adpt_api->adpt_vxlan_func_bitmap = func_ctrl->bitmap[0];
+	} else if(module == FAL_MODULE_GENEVE){
+		p_adpt_api->adpt_geneve_func_bitmap = func_ctrl->bitmap[0];
 	}
 
 
@@ -364,6 +378,10 @@ sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_vport_func_bitmap;
 	} else if(module == FAL_MODULE_TUNNEL) {
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_tunnel_func_bitmap;
+	} else if(module == FAL_MODULE_VXLAN) {
+		func_ctrl->bitmap[0] = p_adpt_api->adpt_vxlan_func_bitmap;
+	} else if(module == FAL_MODULE_GENEVE) {
+		func_ctrl->bitmap[0] = p_adpt_api->adpt_geneve_func_bitmap;
 	}
 
 	return SW_OK;
@@ -394,6 +412,14 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap = 0xffffffff;
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_TUNNEL);
+			SW_RTN_ON_ERROR(rv);
+
+			g_adpt_api[dev_id]->adpt_vxlan_func_bitmap = 0xffffffff;
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VXLAN);
+			SW_RTN_ON_ERROR(rv);
+
+			g_adpt_api[dev_id]->adpt_geneve_func_bitmap = 0xffffffff;
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_GENEVE);
 			SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(HPPE)
@@ -581,6 +607,18 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			SW_RTN_ON_ERROR(rv);
 #endif
 
+			g_adpt_api[dev_id]->adpt_vxlan_func_bitmap = 0;
+#if defined(IN_VXLAN)
+			adpt_appe_vxlan_func_bitmap_init(dev_id);
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VXLAN);
+			SW_RTN_ON_ERROR(rv);
+#endif
+			g_adpt_api[dev_id]->adpt_geneve_func_bitmap = 0;
+#if defined(IN_GENEVE)
+			adpt_appe_geneve_func_bitmap_init(dev_id);
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_GENEVE);
+			SW_RTN_ON_ERROR(rv);
+#endif
 #endif
 #if defined(HPPE)
 		case CHIP_HPPE:

@@ -53,6 +53,8 @@ extern "C" {
 #include "fal_ptp.h"
 #include "fal_sfp.h"
 #include "fal_tunnel.h"
+#include "fal_vxlan.h"
+#include "fal_geneve.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1058,6 +1060,29 @@ typedef sw_error_t (*adpt_vport_physical_port_id_set_func)(a_uint32_t dev_id,
 		fal_port_t vport, fal_port_t pport);
 typedef sw_error_t (*adpt_vport_physical_port_id_get_func)(a_uint32_t dev_id,
 		fal_port_t vport, fal_port_t *pport);
+/*vxlan*/
+typedef sw_error_t (*adpt_vxlan_entry_add_func)(a_uint32_t dev_id,
+	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_vxlan_entry_del_func)(a_uint32_t dev_id,
+	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_vxlan_entry_getfirst_func)(a_uint32_t dev_id,
+	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_vxlan_entry_getnext_func)(a_uint32_t dev_id,
+	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_vxlan_gpe_proto_cfg_set_func)(a_uint32_t dev_id,
+	fal_vxlan_gpe_proto_cfg_t * proto_cfg);
+typedef sw_error_t (*adpt_vxlan_gpe_proto_cfg_get_func)(a_uint32_t dev_id,
+	fal_vxlan_gpe_proto_cfg_t * proto_cfg);
+
+/*geneve*/
+typedef sw_error_t (*adpt_geneve_entry_add_func)(a_uint32_t dev_id,
+        fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_geneve_entry_del_func)(a_uint32_t dev_id,
+        fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_geneve_entry_getfirst_func)(a_uint32_t dev_id,
+        fal_tunnel_udp_entry_t * entry);
+typedef sw_error_t (*adpt_geneve_entry_getnext_func)(a_uint32_t dev_id,
+        fal_tunnel_udp_entry_t * entry);
 
 /* tunnel */
 typedef sw_error_t
@@ -1724,6 +1749,20 @@ typedef struct
 	adpt_tunnel_encap_rule_entry_set_func adpt_tunnel_encap_rule_entry_set;
 	adpt_tunnel_encap_rule_entry_get_func adpt_tunnel_encap_rule_entry_get;
 	adpt_tunnel_encap_rule_entry_del_func adpt_tunnel_encap_rule_entry_del;
+	/*vxlan*/
+	a_uint32_t adpt_vxlan_func_bitmap;
+	adpt_vxlan_entry_add_func adpt_vxlan_entry_add;
+	adpt_vxlan_entry_del_func adpt_vxlan_entry_del;
+	adpt_vxlan_entry_getfirst_func adpt_vxlan_entry_getfirst;
+	adpt_vxlan_entry_getnext_func adpt_vxlan_entry_getnext;
+	adpt_vxlan_gpe_proto_cfg_set_func adpt_vxlan_gpe_proto_cfg_set;
+	adpt_vxlan_gpe_proto_cfg_get_func adpt_vxlan_gpe_proto_cfg_get;
+	/*geneve*/
+	a_uint32_t adpt_geneve_func_bitmap;
+	adpt_geneve_entry_add_func adpt_geneve_entry_add;
+	adpt_geneve_entry_del_func adpt_geneve_entry_del;
+	adpt_geneve_entry_getfirst_func adpt_geneve_entry_getfirst;
+	adpt_geneve_entry_getnext_func adpt_geneve_entry_getnext;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

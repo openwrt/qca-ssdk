@@ -61,6 +61,8 @@ extern "C" {
 #include "fal_sfp.h"
 #include "fal_vport.h"
 #include "fal_tunnel.h"
+#include "fal_vxlan.h"
+#include "fal_geneve.h"
 /* auto_insert_flag */
 
 /*qca808x_start*/

@@ -1000,6 +1000,22 @@ extern "C" {
 #define SW_API_TUNNEL_DECAP_HEADER_CTRL_SET	(28 + SW_API_TUNNEL_OFFSET)
 #define SW_API_TUNNEL_DECAP_HEADER_CTRL_GET	(29 + SW_API_TUNNEL_OFFSET)
 
+/* VXLAN */
+#define SW_API_VXLAN_OFFSET                       3500
+#define SW_API_VXLAN_ENTRY_ADD                    (0 + SW_API_VXLAN_OFFSET)
+#define SW_API_VXLAN_ENTRY_DEL                    (1 + SW_API_VXLAN_OFFSET)
+#define SW_API_VXLAN_ENTRY_GETFIRST               (2 + SW_API_VXLAN_OFFSET)
+#define SW_API_VXLAN_ENTRY_GETNEXT                (3 + SW_API_VXLAN_OFFSET)
+#define SW_API_VXLAN_GPE_PROTO_CFG_SET            (4 + SW_API_VXLAN_OFFSET)
+#define SW_API_VXLAN_GPE_PROTO_CFG_GET            (5 + SW_API_VXLAN_OFFSET)
+
+/* GENEVE */
+#define SW_API_GENEVE_OFFSET                       3600
+#define SW_API_GENEVE_ENTRY_ADD                    (0 + SW_API_GENEVE_OFFSET)
+#define SW_API_GENEVE_ENTRY_DEL                    (1 + SW_API_GENEVE_OFFSET)
+#define SW_API_GENEVE_ENTRY_GETFIRST               (2 + SW_API_GENEVE_OFFSET)
+#define SW_API_GENEVE_ENTRY_GETNEXT                (3 + SW_API_GENEVE_OFFSET)
+
 /* auto_insert_flag */
 /*qca808x_start*/
     /*debug*/

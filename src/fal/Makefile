@@ -141,6 +141,14 @@ ifeq (TRUE, $(IN_TUNNEL))
 	SRC_LIST += fal_tunnel.c
 endif
 
+ifeq (TRUE, $(IN_VXLAN))
+  SRC_LIST += fal_vxlan.c
+endif
+
+ifeq (TRUE, $(IN_GENEVE))
+  SRC_LIST += fal_geneve.c
+endif
+
 #auto_insert_flag
 include $(PRJ_PATH)/make/components.mk
 include $(PRJ_PATH)/make/defs.mk

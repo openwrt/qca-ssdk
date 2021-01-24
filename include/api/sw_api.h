@@ -257,6 +257,9 @@ typedef enum
 	SW_TUNNEL_TUNNEL_ID,
 	SW_TUNNEL_ENCAP_ENTRY,
 	SW_TUNNEL_ENCAP_RULE_ENTRY,
+	SW_VXLAN_TYPE,
+	SW_TUNNEL_UDP_ENTRY,
+	SW_VXLAN_GPE_PROTO,
 /* auto_insert_flag */
 } sw_data_type_e;
 

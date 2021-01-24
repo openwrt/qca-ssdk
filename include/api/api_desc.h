@@ -5040,6 +5040,64 @@ extern "C" {
 			sizeof(fal_tunnel_intf_t), \
 			SW_PARAM_PTR|SW_PARAM_OUT, "Port Intf"),
 
+#define SW_API_VXLAN_ENTRY_ADD_DESC \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_VXLAN_TYPE, \
+		    sizeof(fal_vxlan_type_t), SW_PARAM_IN, "VxLAN Type"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_TUNNEL_UDP_ENTRY, \
+		    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "VxLAN Entry"),
+
+#define SW_API_VXLAN_ENTRY_DEL_DESC \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_DEL, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_DEL, SW_VXLAN_TYPE, \
+		    sizeof(fal_vxlan_type_t), SW_PARAM_IN, "VxLAN Type"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_DEL, SW_TUNNEL_UDP_ENTRY, \
+		    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "VxLAN Entry"),
+
+#define SW_API_VXLAN_ENTRY_GETFIRST_DESC \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_GETFIRST, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_GETFIRST, SW_VXLAN_TYPE, \
+		    sizeof(fal_vxlan_type_t), SW_PARAM_IN, "VxLAN Type"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_GETFIRST, SW_TUNNEL_UDP_ENTRY, \
+		    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_OUT, "VxLAN Entry"),
+
+#define SW_API_VXLAN_ENTRY_GETNEXT_DESC \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_GETNEXT, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_GETNEXT, SW_VXLAN_TYPE, \
+		    sizeof(fal_vxlan_type_t), SW_PARAM_IN, "VxLAN Type"), \
+    SW_PARAM_DEF(SW_API_VXLAN_ENTRY_GETNEXT, SW_TUNNEL_UDP_ENTRY, \
+		    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "VxLAN Entry"),
+
+#define SW_API_VXLAN_GPE_PROTO_CFG_SET_DESC \
+    SW_PARAM_DEF(SW_API_VXLAN_GPE_PROTO_CFG_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VXLAN_GPE_PROTO_CFG_SET, SW_VXLAN_GPE_PROTO, \
+		    sizeof(fal_vxlan_gpe_proto_cfg_t), SW_PARAM_PTR|SW_PARAM_IN, "VxLAN GPE Proto"),
+
+#define SW_API_VXLAN_GPE_PROTO_CFG_GET_DESC \
+    SW_PARAM_DEF(SW_API_VXLAN_GPE_PROTO_CFG_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_VXLAN_GPE_PROTO_CFG_GET, SW_VXLAN_GPE_PROTO, \
+		    sizeof(fal_vxlan_gpe_proto_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "VxLAN GPE Proto"),
+
+#define SW_API_GENEVE_ENTRY_ADD_DESC \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_ADD, SW_TUNNEL_UDP_ENTRY, \
+                    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "Geneve Entry"),
+
+#define SW_API_GENEVE_ENTRY_DEL_DESC \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_DEL, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_DEL, SW_TUNNEL_UDP_ENTRY, \
+                    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "Geneve Entry"),
+
+#define SW_API_GENEVE_ENTRY_GETFIRST_DESC \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_GETFIRST, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_GETFIRST, SW_TUNNEL_UDP_ENTRY, \
+                    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_OUT, "Geneve Entry"),
+
+#define SW_API_GENEVE_ENTRY_GETNEXT_DESC \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_GETNEXT, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_GENEVE_ENTRY_GETNEXT, SW_TUNNEL_UDP_ENTRY, \
+                    sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Geneve Entry"),
+
 /* auto_insert_flag */
 /*qca808x_start*/
 

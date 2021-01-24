@@ -2407,6 +2407,44 @@ extern "C" {
 #define TUNNEL_API_PARAM
 #endif
 
+#ifdef IN_VXLAN
+#define VXLAN_API \
+    SW_API_DEF(SW_API_VXLAN_ENTRY_ADD, fal_vxlan_entry_add), \
+    SW_API_DEF(SW_API_VXLAN_ENTRY_DEL, fal_vxlan_entry_del), \
+    SW_API_DEF(SW_API_VXLAN_ENTRY_GETFIRST, fal_vxlan_entry_getfirst), \
+    SW_API_DEF(SW_API_VXLAN_ENTRY_GETNEXT, fal_vxlan_entry_getnext), \
+    SW_API_DEF(SW_API_VXLAN_GPE_PROTO_CFG_SET, fal_vxlan_gpe_proto_cfg_set), \
+    SW_API_DEF(SW_API_VXLAN_GPE_PROTO_CFG_GET, fal_vxlan_gpe_proto_cfg_get),
+
+#define VXLAN_API_PARAM \
+    SW_API_DESC(SW_API_VXLAN_ENTRY_ADD) \
+    SW_API_DESC(SW_API_VXLAN_ENTRY_DEL) \
+    SW_API_DESC(SW_API_VXLAN_ENTRY_GETFIRST) \
+    SW_API_DESC(SW_API_VXLAN_ENTRY_GETNEXT) \
+    SW_API_DESC(SW_API_VXLAN_GPE_PROTO_CFG_SET) \
+    SW_API_DESC(SW_API_VXLAN_GPE_PROTO_CFG_GET)
+#else
+#define VXLAN_API
+#define VXLAN_API_PARAM
+#endif
+
+#ifdef IN_GENEVE
+#define GENEVE_API \
+    SW_API_DEF(SW_API_GENEVE_ENTRY_ADD, fal_geneve_entry_add), \
+    SW_API_DEF(SW_API_GENEVE_ENTRY_DEL, fal_geneve_entry_del), \
+    SW_API_DEF(SW_API_GENEVE_ENTRY_GETFIRST, fal_geneve_entry_getfirst), \
+    SW_API_DEF(SW_API_GENEVE_ENTRY_GETNEXT, fal_geneve_entry_getnext),
+
+#define GENEVE_API_PARAM \
+    SW_API_DESC(SW_API_GENEVE_ENTRY_ADD) \
+    SW_API_DESC(SW_API_GENEVE_ENTRY_DEL) \
+    SW_API_DESC(SW_API_GENEVE_ENTRY_GETFIRST) \
+    SW_API_DESC(SW_API_GENEVE_ENTRY_GETNEXT)
+#else
+#define GENEVE_API
+#define GENEVE_API_PARAM
+#endif
+
 /* auto_insert_flag */
 /*qca808x_start*/
 #define SSDK_API \
@@ -2454,6 +2492,8 @@ extern "C" {
     SFP_API \
     VPORT_API \
     TUNNEL_API \
+    VXLAN_API \
+    GENEVE_API \
 /* auto_insert_flag_1 */ \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_MAX, NULL),
@@ -2512,6 +2552,8 @@ extern "C" {
     SFP_API_PARAM \
     VPORT_API_PARAM \
     TUNNEL_API_PARAM \
+    VXLAN_API_PARAM \
+    GENEVE_API_PARAM \
 /* auto_insert_flag_2 */ \
 /*qca808x_start*/\
     SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),

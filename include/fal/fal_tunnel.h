@@ -116,6 +116,14 @@ enum {
 	FAL_TUNNEL_KEY_MAX,
 };
 
+/* tunnel udp entry */
+typedef struct {
+	a_uint8_t ip_ver;        /* 1 ipv4, 2 ipv6, 3 ipv4 or ipv6 */
+	a_uint8_t udp_type;      /* 1 udp, 2 udp-lite, 3 udp or udp-lite*/
+	a_uint8_t l4_port_type;  /* 1 dst port, 2 src port, 3 dst or src port*/
+	a_uint16_t l4_port;      /* l4 port value*/
+} fal_tunnel_udp_entry_t;
+
 typedef struct {
 	a_uint32_t entry_id; /*entry index*/
 	a_uint8_t ip_ver; /*0 for ipv4 or 1 for ipv6*/

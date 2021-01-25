@@ -635,6 +635,10 @@ void adpt_hppe_vsi_func_bitmap_init(a_uint32_t dev_id)
 						(1<<FUNC_VSI_MEMBER_GET)|
 						(1<<FUNC_VSI_COUNTER_GET)|
 						(1<<FUNC_VSI_COUNTER_CLEANUP));
+#ifdef APPE
+	p_adpt_api->adpt_vsi_func_bitmap |= ((1<<FUNC_VSI_BRIDGE_VSI_SET)|
+						(1<<FUNC_VSI_BRIDGE_VSI_GET));
+#endif
 
 	return;
 }
@@ -656,7 +660,12 @@ static void adpt_hppe_vsi_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_
 	p_adpt_api->adpt_vsi_member_get = NULL;
 	p_adpt_api->adpt_vsi_counter_get = NULL;
 	p_adpt_api->adpt_vsi_counter_cleanup = NULL;
-
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		p_adpt_api->adpt_vsi_bridge_vsi_get = NULL;
+		p_adpt_api->adpt_vsi_bridge_vsi_set = NULL;
+	}
+#endif
 	return;
 }
 
@@ -698,6 +707,15 @@ sw_error_t adpt_hppe_vsi_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_vsi_member_set = adpt_hppe_vsi_member_set;
 	if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_MEMBER_GET))
 		p_adpt_api->adpt_vsi_member_get = adpt_hppe_vsi_member_get;
+
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_BRIDGE_VSI_GET))
+			p_adpt_api->adpt_vsi_bridge_vsi_get = adpt_appe_vsi_bridge_vsi_get;
+		if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_BRIDGE_VSI_SET))
+			p_adpt_api->adpt_vsi_bridge_vsi_set = adpt_appe_vsi_bridge_vsi_set;
+	}
+#endif
 
 	return SW_OK;
 }

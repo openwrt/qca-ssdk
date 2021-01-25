@@ -320,6 +320,7 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_VSI_NEWADDR_LRN, (param_check_t)cmd_data_check_newadr_lrn, NULL),
     SW_TYPE_DEF(SW_VSI_STAMOVE, (param_check_t)cmd_data_check_stamove, NULL),
     SW_TYPE_DEF(SW_VSI_MEMBER, (param_check_t)cmd_data_check_vsi_member, NULL),
+    SW_TYPE_DEF(SW_VSI_BRIDGE_VSI,(param_check_t)cmd_data_check_vsi_bridge_vsi, NULL),
     SW_TYPE_DEF(SW_VSI_COUNTER, NULL, NULL),
 #endif
 #ifdef IN_QM
@@ -9857,6 +9858,31 @@ cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size)
 
 	*(fal_vsi_member_t *)val = entry;
 	return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_vsi_bridge_vsi(char *cmd_str, void *arg_val, a_uint32_t size)
+{
+    sw_error_t rv;
+    fal_vsi_bridge_vsi_t bridge_vsi;
+
+    aos_mem_zero(&bridge_vsi, sizeof (fal_vsi_bridge_vsi_t));
+
+    rv = __cmd_data_check_complex("bridge_vsi_en", "disable",
+                        "usage: bridge vsi enable or disable\n",
+                        cmd_data_check_enable, &(bridge_vsi.bridge_vsi_enable),
+                        sizeof (a_bool_t));
+    SW_RTN_ON_ERROR(rv);
+
+    rv = __cmd_data_check_complex("bridge_vsi_id", "0",
+                        "usage: bridge vsi id is 0~63\n",
+                        cmd_data_check_uint32, &(bridge_vsi.bridge_vsi_id),
+                        sizeof (a_uint32_t));
+
+    *(fal_vsi_bridge_vsi_t *)arg_val = bridge_vsi;
+
+    return rv;
+
 }
 #endif
 

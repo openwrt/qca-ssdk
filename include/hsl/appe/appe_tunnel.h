@@ -22,9 +22,15 @@
 #ifndef _APPE_TUNNEL_H_
 #define _APPE_TUNNEL_H_
 
-#define TL_L3_IF_TBL_MAX_ENTRY	128
-#define TL_KEY_GEN_MAX_ENTRY	16
-#define TL_TBL_MAX_ENTRY	128
+#define TL_L3_IF_TBL_MAX_ENTRY		128
+#define TL_KEY_GEN_MAX_ENTRY		16
+#define TL_TBL_MAX_ENTRY		128
+#define EG_PROTO_MAPPING0_MAX_ENTRY	2
+#define EG_PROTO_MAPPING1_MAX_ENTRY	2
+#define TX_BUFF_THRSH_MAX_ENTRY		8
+#define EG_HEADER_DATA_MAX_ENTRY	128
+#define EG_XLAT_TUN_CTRL_MAX_ENTRY	128
+#define EG_EDIT_RULE_MAX_ENTRY		16
 
 
 sw_error_t
@@ -1987,5 +1993,901 @@ appe_tl_tbl_ttl_mode_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
-#endif
+sw_error_t
+appe_eg_ipv4_hdr_ctrl_get(
+		a_uint32_t dev_id,
+		union eg_ipv4_hdr_ctrl_u *value);
 
+sw_error_t
+appe_eg_ipv4_hdr_ctrl_set(
+		a_uint32_t dev_id,
+		union eg_ipv4_hdr_ctrl_u *value);
+
+sw_error_t
+appe_eg_udp_entropy_ctrl_get(
+		a_uint32_t dev_id,
+		union eg_udp_entropy_ctrl_u *value);
+
+sw_error_t
+appe_eg_udp_entropy_ctrl_set(
+		a_uint32_t dev_id,
+		union eg_udp_entropy_ctrl_u *value);
+
+sw_error_t
+appe_ecn_profile_get(
+		a_uint32_t dev_id,
+		union ecn_profile_u *value);
+
+sw_error_t
+appe_ecn_profile_set(
+		a_uint32_t dev_id,
+		union ecn_profile_u *value);
+
+sw_error_t
+appe_eg_proto_mapping0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_proto_mapping0_u *value);
+
+sw_error_t
+appe_eg_proto_mapping0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_proto_mapping0_u *value);
+
+sw_error_t
+appe_eg_proto_mapping1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_proto_mapping1_u *value);
+
+sw_error_t
+appe_eg_proto_mapping1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_proto_mapping1_u *value);
+
+sw_error_t
+appe_dbg_addr_get(
+		a_uint32_t dev_id,
+		union dbg_addr_u *value);
+
+sw_error_t
+appe_dbg_addr_set(
+		a_uint32_t dev_id,
+		union dbg_addr_u *value);
+
+sw_error_t
+appe_dbg_data_get(
+		a_uint32_t dev_id,
+		union dbg_data_u *value);
+
+sw_error_t
+appe_tx_buff_thrsh_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tx_buff_thrsh_u *value);
+
+sw_error_t
+appe_tx_buff_thrsh_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tx_buff_thrsh_u *value);
+
+sw_error_t
+appe_eg_header_data_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_header_data_u *value);
+
+sw_error_t
+appe_eg_header_data_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_header_data_u *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_xlat_tun_ctrl_u *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_xlat_tun_ctrl_u *value);
+
+sw_error_t
+appe_eg_edit_rule_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_edit_rule_u *value);
+
+sw_error_t
+appe_eg_edit_rule_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union eg_edit_rule_u *value);
+
+sw_error_t
+appe_eg_ipv4_hdr_ctrl_ipv4_df_set_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_eg_ipv4_hdr_ctrl_ipv4_df_set_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_eg_ipv4_hdr_ctrl_ipv4_id_seed_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_eg_ipv4_hdr_ctrl_ipv4_id_seed_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_eg_udp_entropy_ctrl_port_mask_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_eg_udp_entropy_ctrl_port_mask_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_eg_udp_entropy_ctrl_port_base_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_eg_udp_entropy_ctrl_port_base_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_ecn_profile_profile2_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_ecn_profile_profile2_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_ecn_profile_profile1_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_ecn_profile_profile1_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_ecn_profile_profile0_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_ecn_profile_profile0_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_eg_proto_mapping0_protocol0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_proto_mapping0_protocol0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_proto_mapping1_protocol1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_proto_mapping1_protocol1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_dbg_addr_dbg_addr_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_dbg_addr_dbg_addr_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_dbg_data_dbg_data_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_tx_buff_thrsh_xon_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tx_buff_thrsh_xon_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tx_buff_thrsh_xoff_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tx_buff_thrsh_xoff_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_header_data_data_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint64_t *value);
+
+sw_error_t
+appe_eg_header_data_data_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint64_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ip_proto_update_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ip_proto_update_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_cpcp_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_cpcp_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_data_length_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_data_length_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_resv_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_resv_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_cdei_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_cdei_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_dscp_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_dscp_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ip_ver_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ip_ver_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ipv4_id_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ipv4_id_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l3_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l3_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l4_checksum_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l4_checksum_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ipv6_fl_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ipv6_fl_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_sport_entropy_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_sport_entropy_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ctag_fmt_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ctag_fmt_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_pppoe_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_pppoe_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_vni_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_vni_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l4_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l4_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_edit_rule_target_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_edit_rule_target_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_sdei_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_sdei_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_output_vp_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_output_vp_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ecn_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ecn_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_spcp_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_spcp_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_vlan_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_vlan_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_edit_rule_id_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_edit_rule_id_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_payload_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_payload_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l4_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_l4_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_tunnel_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_tunnel_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_output_vp_valid_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_output_vp_valid_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ttl_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ttl_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_stag_fmt_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_stag_fmt_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ipv4_df_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_xlat_tun_ctrl_ipv4_df_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_src1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_src1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_valid3_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_valid3_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_pos2_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_pos2_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_valid2_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_valid2_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_src2_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_src2_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_pos2_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_pos2_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_start3_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_start3_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_pos3_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_pos3_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_width2_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_width2_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_valid2_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_valid2_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_width2_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_width2_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_start3_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_start3_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_start2_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_start2_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_src3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_src3_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_pos3_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_pos3_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_width3_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_width3_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_valid3_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_valid3_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_width3_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_width3_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_eg_edit_rule_start2_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_eg_edit_rule_start2_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tl_cnt_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tl_cnt_tbl_u *value);
+
+sw_error_t
+appe_tl_cnt_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tl_cnt_tbl_u *value);
+
+sw_error_t
+appe_tl_port_vp_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tl_port_vp_tbl_u *value);
+
+sw_error_t
+appe_tl_port_vp_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tl_port_vp_tbl_u *value);
+
+sw_error_t
+appe_tl_vlan_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tl_vlan_tbl_u *value);
+
+sw_error_t
+appe_tl_vlan_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tl_vlan_tbl_u *value);
+#endif

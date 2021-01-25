@@ -1898,4 +1898,834 @@ union tl_tbl_u {
 	struct tl_tbl_0 bf0;
 	struct tl_tbl_1 bf1;
 };
+
+/*[register] EG_IPV4_HDR_CTRL*/
+#define EG_IPV4_HDR_CTRL
+#define EG_IPV4_HDR_CTRL_ADDRESS 0x50
+#define EG_IPV4_HDR_CTRL_NUM     1
+#define EG_IPV4_HDR_CTRL_INC     0x4
+#define EG_IPV4_HDR_CTRL_TYPE    REG_TYPE_RW
+#define EG_IPV4_HDR_CTRL_DEFAULT 0x0
+	/*[field] IPV4_ID_SEED*/
+	#define EG_IPV4_HDR_CTRL_IPV4_ID_SEED
+	#define EG_IPV4_HDR_CTRL_IPV4_ID_SEED_OFFSET  0
+	#define EG_IPV4_HDR_CTRL_IPV4_ID_SEED_LEN     16
+	#define EG_IPV4_HDR_CTRL_IPV4_ID_SEED_DEFAULT 0x0
+	/*[field] IPV4_DF_SET*/
+	#define EG_IPV4_HDR_CTRL_IPV4_DF_SET
+	#define EG_IPV4_HDR_CTRL_IPV4_DF_SET_OFFSET  16
+	#define EG_IPV4_HDR_CTRL_IPV4_DF_SET_LEN     2
+	#define EG_IPV4_HDR_CTRL_IPV4_DF_SET_DEFAULT 0x0
+
+struct eg_ipv4_hdr_ctrl {
+	a_uint32_t  ipv4_id_seed:16;
+	a_uint32_t  ipv4_df_set:2;
+	a_uint32_t  _reserved0:14;
+};
+
+union eg_ipv4_hdr_ctrl_u {
+	a_uint32_t val;
+	struct eg_ipv4_hdr_ctrl bf;
+};
+
+/*[register] EG_UDP_ENTROPY_CTRL*/
+#define EG_UDP_ENTROPY_CTRL
+#define EG_UDP_ENTROPY_CTRL_ADDRESS 0x54
+#define EG_UDP_ENTROPY_CTRL_NUM     1
+#define EG_UDP_ENTROPY_CTRL_INC     0x4
+#define EG_UDP_ENTROPY_CTRL_TYPE    REG_TYPE_RW
+#define EG_UDP_ENTROPY_CTRL_DEFAULT 0x0
+	/*[field] PORT_BASE*/
+	#define EG_UDP_ENTROPY_CTRL_PORT_BASE
+	#define EG_UDP_ENTROPY_CTRL_PORT_BASE_OFFSET  0
+	#define EG_UDP_ENTROPY_CTRL_PORT_BASE_LEN     16
+	#define EG_UDP_ENTROPY_CTRL_PORT_BASE_DEFAULT 0x0
+	/*[field] PORT_MASK*/
+	#define EG_UDP_ENTROPY_CTRL_PORT_MASK
+	#define EG_UDP_ENTROPY_CTRL_PORT_MASK_OFFSET  16
+	#define EG_UDP_ENTROPY_CTRL_PORT_MASK_LEN     16
+	#define EG_UDP_ENTROPY_CTRL_PORT_MASK_DEFAULT 0x0
+
+struct eg_udp_entropy_ctrl {
+	a_uint32_t  port_base:16;
+	a_uint32_t  port_mask:16;
+};
+
+union eg_udp_entropy_ctrl_u {
+	a_uint32_t val;
+	struct eg_udp_entropy_ctrl bf;
+};
+
+/*[register] ECN_PROFILE*/
+#define ECN_PROFILE
+#define ECN_PROFILE_ADDRESS 0x60
+#define ECN_PROFILE_NUM     1
+#define ECN_PROFILE_INC     0x4
+#define ECN_PROFILE_TYPE    REG_TYPE_RW
+#define ECN_PROFILE_DEFAULT 0xe4a400
+	/*[field] PROFILE0*/
+	#define ECN_PROFILE_PROFILE0
+	#define ECN_PROFILE_PROFILE0_OFFSET  0
+	#define ECN_PROFILE_PROFILE0_LEN     8
+	#define ECN_PROFILE_PROFILE0_DEFAULT 0x0
+	/*[field] PROFILE1*/
+	#define ECN_PROFILE_PROFILE1
+	#define ECN_PROFILE_PROFILE1_OFFSET  8
+	#define ECN_PROFILE_PROFILE1_LEN     8
+	#define ECN_PROFILE_PROFILE1_DEFAULT 0xa4
+	/*[field] PROFILE2*/
+	#define ECN_PROFILE_PROFILE2
+	#define ECN_PROFILE_PROFILE2_OFFSET  16
+	#define ECN_PROFILE_PROFILE2_LEN     8
+	#define ECN_PROFILE_PROFILE2_DEFAULT 0xe4
+
+struct ecn_profile {
+	a_uint32_t  profile0:8;
+	a_uint32_t  profile1:8;
+	a_uint32_t  profile2:8;
+	a_uint32_t  _reserved0:8;
+};
+
+union ecn_profile_u {
+	a_uint32_t val;
+	struct ecn_profile bf;
+};
+
+/*[register] EG_PROTO_MAPPING0*/
+#define EG_PROTO_MAPPING0
+#define EG_PROTO_MAPPING0_ADDRESS 0x68
+#define EG_PROTO_MAPPING0_NUM     2
+#define EG_PROTO_MAPPING0_INC     0x4
+#define EG_PROTO_MAPPING0_TYPE    REG_TYPE_RW
+#define EG_PROTO_MAPPING0_DEFAULT 0x0
+	/*[field] PROTOCOL0*/
+	#define EG_PROTO_MAPPING0_PROTOCOL0
+	#define EG_PROTO_MAPPING0_PROTOCOL0_OFFSET  0
+	#define EG_PROTO_MAPPING0_PROTOCOL0_LEN     32
+	#define EG_PROTO_MAPPING0_PROTOCOL0_DEFAULT 0x0
+
+struct eg_proto_mapping0 {
+	a_uint32_t  protocol0:32;
+};
+
+union eg_proto_mapping0_u {
+	a_uint32_t val;
+	struct eg_proto_mapping0 bf;
+};
+
+/*[register] EG_PROTO_MAPPING1*/
+#define EG_PROTO_MAPPING1
+#define EG_PROTO_MAPPING1_ADDRESS 0x70
+#define EG_PROTO_MAPPING1_NUM     2
+#define EG_PROTO_MAPPING1_INC     0x4
+#define EG_PROTO_MAPPING1_TYPE    REG_TYPE_RW
+#define EG_PROTO_MAPPING1_DEFAULT 0x0
+	/*[field] PROTOCOL1*/
+	#define EG_PROTO_MAPPING1_PROTOCOL1
+	#define EG_PROTO_MAPPING1_PROTOCOL1_OFFSET  0
+	#define EG_PROTO_MAPPING1_PROTOCOL1_LEN     32
+	#define EG_PROTO_MAPPING1_PROTOCOL1_DEFAULT 0x0
+
+struct eg_proto_mapping1 {
+	a_uint32_t  protocol1:32;
+};
+
+union eg_proto_mapping1_u {
+	a_uint32_t val;
+	struct eg_proto_mapping1 bf;
+};
+
+/*[register] DBG_ADDR*/
+#define DBG_ADDR
+#define DBG_ADDR_ADDRESS 0x80
+#define DBG_ADDR_NUM     1
+#define DBG_ADDR_INC     0x4
+#define DBG_ADDR_TYPE    REG_TYPE_RW
+#define DBG_ADDR_DEFAULT 0x0
+	/*[field] DBG_ADDR*/
+	#define DBG_ADDR_DBG_ADDR
+	#define DBG_ADDR_DBG_ADDR_OFFSET  0
+	#define DBG_ADDR_DBG_ADDR_LEN     16
+	#define DBG_ADDR_DBG_ADDR_DEFAULT 0x0
+
+struct dbg_addr {
+	a_uint32_t  dbg_addr:16;
+	a_uint32_t  _reserved0:16;
+};
+
+union dbg_addr_u {
+	a_uint32_t val;
+	struct dbg_addr bf;
+};
+
+/*[register] DBG_DATA*/
+#define DBG_DATA
+#define DBG_DATA_ADDRESS 0x84
+#define DBG_DATA_NUM     1
+#define DBG_DATA_INC     0x4
+#define DBG_DATA_TYPE    REG_TYPE_RO
+#define DBG_DATA_DEFAULT 0x0
+	/*[field] DBG_DATA*/
+	#define DBG_DATA_DBG_DATA
+	#define DBG_DATA_DBG_DATA_OFFSET  0
+	#define DBG_DATA_DBG_DATA_LEN     32
+	#define DBG_DATA_DBG_DATA_DEFAULT 0x0
+
+struct dbg_data {
+	a_uint32_t  dbg_data:32;
+};
+
+union dbg_data_u {
+	a_uint32_t val;
+	struct dbg_data bf;
+};
+
+/*[register] TX_BUFF_THRSH*/
+#define TX_BUFF_THRSH
+#define TX_BUFF_THRSH_ADDRESS 0x6100
+#define TX_BUFF_THRSH_NUM     8
+#define TX_BUFF_THRSH_INC     0x4
+#define TX_BUFF_THRSH_TYPE    REG_TYPE_RW
+#define TX_BUFF_THRSH_DEFAULT 0x203
+	/*[field] XOFF*/
+	#define TX_BUFF_THRSH_XOFF
+	#define TX_BUFF_THRSH_XOFF_OFFSET  0
+	#define TX_BUFF_THRSH_XOFF_LEN     8
+	#define TX_BUFF_THRSH_XOFF_DEFAULT 0x3
+	/*[field] XON*/
+	#define TX_BUFF_THRSH_XON
+	#define TX_BUFF_THRSH_XON_OFFSET  8
+	#define TX_BUFF_THRSH_XON_LEN     8
+	#define TX_BUFF_THRSH_XON_DEFAULT 0x2
+
+struct tx_buff_thrsh {
+	a_uint32_t  xoff:8;
+	a_uint32_t  xon:8;
+	a_uint32_t  _reserved0:16;
+};
+
+union tx_buff_thrsh_u {
+	a_uint32_t val;
+	struct tx_buff_thrsh bf;
+};
+
+/*[table] EG_HEADER_DATA*/
+#define EG_HEADER_DATA
+#define EG_HEADER_DATA_ADDRESS 0x34000
+#define EG_HEADER_DATA_NUM     128
+#define EG_HEADER_DATA_INC     0x80
+#define EG_HEADER_DATA_TYPE    REG_TYPE_RW
+#define EG_HEADER_DATA_DEFAULT 0x0
+	/*[field] DATA*/
+	#define EG_HEADER_DATA_DATA
+	#define EG_HEADER_DATA_DATA_OFFSET  0
+	#define EG_HEADER_DATA_DATA_LEN     1024
+	#define EG_HEADER_DATA_DATA_DEFAULT 0x0
+
+struct eg_header_data {
+	a_uint32_t  data_0:32;
+	a_uint32_t  data_1:32;
+	a_uint32_t  data_2:32;
+	a_uint32_t  data_3:32;
+	a_uint32_t  data_4:32;
+	a_uint32_t  data_5:32;
+	a_uint32_t  data_6:32;
+	a_uint32_t  data_7:32;
+	a_uint32_t  data_8:32;
+	a_uint32_t  data_9:32;
+	a_uint32_t  data_10:32;
+	a_uint32_t  data_11:32;
+	a_uint32_t  data_12:32;
+	a_uint32_t  data_13:32;
+	a_uint32_t  data_14:32;
+	a_uint32_t  data_15:32;
+	a_uint32_t  data_16:32;
+	a_uint32_t  data_17:32;
+	a_uint32_t  data_18:32;
+	a_uint32_t  data_19:32;
+	a_uint32_t  data_20:32;
+	a_uint32_t  data_21:32;
+	a_uint32_t  data_22:32;
+	a_uint32_t  data_23:32;
+	a_uint32_t  data_24:32;
+	a_uint32_t  data_25:32;
+	a_uint32_t  data_26:32;
+	a_uint32_t  data_27:32;
+	a_uint32_t  data_28:32;
+	a_uint32_t  data_29:32;
+	a_uint32_t  data_30:32;
+	a_uint32_t  data_31:32;
+};
+
+union eg_header_data_u {
+	a_uint32_t val[32];
+	struct eg_header_data bf;
+};
+
+/*[table] EG_XLAT_TUN_CTRL*/
+#define EG_XLAT_TUN_CTRL
+#define EG_XLAT_TUN_CTRL_ADDRESS 0x3a000
+#define EG_XLAT_TUN_CTRL_NUM     128
+#define EG_XLAT_TUN_CTRL_INC     0x10
+#define EG_XLAT_TUN_CTRL_TYPE    REG_TYPE_RW
+#define EG_XLAT_TUN_CTRL_DEFAULT 0x0
+	/*[field] TYPE*/
+	#define EG_XLAT_TUN_CTRL_TYPE_F
+	#define EG_XLAT_TUN_CTRL_TYPE_F_OFFSET  0
+	#define EG_XLAT_TUN_CTRL_TYPE_F_LEN     1
+	#define EG_XLAT_TUN_CTRL_TYPE_F_DEFAULT 0x0
+	/*[field] RESV*/
+	#define EG_XLAT_TUN_CTRL_RESV
+	#define EG_XLAT_TUN_CTRL_RESV_OFFSET  1
+	#define EG_XLAT_TUN_CTRL_RESV_LEN     3
+	#define EG_XLAT_TUN_CTRL_RESV_DEFAULT 0x0
+	/*[field] EDIT_RULE_ID*/
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_ID
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_ID_OFFSET  4
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_ID_LEN     4
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_ID_DEFAULT 0x0
+	/*[field] EDIT_RULE_TARGET*/
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_TARGET
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_TARGET_OFFSET  8
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_TARGET_LEN     2
+	#define EG_XLAT_TUN_CTRL_EDIT_RULE_TARGET_DEFAULT 0x0
+	/*[field] DATA_LENGTH*/
+	#define EG_XLAT_TUN_CTRL_DATA_LENGTH
+	#define EG_XLAT_TUN_CTRL_DATA_LENGTH_OFFSET  10
+	#define EG_XLAT_TUN_CTRL_DATA_LENGTH_LEN     8
+	#define EG_XLAT_TUN_CTRL_DATA_LENGTH_DEFAULT 0x0
+	/*[field] VLAN_OFFSET*/
+	#define EG_XLAT_TUN_CTRL_VLAN_OFFSET
+	#define EG_XLAT_TUN_CTRL_VLAN_OFFSET_OFFSET  18
+	#define EG_XLAT_TUN_CTRL_VLAN_OFFSET_LEN     5
+	#define EG_XLAT_TUN_CTRL_VLAN_OFFSET_DEFAULT 0x0
+	/*[field] L3_OFFSET*/
+	#define EG_XLAT_TUN_CTRL_L3_OFFSET
+	#define EG_XLAT_TUN_CTRL_L3_OFFSET_OFFSET  23
+	#define EG_XLAT_TUN_CTRL_L3_OFFSET_LEN     6
+	#define EG_XLAT_TUN_CTRL_L3_OFFSET_DEFAULT 0x0
+	/*[field] PPPOE_EN*/
+	#define EG_XLAT_TUN_CTRL_PPPOE_EN
+	#define EG_XLAT_TUN_CTRL_PPPOE_EN_OFFSET  29
+	#define EG_XLAT_TUN_CTRL_PPPOE_EN_LEN     1
+	#define EG_XLAT_TUN_CTRL_PPPOE_EN_DEFAULT 0x0
+	/*[field] IP_VER*/
+	#define EG_XLAT_TUN_CTRL_IP_VER
+	#define EG_XLAT_TUN_CTRL_IP_VER_OFFSET  30
+	#define EG_XLAT_TUN_CTRL_IP_VER_LEN     1
+	#define EG_XLAT_TUN_CTRL_IP_VER_DEFAULT 0x0
+	/*[field] DSCP_MODE*/
+	#define EG_XLAT_TUN_CTRL_DSCP_MODE
+	#define EG_XLAT_TUN_CTRL_DSCP_MODE_OFFSET  31
+	#define EG_XLAT_TUN_CTRL_DSCP_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_DSCP_MODE_DEFAULT 0x0
+	/*[field] L4_OFFSET*/
+	#define EG_XLAT_TUN_CTRL_L4_OFFSET
+	#define EG_XLAT_TUN_CTRL_L4_OFFSET_OFFSET  32
+	#define EG_XLAT_TUN_CTRL_L4_OFFSET_LEN     7
+	#define EG_XLAT_TUN_CTRL_L4_OFFSET_DEFAULT 0x0
+	/*[field] TUNNEL_OFFSET*/
+	#define EG_XLAT_TUN_CTRL_TUNNEL_OFFSET
+	#define EG_XLAT_TUN_CTRL_TUNNEL_OFFSET_OFFSET  39
+	#define EG_XLAT_TUN_CTRL_TUNNEL_OFFSET_LEN     7
+	#define EG_XLAT_TUN_CTRL_TUNNEL_OFFSET_DEFAULT 0x0
+	/*[field] STAG_FMT*/
+	#define EG_XLAT_TUN_CTRL_STAG_FMT
+	#define EG_XLAT_TUN_CTRL_STAG_FMT_OFFSET  46
+	#define EG_XLAT_TUN_CTRL_STAG_FMT_LEN     1
+	#define EG_XLAT_TUN_CTRL_STAG_FMT_DEFAULT 0x0
+	/*[field] CTAG_FMT*/
+	#define EG_XLAT_TUN_CTRL_CTAG_FMT
+	#define EG_XLAT_TUN_CTRL_CTAG_FMT_OFFSET  47
+	#define EG_XLAT_TUN_CTRL_CTAG_FMT_LEN     1
+	#define EG_XLAT_TUN_CTRL_CTAG_FMT_DEFAULT 0x0
+	/*[field] SPCP_MODE*/
+	#define EG_XLAT_TUN_CTRL_SPCP_MODE
+	#define EG_XLAT_TUN_CTRL_SPCP_MODE_OFFSET  48
+	#define EG_XLAT_TUN_CTRL_SPCP_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_SPCP_MODE_DEFAULT 0x0
+	/*[field] SDEI_MODE*/
+	#define EG_XLAT_TUN_CTRL_SDEI_MODE
+	#define EG_XLAT_TUN_CTRL_SDEI_MODE_OFFSET  49
+	#define EG_XLAT_TUN_CTRL_SDEI_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_SDEI_MODE_DEFAULT 0x0
+	/*[field] CPCP_MODE*/
+	#define EG_XLAT_TUN_CTRL_CPCP_MODE
+	#define EG_XLAT_TUN_CTRL_CPCP_MODE_OFFSET  50
+	#define EG_XLAT_TUN_CTRL_CPCP_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_CPCP_MODE_DEFAULT 0x0
+	/*[field] CDEI_MODE*/
+	#define EG_XLAT_TUN_CTRL_CDEI_MODE
+	#define EG_XLAT_TUN_CTRL_CDEI_MODE_OFFSET  51
+	#define EG_XLAT_TUN_CTRL_CDEI_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_CDEI_MODE_DEFAULT 0x0
+	/*[field] ECN_MODE*/
+	#define EG_XLAT_TUN_CTRL_ECN_MODE
+	#define EG_XLAT_TUN_CTRL_ECN_MODE_OFFSET  52
+	#define EG_XLAT_TUN_CTRL_ECN_MODE_LEN     2
+	#define EG_XLAT_TUN_CTRL_ECN_MODE_DEFAULT 0x0
+	/*[field] TTL_MODE*/
+	#define EG_XLAT_TUN_CTRL_TTL_MODE
+	#define EG_XLAT_TUN_CTRL_TTL_MODE_OFFSET  54
+	#define EG_XLAT_TUN_CTRL_TTL_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_TTL_MODE_DEFAULT 0x0
+	/*[field] IPV4_DF_MODE*/
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_MODE
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_MODE_OFFSET  55
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_MODE_DEFAULT 0x0
+	/*[field] IPV4_ID_MODE*/
+	#define EG_XLAT_TUN_CTRL_IPV4_ID_MODE
+	#define EG_XLAT_TUN_CTRL_IPV4_ID_MODE_OFFSET  56
+	#define EG_XLAT_TUN_CTRL_IPV4_ID_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_IPV4_ID_MODE_DEFAULT 0x0
+	/*[field] IPV6_FL_MODE*/
+	#define EG_XLAT_TUN_CTRL_IPV6_FL_MODE
+	#define EG_XLAT_TUN_CTRL_IPV6_FL_MODE_OFFSET  57
+	#define EG_XLAT_TUN_CTRL_IPV6_FL_MODE_LEN     2
+	#define EG_XLAT_TUN_CTRL_IPV6_FL_MODE_DEFAULT 0x0
+	/*[field] IP_PROTO_UPDATE*/
+	#define EG_XLAT_TUN_CTRL_IP_PROTO_UPDATE
+	#define EG_XLAT_TUN_CTRL_IP_PROTO_UPDATE_OFFSET  59
+	#define EG_XLAT_TUN_CTRL_IP_PROTO_UPDATE_LEN     1
+	#define EG_XLAT_TUN_CTRL_IP_PROTO_UPDATE_DEFAULT 0x0
+	/*[field] L4_TYPE*/
+	#define EG_XLAT_TUN_CTRL_L4_TYPE
+	#define EG_XLAT_TUN_CTRL_L4_TYPE_OFFSET  60
+	#define EG_XLAT_TUN_CTRL_L4_TYPE_LEN     3
+	#define EG_XLAT_TUN_CTRL_L4_TYPE_DEFAULT 0x0
+	/*[field] SPORT_ENTROPY_EN*/
+	#define EG_XLAT_TUN_CTRL_SPORT_ENTROPY_EN
+	#define EG_XLAT_TUN_CTRL_SPORT_ENTROPY_EN_OFFSET  63
+	#define EG_XLAT_TUN_CTRL_SPORT_ENTROPY_EN_LEN     1
+	#define EG_XLAT_TUN_CTRL_SPORT_ENTROPY_EN_DEFAULT 0x0
+	/*[field] L4_CHECKSUM_EN*/
+	#define EG_XLAT_TUN_CTRL_L4_CHECKSUM_EN
+	#define EG_XLAT_TUN_CTRL_L4_CHECKSUM_EN_OFFSET  64
+	#define EG_XLAT_TUN_CTRL_L4_CHECKSUM_EN_LEN     1
+	#define EG_XLAT_TUN_CTRL_L4_CHECKSUM_EN_DEFAULT 0x0
+	/*[field] VNI_MODE*/
+	#define EG_XLAT_TUN_CTRL_VNI_MODE
+	#define EG_XLAT_TUN_CTRL_VNI_MODE_OFFSET  65
+	#define EG_XLAT_TUN_CTRL_VNI_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_VNI_MODE_DEFAULT 0x0
+	/*[field] PAYLOAD_TYPE*/
+	#define EG_XLAT_TUN_CTRL_PAYLOAD_TYPE
+	#define EG_XLAT_TUN_CTRL_PAYLOAD_TYPE_OFFSET  66
+	#define EG_XLAT_TUN_CTRL_PAYLOAD_TYPE_LEN     2
+	#define EG_XLAT_TUN_CTRL_PAYLOAD_TYPE_DEFAULT 0x0
+	/*[field] OUTPUT_VP_VALID*/
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_VALID
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_VALID_OFFSET  68
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_VALID_LEN     1
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_VALID_DEFAULT 0x0
+	/*[field] OUTPUT_VP*/
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_OFFSET  69
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_LEN     8
+	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_DEFAULT 0x0
+
+struct eg_xlat_tun_ctrl {
+	a_uint32_t  type:1;
+	a_uint32_t  resv:3;
+	a_uint32_t  edit_rule_id:4;
+	a_uint32_t  edit_rule_target:2;
+	a_uint32_t  data_length:8;
+	a_uint32_t  vlan_offset:5;
+	a_uint32_t  l3_offset:6;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  ip_ver:1;
+	a_uint32_t  dscp_mode:1;
+	a_uint32_t  l4_offset:7;
+	a_uint32_t  tunnel_offset:7;
+	a_uint32_t  stag_fmt:1;
+	a_uint32_t  ctag_fmt:1;
+	a_uint32_t  spcp_mode:1;
+	a_uint32_t  sdei_mode:1;
+	a_uint32_t  cpcp_mode:1;
+	a_uint32_t  cdei_mode:1;
+	a_uint32_t  ecn_mode:2;
+	a_uint32_t  ttl_mode:1;
+	a_uint32_t  ipv4_df_mode:1;
+	a_uint32_t  ipv4_id_mode:1;
+	a_uint32_t  ipv6_fl_mode:2;
+	a_uint32_t  ip_proto_update:1;
+	a_uint32_t  l4_type:3;
+	a_uint32_t  sport_entropy_en:1;
+	a_uint32_t  l4_checksum_en:1;
+	a_uint32_t  vni_mode:1;
+	a_uint32_t  payload_type:2;
+	a_uint32_t  output_vp_valid:1;
+	a_uint32_t  output_vp:8;
+	a_uint32_t  _reserved0:19;
+};
+
+union eg_xlat_tun_ctrl_u {
+	a_uint32_t val[3];
+	struct eg_xlat_tun_ctrl bf;
+};
+
+/*[table] EG_EDIT_RULE*/
+#define EG_EDIT_RULE
+#define EG_EDIT_RULE_ADDRESS 0x3c000
+#define EG_EDIT_RULE_NUM     16
+#define EG_EDIT_RULE_INC     0x10
+#define EG_EDIT_RULE_TYPE    REG_TYPE_RW
+#define EG_EDIT_RULE_DEFAULT 0x0
+	/*[field] SRC1*/
+	#define EG_EDIT_RULE_SRC1
+	#define EG_EDIT_RULE_SRC1_OFFSET  0
+	#define EG_EDIT_RULE_SRC1_LEN     6
+	#define EG_EDIT_RULE_SRC1_DEFAULT 0x0
+	/*[field] SRC2*/
+	#define EG_EDIT_RULE_SRC2
+	#define EG_EDIT_RULE_SRC2_OFFSET  6
+	#define EG_EDIT_RULE_SRC2_LEN     3
+	#define EG_EDIT_RULE_SRC2_DEFAULT 0x0
+	/*[field] VALID2_0*/
+	#define EG_EDIT_RULE_VALID2_0
+	#define EG_EDIT_RULE_VALID2_0_OFFSET  9
+	#define EG_EDIT_RULE_VALID2_0_LEN     1
+	#define EG_EDIT_RULE_VALID2_0_DEFAULT 0x0
+	/*[field] START2_0*/
+	#define EG_EDIT_RULE_START2_0
+	#define EG_EDIT_RULE_START2_0_OFFSET  10
+	#define EG_EDIT_RULE_START2_0_LEN     5
+	#define EG_EDIT_RULE_START2_0_DEFAULT 0x0
+	/*[field] WIDTH2_0*/
+	#define EG_EDIT_RULE_WIDTH2_0
+	#define EG_EDIT_RULE_WIDTH2_0_OFFSET  15
+	#define EG_EDIT_RULE_WIDTH2_0_LEN     5
+	#define EG_EDIT_RULE_WIDTH2_0_DEFAULT 0x0
+	/*[field] POS2_0*/
+	#define EG_EDIT_RULE_POS2_0
+	#define EG_EDIT_RULE_POS2_0_OFFSET  20
+	#define EG_EDIT_RULE_POS2_0_LEN     7
+	#define EG_EDIT_RULE_POS2_0_DEFAULT 0x0
+	/*[field] VALID2_1*/
+	#define EG_EDIT_RULE_VALID2_1
+	#define EG_EDIT_RULE_VALID2_1_OFFSET  27
+	#define EG_EDIT_RULE_VALID2_1_LEN     1
+	#define EG_EDIT_RULE_VALID2_1_DEFAULT 0x0
+	/*[field] START2_1*/
+	#define EG_EDIT_RULE_START2_1
+	#define EG_EDIT_RULE_START2_1_OFFSET  28
+	#define EG_EDIT_RULE_START2_1_LEN     5
+	#define EG_EDIT_RULE_START2_1_DEFAULT 0x0
+	/*[field] WIDTH2_1*/
+	#define EG_EDIT_RULE_WIDTH2_1
+	#define EG_EDIT_RULE_WIDTH2_1_OFFSET  33
+	#define EG_EDIT_RULE_WIDTH2_1_LEN     5
+	#define EG_EDIT_RULE_WIDTH2_1_DEFAULT 0x0
+	/*[field] POS2_1*/
+	#define EG_EDIT_RULE_POS2_1
+	#define EG_EDIT_RULE_POS2_1_OFFSET  38
+	#define EG_EDIT_RULE_POS2_1_LEN     7
+	#define EG_EDIT_RULE_POS2_1_DEFAULT 0x0
+	/*[field] SRC3*/
+	#define EG_EDIT_RULE_SRC3
+	#define EG_EDIT_RULE_SRC3_OFFSET  45
+	#define EG_EDIT_RULE_SRC3_LEN     3
+	#define EG_EDIT_RULE_SRC3_DEFAULT 0x0
+	/*[field] VALID3_0*/
+	#define EG_EDIT_RULE_VALID3_0
+	#define EG_EDIT_RULE_VALID3_0_OFFSET  48
+	#define EG_EDIT_RULE_VALID3_0_LEN     1
+	#define EG_EDIT_RULE_VALID3_0_DEFAULT 0x0
+	/*[field] START3_0*/
+	#define EG_EDIT_RULE_START3_0
+	#define EG_EDIT_RULE_START3_0_OFFSET  49
+	#define EG_EDIT_RULE_START3_0_LEN     4
+	#define EG_EDIT_RULE_START3_0_DEFAULT 0x0
+	/*[field] WIDTH3_0*/
+	#define EG_EDIT_RULE_WIDTH3_0
+	#define EG_EDIT_RULE_WIDTH3_0_OFFSET  53
+	#define EG_EDIT_RULE_WIDTH3_0_LEN     4
+	#define EG_EDIT_RULE_WIDTH3_0_DEFAULT 0x0
+	/*[field] POS3_0*/
+	#define EG_EDIT_RULE_POS3_0
+	#define EG_EDIT_RULE_POS3_0_OFFSET  57
+	#define EG_EDIT_RULE_POS3_0_LEN     7
+	#define EG_EDIT_RULE_POS3_0_DEFAULT 0x0
+	/*[field] VALID3_1*/
+	#define EG_EDIT_RULE_VALID3_1
+	#define EG_EDIT_RULE_VALID3_1_OFFSET  64
+	#define EG_EDIT_RULE_VALID3_1_LEN     1
+	#define EG_EDIT_RULE_VALID3_1_DEFAULT 0x0
+	/*[field] START3_1*/
+	#define EG_EDIT_RULE_START3_1
+	#define EG_EDIT_RULE_START3_1_OFFSET  65
+	#define EG_EDIT_RULE_START3_1_LEN     4
+	#define EG_EDIT_RULE_START3_1_DEFAULT 0x0
+	/*[field] WIDTH3_1*/
+	#define EG_EDIT_RULE_WIDTH3_1
+	#define EG_EDIT_RULE_WIDTH3_1_OFFSET  69
+	#define EG_EDIT_RULE_WIDTH3_1_LEN     4
+	#define EG_EDIT_RULE_WIDTH3_1_DEFAULT 0x0
+	/*[field] POS3_1*/
+	#define EG_EDIT_RULE_POS3_1
+	#define EG_EDIT_RULE_POS3_1_OFFSET  73
+	#define EG_EDIT_RULE_POS3_1_LEN     7
+	#define EG_EDIT_RULE_POS3_1_DEFAULT 0x0
+
+struct eg_edit_rule {
+	a_uint32_t  src1:6;
+	a_uint32_t  src2:3;
+	a_uint32_t  valid2_0:1;
+	a_uint32_t  start2_0:5;
+	a_uint32_t  width2_0:5;
+	a_uint32_t  pos2_0:7;
+	a_uint32_t  valid2_1:1;
+	a_uint32_t  start2_1_0:4;
+	a_uint32_t  start2_1_1:1;
+	a_uint32_t  width2_1:5;
+	a_uint32_t  pos2_1:7;
+	a_uint32_t  src3:3;
+	a_uint32_t  valid3_0:1;
+	a_uint32_t  start3_0:4;
+	a_uint32_t  width3_0:4;
+	a_uint32_t  pos3_0:7;
+	a_uint32_t  valid3_1:1;
+	a_uint32_t  start3_1:4;
+	a_uint32_t  width3_1:4;
+	a_uint32_t  pos3_1:7;
+	a_uint32_t  _reserved0:16;
+};
+
+union eg_edit_rule_u {
+	a_uint32_t val[3];
+	struct eg_edit_rule bf;
+};
+
+/*[table] TL_CNT_TBL*/
+#define TL_CNT_TBL
+#define TL_CNT_TBL_ADDRESS 0x54000
+#define TL_CNT_TBL_NUM     128
+#define TL_CNT_TBL_INC     0x10
+#define TL_CNT_TBL_TYPE    REG_TYPE_RW
+#define TL_CNT_TBL_DEFAULT 0x0
+	/*[field] RX_PKT_CNT*/
+	#define TL_CNT_TBL_RX_PKT_CNT
+	#define TL_CNT_TBL_RX_PKT_CNT_OFFSET  0
+	#define TL_CNT_TBL_RX_PKT_CNT_LEN     32
+	#define TL_CNT_TBL_RX_PKT_CNT_DEFAULT 0x0
+	/*[field] RX_BYTE_CNT*/
+	#define TL_CNT_TBL_RX_BYTE_CNT
+	#define TL_CNT_TBL_RX_BYTE_CNT_OFFSET  32
+	#define TL_CNT_TBL_RX_BYTE_CNT_LEN     40
+	#define TL_CNT_TBL_RX_BYTE_CNT_DEFAULT 0x0
+
+struct tl_cnt_tbl {
+	a_uint32_t  rx_pkt_cnt:32;
+	a_uint32_t  rx_byte_cnt_0:32;
+	a_uint32_t  rx_byte_cnt_1:8;
+	a_uint32_t  _reserved0:24;
+};
+
+union tl_cnt_tbl_u {
+	a_uint32_t val[3];
+	struct tl_cnt_tbl bf;
+};
+
+/*[table] TL_PORT_VP_TBL*/
+#define TL_PORT_VP_TBL
+#define TL_PORT_VP_TBL_ADDRESS 0x2000
+#define TL_PORT_VP_TBL_NUM     256
+#define TL_PORT_VP_TBL_INC     0x10
+#define TL_PORT_VP_TBL_TYPE    REG_TYPE_RW
+#define TL_PORT_VP_TBL_DEFAULT 0x0
+	/*[field] VLAN_PROFILE*/
+	#define TL_PORT_VP_TBL_VLAN_PROFILE
+	#define TL_PORT_VP_TBL_VLAN_PROFILE_OFFSET  0
+	#define TL_PORT_VP_TBL_VLAN_PROFILE_LEN     8
+	#define TL_PORT_VP_TBL_VLAN_PROFILE_DEFAULT 0x0
+	/*[field] PPPOE_PROFILE*/
+	#define TL_PORT_VP_TBL_PPPOE_PROFILE
+	#define TL_PORT_VP_TBL_PPPOE_PROFILE_OFFSET  8
+	#define TL_PORT_VP_TBL_PPPOE_PROFILE_LEN     8
+	#define TL_PORT_VP_TBL_PPPOE_PROFILE_DEFAULT 0x0
+	/*[field] PRE_IPO_PROFILE*/
+	#define TL_PORT_VP_TBL_PRE_IPO_PROFILE
+	#define TL_PORT_VP_TBL_PRE_IPO_PROFILE_OFFSET  16
+	#define TL_PORT_VP_TBL_PRE_IPO_PROFILE_LEN     8
+	#define TL_PORT_VP_TBL_PRE_IPO_PROFILE_DEFAULT 0x0
+	/*[field] TL_L3_IF_VALID*/
+	#define TL_PORT_VP_TBL_TL_L3_IF_VALID
+	#define TL_PORT_VP_TBL_TL_L3_IF_VALID_OFFSET  24
+	#define TL_PORT_VP_TBL_TL_L3_IF_VALID_LEN     1
+	#define TL_PORT_VP_TBL_TL_L3_IF_VALID_DEFAULT 0x0
+	/*[field] TL_L3_IF_INDEX*/
+	#define TL_PORT_VP_TBL_TL_L3_IF_INDEX
+	#define TL_PORT_VP_TBL_TL_L3_IF_INDEX_OFFSET  25
+	#define TL_PORT_VP_TBL_TL_L3_IF_INDEX_LEN     7
+	#define TL_PORT_VP_TBL_TL_L3_IF_INDEX_DEFAULT 0x0
+	/*[field] MAC_ADDR*/
+	#define TL_PORT_VP_TBL_MAC_ADDR
+	#define TL_PORT_VP_TBL_MAC_ADDR_OFFSET  32
+	#define TL_PORT_VP_TBL_MAC_ADDR_LEN     48
+	#define TL_PORT_VP_TBL_MAC_ADDR_DEFAULT 0x0
+	/*[field] PPPOE_EN*/
+	#define TL_PORT_VP_TBL_PPPOE_EN
+	#define TL_PORT_VP_TBL_PPPOE_EN_OFFSET  80
+	#define TL_PORT_VP_TBL_PPPOE_EN_LEN     1
+	#define TL_PORT_VP_TBL_PPPOE_EN_DEFAULT 0x0
+	/*[field] RX_CNT_EN*/
+	#define TL_PORT_VP_TBL_RX_CNT_EN
+	#define TL_PORT_VP_TBL_RX_CNT_EN_OFFSET  81
+	#define TL_PORT_VP_TBL_RX_CNT_EN_LEN     1
+	#define TL_PORT_VP_TBL_RX_CNT_EN_DEFAULT 0x0
+
+struct tl_port_vp_tbl {
+	a_uint32_t  vlan_profile:8;
+	a_uint32_t  pppoe_profile:8;
+	a_uint32_t  pre_ipo_profile:8;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  mac_addr_0:32;
+	a_uint32_t  mac_addr_1:16;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  rx_cnt_en:1;
+	a_uint32_t  _reserved0:14;
+};
+
+union tl_port_vp_tbl_u {
+	a_uint32_t val[3];
+	struct tl_port_vp_tbl bf;
+};
+
+/*[table] TL_VLAN_TBL*/
+#define TL_VLAN_TBL
+#define TL_VLAN_TBL_ADDRESS 0x1000
+#define TL_VLAN_TBL_NUM     8
+#define TL_VLAN_TBL_INC     0x10
+#define TL_VLAN_TBL_TYPE    REG_TYPE_RW
+#define TL_VLAN_TBL_DEFAULT 0x0
+	/*[field] VALID*/
+	#define TL_VLAN_TBL_VALID
+	#define TL_VLAN_TBL_VALID_OFFSET  0
+	#define TL_VLAN_TBL_VALID_LEN     1
+	#define TL_VLAN_TBL_VALID_DEFAULT 0x0
+	/*[field] TYPE*/
+	#define TL_VLAN_TBL_TYPE_F
+	#define TL_VLAN_TBL_TYPE_F_OFFSET  1
+	#define TL_VLAN_TBL_TYPE_F_LEN     2
+	#define TL_VLAN_TBL_TYPE_F_DEFAULT 0x0
+	/*[field] PORT_BITMAP reuse TYPE[1]*/
+	#define TL_VLAN_TBL_PORT_BITMAP
+	#define TL_VLAN_TBL_PORT_BITMAP_OFFSET  3
+	#define TL_VLAN_TBL_PORT_BITMAP_LEN     8
+	#define TL_VLAN_TBL_PORT_BITMAP_DEFAULT 0x0
+	/*[field] VP_PROFILE reuse TYPE[2]*/
+	#define TL_VLAN_TBL_VP_PROFILE
+	#define TL_VLAN_TBL_VP_PROFILE_OFFSET  3
+	#define TL_VLAN_TBL_VP_PROFILE_LEN     8
+	#define TL_VLAN_TBL_VP_PROFILE_DEFAULT 0x0
+	/*[field] PORT_VP_ID reuse TYPE[0]*/
+	#define TL_VLAN_TBL_PORT_VP_ID
+	#define TL_VLAN_TBL_PORT_VP_ID_OFFSET  3
+	#define TL_VLAN_TBL_PORT_VP_ID_LEN     8
+	#define TL_VLAN_TBL_PORT_VP_ID_DEFAULT 0x0
+	/*[field] SKEY_FMT*/
+	#define TL_VLAN_TBL_SKEY_FMT
+	#define TL_VLAN_TBL_SKEY_FMT_OFFSET  11
+	#define TL_VLAN_TBL_SKEY_FMT_LEN     3
+	#define TL_VLAN_TBL_SKEY_FMT_DEFAULT 0x0
+	/*[field] SKEY_VID_INCL*/
+	#define TL_VLAN_TBL_SKEY_VID_INCL
+	#define TL_VLAN_TBL_SKEY_VID_INCL_OFFSET  14
+	#define TL_VLAN_TBL_SKEY_VID_INCL_LEN     1
+	#define TL_VLAN_TBL_SKEY_VID_INCL_DEFAULT 0x0
+	/*[field] SKEY_VID*/
+	#define TL_VLAN_TBL_SKEY_VID
+	#define TL_VLAN_TBL_SKEY_VID_OFFSET  15
+	#define TL_VLAN_TBL_SKEY_VID_LEN     12
+	#define TL_VLAN_TBL_SKEY_VID_DEFAULT 0x0
+	/*[field] CKEY_FMT*/
+	#define TL_VLAN_TBL_CKEY_FMT
+	#define TL_VLAN_TBL_CKEY_FMT_OFFSET  27
+	#define TL_VLAN_TBL_CKEY_FMT_LEN     3
+	#define TL_VLAN_TBL_CKEY_FMT_DEFAULT 0x0
+	/*[field] CKEY_VID_INCL*/
+	#define TL_VLAN_TBL_CKEY_VID_INCL
+	#define TL_VLAN_TBL_CKEY_VID_INCL_OFFSET  30
+	#define TL_VLAN_TBL_CKEY_VID_INCL_LEN     1
+	#define TL_VLAN_TBL_CKEY_VID_INCL_DEFAULT 0x0
+	/*[field] CKEY_VID*/
+	#define TL_VLAN_TBL_CKEY_VID
+	#define TL_VLAN_TBL_CKEY_VID_OFFSET  31
+	#define TL_VLAN_TBL_CKEY_VID_LEN     12
+	#define TL_VLAN_TBL_CKEY_VID_DEFAULT 0x0
+	/*[field] TL_L3_IF_VALID*/
+	#define TL_VLAN_TBL_TL_L3_IF_VALID
+	#define TL_VLAN_TBL_TL_L3_IF_VALID_OFFSET  43
+	#define TL_VLAN_TBL_TL_L3_IF_VALID_LEN     1
+	#define TL_VLAN_TBL_TL_L3_IF_VALID_DEFAULT 0x0
+	/*[field] TL_L3_IF_INDEX*/
+	#define TL_VLAN_TBL_TL_L3_IF_INDEX
+	#define TL_VLAN_TBL_TL_L3_IF_INDEX_OFFSET  44
+	#define TL_VLAN_TBL_TL_L3_IF_INDEX_LEN     7
+	#define TL_VLAN_TBL_TL_L3_IF_INDEX_DEFAULT 0x0
+	/*[field] PPPOE_EN*/
+	#define TL_VLAN_TBL_PPPOE_EN
+	#define TL_VLAN_TBL_PPPOE_EN_OFFSET  51
+	#define TL_VLAN_TBL_PPPOE_EN_LEN     1
+	#define TL_VLAN_TBL_PPPOE_EN_DEFAULT 0x0
+
+struct tl_vlan_tbl_2 {
+	a_uint32_t  valid:1;
+	a_uint32_t  type:2;
+	a_uint32_t  vp_profile:8;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid_0:1;
+	a_uint32_t  ckey_vid_1:11;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  _reserved0:12;
+};
+
+struct tl_vlan_tbl_0 {
+	a_uint32_t  valid:1;
+	a_uint32_t  type:2;
+	a_uint32_t  port_vp_id:8;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid_0:1;
+	a_uint32_t  ckey_vid_1:11;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  _reserved0:12;
+};
+
+struct tl_vlan_tbl_1 {
+	a_uint32_t  valid:1;
+	a_uint32_t  type:2;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_vid_0:1;
+	a_uint32_t  ckey_vid_1:11;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  _reserved0:12;
+};
+
+union tl_vlan_tbl_u {
+	a_uint32_t val[2];
+	struct tl_vlan_tbl_0 bf0;
+	struct tl_vlan_tbl_1 bf1;
+	struct tl_vlan_tbl_2 bf2;
+};
 #endif

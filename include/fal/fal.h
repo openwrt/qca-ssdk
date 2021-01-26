@@ -60,6 +60,8 @@ extern "C" {
 #include "fal_ptp.h"
 #include "fal_sfp.h"
 #include "fal_vport.h"
+#include "fal_tunnel.h"
+/* auto_insert_flag */
 
 /*qca808x_start*/
 #ifdef __cplusplus

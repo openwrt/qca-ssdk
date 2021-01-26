@@ -360,3 +360,5 @@ IN_VXLAN=TRUE
 IN_GENEVE=TRUE
 IN_TUNNEL_PROGRAM=TRUE
 endif
+
+#auto_insert_flag

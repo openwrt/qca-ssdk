@@ -137,6 +137,11 @@ ifeq (TRUE, $(IN_VPORT))
   SRC_LIST += fal_vport.c
 endif
 
+ifeq (TRUE, $(IN_TUNNEL))
+	SRC_LIST += fal_tunnel.c
+endif
+
+#auto_insert_flag
 include $(PRJ_PATH)/make/components.mk
 include $(PRJ_PATH)/make/defs.mk
 include $(PRJ_PATH)/make/target.mk

@@ -247,6 +247,17 @@ typedef enum
 	SW_SFP_CTRL_STATUS,
 	SW_SFP_ALARM_WARN_FLAG,
 	SW_SFP_CCODE_TYPE,
+	SW_TUNNEL_GLOBAL_CFG,
+	SW_TUNNEL_ENCAP_HEADER_CTRL,
+	SW_TUNNEL_DECAP_HEADER_CTRL,
+	SW_TUNNEL_INTF,
+	SW_TUNNEL_PORT_INTF,
+	SW_TUNNEL_VLAN_INTF,
+	SW_TUNNEL_DECAP_ENTRY,
+	SW_TUNNEL_TUNNEL_ID,
+	SW_TUNNEL_ENCAP_ENTRY,
+	SW_TUNNEL_ENCAP_RULE_ENTRY,
+/* auto_insert_flag */
 } sw_data_type_e;
 
     typedef struct
@@ -259,7 +270,7 @@ typedef enum
     {
         a_uint32_t api_id;
         a_uint16_t data_size;
-        a_uint8_t  data_type;
+	a_uint8_t  data_type;
         a_uint8_t  param_type;
     } sw_api_param_t;
 

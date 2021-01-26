@@ -52,6 +52,7 @@ extern "C" {
 #include "fal_misc.h"
 #include "fal_ptp.h"
 #include "fal_sfp.h"
+#include "fal_tunnel.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1058,6 +1059,89 @@ typedef sw_error_t (*adpt_vport_physical_port_id_set_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_vport_physical_port_id_get_func)(a_uint32_t dev_id,
 		fal_port_t vport, fal_port_t *pport);
 
+/* tunnel */
+typedef sw_error_t
+(*adpt_tunnel_decap_entry_add_func)(a_uint32_t dev_id,
+		fal_tunnel_op_mode_t add_mode, fal_tunnel_decap_entry_t *value);
+typedef sw_error_t
+(*adpt_tunnel_decap_entry_del_func)(a_uint32_t dev_id,
+		fal_tunnel_op_mode_t del_mode, fal_tunnel_decap_entry_t *value);
+typedef sw_error_t
+(*adpt_tunnel_decap_entry_get_func)(a_uint32_t dev_id,
+		fal_tunnel_op_mode_t get_mode, fal_tunnel_decap_entry_t *value);
+typedef sw_error_t
+(*adpt_tunnel_decap_entry_getnext_func)(a_uint32_t dev_id,
+		fal_tunnel_op_mode_t next_mode, fal_tunnel_decap_entry_t *value);
+typedef sw_error_t
+(*adpt_tunnel_decap_entry_flush_func)(a_uint32_t dev_id);
+typedef sw_error_t
+(*adpt_tunnel_decap_header_ctrl_set_func)(a_uint32_t dev_id,
+		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+typedef sw_error_t
+(*adpt_tunnel_decap_header_ctrl_get_func)(a_uint32_t dev_id,
+		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+typedef sw_error_t
+(*adpt_tunnel_encap_header_ctrl_set_func)(a_uint32_t dev_id,
+		fal_tunnel_encap_header_ctrl_t *header_ctrl);
+typedef sw_error_t
+(*adpt_tunnel_encap_header_ctrl_get_func)(a_uint32_t dev_id,
+		fal_tunnel_encap_header_ctrl_t *header_ctrl);
+typedef sw_error_t
+(*adpt_tunnel_global_cfg_get_func)(a_uint32_t dev_id, fal_tunnel_global_cfg_t *cfg);
+typedef sw_error_t
+(*adpt_tunnel_global_cfg_set_func)(a_uint32_t dev_id, fal_tunnel_global_cfg_t *cfg);
+typedef sw_error_t
+(*adpt_tunnel_port_intf_set_func)(a_uint32_t dev_id, fal_port_t port_id,
+		fal_tunnel_port_intf_t *port_cfg);
+typedef sw_error_t
+(*adpt_tunnel_port_intf_get_func)(a_uint32_t dev_id, fal_port_t port_id,
+		fal_tunnel_port_intf_t *port_cfg);
+typedef sw_error_t
+(*adpt_tunnel_vlan_intf_add_func)(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
+typedef sw_error_t
+(*adpt_tunnel_vlan_intf_getfirst_func)(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
+typedef sw_error_t
+(*adpt_tunnel_vlan_intf_getnext_func)(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
+typedef sw_error_t
+(*adpt_tunnel_vlan_intf_del_func)(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
+typedef sw_error_t
+(*adpt_tunnel_intf_set_func)(a_uint32_t dev_id, a_uint32_t l3_if, fal_tunnel_intf_t *intf_t);
+typedef sw_error_t
+(*adpt_tunnel_intf_get_func)(a_uint32_t dev_id, a_uint32_t l3_if, fal_tunnel_intf_t *intf_t);
+typedef sw_error_t
+(*adpt_tunnel_encap_port_tunnelid_set_func)(a_uint32_t dev_id,
+		a_uint32_t port_id, fal_tunnel_id_t *tunnel_id);
+typedef sw_error_t
+(*adpt_tunnel_encap_port_tunnelid_get_func)(a_uint32_t dev_id,
+		a_uint32_t port_id, fal_tunnel_id_t *tunnel_id);
+typedef sw_error_t
+(*adpt_tunnel_encap_intf_tunnelid_set_func)(a_uint32_t dev_id,
+		a_uint32_t intf_id, fal_tunnel_id_t *tunnel_id);
+typedef sw_error_t
+(*adpt_tunnel_encap_intf_tunnelid_get_func)(a_uint32_t dev_id,
+		a_uint32_t intf_id, fal_tunnel_id_t *tunnel_id);
+typedef sw_error_t
+(*adpt_tunnel_encap_entry_add_func)(a_uint32_t dev_id, a_uint32_t tunnel_id,
+		fal_tunnel_encap_cfg_t *tunnel_encap_cfg);
+typedef sw_error_t
+(*adpt_tunnel_encap_entry_del_func)(a_uint32_t dev_id, a_uint32_t tunnel_id);
+typedef sw_error_t
+(*adpt_tunnel_encap_entry_get_func)(a_uint32_t dev_id, a_uint32_t tunnel_id,
+		fal_tunnel_encap_cfg_t *tunnel_encap_cfg);
+typedef sw_error_t
+(*adpt_tunnel_encap_entry_getnext_func)(a_uint32_t dev_id, a_uint32_t tunnel_id,
+		fal_tunnel_encap_cfg_t *tunnel_encap_cfg);
+typedef sw_error_t
+(*adpt_tunnel_encap_rule_entry_set_func)(a_uint32_t dev_id, a_uint32_t rule_id,
+		fal_tunnel_encap_rule_t *rule_entry);
+typedef sw_error_t
+(*adpt_tunnel_encap_rule_entry_get_func)(a_uint32_t dev_id, a_uint32_t rule_id,
+		fal_tunnel_encap_rule_t *rule_entry);
+typedef sw_error_t
+(*adpt_tunnel_encap_rule_entry_del_func)(a_uint32_t dev_id, a_uint32_t rule_id,
+		fal_tunnel_encap_rule_t *rule_entry);
+
+/* auto_insert_flag */
 typedef struct
 {
 	ssdk_chip_type chip_type;
@@ -1607,6 +1691,40 @@ typedef struct
 	a_uint32_t adpt_vport_func_bitmap;
 	adpt_vport_physical_port_id_set_func adpt_vport_physical_port_id_set;
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
+
+	/* tunnel */
+	a_uint32_t adpt_tunnel_func_bitmap;
+	adpt_tunnel_decap_entry_add_func adpt_tunnel_decap_entry_add;
+	adpt_tunnel_decap_entry_del_func adpt_tunnel_decap_entry_del;
+	adpt_tunnel_decap_entry_get_func adpt_tunnel_decap_entry_get;
+	adpt_tunnel_decap_entry_getnext_func adpt_tunnel_decap_entry_getnext;
+	adpt_tunnel_decap_entry_flush_func adpt_tunnel_decap_entry_flush;
+	adpt_tunnel_decap_header_ctrl_set_func adpt_tunnel_decap_header_ctrl_set;
+	adpt_tunnel_decap_header_ctrl_get_func adpt_tunnel_decap_header_ctrl_get;
+	adpt_tunnel_encap_header_ctrl_set_func adpt_tunnel_encap_header_ctrl_set;
+	adpt_tunnel_encap_header_ctrl_get_func adpt_tunnel_encap_header_ctrl_get;
+	adpt_tunnel_global_cfg_get_func adpt_tunnel_global_cfg_get;
+	adpt_tunnel_global_cfg_set_func adpt_tunnel_global_cfg_set;
+	adpt_tunnel_port_intf_set_func adpt_tunnel_port_intf_set;
+	adpt_tunnel_port_intf_get_func adpt_tunnel_port_intf_get;
+	adpt_tunnel_vlan_intf_add_func adpt_tunnel_vlan_intf_add;
+	adpt_tunnel_vlan_intf_getfirst_func adpt_tunnel_vlan_intf_getfirst;
+	adpt_tunnel_vlan_intf_getnext_func adpt_tunnel_vlan_intf_getnext;
+	adpt_tunnel_vlan_intf_del_func adpt_tunnel_vlan_intf_del;
+	adpt_tunnel_intf_set_func adpt_tunnel_intf_set;
+	adpt_tunnel_intf_get_func adpt_tunnel_intf_get;
+	adpt_tunnel_encap_port_tunnelid_set_func adpt_tunnel_encap_port_tunnelid_set;
+	adpt_tunnel_encap_port_tunnelid_get_func adpt_tunnel_encap_port_tunnelid_get;
+	adpt_tunnel_encap_intf_tunnelid_set_func adpt_tunnel_encap_intf_tunnelid_set;
+	adpt_tunnel_encap_intf_tunnelid_get_func adpt_tunnel_encap_intf_tunnelid_get;
+	adpt_tunnel_encap_entry_add_func adpt_tunnel_encap_entry_add;
+	adpt_tunnel_encap_entry_del_func adpt_tunnel_encap_entry_del;
+	adpt_tunnel_encap_entry_get_func adpt_tunnel_encap_entry_get;
+	adpt_tunnel_encap_entry_getnext_func adpt_tunnel_encap_entry_getnext;
+	adpt_tunnel_encap_rule_entry_set_func adpt_tunnel_encap_rule_entry_set;
+	adpt_tunnel_encap_rule_entry_get_func adpt_tunnel_encap_rule_entry_get;
+	adpt_tunnel_encap_rule_entry_del_func adpt_tunnel_encap_rule_entry_del;
+/* auto_insert_flag_1 */
 }adpt_api_t;
 
 #define ADPT_IS_PPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_PPORT && \

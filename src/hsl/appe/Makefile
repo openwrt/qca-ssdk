@@ -53,6 +53,10 @@ ifeq (TRUE, $(IN_POLICER))
 	SRC_LIST+=appe_policer.c
 endif
 
+ifeq (TRUE, $(IN_SERVCODE))
+	SRC_LIST+=appe_servcode.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

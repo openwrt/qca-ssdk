@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -51,7 +51,11 @@ union service_tbl_u {
 
 /*[table] IN_L2_SERVICE_TBL*/
 #define IN_L2_SERVICE_TBL
+#if defined(APPE)
+#define IN_L2_SERVICE_TBL_ADDRESS 0x6000
+#else
 #define IN_L2_SERVICE_TBL_ADDRESS 0x4000
+#endif
 #define IN_L2_SERVICE_TBL_NUM     256
 #define IN_L2_SERVICE_TBL_INC     0x10
 #define IN_L2_SERVICE_TBL_TYPE    REG_TYPE_RW
@@ -103,7 +107,11 @@ union in_l2_service_tbl_u {
 
 /*[table] EG_SERVICE_TBL*/
 #define EG_SERVICE_TBL
+#if defined(APPE)
+#define EG_SERVICE_TBL_ADDRESS 0x23000
+#else
 #define EG_SERVICE_TBL_ADDRESS 0xc000
+#endif
 #define EG_SERVICE_TBL_NUM     256
 #define EG_SERVICE_TBL_INC     0x8
 #define EG_SERVICE_TBL_TYPE    REG_TYPE_RW

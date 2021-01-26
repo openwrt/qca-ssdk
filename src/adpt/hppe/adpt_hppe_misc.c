@@ -187,9 +187,177 @@ char cpucode[][85] = {
 "Service code action",
 "Egress mirror to CPU",
 "Ingress mirror to CPU",
+#ifdef APPE
+"TUNNEL interface check fail",/*cpu code 186*/
+"TUNNEL vlan check fail",
+"TUNNEL PPPOE multicast term",
+"TUNNEL de-accelate",
+"TUNNEL UDP checksum zero",
+"TUNNEL TTL exceed",
+"TUNNEL LPM interface check fail",
+"TUNNEL LPM vlan check fail",
+"TUNNEL MAP source check fail",
+"TUNNEL MAP destination check fail",
+"TUNNEL MAP UDP checksum zero",
+"TUNNEL MAP non TCP and UDP",
+"TUNNEL forward command",/*cpu code 198*/
+
+"L2 PRE-ACL action",/*cpu code 210*/
+"TUNNEL L2 context invalid",
+"reserve0",
+"reserve1",
+"TUNNEL decap ECN",
+"TUNNEL inner packet too short",
+"TUNNEL VXLAN header",
+"TUNNEL VXLAN GPE header",
+"TUNNEL GENEVE header",
+"TUNNEL GRE header",
+"reserved",
+"TUNNEL unknow inner type",
+"TUNNEL VXLAN flag",
+"TUNNEL VXLAN GRE flag",
+"TUNNEL GRE flag",
+"TUNNEL GENEVE flag",
+"TUNNEL PROGRAM0",
+"TUNNEL PROGRAM1",
+"TUNNEL PROGRAM2",
+"TUNNEL PROGRAM3",
+"TUNNEL PROGRAM4",
+"TUNNEL PROGRAM5",/*cpu code 231*/
+#endif
 };
 
 char dropcode[][75] = {
+#ifdef APPE
+"None",
+"Unkown L2 protocol exception drop",
+"PPPoE wrong version or wrong header exception drop",
+"PPPoE unsupported PPP protocol exception drop",
+"IPv4 wrong version exception drop",
+"IPv4 wrong format exception drop",
+"IPv4 with option exception drop",
+"IPv4 bad total length exception drop",
+"IPv4 fragment exception drop",
+"IPv4 ping of death exception drop",
+"IPv4 small TTL exception drop",
+"IPv4 unknown IP protocol exception drop",
+"IPv4 checksum error exception drop",
+"IPv4 invalid IP exception drop",
+"IPv4 LAND attack exception drop",
+"IPv4 other exception drop",
+"IPv6 wrong version exception drop",
+"IPv6 wrong format exception drop",
+"IPv6 bad payload length exception drop",
+"IPv6 with extension header exception drop",
+"IPv6 small hop limit exception drop",
+"IPv6 invalid IP exception drop",
+"IPv6 LAND attack exception drop",
+"IPv6 fragment exception drop",
+"IPv6 ping of death exception drop",
+"IPv6 with more than 2 extension headers exception drop",
+"IPv6 other exception drop",
+"TCP format error exception drop",
+"TCP same SP and DP exception drop",
+"TCP flags exception drop",
+"TCP checksum error exception drop",
+"UDP format error exception drop",
+"UDP same SP and DP exception drop",
+"UDP bad length exception drop",
+"UDP checksum error exception drop",
+"UDP-Lite format error exception drop",
+"UDP-Lite checksum error exception drop",
+"L3 route PRE-IPO RT drop",
+"L3 route PRE-IPO SNAPT drop",
+"L3 route PRE-IPO DNAPT drop",
+"L3 route PRE-IPO SNAT drop",
+"L3 route PRE-IPO DNAT drop",
+"TUNNEL interface check fail exception drop",
+"TUNNEL vlan check fail exception drop",
+"TUNNEL PPPOE multicast term exception drop",
+"TUNNEL de-accelerate exception drop",
+"TUNNEL UDP checksum zero drop",
+"TUNNEL TTL exceed exception drop",
+"TUNNEL LPM interface check fail drop",
+"TUNNEL LPM VLAN check fail drop",
+"TUNNEL MAP source check fail drop",
+"TUNNEL MAP destination check fail drop",
+"TUNNEL MAP UDP checksum zero drop",
+"TUNNEL MAP non TCP UDP drop",
+"Pre-ACL entry hit action drop",
+"TUNNEL L2 invalid context exception drop",
+"reserve0 exception drop",
+"reserve1 exception drop",
+"TUNNEL decap ECN drop",
+"TUNNEL inner packet too short drop",
+"TUNNEL VXLAN header exception drop",
+"TUNNEL VXLAN GRE header exception drop",
+"TUNNEL GENEVE header exception drop",
+"TUNNEL GRE header exception drop",
+"reserved exception drop",
+"TUNNEL unknow inner type exception drop",
+"TUNNEL flag exception drop",
+"TUNNEL PROGRAM exception drop",
+"TUNNEL forward command exception drop",
+"L3 bridge action drop",
+"L3 no route with Preheader NAT action",
+"L3 no route with Preheader NAT action error configuration",
+"L3 route action drop",
+"L3 no route action drop",
+"L3 no route next hop invalid action drop",
+"L3 no route preheader action drop",
+"L3 bridge action drop",
+"L3 flow action drop",
+"L3 flow miss action drop",
+"L2 MRU checking fail drop",
+"L2 MTU checking fail drop",
+"L3 IP prefix broadcast drop",
+"L3 MTU checking fail drop",
+"L3 MRU checking fail drop",
+"L3 ICMP redirect drop",
+"Fake MAC header indicated packet not routing or bypass L3 edit drop",
+"L3 IP route TTL zero drop",
+"L3 flow service code loop drop",
+"L3 flow de-accelerate drop",
+"L3 flow source interface check fail drop",
+"Flow toggle mismatch exception drop",
+"MTU check exception if DF set drop",
+"PPPoE multicast packet with IP routing enabled drop",
+"IPv4 SG unkown drop",
+"IPv6 SG unkown drop",
+"ARP SG unkown drop",
+"ND SG unkown drop",
+"IPv4 SG violation drop",
+"IPv6 SG violation drop",
+"ARP SG violation drop",
+"ND SG violation drop",
+"L2 new MAC address drop",
+"L2 hash violation drop",
+"L2 station move drop",
+"L2 learn limit drop",
+"L2 SA lookup action drop",
+"L2 DA lookup action drop",
+"APP_CTRL action drop",
+"Ingress VLAN filtering action drop",
+"Ingress VLAN translation miss drop",
+"Egress VLAN filtering drop",
+"ACL-pre entry hit action drop",
+"ACL-post entry hit action drop",
+"Multicast SA or broadcast SA drop",
+"No destination drop",
+"STG ingress filtering drop",
+"STG egress filtering drop",
+"Source port filter drop",
+"Trunk select fail drop",
+"TX MAC disable drop",
+"Ingress VLAN tag format drop",
+"CRC error drop",
+"PAUSE frame drop",
+"Promisc drop",
+"Isolation drop",
+"Magagement packet APP_CTRL drop",
+"Fake L2 protocol indicated packet not routing or bypass L3 edit drop",
+"Policing drop",
+#else
 "None",
 "Unkown L2 protocol exception drop",
 "PPPoE wrong version or wrong type exception drop",
@@ -318,6 +486,7 @@ char dropcode[][75] = {
 "Magagement packet APP_CTRL drop",
 "Fake L2 protocol indicated packet not routing or bypass L3 edit drop",
 "Policing drop"
+#endif
 };
 
 sw_error_t
@@ -884,23 +1053,29 @@ adpt_hppe_debug_cpu_code_counter_get(a_bool_t show_type)
 			if (i >=0 && i <= 70)
 				printk("%15llu(%s)", value, cpucode[i]);
 			else if (i >= 79 && i <= 92)
-				printk("%15llu(%s)", value, cpucode[i - 8]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 8], i);
 			else if (i >= 97 && i <= 102)
-				printk("%15llu(%s)", value, cpucode[i - 12]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 12], i);
 			else if (i >= 107 && i <= 110)
-				printk("%15llu(%s)", value, cpucode[i - 16]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 16], i);
 			else if (i >= 113 && i <= 127)
-				printk("%15llu(%s)", value, cpucode[i - 18]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 18], i);
 			else if (i >= 136 && i <= 143)
-				printk("%15llu(%s)", value, cpucode[i - 26]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 26], i);
 			else if (i >= 148 && i <= 174)
-				printk("%15llu(%s)", value, cpucode[i - 30]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 30], i);
 			else if (i >= 178 && i <= 180)
-				printk("%15llu(%s)", value, cpucode[i - 33]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 33], i);
+#ifdef APPE
+			else if (i >= 186 && i <= 198)
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 36], i);
+			else if (i >= 210 && i <= 231)
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 47], i);
+#endif
 			else if (i >= 254 && i <= 255)
-				printk("%15llu(%s)", value, cpucode[i - 106]);
+				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 106], i);
 			else
-				printk("%15llu(Reserved)", value);
+				printk("%15llu(Reserved),cpucode:%d", value, i);
 		}
 	}
 	printk("\n");
@@ -926,7 +1101,7 @@ adpt_hppe_debug_drop_cpu_counter_get(a_bool_t show_type)
 		{
 			printk("\n");
 			printk("%-35s", "");
-			printk("%15llu(port=%d:%s)", value, (i - 256) % 8, dropcode[(i - 256) / 8]);
+			printk("%15llu(port=%d:%s),dropcode:%d", value, (i - 256) % 8, dropcode[(i - 256) / 8], (i-256)/8);
 		}
 	}
 	printk("\n");

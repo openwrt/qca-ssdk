@@ -2445,6 +2445,35 @@ extern "C" {
 #define GENEVE_API_PARAM
 #endif
 
+#ifdef IN_TUNNEL_PROGRAM
+#define TUNNEL_PROGRAM_API \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_ADD, fal_tunnel_program_entry_add), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_DEL, fal_tunnel_program_entry_del), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETFIRST, fal_tunnel_program_entry_getfirst), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETNEXT, fal_tunnel_program_entry_getnext), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_CFG_SET, fal_tunnel_program_cfg_set), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_CFG_GET, fal_tunnel_program_cfg_get), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_UDF_ADD, fal_tunnel_program_udf_add), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_UDF_DEL, fal_tunnel_program_udf_del), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETFIRST, fal_tunnel_program_udf_getfirst), \
+    SW_API_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETNEXT, fal_tunnel_program_udf_getnext),
+
+#define TUNNEL_PROGRAM_API_PARAM \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_ENTRY_ADD) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_ENTRY_DEL) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_ENTRY_GETFIRST) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_ENTRY_GETNEXT) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_CFG_SET) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_CFG_GET) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_UDF_ADD) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_UDF_DEL) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_UDF_GETFIRST) \
+    SW_API_DESC(SW_API_TUNNEL_PROGRAM_UDF_GETNEXT)
+#else
+#define TUNNEL_PROGRAM_API
+#define TUNNEL_PROGRAM_API_PARAM
+#endif
+
 /* auto_insert_flag */
 /*qca808x_start*/
 #define SSDK_API \
@@ -2494,6 +2523,7 @@ extern "C" {
     TUNNEL_API \
     VXLAN_API \
     GENEVE_API \
+    TUNNEL_PROGRAM_API \
 /* auto_insert_flag_1 */ \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_MAX, NULL),
@@ -2554,6 +2584,7 @@ extern "C" {
     TUNNEL_API_PARAM \
     VXLAN_API_PARAM \
     GENEVE_API_PARAM \
+    TUNNEL_PROGRAM_API_PARAM \
 /* auto_insert_flag_2 */ \
 /*qca808x_start*/\
     SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),

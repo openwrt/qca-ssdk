@@ -5098,6 +5098,77 @@ extern "C" {
     SW_PARAM_DEF(SW_API_GENEVE_ENTRY_GETNEXT, SW_TUNNEL_UDP_ENTRY, \
                     sizeof(fal_tunnel_udp_entry_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Geneve Entry"),
 
+#define SW_API_TUNNEL_PROGRAM_ENTRY_ADD_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_ADD, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_ADD, SW_TUNNEL_PROGRAM_ENTRY, \
+                    sizeof(fal_tunnel_program_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "Program Entry"),
+
+#define SW_API_TUNNEL_PROGRAM_ENTRY_DEL_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_DEL, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_DEL, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_DEL, SW_TUNNEL_PROGRAM_ENTRY, \
+                    sizeof(fal_tunnel_program_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "Program Entry"),
+
+#define SW_API_TUNNEL_PROGRAM_ENTRY_GETFIRST_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETFIRST, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETFIRST, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETFIRST, SW_TUNNEL_PROGRAM_ENTRY, \
+                    sizeof(fal_tunnel_program_entry_t), SW_PARAM_PTR|SW_PARAM_OUT, "Program Entry"),
+
+#define SW_API_TUNNEL_PROGRAM_ENTRY_GETNEXT_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETNEXT, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETNEXT, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_ENTRY_GETNEXT, SW_TUNNEL_PROGRAM_ENTRY, \
+                    sizeof(fal_tunnel_program_entry_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Program Entry"),
+
+#define SW_API_TUNNEL_PROGRAM_CFG_SET_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_CFG_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_CFG_SET, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_CFG_SET, SW_TUNNEL_PROGRAM_CFG, \
+                    sizeof(fal_tunnel_program_cfg_t), SW_PARAM_PTR|SW_PARAM_IN, "Program Cfg"),
+
+#define SW_API_TUNNEL_PROGRAM_CFG_GET_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_CFG_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_CFG_GET, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_CFG_GET, SW_TUNNEL_PROGRAM_CFG, \
+                    sizeof(fal_tunnel_program_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "Program Cfg"),
+
+#define SW_API_TUNNEL_PROGRAM_UDF_ADD_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_ADD, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_ADD, SW_TUNNEL_PROGRAM_UDF, \
+                    sizeof(fal_tunnel_program_udf_t), SW_PARAM_PTR|SW_PARAM_IN, "Program Udf"),
+
+#define SW_API_TUNNEL_PROGRAM_UDF_DEL_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_DEL, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_DEL, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_DEL, SW_TUNNEL_PROGRAM_UDF, \
+                    sizeof(fal_tunnel_program_udf_t), SW_PARAM_PTR|SW_PARAM_IN, "Program Udf"),
+
+
+#define SW_API_TUNNEL_PROGRAM_UDF_GETFIRST_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETFIRST, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETFIRST, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETFIRST, SW_TUNNEL_PROGRAM_UDF, \
+                    sizeof(fal_tunnel_program_udf_t), SW_PARAM_PTR|SW_PARAM_OUT, "Program Udf"),
+
+#define SW_API_TUNNEL_PROGRAM_UDF_GETNEXT_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETNEXT, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETNEXT, SW_TUNNEL_PROGRAM_TYPE, \
+                    sizeof(fal_tunnel_program_type_t), SW_PARAM_IN, "Program Type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETNEXT, SW_TUNNEL_PROGRAM_UDF, \
+                    sizeof(fal_tunnel_program_udf_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Program Udf"),
+
 /* auto_insert_flag */
 /*qca808x_start*/
 

@@ -55,6 +55,7 @@ extern "C" {
 #include "fal_tunnel.h"
 #include "fal_vxlan.h"
 #include "fal_geneve.h"
+#include "fal_tunnel_program.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1166,6 +1167,28 @@ typedef sw_error_t
 (*adpt_tunnel_encap_rule_entry_del_func)(a_uint32_t dev_id, a_uint32_t rule_id,
 		fal_tunnel_encap_rule_t *rule_entry);
 
+/*tunnel program*/
+typedef sw_error_t (*adpt_tunnel_program_entry_add_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_entry_t * entry);
+typedef sw_error_t (*adpt_tunnel_program_entry_del_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_entry_t * entry);
+typedef sw_error_t (*adpt_tunnel_program_entry_getfirst_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_entry_t * entry);
+typedef sw_error_t (*adpt_tunnel_program_entry_getnext_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_entry_t * entry);
+typedef sw_error_t (*adpt_tunnel_program_cfg_set_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_cfg_t * cfg);
+typedef sw_error_t (*adpt_tunnel_program_cfg_get_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_cfg_t * cfg);
+typedef sw_error_t (*adpt_tunnel_program_udf_add_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
+typedef sw_error_t (*adpt_tunnel_program_udf_del_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
+typedef sw_error_t (*adpt_tunnel_program_udf_getfirst_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
+typedef sw_error_t (*adpt_tunnel_program_udf_getnext_func)(a_uint32_t dev_id,
+        fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
+
 /* auto_insert_flag */
 typedef struct
 {
@@ -1763,6 +1786,18 @@ typedef struct
 	adpt_geneve_entry_del_func adpt_geneve_entry_del;
 	adpt_geneve_entry_getfirst_func adpt_geneve_entry_getfirst;
 	adpt_geneve_entry_getnext_func adpt_geneve_entry_getnext;
+	/*tunnel program*/
+	a_uint32_t adpt_tunnel_program_func_bitmap;
+	adpt_tunnel_program_entry_add_func adpt_tunnel_program_entry_add;
+	adpt_tunnel_program_entry_del_func adpt_tunnel_program_entry_del;
+	adpt_tunnel_program_entry_getfirst_func adpt_tunnel_program_entry_getfirst;
+	adpt_tunnel_program_entry_getnext_func adpt_tunnel_program_entry_getnext;
+	adpt_tunnel_program_cfg_set_func adpt_tunnel_program_cfg_set;
+	adpt_tunnel_program_cfg_get_func adpt_tunnel_program_cfg_get;
+	adpt_tunnel_program_udf_add_func adpt_tunnel_program_udf_add;
+	adpt_tunnel_program_udf_del_func adpt_tunnel_program_udf_del;
+	adpt_tunnel_program_udf_getfirst_func adpt_tunnel_program_udf_getfirst;
+	adpt_tunnel_program_udf_getnext_func adpt_tunnel_program_udf_getnext;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

@@ -29,6 +29,9 @@ extern "C" {
 sw_error_t adpt_appe_vport_init(a_uint32_t dev_id);
 void adpt_appe_vport_func_bitmap_init(a_uint32_t dev_id);
 
+sw_error_t adpt_appe_tunnel_init(a_uint32_t dev_id);
+void adpt_appe_tunnel_func_bitmap_init(a_uint32_t dev_id);
+
 
 #ifdef __cplusplus
 }

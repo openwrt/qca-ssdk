@@ -64,6 +64,11 @@ static sw_error_t adpt_appe_module_func_register(a_uint32_t dev_id, a_uint32_t m
 			rv = adpt_appe_vport_init(dev_id);
 #endif
 			break;
+		case FAL_MODULE_TUNNEL:
+#if defined(IN_TUNNEL)
+			rv = adpt_appe_tunnel_init(dev_id);
+#endif
+			break;
 		default:
 			break;
 	}
@@ -274,6 +279,8 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 		p_adpt_api->adpt_policer_func_bitmap = func_ctrl->bitmap[0];
 	} else if(module == FAL_MODULE_VPORT){
 		p_adpt_api->adpt_vport_func_bitmap = func_ctrl->bitmap[0];
+	} else if(module == FAL_MODULE_TUNNEL){
+		p_adpt_api->adpt_tunnel_func_bitmap = func_ctrl->bitmap[0];
 	}
 
 
@@ -355,6 +362,8 @@ sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_policer_func_bitmap;
 	} else if(module == FAL_MODULE_VPORT) {
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_vport_func_bitmap;
+	} else if(module == FAL_MODULE_TUNNEL) {
+		func_ctrl->bitmap[0] = p_adpt_api->adpt_tunnel_func_bitmap;
 	}
 
 	return SW_OK;
@@ -381,6 +390,10 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 			g_adpt_api[dev_id]->adpt_vport_func_bitmap = 0xffffffff;
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VPORT);
+			SW_RTN_ON_ERROR(rv);
+
+			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap = 0xffffffff;
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_TUNNEL);
 			SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(HPPE)
@@ -561,6 +574,13 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VPORT);
 			SW_RTN_ON_ERROR(rv);
 #endif
+			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap = 0;
+#if defined(IN_TUNNEL)
+			adpt_appe_tunnel_func_bitmap_init(dev_id);
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_TUNNEL);
+			SW_RTN_ON_ERROR(rv);
+#endif
+
 #endif
 #if defined(HPPE)
 		case CHIP_HPPE:

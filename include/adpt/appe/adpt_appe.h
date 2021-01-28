@@ -38,6 +38,8 @@ sw_error_t adpt_appe_vxlan_init(a_uint32_t dev_id);
 void adpt_appe_geneve_func_bitmap_init(a_uint32_t dev_id);
 sw_error_t adpt_appe_geneve_init(a_uint32_t dev_id);
 
+void adpt_appe_tunnel_program_func_bitmap_init(a_uint32_t dev_id);
+sw_error_t adpt_appe_tunnel_program_init(a_uint32_t dev_id);
 
 #ifdef __cplusplus
 }

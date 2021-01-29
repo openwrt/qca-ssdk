@@ -678,6 +678,10 @@ typedef sw_error_t (*adpt_portvlan_member_add_func)(a_uint32_t dev_id, fal_port_
 typedef sw_error_t (*adpt_portvlan_member_del_func)(a_uint32_t dev_id, fal_port_t port_id, fal_port_t mem_port_id);
 typedef sw_error_t (*adpt_portvlan_member_update_func)(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t mem_port_map);
 typedef sw_error_t (*adpt_portvlan_member_get_func)(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t * mem_port_map);
+typedef sw_error_t (*adpt_port_vlan_vpgroup_set_func)(a_uint32_t dev_id,
+		a_uint32_t vport, fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id);
+typedef sw_error_t (*adpt_port_vlan_vpgroup_get_func)(a_uint32_t dev_id,
+		a_uint32_t vport, fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id);
 /*portvlan module end*/
 
 /*ctrlpkt module end*/
@@ -1364,6 +1368,8 @@ typedef struct
 	adpt_portvlan_member_del_func adpt_portvlan_member_del;
 	adpt_portvlan_member_update_func adpt_portvlan_member_update;
 	adpt_portvlan_member_get_func adpt_portvlan_member_get;
+	adpt_port_vlan_vpgroup_set_func adpt_port_vlan_vpgroup_set;
+	adpt_port_vlan_vpgroup_get_func adpt_port_vlan_vpgroup_get;
 	/*portvlan module end*/
 
 	/*ctrlpkt module begin*/

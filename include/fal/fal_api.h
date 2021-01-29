@@ -395,7 +395,9 @@ extern "C" {
     SW_API_DEF(SW_API_PT_VLAN_TRANS_ADV_GETFIRST, fal_port_vlan_trans_adv_getfirst), \
     SW_API_DEF(SW_API_PT_VLAN_TRANS_ADV_GETNEXT, fal_port_vlan_trans_adv_getnext), \
     SW_API_DEF(SW_API_PT_VLAN_COUNTER_GET, fal_port_vlan_counter_get), \
-    SW_API_DEF(SW_API_PT_VLAN_COUNTER_CLEANUP, fal_port_vlan_counter_cleanup),
+    SW_API_DEF(SW_API_PT_VLAN_COUNTER_CLEANUP, fal_port_vlan_counter_cleanup), \
+    SW_API_DEF(SW_API_PT_VLAN_VPGROUP_SET, fal_port_vlan_vpgroup_set), \
+    SW_API_DEF(SW_API_PT_VLAN_VPGROUP_GET, fal_port_vlan_vpgroup_get),
 
 #define PORTVLAN_API_PARAM \
     SW_API_DESC(SW_API_PT_ING_MODE_GET) \
@@ -471,7 +473,9 @@ extern "C" {
     SW_API_DESC(SW_API_PT_VLAN_TRANS_ADV_GETFIRST) \
     SW_API_DESC(SW_API_PT_VLAN_TRANS_ADV_GETNEXT) \
     SW_API_DESC(SW_API_PT_VLAN_COUNTER_GET) \
-    SW_API_DESC(SW_API_PT_VLAN_COUNTER_CLEANUP)
+    SW_API_DESC(SW_API_PT_VLAN_COUNTER_CLEANUP) \
+    SW_API_DESC(SW_API_PT_VLAN_VPGROUP_SET) \
+    SW_API_DESC(SW_API_PT_VLAN_VPGROUP_GET)
 
 #else
 #define PORTVLAN_API \

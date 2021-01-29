@@ -2182,6 +2182,40 @@ _fal_port_vlan_counter_cleanup(a_uint32_t dev_id, a_uint32_t cnt_index)
 }
 
 sw_error_t
+_fal_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport,
+		fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_port_vlan_vpgroup_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_vlan_vpgroup_set(dev_id, vport, direction, vpgroup_id);
+    return rv;
+}
+
+sw_error_t
+_fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
+		fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_port_vlan_vpgroup_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_vlan_vpgroup_get(dev_id, vport, direction, vpgroup_id);
+    return rv;
+}
+
+sw_error_t
 fal_global_qinq_mode_set(a_uint32_t dev_id, fal_global_qinq_mode_t *mode)
 {
     sw_error_t rv = SW_OK;
@@ -2492,6 +2526,32 @@ fal_port_vlan_counter_cleanup(a_uint32_t dev_id, a_uint32_t cnt_index)
     return rv;
 }
 
+sw_error_t
+fal_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport,
+		fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_port_vlan_vpgroup_set(dev_id, vport, direction, vpgroup_id);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
+		fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_port_vlan_vpgroup_get(dev_id, vport, direction, vpgroup_id);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+EXPORT_SYMBOL(fal_port_vlan_vpgroup_set);
+EXPORT_SYMBOL(fal_port_vlan_vpgroup_get);
 EXPORT_SYMBOL(fal_port_invlan_mode_set);
 EXPORT_SYMBOL(fal_global_qinq_mode_set);
 EXPORT_SYMBOL(fal_global_qinq_mode_get);

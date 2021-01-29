@@ -254,6 +254,8 @@ enum {
 	FUNC_PORT_VLAN_MEMBER_DEL,
 	FUNC_PORT_VLAN_MEMBER_UPDATE,
 	FUNC_PORT_VLAN_MEMBER_GET,
+	FUNC_PORT_VLAN_VPGROUP_SET,
+	FUNC_PORT_VLAN_VPGROUP_GET,
 };
 
     sw_error_t
@@ -751,6 +753,12 @@ enum {
     fal_port_vlan_trans_adv_getnext(a_uint32_t dev_id, fal_port_t port_id, fal_port_vlan_direction_t direction,
                             fal_vlan_trans_adv_rule_t * rule, fal_vlan_trans_adv_action_t * action);
 
+    sw_error_t
+    fal_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport,
+		    fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id);
+    sw_error_t
+    fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
+		    fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id);
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

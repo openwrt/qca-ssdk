@@ -1408,6 +1408,30 @@ hppe_ipr_byte_high_reg_bytes_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#if (defined(APPE) || defined(CPPE))
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
 
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+#endif
 #endif
 

@@ -56,20 +56,6 @@ adpt_cppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 adpt_cppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl);
-sw_error_t
-adpt_cppe_port_source_filter_set(a_uint32_t dev_id,
-		fal_port_t port_id, a_bool_t enable);
-sw_error_t
-adpt_cppe_port_source_filter_get(a_uint32_t dev_id,
-		fal_port_t port_id, a_bool_t * enable);
-sw_error_t
-adpt_cppe_port_source_filter_config_set(
-		a_uint32_t dev_id, fal_port_t port_id,
-		fal_src_filter_config_t *src_filter_config);
-sw_error_t
-adpt_cppe_port_source_filter_config_get
-		(a_uint32_t dev_id, fal_port_t port_id,
-		fal_src_filter_config_t* src_filter_config);
 #endif
 sw_error_t
 adpt_cppe_port_to_channel_convert(a_uint32_t dev_id,

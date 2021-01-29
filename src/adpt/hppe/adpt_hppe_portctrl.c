@@ -3774,7 +3774,101 @@ adpt_hppe_port_wol_status_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#if (defined(CPPE) || defined(APPE))
+static sw_error_t
+_adpt_ppe_port_source_filter_config_get(a_uint32_t dev_id,
+	fal_port_t port_id, fal_src_filter_config_t *src_filter_config)
+{
+	sw_error_t rv = SW_OK;
+	a_bool_t src_filter_bypass;
 
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(src_filter_config);
+
+	port_id = FAL_PORT_ID_VALUE(port_id);
+	rv = ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_get(dev_id, port_id,
+			&src_filter_bypass);
+	SW_RTN_ON_ERROR(rv);
+	if(src_filter_bypass == A_TRUE)
+	{
+		src_filter_config->src_filter_enable = A_FALSE;
+	}
+	else
+	{
+		src_filter_config->src_filter_enable = A_TRUE;
+	}
+
+	rv = ppe_mru_mtu_ctrl_tbl_source_filtering_mode_get(dev_id,
+			port_id, &(src_filter_config->src_filter_mode));
+
+	return rv;
+}
+
+static sw_error_t
+_adpt_ppe_port_source_filter_config_set(a_uint32_t dev_id,
+	fal_port_t port_id, fal_src_filter_config_t *src_filter_config)
+{
+	sw_error_t rv = SW_OK;
+	a_bool_t src_filter_bypass;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(src_filter_config);
+
+	port_id = FAL_PORT_ID_VALUE(port_id);
+	if(src_filter_config->src_filter_enable == A_TRUE)
+	{
+		src_filter_bypass = A_FALSE;
+	}
+	else
+	{
+		src_filter_bypass = A_TRUE;
+	}
+	rv = ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_set(dev_id, port_id,
+			src_filter_bypass);
+	SW_RTN_ON_ERROR(rv);
+	rv = ppe_mru_mtu_ctrl_tbl_source_filtering_mode_set(dev_id, port_id,
+			src_filter_config->src_filter_mode);
+
+	return rv;
+}
+
+sw_error_t
+_adpt_ppe_port_source_filter_get(a_uint32_t dev_id,
+	fal_port_t port_id, a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+	fal_src_filter_config_t src_filter_config;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(enable);
+
+	rv = _adpt_ppe_port_source_filter_config_get(dev_id, port_id,
+			&src_filter_config);
+	SW_RTN_ON_ERROR(rv);
+	*enable = src_filter_config.src_filter_enable;
+
+	return rv;
+}
+
+sw_error_t
+_adpt_ppe_port_source_filter_set(a_uint32_t dev_id,
+	fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	fal_src_filter_config_t src_filter_config;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	rv = _adpt_ppe_port_source_filter_config_get(dev_id,
+			port_id, &src_filter_config);
+	SW_RTN_ON_ERROR(rv);
+	src_filter_config.src_filter_enable = enable;
+	rv = _adpt_ppe_port_source_filter_config_set(dev_id, port_id,
+			&src_filter_config);
+
+	return rv;
+}
+#endif
 sw_error_t
 adpt_hppe_port_source_filter_get(a_uint32_t dev_id,
 				fal_port_t port_id, a_bool_t * enable)
@@ -3818,9 +3912,10 @@ adpt_ppe_port_source_filter_get(a_uint32_t dev_id,
 				fal_port_t port_id, a_bool_t * enable)
 {
 	ADPT_DEV_ID_CHECK(dev_id);
-#ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
-		return adpt_cppe_port_source_filter_get(dev_id, port_id, enable);
+#if (defined(CPPE) || defined(APPE))
+	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+		adpt_chip_type_get(dev_id) == CHIP_APPE){
+		return _adpt_ppe_port_source_filter_get(dev_id, port_id, enable);
 	}
 #endif
 	return adpt_hppe_port_source_filter_get(dev_id, port_id, enable);
@@ -3832,9 +3927,10 @@ adpt_ppe_port_source_filter_set(a_uint32_t dev_id,
 
 {
 	ADPT_DEV_ID_CHECK(dev_id);
-#ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
-		return adpt_cppe_port_source_filter_set(dev_id, port_id, enable);
+#if (defined(CPPE) || defined(APPE))
+	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+		adpt_chip_type_get(dev_id) == CHIP_APPE){
+		return _adpt_ppe_port_source_filter_set(dev_id, port_id, enable);
 	}
 #endif
 	return adpt_hppe_port_source_filter_set(dev_id, port_id, enable);
@@ -3845,9 +3941,10 @@ adpt_ppe_port_source_filter_config_get(a_uint32_t dev_id,
 				fal_port_t port_id, fal_src_filter_config_t* src_filter_config)
 {
 	ADPT_DEV_ID_CHECK(dev_id);
-#ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
-		return adpt_cppe_port_source_filter_config_get(dev_id, port_id,
+#if (defined(CPPE) || defined(APPE))
+	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+		adpt_chip_type_get(dev_id) == CHIP_APPE){
+		return _adpt_ppe_port_source_filter_config_get(dev_id, port_id,
 				src_filter_config);
 	}
 #endif
@@ -3860,9 +3957,10 @@ adpt_ppe_port_source_filter_config_set(a_uint32_t dev_id,
 
 {
 	ADPT_DEV_ID_CHECK(dev_id);
-#ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
-		return adpt_cppe_port_source_filter_config_set(dev_id, port_id, src_filter_config);
+#if (defined(CPPE) || defined(APPE))
+	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION ||
+		adpt_chip_type_get(dev_id) == CHIP_APPE){
+		return _adpt_ppe_port_source_filter_config_set(dev_id, port_id, src_filter_config);
 	}
 #endif
 	return SW_NOT_SUPPORTED;

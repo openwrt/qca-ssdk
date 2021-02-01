@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -35,6 +35,8 @@ extern "C" {
 #define FAL_SERVCODE_API_UNLOCK
 #endif
 
+#define SERVICE_BYP_NUM 4
+
 enum {
 	FLD_UPDATE_CAPWAP_EN = 0, /*only for IP197*/
 	FLD_UPDATE_DIRECTION, /*only for IP197*/
@@ -44,6 +46,21 @@ enum {
 	FLD_UPDATE_SERVICE_CODE,
 	FLD_UPDATE_HASH_FLOW_INDEX,
 	FLD_UPDATE_FAKE_L2_PROT_EN, /*only for IP197*/
+	/* new add for alder */
+	FLD_UP_EIP_FLOW_LABEL = 8, /*only for IP197*/
+	FLD_UP_ALLOWPADDING,       /*only for IP197*/
+	FLD_UP_STRIPPADDING,       /*only for IP197*/
+	FLD_UP_KEEPOUTER,          /*only for IP197*/
+	FLD_UP_L4CHECKSUM,         /*only for IP197*/
+	FLD_UP_IPV4CHECKSUM,       /*only for IP197*/
+	FLD_UP_ENCLASTDEST,        /*only for IP197*/
+	FLD_UP_WIFI_QOS,
+	FLD_UP_TREE_QOS,
+	FLD_UP_FLOW_IDX,
+	FLD_UP_SRC_INFO_BYPASS = 24,
+	FLD_UP_DST_INFO_BYPASS,
+	FLD_UP_MAC_HDR_BYPASS,
+	FLD_UP_FAKE_MAC_CLEAR,
 };
 
 enum {
@@ -66,6 +83,8 @@ enum {
 	FAKE_L2_PROTO_BYP,
 	PPPOE_TERMINATION_BYP,
 	DEFAULT_VLAN_BYP,
+	DEFAULT_PCP_BYP, /* new add for alder */
+	VSI_ASSIGN_BYP, /* new add for alder */
 	IN_VLAN_ASSIGN_FAIL_BYP = 24,
 	SOURCE_GUARD_BYP,
 	MRU_MTU_CHECK_BYP,
@@ -94,6 +113,9 @@ enum {
 	DSCP_QOS_BYP,
 	PCP_QOS_BYP,
 	PREHEADER_QOS_BYP,
+	/* new add for alder */
+	FAKE_MAC_DROP_BYP,
+	TUNL_CONTEXT_BYP,
 
 	RX_VLAN_COUNTER_BYP = 64,
 	RX_COUNTER_BYP,
@@ -101,10 +123,33 @@ enum {
 	TX_COUNTER_BYP,
 };
 
+/* new add for alder */
+enum {
+	TL_SERVICE_CODE_BYP = 0,
+	TL_BYP,
+	TL_L3_IF_CHECK_BYP,
+	TL_VLAN_CHECK_BYP,
+	TL_DMAC_CHECK_BYP,
+	TL_UDP_CSUM_0_CHECK_BYP = 5,
+	TL_TBL_DE_ACCE_CHECK_BYP,
+	TL_PPPOE_MC_TERM_CHECK_BYP,
+	TL_TTL_EXCEED_CHECK_BYP,
+	TL_MAP_SRC_CHECK_BYP,
+	TL_MAP_DST_CHECK_BYP = 10,
+	TL_LPM_DST_LOOKUP_BYP,
+	TL_LPM_LOOKUP_BYP,
+	TL_WRONG_PKT_FMT_L2_BYP,
+	TL_WRONG_PKT_FMT_L3_IPV4_BYP,
+	TL_WRONG_PKT_FMT_L3_IPV6_BYP = 15,
+	TL_WRONG_PKT_FMT_L4_BYP,
+	TL_WRONG_PKT_FMT_TUNNEL_BYP,
+	TL_PRE_IPO_BYP = 20,
+};
+
 typedef struct {
 	a_bool_t dest_port_valid; /* dest_port_id valid or not */
 	fal_port_t dest_port_id; /* destination physical port id:0-7 */
-	a_uint32_t  bypass_bitmap[3]; /* refer to enum IN_VLAN_TAG_FMT_CHECK_BYP... */
+	a_uint32_t  bypass_bitmap[SERVICE_BYP_NUM]; /* refer to enum IN_VLAN_TAG_FMT_CHECK_BYP... */
 	a_uint32_t  direction; /* if dest is vp, fill it in dest_info or src_info, 0:dest, 1:src */
 
 	a_uint32_t  field_update_bitmap; /* refer to enum FLD_UPDATE_CAPWAP_EN... */

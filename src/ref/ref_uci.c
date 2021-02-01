@@ -9777,16 +9777,18 @@ parse_servcode_config(struct switch_val *val)
 			val_ptr[4] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "bypass_bitmap_2")) {
 			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "direction")) {
+		} else if (!strcmp(ext_value_p->option_name, "bypass_bitmap_3")) {
 			val_ptr[6] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "field_update_bitmap")) {
+		} else if (!strcmp(ext_value_p->option_name, "direction")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "next_servicecode")) {
+		} else if (!strcmp(ext_value_p->option_name, "field_update_bitmap")) {
 			val_ptr[8] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "hardwareservices")) {
+		} else if (!strcmp(ext_value_p->option_name, "next_servicecode")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "offsetselection")) {
+		} else if (!strcmp(ext_value_p->option_name, "hardwareservices")) {
 			val_ptr[10] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "offsetselection")) {
+			val_ptr[11] = (char*)ext_value_p->option_value;
 		}  else {
 			rv = -1;
 			break;

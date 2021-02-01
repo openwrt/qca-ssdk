@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2015-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -382,9 +382,18 @@ enum
 	FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET,
 };
 
+typedef enum {
+	FAL_MTU_ETHERNET = 0,
+	FAL_MTU_IP,
+} fal_mtu_type_t;
+
 typedef struct {
-	a_uint32_t 		mtu_size;
-	fal_fwd_cmd_t 	action;
+	a_uint32_t	mtu_size;
+	fal_fwd_cmd_t	action;
+	a_bool_t	mtu_enable;/*add it for ipq95xx*/
+	fal_mtu_type_t	mtu_type;/*add it for ipq95xx*/
+	a_uint32_t	extra_header_len;/*add it for ipq95xx*/
+	a_uint32_t	eg_vlan_tag_flag;/*bit 0 ctag, bit 1 stag,add it for ipq95xx*/
 } fal_mtu_ctrl_t;
 
 typedef struct {

@@ -7422,3 +7422,69 @@ appe_tl_vlan_tbl_set(
 				value->val,
 				sizeof(union tl_vlan_tbl_u) / sizeof(a_uint32_t));
 }
+
+sw_error_t
+appe_ecn_map_mode0_0_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode0_0_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE0_0_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode0_0_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode0_0_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE0_0_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode1_0_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode1_0_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE1_0_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode1_0_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode1_0_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE1_0_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode2_0_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode2_0_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE2_0_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode2_0_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode2_0_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE2_0_ADDRESS,
+				value->val);
+}

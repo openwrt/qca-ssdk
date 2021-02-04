@@ -2177,8 +2177,13 @@ union eg_header_data_u {
 	/*[field] RESV*/
 	#define EG_XLAT_TUN_CTRL_RESV
 	#define EG_XLAT_TUN_CTRL_RESV_OFFSET  1
-	#define EG_XLAT_TUN_CTRL_RESV_LEN     3
+	#define EG_XLAT_TUN_CTRL_RESV_LEN     2
 	#define EG_XLAT_TUN_CTRL_RESV_DEFAULT 0x0
+	/*[field] IPV4_DF_MODE_EXT*/
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_EXT_MODE
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_EXT_MODE_OFFSET  3
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_EXT_MODE_LEN     1
+	#define EG_XLAT_TUN_CTRL_IPV4_DF_EXT_MODE_DEFAULT 0x0
 	/*[field] EDIT_RULE_ID*/
 	#define EG_XLAT_TUN_CTRL_EDIT_RULE_ID
 	#define EG_XLAT_TUN_CTRL_EDIT_RULE_ID_OFFSET  4
@@ -2327,7 +2332,8 @@ union eg_header_data_u {
 
 struct eg_xlat_tun_ctrl {
 	a_uint32_t  type:1;
-	a_uint32_t  resv:3;
+	a_uint32_t  resv:2;
+	a_uint32_t  ipv4_df_mode_ext:1;
 	a_uint32_t  edit_rule_id:4;
 	a_uint32_t  edit_rule_target:2;
 	a_uint32_t  data_length:8;
@@ -2727,5 +2733,71 @@ union tl_vlan_tbl_u {
 	struct tl_vlan_tbl_0 bf0;
 	struct tl_vlan_tbl_1 bf1;
 	struct tl_vlan_tbl_2 bf2;
+};
+
+/*[register] ECN_MAP_MODE0_0*/
+#define ECN_MAP_MODE0_0
+#define ECN_MAP_MODE0_0_ADDRESS 0x43c0
+#define ECN_MAP_MODE0_0_NUM     1
+#define ECN_MAP_MODE0_0_INC     0x4
+#define ECN_MAP_MODE0_0_TYPE    REG_TYPE_RW
+#define ECN_MAP_MODE0_0_DEFAULT 0x57abff
+	/*[field] NEW_ECN*/
+	#define ECN_MAP_MODE0_0_NEW_ECN
+	#define ECN_MAP_MODE0_0_NEW_ECN_OFFSET  0
+	#define ECN_MAP_MODE0_0_NEW_ECN_LEN     32
+	#define ECN_MAP_MODE0_0_NEW_ECN_DEFAULT 0x57abff
+
+struct ecn_map_mode0_0 {
+	a_uint32_t  new_ecn:32;
+};
+
+union ecn_map_mode0_0_u {
+	a_uint32_t val;
+	struct ecn_map_mode0_0 bf;
+};
+
+/*[register] ECN_MAP_MODE1_0*/
+#define ECN_MAP_MODE1_0
+#define ECN_MAP_MODE1_0_ADDRESS 0x43d0
+#define ECN_MAP_MODE1_0_NUM     1
+#define ECN_MAP_MODE1_0_INC     0x4
+#define ECN_MAP_MODE1_0_TYPE    REG_TYPE_RW
+#define ECN_MAP_MODE1_0_DEFAULT 0x57abff
+	/*[field] NEW_ECN*/
+	#define ECN_MAP_MODE1_0_NEW_ECN
+	#define ECN_MAP_MODE1_0_NEW_ECN_OFFSET  0
+	#define ECN_MAP_MODE1_0_NEW_ECN_LEN     32
+	#define ECN_MAP_MODE1_0_NEW_ECN_DEFAULT 0x57abff
+
+struct ecn_map_mode1_0 {
+	a_uint32_t  new_ecn:32;
+};
+
+union ecn_map_mode1_0_u {
+	a_uint32_t val;
+	struct ecn_map_mode1_0 bf;
+};
+
+/*[register] ECN_MAP_MODE2_0*/
+#define ECN_MAP_MODE2_0
+#define ECN_MAP_MODE2_0_ADDRESS 0x43e0
+#define ECN_MAP_MODE2_0_NUM     1
+#define ECN_MAP_MODE2_0_INC     0x4
+#define ECN_MAP_MODE2_0_TYPE    REG_TYPE_RW
+#define ECN_MAP_MODE2_0_DEFAULT 0x5babff
+	/*[field] NEW_ECN*/
+	#define ECN_MAP_MODE2_0_NEW_ECN
+	#define ECN_MAP_MODE2_0_NEW_ECN_OFFSET  0
+	#define ECN_MAP_MODE2_0_NEW_ECN_LEN     32
+	#define ECN_MAP_MODE2_0_NEW_ECN_DEFAULT 0x5babff
+
+struct ecn_map_mode2_0 {
+	a_uint32_t  new_ecn:32;
+};
+
+union ecn_map_mode2_0_u {
+	a_uint32_t val;
+	struct ecn_map_mode2_0 bf;
 };
 #endif

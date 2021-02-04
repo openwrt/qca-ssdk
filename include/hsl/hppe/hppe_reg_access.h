@@ -32,6 +32,7 @@ extern "C" {
 #define IPO_CSR_BASE_ADDR            0x0b0000
 
 #if defined(APPE)
+#define PRE_IPO_CSR_BASE_ADDR        0x180000
 #define IPR_CSR_BASE_ADDR            0x1e0000
 #define NSS_XGMAC_CSR_BASE_ADDR      0x500000
 #define TUNNEL_LOOKUP_BASE_ADDR      0x300000

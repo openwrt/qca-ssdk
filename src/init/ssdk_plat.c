@@ -883,6 +883,41 @@ void ssdk_dts_port_scheduler_dump(a_uint32_t dev_id)
 	}
 }
 
+void ssdk_dts_reserved_scheduler_dump(a_uint32_t dev_id)
+{
+	ssdk_dt_portscheduler_cfg *reserved_cfg;
+	ssdk_dt_scheduler_cfg *scheduler_cfg;
+	a_uint8_t srcmsg[7][16];
+
+	scheduler_cfg = ssdk_bootup_shceduler_cfg_get(dev_id);
+	if (!scheduler_cfg) {
+		return;
+	}
+
+	reserved_cfg = &scheduler_cfg->reserved_pool;
+
+	printk("=============================reserved_scheduler_resource========================="
+			"\n");
+	printk("reserved   ucastq     mcastq     10sp     10cdrr     10edrr     11cdrr     11edrr"
+			"\n");
+	snprintf(srcmsg[0], sizeof(srcmsg[0]), "<%d %d>", reserved_cfg->ucastq_start,
+			reserved_cfg->ucastq_end);
+	snprintf(srcmsg[1], sizeof(srcmsg[1]), "<%d %d>", reserved_cfg->mcastq_start,
+			reserved_cfg->mcastq_end);
+	snprintf(srcmsg[2], sizeof(srcmsg[2]), "<%d %d>", reserved_cfg->l0sp_start,
+			reserved_cfg->l0sp_end);
+	snprintf(srcmsg[3], sizeof(srcmsg[3]), "<%d %d>", reserved_cfg->l0cdrr_start,
+			reserved_cfg->l0cdrr_end);
+	snprintf(srcmsg[4], sizeof(srcmsg[4]), "<%d %d>", reserved_cfg->l0edrr_start,
+			reserved_cfg->l0edrr_end);
+	snprintf(srcmsg[5], sizeof(srcmsg[5]), "<%d %d>", reserved_cfg->l1cdrr_start,
+			reserved_cfg->l1cdrr_end);
+	snprintf(srcmsg[6], sizeof(srcmsg[6]), "<%d %d>", reserved_cfg->l1edrr_start,
+			reserved_cfg->l1edrr_end);
+	printk("      %11s%11s%9s%11s%11s%11s%11s\n", srcmsg[0], srcmsg[1], srcmsg[2], srcmsg[3],
+			srcmsg[4], srcmsg[5], srcmsg[6]);
+}
+
 void ssdk_dts_l0scheduler_dump(a_uint32_t dev_id)
 {
 	a_uint32_t i;
@@ -1030,6 +1065,8 @@ static ssize_t ssdk_dts_dump(struct device *dev,
 #ifdef IN_QOS
 		printk("\n");
 		ssdk_dts_port_scheduler_dump(dev_id);
+		printk("\n");
+		ssdk_dts_reserved_scheduler_dump(dev_id);
 		printk("\n");
 		ssdk_dts_l0scheduler_dump(dev_id);
 		printk("\n");

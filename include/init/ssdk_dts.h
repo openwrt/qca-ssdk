@@ -65,6 +65,7 @@ typedef struct {
 	ssdk_dt_portscheduler_cfg pool[SSDK_MAX_PORT_NUM];
 	ssdk_dt_l0scheduler_cfg l0cfg[SSDK_L0SCHEDULER_CFG_MAX];
 	ssdk_dt_l1scheduler_cfg l1cfg[SSDK_L1SCHEDULER_CFG_MAX];
+	ssdk_dt_portscheduler_cfg reserved_pool;
 } ssdk_dt_scheduler_cfg;
 
 typedef struct

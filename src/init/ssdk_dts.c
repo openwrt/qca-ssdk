@@ -408,17 +408,24 @@ static void ssdk_dt_parse_l0_queue_cfg(
 	a_uint32_t tmp_cfg[5];
 	const __be32 *paddr;
 	a_uint32_t len, i, queue_id, pri_loop;
+	a_uint32_t max_pri = SSDK_SP_MAX_PRIORITY;
 
 	paddr = of_get_property(node, queue_name, &len);
 	len /= sizeof(a_uint32_t);
 	if (!paddr) {
-		SSDK_ERROR("error reading %s property\n", queue_name);
+		SSDK_DEBUG("error reading %s property\n", queue_name);
 		return;
 	}
 	if (of_property_read_u32_array(node, "cfg", tmp_cfg, 5)) {
 		SSDK_ERROR("error reading cfg property!\n");
 		return;
 	}
+
+	/* update the max_pri if the property ucast_max_pri exist */
+	if (!of_property_read_u32(node, "ucast_max_pri", &max_pri)) {
+		SSDK_DEBUG("Configure Max priority per SP: %d\n", max_pri);
+	}
+
 	if (of_property_read_u32(node, loop_name, &pri_loop)) {
 		for (i = 0; i < len; i++) {
 			queue_id = be32_to_cpup(paddr+i);
@@ -450,10 +457,10 @@ static void ssdk_dt_parse_l0_queue_cfg(
 		for (i = 0; i < pri_loop; i++) {
 			cfg->l0cfg[queue_id + i].valid = 1;
 			cfg->l0cfg[queue_id + i].port_id = port_id;
-			cfg->l0cfg[queue_id + i].sp_id = tmp_cfg[0] + i/SSDK_SP_MAX_PRIORITY;
-			cfg->l0cfg[queue_id + i].cpri = tmp_cfg[1] + i%SSDK_SP_MAX_PRIORITY;
+			cfg->l0cfg[queue_id + i].sp_id = tmp_cfg[0] + i/max_pri;
+			cfg->l0cfg[queue_id + i].cpri = tmp_cfg[1] + i%max_pri;
 			cfg->l0cfg[queue_id + i].cdrr_id = tmp_cfg[2] + i;
-			cfg->l0cfg[queue_id + i].epri = tmp_cfg[3] + i%SSDK_SP_MAX_PRIORITY;
+			cfg->l0cfg[queue_id + i].epri = tmp_cfg[3] + i%max_pri;
 			cfg->l0cfg[queue_id + i].edrr_id = tmp_cfg[4] + i;
 		}
 	}
@@ -485,6 +492,7 @@ static void ssdk_dt_parse_scheduler_resource(
 {
 	a_uint32_t uq[2], mq[2], l0sp[2], l0cdrr[2];
 	a_uint32_t l0edrr[2], l1cdrr[2], l1edrr[2];
+	ssdk_dt_portscheduler_cfg *scheduler_cfg = NULL;
 	ssdk_dt_scheduler_cfg *cfg = &(ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->scheduler_cfg);
 
 	if (of_property_read_u32_array(port_node, "ucast_queue", uq, 2)
@@ -497,20 +505,31 @@ static void ssdk_dt_parse_scheduler_resource(
 		SSDK_ERROR("error reading port resource scheduler properties\n");
 		return;
 	}
-	cfg->pool[port_id].ucastq_start = uq[0];
-	cfg->pool[port_id].ucastq_end = uq[1];
-	cfg->pool[port_id].mcastq_start = mq[0];
-	cfg->pool[port_id].mcastq_end = mq[1];
-	cfg->pool[port_id].l0sp_start = l0sp[0];
-	cfg->pool[port_id].l0sp_end = l0sp[1];
-	cfg->pool[port_id].l0cdrr_start = l0cdrr[0];
-	cfg->pool[port_id].l0cdrr_end = l0cdrr[1];
-	cfg->pool[port_id].l0edrr_start = l0edrr[0];
-	cfg->pool[port_id].l0edrr_end = l0edrr[1];
-	cfg->pool[port_id].l1cdrr_start = l1cdrr[0];
-	cfg->pool[port_id].l1cdrr_end = l1cdrr[1];
-	cfg->pool[port_id].l1edrr_start = l1edrr[0];
-	cfg->pool[port_id].l1edrr_end = l1edrr[1];
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+	if (of_node_name_eq(port_node, "reserved")) {
+#else
+	if (!of_node_cmp(port_node->name, "reserved")) {
+#endif
+		scheduler_cfg = &cfg->reserved_pool;
+	} else {
+		scheduler_cfg = &cfg->pool[port_id];
+	}
+
+	scheduler_cfg->ucastq_start = uq[0];
+	scheduler_cfg->ucastq_end = uq[1];
+	scheduler_cfg->mcastq_start = mq[0];
+	scheduler_cfg->mcastq_end = mq[1];
+	scheduler_cfg->l0sp_start = l0sp[0];
+	scheduler_cfg->l0sp_end = l0sp[1];
+	scheduler_cfg->l0cdrr_start = l0cdrr[0];
+	scheduler_cfg->l0cdrr_end = l0cdrr[1];
+	scheduler_cfg->l0edrr_start = l0edrr[0];
+	scheduler_cfg->l0edrr_end = l0edrr[1];
+	scheduler_cfg->l1cdrr_start = l1cdrr[0];
+	scheduler_cfg->l1cdrr_end = l1cdrr[1];
+	scheduler_cfg->l1edrr_start = l1edrr[0];
+	scheduler_cfg->l1edrr_end = l1edrr[1];
 }
 
 static void ssdk_dt_parse_scheduler_cfg(a_uint32_t dev_id, struct device_node *switch_node)
@@ -525,13 +544,19 @@ static void ssdk_dt_parse_scheduler_cfg(a_uint32_t dev_id, struct device_node *s
 		return;
 	}
 	for_each_available_child_of_node(scheduler_node, child) {
-		if (of_property_read_u32(child, "port_id", &port_id)) {
-			SSDK_ERROR("error reading for port_id property!\n");
-			return;
-		}
-		if (port_id >= SSDK_MAX_PORT_NUM) {
-			SSDK_ERROR("invalid parameter for port_id(%d)!\n", port_id);
-			return;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+		if (!of_node_name_eq(child, "reserved")) {
+#else
+		if (of_node_cmp(child->name, "reserved")) {
+#endif
+			if (of_property_read_u32(child, "port_id", &port_id)) {
+				SSDK_ERROR("error reading for port_id property!\n");
+				return;
+			}
+			if (port_id >= SSDK_MAX_PORT_NUM) {
+				SSDK_ERROR("invalid parameter for port_id(%d)!\n", port_id);
+				return;
+			}
 		}
 		ssdk_dt_parse_scheduler_resource(child, dev_id, port_id);
 	}

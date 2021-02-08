@@ -21,6 +21,9 @@
  */
 #include "sw.h"
 #include "fal_vport.h"
+#if defined(IN_QM)
+#include "fal_qm.h"
+#endif
 #include "appe_l2_vp_reg.h"
 #include "appe_l2_vp.h"
 #include "adpt.h"
@@ -51,13 +54,41 @@ adpt_appe_vport_physical_port_id_set(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	a_uint32_t pport_id = 0;
 	a_uint32_t vport_value = 0;
+#if defined(IN_QM)
+	adpt_api_t *p_adpt_api = NULL;
+	a_uint32_t queue_base = 0;
+	a_uint8_t profile = 0;
+	fal_ucast_queue_dest_t queue_dest;
+#endif
 
 	ADPT_DEV_ID_CHECK(dev_id);
-
 	vport_value = FAL_PORT_ID_VALUE(vport_id);
 	pport_id = FAL_PORT_ID_VALUE(phyport_id);
 
 	rv = appe_l2_vp_port_tbl_physical_port_set(dev_id, vport_value, pport_id);
+	SW_RTN_ON_ERROR(rv);
+
+#if defined(IN_QM)
+	p_adpt_api = adpt_api_ptr_get(dev_id);
+	ADPT_NULL_POINT_CHECK(p_adpt_api);
+	ADPT_NULL_POINT_CHECK(p_adpt_api->adpt_ucast_queue_base_profile_set);
+	ADPT_NULL_POINT_CHECK(p_adpt_api->adpt_ucast_queue_base_profile_get);
+
+	aos_mem_zero(&queue_dest, sizeof(fal_ucast_queue_dest_t));
+
+	/* configure the queue base of vport with the queue base of physical port
+	 * the source profile id 0 is selected by default.
+	 * */
+	queue_dest.src_profile = 0;
+	queue_dest.dst_port = pport_id;
+	rv = p_adpt_api->adpt_ucast_queue_base_profile_get(dev_id,
+			&queue_dest, &queue_base, &profile);
+	SW_RTN_ON_ERROR(rv);
+
+	queue_dest.dst_port = vport_value;
+	rv = p_adpt_api->adpt_ucast_queue_base_profile_set(dev_id,
+			&queue_dest, queue_base, profile);
+#endif
 
 	return rv;
 }

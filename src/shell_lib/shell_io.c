@@ -22,6 +22,8 @@
     do { if ((rtn) == NULL) return SW_BAD_PARAM; } while(0);
 
 #define DEFAULT_FLAG "default"
+#define MAX_ARRT_NUM 32
+#define INVALID_ARRT_VALUE 0xFFFFFFFF
 static char **full_cmdstrp;
 static int talk_mode = 1;
 
@@ -40,6 +42,55 @@ static int talk_mode = 1;
             ret = chk_func param; \
         }\
     } while (talk_mode && (SW_OK != ret));\
+}
+
+struct sub_attr_des_t
+{
+	char *sub_attr_name;
+	a_uint32_t value;
+};
+
+struct attr_des_t
+{
+	char *attr_name;
+	struct sub_attr_des_t sub_attr_des[MAX_ARRT_NUM];
+};
+
+struct attr_des_t g_attr_des[] =
+{
+	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
+};
+
+sw_error_t
+cmd_data_check_attr(char * attr_name, char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
+{
+	a_uint32_t i, j;
+
+	if (NULL == cmd_str)
+	{
+		return SW_BAD_VALUE;
+	}
+
+	for (i = 0; g_attr_des[i].attr_name != NULL; i++)
+	{
+		if (!strcasecmp(attr_name, g_attr_des[i].attr_name))
+		{ /* find attr */
+			break;
+		}
+	}
+	if (g_attr_des[i].attr_name == NULL)
+	{
+		return SW_BAD_VALUE;
+	}
+	for (j = 0; g_attr_des[i].sub_attr_des[j].sub_attr_name != NULL; j++)
+	{
+		if (!strcasecmp(cmd_str, g_attr_des[i].sub_attr_des[j].sub_attr_name))
+		{ /* find sub attr */
+			*arg_val = g_attr_des[i].sub_attr_des[j].value;
+			return SW_OK;
+		}
+	}
+	return SW_BAD_VALUE;
 }
 
 int

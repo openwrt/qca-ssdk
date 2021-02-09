@@ -131,7 +131,18 @@ typedef struct{
 	a_int8_t   phy_name[32];
 }fal_phy_dump_t;
 
+typedef enum
+{
+	FAL_DEST_INFO_PORT_BMP = 0,
+	FAL_DEST_INFO_PORT_ID,
+	FAL_DEST_INFO_BUTT
+} fal_dest_info_type_t;
 
+typedef struct
+{
+	fal_dest_info_type_t dest_info_type;
+	a_uint32_t dest_info_value;
+}fal_dest_info_t;
 
 #ifdef __cplusplus
 }

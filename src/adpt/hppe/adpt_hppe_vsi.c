@@ -636,7 +636,9 @@ void adpt_hppe_vsi_func_bitmap_init(a_uint32_t dev_id)
 						(1<<FUNC_VSI_COUNTER_GET)|
 						(1<<FUNC_VSI_COUNTER_CLEANUP));
 #ifdef APPE
-	p_adpt_api->adpt_vsi_func_bitmap |= ((1<<FUNC_VSI_BRIDGE_VSI_SET)|
+	p_adpt_api->adpt_vsi_func_bitmap |= ((1<<FUNC_VSI_INVALIDVSI_CTRL_SET)|
+						(1<<FUNC_VSI_INVALIDVSI_CTRL_GET)|
+						(1<<FUNC_VSI_BRIDGE_VSI_SET)|
 						(1<<FUNC_VSI_BRIDGE_VSI_GET));
 #endif
 
@@ -664,6 +666,8 @@ static void adpt_hppe_vsi_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_
 	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		p_adpt_api->adpt_vsi_bridge_vsi_get = NULL;
 		p_adpt_api->adpt_vsi_bridge_vsi_set = NULL;
+		p_adpt_api->adpt_vsi_invalidvsi_ctrl_get = NULL;
+		p_adpt_api->adpt_vsi_invalidvsi_ctrl_set = NULL;
 	}
 #endif
 	return;
@@ -714,6 +718,10 @@ sw_error_t adpt_hppe_vsi_init(a_uint32_t dev_id)
 			p_adpt_api->adpt_vsi_bridge_vsi_get = adpt_appe_vsi_bridge_vsi_get;
 		if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_BRIDGE_VSI_SET))
 			p_adpt_api->adpt_vsi_bridge_vsi_set = adpt_appe_vsi_bridge_vsi_set;
+		if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_INVALIDVSI_CTRL_GET))
+			p_adpt_api->adpt_vsi_invalidvsi_ctrl_get = adpt_appe_vsi_invalidvsi_ctrl_get;
+		if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_INVALIDVSI_CTRL_SET))
+			p_adpt_api->adpt_vsi_invalidvsi_ctrl_set = adpt_appe_vsi_invalidvsi_ctrl_set;
 	}
 #endif
 

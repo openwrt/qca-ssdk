@@ -151,6 +151,8 @@ typedef sw_error_t (*adpt_vsi_counter_get_func)(a_uint32_t dev_id, a_uint32_t vs
 typedef sw_error_t (*adpt_vsi_counter_cleanup_func)(a_uint32_t dev_id, a_uint32_t vsi_id);
 typedef sw_error_t (*adpt_vsi_bridge_vsi_get_func)(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_bridge_vsi_t *bridge_vsi);
 typedef sw_error_t (*adpt_vsi_bridge_vsi_set_func)(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_bridge_vsi_t *bridge_vsi);
+typedef sw_error_t (*adpt_vsi_invalidvsi_ctrl_get_func)(a_uint32_t dev_id, fal_port_t port_id, fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl);
+typedef sw_error_t (*adpt_vsi_invalidvsi_ctrl_set_func)(a_uint32_t dev_id, fal_port_t port_id, fal_vsi_invalidvsi_ctrl_t *invalidvsi_ctrl);
 
 // portctrl function.
 
@@ -1131,6 +1133,8 @@ typedef struct
 	adpt_vsi_counter_cleanup_func adpt_vsi_counter_cleanup;
 	adpt_vsi_bridge_vsi_get_func adpt_vsi_bridge_vsi_get;
 	adpt_vsi_bridge_vsi_set_func adpt_vsi_bridge_vsi_set;
+	adpt_vsi_invalidvsi_ctrl_get_func adpt_vsi_invalidvsi_ctrl_get;
+	adpt_vsi_invalidvsi_ctrl_set_func adpt_vsi_invalidvsi_ctrl_set;
 
 	// port_ctrl
 	a_uint32_t adpt_port_ctrl_func_bitmap[3];

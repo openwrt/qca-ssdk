@@ -321,6 +321,7 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_VSI_STAMOVE, (param_check_t)cmd_data_check_stamove, NULL),
     SW_TYPE_DEF(SW_VSI_MEMBER, (param_check_t)cmd_data_check_vsi_member, NULL),
     SW_TYPE_DEF(SW_VSI_BRIDGE_VSI,(param_check_t)cmd_data_check_vsi_bridge_vsi, NULL),
+    SW_TYPE_DEF(SW_VSI_INVALIDVSI_CTRL,(param_check_t)cmd_data_check_vsi_invalidvsi_ctrl, NULL),
     SW_TYPE_DEF(SW_VSI_COUNTER, NULL, NULL),
 #endif
 #ifdef IN_QM
@@ -9883,6 +9884,36 @@ cmd_data_check_vsi_bridge_vsi(char *cmd_str, void *arg_val, a_uint32_t size)
 
     return rv;
 
+}
+
+sw_error_t
+cmd_data_check_vsi_invalidvsi_ctrl(char *cmd_str, void *arg_val, a_uint32_t size)
+{
+    sw_error_t rv;
+    fal_vsi_invalidvsi_ctrl_t invalidvsi_ctrl;
+
+    aos_mem_zero(&invalidvsi_ctrl, sizeof (fal_vsi_invalidvsi_ctrl_t));
+
+    rv = __cmd_data_check_complex("dest_en", "disable",
+                        "usage:dest_en,enable/disable\n",
+                        cmd_data_check_enable, &(invalidvsi_ctrl.dest_en),
+                        sizeof (invalidvsi_ctrl.dest_en));
+    SW_RTN_ON_ERROR(rv);
+
+    rv = __cmd_data_check_complex("dest_info_type", "1",
+                        "usage:dest_info_type,0 port_bmp, 1 port_id...\n",
+                        cmd_data_check_uint32, &(invalidvsi_ctrl.dest_info.dest_info_type),
+                        sizeof (invalidvsi_ctrl.dest_info.dest_info_type));
+    SW_RTN_ON_ERROR(rv);
+    rv = __cmd_data_check_complex("dest_info_value", "0",
+                        "usage:dest_info_value, port_id/port_bmp\n",
+                        cmd_data_check_uint32, &(invalidvsi_ctrl.dest_info.dest_info_value),
+                        sizeof (invalidvsi_ctrl.dest_info.dest_info_value));
+    SW_RTN_ON_ERROR(rv);
+
+    *(fal_vsi_invalidvsi_ctrl_t *)arg_val = invalidvsi_ctrl;
+
+    return rv;
 }
 #endif
 

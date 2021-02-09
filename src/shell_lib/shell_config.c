@@ -1190,6 +1190,7 @@ struct sub_cmd_des_t g_vsi_des[] =
 	{"member", "set", SW_API_VSI_MEMBER_SET, NULL},
 	{"counter", "cleanup", SW_API_VSI_COUNTER_CLEANUP, NULL},
 	{"bridgevsi", "set", SW_API_VSI_BRIDGE_VSI_SET, NULL},
+	{"invalidvsi_ctrl", "set", SW_API_VSI_INVALIDVSI_CTRL_SET, NULL},
 	{NULL, NULL, 0, NULL}/*end of desc*/
 };
 #endif

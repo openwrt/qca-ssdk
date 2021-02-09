@@ -153,6 +153,10 @@ ifeq (TRUE, $(IN_TUNNEL_PROGRAM))
   SRC_LIST += fal_tunnel_program.c
 endif
 
+ifeq (TRUE, $(IN_MAPT))
+	SRC_LIST += fal_mapt.c
+endif
+
 #auto_insert_flag
 include $(PRJ_PATH)/make/components.mk
 include $(PRJ_PATH)/make/defs.mk

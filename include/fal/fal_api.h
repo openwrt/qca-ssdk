@@ -2474,6 +2474,32 @@ extern "C" {
 #define TUNNEL_PROGRAM_API_PARAM
 #endif
 
+#ifdef IN_MAPT
+#define MAPT_API \
+	SW_API_DEF(SW_API_MAPT_DECAP_CTRL_SET, fal_mapt_decap_ctrl_set), \
+	SW_API_DEF(SW_API_MAPT_DECAP_CTRL_GET, fal_mapt_decap_ctrl_get), \
+	SW_API_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_SET, fal_mapt_decap_rule_entry_set), \
+	SW_API_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_GET, fal_mapt_decap_rule_entry_get), \
+	SW_API_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_DEL, fal_mapt_decap_rule_entry_del), \
+	SW_API_DEF(SW_API_MAPT_DECAP_ENTRY_ADD, fal_mapt_decap_entry_add), \
+	SW_API_DEF(SW_API_MAPT_DECAP_ENTRY_DEL, fal_mapt_decap_entry_del), \
+	SW_API_DEF(SW_API_MAPT_DECAP_ENTRY_GETFIRST, fal_mapt_decap_entry_getfirst), \
+	SW_API_DEF(SW_API_MAPT_DECAP_ENTRY_GETNEXT, fal_mapt_decap_entry_getnext),
+#define MAPT_API_PARAM \
+	SW_API_DESC(SW_API_MAPT_DECAP_CTRL_SET) \
+	SW_API_DESC(SW_API_MAPT_DECAP_CTRL_GET) \
+	SW_API_DESC(SW_API_MAPT_DECAP_RULE_ENTRY_SET) \
+	SW_API_DESC(SW_API_MAPT_DECAP_RULE_ENTRY_GET) \
+	SW_API_DESC(SW_API_MAPT_DECAP_RULE_ENTRY_DEL) \
+	SW_API_DESC(SW_API_MAPT_DECAP_ENTRY_ADD) \
+	SW_API_DESC(SW_API_MAPT_DECAP_ENTRY_DEL) \
+	SW_API_DESC(SW_API_MAPT_DECAP_ENTRY_GETFIRST) \
+	SW_API_DESC(SW_API_MAPT_DECAP_ENTRY_GETNEXT)
+#else
+#define MAPT_API
+#define MAPT_API_PARAM
+#endif
+
 /* auto_insert_flag */
 /*qca808x_start*/
 #define SSDK_API \
@@ -2524,6 +2550,7 @@ extern "C" {
     VXLAN_API \
     GENEVE_API \
     TUNNEL_PROGRAM_API \
+    MAPT_API \
 /* auto_insert_flag_1 */ \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_MAX, NULL),
@@ -2585,6 +2612,7 @@ extern "C" {
     VXLAN_API_PARAM \
     GENEVE_API_PARAM \
     TUNNEL_PROGRAM_API_PARAM \
+    MAPT_API_PARAM \
 /* auto_insert_flag_2 */ \
 /*qca808x_start*/\
     SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),

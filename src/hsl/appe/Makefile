@@ -17,7 +17,7 @@ ifeq (TRUE, $(IN_TUNNEL))
 	SRC_LIST+=appe_tunnel.c
 endif
 
-ifeq (TRUE, $(IN_TUNNEL_MAP))
+ifeq (TRUE, $(IN_MAPT))
 	SRC_LIST+=appe_tunnel_map.c
 endif
 

@@ -243,8 +243,8 @@ ifeq (TRUE, $(IN_TUNNEL))
   MODULE_CFLAG += -DIN_TUNNEL
 endif
 
-ifeq (TRUE, $(IN_TUNNEL_MAP))
-  MODULE_CFLAG += -DIN_TUNNEL_MAP
+ifeq (TRUE, $(IN_MAPT))
+  MODULE_CFLAG += -DIN_MAPT
 endif
 
 ifeq (TRUE, $(IN_VXLAN))

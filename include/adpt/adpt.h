@@ -56,6 +56,7 @@ extern "C" {
 #include "fal_vxlan.h"
 #include "fal_geneve.h"
 #include "fal_tunnel_program.h"
+#include "fal_mapt.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1189,6 +1190,26 @@ typedef sw_error_t (*adpt_tunnel_program_udf_getfirst_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_tunnel_program_udf_getnext_func)(a_uint32_t dev_id,
         fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
 
+/*mapt*/
+typedef sw_error_t (*adpt_mapt_decap_ctrl_set_func)(a_uint32_t dev_id,
+		fal_mapt_decap_ctrl_t *decap_ctrl);
+typedef sw_error_t (*adpt_mapt_decap_ctrl_get_func)(a_uint32_t dev_id,
+		fal_mapt_decap_ctrl_t *decap_ctrl);
+typedef sw_error_t (*adpt_mapt_decap_rule_entry_set_func)(a_uint32_t dev_id,
+		a_uint32_t rule_id, fal_mapt_decap_edit_rule_entry_t *mapt_rule_entry);
+typedef sw_error_t (*adpt_mapt_decap_rule_entry_get_func)(a_uint32_t dev_id,
+		a_uint32_t rule_id, fal_mapt_decap_edit_rule_entry_t *mapt_rule_entry);
+typedef sw_error_t (*adpt_mapt_decap_rule_entry_del_func)(a_uint32_t dev_id,
+		a_uint32_t rule_id, fal_mapt_decap_edit_rule_entry_t *mapt_rule_entry);
+typedef sw_error_t (*adpt_mapt_decap_entry_add_func)(a_uint32_t dev_id,
+		fal_mapt_decap_entry_t *mapt_entry);
+typedef sw_error_t (*adpt_mapt_decap_entry_del_func)(a_uint32_t dev_id,
+		fal_mapt_decap_entry_t *mapt_entry);
+typedef sw_error_t (*adpt_mapt_decap_entry_getfirst_func)(a_uint32_t dev_id,
+		fal_mapt_decap_entry_t *mapt_entry);
+typedef sw_error_t (*adpt_mapt_decap_entry_getnext_func)(a_uint32_t dev_id,
+		fal_mapt_decap_entry_t *mapt_entry);
+
 /* auto_insert_flag */
 typedef struct
 {
@@ -1798,6 +1819,17 @@ typedef struct
 	adpt_tunnel_program_udf_del_func adpt_tunnel_program_udf_del;
 	adpt_tunnel_program_udf_getfirst_func adpt_tunnel_program_udf_getfirst;
 	adpt_tunnel_program_udf_getnext_func adpt_tunnel_program_udf_getnext;
+	/*mapt*/
+	a_uint32_t adpt_mapt_func_bitmap;
+	adpt_mapt_decap_ctrl_set_func adpt_mapt_decap_ctrl_set;
+	adpt_mapt_decap_ctrl_get_func adpt_mapt_decap_ctrl_get;
+	adpt_mapt_decap_rule_entry_set_func adpt_mapt_decap_rule_entry_set;
+	adpt_mapt_decap_rule_entry_get_func adpt_mapt_decap_rule_entry_get;
+	adpt_mapt_decap_rule_entry_del_func adpt_mapt_decap_rule_entry_del;
+	adpt_mapt_decap_entry_add_func adpt_mapt_decap_entry_add;
+	adpt_mapt_decap_entry_del_func adpt_mapt_decap_entry_del;
+	adpt_mapt_decap_entry_getfirst_func adpt_mapt_decap_entry_getfirst;
+	adpt_mapt_decap_entry_getnext_func adpt_mapt_decap_entry_getnext;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

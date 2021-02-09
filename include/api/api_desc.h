@@ -5169,6 +5169,67 @@ extern "C" {
     SW_PARAM_DEF(SW_API_TUNNEL_PROGRAM_UDF_GETNEXT, SW_TUNNEL_PROGRAM_UDF, \
                     sizeof(fal_tunnel_program_udf_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Program Udf"),
 
+#define SW_API_MAPT_DECAP_CTRL_SET_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_CTRL_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_CTRL_SET, SW_MAPT_DECAP_CTRL, \
+			sizeof(fal_mapt_decap_ctrl_t), SW_PARAM_PTR|SW_PARAM_IN, "Decap Ctrl"),
+
+#define SW_API_MAPT_DECAP_CTRL_GET_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_CTRL_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_CTRL_GET, SW_MAPT_DECAP_CTRL, \
+			sizeof(fal_mapt_decap_ctrl_t), SW_PARAM_PTR|SW_PARAM_OUT, "Decap Ctrl"),
+
+#define SW_API_MAPT_DECAP_RULE_ENTRY_SET_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Rule Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_SET, SW_MAPT_DECAP_RULE_ENTRY, \
+			sizeof(fal_mapt_decap_edit_rule_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Mapt Rule Entry"),
+
+#define SW_API_MAPT_DECAP_RULE_ENTRY_GET_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Rule Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_GET, SW_MAPT_DECAP_RULE_ENTRY, \
+			sizeof(fal_mapt_decap_edit_rule_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_OUT, "Mapt Rule Entry"),
+
+#define SW_API_MAPT_DECAP_RULE_ENTRY_DEL_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_DEL, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_RULE_ENTRY_DEL, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Rule Id "),
+
+#define SW_API_MAPT_DECAP_ENTRY_ADD_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_ADD, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_ADD, SW_MAPT_DECAP_ENTRY, \
+			sizeof(fal_mapt_decap_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "Mapt Entry"),
+
+#define SW_API_MAPT_DECAP_ENTRY_DEL_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_DEL, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_DEL, SW_MAPT_DECAP_ENTRY, \
+			sizeof(fal_mapt_decap_entry_t), SW_PARAM_PTR|SW_PARAM_IN, "Mapt Entry"),
+
+#define SW_API_MAPT_DECAP_ENTRY_GETFIRST_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_GETFIRST, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_GETFIRST, SW_MAPT_DECAP_ENTRY, \
+			sizeof(fal_mapt_decap_entry_t), SW_PARAM_PTR|SW_PARAM_OUT, "Mapt Entry"),
+
+#define SW_API_MAPT_DECAP_ENTRY_GETNEXT_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_GETNEXT, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_ENTRY_GETNEXT, SW_MAPT_DECAP_ENTRY, \
+			sizeof(fal_mapt_decap_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_OUT|SW_PARAM_IN, "Mapt Entry"),
+
 /* auto_insert_flag */
 /*qca808x_start*/
 

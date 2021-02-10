@@ -38,8 +38,13 @@ static sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 	SW_RTN_ON_NULL(p_api->adpt_port_bridge_txmac_set);
 
 	for(port = SSDK_PHYSICAL_PORT0; port <= SSDK_PHYSICAL_PORT7; port++) {
-		fal_fdb_port_learning_ctrl_set(dev_id, port, A_TRUE, FAL_MAC_FRWRD);
-		fal_fdb_port_stamove_ctrl_set(dev_id, port, A_TRUE, FAL_MAC_FRWRD);
+		if(port == SSDK_PHYSICAL_PORT0) {
+			fal_fdb_port_learning_ctrl_set(dev_id, port, A_FALSE, FAL_MAC_FRWRD);
+			fal_fdb_port_stamove_ctrl_set(dev_id, port, A_FALSE, FAL_MAC_FRWRD);
+		} else {
+			fal_fdb_port_learning_ctrl_set(dev_id, port, A_TRUE, FAL_MAC_FRWRD);
+			fal_fdb_port_stamove_ctrl_set(dev_id, port, A_TRUE, FAL_MAC_FRWRD);
+		}
 		fal_portvlan_member_update(dev_id, port, 0x7f);
 		if (port == SSDK_PHYSICAL_PORT0 || port == SSDK_PHYSICAL_PORT7) {
 			p_api->adpt_port_bridge_txmac_set(dev_id, port, A_TRUE);

@@ -36,6 +36,7 @@ extern "C" {
 #define IPR_CSR_BASE_ADDR            0x1e0000
 #define NSS_XGMAC_CSR_BASE_ADDR      0x500000
 #define TUNNEL_LOOKUP_BASE_ADDR      0x300000
+#define TUNNEL_PARSER_BASE_ADDR      0x1d0000
 #else
 #define IPR_CSR_BASE_ADDR            0x002000
 #define NSS_XGMAC_CSR_BASE_ADDR      0x003000
@@ -48,8 +49,6 @@ extern "C" {
 #define NSS_GLOBAL_BASE_ADDR    	 0x0
 #define NSS_UNIPHY_BASE_ADDR    0x0
 #define NSS_LPI_BASE_ADDR    0x400
-#define TUNNEL_LOOKUP_BASE_ADDR      0x300000
-#define TUNNEL_PARSER_BASE_ADDR      0x1d0000
 
 sw_error_t hppe_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint32_t *val);
 sw_error_t hppe_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint32_t val);

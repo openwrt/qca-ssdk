@@ -2317,6 +2317,69 @@ hppe_mru_mtu_ctrl_tbl_mru_set(
 	ret = hppe_mru_mtu_ctrl_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#if (defined(CPPE) || defined(APPE))
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_mode_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.source_filtering_mode;
+	return ret;
+}
+
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_mode_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.source_filtering_mode = value;
+	ret = hppe_mru_mtu_ctrl_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.source_filtering_bypass;
+	return ret;
+}
+
+sw_error_t
+ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.source_filtering_bypass = value;
+	ret = hppe_mru_mtu_ctrl_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif
 #endif
 
 sw_error_t

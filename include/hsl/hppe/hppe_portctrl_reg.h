@@ -685,7 +685,7 @@ struct mru_mtu_ctrl_tbl {
 	a_uint32_t  rx_cnt_en:1;
 	a_uint32_t  tx_cnt_en:1;
 	a_uint32_t  src_profile:2;
-#if defined(APPE)
+#if (defined(CPPE) || defined(APPE))
 	a_uint32_t  pcp_qos_group_id:1;
 	a_uint32_t  dscp_qos_group_id:1;
 	a_uint32_t  pcp_res_prec_force:1;
@@ -698,10 +698,14 @@ struct mru_mtu_ctrl_tbl {
 	a_uint32_t  post_acl_res_prec:3;
 	a_uint32_t  source_filtering_bypass:1;
 	a_uint32_t  source_filtering_mode:1;
+#if defined(APPE)
 	a_uint32_t  pre_ipo_outer_res_prec:3;
 	a_uint32_t  pre_ipo_inner_res_prec_0:1;
 	a_uint32_t  pre_ipo_inner_res_prec_1:2;
 	a_uint32_t  _reserved0:30;
+#else
+	a_uint32_t  _reserved0:4;
+#endif
 #else
 	a_uint32_t  _reserved0:28;
 #endif

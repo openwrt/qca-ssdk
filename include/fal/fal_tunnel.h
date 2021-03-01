@@ -32,7 +32,7 @@ extern "C" {
 #define FAL_TUNNEL_DECAP_ENTRY_MAX     128
 #define FAL_TUNNEL_ENCAP_ENTRY_MAX     128
 enum {
-	FUNC_TUNNEL_INTF_SET,
+	FUNC_TUNNEL_INTF_SET = 0,
 	FUNC_TUNNEL_INTF_GET,
 	FUNC_TUNNEL_ENCAP_RULE_ENTRY_SET,
 	FUNC_TUNNEL_ENCAP_RULE_ENTRY_GET,
@@ -61,7 +61,13 @@ enum {
 	FUNC_TUNNEL_DECAP_HEADER_CTRL_SET,
 	FUNC_TUNNEL_DECAP_HEADER_CTRL_GET,
 	FUNC_TUNNEL_PORT_INTF_SET,
-	FUNC_TUNNEL_PORT_INTF_GET
+	FUNC_TUNNEL_PORT_INTF_GET,
+	FUNC_TUNNEL_UDF_PROFILE_ENTRY_ADD,
+	FUNC_TUNNEL_UDF_PROFILE_ENTRY_DEL,
+	FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST = 32,
+	FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT,
+	FUNC_TUNNEL_UDF_PROFILE_CFG_SET,
+	FUNC_TUNNEL_UDF_PROFILE_CFG_GET,
 };
 
 /* tunnel type */
@@ -115,6 +121,65 @@ enum {
 	FAL_TUNNEL_KEY_UDF1_EN,
 	FAL_TUNNEL_KEY_MAX,
 };
+
+/* tunnel overlay type */
+typedef enum
+{
+	FAL_TUNNEL_OVERLAY_TYPE_GRE_TAP = 0, /*gre tap*/
+	FAL_TUNNEL_OVERLAY_TYPE_VXLAN,       /*vxlan*/
+	FAL_TUNNEL_OVERLAY_TYPE_VXLAN_GPE,   /*vxlan-gpe*/
+	FAL_TUNNEL_OVERLAY_TYPE_GENEVE,      /*geneve*/
+	FAL_TUNNEL_OVERLAY_TYPE_BUTT,
+} fal_tunnel_overlay_type_t;
+
+/* tunnel program type */
+typedef enum
+{
+	FAL_TUNNEL_PROGRAM_TYPE_0 = 0,     /*program0 type*/
+	FAL_TUNNEL_PROGRAM_TYPE_1,         /*program1 type*/
+	FAL_TUNNEL_PROGRAM_TYPE_2,         /*program2 type*/
+	FAL_TUNNEL_PROGRAM_TYPE_3,         /*program3 type*/
+	FAL_TUNNEL_PROGRAM_TYPE_4,         /*program4 type*/
+	FAL_TUNNEL_PROGRAM_TYPE_5,         /*program5 type*/
+	FAL_TUNNEL_PROGRAM_TYPE_BUTT,
+} fal_tunnel_program_type_t;
+
+/* tunnel udf type */
+typedef enum
+{
+	FAL_TUNNEL_UDF_TYPE_L2 = 0, /*start from L2 */
+	FAL_TUNNEL_UDF_TYPE_L3,     /*start from L3 */
+	FAL_TUNNEL_UDF_TYPE_L4,    /*start from L4 */
+	FAL_TUNNEL_UDF_TYPE_OVERLAY, /*start from overlay hdr*/
+	FAL_TUNNEL_UDF_TYPE_PROGRAM, /*start from program hdr */
+	FAL_TUNNEL_UDF_TYPE_PAYLOAD,  /*start from payload */
+	FAL_TUNNEL_UDF_TYPE_BUTT,
+} fal_tunnel_udf_type_t;
+
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE 0
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE 1
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_OVERLAY_TYPE 2
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_PROGRAM_TYPE 3
+
+typedef a_uint32_t fal_tunnel_udf_profile_entry_field_map_t;
+
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(flag, field) \
+    (flag) |= (0x1UL << (field))
+
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_CLR(flag, field) \
+    (flag) &= (~(0x1UL << (field)))
+
+#define FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(flag, field) \
+((flag) & (0x1UL << (field))) ? 1 : 0
+
+typedef struct {
+		fal_tunnel_udf_profile_entry_field_map_t field_flag; /*Indicate
+							*which fields are included*/
+		fal_l3_type_t l3_type;
+		fal_l4_type_t l4_type;
+		fal_tunnel_overlay_type_t overlay_type;
+		fal_tunnel_program_type_t program_type;
+} fal_tunnel_udf_profile_entry_t;
 
 /* tunnel udp entry */
 typedef struct {
@@ -511,6 +576,24 @@ fal_tunnel_encap_rule_entry_get(a_uint32_t dev_id, a_uint32_t rule_id,
 sw_error_t
 fal_tunnel_encap_rule_entry_del(a_uint32_t dev_id, a_uint32_t rule_id,
 		fal_tunnel_encap_rule_t *rule_entry);
+sw_error_t
+fal_tunnel_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+sw_error_t
+fal_tunnel_udf_profile_entry_del(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+sw_error_t
+fal_tunnel_udf_profile_entry_getfirst(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+sw_error_t
+fal_tunnel_udf_profile_entry_getnext(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+sw_error_t
+fal_tunnel_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_tunnel_udf_type_t udf_type, a_uint32_t offset);
+sw_error_t
+fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
 
 sw_error_t
 fal_tunnel_decap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl);

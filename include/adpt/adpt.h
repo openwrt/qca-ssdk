@@ -1177,6 +1177,24 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_tunnel_encap_rule_entry_del_func)(a_uint32_t dev_id, a_uint32_t rule_id,
 		fal_tunnel_encap_rule_t *rule_entry);
+typedef sw_error_t
+(*adpt_tunnel_udf_profile_entry_add_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_tunnel_udf_profile_entry_del_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_tunnel_udf_profile_entry_getfirst_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_tunnel_udf_profile_entry_getnext_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry);
+typedef sw_error_t
+(*adpt_tunnel_udf_profile_cfg_set_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_tunnel_udf_type_t udf_type, a_uint32_t offset);
+typedef sw_error_t
+(*adpt_tunnel_udf_profile_cfg_get_func)(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
 
 /*tunnel program*/
 typedef sw_error_t (*adpt_tunnel_program_entry_add_func)(a_uint32_t dev_id,
@@ -1779,7 +1797,7 @@ typedef struct
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 
 	/* tunnel */
-	a_uint32_t adpt_tunnel_func_bitmap;
+	a_uint32_t adpt_tunnel_func_bitmap[2];
 	adpt_tunnel_decap_entry_add_func adpt_tunnel_decap_entry_add;
 	adpt_tunnel_decap_entry_del_func adpt_tunnel_decap_entry_del;
 	adpt_tunnel_decap_entry_get_func adpt_tunnel_decap_entry_get;
@@ -1810,6 +1828,12 @@ typedef struct
 	adpt_tunnel_encap_rule_entry_set_func adpt_tunnel_encap_rule_entry_set;
 	adpt_tunnel_encap_rule_entry_get_func adpt_tunnel_encap_rule_entry_get;
 	adpt_tunnel_encap_rule_entry_del_func adpt_tunnel_encap_rule_entry_del;
+	adpt_tunnel_udf_profile_entry_add_func adpt_tunnel_udf_profile_entry_add;
+	adpt_tunnel_udf_profile_entry_del_func adpt_tunnel_udf_profile_entry_del;
+	adpt_tunnel_udf_profile_entry_getfirst_func adpt_tunnel_udf_profile_entry_getfirst;
+	adpt_tunnel_udf_profile_entry_getnext_func adpt_tunnel_udf_profile_entry_getnext;
+	adpt_tunnel_udf_profile_cfg_set_func adpt_tunnel_udf_profile_cfg_set;
+	adpt_tunnel_udf_profile_cfg_get_func adpt_tunnel_udf_profile_cfg_get;
 	/*vxlan*/
 	a_uint32_t adpt_vxlan_func_bitmap;
 	adpt_vxlan_entry_add_func adpt_vxlan_entry_add;

@@ -1884,6 +1884,480 @@ adpt_appe_tunnel_encap_rule_entry_del(a_uint32_t dev_id,
 	return rv;
 }
 
+static a_bool_t
+_adpt_appe_is_udf_profile_entry_equal(a_uint32_t dev_id,
+		fal_tunnel_udf_profile_entry_t * entry1, fal_tunnel_udf_profile_entry_t * entry2)
+{
+	if (entry1->field_flag == entry2->field_flag &&
+		entry1->l3_type == entry2->l3_type &&
+		entry1->l4_type == entry2->l4_type &&
+		entry1->overlay_type == entry2->overlay_type &&
+		entry1->program_type == entry2->program_type)
+	{
+		return A_TRUE;
+	}
+	else
+	{
+		return A_FALSE;
+	}
+}
+
+static a_bool_t
+_adpt_appe_get_udf_profile_entry_by_index(a_uint32_t dev_id,
+		a_uint32_t index, fal_tunnel_udf_profile_entry_t * entry, a_uint32_t * profile_id)
+{
+	union tpr_udf_ctrl_0_u udf_ctrl = {0};
+
+	SW_RTN_ON_ERROR(appe_tpr_udf_ctrl_0_get(dev_id, index, &udf_ctrl));
+	if (!udf_ctrl.bf.valid)
+	{
+		aos_mem_zero(&udf_ctrl, sizeof (udf_ctrl));
+	}
+	entry->l3_type = udf_ctrl.bf.l3_type;
+	entry->l4_type = udf_ctrl.bf.l4_type;
+	entry->overlay_type = udf_ctrl.bf.overlay_type;
+	entry->program_type = udf_ctrl.bf.program_type;
+	*profile_id = udf_ctrl.bf.udf_profile;
+
+	if (udf_ctrl.bf.l3_type_incl)
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE);
+	}
+	else
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_CLR(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE);
+	}
+	if (udf_ctrl.bf.l4_type_incl)
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE);
+	}
+	else
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_CLR(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE);
+	}
+	if (udf_ctrl.bf.overlay_type_incl)
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_OVERLAY_TYPE);
+	}
+	else
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_CLR(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_OVERLAY_TYPE);
+	}
+	if (udf_ctrl.bf.program_type_incl)
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_PROGRAM_TYPE);
+	}
+	else
+	{
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_CLR(entry->field_flag,
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_PROGRAM_TYPE);
+	}
+	return udf_ctrl.bf.valid;
+}
+
+static sw_error_t
+_adpt_appe_insert_udf_profile_entry_by_index(a_uint32_t dev_id,
+		a_uint32_t index, fal_tunnel_udf_profile_entry_t * entry, a_uint32_t profile_id)
+{
+	union tpr_udf_ctrl_0_u udf_ctrl = {0};
+
+	udf_ctrl.bf.valid = A_TRUE;
+	udf_ctrl.bf.l3_type = entry->l3_type;
+	udf_ctrl.bf.l4_type = entry->l4_type;
+	udf_ctrl.bf.overlay_type = entry->overlay_type;
+	udf_ctrl.bf.program_type = entry->program_type;
+	udf_ctrl.bf.udf_profile = profile_id;
+
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE))
+	{
+		udf_ctrl.bf.l3_type_incl = A_TRUE;
+	}
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE))
+	{
+		udf_ctrl.bf.l4_type_incl = A_TRUE;
+	}
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_OVERLAY_TYPE))
+	{
+		udf_ctrl.bf.overlay_type_incl = A_TRUE;
+	}
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_PROGRAM_TYPE))
+	{
+		udf_ctrl.bf.program_type_incl = A_TRUE;
+	}
+	return appe_tpr_udf_ctrl_0_set(dev_id, index, &udf_ctrl);
+}
+
+static a_uint32_t
+_adpt_appe_udf_profile_entry_weight(fal_tunnel_udf_profile_entry_t * entry)
+{
+	a_uint32_t weight = 0;
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE))
+	{
+		weight++;
+	}
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE))
+	{
+		weight++;
+	}
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_OVERLAY_TYPE))
+	{
+		weight++;
+	}
+	if (FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_TST(entry->field_flag,
+		FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_PROGRAM_TYPE))
+	{
+		weight++;
+	}
+	return weight;
+}
+
+static sw_error_t
+_adpt_appe_insert_udf_profile_entry_by_sort(a_uint32_t dev_id,
+		a_uint32_t index, fal_tunnel_udf_profile_entry_t * entry, a_uint32_t profile_id)
+{
+	fal_tunnel_udf_profile_entry_t temp_entry = {0};
+	a_uint32_t temp_profile_id;
+	a_uint32_t idx, weight, temp_weight;
+
+	weight = _adpt_appe_udf_profile_entry_weight(entry);
+
+	for (idx = index; idx < TPR_UDF_CTRL_0_MAX_ENTRY-1; idx++)
+	{
+		aos_mem_zero(&temp_entry, sizeof (fal_tunnel_udf_profile_entry_t));
+		_adpt_appe_get_udf_profile_entry_by_index(dev_id, idx+1,
+				&temp_entry, &temp_profile_id);
+		temp_weight = _adpt_appe_udf_profile_entry_weight(&temp_entry);
+		if (weight < temp_weight)
+		{
+			SW_RTN_ON_ERROR(_adpt_appe_insert_udf_profile_entry_by_index(dev_id, idx,
+								&temp_entry, temp_profile_id));
+		}
+		else
+		{
+			break;
+		}
+	}
+	return _adpt_appe_insert_udf_profile_entry_by_index(dev_id, idx, entry, profile_id);
+}
+
+static sw_error_t
+_adpt_appe_tunnel_udf_profile_entry_get(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry, a_bool_t sign_tag)
+{
+	a_uint32_t idx, temp_profile_id;
+	a_bool_t entry_valid;
+	fal_tunnel_udf_profile_entry_t temp_entry;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (profile_id >= TPR_UDF_PROFILE_BASE_MAX_ENTRY)
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	for (idx = 0; idx < TPR_UDF_CTRL_0_MAX_ENTRY; idx++)
+	{
+		aos_mem_zero(&temp_entry, sizeof (fal_tunnel_udf_profile_entry_t));
+		entry_valid = _adpt_appe_get_udf_profile_entry_by_index(dev_id, idx,
+						&temp_entry, &temp_profile_id);
+		if (entry_valid == A_TRUE)
+		{
+			if (temp_profile_id == profile_id)
+			{
+				if (sign_tag == A_TRUE)
+				{
+					aos_mem_copy(entry, &temp_entry,
+						sizeof (fal_tunnel_udf_profile_entry_t));
+					break;
+				}
+				if (A_TRUE == _adpt_appe_is_udf_profile_entry_equal(dev_id,
+						&temp_entry, entry))
+				{
+					sign_tag = A_TRUE;
+				}
+			}
+		}
+	}
+	if (idx == TPR_UDF_CTRL_0_MAX_ENTRY)
+	{
+		return SW_NOT_FOUND;
+	}
+	return SW_OK;
+}
+
+sw_error_t
+adpt_appe_tunnel_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry)
+{
+	a_uint32_t entry_idx, temp_profile_id;
+	a_bool_t entry_valid;
+	a_int32_t idx;
+	fal_tunnel_udf_profile_entry_t temp_entry;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (profile_id >= TPR_UDF_PROFILE_BASE_MAX_ENTRY)
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	for (idx = TPR_UDF_CTRL_0_MAX_ENTRY-1; idx >= 0; idx--)
+	{
+		aos_mem_zero(&temp_entry, sizeof (fal_tunnel_udf_profile_entry_t));
+		entry_valid = _adpt_appe_get_udf_profile_entry_by_index(dev_id, idx,
+						&temp_entry, &temp_profile_id);
+		if (entry_valid == A_TRUE)
+		{
+			if (A_TRUE == _adpt_appe_is_udf_profile_entry_equal(dev_id,
+						&temp_entry, entry))
+			{
+				if (temp_profile_id == profile_id)
+				{
+					return SW_ALREADY_EXIST;
+				}
+				else
+				{
+					SSDK_DEBUG("original profile %d, updated profile %d\n",
+								temp_profile_id, profile_id);
+					return _adpt_appe_insert_udf_profile_entry_by_index(dev_id,
+								idx, entry, profile_id);
+				}
+			}
+		}
+		else
+		{
+			entry_idx = idx;
+			break;
+		}
+	}
+	if (idx < 0)
+	{
+		return SW_NO_RESOURCE;
+	}
+	/* insert new udf entry and sort the entries*/
+	return _adpt_appe_insert_udf_profile_entry_by_sort(dev_id, entry_idx, entry, profile_id);
+}
+
+sw_error_t
+adpt_appe_tunnel_udf_profile_entry_del(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry)
+{
+	a_uint32_t idx, temp_profile_id;
+	a_int32_t j;
+	a_bool_t entry_valid;
+	fal_tunnel_udf_profile_entry_t temp_entry;
+	union tpr_udf_ctrl_0_u udf_ctrl_zero_entry = {0};
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (profile_id >= TPR_UDF_PROFILE_BASE_MAX_ENTRY)
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	for (idx = 0; idx < TPR_UDF_CTRL_0_MAX_ENTRY; idx++)
+	{
+		aos_mem_zero(&temp_entry, sizeof (fal_tunnel_udf_profile_entry_t));
+		entry_valid = _adpt_appe_get_udf_profile_entry_by_index(dev_id, idx,
+						&temp_entry, &temp_profile_id);
+		if (entry_valid == A_TRUE)
+		{
+			if (A_TRUE == _adpt_appe_is_udf_profile_entry_equal(dev_id,
+						&temp_entry, entry))
+			{
+				if (temp_profile_id == profile_id)
+				{
+					/* find the entry*/
+					break;
+				}
+			}
+		}
+	}
+
+	if (idx == TPR_UDF_CTRL_0_MAX_ENTRY)
+	{
+		return SW_NOT_FOUND;
+	}
+
+	/* clear the find entry and resort the entries */
+	for (j = idx; j > 0; j --)
+	{
+		aos_mem_zero(&temp_entry, sizeof (fal_tunnel_udf_profile_entry_t));
+		entry_valid = _adpt_appe_get_udf_profile_entry_by_index(dev_id, j-1,
+						&temp_entry, &temp_profile_id);
+		if (entry_valid == A_TRUE)
+		{
+			SW_RTN_ON_ERROR(_adpt_appe_insert_udf_profile_entry_by_index(dev_id, j,
+						&temp_entry, temp_profile_id));
+		}
+		else
+		{
+			break;
+		}
+	}
+	return appe_tpr_udf_ctrl_0_set(dev_id, j, &udf_ctrl_zero_entry);
+}
+
+sw_error_t
+adpt_appe_tunnel_udf_profile_entry_getfirst(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry)
+{
+	return _adpt_appe_tunnel_udf_profile_entry_get(dev_id, profile_id, entry, A_TRUE);
+}
+
+sw_error_t
+adpt_appe_tunnel_udf_profile_entry_getnext(a_uint32_t dev_id, a_uint32_t profile_id,
+		fal_tunnel_udf_profile_entry_t * entry)
+{
+	return _adpt_appe_tunnel_udf_profile_entry_get(dev_id, profile_id, entry, A_FALSE);
+}
+
+sw_error_t
+adpt_appe_tunnel_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_tunnel_udf_type_t udf_type, a_uint32_t offset)
+{
+	a_uint8_t udf_base = 0;
+	union tpr_udf_profile_base_u udf_profile_base = {0};
+	union tpr_udf_profile_offset_u udf_profile_offset = {0};
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (offset % 2)
+	{ /*only support even data*/
+		return SW_BAD_VALUE;
+	}
+
+	switch(udf_type)
+	{
+		case FAL_TUNNEL_UDF_TYPE_L2:
+			udf_base = 0;
+			break;
+		case FAL_TUNNEL_UDF_TYPE_L3:
+			udf_base = 1;
+			break;
+		case FAL_TUNNEL_UDF_TYPE_L4:
+			udf_base = 2;
+			break;
+		case FAL_TUNNEL_UDF_TYPE_OVERLAY:
+			udf_base = 3;
+			break;
+		case FAL_TUNNEL_UDF_TYPE_PROGRAM:
+			udf_base = 4;
+			break;
+		case FAL_TUNNEL_UDF_TYPE_PAYLOAD:
+			udf_base = 5;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+
+	SW_RTN_ON_ERROR(appe_tpr_udf_profile_base_get(dev_id, profile_id, &udf_profile_base));
+	SW_RTN_ON_ERROR(appe_tpr_udf_profile_offset_get(dev_id, profile_id, &udf_profile_offset));
+
+	switch(udf_idx)
+	{
+		case 0:
+			udf_profile_base.bf.udf0_base = udf_base;
+			udf_profile_offset.bf.udf0_offset = offset/2;
+			break;
+		case 1:
+			udf_profile_base.bf.udf1_base = udf_base;
+			udf_profile_offset.bf.udf1_offset = offset/2;
+			break;
+		case 2:
+			udf_profile_base.bf.udf2_base = udf_base;
+			udf_profile_offset.bf.udf2_offset = offset/2;
+			break;
+		case 3:
+			udf_profile_base.bf.udf3_base = udf_base;
+			udf_profile_offset.bf.udf3_offset = offset/2;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	SW_RTN_ON_ERROR(appe_tpr_udf_profile_base_set(dev_id, profile_id, &udf_profile_base));
+	return appe_tpr_udf_profile_offset_set(dev_id, profile_id, &udf_profile_offset);
+}
+
+sw_error_t
+adpt_appe_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
+		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset)
+{
+	a_uint8_t udf_base = 0;
+	union tpr_udf_profile_base_u udf_profile_base = {0};
+	union tpr_udf_profile_offset_u udf_profile_offset = {0};
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(udf_type);
+	ADPT_NULL_POINT_CHECK(offset);
+
+	SW_RTN_ON_ERROR(appe_tpr_udf_profile_base_get(dev_id, profile_id, &udf_profile_base));
+	SW_RTN_ON_ERROR(appe_tpr_udf_profile_offset_get(dev_id, profile_id, &udf_profile_offset));
+
+	switch(udf_idx)
+	{
+		case 0:
+			udf_base = udf_profile_base.bf.udf0_base;
+			*offset = udf_profile_offset.bf.udf0_offset*2;
+			break;
+		case 1:
+			udf_base = udf_profile_base.bf.udf1_base;
+			*offset = udf_profile_offset.bf.udf1_offset*2;
+			break;
+		case 2:
+			udf_base = udf_profile_base.bf.udf2_base;
+			*offset = udf_profile_offset.bf.udf2_offset*2;
+			break;
+		case 3:
+			udf_base = udf_profile_base.bf.udf3_base;
+			*offset = udf_profile_offset.bf.udf3_offset*2;
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	switch(udf_base)
+	{
+		case 0:
+			*udf_type = FAL_TUNNEL_UDF_TYPE_L2;
+			break;
+		case 1:
+			*udf_type = FAL_TUNNEL_UDF_TYPE_L3;
+			break;
+		case 2:
+			*udf_type = FAL_TUNNEL_UDF_TYPE_L4;
+			break;
+		case 3:
+			*udf_type = FAL_TUNNEL_UDF_TYPE_OVERLAY;
+			break;
+		case 4:
+			*udf_type = FAL_TUNNEL_UDF_TYPE_PROGRAM;
+			break;
+		case 5:
+			*udf_type = FAL_TUNNEL_UDF_TYPE_PAYLOAD;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+
+	return SW_OK;
+}
+
 void adpt_appe_tunnel_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -1893,7 +2367,8 @@ void adpt_appe_tunnel_func_bitmap_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return;
 
-	p_adpt_api->adpt_tunnel_func_bitmap = 0;
+	p_adpt_api->adpt_tunnel_func_bitmap[0] = 0;
+	p_adpt_api->adpt_tunnel_func_bitmap[1] = 0;
 
 	return;
 }
@@ -1929,7 +2404,12 @@ static void adpt_appe_tunnel_func_unregister(a_uint32_t dev_id, adpt_api_t *p_ad
 	p_adpt_api->adpt_tunnel_encap_rule_entry_set = NULL;
 	p_adpt_api->adpt_tunnel_encap_rule_entry_get = NULL;
 	p_adpt_api->adpt_tunnel_encap_rule_entry_del = NULL;
-
+	p_adpt_api->adpt_tunnel_udf_profile_entry_add = NULL;
+	p_adpt_api->adpt_tunnel_udf_profile_entry_del = NULL;
+	p_adpt_api->adpt_tunnel_udf_profile_entry_getfirst = NULL;
+	p_adpt_api->adpt_tunnel_udf_profile_entry_getnext = NULL;
+	p_adpt_api->adpt_tunnel_udf_profile_cfg_set = NULL;
+	p_adpt_api->adpt_tunnel_udf_profile_cfg_get = NULL;
 	return;
 }
 
@@ -1945,96 +2425,126 @@ adpt_appe_tunnel_init(a_uint32_t dev_id)
 
 	adpt_appe_tunnel_func_unregister(dev_id, p_adpt_api);
 
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_ENTRY_ADD))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ENTRY_ADD))
 		p_adpt_api->adpt_tunnel_decap_entry_add =
 			adpt_appe_tunnel_decap_entry_add;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_ENTRY_DEL))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ENTRY_DEL))
 		p_adpt_api->adpt_tunnel_decap_entry_del =
 			adpt_appe_tunnel_decap_entry_del;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_ENTRY_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ENTRY_GET))
 		p_adpt_api->adpt_tunnel_decap_entry_get =
 			adpt_appe_tunnel_decap_entry_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_ENTRY_GETNEXT))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ENTRY_GETNEXT))
 		p_adpt_api->adpt_tunnel_decap_entry_getnext =
 			adpt_appe_tunnel_decap_entry_getnext;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_ENTRY_FLUSH))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ENTRY_FLUSH))
 		p_adpt_api->adpt_tunnel_decap_entry_flush =
 			adpt_appe_tunnel_decap_entry_flush;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_GLOBAL_CFG_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_GLOBAL_CFG_SET))
 		p_adpt_api->adpt_tunnel_global_cfg_set =
 			adpt_appe_tunnel_global_cfg_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_GLOBAL_CFG_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_GLOBAL_CFG_GET))
 		p_adpt_api->adpt_tunnel_global_cfg_get =
 			adpt_appe_tunnel_global_cfg_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_PORT_INTF_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_PORT_INTF_SET))
 		p_adpt_api->adpt_tunnel_port_intf_set =
 			adpt_appe_tunnel_port_intf_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_PORT_INTF_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_PORT_INTF_GET))
 		p_adpt_api->adpt_tunnel_port_intf_get =
 			adpt_appe_tunnel_port_intf_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_VLAN_INTF_ADD))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_VLAN_INTF_ADD))
 		p_adpt_api->adpt_tunnel_vlan_intf_add =
 			adpt_appe_tunnel_vlan_intf_add;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_VLAN_INTF_GETFIRST))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_VLAN_INTF_GETFIRST))
 		p_adpt_api->adpt_tunnel_vlan_intf_getfirst =
 			adpt_appe_tunnel_vlan_intf_getfirst;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_VLAN_INTF_GETNEXT))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_VLAN_INTF_GETNEXT))
 		p_adpt_api->adpt_tunnel_vlan_intf_getnext =
 			adpt_appe_tunnel_vlan_intf_getnext;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_VLAN_INTF_DEL))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_VLAN_INTF_DEL))
 		p_adpt_api->adpt_tunnel_vlan_intf_del =
 			adpt_appe_tunnel_vlan_intf_del;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_INTF_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_INTF_SET))
 		p_adpt_api->adpt_tunnel_intf_set =
 			adpt_appe_tunnel_intf_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_INTF_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_INTF_GET))
 		p_adpt_api->adpt_tunnel_intf_get =
 			adpt_appe_tunnel_intf_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_PORT_TUNNELID_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_PORT_TUNNELID_SET))
 		p_adpt_api->adpt_tunnel_encap_port_tunnelid_set =
 			adpt_appe_tunnel_encap_port_tunnelid_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_PORT_TUNNELID_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_PORT_TUNNELID_GET))
 		p_adpt_api->adpt_tunnel_encap_port_tunnelid_get =
 			adpt_appe_tunnel_encap_port_tunnelid_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_INTF_TUNNELID_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_INTF_TUNNELID_SET))
 		p_adpt_api->adpt_tunnel_encap_intf_tunnelid_set =
 			adpt_appe_tunnel_encap_intf_tunnelid_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_INTF_TUNNELID_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_INTF_TUNNELID_GET))
 		p_adpt_api->adpt_tunnel_encap_intf_tunnelid_get =
 			adpt_appe_tunnel_encap_intf_tunnelid_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_ENTRY_ADD))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_ENTRY_ADD))
 		p_adpt_api->adpt_tunnel_encap_entry_add =
 			adpt_appe_tunnel_encap_entry_add;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_ENTRY_DEL))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_ENTRY_DEL))
 		p_adpt_api->adpt_tunnel_encap_entry_del =
 			adpt_appe_tunnel_encap_entry_del;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_ENTRY_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_ENTRY_GET))
 		p_adpt_api->adpt_tunnel_encap_entry_get =
 			adpt_appe_tunnel_encap_entry_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_ENTRY_GETNEXT))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_ENTRY_GETNEXT))
 		p_adpt_api->adpt_tunnel_encap_entry_getnext =
 			adpt_appe_tunnel_encap_entry_getnext;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_SET))
 		p_adpt_api->adpt_tunnel_encap_rule_entry_set =
 			adpt_appe_tunnel_encap_rule_entry_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_GET))
 		p_adpt_api->adpt_tunnel_encap_rule_entry_get =
 			adpt_appe_tunnel_encap_rule_entry_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_DEL))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_DEL))
 		p_adpt_api->adpt_tunnel_encap_rule_entry_del =
 			adpt_appe_tunnel_encap_rule_entry_del;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_SET))
 		p_adpt_api->adpt_tunnel_encap_header_ctrl_set =
 			adpt_appe_tunnel_encap_header_ctrl_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_GET))
 		p_adpt_api->adpt_tunnel_encap_header_ctrl_get =
 			adpt_appe_tunnel_encap_header_ctrl_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_SET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_SET))
 		p_adpt_api->adpt_tunnel_decap_header_ctrl_set =
 			adpt_appe_tunnel_decap_header_ctrl_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_GET))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_GET))
 		p_adpt_api->adpt_tunnel_decap_header_ctrl_get =
 			adpt_appe_tunnel_decap_header_ctrl_get;
+	if(p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_ADD))
+	{
+		p_adpt_api->adpt_tunnel_udf_profile_entry_add =
+			adpt_appe_tunnel_udf_profile_entry_add;
+	}
+	if(p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_DEL))
+	{
+		p_adpt_api->adpt_tunnel_udf_profile_entry_del =
+			adpt_appe_tunnel_udf_profile_entry_del;
+	}
+	if(p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST % 32))
+	{
+		p_adpt_api->adpt_tunnel_udf_profile_entry_getfirst =
+			adpt_appe_tunnel_udf_profile_entry_getfirst;
+	}
+	if(p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT % 32))
+	{
+		p_adpt_api->adpt_tunnel_udf_profile_entry_getnext =
+			adpt_appe_tunnel_udf_profile_entry_getnext;
+	}
+	if(p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_UDF_PROFILE_CFG_SET % 32))
+	{
+		p_adpt_api->adpt_tunnel_udf_profile_cfg_set =
+			adpt_appe_tunnel_udf_profile_cfg_set;
+	}
+	if(p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_UDF_PROFILE_CFG_GET % 32))
+	{
+		p_adpt_api->adpt_tunnel_udf_profile_cfg_get =
+			adpt_appe_tunnel_udf_profile_cfg_get;
+	}
 
 	return SW_OK;
 }

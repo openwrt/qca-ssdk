@@ -5088,6 +5088,66 @@ extern "C" {
 			sizeof(fal_tunnel_intf_t), \
 			SW_PARAM_PTR|SW_PARAM_OUT, "Port Intf"),
 
+#define SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Profile ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, SW_TUNNEL_UDF_PROFILE_ENTRY, \
+			sizeof(fal_tunnel_udf_profile_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "udf profile entry"),
+
+#define SW_API_TUNNEL_UDF_PROFILE_ENTRY_DEL_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_DEL, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_DEL, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Profile ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_DEL, SW_TUNNEL_UDF_PROFILE_ENTRY, \
+			sizeof(fal_tunnel_udf_profile_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "udf profile entry"),
+
+#define SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Profile ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST, SW_TUNNEL_UDF_PROFILE_ENTRY, \
+			sizeof(fal_tunnel_udf_profile_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_OUT, "udf profile entry"),
+
+#define SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Profile ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT, SW_TUNNEL_UDF_PROFILE_ENTRY, \
+			sizeof(fal_tunnel_udf_profile_entry_t), \
+			SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "udf profile entry"),
+
+#define SW_API_TUNNEL_UDF_PROFILE_CFG_SET_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "udf_profile"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "udf_index"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_SET, SW_TUNNEL_UDF_TYPE, \
+			sizeof(fal_tunnel_udf_type_t), SW_PARAM_IN, "udf_type"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "udf_offset"),
+
+#define SW_API_TUNNEL_UDF_PROFILE_CFG_GET_DESC \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "udf_profile"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "udf_index"), \
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, SW_TUNNEL_UDF_TYPE, \
+			sizeof(fal_tunnel_udf_type_t), SW_PARAM_PTR|SW_PARAM_OUT, "udf_type"),\
+    SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "udf_offset"),
+
 #define SW_API_VXLAN_ENTRY_ADD_DESC \
     SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_VXLAN_TYPE, \

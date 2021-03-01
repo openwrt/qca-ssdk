@@ -300,7 +300,8 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 	} else if(module == FAL_MODULE_VPORT){
 		p_adpt_api->adpt_vport_func_bitmap = func_ctrl->bitmap[0];
 	} else if(module == FAL_MODULE_TUNNEL){
-		p_adpt_api->adpt_tunnel_func_bitmap = func_ctrl->bitmap[0];
+		p_adpt_api->adpt_tunnel_func_bitmap[0] = func_ctrl->bitmap[0];
+		p_adpt_api->adpt_tunnel_func_bitmap[1] = func_ctrl->bitmap[1];
 	} else if(module == FAL_MODULE_VXLAN){
 		p_adpt_api->adpt_vxlan_func_bitmap = func_ctrl->bitmap[0];
 	} else if(module == FAL_MODULE_GENEVE){
@@ -390,7 +391,8 @@ sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
 	} else if(module == FAL_MODULE_VPORT) {
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_vport_func_bitmap;
 	} else if(module == FAL_MODULE_TUNNEL) {
-		func_ctrl->bitmap[0] = p_adpt_api->adpt_tunnel_func_bitmap;
+		func_ctrl->bitmap[0] = p_adpt_api->adpt_tunnel_func_bitmap[0];
+		func_ctrl->bitmap[1] = p_adpt_api->adpt_tunnel_func_bitmap[1];
 	} else if(module == FAL_MODULE_VXLAN) {
 		func_ctrl->bitmap[0] = p_adpt_api->adpt_vxlan_func_bitmap;
 	} else if(module == FAL_MODULE_GENEVE) {
@@ -427,7 +429,8 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VPORT);
 			SW_RTN_ON_ERROR(rv);
 
-			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap = 0xffffffff;
+			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap[0] = 0xffffffff;
+			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap[1] = 0xffffffff;
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_TUNNEL);
 			SW_RTN_ON_ERROR(rv);
 
@@ -625,7 +628,8 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_VPORT);
 			SW_RTN_ON_ERROR(rv);
 #endif
-			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap = 0;
+			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap[0] = 0;
+			g_adpt_api[dev_id]->adpt_tunnel_func_bitmap[1] = 0;
 #if defined(IN_TUNNEL)
 			adpt_appe_tunnel_func_bitmap_init(dev_id);
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_TUNNEL);

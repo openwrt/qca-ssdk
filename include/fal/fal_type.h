@@ -65,6 +65,26 @@ extern "C" {
         a_uint32_t ul[4];
     } fal_ip6_addr_t;
 
+    typedef enum
+    {
+        FAL_L3_TYPE_OTHERS = 0,
+        FAL_L3_TYPE_IPV4,
+        FAL_L3_TYPE_ARP,
+        FAL_L3_TYPE_IPV6,
+        FAL_L3_TYPE_BUTT,
+    } fal_l3_type_t;
+
+    typedef enum
+    {
+        FAL_L4_TYPE_OTHERS = 0,
+        FAL_L4_TYPE_TCP,
+        FAL_L4_TYPE_UDP,
+        FAL_L4_TYPE_UDP_LITE,
+        FAL_L4_TYPE_ICMP,
+        FAL_L4_TYPE_GRE,
+        FAL_L4_TYPE_BUTT,
+    } fal_l4_type_t;
+
     /**
     @brief This enum defines several forwarding command type.
     * Field description:

@@ -28,17 +28,7 @@ extern "C" {
 
 #include "sw.h"
 #include "fal_type.h"
-
-typedef enum
-{
-	FAL_TUNNEL_PROGRAM_TYPE_0 = 0,     /*program0 type*/
-	FAL_TUNNEL_PROGRAM_TYPE_1,         /*program1 type*/
-	FAL_TUNNEL_PROGRAM_TYPE_2,         /*program2 type*/
-	FAL_TUNNEL_PROGRAM_TYPE_3,         /*program3 type*/
-	FAL_TUNNEL_PROGRAM_TYPE_4,         /*program4 type*/
-	FAL_TUNNEL_PROGRAM_TYPE_5,         /*program5 type*/
-	FAL_TUNNEL_PROGRAM_TYPE_BUTT,
-} fal_tunnel_program_type_t;
+#include "fal_tunnel.h"
 
 typedef enum {
 	FAL_ETHERNET_HDR =0,

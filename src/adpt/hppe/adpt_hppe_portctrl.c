@@ -3208,7 +3208,9 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 				port_id_end = SSDK_PHYSICAL_PORT5;
 				break;
 			default:
-				break;
+				SSDK_INFO ("uniphy %d interface mode is 0x%x\n",
+					mode_index, mode[SSDK_UNIPHY_INSTANCE0]);
+				return SW_OK;
 		}
 	}
 	else if(mode_index == SSDK_UNIPHY_INSTANCE1)

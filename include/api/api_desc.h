@@ -4098,6 +4098,20 @@ extern "C" {
     SW_PARAM_DEF(SW_API_QM_SOURCE_PROFILE_GET, SW_UINT32, 4, \
 		    SW_PARAM_PTR|SW_PARAM_OUT, "Source profile"),
 
+#define SW_API_QM_ENQUEUE_CFG_GET_DESC \
+    SW_PARAM_DEF(SW_API_QM_ENQUEUE_CFG_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_QM_ENQUEUE_CFG_GET, SW_ENQUEUE_CFG, \
+		    sizeof(fal_enqueue_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT|SW_PARAM_IN, \
+		    "enqueue configuration"),
+
+#define SW_API_QM_ENQUEUE_CFG_SET_DESC \
+    SW_PARAM_DEF(SW_API_QM_ENQUEUE_CFG_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_QM_ENQUEUE_CFG_SET, SW_ENQUEUE_CFG, \
+		    sizeof(fal_enqueue_cfg_t), SW_PARAM_PTR|SW_PARAM_IN, \
+		    "enqueue configuration"),
+
 #define SW_API_MGMTCTRL_ETHTYPE_PROFILE_SET_DESC \
     SW_PARAM_DEF(SW_API_MGMTCTRL_ETHTYPE_PROFILE_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_MGMTCTRL_ETHTYPE_PROFILE_SET, SW_UINT32, 4, SW_PARAM_IN, "Profile ID"), \

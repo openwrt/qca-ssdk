@@ -267,6 +267,7 @@ typedef enum
 	SW_MAPT_DECAP_CTRL,
 	SW_MAPT_DECAP_RULE_ENTRY,
 	SW_MAPT_DECAP_ENTRY,
+	SW_ENQUEUE_CFG,
 /* auto_insert_flag */
 } sw_data_type_e;
 

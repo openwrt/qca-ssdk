@@ -627,6 +627,10 @@ typedef sw_error_t (*adpt_qm_port_source_profile_set_func)(
 		a_uint32_t dev_id, fal_port_t port, a_uint32_t src_profile);
 typedef sw_error_t (*adpt_qm_port_source_profile_get_func)(
 		a_uint32_t dev_id, fal_port_t port, a_uint32_t *src_profile);
+typedef sw_error_t (*adpt_qm_enqueue_config_get_func)(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg);
+typedef sw_error_t (*adpt_qm_enqueue_config_set_func)(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg);
 
 
 /*portvlan module begin*/
@@ -1488,6 +1492,8 @@ typedef struct
 	adpt_qm_enqueue_ctrl_get_func adpt_qm_enqueue_ctrl_get;
 	adpt_qm_port_source_profile_set_func adpt_qm_port_source_profile_set;
 	adpt_qm_port_source_profile_get_func adpt_qm_port_source_profile_get;
+	adpt_qm_enqueue_config_get_func adpt_qm_enqueue_config_get;
+	adpt_qm_enqueue_config_set_func adpt_qm_enqueue_config_set;
 
 	/*portvlan module begin*/
 	a_uint32_t adpt_portvlan_func_bitmap[2];

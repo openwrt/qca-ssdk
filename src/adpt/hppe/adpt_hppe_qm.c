@@ -33,6 +33,9 @@
 #if defined(CPPE)
 #include "adpt_cppe_qm.h"
 #endif
+#if defined(APPE)
+#include "adpt_appe_qm.h"
+#endif
 
 #define SERVICE_CODE_QUEUE_OFFSET   2048
 #define CPU_CODE_QUEUE_OFFSET         1024
@@ -1275,7 +1278,9 @@ void adpt_hppe_qm_func_bitmap_init(a_uint32_t dev_id)
 						(1 << FUNC_QM_ENQUEUE_CTRL_GET) |
 						(1 << FUNC_QM_ENQUEUE_CTRL_SET) |
 						(1 << FUNC_QM_PORT_SRCPROFILE_GET));
-	p_adpt_api->adpt_qm_func_bitmap[1] = 1 << (FUNC_QM_PORT_SRCPROFILE_SET % 32);
+	p_adpt_api->adpt_qm_func_bitmap[1] = (1 << (FUNC_QM_PORT_SRCPROFILE_SET % 32)) |
+						(1 << (FUNC_QM_ENQUEUE_CFG_GET % 32)) |
+						(1 << (FUNC_QM_ENQUEUE_CFG_SET % 32));
 	return;
 }
 
@@ -1403,6 +1408,12 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_qm_port_source_profile_get = adpt_ppe_qm_port_source_profile_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_PORT_SRCPROFILE_SET % 32)))
 		p_adpt_api->adpt_qm_port_source_profile_set = adpt_ppe_qm_port_source_profile_set;
+#endif
+#if defined(APPE)
+	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_ENQUEUE_CFG_GET % 32)))
+		p_adpt_api->adpt_qm_enqueue_config_get = adpt_appe_qm_enqueue_config_get;
+	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_ENQUEUE_CFG_SET % 32)))
+		p_adpt_api->adpt_qm_enqueue_config_set = adpt_appe_qm_enqueue_config_set;
 #endif
 
 	return SW_OK;

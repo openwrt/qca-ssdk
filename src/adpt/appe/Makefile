@@ -45,6 +45,10 @@ ifeq (TRUE, $(IN_MAPT))
   SRC_LIST += adpt_appe_mapt.c
 endif
 
+ifeq (TRUE, $(IN_QM))
+  SRC_LIST += adpt_appe_qm.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

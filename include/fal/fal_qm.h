@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -85,6 +85,37 @@ typedef struct {
 	fal_port_t dst_port; /* destination physical or VP port */
 } fal_ucast_queue_dest_t;
 
+typedef enum {
+	FAL_ENQUEUE_FLOW = 0,
+	FAL_ENQUEUE_VSI,
+	FAL_ENQUEUE_SERVCODE,
+	FAL_ENQUEUE_INVALID,
+} fal_enqueue_type_t;
+
+typedef struct {
+	fal_enqueue_type_t enqueue_type; /* enqueue type: 0: flow, 1: vsi+dst_port, 2 servcode */
+	a_uint8_t flow_pri_profile; /* priority profile from flow match entry */
+	struct vsi_dest_t {
+		a_uint32_t vsi; /* post vsi */
+		a_uint32_t phy_port; /* dst port id */
+	} vsi_dest;
+	a_uint32_t dst_port; /* enable enqueue service code on dest port */
+} fal_enqueue_rule_t;
+
+typedef struct {
+	a_bool_t enqueue_en; /* enqueue enable or not */
+	fal_port_t enqueue_vport; /* enqueu vp id when enqueue type: flow or vsi */
+	struct servcode_dest_t {
+		a_uint32_t service_code; /* enqueue service code when enqueu type: service code */
+		a_uint32_t phy_port; /* destination phy port when enqueue type: service code */
+	} enqueue_servcode;
+} fal_enqueue_index_t;
+
+typedef struct {
+	fal_enqueue_rule_t rule_entry; /* enqueue rule */
+	fal_enqueue_index_t index_entry; /* index for egress queue */
+} fal_enqueue_cfg_t;
+
 #define FAL_QM_DROP_ITEMS	6
 typedef struct {
 	a_uint32_t tx_packets;
@@ -128,6 +159,8 @@ enum {
 	FUNC_QM_ENQUEUE_CTRL_SET,
 	FUNC_QM_PORT_SRCPROFILE_GET,
 	FUNC_QM_PORT_SRCPROFILE_SET,
+	FUNC_QM_ENQUEUE_CFG_GET,
+	FUNC_QM_ENQUEUE_CFG_SET,
 };
 
 sw_error_t
@@ -333,6 +366,13 @@ fal_qm_port_source_profile_get(
 
 #endif
 
+sw_error_t
+fal_qm_enqueue_config_set(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg);
+
+sw_error_t
+fal_qm_enqueue_config_get(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg);
 
 #ifdef __cplusplus
 }

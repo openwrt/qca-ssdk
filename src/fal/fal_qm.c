@@ -542,6 +542,38 @@ _fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable
 	return rv;
 }
 
+sw_error_t
+_fal_qm_enqueue_config_set(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_qm_enqueue_config_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_qm_enqueue_config_set(dev_id, enqueue_cfg);
+	return rv;
+}
+
+sw_error_t
+_fal_qm_enqueue_config_get(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_qm_enqueue_config_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_qm_enqueue_config_get(dev_id, enqueue_cfg);
+	return rv;
+}
+
 #ifndef IN_QM_MINI
 sw_error_t
 _fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enable)
@@ -1021,6 +1053,34 @@ fal_qm_port_source_profile_get(a_uint32_t dev_id, fal_port_t port, a_uint32_t *s
 	return rv;
 }
 #endif
+
+sw_error_t
+fal_qm_enqueue_config_set(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_qm_enqueue_config_set(dev_id, enqueue_cfg);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
+sw_error_t
+fal_qm_enqueue_config_get(a_uint32_t dev_id,
+		fal_enqueue_cfg_t *enqueue_cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_qm_enqueue_config_get(dev_id, enqueue_cfg);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
+EXPORT_SYMBOL(fal_qm_enqueue_config_set);
+
+EXPORT_SYMBOL(fal_qm_enqueue_config_get);
 
 EXPORT_SYMBOL(fal_ac_ctrl_set);
 

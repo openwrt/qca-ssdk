@@ -1814,7 +1814,9 @@ extern "C" {
     SW_API_DEF(SW_API_QM_ENQUEUE_CTRL_SET, fal_qm_enqueue_ctrl_set), \
     SW_API_DEF(SW_API_QM_ENQUEUE_CTRL_GET, fal_qm_enqueue_ctrl_get), \
     SW_API_DEF(SW_API_QM_SOURCE_PROFILE_SET, fal_qm_port_source_profile_set), \
-    SW_API_DEF(SW_API_QM_SOURCE_PROFILE_GET, fal_qm_port_source_profile_get),
+    SW_API_DEF(SW_API_QM_SOURCE_PROFILE_GET, fal_qm_port_source_profile_get), \
+    SW_API_DEF(SW_API_QM_ENQUEUE_CFG_GET, fal_qm_enqueue_config_get), \
+    SW_API_DEF(SW_API_QM_ENQUEUE_CFG_SET, fal_qm_enqueue_config_set),
 
 #define QM_API_PARAM \
     SW_API_DESC(SW_API_UCAST_QUEUE_BASE_PROFILE_SET) \
@@ -1849,7 +1851,9 @@ extern "C" {
     SW_API_DESC(SW_API_QM_ENQUEUE_CTRL_SET) \
     SW_API_DESC(SW_API_QM_ENQUEUE_CTRL_GET) \
     SW_API_DESC(SW_API_QM_SOURCE_PROFILE_SET) \
-    SW_API_DESC(SW_API_QM_SOURCE_PROFILE_GET)
+    SW_API_DESC(SW_API_QM_SOURCE_PROFILE_GET) \
+    SW_API_DESC(SW_API_QM_ENQUEUE_CFG_GET) \
+    SW_API_DESC(SW_API_QM_ENQUEUE_CFG_SET)
 #else
 #define QM_API \
     SW_API_DEF(SW_API_UCAST_QUEUE_BASE_PROFILE_SET, fal_ucast_queue_base_profile_set), \

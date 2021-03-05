@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -23,6 +23,9 @@
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
 #include "adpt.h"
+#ifdef APPE
+#include "adpt_appe_ctrlpkt.h"
+#endif
 
 a_uint32_t
 _get_mgmtctrl_ctrlpkt_profile_by_index(a_uint32_t dev_id, a_uint32_t index, fal_ctrlpkt_profile_t *ctrlpkt)
@@ -37,9 +40,14 @@ _get_mgmtctrl_ctrlpkt_profile_by_index(a_uint32_t dev_id, a_uint32_t index, fal_
 	ctrlpkt->action.in_stp_bypass = entry.bf.in_stg_byp;
 	ctrlpkt->action.in_vlan_fltr_bypass = entry.bf.in_vlan_fltr_byp;
 
-	if (entry.bf.portbitmap_include)
+	if (entry.bf.portbitmap_include) {
+#ifdef APPE
+		ctrlpkt->port_map = FAL_PORT_ID(adpt_port_type_convert(A_FALSE,
+			entry.bf.port_type), entry.bf.portbitmap);
+#else
 		ctrlpkt->port_map = entry.bf.portbitmap;
-
+#endif
+	}
 	if (entry.bf.ethertype_include)
 		ctrlpkt->ethtype_profile_bitmap = entry.bf.ethertype_index_bitmap_0 | (entry.bf.ethertype_index_bitmap_1 << 2);
 
@@ -228,8 +236,13 @@ adpt_hppe_mgmtctrl_ctrlpkt_profile_add(a_uint32_t dev_id, fal_ctrlpkt_profile_t 
 	entry.bf.ethertype_index_bitmap_1 = (ctrlpkt->ethtype_profile_bitmap >> 2);
 
 	entry.bf.portbitmap_include = ctrlpkt->port_map?1:0;
+#ifdef APPE
+	entry.bf.port_type = adpt_port_type_convert(A_TRUE,
+		FAL_PORT_ID_TYPE(ctrlpkt->port_map));
+	entry.bf.portbitmap = FAL_PORT_ID_VALUE (ctrlpkt->port_map);
+#else
 	entry.bf.portbitmap = ctrlpkt->port_map;
-
+#endif
 	entry.bf.in_vlan_fltr_byp = ctrlpkt->action.in_vlan_fltr_bypass?1:0;
 	entry.bf.in_stg_byp = ctrlpkt->action.in_stp_bypass?1:0;
 	entry.bf.l2_sec_byp = ctrlpkt->action.l2_filter_bypass?1:0;
@@ -327,6 +340,14 @@ void adpt_hppe_ctrlpkt_func_bitmap_init(a_uint32_t dev_id)
 						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_DEL) |
 						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETFIRST) |
 						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT));
+#ifdef APPE
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	{
+		p_adpt_api->adpt_ctrlpkt_func_bitmap |= (
+						(1 << FUNC_MGMTCTRL_VPGROUP_SET) |
+						(1 << FUNC_MGMTCTRL_VPGROUP_GET));
+	}
+#endif
 
 	return;
 }
@@ -344,7 +365,13 @@ static void adpt_hppe_ctrlpkt_func_unregister(a_uint32_t dev_id, adpt_api_t *p_a
 	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_del = NULL;
 	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getfirst = NULL;
 	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getnext = NULL;
-
+#ifdef APPE
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	{
+		p_adpt_api->adpt_mgmtctrl_vpgroup_set = NULL;
+		p_adpt_api->adpt_mgmtctrl_vpgroup_get = NULL;
+	}
+#endif
 	return;
 }
 
@@ -375,7 +402,17 @@ sw_error_t adpt_hppe_ctrlpkt_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getfirst = adpt_hppe_mgmtctrl_ctrlpkt_profile_getfirst;
 	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT))
 		p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getnext = adpt_hppe_mgmtctrl_ctrlpkt_profile_getnext;
-
+#ifdef APPE
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	{
+		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_VPGROUP_SET))
+			p_adpt_api->adpt_mgmtctrl_vpgroup_set =
+				adpt_appe_mgmtctrl_vpgroup_set;
+		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_VPGROUP_GET))
+			p_adpt_api->adpt_mgmtctrl_vpgroup_get =
+				adpt_appe_mgmtctrl_vpgroup_get;
+	}
+#endif
 	return SW_OK;
 }
 

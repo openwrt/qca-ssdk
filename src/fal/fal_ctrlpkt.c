@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -150,6 +150,36 @@ _fal_mgmtctrl_ctrlpkt_profile_getnext(a_uint32_t dev_id, fal_ctrlpkt_profile_t *
 }
 
 sw_error_t
+_fal_mgmtctrl_vpgroup_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vpgroup_id)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_mgmtctrl_vpgroup_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_mgmtctrl_vpgroup_set(dev_id, port_id, vpgroup_id);
+    return rv;
+}
+
+sw_error_t
+_fal_mgmtctrl_vpgroup_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vpgroup_id)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_mgmtctrl_vpgroup_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_mgmtctrl_vpgroup_get(dev_id, port_id, vpgroup_id);
+    return rv;
+}
+
+sw_error_t
 fal_mgmtctrl_ethtype_profile_set(a_uint32_t dev_id, a_uint32_t profile_id, a_uint32_t ethtype)
 {
     sw_error_t rv = SW_OK;
@@ -237,6 +267,28 @@ fal_mgmtctrl_ctrlpkt_profile_getnext(a_uint32_t dev_id, fal_ctrlpkt_profile_t *c
     return rv;
 }
 
+sw_error_t
+fal_mgmtctrl_vpgroup_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vpgroup_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_CTRLPKT_API_LOCK;
+    rv = _fal_mgmtctrl_vpgroup_set(dev_id, port_id, vpgroup_id);
+    FAL_CTRLPKT_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_mgmtctrl_vpgroup_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vpgroup_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_CTRLPKT_API_LOCK;
+    rv = _fal_mgmtctrl_vpgroup_get(dev_id, port_id, vpgroup_id);
+    FAL_CTRLPKT_API_UNLOCK;
+    return rv;
+}
+
 EXPORT_SYMBOL(fal_mgmtctrl_ethtype_profile_set);
 EXPORT_SYMBOL(fal_mgmtctrl_ethtype_profile_get);
 EXPORT_SYMBOL(fal_mgmtctrl_rfdb_profile_set);
@@ -245,4 +297,5 @@ EXPORT_SYMBOL(fal_mgmtctrl_ctrlpkt_profile_add);
 EXPORT_SYMBOL(fal_mgmtctrl_ctrlpkt_profile_del);
 EXPORT_SYMBOL(fal_mgmtctrl_ctrlpkt_profile_getfirst);
 EXPORT_SYMBOL(fal_mgmtctrl_ctrlpkt_profile_getnext);
-
+EXPORT_SYMBOL(fal_mgmtctrl_vpgroup_set);
+EXPORT_SYMBOL(fal_mgmtctrl_vpgroup_get);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -578,4 +578,35 @@ hppe_app_ctrl_in_vlan_fltr_byp_set(
 	ret = hppe_app_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#ifdef APPE
+sw_error_t
+appe_app_ctrl_port_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union app_ctrl_u reg_val;
+	sw_error_t ret = SW_OK;
 
+	ret = hppe_app_ctrl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.port_type;
+	return ret;
+}
+
+sw_error_t
+appe_app_ctrl_port_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union app_ctrl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_app_ctrl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.port_type = value;
+	ret = hppe_app_ctrl_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif

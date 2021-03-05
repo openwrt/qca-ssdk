@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2020, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -704,6 +704,8 @@ typedef sw_error_t (*adpt_mgmtctrl_ctrlpkt_profile_add_func)(a_uint32_t dev_id, 
 typedef sw_error_t (*adpt_mgmtctrl_ctrlpkt_profile_del_func)(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
 typedef sw_error_t (*adpt_mgmtctrl_ctrlpkt_profile_getfirst_func)(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
 typedef sw_error_t (*adpt_mgmtctrl_ctrlpkt_profile_getnext_func)(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
+typedef sw_error_t (*adpt_mgmtctrl_vpgroup_set_func)(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t vpgroup_id);
+typedef sw_error_t (*adpt_mgmtctrl_vpgroup_get_func)(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *vpgroup_id);
 /*ctrlpkt module end*/
 
 /*service module end*/
@@ -1553,6 +1555,8 @@ typedef struct
 	adpt_mgmtctrl_ctrlpkt_profile_del_func adpt_mgmtctrl_ctrlpkt_profile_del;
 	adpt_mgmtctrl_ctrlpkt_profile_getfirst_func adpt_mgmtctrl_ctrlpkt_profile_getfirst;
 	adpt_mgmtctrl_ctrlpkt_profile_getnext_func adpt_mgmtctrl_ctrlpkt_profile_getnext;
+	adpt_mgmtctrl_vpgroup_set_func adpt_mgmtctrl_vpgroup_set;
+	adpt_mgmtctrl_vpgroup_get_func adpt_mgmtctrl_vpgroup_get;
 	/*ctrlpkt module end*/
 
 	/*servcode module begin*/

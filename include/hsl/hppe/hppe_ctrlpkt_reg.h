@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -147,7 +147,12 @@ struct app_ctrl {
 	a_uint32_t  l2_sec_byp:1;
 	a_uint32_t  sg_byp:1;
 	a_uint32_t  cmd:2;
+#ifdef APPE
+	a_uint32_t  port_type:2;
+	a_uint32_t  _reserved0:13;
+#else
 	a_uint32_t  _reserved0:15;
+#endif
 };
 
 union app_ctrl_u {

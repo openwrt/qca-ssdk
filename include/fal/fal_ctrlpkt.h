@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -77,6 +77,8 @@ enum {
 	FUNC_MGMTCTRL_CTRLPKT_PROFILE_DEL,
 	FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETFIRST,
 	FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT,
+	FUNC_MGMTCTRL_VPGROUP_SET,
+	FUNC_MGMTCTRL_VPGROUP_GET,
 };
 
 sw_error_t fal_mgmtctrl_ethtype_profile_set(a_uint32_t dev_id, a_uint32_t profile_id, a_uint32_t ethtype);
@@ -89,6 +91,8 @@ sw_error_t fal_mgmtctrl_ctrlpkt_profile_add(a_uint32_t dev_id, fal_ctrlpkt_profi
 sw_error_t fal_mgmtctrl_ctrlpkt_profile_del(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
 sw_error_t fal_mgmtctrl_ctrlpkt_profile_getfirst(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
 sw_error_t fal_mgmtctrl_ctrlpkt_profile_getnext(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
+sw_error_t fal_mgmtctrl_vpgroup_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vpgroup_id);
+sw_error_t fal_mgmtctrl_vpgroup_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vpgroup_id);
 
 #ifdef __cplusplus
 }

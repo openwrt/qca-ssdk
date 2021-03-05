@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2015-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -4155,6 +4155,20 @@ extern "C" {
     SW_PARAM_DEF(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT, SW_CTRLPKT_PROFILE, \
 		    sizeof(fal_ctrlpkt_profile_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, \
 		    "app entry"),
+
+#define SW_API_MGMTCTRL_VPGROUP_SET_DESC \
+	SW_PARAM_DEF(SW_API_MGMTCTRL_VPGROUP_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+	SW_PARAM_DEF(SW_API_MGMTCTRL_VPGROUP_SET, SW_UINT32, sizeof(fal_port_t), SW_PARAM_IN, \
+		"port_id"), \
+	SW_PARAM_DEF(SW_API_MGMTCTRL_VPGROUP_SET, SW_UINT32, sizeof(a_uint32_t), SW_PARAM_IN, \
+		"vpgroup_id"),
+
+#define SW_API_MGMTCTRL_VPGROUP_GET_DESC \
+	SW_PARAM_DEF(SW_API_MGMTCTRL_VPGROUP_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+	SW_PARAM_DEF(SW_API_MGMTCTRL_VPGROUP_GET, SW_UINT32, sizeof(fal_port_t), SW_PARAM_IN, \
+		"port_id"), \
+	SW_PARAM_DEF(SW_API_MGMTCTRL_VPGROUP_GET, SW_UINT32, sizeof(a_uint32_t), \
+		SW_PARAM_PTR|SW_PARAM_OUT, "vpgroup_id"),
 
 #define SW_API_SERVCODE_CONFIG_SET_DESC \
     SW_PARAM_DEF(SW_API_SERVCODE_CONFIG_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \

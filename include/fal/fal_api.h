@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2015-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -2023,7 +2023,9 @@ extern "C" {
     SW_API_DEF(SW_API_MGMTCTRL_CTRLPKT_PROFILE_ADD, fal_mgmtctrl_ctrlpkt_profile_add), \
     SW_API_DEF(SW_API_MGMTCTRL_CTRLPKT_PROFILE_DEL, fal_mgmtctrl_ctrlpkt_profile_del), \
     SW_API_DEF(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETFIRST, fal_mgmtctrl_ctrlpkt_profile_getfirst), \
-    SW_API_DEF(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT, fal_mgmtctrl_ctrlpkt_profile_getnext),
+    SW_API_DEF(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT, fal_mgmtctrl_ctrlpkt_profile_getnext), \
+    SW_API_DEF(SW_API_MGMTCTRL_VPGROUP_SET, fal_mgmtctrl_vpgroup_set), \
+    SW_API_DEF(SW_API_MGMTCTRL_VPGROUP_GET, fal_mgmtctrl_vpgroup_get),
 
 #define CTRLPKT_API_PARAM \
     SW_API_DESC(SW_API_MGMTCTRL_ETHTYPE_PROFILE_SET) \
@@ -2033,7 +2035,9 @@ extern "C" {
     SW_API_DESC(SW_API_MGMTCTRL_CTRLPKT_PROFILE_ADD) \
     SW_API_DESC(SW_API_MGMTCTRL_CTRLPKT_PROFILE_DEL) \
     SW_API_DESC(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETFIRST) \
-    SW_API_DESC(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT)
+    SW_API_DESC(SW_API_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT) \
+    SW_API_DESC(SW_API_MGMTCTRL_VPGROUP_SET) \
+    SW_API_DESC(SW_API_MGMTCTRL_VPGROUP_GET)
 #else
 #define CTRLPKT_API
 #define CTRLPKT_API_PARAM

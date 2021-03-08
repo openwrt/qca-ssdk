@@ -2850,7 +2850,11 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 					break;
 #endif
 				case SSDK_PHYSICAL_PORT5:
-					*mode0 = PORT_WRAPPER_SGMII_CHANNEL4;
+					if(ssdk_dt_global_get_mac_mode(dev_id,
+						SSDK_UNIPHY_INSTANCE1) == PORT_WRAPPER_MAX)
+					{
+						*mode0 = PORT_WRAPPER_SGMII_CHANNEL4;
+					}
 					break;
 				default:
 					SSDK_ERROR("port %d doesn't support "
@@ -4702,7 +4706,9 @@ adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
 			if ((((mode == PORT_WRAPPER_PSGMII) ||
 			      (mode == PORT_WRAPPER_PSGMII_FIBER)) &&
 			     (mode1 == PORT_WRAPPER_MAX)) ||
-			    ((mode == PORT_WRAPPER_SGMII4_RGMII4) && (mode1 == PORT_WRAPPER_MAX)))
+			    ((mode == PORT_WRAPPER_SGMII4_RGMII4 ||
+			        mode == PORT_WRAPPER_SGMII_CHANNEL4)
+			        && (mode1 == PORT_WRAPPER_MAX)))
 			{
 				adpt_hppe_pqsgmii_speed_clock_set(dev_id, port_id, phy_speed);
 				return;
@@ -4755,7 +4761,9 @@ adpt_hppe_gcc_uniphy_clock_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 			if ((((mode == PORT_WRAPPER_PSGMII) ||
 			      (mode == PORT_WRAPPER_PSGMII_FIBER)) &&
 			     (mode1 == PORT_WRAPPER_MAX)) ||
-			    ((mode == PORT_WRAPPER_SGMII4_RGMII4) && (mode1 == PORT_WRAPPER_MAX)))
+			    ((mode == PORT_WRAPPER_SGMII4_RGMII4 ||
+			        mode == PORT_WRAPPER_SGMII_CHANNEL4)
+			        && (mode1 == PORT_WRAPPER_MAX)))
 			{
 				qca_gcc_uniphy_port_clock_set(dev_id, uniphy_index,
 				port_id, enable);

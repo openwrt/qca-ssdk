@@ -2002,6 +2002,18 @@ adpt_appe_tunnel_init(a_uint32_t dev_id)
 	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_RULE_ENTRY_DEL))
 		p_adpt_api->adpt_tunnel_encap_rule_entry_del =
 			adpt_appe_tunnel_encap_rule_entry_del;
+	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_SET))
+		p_adpt_api->adpt_tunnel_encap_header_ctrl_set =
+			adpt_appe_tunnel_encap_header_ctrl_set;
+	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_GET))
+		p_adpt_api->adpt_tunnel_encap_header_ctrl_get =
+			adpt_appe_tunnel_encap_header_ctrl_get;
+	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_SET))
+		p_adpt_api->adpt_tunnel_decap_header_ctrl_set =
+			adpt_appe_tunnel_decap_header_ctrl_set;
+	if (p_adpt_api->adpt_tunnel_func_bitmap & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_GET))
+		p_adpt_api->adpt_tunnel_decap_header_ctrl_get =
+			adpt_appe_tunnel_decap_header_ctrl_get;
 
 	return SW_OK;
 }

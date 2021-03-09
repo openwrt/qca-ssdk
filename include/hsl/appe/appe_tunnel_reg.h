@@ -22,6 +22,174 @@
 #ifndef APPE_TUNNEL_REG_H
 #define APPE_TUNNEL_REG_H
 
+/*[register] TPR_UDF_CTRL_0*/
+#define TPR_UDF_CTRL_0
+#define TPR_UDF_CTRL_0_ADDRESS 0x400
+#define TPR_UDF_CTRL_0_NUM     16
+#define TPR_UDF_CTRL_0_INC     0x4
+#define TPR_UDF_CTRL_0_TYPE    REG_TYPE_RW
+#define TPR_UDF_CTRL_0_DEFAULT 0x0
+	/*[field] L3_TYPE*/
+	#define TPR_UDF_CTRL_0_L3_TYPE
+	#define TPR_UDF_CTRL_0_L3_TYPE_OFFSET  0
+	#define TPR_UDF_CTRL_0_L3_TYPE_LEN     2
+	#define TPR_UDF_CTRL_0_L3_TYPE_DEFAULT 0x0
+	/*[field] L3_TYPE_INCL*/
+	#define TPR_UDF_CTRL_0_L3_TYPE_INCL
+	#define TPR_UDF_CTRL_0_L3_TYPE_INCL_OFFSET  2
+	#define TPR_UDF_CTRL_0_L3_TYPE_INCL_LEN     1
+	#define TPR_UDF_CTRL_0_L3_TYPE_INCL_DEFAULT 0x0
+	/*[field] L4_TYPE*/
+	#define TPR_UDF_CTRL_0_L4_TYPE
+	#define TPR_UDF_CTRL_0_L4_TYPE_OFFSET  4
+	#define TPR_UDF_CTRL_0_L4_TYPE_LEN     3
+	#define TPR_UDF_CTRL_0_L4_TYPE_DEFAULT 0x0
+	/*[field] L4_TYPE_INCL*/
+	#define TPR_UDF_CTRL_0_L4_TYPE_INCL
+	#define TPR_UDF_CTRL_0_L4_TYPE_INCL_OFFSET  7
+	#define TPR_UDF_CTRL_0_L4_TYPE_INCL_LEN     1
+	#define TPR_UDF_CTRL_0_L4_TYPE_INCL_DEFAULT 0x0
+	/*[field] OVERLAY_TYPE*/
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_OFFSET  8
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_LEN     2
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_DEFAULT 0x0
+	/*[field] OVERLAY_TYPE_INCL*/
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_INCL
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_INCL_OFFSET  10
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_INCL_LEN     1
+	#define TPR_UDF_CTRL_0_OVERLAY_TYPE_INCL_DEFAULT 0x0
+	/*[field] PROGRAM_TYPE*/
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_OFFSET  12
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_LEN     3
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_DEFAULT 0x0
+	/*[field] PROGRAM_TYPE_INCL*/
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_INCL
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_INCL_OFFSET  15
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_INCL_LEN     1
+	#define TPR_UDF_CTRL_0_PROGRAM_TYPE_INCL_DEFAULT 0x0
+	/*[field] UDF_PROFILE*/
+	#define TPR_UDF_CTRL_0_UDF_PROFILE
+	#define TPR_UDF_CTRL_0_UDF_PROFILE_OFFSET  17
+	#define TPR_UDF_CTRL_0_UDF_PROFILE_LEN     3
+	#define TPR_UDF_CTRL_0_UDF_PROFILE_DEFAULT 0x0
+	/*[field] VALID*/
+	#define TPR_UDF_CTRL_0_VALID
+	#define TPR_UDF_CTRL_0_VALID_OFFSET  31
+	#define TPR_UDF_CTRL_0_VALID_LEN     1
+	#define TPR_UDF_CTRL_0_VALID_DEFAULT 0x0
+
+struct tpr_udf_ctrl_0 {
+	a_uint32_t  l3_type:2;
+	a_uint32_t  l3_type_incl:1;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  l4_type:3;
+	a_uint32_t  l4_type_incl:1;
+	a_uint32_t  overlay_type:2;
+	a_uint32_t  overlay_type_incl:1;
+	a_uint32_t  _reserved1:1;
+	a_uint32_t  program_type:3;
+	a_uint32_t  program_type_incl:1;
+	a_uint32_t  _reserved2:1;
+	a_uint32_t  udf_profile:3;
+	a_uint32_t  _reserved3:11;
+	a_uint32_t  valid:1;
+};
+
+union tpr_udf_ctrl_0_u {
+	a_uint32_t val;
+	struct tpr_udf_ctrl_0 bf;
+};
+
+/*[register] TPR_UDF_PROFILE_BASE*/
+#define TPR_UDF_PROFILE_BASE
+#define TPR_UDF_PROFILE_BASE_ADDRESS 0x440
+#define TPR_UDF_PROFILE_BASE_NUM     8
+#define TPR_UDF_PROFILE_BASE_INC     0x4
+#define TPR_UDF_PROFILE_BASE_TYPE    REG_TYPE_RW
+#define TPR_UDF_PROFILE_BASE_DEFAULT 0x0
+	/*[field] UDF0_BASE*/
+	#define TPR_UDF_PROFILE_BASE_UDF0_BASE
+	#define TPR_UDF_PROFILE_BASE_UDF0_BASE_OFFSET  0
+	#define TPR_UDF_PROFILE_BASE_UDF0_BASE_LEN     3
+	#define TPR_UDF_PROFILE_BASE_UDF0_BASE_DEFAULT 0x0
+	/*[field] UDF1_BASE*/
+	#define TPR_UDF_PROFILE_BASE_UDF1_BASE
+	#define TPR_UDF_PROFILE_BASE_UDF1_BASE_OFFSET  8
+	#define TPR_UDF_PROFILE_BASE_UDF1_BASE_LEN     3
+	#define TPR_UDF_PROFILE_BASE_UDF1_BASE_DEFAULT 0x0
+	/*[field] UDF2_BASE*/
+	#define TPR_UDF_PROFILE_BASE_UDF2_BASE
+	#define TPR_UDF_PROFILE_BASE_UDF2_BASE_OFFSET  16
+	#define TPR_UDF_PROFILE_BASE_UDF2_BASE_LEN     3
+	#define TPR_UDF_PROFILE_BASE_UDF2_BASE_DEFAULT 0x0
+	/*[field] UDF3_BASE*/
+	#define TPR_UDF_PROFILE_BASE_UDF3_BASE
+	#define TPR_UDF_PROFILE_BASE_UDF3_BASE_OFFSET  24
+	#define TPR_UDF_PROFILE_BASE_UDF3_BASE_LEN     3
+	#define TPR_UDF_PROFILE_BASE_UDF3_BASE_DEFAULT 0x0
+
+struct tpr_udf_profile_base {
+	a_uint32_t  udf0_base:3;
+	a_uint32_t  _reserved0:5;
+	a_uint32_t  udf1_base:3;
+	a_uint32_t  _reserved1:5;
+	a_uint32_t  udf2_base:3;
+	a_uint32_t  _reserved2:5;
+	a_uint32_t  udf3_base:3;
+	a_uint32_t  _reserved3:5;
+};
+
+union tpr_udf_profile_base_u {
+	a_uint32_t val;
+	struct tpr_udf_profile_base bf;
+};
+
+/*[register] TPR_UDF_PROFILE_OFFSET*/
+#define TPR_UDF_PROFILE_OFFSET
+#define TPR_UDF_PROFILE_OFFSET_ADDRESS 0x460
+#define TPR_UDF_PROFILE_OFFSET_NUM     8
+#define TPR_UDF_PROFILE_OFFSET_INC     0x4
+#define TPR_UDF_PROFILE_OFFSET_TYPE    REG_TYPE_RW
+#define TPR_UDF_PROFILE_OFFSET_DEFAULT 0x0
+	/*[field] UDF0_OFFSET*/
+	#define TPR_UDF_PROFILE_OFFSET_UDF0_OFFSET
+	#define TPR_UDF_PROFILE_OFFSET_UDF0_OFFSET_OFFSET  0
+	#define TPR_UDF_PROFILE_OFFSET_UDF0_OFFSET_LEN     6
+	#define TPR_UDF_PROFILE_OFFSET_UDF0_OFFSET_DEFAULT 0x0
+	/*[field] UDF1_OFFSET*/
+	#define TPR_UDF_PROFILE_OFFSET_UDF1_OFFSET
+	#define TPR_UDF_PROFILE_OFFSET_UDF1_OFFSET_OFFSET  8
+	#define TPR_UDF_PROFILE_OFFSET_UDF1_OFFSET_LEN     6
+	#define TPR_UDF_PROFILE_OFFSET_UDF1_OFFSET_DEFAULT 0x0
+	/*[field] UDF2_OFFSET*/
+	#define TPR_UDF_PROFILE_OFFSET_UDF2_OFFSET
+	#define TPR_UDF_PROFILE_OFFSET_UDF2_OFFSET_OFFSET  16
+	#define TPR_UDF_PROFILE_OFFSET_UDF2_OFFSET_LEN     6
+	#define TPR_UDF_PROFILE_OFFSET_UDF2_OFFSET_DEFAULT 0x0
+	/*[field] UDF3_OFFSET*/
+	#define TPR_UDF_PROFILE_OFFSET_UDF3_OFFSET
+	#define TPR_UDF_PROFILE_OFFSET_UDF3_OFFSET_OFFSET  24
+	#define TPR_UDF_PROFILE_OFFSET_UDF3_OFFSET_LEN     6
+	#define TPR_UDF_PROFILE_OFFSET_UDF3_OFFSET_DEFAULT 0x0
+
+struct tpr_udf_profile_offset {
+	a_uint32_t  udf0_offset:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  udf1_offset:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  udf2_offset:6;
+	a_uint32_t  _reserved2:2;
+	a_uint32_t  udf3_offset:6;
+	a_uint32_t  _reserved3:2;
+};
+
+union tpr_udf_profile_offset_u {
+	a_uint32_t val;
+	struct tpr_udf_profile_offset bf;
+};
+
 /*[register] TL_TBL_OP*/
 #define TL_TBL_OP
 #define TL_TBL_OP_ADDRESS 0x0

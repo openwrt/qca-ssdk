@@ -22,6 +22,9 @@
 #ifndef _APPE_TUNNEL_H_
 #define _APPE_TUNNEL_H_
 
+#define TPR_UDF_CTRL_0_MAX_ENTRY	16
+#define TPR_UDF_PROFILE_BASE_MAX_ENTRY	8
+#define TPR_UDF_PROFILE_OFFSET_MAX_ENTRY	8
 #define TL_L3_IF_TBL_MAX_ENTRY		128
 #define TL_KEY_GEN_MAX_ENTRY		16
 #define TL_TBL_MAX_ENTRY		128
@@ -32,6 +35,257 @@
 #define EG_XLAT_TUN_CTRL_MAX_ENTRY	128
 #define EG_EDIT_RULE_MAX_ENTRY		16
 
+sw_error_t
+appe_tpr_udf_ctrl_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_udf_ctrl_0_u *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_udf_ctrl_0_u *value);
+
+sw_error_t
+appe_tpr_udf_profile_base_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_udf_profile_base_u *value);
+
+sw_error_t
+appe_tpr_udf_profile_base_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_udf_profile_base_u *value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_udf_profile_offset_u *value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_udf_profile_offset_u *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l4_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l4_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_overlay_type_incl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_overlay_type_incl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l3_type_incl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l3_type_incl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_udf_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_udf_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_overlay_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_overlay_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_valid_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_valid_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l4_type_incl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l4_type_incl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_program_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_program_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_program_type_incl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_program_type_incl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l3_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_ctrl_0_l3_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf3_base_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf3_base_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf1_base_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf1_base_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf0_base_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf0_base_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf2_base_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_base_udf2_base_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf1_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf1_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf0_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf0_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf2_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf2_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf3_offset_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_udf_profile_offset_udf3_offset_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
 
 sw_error_t
 appe_tl_tbl_op_get(

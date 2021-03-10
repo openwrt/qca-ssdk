@@ -26,7 +26,7 @@ extern "C" {
 
 #include "sw.h"
 #include "fal/fal_type.h"
-
+#include "fal_tunnel.h"
 
     /**
     @brief This enum defines the ACL rule type.
@@ -36,6 +36,10 @@ extern "C" {
         FAL_ACL_RULE_IP4,       /**< include MAC, IP4 and Tcp/Udp udf fields*/
         FAL_ACL_RULE_IP6,       /**< include MAC, IP6 and Tcp/Udp udf fields*/
         FAL_ACL_RULE_UDF,       /**< only include user defined fields*/
+        FAL_ACL_RULE_TUNNEL_MAC,  /**<include tunnel packet outer MAC, udf fields*/
+        FAL_ACL_RULE_TUNNEL_IP4,  /**<include tunnel packet outer MAC, IP4 and Tcp/Udp udf fields*/
+        FAL_ACL_RULE_TUNNEL_IP6,  /**<include tunnel packet outer MAC, IP6 and Tcp/Udp udf fields*/
+        FAL_ACL_RULE_TUNNEL_UDF,  /**<only include tunnel outer udf fields*/
         FAL_ACL_RULE_BUTT,
     }
     fal_acl_rule_type_t;
@@ -60,6 +64,8 @@ extern "C" {
         FAL_ACL_POLICY_ROUTE = 0,
         FAL_ACL_POLICY_SNAT,
         FAL_ACL_POLICY_DNAT,
+        FAL_ACL_POLICY_SNAPT,
+        FAL_ACL_POLICY_DNAPT,
         FAL_ACL_POLICY_RESERVE,
     } fal_policy_forward_t;
 
@@ -173,8 +179,10 @@ typedef enum {
 #define    FAL_ACL_FIELD_UDF1            54
 #define    FAL_ACL_FIELD_UDF2            55
 #define    FAL_ACL_FIELD_UDF3            56
+/*new add for alder*/
+#define    FAL_ACL_FIELD_UDFPROFILE      57
 
-#define    FAL_ACL_FIELD_NUM    57
+#define    FAL_ACL_FIELD_NUM             58
 
 
 #define    FAL_ACL_ACTION_PERMIT        0
@@ -208,7 +216,11 @@ typedef enum {
 #define    FAL_ACL_ACTION_CPU_CODE 28
 #define    FAL_ACL_ACTION_SYN_TOGGLE 29
 #define    FAL_ACL_ACTION_METADATA_EN 30
-
+/*extend action flg*/
+/*new add for alder*/
+#define    FAL_ACL_ACTION_CASCADE   0
+#define    FAL_ACL_ACTION_VPN       1
+#define    FAL_ACL_ACTION_LEARN_DIS 2
 
 enum{
 	FAL_ACL_BYPASS_IN_VLAN_MISS = 0,
@@ -269,6 +281,163 @@ enum{
     (((flag[(field) / 32]) & (0x1UL << ((field) % 32))) ? 1 : 0)
 
 #define FAL_ACL_UDF_MAX_LENGTH 16
+
+
+/**
+ *@brief This is tunnel inner packet rule field
+ *
+*/
+typedef struct
+{
+	fal_acl_rule_type_t rule_type;/*mac, IP4, IP6 ,UDF*/
+	fal_acl_field_map_t field_flg;/*Indicate which fields are selected*/
+
+	/* fields of mac rule */
+	fal_mac_addr_t src_mac_val;/*source mac*/
+	fal_mac_addr_t src_mac_mask;/*source mac mask*/
+	fal_mac_addr_t dest_mac_val;/*destination mac*/
+	fal_mac_addr_t dest_mac_mask;/*destionation mac mask*/
+	a_uint16_t ethtype_val;/*ethernet type*/
+	a_uint16_t ethtype_mask;/*ethernet type mask*/
+
+	/* fields of vlan rule*/
+	a_uint8_t stagged_val; /*1-untag, 2-pritag, 4-tagged*/
+	a_uint8_t stagged_mask;
+	a_uint8_t ctagged_val;/*same as stagged define*/
+	a_uint8_t ctagged_mask;
+	a_uint16_t stag_vid_val;/*stag vlan id*/
+	a_uint16_t stag_vid_mask;/*stag vlan id mask*/
+	fal_acl_field_op_t stag_vid_op;/*vlan id operation,
+					*larger than or smaller than or range or mask*/
+	a_uint16_t ctag_vid_val;
+	a_uint16_t ctag_vid_mask;
+	fal_acl_field_op_t ctag_vid_op;
+	a_uint8_t stag_pri_val;/*stag priority*/
+	a_uint8_t stag_pri_mask;/*stag priority mask*/
+	a_uint8_t ctag_pri_val;
+	a_uint8_t ctag_pri_mask;
+	a_uint8_t stag_dei_val;/*stag dei*/
+	a_uint8_t stag_dei_mask;/*stag dei mask*/
+	a_uint8_t ctag_cfi_val;/*ctag cfi*/
+	a_uint8_t ctag_cfi_mask;/*ctag cfi mask*/
+
+	/* fields of ip4 rule */
+	fal_ip4_addr_t src_ip4_val;/*source ipv4 address*/
+	fal_ip4_addr_t src_ip4_mask;/*source ipv4 address mask*/
+	fal_ip4_addr_t dest_ip4_val;/*destination ipv4 address*/
+	fal_ip4_addr_t dest_ip4_mask;/*destination ipv4 address mask*/
+
+	/* fields of ip6 rule */
+	fal_ip6_addr_t src_ip6_val;/*source ipv6 address*/
+	fal_ip6_addr_t src_ip6_mask;/*source ipv6 address mask*/
+	fal_ip6_addr_t dest_ip6_val;/*destination ipv6 address*/
+	fal_ip6_addr_t dest_ip6_mask;/*destination ipv6 address mask*/
+
+	/* fields of ip rule */
+	a_uint8_t ip_proto_val;/*IP protocol*/
+	a_uint8_t ip_proto_mask;/*IP protocol mask*/
+	a_uint8_t ip_dscp_val;/*IP DSCP*/
+	a_uint8_t ip_dscp_mask;/*IP DSCP mask*/
+
+	/* fields of layer four */
+	a_uint16_t src_l4port_val;/*source L4 port*/
+	a_uint16_t src_l4port_mask;/*source L4 port mask*/
+	fal_acl_field_op_t src_l4port_op;/*source L4 port operation*/
+	a_uint16_t dest_l4port_val;/*destination L4 port*/
+	a_uint16_t dest_l4port_mask;/*destination L4 mask*/
+	fal_acl_field_op_t dest_l4port_op;/*destination L4 operation*/
+	a_uint8_t icmp_type_val;/*ICMP type*/
+	a_uint8_t icmp_type_mask;/*ICMP type mask*/
+	a_uint8_t icmp_code_val;/*ICMP code*/
+	a_uint8_t icmp_code_mask;/*ICMP code mask*/
+	a_uint8_t tcp_flag_val;/*tcp flags value*/
+	a_uint8_t tcp_flag_mask;/*tcp flags mask*/
+
+	/* fileds of is or not */
+	a_bool_t is_ip_val;/*is ip or not*/
+	a_uint8_t is_ip_mask;
+	a_bool_t is_ipv6_val;/*is ipv6 or ipv4*/
+	a_uint8_t is_ipv6_mask;
+	a_bool_t is_fake_mac_header_val;/*is fake mac header or not*/
+	a_uint8_t is_fake_mac_header_mask;
+	a_bool_t is_snap_val;/*is snap or not*/
+	a_uint8_t is_snap_mask;
+	a_bool_t is_ethernet_val;/*is ethernet or not*/
+	a_uint8_t is_ethernet_mask;
+	a_bool_t is_fragement_val;/*is fragment or not*/
+	a_uint8_t is_fragement_mask;
+	a_bool_t is_ah_header_val;/*is ah header or not*/
+	a_uint8_t is_ah_header_mask;
+	a_bool_t is_esp_header_val;/*is esp header or not*/
+	a_uint8_t is_esp_header_mask;
+	a_bool_t is_mobility_header_val;/*is mobility header or not*/
+	a_uint8_t is_mobility_header_mask;
+	a_bool_t is_fragment_header_val;/*is fragment header or not*/
+	a_uint8_t is_fragment_header_mask;
+	a_bool_t is_other_header_val;/*is other header or not*/
+	a_uint8_t is_other_header_mask;
+	a_bool_t is_ipv4_option_val;/*is ipv4 option or not*/
+	a_uint8_t is_ipv4_option_mask;
+	a_bool_t is_first_frag_val;/*is first fragment or not*/
+	a_uint8_t is_first_frag_mask;
+
+	/*fields of L2 MISC rule*/
+	a_uint16_t pppoe_sessionid;/*pppoe session id*/
+	a_uint16_t pppoe_sessionid_mask;/*pppoe session mask*/
+	fal_acl_field_op_t icmp_type_code_op;/*icmp type operation*/
+
+	/*fields of IP MISC rule*/
+	a_uint8_t l3_ttl;/*L3 TTL,0-ttl 0, 1-ttl 1, 2-ttl 255, 3- ttl other*/
+	a_uint8_t l3_ttl_mask;/*L3 TTL mask*/
+	fal_acl_field_op_t l3_length_op;/*L3 TTL operation*/
+	a_uint16_t l3_length;/*L3 length*/
+	a_uint16_t l3_length_mask;/*L3 length mask*/
+	a_uint16_t l3_pkt_type;/*l3 packet type, 0-tcp, 1-udp, 3-udp_lite, 5-arp, 7-icmp*/
+	a_uint16_t l3_pkt_type_mask;
+
+	/*field of udf*/
+	fal_acl_field_op_t udf0_op;/*udf operation*/
+	a_uint16_t udf0_val;/*udf value, 2bytes*/
+	a_uint16_t udf0_mask;/*udf mask, 2bytes*/
+	fal_acl_field_op_t udf1_op;
+	a_uint16_t udf1_val;
+	a_uint16_t udf1_mask;
+	fal_acl_field_op_t udf2_op;
+	a_uint16_t udf2_val;
+	a_uint16_t udf2_mask;
+	a_uint16_t udf3_val;
+	a_uint16_t udf3_mask;
+	a_uint8_t udfprofile_val;
+	a_uint8_t udfprofile_mask;
+} fal_acl_rule_field_t;
+
+
+/**
+ *@brief This is tunnel info field
+ *
+*/
+#define    FAL_ACL_FIELD_TUNNEL_TYPE        0
+#define    FAL_ACL_FIELD_TUNNEL_INNER_TYPE  1
+#define    FAL_ACL_FIELD_TUNNEL_KEY_VALID   2
+#define    FAL_ACL_FIELD_TUNNEL_KEY         3
+#define    FAL_ACL_FIELD_TUNNEL_DECAP_EN    4
+#define    FAL_ACL_FIELD_TUNNEL_INVERSE_ALL 5
+
+typedef a_uint32_t fal_acl_tunnel_field_map_t[1];
+typedef struct
+{
+	fal_acl_tunnel_field_map_t field_flg;/*Indicate which fields are selected*/
+	fal_tunnel_type_t tunnel_type;
+	a_uint8_t tunnel_type_mask;
+	fal_hdr_type_t inner_type;
+	a_uint8_t inner_type_mask;
+	a_bool_t tunnel_key_valid;
+	a_uint8_t tunnel_key_valid_mask;
+	a_uint32_t tunnel_key;
+	a_uint32_t tunnel_key_mask;
+	a_bool_t tunnel_decap_en;
+	a_uint8_t tunnel_decap_en_mask;
+} fal_acl_tunnel_info_t;
 
     /**
      * @brief This structure defines the Acl rule.
@@ -493,7 +662,7 @@ typedef struct
 	fal_acl_field_op_t l3_length_op;/*L3 TTL operation*/
 	a_uint16_t l3_length;/*L3 length*/
 	a_uint16_t l3_length_mask;/*L3 length mask*/
-	a_uint16_t l3_pkt_type;/*l3 packet type, 0-tcp, 1-udp, 3-udp_lite, 5-arp, 7-icmp*/
+	a_uint16_t l3_pkt_type;/*l3 packet type, 0-tcp, 1-udp, 3-udp_lite, 5-arp, 7-icmp, 4-gre*/
 	a_uint16_t l3_pkt_type_mask;
 	/*field of udf*/
 	fal_acl_field_op_t udf0_op;/*udf operation*/
@@ -521,6 +690,21 @@ typedef struct
 	/*new add acl action for IPQ60xx*/
 	a_uint8_t dscp_mask;/*modify dscp mask,IPQ60xx support*/
 	a_uint8_t qos_res_prec;/*qos res prec,IPQ60xx support*/
+
+	/*new add acl udf for alder*/
+	fal_acl_field_op_t udf2_op;
+	a_uint8_t udfprofile_val;
+	a_uint8_t udfprofile_mask;
+	/*new add acl action for alder*/
+	fal_acl_action_map_t  action_flg_ext;
+	a_uint8_t cascade_data;
+	a_uint8_t vpn_type; /*0 vsi; 1 vrf*/
+	a_uint8_t vpn_id;
+	a_uint16_t napt_l4_port; /*l4 port for NAPT*/
+
+	/*new add acl rule fields for alder*/
+	fal_acl_tunnel_info_t  tunnel_info; /*tunnel info fields*/
+	fal_acl_rule_field_t   inner_rule_field; /*tunnel inner packet rule fileds*/
 } fal_acl_rule_t;
 
 
@@ -544,6 +728,11 @@ typedef struct
         FAL_ACL_BIND_PORTBITMAP = 1,  /**<   Acl wil work on port bitmap */
         FAL_ACL_BIND_SERVICE_CODE = 2,  /**<   Acl wil work on service code */
         FAL_ACL_BIND_L3_IF = 3,  /**<   Acl wil work on l3 interface */
+        FAL_ACL_BIND_VP_GROUP =4, /**<  Acl will work on vp group */
+        FAL_ACL_BIND_TUNNEL_L3_IF = 5, /** <  Acl will work on tunnel decap l3 interface */
+        FAL_ACL_BIND_TUNNEL_PORT = 6,  /** <  Acl will work on tunnel decap port and virtual port*/
+        FAL_ACL_BIND_TUNNEL_VP_GROUP = 7, /** <  Acl will work on tunnel decap vp group*/
+        FAL_ACL_BIND_SERVICE_PORTBITMAP = 8, /** <  Acl will work on service port bitmap*/
     } fal_acl_bind_obj_t;
 
 enum

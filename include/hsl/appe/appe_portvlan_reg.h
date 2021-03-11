@@ -301,4 +301,55 @@ union eg_vsi_vp_tag_u {
 	struct eg_vsi_vp_tag bf;
 };
 
+/*[register] TPR_PORT_PARSING*/
+#define TPR_PORT_PARSING
+#define TPR_PORT_PARSING_ADDRESS 0x0
+#define TPR_PORT_PARSING_NUM     8
+#define TPR_PORT_PARSING_INC     0x4
+#define TPR_PORT_PARSING_TYPE    REG_TYPE_RW
+#define TPR_PORT_PARSING_DEFAULT 0x0
+	/*[field] PORT_ROLE*/
+	#define TPR_PORT_PARSING_PORT_ROLE
+	#define TPR_PORT_PARSING_PORT_ROLE_OFFSET  0
+	#define TPR_PORT_PARSING_PORT_ROLE_LEN     1
+	#define TPR_PORT_PARSING_PORT_ROLE_DEFAULT 0x0
+
+struct tpr_port_parsing {
+	a_uint32_t  port_role:1;
+	a_uint32_t  _reserved0:31;
+};
+
+union tpr_port_parsing_u {
+	a_uint32_t val;
+	struct tpr_port_parsing bf;
+};
+
+/*[register] TPR_VLAN_TPID*/
+#define TPR_VLAN_TPID
+#define TPR_VLAN_TPID_ADDRESS 0x20
+#define TPR_VLAN_TPID_NUM     1
+#define TPR_VLAN_TPID_INC     0x4
+#define TPR_VLAN_TPID_TYPE    REG_TYPE_RW
+#define TPR_VLAN_TPID_DEFAULT 0x88a88100
+	/*[field] CTAG_TPID*/
+	#define TPR_VLAN_TPID_CTAG_TPID
+	#define TPR_VLAN_TPID_CTAG_TPID_OFFSET  0
+	#define TPR_VLAN_TPID_CTAG_TPID_LEN     16
+	#define TPR_VLAN_TPID_CTAG_TPID_DEFAULT 0x8100
+	/*[field] STAG_TPID*/
+	#define TPR_VLAN_TPID_STAG_TPID
+	#define TPR_VLAN_TPID_STAG_TPID_OFFSET  16
+	#define TPR_VLAN_TPID_STAG_TPID_LEN     16
+	#define TPR_VLAN_TPID_STAG_TPID_DEFAULT 0x88a8
+
+struct tpr_vlan_tpid {
+	a_uint32_t  ctag_tpid:16;
+	a_uint32_t  stag_tpid:16;
+};
+
+union tpr_vlan_tpid_u {
+	a_uint32_t val;
+	struct tpr_vlan_tpid bf;
+};
+
 #endif

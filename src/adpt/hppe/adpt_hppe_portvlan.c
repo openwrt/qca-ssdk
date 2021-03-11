@@ -654,8 +654,17 @@ adpt_hppe_port_qinq_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
 
 	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(mode);
 
 #if defined(APPE)
+	if (ADPT_IS_PPORT(port_id)) {
+		if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_TUNNEL_EN)) {
+			rtn = appe_tpr_port_parsing_port_role_set(dev_id,
+					port_value, mode->tunnel_port_role);
+			SW_RTN_ON_ERROR(rtn);
+		}
+	}
+
 	if (ADPT_IS_VPORT(port_id)) {
 		if (FAL_FLG_TST(mode->mask, FAL_PORT_QINQ_ROLE_INGRESS_EN)) {
 			rtn = appe_vport_parsing_port_role_set(dev_id,
@@ -696,6 +705,12 @@ adpt_hppe_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 	ADPT_NULL_POINT_CHECK(mode);
 
 #if defined(APPE)
+	if (ADPT_IS_PPORT(port_id)) {
+		rtn = appe_tpr_port_parsing_port_role_get(dev_id,
+				port_value, (a_uint32_t *)mode->tunnel_port_role);
+		SW_RTN_ON_ERROR(rtn);
+	}
+
 	if (ADPT_IS_VPORT(port_id)) {
 		rtn = appe_vport_parsing_port_role_get(dev_id,
 				(port_value - SSDK_MIN_VIRTUAL_PORT_ID),
@@ -724,8 +739,12 @@ adpt_hppe_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid)
 	sw_error_t rtn = SW_OK;
 	union edma_vlan_tpid_reg_u edma_tpid;
 	union vlan_tpid_reg_u ppe_tpid;
+#if defined(APPE)
+	union tpr_vlan_tpid_u tunnel_tpid;
+#endif
 
 	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(tpid);
 
 	rtn = hppe_edma_vlan_tpid_reg_get(dev_id, &edma_tpid);
 	SW_RTN_ON_ERROR(rtn);
@@ -743,6 +762,27 @@ adpt_hppe_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid)
 		ppe_tpid.bf.stag_tpid = tpid->stpid;
 	}
 
+#if defined(APPE)
+	/* edma tpid is configured as same as tunnel tpid for appe
+	 * for hppe, edma tpid is configured as ipr tpid
+	 */
+	rtn = appe_tpr_vlan_tpid_get(dev_id, &tunnel_tpid);
+	SW_RTN_ON_ERROR(rtn);
+
+	if (FAL_FLG_TST(tpid->mask, FAL_TUNNEL_TPID_CTAG_EN)) {
+		edma_tpid.bf.ctag_tpid = tpid->tunnel_ctpid;
+		tunnel_tpid.bf.ctag_tpid = tpid->tunnel_ctpid;
+	}
+
+	if (FAL_FLG_TST(tpid->mask, FAL_TUNNEL_TPID_STAG_EN)) {
+		edma_tpid.bf.stag_tpid = tpid->tunnel_stpid;
+		tunnel_tpid.bf.stag_tpid = tpid->tunnel_stpid;
+	}
+
+	rtn = appe_tpr_vlan_tpid_set(dev_id, &tunnel_tpid);
+	SW_RTN_ON_ERROR(rtn);
+#endif
+
 	rtn = hppe_edma_vlan_tpid_reg_set(dev_id, &edma_tpid);
 	SW_RTN_ON_ERROR(rtn);
 
@@ -756,12 +796,26 @@ adpt_hppe_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid)
 {
 	sw_error_t rtn = SW_OK;
 	union vlan_tpid_reg_u ppe_tpid;
+#if defined(APPE)
+	union tpr_vlan_tpid_u tunnel_tpid;
+#endif
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(tpid);
 
 	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
 	SW_RTN_ON_ERROR(rtn);
+
+#if defined(APPE)
+	/* edma tpid is configured as same as tunnel tpid for appe
+	 * for hppe, edma tpid is configured as ipr tpid
+	 */
+	rtn = appe_tpr_vlan_tpid_get(dev_id, &tunnel_tpid);
+	SW_RTN_ON_ERROR(rtn);
+
+	tpid->tunnel_ctpid = tunnel_tpid.bf.ctag_tpid;
+	tpid->tunnel_stpid = tunnel_tpid.bf.stag_tpid;
+#endif
 
 	tpid->ctpid = ppe_tpid.bf.ctag_tpid;
 	tpid->stpid = ppe_tpid.bf.stag_tpid;

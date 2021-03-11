@@ -27,6 +27,7 @@
 #define IPR_VP_PARSING_MAX_ENTRY	192
 #define VLAN_PORT_VP_TBL_MAX_ENTRY	256
 #define EG_VSI_VP_TAG_MAX_ENTRY         2048
+#define TPR_PORT_PARSING_MAX_ENTRY	8
 
 sw_error_t
 appe_ipr_vp_parsing_get(
@@ -75,6 +76,28 @@ appe_eg_vsi_vp_tag_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union eg_vsi_vp_tag_u *value);
+
+sw_error_t
+appe_tpr_port_parsing_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_port_parsing_u *value);
+
+sw_error_t
+appe_tpr_port_parsing_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tpr_port_parsing_u *value);
+
+sw_error_t
+appe_tpr_vlan_tpid_get(
+		a_uint32_t dev_id,
+		union tpr_vlan_tpid_u *value);
+
+sw_error_t
+appe_tpr_vlan_tpid_set(
+		a_uint32_t dev_id,
+		union tpr_vlan_tpid_u *value);
 
 sw_error_t
 appe_vport_parsing_port_role_get(
@@ -495,4 +518,36 @@ appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+
+sw_error_t
+appe_tpr_port_parsing_port_role_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tpr_port_parsing_port_role_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+appe_tpr_vlan_tpid_stag_tpid_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_tpr_vlan_tpid_stag_tpid_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+appe_tpr_vlan_tpid_ctag_tpid_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_tpr_vlan_tpid_ctag_tpid_set(
+		a_uint32_t dev_id,
+		unsigned int value);
 #endif

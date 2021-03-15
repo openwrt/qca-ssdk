@@ -319,6 +319,7 @@ adpt_appe_mapt_decap_entry_del(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	union tl_map_lpm_tbl_u tl_map_lpm;
 	union tl_map_lpm_act_u tl_map_act;
+	union tl_map_lpm_counter_u tl_map_cnt;
 	a_uint32_t index;
 
 	ADPT_DEV_ID_CHECK(dev_id);
@@ -326,6 +327,7 @@ adpt_appe_mapt_decap_entry_del(a_uint32_t dev_id,
 
 	aos_mem_zero(&tl_map_lpm, sizeof(union tl_map_lpm_tbl_u));
 	aos_mem_zero(&tl_map_act, sizeof(union tl_map_lpm_act_u));
+	aos_mem_zero(&tl_map_cnt, sizeof(union tl_map_lpm_counter_u));
 
 	index = 0;
 	while (index < TL_MAP_LPM_TBL_MAX_ENTRY) {
@@ -344,6 +346,9 @@ adpt_appe_mapt_decap_entry_del(a_uint32_t dev_id,
 		SW_RTN_ON_ERROR(rv);
 
 		rv = appe_tl_map_lpm_act_set(dev_id, index, &tl_map_act);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = appe_tl_map_lpm_counter_set(dev_id, index, &tl_map_cnt);
 		SW_RTN_ON_ERROR(rv);
 	} else {
 		return SW_NOT_FOUND;

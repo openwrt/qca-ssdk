@@ -707,7 +707,7 @@ adpt_hppe_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 #if defined(APPE)
 	if (ADPT_IS_PPORT(port_id)) {
 		rtn = appe_tpr_port_parsing_port_role_get(dev_id,
-				port_value, (a_uint32_t *)mode->tunnel_port_role);
+				port_value, (a_uint32_t *)&mode->tunnel_port_role);
 		SW_RTN_ON_ERROR(rtn);
 	}
 

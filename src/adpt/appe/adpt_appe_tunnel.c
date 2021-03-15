@@ -725,11 +725,13 @@ adpt_appe_tunnel_decap_entry_del(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	fal_tunnel_rule_t *rule_key;
 	union tl_tbl_u tl_tbl;
+	union tl_cnt_tbl_u tl_cnt_tbl;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(entry);
 
 	aos_mem_zero(&tl_tbl, sizeof(union tl_tbl_u));
+	aos_mem_zero(&tl_cnt_tbl, sizeof(union tl_cnt_tbl_u));
 
 	rule_key = &entry->decap_rule;
 
@@ -753,6 +755,8 @@ adpt_appe_tunnel_decap_entry_del(a_uint32_t dev_id,
 
 	rv = adpt_appe_tunnel_key_op(dev_id, FAL_TUNNEL_OP_TYPE_DEL, rule_key);
 	SW_RTN_ON_ERROR(rv);
+
+	rv = appe_tl_cnt_tbl_set(dev_id, rule_key->entry_id, &tl_cnt_tbl);
 
 	return rv;
 }
@@ -812,11 +816,18 @@ adpt_appe_tunnel_decap_entry_flush(a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t index = 0;
+	union tl_cnt_tbl_u tl_cnt_tbl;
 
 	ADPT_DEV_ID_CHECK(dev_id);
+	aos_mem_zero(&tl_cnt_tbl, sizeof(union tl_cnt_tbl_u));
 
 	rv = appe_tunnel_decap_entry_op(dev_id, FAL_TUNNEL_OP_TYPE_FLUSH,
 			FAL_TUNNEL_OP_MODE_HASH, NULL, &index);
+
+	for (index = 0; index < FAL_TUNNEL_DECAP_ENTRY_MAX; index++) {
+		rv = appe_tl_cnt_tbl_set(dev_id, index, &tl_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+	}
 
 	return rv;
 }

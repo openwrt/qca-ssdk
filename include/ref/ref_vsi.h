@@ -44,13 +44,14 @@ enum{
 typedef struct REF_VLAN_INFO_T {
 	a_uint32_t stag_vid;
 	a_uint32_t ctag_vid;
-	a_uint32_t vport_bitmap; /*vlan based vsi*/
+	fal_pbmp_t vlan_port_bitmap; /*vlan based vsi*/
 	struct REF_VLAN_INFO_T *pNext;
 }ref_vlan_info_t;
 
 typedef struct{
 	a_uint32_t valid;
 	a_uint32_t pport_bitmap; /*port based vsi*/
+	a_uint32_t vport_bitmap[SSDK_MAX_VIRTUAL_PORT_NUM/32];
 	ref_vlan_info_t *pHead;
 }ref_vsi_t;
 

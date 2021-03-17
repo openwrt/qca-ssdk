@@ -261,10 +261,12 @@ typedef struct {
 	fal_tunnel_intf_id_t l3_if; /* tunnel l3 interface */
 	fal_mac_addr_t mac_addr; /* compare dst mac address of packet */
 	a_bool_t pppoe_en; /* enable pppoe based on port */
+	a_uint32_t vlan_group_id; /* vlan group id matched with tunnel vlan intf */
+	a_uint32_t pppoe_group_id; /* pppoe group id matched with tunnel pppoe session */
 } fal_tunnel_port_intf_t;
 
 typedef struct {
-	fal_port_t port_id; /* port ID including port bitmap, port/vp, vp group */
+	fal_pbmp_t port_id; /* port ID including port bitmap, port/vp, vp group */
 	a_uint16_t key_bmp; /* key bit map */
 	a_uint8_t svlan_fmt; /* 1: Untagged, 2: Untagged, 4: Untagged */
 	a_uint16_t svlan_id; /* svlan id */

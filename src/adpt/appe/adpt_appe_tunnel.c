@@ -1114,6 +1114,8 @@ adpt_appe_tunnel_port_intf_set(a_uint32_t dev_id,
 	rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
 	SW_RTN_ON_ERROR(rv);
 
+	tl_port_vp_tbl.bf.vlan_profile = port_cfg->vlan_group_id;
+	tl_port_vp_tbl.bf.pppoe_profile = port_cfg->pppoe_group_id;
 	tl_port_vp_tbl.bf.tl_l3_if_valid = port_cfg->l3_if.l3_if_valid;
 	tl_port_vp_tbl.bf.tl_l3_if_index = port_cfg->l3_if.l3_if_index;
 	tl_port_vp_tbl.bf.pppoe_en = port_cfg->pppoe_en;
@@ -1145,6 +1147,8 @@ adpt_appe_tunnel_port_intf_get(a_uint32_t dev_id,
 	rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
 	SW_RTN_ON_ERROR(rv);
 
+	port_cfg->vlan_group_id = tl_port_vp_tbl.bf.vlan_profile;
+	port_cfg->pppoe_group_id = tl_port_vp_tbl.bf.pppoe_profile;
 	port_cfg->l3_if.l3_if_valid = tl_port_vp_tbl.bf.tl_l3_if_valid;
 	port_cfg->l3_if.l3_if_index = tl_port_vp_tbl.bf.tl_l3_if_index;
 	port_cfg->pppoe_en = tl_port_vp_tbl.bf.pppoe_en;

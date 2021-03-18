@@ -240,6 +240,14 @@ typedef struct
 	} route_addr_mask;
 } fal_network_route_entry_t;
 
+typedef enum {
+	FAL_UDP_ZERO_CSUM_FRWRD = 0,	/* packets are normally forwarded */
+	FAL_UDP_ZERO_CSUM_DROP,		/* packets are dropped */
+	FAL_UDP_ZERO_CSUM_RECALC_MAPT,	/* packets recalculate checksum for mapt */
+	FAL_UDP_ZERO_CSUM_RDT_TO_CPU,	/* packets are redirected to cpu */
+	FAL_UDP_ZERO_CSUM_BUTT          /* invalid action */
+} fal_udp_zero_csum_cmd_t;
+
 typedef struct {
 	a_uint16_t mru; /* Maximum Receive Unit*/
 	a_uint16_t mtu; /* Maximum Transmission Unit*/
@@ -252,6 +260,12 @@ typedef struct {
 	a_uint8_t mac_addr_bitmap; /* bitmap for mac address*/
 	fal_mac_addr_t mac_addr; /* mac address */
 	fal_ip_counter_t counter; /* interface related counter */
+	a_bool_t dmac_check_en; /* enable check dmac or not, added for ipq95xx */
+	fal_udp_zero_csum_cmd_t udp_zero_csum_action; /* action for udp checksum 0
+						       * added for ipq95xx*/
+	a_uint16_t ip6_mru; /* IPv6 Maximum Receive Unit, added for ipq95xx*/
+	a_uint16_t ip6_mtu; /* IPv6 Maximum Transmission Unit, added for ipq95xx*/
+	a_uint16_t vpn_id; /* vpn id, added for ipq95xx */
 } fal_intf_entry_t;
 
 typedef struct
@@ -322,6 +336,8 @@ typedef struct
 	a_bool_t icmp_rdt_deacclr_en; /*0 for disable and 1 for enable*/
 	a_uint8_t hash_mode_0; /*0 crc10, 1 xor, 2 crc16*/
 	a_uint8_t hash_mode_1; /*0 crc10, 1 xor, 2 crc16*/
+	fal_fwd_cmd_t rt_fail_no_eth_action; /* route fail with no eth header action
+					      * added for ipq95xx */
 } fal_ip_global_cfg_t;
 
 enum {

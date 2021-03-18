@@ -434,7 +434,14 @@ adpt_hppe_flow_entry_host_op_add(
 		return SW_FAIL;
 	if (rv == SW_OK) {
 		union eg_flow_tree_map_tbl_u eg_treemap;
+		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
+		SW_RTN_ON_ERROR(rv);
+
 		eg_treemap.bf.tree_id = flow_entry->tree_id;
+#if defined(APPE)
+		eg_treemap.bf.wifi_qos_flag = flow_entry->wifi_qos_en;
+		eg_treemap.bf.wifi_qos = flow_entry->wifi_qos;
+#endif
 		rv = hppe_eg_flow_tree_map_tbl_set(dev_id, flow_entry->entry_id, &eg_treemap);
 	}
 	return rv;
@@ -691,6 +698,10 @@ adpt_hppe_flow_entry_host_op_get(
 		union in_flow_cnt_tbl_u cnt;
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
 		flow_entry->tree_id = eg_treemap.bf.tree_id;
+#if defined(APPE)
+		flow_entry->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
+		flow_entry->wifi_qos = eg_treemap.bf.wifi_qos;
+#endif
 		rv = hppe_in_flow_cnt_tbl_get(dev_id, flow_entry->entry_id, &cnt);
 		flow_entry->pkt_counter = cnt.bf.hit_pkt_counter;
 		flow_entry->byte_counter = cnt.bf.hit_byte_counter_0 | \
@@ -1246,6 +1257,10 @@ adpt_hppe_flow_entry_get(
 		union in_flow_cnt_tbl_u cnt;
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
 		flow_entry->tree_id = eg_treemap.bf.tree_id;
+#if defined(APPE)
+		flow_entry->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
+		flow_entry->wifi_qos = eg_treemap.bf.wifi_qos;
+#endif
 		rv = hppe_in_flow_cnt_tbl_get(dev_id, flow_entry->entry_id, &cnt);
 		flow_entry->pkt_counter = cnt.bf.hit_pkt_counter;
 		flow_entry->byte_counter = cnt.bf.hit_byte_counter_0 | \
@@ -1894,7 +1909,14 @@ adpt_hppe_flow_entry_add(
 		return SW_FAIL;
 	if (rv == SW_OK) {
 		union eg_flow_tree_map_tbl_u eg_treemap;
+		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
+		SW_RTN_ON_ERROR(rv);
+
 		eg_treemap.bf.tree_id = flow_entry->tree_id;
+#if defined(APPE)
+		eg_treemap.bf.wifi_qos_flag = flow_entry->wifi_qos_en;
+		eg_treemap.bf.wifi_qos = flow_entry->wifi_qos;
+#endif
 		rv = hppe_eg_flow_tree_map_tbl_set(dev_id, flow_entry->entry_id, &eg_treemap);
 	}
 	return rv;
@@ -1922,14 +1944,13 @@ adpt_hppe_flow_global_cfg_get(
 	memset(&route_ctrl_ext, 0, sizeof(route_ctrl_ext));
 
 	rv = hppe_flow_ctrl0_get(dev_id, &flow_ctrl0);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
+
 	rv = hppe_l3_route_ctrl_get(dev_id, &route_ctrl);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
+
 	rv = hppe_l3_route_ctrl_ext_get(dev_id, &route_ctrl_ext);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
 
 #if defined(CPPE)
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
@@ -1943,6 +1964,14 @@ adpt_hppe_flow_global_cfg_get(
 	cfg->src_if_check_action= route_ctrl.bf.flow_src_if_check_cmd;
 	cfg->src_if_check_deacclr_en= route_ctrl.bf.flow_src_if_check_de_acce;
 	cfg->service_loop_en = route_ctrl_ext.bf.flow_service_code_loop_en;
+#if defined(APPE)
+	cfg->ptmu_fail_action = route_ctrl_ext.bf.flow_pmtu_fail;
+	cfg->ptmu_fail_deacclr_en = route_ctrl_ext.bf.flow_pmtu_fail_de_acce;
+	cfg->ptmu_fail_df_action = route_ctrl_ext.bf.flow_pmtu_df_fail;
+	cfg->ptmu_fail_df_deacclr_en = route_ctrl_ext.bf.flow_pmtu_df_fail_de_acce;
+	cfg->l2_vpn_en = route_ctrl_ext.bf.l2_vpn_en;
+	cfg->l3_vpn_en = route_ctrl_ext.bf.l3_vpn_en;
+#endif
 	cfg->service_loop_action = route_ctrl.bf.flow_service_code_loop;
 	cfg->service_loop_deacclr_en = route_ctrl.bf.flow_service_code_loop_de_acce;
 	cfg->flow_deacclr_action = route_ctrl.bf.flow_de_acce_cmd;
@@ -1986,6 +2015,14 @@ adpt_hppe_flow_global_cfg_set(
 	route_ctrl.bf.flow_src_if_check_cmd = cfg->src_if_check_action;
 	route_ctrl.bf.flow_src_if_check_de_acce = cfg->src_if_check_deacclr_en;
 	route_ctrl_ext.bf.flow_service_code_loop_en = cfg->service_loop_en;
+#if defined(APPE)
+	route_ctrl_ext.bf.flow_pmtu_fail = cfg->ptmu_fail_action;
+	route_ctrl_ext.bf.flow_pmtu_fail_de_acce = cfg->ptmu_fail_deacclr_en;
+	route_ctrl_ext.bf.flow_pmtu_df_fail = cfg->ptmu_fail_df_action;
+	route_ctrl_ext.bf.flow_pmtu_df_fail_de_acce = cfg->ptmu_fail_df_deacclr_en;
+	route_ctrl_ext.bf.l2_vpn_en = cfg->l2_vpn_en;
+	route_ctrl_ext.bf.l3_vpn_en = cfg->l3_vpn_en;
+#endif
 	route_ctrl.bf.flow_service_code_loop = cfg->service_loop_action;
 	route_ctrl.bf.flow_service_code_loop_de_acce = cfg->service_loop_deacclr_en;
 	route_ctrl.bf.flow_de_acce_cmd = cfg->flow_deacclr_action;

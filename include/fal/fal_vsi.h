@@ -53,7 +53,7 @@ typedef struct{
 	a_uint32_t umc_ports;/*VSI member ports for unknown multicast*/
 	a_uint32_t bc_ports;/*VSI member ports for broadcast*/
 	a_uint32_t member_vports[SSDK_MAX_VIRTUAL_PORT_NUM/32];/*VSI member vports for known unicast
-		packets, add it for ipq90xx*/
+		packets, add it for ipq95xx*/
 }fal_vsi_member_t;
 
 

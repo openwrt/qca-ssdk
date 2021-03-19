@@ -459,7 +459,7 @@ typedef struct {
 	fal_qinq_port_role_t ingress_port_role; /* port inress direction role */
 	fal_qinq_port_role_t egress_port_role; /* port egress direction role */
 	fal_qinq_port_role_t tunnel_port_role; /* tunnel ingress parse role
-						* added for ipq90xx */
+						* added for ipq95xx */
 } fal_port_qinq_role_t;
 
 #define FAL_TPID_CTAG_EN (0x1UL << 0)
@@ -473,8 +473,8 @@ typedef struct
 			  * */
 	a_uint16_t ctpid; /* customer tpid value */
 	a_uint16_t stpid; /* service tpid value */
-	a_uint16_t tunnel_ctpid; /* tunnel customer tpid value, added for ipq90xx */
-	a_uint16_t tunnel_stpid; /* tunnel service tpid value, added for ipq90xx */
+	a_uint16_t tunnel_ctpid; /* tunnel customer tpid value, added for ipq95xx */
+	a_uint16_t tunnel_stpid; /* tunnel service tpid value, added for ipq95xx */
 } fal_tpid_t;
 
 typedef struct {
@@ -483,11 +483,11 @@ typedef struct {
 	a_bool_t untagged_filter; /* check if ingress will filter untagged packet */
 	a_bool_t priority_filter; /* check if ingress will filter priority packet */
 	a_bool_t ctag_tagged_filter; /* ingress filter ctag tagged packet or not,
-				      * added for ipq90xx */
+				      * added for ipq95xx */
 	a_bool_t ctag_untagged_filter; /* ingress filter ctag untagged packet or not,
-					* added for ipq90xx */
+					* added for ipq95xx */
 	a_bool_t ctag_priority_filter; /* ingress filter ctag priority packet or not,
-					* added for ipq90xx */
+					* added for ipq95xx */
 } fal_ingress_vlan_filter_t;
 
 #define FAL_PORT_VLAN_TAG_CVID_EN (0x1UL << 0)
@@ -569,11 +569,11 @@ typedef struct
 	a_uint32_t vsi; /* vsi value */
 
 	/*vni fields match for ingress added by appe*/
-	a_bool_t vni_resv_enable; /* check vni resv or not, added for ipq90xx */
+	a_bool_t vni_resv_enable; /* check vni resv or not, added for ipq95xx */
 	a_uint8_t vni_resv_type;  /* 0 for vni only, 1 for vni and reserver,
-				   * added for ipq90xx
+				   * added for ipq95xx
 				   * */
-	a_uint32_t vni_resv; /* vni or gre key filed value, added for ipq90xx*/
+	a_uint32_t vni_resv; /* vni or gre key filed value, added for ipq95xx*/
 } fal_vlan_trans_adv_rule_t;
 
 typedef struct
@@ -599,13 +599,13 @@ typedef struct
 	a_bool_t vsi_xlt_enable; /* check if action will enable vsi xlt */
 	a_uint8_t vsi_xlt; /* vsi xlt value */
 	/*src info fields for ingress added by appe*/
-	a_bool_t src_info_enable; /* src info xlt or not, added for ipq90xx*/
+	a_bool_t src_info_enable; /* src info xlt or not, added for ipq95xx*/
 	a_uint8_t src_info_type; /* 0 virtual port, 1 l3_if for tunnel payload,
-				  * added for ipq90xx */
-	a_uint32_t src_info; /* src info value, added for ipq90xx */
+				  * added for ipq95xx */
+	a_uint32_t src_info; /* src info value, added for ipq95xx */
 	/*vni fields for egress added by appe*/
-	a_bool_t vni_resv_enable; /* vni xlat or not, added for ipq90xx*/
-	a_uint32_t vni_resv;	/* vni xlt value, added for ipq90xx*/
+	a_bool_t vni_resv_enable; /* vni xlat or not, added for ipq95xx*/
+	a_uint32_t vni_resv;	/* vni xlt value, added for ipq95xx*/
 } fal_vlan_trans_adv_action_t;
 
 typedef struct

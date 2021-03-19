@@ -247,9 +247,9 @@ extern a_uint32_t ssdk_log_level;
 		if (SSDK_LOG_LEVEL_##lev <= ssdk_log_level) {\
 			a_uint32_t i_buf = 0;\
 			for(i_buf=0; i_buf<(len); i_buf++) {\
-				printk("%08lx ", *((buf)+i_buf));\
+				printk(KERN_CONT "%08lx ", *((buf)+i_buf));\
 			}\
-			printk("\n");\
+			printk(KERN_CONT "\n");\
 		}\
 	} while(0)
 

@@ -681,16 +681,16 @@ adpt_hppe_debug_prx_drop_cnt_get(void)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15u(port=%04d)", value, i);
+			printk(KERN_CONT "%15u(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -714,16 +714,16 @@ adpt_hppe_debug_prx_drop_pkt_stat_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(port=%04d)", value, i);
+			printk(KERN_CONT "%15llu(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -750,16 +750,16 @@ adpt_hppe_debug_ipx_pkt_num_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(port=%04d)", value, i);
+			printk(KERN_CONT "%15llu(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -781,16 +781,16 @@ adpt_hppe_debug_vlan_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(vsi=%04d)", value, i);
+			printk(KERN_CONT "%15llu(vsi=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -812,16 +812,16 @@ adpt_hppe_debug_pre_l2_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(vsi=%04d)", value, i);
+			printk(KERN_CONT "%15llu(vsi=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 
 	sign = tags = 0;
 	printk("%-35s", "PRE_L2_CNT_TBL RX_DROP:");
@@ -835,16 +835,16 @@ adpt_hppe_debug_pre_l2_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(vsi=%04d)", value, i);
+			printk(KERN_CONT "%15llu(vsi=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void adpt_hppe_debug_port_tx_drop_counter_get(a_bool_t show_type)
@@ -865,16 +865,16 @@ void adpt_hppe_debug_port_tx_drop_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(port=%04d)", value, i);
+			printk(KERN_CONT "%15llu(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -896,16 +896,16 @@ adpt_hppe_debug_eg_vsi_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(vsi=%04d)", value, i);
+			printk(KERN_CONT "%15llu(vsi=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -927,16 +927,16 @@ adpt_hppe_debug_port_tx_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(port=%04d)", value, i);
+			printk(KERN_CONT "%15llu(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -958,16 +958,16 @@ adpt_hppe_debug_vp_tx_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(port=%04d)", value, i);
+			printk(KERN_CONT "%15llu(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -989,16 +989,16 @@ adpt_hppe_debug_queue_tx_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(queue=%04d)", value, i);
+			printk(KERN_CONT "%15llu(queue=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -1020,16 +1020,16 @@ adpt_hppe_debug_vp_tx_drop_counter_get(a_bool_t show_type)
 		if (value > 0)
 		{
 			if (sign) {
-				printk("\n");
-				printk("%-35s", "");
+				printk(KERN_CONT "\n");
+				printk(KERN_CONT "%-35s", "");
 			}
 			sign = 0;
-			printk("%15llu(port=%04d)", value, i);
+			printk(KERN_CONT "%15llu(port=%04d)", value, i);
 			if (++tags % 3 == 0)
 				sign = 1;
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -1050,37 +1050,37 @@ adpt_hppe_debug_cpu_code_counter_get(a_bool_t show_type)
 			value = drop_cpu_cnt_tbl.bf.byte_cnt_0 | ((a_uint64_t)drop_cpu_cnt_tbl.bf.byte_cnt_1 << 32);
 		if (value > 0)
 		{
-			printk("\n");
-			printk("%-35s", "");
+			printk(KERN_CONT "\n");
+			printk(KERN_CONT "%-35s", "");
 			if (i >=0 && i <= 70)
-				printk("%15llu(%s)", value, cpucode[i]);
+				printk(KERN_CONT "%15llu(%s)", value, cpucode[i]);
 			else if (i >= 79 && i <= 92)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 8], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 8], i);
 			else if (i >= 97 && i <= 102)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 12], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 12], i);
 			else if (i >= 107 && i <= 110)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 16], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 16], i);
 			else if (i >= 113 && i <= 127)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 18], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 18], i);
 			else if (i >= 136 && i <= 143)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 26], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 26], i);
 			else if (i >= 148 && i <= 174)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 30], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 30], i);
 			else if (i >= 178 && i <= 180)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 33], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 33], i);
 #ifdef APPE
 			else if (i >= 186 && i <= 198)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 36], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 36], i);
 			else if (i >= 210 && i <= 231)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 47], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 47], i);
 #endif
 			else if (i >= 254 && i <= 255)
-				printk("%15llu(%s),cpucode:%d", value, cpucode[i - 106], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 106], i);
 			else
-				printk("%15llu(Reserved),cpucode:%d", value, i);
+				printk(KERN_CONT "%15llu(Reserved),cpucode:%d", value, i);
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 void
@@ -1101,12 +1101,12 @@ adpt_hppe_debug_drop_cpu_counter_get(a_bool_t show_type)
 			value = drop_cpu_cnt_tbl.bf.byte_cnt_0 | ((a_uint64_t)drop_cpu_cnt_tbl.bf.byte_cnt_1 << 32);
 		if (value > 0)
 		{
-			printk("\n");
-			printk("%-35s", "");
-			printk("%15llu(port=%d:%s),dropcode:%d", value, (i - 256) % 8, dropcode[(i - 256) / 8], (i-256)/8);
+			printk(KERN_CONT "\n");
+			printk(KERN_CONT "%-35s", "");
+			printk(KERN_CONT "%15llu(port=%d:%s),dropcode:%d", value, (i - 256) % 8, dropcode[(i - 256) / 8], (i-256)/8);
 		}
 	}
-	printk("\n");
+	printk(KERN_CONT "\n");
 }
 
 /* if show_type = A_FALSE, show packets.

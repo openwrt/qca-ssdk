@@ -364,9 +364,9 @@ static void _adpt_acl_reg_dump(a_uint8_t *reg, a_uint32_t len)
 
 	for(i = 0; i < len; i++)
 	{
-		if(i%32 == 0)
-			printk("\n");
-		printk("%02x ", reg[i]);
+		printk(KERN_CONT "%02x ", reg[i]);
+		if((i+1)%32 == 0 || (i == len-1))
+			printk(KERN_CONT "\n");
 	}
 
 	return;
@@ -3757,14 +3757,11 @@ _adpt_hppe_acl_rule_dump(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW
 					hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+i, &hw_act);
 				printk("hw_entry %d\n", hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+i);
 				_adpt_acl_reg_dump((u_int8_t *)&hw_reg, sizeof(hw_reg));
-				printk("\n");
 				printk("hw_entry_mask %d\n",
 					hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+i);
 				_adpt_acl_reg_dump((u_int8_t *)&hw_mask, sizeof(hw_mask));
-				printk("\n");
 				printk("hw_action %d\n", hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+i);
 				_adpt_acl_reg_dump((u_int8_t *)&hw_act, sizeof(hw_act));
-				printk("\n");
 			}
 		}
 	}

@@ -1406,7 +1406,7 @@ dess_rgmii_mac_work_stop(struct qca_phy_priv *priv)
 void
 qca_mac_port_status_init(a_uint32_t dev_id, a_uint32_t port_id)
 {
-	if(port_id < SSDK_PHYSICAL_PORT1 || port_id > SSDK_PHYSICAL_PORT6)
+	if(port_id < SSDK_PHYSICAL_PORT1 || port_id >= SW_MAX_NR_PORT)
 	{
 		SSDK_ERROR("port %d does not support status init\n", port_id);
 		return;

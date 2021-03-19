@@ -736,7 +736,7 @@ ssdk_mp_reset_init(void)
 	i = UNIPHY1_SOFT_RESET_E;
 	uniphy_rsts[i] = of_reset_control_get(rst_node, UNIPHY1_SOFT_RESET_ID);
 
-	SSDK_INFO("MP reset successfully!1\n");
+	SSDK_INFO("MP reset successfully!\n");
 #endif
 }
 

@@ -3276,15 +3276,24 @@ static int ssdk_dev_event(struct notifier_block *this, unsigned long event, void
 #endif
 		case NETDEV_CHANGEMTU:
 			if(dev->type == ARPHRD_ETHER) {
-				if (strstr(dev->name, "eth")) {
-					if (cfg.chip_type == CHIP_DESS ||
-					   cfg.chip_type == CHIP_ISIS ||
-					   cfg.chip_type == CHIP_ISISC) {
-#ifdef IN_MISC
-						fal_frame_max_size_set(0,
-							dev->mtu + 18);
-#endif
+				if (cfg.chip_type == CHIP_DESS ||
+					cfg.chip_type == CHIP_ISIS ||
+					cfg.chip_type == CHIP_ISISC) {
+					struct net_device *eth_dev = NULL;
+					unsigned int mtu= 0;
+
+					if(!strcmp(dev->name, "eth0")) {
+						eth_dev = dev_get_by_name(&init_net, "eth1");
+					} else if (!strcmp(dev->name, "eth1")) {
+						eth_dev = dev_get_by_name(&init_net, "eth0");
+					} else {
+						return NOTIFY_DONE;
 					}
+					mtu = dev->mtu > eth_dev->mtu ? dev->mtu : eth_dev->mtu;
+#ifdef IN_MISC
+					fal_frame_max_size_set(0, mtu + 18);
+#endif
+					dev_put(eth_dev);
 				}
 			}
 			break;

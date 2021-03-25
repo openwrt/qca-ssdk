@@ -1531,50 +1531,6 @@ union tl_ctrl_u {
 	struct tl_ctrl bf;
 };
 
-/*[register] TL_INGRESS_CNT*/
-#define TL_INGRESS_CNT
-#define TL_INGRESS_CNT_ADDRESS 0x108
-#define TL_INGRESS_CNT_NUM     1
-#define TL_INGRESS_CNT_INC     0x4
-#define TL_INGRESS_CNT_TYPE    REG_TYPE_RO
-#define TL_INGRESS_CNT_DEFAULT 0x0
-	/*[field] CNT*/
-	#define TL_INGRESS_CNT_CNT
-	#define TL_INGRESS_CNT_CNT_OFFSET  0
-	#define TL_INGRESS_CNT_CNT_LEN     32
-	#define TL_INGRESS_CNT_CNT_DEFAULT 0x0
-
-struct tl_ingress_cnt {
-	a_uint32_t  cnt:32;
-};
-
-union tl_ingress_cnt_u {
-	a_uint32_t val;
-	struct tl_ingress_cnt bf;
-};
-
-/*[register] TL_EGRESS_CNT*/
-#define TL_EGRESS_CNT
-#define TL_EGRESS_CNT_ADDRESS 0x10c
-#define TL_EGRESS_CNT_NUM     1
-#define TL_EGRESS_CNT_INC     0x4
-#define TL_EGRESS_CNT_TYPE    REG_TYPE_RO
-#define TL_EGRESS_CNT_DEFAULT 0x0
-	/*[field] CNT*/
-	#define TL_EGRESS_CNT_CNT
-	#define TL_EGRESS_CNT_CNT_OFFSET  0
-	#define TL_EGRESS_CNT_CNT_LEN     32
-	#define TL_EGRESS_CNT_CNT_DEFAULT 0x0
-
-struct tl_egress_cnt {
-	a_uint32_t  cnt:32;
-};
-
-union tl_egress_cnt_u {
-	a_uint32_t val;
-	struct tl_egress_cnt bf;
-};
-
 /*[table] TL_L3_IF_TBL*/
 #define TL_L3_IF_TBL
 #define TL_L3_IF_TBL_ADDRESS 0x3000

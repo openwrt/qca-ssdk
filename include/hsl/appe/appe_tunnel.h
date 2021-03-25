@@ -743,16 +743,6 @@ appe_tl_ctrl_set(
 		union tl_ctrl_u *value);
 
 sw_error_t
-appe_tl_ingress_cnt_get(
-		a_uint32_t dev_id,
-		union tl_ingress_cnt_u *value);
-
-sw_error_t
-appe_tl_egress_cnt_get(
-		a_uint32_t dev_id,
-		union tl_egress_cnt_u *value);
-
-sw_error_t
 appe_tl_l3_if_tbl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -1492,16 +1482,6 @@ sw_error_t
 appe_tl_ctrl_tl_de_acce_cmd_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
-sw_error_t
-appe_tl_ingress_cnt_cnt_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-appe_tl_egress_cnt_cnt_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
 
 sw_error_t
 appe_tl_l3_if_tbl_ttl_exceed_de_acce_get(

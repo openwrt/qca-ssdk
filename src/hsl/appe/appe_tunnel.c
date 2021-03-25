@@ -1669,28 +1669,6 @@ appe_tl_ctrl_set(
 }
 
 sw_error_t
-appe_tl_ingress_cnt_get(
-		a_uint32_t dev_id,
-		union tl_ingress_cnt_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				TUNNEL_LOOKUP_BASE_ADDR + TL_INGRESS_CNT_ADDRESS,
-				&value->val);
-}
-
-sw_error_t
-appe_tl_egress_cnt_get(
-		a_uint32_t dev_id,
-		union tl_egress_cnt_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				TUNNEL_LOOKUP_BASE_ADDR + TL_EGRESS_CNT_ADDRESS,
-				&value->val);
-}
-
-sw_error_t
 appe_tl_l3_if_tbl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -4056,32 +4034,6 @@ appe_tl_ctrl_tl_de_acce_cmd_set(
 		return ret;
 	reg_val.bf.tl_de_acce_cmd = value;
 	ret = appe_tl_ctrl_set(dev_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-appe_tl_ingress_cnt_cnt_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union tl_ingress_cnt_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = appe_tl_ingress_cnt_get(dev_id, &reg_val);
-	*value = reg_val.bf.cnt;
-	return ret;
-}
-
-sw_error_t
-appe_tl_egress_cnt_cnt_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union tl_egress_cnt_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = appe_tl_egress_cnt_get(dev_id, &reg_val);
-	*value = reg_val.bf.cnt;
 	return ret;
 }
 

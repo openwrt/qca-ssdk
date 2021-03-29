@@ -402,17 +402,20 @@ adpt_appe_tunnel_decap_entry_convert(a_uint32_t dev_id, fal_tunnel_decap_entry_t
 				(tl_tbl.bf0.ipv6_src_addr_1 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET));
 
-			rule_key->sip.ip6_addr.ul[2] = (tl_tbl.bf0.ipv6_src_addr_1 &
+			rule_key->sip.ip6_addr.ul[2] = ((tl_tbl.bf0.ipv6_src_addr_1 >>
+				TL_TBL_IPV6_SRC_ADDR_OFFSET % 32) &
 				BITS(0, SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET))) |
 				(tl_tbl.bf0.ipv6_src_addr_2 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET));
 
-			rule_key->sip.ip6_addr.ul[1] = (tl_tbl.bf0.ipv6_src_addr_2 &
+			rule_key->sip.ip6_addr.ul[1] = ((tl_tbl.bf0.ipv6_src_addr_2 >>
+				TL_TBL_IPV6_SRC_ADDR_OFFSET % 32) &
 				BITS(0, SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET))) |
 				(tl_tbl.bf0.ipv6_src_addr_3 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET));
 
-			rule_key->sip.ip6_addr.ul[0] = (tl_tbl.bf0.ipv6_src_addr_3 &
+			rule_key->sip.ip6_addr.ul[0] = ((tl_tbl.bf0.ipv6_src_addr_3 >>
+				TL_TBL_IPV6_SRC_ADDR_OFFSET % 32) &
 				BITS(0, SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET))) |
 				(tl_tbl.bf0.ipv6_src_addr_4 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_SRC_ADDR_OFFSET));
@@ -422,17 +425,20 @@ adpt_appe_tunnel_decap_entry_convert(a_uint32_t dev_id, fal_tunnel_decap_entry_t
 				(tl_tbl.bf0.ipv6_dst_addr_1 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET));
 
-			rule_key->dip.ip6_addr.ul[2] = (tl_tbl.bf0.ipv6_dst_addr_1 &
+			rule_key->dip.ip6_addr.ul[2] = ((tl_tbl.bf0.ipv6_dst_addr_1 >>
+				TL_TBL_IPV6_DST_ADDR_OFFSET % 32) &
 				BITS(0, SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET))) |
 				(tl_tbl.bf0.ipv6_dst_addr_2 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET));
 
-			rule_key->dip.ip6_addr.ul[1] = (tl_tbl.bf0.ipv6_dst_addr_2 &
+			rule_key->dip.ip6_addr.ul[1] = ((tl_tbl.bf0.ipv6_dst_addr_2 >>
+				TL_TBL_IPV6_DST_ADDR_OFFSET % 32) &
 				BITS(0, SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET))) |
 				(tl_tbl.bf0.ipv6_dst_addr_3 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET));
 
-			rule_key->dip.ip6_addr.ul[0] = (tl_tbl.bf0.ipv6_dst_addr_3 &
+			rule_key->dip.ip6_addr.ul[0] = ((tl_tbl.bf0.ipv6_dst_addr_3 >>
+				TL_TBL_IPV6_DST_ADDR_OFFSET % 32) &
 				BITS(0, SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET))) |
 				(tl_tbl.bf0.ipv6_dst_addr_4 <<
 				 SW_FIELD_OFFSET_IN_WORD(TL_TBL_IPV6_DST_ADDR_OFFSET));

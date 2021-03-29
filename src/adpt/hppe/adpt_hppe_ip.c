@@ -526,10 +526,11 @@ adpt_hppe_ip_intf_get(
 	union in_l3_if_tbl_u in_l3_if_tbl;
 	union eg_l3_if_tbl_u eg_l3_if_tbl;
 
-	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
-	memset(&eg_l3_if_tbl, 0, sizeof(eg_l3_if_tbl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(entry);
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	memset(&eg_l3_if_tbl, 0, sizeof(eg_l3_if_tbl));
 
 	rv = hppe_in_l3_if_tbl_get(dev_id, index, &in_l3_if_tbl);
 	if( rv != SW_OK )
@@ -547,6 +548,13 @@ adpt_hppe_ip_intf_get(
 	entry->ttl_exceed_action = in_l3_if_tbl.bf.ttl_exceed_cmd;
 	entry->ttl_exceed_deacclr_en = in_l3_if_tbl.bf.ttl_exceed_de_acce;
 	entry->mac_addr_bitmap = in_l3_if_tbl.bf.mac_bitmap;
+#if defined(APPE)
+	entry->dmac_check_en = !in_l3_if_tbl.bf.dmac_check_dis;
+	entry->vpn_id = in_l3_if_tbl.bf.vpn_id;
+	entry->ip6_mru = in_l3_if_tbl.bf.mru_ipv6;
+	entry->ip6_mtu = in_l3_if_tbl.bf.mtu_ipv6;
+	entry->udp_zero_csum_action = in_l3_if_tbl.bf.udp_csm0_cmd;
+#endif
 	entry->mac_addr.uc[5] = eg_l3_if_tbl.bf.mac_addr_0;
 	entry->mac_addr.uc[4] = eg_l3_if_tbl.bf.mac_addr_0 >> 8;
 	entry->mac_addr.uc[3] = eg_l3_if_tbl.bf.mac_addr_0 >> 16;
@@ -1007,12 +1015,20 @@ adpt_hppe_ip_intf_set(
 {
 	union in_l3_if_tbl_u in_l3_if_tbl;
 	union eg_l3_if_tbl_u eg_l3_if_tbl;
+	sw_error_t rv = SW_OK;
 	a_uint8_t i = 0;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(entry);
 
 	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
 	memset(&eg_l3_if_tbl, 0, sizeof(eg_l3_if_tbl));
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(entry);
+
+	rv = hppe_in_l3_if_tbl_get(dev_id, index, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_eg_l3_if_tbl_get(dev_id, index, &eg_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
 
 	in_l3_if_tbl.bf.mru = entry->mru;
 	in_l3_if_tbl.bf.mtu = entry->mtu;
@@ -1023,6 +1039,13 @@ adpt_hppe_ip_intf_set(
 	in_l3_if_tbl.bf.ttl_exceed_cmd = entry->ttl_exceed_action;
 	in_l3_if_tbl.bf.ttl_exceed_de_acce = entry->ttl_exceed_deacclr_en;
 	in_l3_if_tbl.bf.mac_bitmap = entry->mac_addr_bitmap;
+#if defined(APPE)
+	in_l3_if_tbl.bf.dmac_check_dis = !entry->dmac_check_en;
+	in_l3_if_tbl.bf.vpn_id = entry->vpn_id;
+	in_l3_if_tbl.bf.mru_ipv6 = entry->ip6_mru;
+	in_l3_if_tbl.bf.mtu_ipv6 = entry->ip6_mtu;
+	in_l3_if_tbl.bf.udp_csm0_cmd = entry->udp_zero_csum_action;
+#endif
 	eg_l3_if_tbl.bf.mac_addr_0 = entry->mac_addr.uc[5] | \
 							entry->mac_addr.uc[4] << 8 | \
 							entry->mac_addr.uc[3] << 16 | \
@@ -1041,9 +1064,11 @@ adpt_hppe_ip_intf_set(
 		}
 	}
 	
-	hppe_in_l3_if_tbl_set(dev_id, index, &in_l3_if_tbl);
-	hppe_eg_l3_if_tbl_set(dev_id, index, &eg_l3_if_tbl);
-	return SW_OK;
+	rv = hppe_in_l3_if_tbl_set(dev_id, index, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_eg_l3_if_tbl_set(dev_id, index, &eg_l3_if_tbl);
+	return rv;
 }
 
 sw_error_t
@@ -1150,12 +1175,10 @@ adpt_hppe_ip_global_ctrl_get(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg)
 	memset(&l3_route_ctrl, 0, sizeof(l3_route_ctrl_ext));
 
 	rv = hppe_l3_route_ctrl_get(dev_id, &l3_route_ctrl);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
 
 	rv = hppe_l3_route_ctrl_ext_get(dev_id, &l3_route_ctrl_ext);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
 
 	cfg->mru_fail_action = l3_route_ctrl.bf.ip_mru_check_fail;
 	cfg->mru_deacclr_en = l3_route_ctrl.bf.ip_mru_check_fail_de_acce;
@@ -1169,6 +1192,9 @@ adpt_hppe_ip_global_ctrl_get(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg)
 	cfg->icmp_rdt_deacclr_en = l3_route_ctrl.bf.icmp_rdt_de_acce;
 	cfg->hash_mode_0 = l3_route_ctrl_ext.bf.host_hash_mode_0;
 	cfg->hash_mode_1 = l3_route_ctrl_ext.bf.host_hash_mode_1;
+#if defined(APPE)
+	cfg->rt_fail_no_eth_action = l3_route_ctrl_ext.bf.ip_route_fail_no_eth;
+#endif
 
 	return SW_OK;
 }
@@ -1186,12 +1212,10 @@ adpt_hppe_ip_global_ctrl_set(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg)
 	memset(&l3_route_ctrl, 0, sizeof(l3_route_ctrl_ext));
 
 	rv = hppe_l3_route_ctrl_get(dev_id, &l3_route_ctrl);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
 
 	rv = hppe_l3_route_ctrl_ext_get(dev_id, &l3_route_ctrl_ext);
-	if( rv != SW_OK )
-		return rv;
+	SW_RTN_ON_ERROR(rv);
 
 	l3_route_ctrl.bf.ip_mru_check_fail = cfg->mru_fail_action;
 	l3_route_ctrl.bf.ip_mru_check_fail_de_acce = cfg->mru_deacclr_en;
@@ -1205,10 +1229,15 @@ adpt_hppe_ip_global_ctrl_set(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg)
 	l3_route_ctrl.bf.icmp_rdt_de_acce = cfg->icmp_rdt_deacclr_en;
 	l3_route_ctrl_ext.bf.host_hash_mode_0 = cfg->hash_mode_0;
 	l3_route_ctrl_ext.bf.host_hash_mode_1 = cfg->hash_mode_1;
+#if defined(APPE)
+	l3_route_ctrl_ext.bf.ip_route_fail_no_eth = cfg->rt_fail_no_eth_action;
+#endif
 
-	hppe_l3_route_ctrl_set(dev_id, &l3_route_ctrl);
-	hppe_l3_route_ctrl_ext_set(dev_id, &l3_route_ctrl_ext);
-	return SW_OK;
+	rv = hppe_l3_route_ctrl_set(dev_id, &l3_route_ctrl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_l3_route_ctrl_ext_set(dev_id, &l3_route_ctrl_ext);
+	return rv;
 }
 
 sw_error_t

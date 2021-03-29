@@ -107,12 +107,14 @@ typedef struct {
 	a_uint32_t tree_id; /*for qos*/
 	a_uint32_t pkt_counter; /*flow packet counter*/
 	a_uint64_t byte_counter; /*flow byte counter*/
-	a_bool_t pmtu_check_l3; /* compare pmtu with paket length of L3 or L2, added for ipq90xx */
-	a_uint32_t pmtu; /*path mtu length, added for ipq90xx */
-	a_uint32_t vpn_id; /*vpn id, added for ipq90xx */
-	a_bool_t vlan_fmt_valid; /*egress with vlan format of bridge, added for ipq90xx */
-	a_bool_t svlan_fmt; /*egress with svlan tag of bridge, added for ipq90xx */
-	a_bool_t cvlan_fmt; /*egress with cvlan tag of bridge, added for ipq90xx */
+	a_bool_t pmtu_check_l3; /* compare pmtu with paket length of L3 or L2, added for ipq95xx */
+	a_uint32_t pmtu; /*path mtu length, added for ipq95xx */
+	a_uint32_t vpn_id; /*vpn id, added for ipq95xx */
+	a_bool_t vlan_fmt_valid; /*egress with vlan format of bridge, added for ipq95xx */
+	a_bool_t svlan_fmt; /*egress with svlan tag of bridge, added for ipq95xx */
+	a_bool_t cvlan_fmt; /*egress with cvlan tag of bridge, added for ipq95xx */
+	a_bool_t wifi_qos_en; /* enable wifi qos or not, added for ipq95xx */
+	a_uint32_t wifi_qos; /* wifi qos value, added for ipq95xx */
 } fal_flow_entry_t;
 
 typedef struct {
@@ -127,6 +129,20 @@ typedef struct {
 	a_uint8_t hash_mode_0; /*0 crc10, 1 xor, 2 crc16*/
 	a_uint8_t hash_mode_1; /*0 crc10, 1 xor, 2 crc16*/
 	a_bool_t flow_mismatch_copy_escape_en; /*0 for disable and 1 for enable*/
+	fal_fwd_cmd_t ptmu_fail_action; /* mtu check fail action
+					 * added for ipq95xx */
+	a_bool_t ptmu_fail_deacclr_en; /* mtu check fail deaccelerate or not
+					     * added for ipq95xx */
+	fal_fwd_cmd_t ptmu_fail_df_action; /* mtu check fail and
+					    * fragmentaion not allowed action
+					    * added for ipq95xx */
+	a_bool_t ptmu_fail_df_deacclr_en; /* mtu check fail and
+					     * dont fragment not allowed deaccelerate or not
+					     * added for ipq95xx */
+	a_bool_t l2_vpn_en; /* enable vsi as flow key or not
+			     * added for ipq95xx */
+	a_bool_t l3_vpn_en; /* enable vrf(vpn_id configured by ip globalctrl) as flow key or not
+			     * added for ipq95xx */
 } fal_flow_global_cfg_t;
 
 typedef struct {

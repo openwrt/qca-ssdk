@@ -58,13 +58,15 @@ enum {
 	FUNC_TUNNEL_GLOBAL_CFG_GET,
 	FUNC_TUNNEL_ENCAP_HEADER_CTRL_SET,
 	FUNC_TUNNEL_ENCAP_HEADER_CTRL_GET,
-	FUNC_TUNNEL_DECAP_HEADER_CTRL_SET,
-	FUNC_TUNNEL_DECAP_HEADER_CTRL_GET,
 	FUNC_TUNNEL_PORT_INTF_SET,
 	FUNC_TUNNEL_PORT_INTF_GET,
+	FUNC_TUNNEL_DECAP_ECN_SET,
+	FUNC_TUNNEL_DECAP_ECN_GET,
+	FUNC_TUNNEL_ENCAP_ECN_SET,
+	FUNC_TUNNEL_ENCAP_ECN_GET,
 	FUNC_TUNNEL_UDF_PROFILE_ENTRY_ADD,
 	FUNC_TUNNEL_UDF_PROFILE_ENTRY_DEL,
-	FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST = 32,
+	FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST,
 	FUNC_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT,
 	FUNC_TUNNEL_UDF_PROFILE_CFG_SET,
 	FUNC_TUNNEL_UDF_PROFILE_CFG_GET,
@@ -261,11 +263,47 @@ typedef struct {
 	fal_tunnel_action_t decap_action; /* decapsulation entry rule */
 } fal_tunnel_decap_entry_t;
 
+#define FAL_ECN_VAL_LENGTH_MASK	3 /* 2 bits for ecn value */
+#define FAL_ECN_EXP_LENGTH_MASK	1 /* 1 bits for ecn exception */
+typedef enum {
+	FAL_ENCAP_ECN_NO_UPDATE = 0, /* no update ecn */
+	FAL_ENCAP_ECN_RFC3168_LIMIT_RFC6040_CMPAT_MODE = 1, /* RFC3168 limitation mode
+							     * RFC6040 compatibility mode
+							     * for encapsulation */
+	FAL_ENCAP_ECN_RFC3168_FULL_MODE = 2, /* RFC3168 full mode for encapsulation */
+	FAL_ENCAP_ECN_RFC4301_RFC6040_NORMAL_MODE = 3 /* RFC4301 mode and RFC6040 normal mode
+							* for encapsulation */
+} fal_tunnel_encap_ecn_mode_t;
+
+typedef enum {
+	FAL_TUNNEL_DECAP_ECN_RFC3168_MODE = 0, /* RFC3168 mode for decapsulation */
+	FAL_TUNNEL_DECAP_ECN_RFC4301_MODE = 1, /* RFC4301 mode for decapsulation */
+	FAL_TUNNEL_DECAP_ECN_RFC6040_MODE = 2 /* RFC6040 mode for decapsulation */
+} fal_tunnel_decap_ecn_mode_t;
+
+typedef enum {
+	FAL_TUNNEL_ECN_NOT_ECT, /* Not ECN-capable transport */
+	FAL_TUNNEL_ECN_ECT_0, /* ECN-capable transport */
+	FAL_TUNNEL_ECN_ECT_1, /* ECN-capable transport */
+	FAL_TUNNEL_ECN_CE, /* Congestion experienced */
+	FAL_TUNNEL_ECN_INVALID /* Congestion experienced */
+} fal_tunnel_ecn_val_t;
+
 typedef struct {
-	a_uint32_t ecn_map_data[3]; /* index by ecn_mode,
-				     * new 2bits ecn for inner & outer ecn pair (total 16 pairs)
-				     */
-} fal_tunnel_decap_header_ctrl_t;
+	fal_tunnel_decap_ecn_mode_t ecn_mode; /* ecn mode including RFC 3168, RFC 4301, RFC 6040 */
+	fal_tunnel_ecn_val_t outer_ecn; /* as described by fal_tunnel_ecn_val_t */
+	fal_tunnel_ecn_val_t inner_ecn; /* as described by fal_tunnel_ecn_val_t */
+} fal_tunnel_decap_ecn_rule_t;
+
+typedef struct {
+	fal_tunnel_ecn_val_t ecn_value; /* as described by fal_tunnel_ecn_val_t */
+	a_bool_t ecn_exp; /* ecn exception or not */
+} fal_tunnel_decap_ecn_action_t;
+
+typedef struct {
+	fal_tunnel_encap_ecn_mode_t ecn_mode; /* as described by fal_encap_ecn_mode_t */
+	fal_tunnel_ecn_val_t inner_ecn; /* ecn value of incoming packet */
+} fal_tunnel_encap_ecn_t;
 
 typedef struct {
 	fal_fwd_cmd_t deacce_action; /* DE_ACCE in the matched TT table is
@@ -488,9 +526,6 @@ typedef struct {
 } fal_tunnel_encap_rule_t;
 
 typedef struct {
-	a_uint8_t ecn_profile[3]; /* index by ecn_mode,
-				   * every 2bits for not-ect, ect(1), ect(0), ce
-				   */
 	a_uint16_t ipv4_id_seed; /* used for pseudo random number generation */
 	a_uint16_t ipv4_df_set; /* 0 = Always 0, 1= Follow RFC7915, 2 = Always 1 */
 	a_uint16_t udp_sport_base; /* the hash base of the udp port */
@@ -596,18 +631,26 @@ fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
 		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
 
 sw_error_t
-fal_tunnel_decap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl);
-
-sw_error_t
-fal_tunnel_decap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl);
-
-
-sw_error_t
 fal_tunnel_encap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl_t *header_ctrl);
 
 sw_error_t
 fal_tunnel_encap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl_t *header_ctrl);
 
+sw_error_t
+fal_tunnel_decap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action);
+
+sw_error_t
+fal_tunnel_decap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action);
+
+sw_error_t
+fal_tunnel_encap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value);
+
+sw_error_t
+fal_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value);
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

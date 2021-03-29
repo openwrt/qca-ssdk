@@ -5162,19 +5162,45 @@ extern "C" {
 			sizeof(fal_tunnel_global_cfg_t), \
 			SW_PARAM_PTR|SW_PARAM_OUT, "Global Cfg"),
 
-#define SW_API_TUNNEL_DECAP_HEADER_CTRL_SET_DESC \
-	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_HEADER_CTRL_SET, SW_UINT32, \
+#define SW_API_TUNNEL_DECAP_ECN_MODE_SET_DESC \
+	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_SET, SW_UINT32, \
 			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
-	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_HEADER_CTRL_SET, SW_TUNNEL_DECAP_HEADER_CTRL, \
-			sizeof(fal_tunnel_decap_header_ctrl_t), \
-			SW_PARAM_PTR|SW_PARAM_IN, "Global decap header control"),
+	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_SET, SW_TUNNEL_DECAP_ECN_RULE, \
+			sizeof(fal_tunnel_decap_ecn_rule_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Decap ECN rule"), \
+	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_SET, SW_TUNNEL_DECAP_ECN_ACTION, \
+			sizeof(fal_tunnel_decap_ecn_action_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Decap ECN action"),
 
-#define SW_API_TUNNEL_DECAP_HEADER_CTRL_GET_DESC \
-	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_HEADER_CTRL_GET, SW_UINT32, \
+#define SW_API_TUNNEL_DECAP_ECN_MODE_GET_DESC \
+	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_GET, SW_UINT32, \
 			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
-	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_HEADER_CTRL_GET, SW_TUNNEL_DECAP_HEADER_CTRL, \
-			sizeof(fal_tunnel_decap_header_ctrl_t), \
-			SW_PARAM_PTR|SW_PARAM_OUT, "Global decap header control"),
+	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_GET, SW_TUNNEL_DECAP_ECN_RULE, \
+			sizeof(fal_tunnel_decap_ecn_rule_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Decap ECN rule"), \
+	SW_PARAM_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_GET, SW_TUNNEL_DECAP_ECN_ACTION, \
+			sizeof(fal_tunnel_decap_ecn_action_t), \
+			SW_PARAM_PTR|SW_PARAM_OUT, "Decap ECN action"),
+
+#define SW_API_TUNNEL_ENCAP_ECN_MODE_SET_DESC \
+	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_SET, SW_TUNNEL_ENCAP_ECN_RULE, \
+			sizeof(fal_tunnel_encap_ecn_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Encap ECN rule"), \
+	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_SET, SW_UINT8, \
+			sizeof(a_uint8_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Encap ECN value"),
+
+#define SW_API_TUNNEL_ENCAP_ECN_MODE_GET_DESC \
+	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_GET, SW_TUNNEL_ENCAP_ECN_RULE, \
+			sizeof(fal_tunnel_encap_ecn_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Encap ECN rule"), \
+	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_GET, SW_UINT8, \
+			sizeof(a_uint8_t), \
+			SW_PARAM_PTR|SW_PARAM_OUT, "Encap ECN value"),
 
 #define SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET_DESC \
 	SW_PARAM_DEF(SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET, SW_UINT32, \

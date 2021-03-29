@@ -1151,11 +1151,17 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_tunnel_decap_entry_flush_func)(a_uint32_t dev_id);
 typedef sw_error_t
-(*adpt_tunnel_decap_header_ctrl_set_func)(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+(*adpt_tunnel_encap_ecn_mode_get_func)(a_uint32_t dev_id,
+		fal_tunnel_encap_ecn_t *ecn_rule, fal_tunnel_ecn_val_t *ecn_value);
 typedef sw_error_t
-(*adpt_tunnel_decap_header_ctrl_get_func)(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+(*adpt_tunnel_encap_ecn_mode_set_func)(a_uint32_t dev_id,
+		fal_tunnel_encap_ecn_t *ecn_rule, fal_tunnel_ecn_val_t *ecn_value);
+typedef sw_error_t
+(*adpt_tunnel_decap_ecn_mode_get_func)(a_uint32_t dev_id,
+		fal_tunnel_decap_ecn_rule_t *ecn_rule, fal_tunnel_decap_ecn_action_t *ecn_action);
+typedef sw_error_t
+(*adpt_tunnel_decap_ecn_mode_set_func)(a_uint32_t dev_id,
+		fal_tunnel_decap_ecn_rule_t *ecn_rule, fal_tunnel_decap_ecn_action_t *ecn_action);
 typedef sw_error_t
 (*adpt_tunnel_encap_header_ctrl_set_func)(a_uint32_t dev_id,
 		fal_tunnel_encap_header_ctrl_t *header_ctrl);
@@ -1860,8 +1866,10 @@ typedef struct
 	adpt_tunnel_decap_entry_get_func adpt_tunnel_decap_entry_get;
 	adpt_tunnel_decap_entry_getnext_func adpt_tunnel_decap_entry_getnext;
 	adpt_tunnel_decap_entry_flush_func adpt_tunnel_decap_entry_flush;
-	adpt_tunnel_decap_header_ctrl_set_func adpt_tunnel_decap_header_ctrl_set;
-	adpt_tunnel_decap_header_ctrl_get_func adpt_tunnel_decap_header_ctrl_get;
+	adpt_tunnel_decap_ecn_mode_get_func adpt_tunnel_decap_ecn_mode_get;
+	adpt_tunnel_decap_ecn_mode_set_func adpt_tunnel_decap_ecn_mode_set;
+	adpt_tunnel_encap_ecn_mode_get_func adpt_tunnel_encap_ecn_mode_get;
+	adpt_tunnel_encap_ecn_mode_set_func adpt_tunnel_encap_ecn_mode_set;
 	adpt_tunnel_encap_header_ctrl_set_func adpt_tunnel_encap_header_ctrl_set;
 	adpt_tunnel_encap_header_ctrl_get_func adpt_tunnel_encap_header_ctrl_get;
 	adpt_tunnel_global_cfg_get_func adpt_tunnel_global_cfg_get;

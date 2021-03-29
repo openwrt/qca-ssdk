@@ -38,11 +38,17 @@ sw_error_t
 adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 		fal_tunnel_encap_header_ctrl_t *header_ctrl);
 sw_error_t
-adpt_appe_tunnel_decap_header_ctrl_set(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+adpt_appe_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value);
 sw_error_t
-adpt_appe_tunnel_decap_header_ctrl_get(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+adpt_appe_tunnel_encap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value);
+sw_error_t
+adpt_appe_tunnel_decap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action);
+sw_error_t
+adpt_appe_tunnel_decap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action);
 sw_error_t
 adpt_appe_tunnel_global_cfg_get(a_uint32_t dev_id, fal_tunnel_global_cfg_t *cfg);
 sw_error_t

@@ -845,7 +845,6 @@ adpt_appe_tunnel_encap_header_ctrl_set(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	union eg_ipv4_hdr_ctrl_u eg_ipv4_hdr_ctrl;
 	union eg_udp_entropy_ctrl_u udp_entropy_ctrl;
-	union ecn_profile_u ecn_profile;
 	union eg_proto_mapping0_u proto_mapping0[2];
 	union eg_proto_mapping1_u proto_mapping1[2];
 
@@ -854,7 +853,6 @@ adpt_appe_tunnel_encap_header_ctrl_set(a_uint32_t dev_id,
 
 	aos_mem_zero(&eg_ipv4_hdr_ctrl, sizeof(union eg_ipv4_hdr_ctrl_u));
 	aos_mem_zero(&udp_entropy_ctrl, sizeof(union eg_udp_entropy_ctrl_u));
-	aos_mem_zero(&ecn_profile, sizeof(union ecn_profile_u));
 	aos_mem_zero(&proto_mapping0, sizeof(union eg_proto_mapping0_u));
 	aos_mem_zero(&proto_mapping1, sizeof(union eg_proto_mapping1_u));
 
@@ -862,9 +860,6 @@ adpt_appe_tunnel_encap_header_ctrl_set(a_uint32_t dev_id,
 	SW_RTN_ON_ERROR(rv);
 
 	rv = appe_eg_udp_entropy_ctrl_get(dev_id, &udp_entropy_ctrl);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = appe_ecn_profile_get(dev_id, &ecn_profile);
 	SW_RTN_ON_ERROR(rv);
 
 	rv = appe_eg_proto_mapping0_get(dev_id, 0, &proto_mapping0[0]);
@@ -883,9 +878,6 @@ adpt_appe_tunnel_encap_header_ctrl_set(a_uint32_t dev_id,
 	eg_ipv4_hdr_ctrl.bf.ipv4_df_set = header_ctrl->ipv4_df_set;
 	udp_entropy_ctrl.bf.port_base = header_ctrl->udp_sport_base;
 	udp_entropy_ctrl.bf.port_mask = header_ctrl->udp_sport_mask;
-	ecn_profile.bf.profile0 = header_ctrl->ecn_profile[0] & 0xff;
-	ecn_profile.bf.profile1 = header_ctrl->ecn_profile[1] & 0xff;
-	ecn_profile.bf.profile2 = header_ctrl->ecn_profile[2] & 0xff;
 	proto_mapping0[0].bf.protocol0 = header_ctrl->proto_map_data[0];
 	proto_mapping1[0].bf.protocol1 = header_ctrl->proto_map_data[1];
 	proto_mapping0[1].bf.protocol0 = header_ctrl->proto_map_data[2];
@@ -895,9 +887,6 @@ adpt_appe_tunnel_encap_header_ctrl_set(a_uint32_t dev_id,
 	SW_RTN_ON_ERROR(rv);
 
 	rv = appe_eg_udp_entropy_ctrl_set(dev_id, &udp_entropy_ctrl);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = appe_ecn_profile_set(dev_id, &ecn_profile);
 	SW_RTN_ON_ERROR(rv);
 
 	rv = appe_eg_proto_mapping0_set(dev_id, 0, &proto_mapping0[0]);
@@ -921,7 +910,6 @@ adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	union eg_ipv4_hdr_ctrl_u eg_ipv4_hdr_ctrl;
 	union eg_udp_entropy_ctrl_u udp_entropy_ctrl;
-	union ecn_profile_u ecn_profile;
 	union eg_proto_mapping0_u proto_mapping0[2];
 	union eg_proto_mapping1_u proto_mapping1[2];
 
@@ -930,7 +918,6 @@ adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 
 	aos_mem_zero(&eg_ipv4_hdr_ctrl, sizeof(union eg_ipv4_hdr_ctrl_u));
 	aos_mem_zero(&udp_entropy_ctrl, sizeof(union eg_udp_entropy_ctrl_u));
-	aos_mem_zero(&ecn_profile, sizeof(union ecn_profile_u));
 	aos_mem_zero(&proto_mapping0, sizeof(union eg_proto_mapping0_u));
 	aos_mem_zero(&proto_mapping1, sizeof(union eg_proto_mapping1_u));
 
@@ -938,9 +925,6 @@ adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 	SW_RTN_ON_ERROR(rv);
 
 	rv = appe_eg_udp_entropy_ctrl_get(dev_id, &udp_entropy_ctrl);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = appe_ecn_profile_get(dev_id, &ecn_profile);
 	SW_RTN_ON_ERROR(rv);
 
 	rv = appe_eg_proto_mapping0_get(dev_id, 0, &proto_mapping0[0]);
@@ -959,9 +943,6 @@ adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 	header_ctrl->ipv4_df_set = eg_ipv4_hdr_ctrl.bf.ipv4_df_set;
 	header_ctrl->udp_sport_base = udp_entropy_ctrl.bf.port_base;
 	header_ctrl->udp_sport_mask = udp_entropy_ctrl.bf.port_mask;
-	header_ctrl->ecn_profile[0] = ecn_profile.bf.profile0;
-	header_ctrl->ecn_profile[1] = ecn_profile.bf.profile1;
-	header_ctrl->ecn_profile[2] = ecn_profile.bf.profile2;
 	header_ctrl->proto_map_data[0] = proto_mapping0[0].bf.protocol0;
 	header_ctrl->proto_map_data[1] = proto_mapping1[0].bf.protocol1;
 	header_ctrl->proto_map_data[2] = proto_mapping0[1].bf.protocol0;
@@ -971,73 +952,280 @@ adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 }
 
 sw_error_t
-adpt_appe_tunnel_decap_header_ctrl_set(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl)
+adpt_appe_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value)
 {
 	sw_error_t rv = SW_OK;
-	union ecn_map_mode0_0_u ecn_map_mode0;
-	union ecn_map_mode1_0_u ecn_map_mode1;
-	union ecn_map_mode2_0_u ecn_map_mode2;
+	union ecn_profile_u ecn_profile;
+	a_uint8_t ecn_data = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(header_ctrl);
+	ADPT_NULL_POINT_CHECK(ecn_rule);
+	ADPT_NULL_POINT_CHECK(ecn_value);
 
-	aos_mem_zero(&ecn_map_mode0, sizeof(union ecn_map_mode0_0_u));
-	aos_mem_zero(&ecn_map_mode1, sizeof(union ecn_map_mode1_0_u));
-	aos_mem_zero(&ecn_map_mode2, sizeof(union ecn_map_mode2_0_u));
+	aos_mem_zero(&ecn_profile, sizeof(union ecn_profile_u));
 
-	rv = appe_ecn_map_mode0_0_get(dev_id, &ecn_map_mode0);
+	rv = appe_ecn_profile_get(dev_id, &ecn_profile);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = appe_ecn_map_mode1_0_get(dev_id, &ecn_map_mode1);
-	SW_RTN_ON_ERROR(rv);
+	switch (ecn_rule->ecn_mode) {
+		case FAL_ENCAP_ECN_RFC3168_LIMIT_RFC6040_CMPAT_MODE:
+			ecn_data = ecn_profile.bf.profile0;
+			break;
+		case FAL_ENCAP_ECN_RFC3168_FULL_MODE:
+			ecn_data = ecn_profile.bf.profile1;
+			break;
+		case FAL_ENCAP_ECN_RFC4301_RFC6040_NORMAL_MODE:
+			ecn_data = ecn_profile.bf.profile2;
+			break;
+		case FAL_ENCAP_ECN_NO_UPDATE:
+		default:
+			SSDK_ERROR("Unsupported encap ecn_mode: %d\n", ecn_rule->ecn_mode);
+			return SW_BAD_PARAM;
+	}
 
-	rv = appe_ecn_map_mode2_0_get(dev_id, &ecn_map_mode2);
-	SW_RTN_ON_ERROR(rv);
-
-	ecn_map_mode0.bf.new_ecn = header_ctrl->ecn_map_data[0];
-	ecn_map_mode1.bf.new_ecn = header_ctrl->ecn_map_data[1];
-	ecn_map_mode2.bf.new_ecn = header_ctrl->ecn_map_data[2];
-
-	rv = appe_ecn_map_mode0_0_set(dev_id, &ecn_map_mode0);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = appe_ecn_map_mode1_0_set(dev_id, &ecn_map_mode1);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = appe_ecn_map_mode2_0_set(dev_id, &ecn_map_mode2);
+	/* every two bits for CE,ECT(1),ECT(0),Not-ECT saved in ecn_data */
+	*ecn_value = (ecn_data >> (ecn_rule->inner_ecn << 1)) & FAL_ECN_VAL_LENGTH_MASK;
 
 	return rv;
 }
 
 sw_error_t
-adpt_appe_tunnel_decap_header_ctrl_get(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl)
+adpt_appe_tunnel_encap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value)
 {
 	sw_error_t rv = SW_OK;
+	union ecn_profile_u ecn_profile;
+	a_uint8_t ecn_data = 0;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(ecn_rule);
+	ADPT_NULL_POINT_CHECK(ecn_value);
+
+	aos_mem_zero(&ecn_profile, sizeof(union ecn_profile_u));
+
+	rv = appe_ecn_profile_get(dev_id, &ecn_profile);
+	SW_RTN_ON_ERROR(rv);
+
+	switch (ecn_rule->ecn_mode) {
+		case FAL_ENCAP_ECN_RFC3168_LIMIT_RFC6040_CMPAT_MODE:
+			ecn_data = ecn_profile.bf.profile0;
+			break;
+		case FAL_ENCAP_ECN_RFC3168_FULL_MODE:
+			ecn_data = ecn_profile.bf.profile1;
+			break;
+		case FAL_ENCAP_ECN_RFC4301_RFC6040_NORMAL_MODE:
+			ecn_data = ecn_profile.bf.profile2;
+			break;
+		case FAL_ENCAP_ECN_NO_UPDATE:
+		default:
+			SSDK_ERROR("Unsupported encap ecn_mode: %d\n", ecn_rule->ecn_mode);
+			return SW_BAD_PARAM;
+	}
+
+	/* every two bits for CE,ECT(1),ECT(0),Not-ECT saved in ecn_data */
+	ecn_data &= ~(FAL_ECN_VAL_LENGTH_MASK << (ecn_rule->inner_ecn << 1));
+	ecn_data |= *ecn_value << (ecn_rule->inner_ecn << 1);
+
+	switch (ecn_rule->ecn_mode) {
+		case FAL_ENCAP_ECN_RFC3168_LIMIT_RFC6040_CMPAT_MODE:
+			ecn_profile.bf.profile0 = ecn_data;
+			break;
+		case FAL_ENCAP_ECN_RFC3168_FULL_MODE:
+			ecn_profile.bf.profile1 = ecn_data;
+			break;
+		case FAL_ENCAP_ECN_RFC4301_RFC6040_NORMAL_MODE:
+			ecn_profile.bf.profile2 = ecn_data;
+			break;
+		case FAL_ENCAP_ECN_NO_UPDATE:
+		default:
+			SSDK_ERROR("Unsupported encap ecn_mode: %d\n", ecn_rule->ecn_mode);
+			return SW_BAD_PARAM;
+	}
+
+	rv = appe_ecn_profile_set(dev_id, &ecn_profile);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_tunnel_decap_ecn_mode_get(a_uint32_t dev_id,
+		fal_tunnel_decap_ecn_rule_t *ecn_rule, fal_tunnel_decap_ecn_action_t *ecn_action)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t ecn_data = 0;
+	a_uint16_t ecn_exp = 0;
 	union ecn_map_mode0_0_u ecn_map_mode0;
 	union ecn_map_mode1_0_u ecn_map_mode1;
 	union ecn_map_mode2_0_u ecn_map_mode2;
+	union ecn_map_mode0_1_u ecn_excep0;
+	union ecn_map_mode1_1_u ecn_excep1;
+	union ecn_map_mode2_1_u ecn_excep2;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(header_ctrl);
+	ADPT_NULL_POINT_CHECK(ecn_rule);
+	ADPT_NULL_POINT_CHECK(ecn_action);
 
 	aos_mem_zero(&ecn_map_mode0, sizeof(union ecn_map_mode0_0_u));
 	aos_mem_zero(&ecn_map_mode1, sizeof(union ecn_map_mode1_0_u));
 	aos_mem_zero(&ecn_map_mode2, sizeof(union ecn_map_mode2_0_u));
+	aos_mem_zero(&ecn_excep0, sizeof(union ecn_map_mode0_1_u));
+	aos_mem_zero(&ecn_excep1, sizeof(union ecn_map_mode1_1_u));
+	aos_mem_zero(&ecn_excep2, sizeof(union ecn_map_mode2_1_u));
 
-	rv = appe_ecn_map_mode0_0_get(dev_id, &ecn_map_mode0);
-	SW_RTN_ON_ERROR(rv);
+	switch (ecn_rule->ecn_mode) {
+		case FAL_TUNNEL_DECAP_ECN_RFC3168_MODE:
+			rv = appe_ecn_map_mode0_0_get(dev_id, &ecn_map_mode0);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode0_1_get(dev_id, &ecn_excep0);
+			SW_RTN_ON_ERROR(rv);
 
-	rv = appe_ecn_map_mode1_0_get(dev_id, &ecn_map_mode1);
-	SW_RTN_ON_ERROR(rv);
+			ecn_data = ecn_map_mode0.bf.new_ecn;
+			ecn_exp = ecn_excep0.bf.exception_en;
+			break;
+		case FAL_TUNNEL_DECAP_ECN_RFC4301_MODE:
+			rv = appe_ecn_map_mode1_0_get(dev_id, &ecn_map_mode1);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode1_1_get(dev_id, &ecn_excep1);
+			SW_RTN_ON_ERROR(rv);
 
-	rv = appe_ecn_map_mode2_0_get(dev_id, &ecn_map_mode2);
-	SW_RTN_ON_ERROR(rv);
+			ecn_data = ecn_map_mode1.bf.new_ecn;
+			ecn_exp = ecn_excep1.bf.exception_en;
+			break;
+		case FAL_TUNNEL_DECAP_ECN_RFC6040_MODE:
+			rv = appe_ecn_map_mode2_0_get(dev_id, &ecn_map_mode2);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode2_1_get(dev_id, &ecn_excep2);
+			SW_RTN_ON_ERROR(rv);
 
-	header_ctrl->ecn_map_data[0] = ecn_map_mode0.bf.new_ecn;
-	header_ctrl->ecn_map_data[1] = ecn_map_mode1.bf.new_ecn;
-	header_ctrl->ecn_map_data[2] = ecn_map_mode2.bf.new_ecn;
+			ecn_data = ecn_map_mode2.bf.new_ecn;
+			ecn_exp = ecn_excep2.bf.exception_en;
+			break;
+		default:
+			SSDK_ERROR("Unsupported decap ecn mode: %d\n", ecn_rule->ecn_mode);
+			return SW_BAD_PARAM;
+	}
+
+	ecn_data = ecn_data >> (((FAL_ECN_VAL_LENGTH_MASK - ecn_rule->outer_ecn) << 1) +
+			((FAL_ECN_VAL_LENGTH_MASK - ecn_rule->inner_ecn) <<
+			 FAL_ECN_VAL_LENGTH_MASK));
+	ecn_action->ecn_value = ecn_data & FAL_ECN_VAL_LENGTH_MASK;
+
+	ecn_exp = ecn_exp >> ((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->outer_ecn) +
+			((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->inner_ecn) << 2));
+	ecn_action->ecn_exp = ecn_exp & FAL_ECN_EXP_LENGTH_MASK;
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_tunnel_decap_ecn_mode_set(a_uint32_t dev_id,
+		fal_tunnel_decap_ecn_rule_t *ecn_rule, fal_tunnel_decap_ecn_action_t *ecn_action)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t ecn_data = 0;
+	a_uint16_t ecn_exp = 0;
+	union ecn_map_mode0_0_u ecn_map_mode0;
+	union ecn_map_mode1_0_u ecn_map_mode1;
+	union ecn_map_mode2_0_u ecn_map_mode2;
+	union ecn_map_mode0_1_u ecn_excep0;
+	union ecn_map_mode1_1_u ecn_excep1;
+	union ecn_map_mode2_1_u ecn_excep2;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(ecn_rule);
+	ADPT_NULL_POINT_CHECK(ecn_action);
+
+	aos_mem_zero(&ecn_map_mode0, sizeof(union ecn_map_mode0_0_u));
+	aos_mem_zero(&ecn_map_mode1, sizeof(union ecn_map_mode1_0_u));
+	aos_mem_zero(&ecn_map_mode2, sizeof(union ecn_map_mode2_0_u));
+	aos_mem_zero(&ecn_excep0, sizeof(union ecn_map_mode0_1_u));
+	aos_mem_zero(&ecn_excep1, sizeof(union ecn_map_mode1_1_u));
+	aos_mem_zero(&ecn_excep2, sizeof(union ecn_map_mode2_1_u));
+
+	switch (ecn_rule->ecn_mode) {
+		case FAL_TUNNEL_DECAP_ECN_RFC3168_MODE:
+			rv = appe_ecn_map_mode0_0_get(dev_id, &ecn_map_mode0);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode0_1_get(dev_id, &ecn_excep0);
+			SW_RTN_ON_ERROR(rv);
+
+			ecn_data = ecn_map_mode0.bf.new_ecn;
+			ecn_exp = ecn_excep0.bf.exception_en;
+			break;
+		case FAL_TUNNEL_DECAP_ECN_RFC4301_MODE:
+			rv = appe_ecn_map_mode1_0_get(dev_id, &ecn_map_mode1);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode1_1_get(dev_id, &ecn_excep1);
+			SW_RTN_ON_ERROR(rv);
+
+			ecn_data = ecn_map_mode1.bf.new_ecn;
+			ecn_exp = ecn_excep1.bf.exception_en;
+			break;
+		case FAL_TUNNEL_DECAP_ECN_RFC6040_MODE:
+			rv = appe_ecn_map_mode2_0_get(dev_id, &ecn_map_mode2);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode2_1_get(dev_id, &ecn_excep2);
+			SW_RTN_ON_ERROR(rv);
+
+			ecn_data = ecn_map_mode2.bf.new_ecn;
+			ecn_exp = ecn_excep2.bf.exception_en;
+			break;
+		default:
+			SSDK_ERROR("Unsupported decap ecn mode: %d\n", ecn_rule->ecn_mode);
+			return SW_BAD_PARAM;
+	}
+
+	ecn_data &= ~(FAL_ECN_VAL_LENGTH_MASK <<
+			(((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->outer_ecn)<<1) +
+			 ((FAL_ECN_VAL_LENGTH_MASK - ecn_rule->inner_ecn) <<
+			  FAL_ECN_VAL_LENGTH_MASK)));
+
+	ecn_data |= (ecn_action->ecn_value <<
+			(((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->outer_ecn)<<1) +
+			((FAL_ECN_VAL_LENGTH_MASK - ecn_rule->inner_ecn) <<
+			 FAL_ECN_VAL_LENGTH_MASK)));
+
+	ecn_exp &= ~(FAL_ECN_EXP_LENGTH_MASK <<
+			((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->outer_ecn) +
+			 ((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->inner_ecn) << 2)));
+
+	ecn_exp |= (ecn_action->ecn_exp <<
+			((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->outer_ecn) +
+			 ((FAL_ECN_VAL_LENGTH_MASK-ecn_rule->inner_ecn) << 2)));
+
+	switch (ecn_rule->ecn_mode) {
+		case FAL_TUNNEL_DECAP_ECN_RFC3168_MODE:
+			ecn_map_mode0.bf.new_ecn = ecn_data;
+			ecn_excep0.bf.exception_en = ecn_exp;
+
+			rv = appe_ecn_map_mode0_0_set(dev_id, &ecn_map_mode0);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode0_1_set(dev_id, &ecn_excep0);
+			SW_RTN_ON_ERROR(rv);
+			break;
+		case FAL_TUNNEL_DECAP_ECN_RFC4301_MODE:
+			ecn_map_mode1.bf.new_ecn = ecn_data;
+			ecn_excep1.bf.exception_en = ecn_exp;
+
+			rv = appe_ecn_map_mode1_0_set(dev_id, &ecn_map_mode1);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode1_1_set(dev_id, &ecn_excep1);
+			SW_RTN_ON_ERROR(rv);
+			break;
+		case FAL_TUNNEL_DECAP_ECN_RFC6040_MODE:
+			ecn_map_mode2.bf.new_ecn = ecn_data;
+			ecn_excep2.bf.exception_en = ecn_exp;
+
+			rv = appe_ecn_map_mode2_0_set(dev_id, &ecn_map_mode2);
+			SW_RTN_ON_ERROR(rv);
+			rv = appe_ecn_map_mode2_1_set(dev_id, &ecn_excep2);
+			SW_RTN_ON_ERROR(rv);
+			break;
+		default:
+			SSDK_ERROR("Unsupported decap ecn mode: %d\n", ecn_rule->ecn_mode);
+			return SW_BAD_PARAM;
+	}
 
 	return rv;
 }
@@ -2410,6 +2598,13 @@ static void adpt_appe_tunnel_func_unregister(a_uint32_t dev_id, adpt_api_t *p_ad
 	p_adpt_api->adpt_tunnel_udf_profile_entry_getnext = NULL;
 	p_adpt_api->adpt_tunnel_udf_profile_cfg_set = NULL;
 	p_adpt_api->adpt_tunnel_udf_profile_cfg_get = NULL;
+	p_adpt_api->adpt_tunnel_encap_header_ctrl_set = NULL;
+	p_adpt_api->adpt_tunnel_encap_header_ctrl_get = NULL;
+	p_adpt_api->adpt_tunnel_decap_ecn_mode_set = NULL;
+	p_adpt_api->adpt_tunnel_decap_ecn_mode_get = NULL;
+	p_adpt_api->adpt_tunnel_encap_ecn_mode_set = NULL;
+	p_adpt_api->adpt_tunnel_encap_ecn_mode_get = NULL;
+
 	return;
 }
 
@@ -2509,18 +2704,24 @@ adpt_appe_tunnel_init(a_uint32_t dev_id)
 	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_HEADER_CTRL_GET))
 		p_adpt_api->adpt_tunnel_encap_header_ctrl_get =
 			adpt_appe_tunnel_encap_header_ctrl_get;
-	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_SET))
-		p_adpt_api->adpt_tunnel_decap_header_ctrl_set =
-			adpt_appe_tunnel_decap_header_ctrl_set;
-	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_HEADER_CTRL_GET))
-		p_adpt_api->adpt_tunnel_decap_header_ctrl_get =
-			adpt_appe_tunnel_decap_header_ctrl_get;
-	if(p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_ADD))
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ECN_SET))
+		p_adpt_api->adpt_tunnel_decap_ecn_mode_set=
+			adpt_appe_tunnel_decap_ecn_mode_set;
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_DECAP_ECN_GET))
+		p_adpt_api->adpt_tunnel_decap_ecn_mode_get=
+			adpt_appe_tunnel_decap_ecn_mode_get;
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_ECN_SET))
+		p_adpt_api->adpt_tunnel_encap_ecn_mode_set=
+			adpt_appe_tunnel_encap_ecn_mode_set;
+	if (p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_ENCAP_ECN_GET))
+		p_adpt_api->adpt_tunnel_encap_ecn_mode_get=
+			adpt_appe_tunnel_encap_ecn_mode_get;
+	if(p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_ADD % 32))
 	{
 		p_adpt_api->adpt_tunnel_udf_profile_entry_add =
 			adpt_appe_tunnel_udf_profile_entry_add;
 	}
-	if(p_adpt_api->adpt_tunnel_func_bitmap[0] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_DEL))
+	if(p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_UDF_PROFILE_ENTRY_DEL % 32))
 	{
 		p_adpt_api->adpt_tunnel_udf_profile_entry_del =
 			adpt_appe_tunnel_udf_profile_entry_del;

@@ -107,8 +107,9 @@ _fal_tunnel_encap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_encap_header_ctr
     return rv;
 }
 
-static sw_error_t
-_fal_tunnel_decap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl)
+sw_error_t
+_fal_tunnel_decap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action)
 {
     adpt_api_t *p_api;
     sw_error_t rv = SW_OK;
@@ -116,15 +117,16 @@ _fal_tunnel_decap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_decap_header_ctr
     p_api = adpt_api_ptr_get(dev_id);
     SW_RTN_ON_NULL(p_api);
 
-    if (NULL == p_api->adpt_tunnel_decap_header_ctrl_set)
+    if (NULL == p_api->adpt_tunnel_decap_ecn_mode_set)
         return SW_NOT_SUPPORTED;
 
-    rv = p_api->adpt_tunnel_decap_header_ctrl_set(dev_id, header_ctrl);
+    rv = p_api->adpt_tunnel_decap_ecn_mode_set(dev_id, ecn_rule, ecn_action);
     return rv;
 }
 
-static sw_error_t
-_fal_tunnel_decap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl)
+sw_error_t
+_fal_tunnel_decap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action)
 {
     adpt_api_t *p_api;
     sw_error_t rv = SW_OK;
@@ -132,10 +134,44 @@ _fal_tunnel_decap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_decap_header_ctr
     p_api = adpt_api_ptr_get(dev_id);
     SW_RTN_ON_NULL(p_api);
 
-    if (NULL == p_api->adpt_tunnel_decap_header_ctrl_get)
+    if (NULL == p_api->adpt_tunnel_decap_ecn_mode_get)
         return SW_NOT_SUPPORTED;
 
-    rv = p_api->adpt_tunnel_decap_header_ctrl_get(dev_id, header_ctrl);
+    rv = p_api->adpt_tunnel_decap_ecn_mode_get(dev_id, ecn_rule, ecn_action);
+    return rv;
+}
+
+sw_error_t
+_fal_tunnel_encap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_tunnel_encap_ecn_mode_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_tunnel_encap_ecn_mode_set(dev_id, ecn_rule, ecn_value);
+    return rv;
+}
+
+sw_error_t
+_fal_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_tunnel_encap_ecn_mode_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_tunnel_encap_ecn_mode_get(dev_id, ecn_rule, ecn_value);
     return rv;
 }
 
@@ -1233,42 +1269,6 @@ fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
 }
 
 /**
- * @brief Set decap header control
- * @param[in] dev_id device id
- * @param[in] decapsulaiton header control
- * @return SW_OK or error code
- */
-sw_error_t
-fal_tunnel_decap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl)
-{
-    sw_error_t rv = SW_OK;
-
-    FAL_API_LOCK;
-    rv = _fal_tunnel_decap_header_ctrl_set(dev_id, header_ctrl);
-    FAL_API_UNLOCK;
-
-    return rv;
-}
-
-/**
- * @brief Get decap header control
- * @param[in] dev_id device id
- * @param[out] decapsulaiton header control
- * @return SW_OK or error code
- */
-sw_error_t
-fal_tunnel_decap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_decap_header_ctrl_t *header_ctrl)
-{
-    sw_error_t rv = SW_OK;
-
-    FAL_API_LOCK;
-    rv = _fal_tunnel_decap_header_ctrl_get(dev_id, header_ctrl);
-    FAL_API_UNLOCK;
-
-    return rv;
-}
-
-/**
  * @brief Set encap header control
  * @param[in] dev_id device id
  * @param[in] encapsulaiton header control
@@ -1304,8 +1304,86 @@ fal_tunnel_encap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl
     return rv;
 }
 
-EXPORT_SYMBOL(fal_tunnel_decap_header_ctrl_set);
-EXPORT_SYMBOL(fal_tunnel_decap_header_ctrl_get);
+/**
+ * @brief Set decap ECN mode
+ * @param[in] dev_id device id
+ * @param[in] decap ecn rule
+ * @param[in] decap ecn action
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_tunnel_decap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_tunnel_decap_ecn_mode_set(dev_id, ecn_rule, ecn_action);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+/**
+ * @brief Get decap ECN mode
+ * @param[in] dev_id device id
+ * @param[in] decap ecn rule
+ * @param[out] decap ecn action
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_tunnel_decap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
+		fal_tunnel_decap_ecn_action_t *ecn_action)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_tunnel_decap_ecn_mode_get(dev_id, ecn_rule, ecn_action);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+/**
+ * @brief Set encap ECN mode
+ * @param[in] dev_id device id
+ * @param[in] decap ecn rule
+ * @param[in] decap ecn value
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_tunnel_encap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_tunnel_encap_ecn_mode_set(dev_id, ecn_rule, ecn_value);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+/**
+ * @brief Get encap ECN mode
+ * @param[in] dev_id device id
+ * @param[in] decap ecn rule
+ * @param[in] decap ecn value
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
+		fal_tunnel_ecn_val_t *ecn_value)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_tunnel_encap_ecn_mode_get(dev_id, ecn_rule, ecn_value);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
 EXPORT_SYMBOL(fal_tunnel_encap_header_ctrl_set);
 EXPORT_SYMBOL(fal_tunnel_encap_header_ctrl_get);
 EXPORT_SYMBOL(fal_tunnel_decap_entry_add);
@@ -1338,6 +1416,10 @@ EXPORT_SYMBOL(fal_tunnel_udf_profile_entry_getfirst);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_entry_getnext);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_cfg_set);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_cfg_get);
+EXPORT_SYMBOL(fal_tunnel_decap_ecn_mode_set);
+EXPORT_SYMBOL(fal_tunnel_decap_ecn_mode_get);
+EXPORT_SYMBOL(fal_tunnel_encap_ecn_mode_set);
+EXPORT_SYMBOL(fal_tunnel_encap_ecn_mode_get);
 /**
  * @}
  */

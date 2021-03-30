@@ -73,6 +73,10 @@ ifeq (TRUE, $(IN_SEC))
   SRC_LIST += adpt_appe_sec.c
 endif
 
+ifeq (TRUE, $(IN_PORTVLAN))
+  SRC_LIST += adpt_appe_portvlan.c
+endif
+
 ifeq (, $(filter APPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

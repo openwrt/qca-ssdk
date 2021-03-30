@@ -18,10 +18,6 @@
  * @{
  */
 #include "sw.h"
-#if defined(APPE)
-#include "appe_portvlan_reg.h"
-#include "appe_portvlan.h"
-#endif
 #include "hppe_portvlan_reg.h"
 #include "hppe_portvlan.h"
 #include "hppe_portctrl_reg.h"
@@ -31,6 +27,11 @@
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
 #include "adpt.h"
+#if defined(APPE)
+#include "appe_portvlan_reg.h"
+#include "appe_portvlan.h"
+#include "adpt_appe_portvlan.h"
+#endif
 
 #ifndef IN_PORTVLAN_MINI
 a_uint32_t
@@ -2560,6 +2561,16 @@ adpt_hppe_portvlan_member_add(a_uint32_t dev_id, fal_port_t port_id, fal_port_t 
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			return adpt_appe_portvlan_vpmember_add(dev_id, port_id, mem_port_id);
+		}
+	}
+#endif
+
 	port_id = FAL_PORT_ID_VALUE(port_id);
 	mem_port_id = FAL_PORT_ID_VALUE(mem_port_id);
 
@@ -2582,6 +2593,16 @@ adpt_hppe_portvlan_member_del(a_uint32_t dev_id, fal_port_t port_id, fal_port_t 
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			return adpt_appe_portvlan_vpmember_del(dev_id, port_id, mem_port_id);
+		}
+	}
+#endif
+
 	port_id = FAL_PORT_ID_VALUE(port_id);
 	mem_port_id = FAL_PORT_ID_VALUE(mem_port_id);
 
@@ -2602,6 +2623,17 @@ adpt_hppe_portvlan_member_update(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp
 	sw_error_t rtn = SW_OK;
 
 	ADPT_DEV_ID_CHECK(dev_id);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			return adpt_appe_portvlan_vpmember_update(dev_id, port_id, mem_port_map);
+		}
+	}
+#endif
+
 	port_id = FAL_PORT_ID_VALUE(port_id);
 
 	memset(&port_bridge_ctrl, 0, sizeof(port_bridge_ctrl));
@@ -2621,6 +2653,17 @@ adpt_hppe_portvlan_member_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t 
 	sw_error_t rtn = SW_OK;
 
 	ADPT_DEV_ID_CHECK(dev_id);
+
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(ADPT_IS_VPORT(port_id))
+		{
+			return adpt_appe_portvlan_vpmember_get(dev_id, port_id, mem_port_map);
+		}
+	}
+#endif
+
 	port_id = FAL_PORT_ID_VALUE(port_id);
 
 	memset(&port_bridge_ctrl, 0, sizeof(port_bridge_ctrl));
@@ -2631,59 +2674,6 @@ adpt_hppe_portvlan_member_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t 
 
 	return rtn;
 }
-
-#if defined(APPE)
-sw_error_t
-adpt_appe_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
-		fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id)
-{
-	sw_error_t rtn = SW_OK;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	switch (direction) {
-		case FAL_PORT_VLAN_INGRESS:
-			rtn = appe_vlan_port_vp_tbl_vlan_profile_set(dev_id, vport_id, vpgroup_id);
-			break;
-		case FAL_PORT_VLAN_EGRESS:
-			rtn = appe_eg_vp_tbl_xlat_profile_set(dev_id, vport_id, vpgroup_id);
-			SW_RTN_ON_ERROR(rtn);
-			break;
-		case FAL_PORT_VLAN_ALL:
-		default:
-			rtn = SW_BAD_PARAM;
-			break;
-	}
-
-	return rtn;
-}
-
-sw_error_t
-adpt_appe_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
-		fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id)
-{
-	sw_error_t rtn = SW_OK;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	switch (direction) {
-		case FAL_PORT_VLAN_INGRESS:
-			rtn = appe_vlan_port_vp_tbl_vlan_profile_get(dev_id, vport_id, vpgroup_id);
-			SW_RTN_ON_ERROR(rtn);
-			break;
-		case FAL_PORT_VLAN_EGRESS:
-			rtn = appe_eg_vp_tbl_xlat_profile_get(dev_id, vport_id, vpgroup_id);
-			SW_RTN_ON_ERROR(rtn);
-			break;
-		case FAL_PORT_VLAN_ALL:
-		default:
-			rtn = SW_BAD_PARAM;
-			break;
-	}
-
-	return rtn;
-}
-#endif
 
 void adpt_hppe_portvlan_func_bitmap_init(a_uint32_t dev_id)
 {

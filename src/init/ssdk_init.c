@@ -3289,6 +3289,9 @@ static int ssdk_dev_event(struct notifier_block *this, unsigned long event, void
 					} else {
 						return NOTIFY_DONE;
 					}
+					if (!eth_dev) {
+						return NOTIFY_DONE;
+					}
 					mtu = dev->mtu > eth_dev->mtu ? dev->mtu : eth_dev->mtu;
 #ifdef IN_MISC
 					fal_frame_max_size_set(0, mtu + 18);

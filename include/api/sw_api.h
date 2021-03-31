@@ -277,6 +277,7 @@ typedef enum
 	SW_POLICER_PRIORITY,
 	SW_POLICER_REMAP,
 	SW_POLICER_CTRL,
+	SW_VPORT_STATE,
 /* auto_insert_flag */
 } sw_data_type_e;
 

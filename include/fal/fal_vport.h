@@ -27,12 +27,33 @@ extern "C" {
 #endif                          /* __cplusplus */
 
 #include "sw.h"
-#include "fal/fal_type.h"
+#include "fal_type.h"
 
 enum {
 	FUNC_VPORT_PHYSICAL_PORT_SET = 0,
 	FUNC_VPORT_PHYSICAL_PORT_GET,
+	FUNC_VPORT_STATE_CHECK_SET,
+	FUNC_VPORT_STATE_CHECK_GET,
 };
+
+typedef enum {
+	FUNC_VPORT_TYPE_TUNNEL = 0,
+	FUNC_VPORT_TYPE_NORMAL,
+	FUNC_VPORT_TYPE_BUTT,
+} fal_vport_type_t;
+
+typedef struct {
+	a_bool_t check_en; /* check enable or not */
+	fal_vport_type_t vp_type; /* 0: tunnel vp, 1: regular vp */
+	a_bool_t vp_active; /* actived or not */
+	a_bool_t eg_data_valid; /* eg_data valid or not for tunnel vp */
+} fal_vport_state_t;
+
+sw_error_t
+fal_vport_state_check_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport_state_t *vp_state);
+
+sw_error_t
+fal_vport_state_check_get(a_uint32_t dev_id, fal_port_t port_id, fal_vport_state_t *vp_state);
 
 sw_error_t
 fal_vport_physical_port_id_set(a_uint32_t dev_id, fal_port_t vport_id, fal_port_t phyport_id);

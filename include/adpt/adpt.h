@@ -57,6 +57,7 @@ extern "C" {
 #include "fal_geneve.h"
 #include "fal_tunnel_program.h"
 #include "fal_mapt.h"
+#include "fal_vport.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1104,6 +1105,10 @@ typedef sw_error_t (*adpt_vport_physical_port_id_set_func)(a_uint32_t dev_id,
 		fal_port_t vport, fal_port_t pport);
 typedef sw_error_t (*adpt_vport_physical_port_id_get_func)(a_uint32_t dev_id,
 		fal_port_t vport, fal_port_t *pport);
+typedef sw_error_t (*adpt_vport_state_check_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_state_t *vp_state);
+typedef sw_error_t (*adpt_vport_state_check_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_state_t *vp_state);
 /*vxlan*/
 typedef sw_error_t (*adpt_vxlan_entry_add_func)(a_uint32_t dev_id,
 	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
@@ -1841,6 +1846,8 @@ typedef struct
 	a_uint32_t adpt_vport_func_bitmap;
 	adpt_vport_physical_port_id_set_func adpt_vport_physical_port_id_set;
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
+	adpt_vport_state_check_set_func adpt_vport_state_check_set;
+	adpt_vport_state_check_get_func adpt_vport_state_check_get;
 
 	/* tunnel */
 	a_uint32_t adpt_tunnel_func_bitmap[2];

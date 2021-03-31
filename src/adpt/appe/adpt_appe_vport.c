@@ -93,6 +93,54 @@ adpt_appe_vport_physical_port_id_set(a_uint32_t dev_id,
 	return rv;
 }
 
+sw_error_t
+adpt_appe_vport_state_check_get(a_uint32_t dev_id, fal_port_t port_id, fal_vport_state_t *vp_state)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(vp_state);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	vp_state->check_en = l2_vp_port_tbl.bf.vp_state_check_en;
+	vp_state->vp_type = l2_vp_port_tbl.bf.vp_type;
+	vp_state->vp_active = l2_vp_port_tbl.bf.vp_context_active;
+	vp_state->eg_data_valid = l2_vp_port_tbl.bf.vp_eg_data_valid;
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_vport_state_check_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport_state_t *vp_state)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(vp_state);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	l2_vp_port_tbl.bf.vp_state_check_en = vp_state->check_en;
+	l2_vp_port_tbl.bf.vp_type = vp_state->vp_type;
+	l2_vp_port_tbl.bf.vp_context_active = vp_state->vp_active;
+	l2_vp_port_tbl.bf.vp_eg_data_valid = vp_state->eg_data_valid;
+
+	rv = appe_l2_vp_port_tbl_set(dev_id, port_value, &l2_vp_port_tbl);
+
+	return rv;
+}
+
 void adpt_appe_vport_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -114,6 +162,8 @@ static void adpt_appe_vport_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adp
 
 	p_adpt_api->adpt_vport_physical_port_id_set = NULL;
 	p_adpt_api->adpt_vport_physical_port_id_get = NULL;
+	p_adpt_api->adpt_vport_state_check_set = NULL;
+	p_adpt_api->adpt_vport_state_check_get = NULL;
 
 	return;
 }
@@ -129,13 +179,18 @@ adpt_appe_vport_init(a_uint32_t dev_id)
 
 	adpt_appe_vport_func_unregister(dev_id, p_adpt_api);
 
-	if (p_adpt_api->adpt_vport_func_bitmap & (1 << FUNC_VPORT_PHYSICAL_PORT_SET))
+	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_PHYSICAL_PORT_SET))
 		p_adpt_api->adpt_vport_physical_port_id_set =
 			adpt_appe_vport_physical_port_id_set;
-	if (p_adpt_api->adpt_vport_func_bitmap & (1 << FUNC_VPORT_PHYSICAL_PORT_GET))
+	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_PHYSICAL_PORT_GET))
 		p_adpt_api->adpt_vport_physical_port_id_get =
 			adpt_appe_vport_physical_port_id_get;
-
+	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_STATE_CHECK_SET))
+		p_adpt_api->adpt_vport_state_check_set =
+			adpt_appe_vport_state_check_set;
+	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_STATE_CHECK_GET))
+		p_adpt_api->adpt_vport_state_check_get =
+			adpt_appe_vport_state_check_get;
 
 	return SW_OK;
 }

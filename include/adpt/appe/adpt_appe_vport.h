@@ -20,7 +20,13 @@
 sw_error_t
 adpt_appe_vport_physical_port_id_get(a_uint32_t dev_id,
 		fal_port_t vport_id, fal_port_t *phyport_id);
-
+sw_error_t
 adpt_appe_vport_physical_port_id_set(a_uint32_t dev_id,
 		fal_port_t vport_id, fal_port_t phyport_id);
+sw_error_t
+adpt_appe_vport_state_check_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_state_t *vp_state);
+sw_error_t
+adpt_appe_vport_state_check_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_state_t *vp_state);
 #endif

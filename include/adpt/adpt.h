@@ -743,6 +743,7 @@ typedef sw_error_t (*adpt_pppoe_en_get_func)(
 		a_uint32_t l3_if,
 		a_uint32_t *enable);
 
+/*sec module*/
 typedef sw_error_t (*adpt_sec_l3_excep_parser_ctrl_set_func)(
 		a_uint32_t dev_id,
 		fal_l3_excep_parser_ctrl *ctrl);
@@ -756,6 +757,26 @@ typedef sw_error_t (*adpt_sec_l3_excep_ctrl_set_func)(
 		a_uint32_t dev_id, a_uint32_t excep_type, fal_l3_excep_ctrl_t *ctrl);
 typedef sw_error_t (*adpt_sec_l4_excep_parser_ctrl_get_func)(
 		a_uint32_t dev_id, fal_l4_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_l2_excep_ctrl_set_func)(
+        a_uint32_t dev_id, a_uint32_t excep_type, fal_l2_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_l2_excep_ctrl_get_func)(
+		a_uint32_t dev_id, a_uint32_t excep_type, fal_l2_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_excep_ctrl_set_func)(
+		a_uint32_t dev_id, a_uint32_t excep_type, fal_tunnel_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_excep_ctrl_get_func)(
+		a_uint32_t dev_id, a_uint32_t excep_type, fal_tunnel_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l3_excep_parser_ctrl_set_func)(
+		a_uint32_t dev_id, fal_l3_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l3_excep_parser_ctrl_get_func)(
+		a_uint32_t dev_id, fal_l3_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l4_excep_parser_ctrl_set_func)(
+		a_uint32_t dev_id, fal_l4_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l4_excep_parser_ctrl_get_func)(
+		a_uint32_t dev_id, fal_l4_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_flags_excep_parser_ctrl_set_func)(
+		a_uint32_t dev_id, a_uint32_t index, fal_tunnel_flags_excep_parser_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_flags_excep_parser_ctrl_get_func)(
+		a_uint32_t dev_id, a_uint32_t index, fal_tunnel_flags_excep_parser_ctrl_t *ctrl);
 
 typedef sw_error_t (*adpt_acl_list_bind_func)(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t direc, fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx);
 typedef sw_error_t (*adpt_acl_list_dump_func)(a_uint32_t dev_id);
@@ -1654,6 +1675,16 @@ typedef struct
 	adpt_sec_l4_excep_parser_ctrl_set_func adpt_sec_l4_excep_parser_ctrl_set;
 	adpt_sec_l3_excep_ctrl_set_func adpt_sec_l3_excep_ctrl_set;
 	adpt_sec_l4_excep_parser_ctrl_get_func adpt_sec_l4_excep_parser_ctrl_get;
+	adpt_sec_l2_excep_ctrl_set_func adpt_sec_l2_excep_ctrl_set;
+	adpt_sec_l2_excep_ctrl_get_func adpt_sec_l2_excep_ctrl_get;
+	adpt_sec_tunnel_excep_ctrl_set_func adpt_sec_tunnel_excep_ctrl_set;
+	adpt_sec_tunnel_excep_ctrl_get_func adpt_sec_tunnel_excep_ctrl_get;
+	adpt_sec_tunnel_l3_excep_parser_ctrl_set_func adpt_sec_tunnel_l3_excep_parser_ctrl_set;
+	adpt_sec_tunnel_l3_excep_parser_ctrl_get_func adpt_sec_tunnel_l3_excep_parser_ctrl_get;
+	adpt_sec_tunnel_l4_excep_parser_ctrl_set_func adpt_sec_tunnel_l4_excep_parser_ctrl_set;
+	adpt_sec_tunnel_l4_excep_parser_ctrl_get_func adpt_sec_tunnel_l4_excep_parser_ctrl_get;
+	adpt_sec_tunnel_flags_excep_parser_ctrl_set_func adpt_sec_tunnel_flags_excep_parser_ctrl_set;
+	adpt_sec_tunnel_flags_excep_parser_ctrl_get_func adpt_sec_tunnel_flags_excep_parser_ctrl_get;
 
 	/*acl*/
 	a_uint32_t adpt_acl_func_bitmap;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2015-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -282,6 +282,9 @@ typedef enum
 	SW_TUNNEL_DECAP_ECN_ACTION,
 	SW_TUNNEL_ENCAP_ECN_RULE,
 	SW_TUNNEL_ECN_VAL,
+	SW_L2_EXP_CTRL,
+	SW_TUNNEL_EXP_CTRL,
+	SW_TUNNEL_FLAGS_PARSER,
 /* auto_insert_flag */
 } sw_data_type_e;
 

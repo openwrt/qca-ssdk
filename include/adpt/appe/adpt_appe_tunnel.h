@@ -103,5 +103,8 @@ adpt_appe_tunnel_encap_rule_entry_get(a_uint32_t dev_id, a_uint32_t rule_id,
 sw_error_t
 adpt_appe_tunnel_encap_rule_entry_del(a_uint32_t dev_id, a_uint32_t rule_id,
 		fal_tunnel_encap_rule_t *rule_entry);
-
+sw_error_t
+adpt_appe_tunnel_exp_decap_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
+sw_error_t
+adpt_appe_tunnel_exp_decap_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
 #endif

@@ -175,6 +175,38 @@ _fal_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_ru
     return rv;
 }
 
+sw_error_t
+_fal_tunnel_exp_decap_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_tunnel_exp_decap_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_tunnel_exp_decap_set(dev_id, port_id, enable);
+    return rv;
+}
+
+sw_error_t
+_fal_tunnel_exp_decap_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_tunnel_exp_decap_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_tunnel_exp_decap_get(dev_id, port_id, enable);
+    return rv;
+}
+
 static sw_error_t
 _fal_tunnel_encap_entry_get(a_uint32_t dev_id, a_uint32_t tunnel_id,
 		fal_tunnel_encap_cfg_t *tunnel_encap_cfg)
@@ -1384,6 +1416,32 @@ fal_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rul
     return rv;
 }
 
+sw_error_t
+fal_tunnel_exp_decap_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_tunnel_exp_decap_set(dev_id, port_id, enable);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+sw_error_t
+fal_tunnel_exp_decap_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_tunnel_exp_decap_get(dev_id, port_id, enable);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+EXPORT_SYMBOL(fal_tunnel_exp_decap_set);
+EXPORT_SYMBOL(fal_tunnel_exp_decap_get);
 EXPORT_SYMBOL(fal_tunnel_encap_header_ctrl_set);
 EXPORT_SYMBOL(fal_tunnel_encap_header_ctrl_get);
 EXPORT_SYMBOL(fal_tunnel_decap_entry_add);

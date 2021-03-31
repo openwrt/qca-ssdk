@@ -1269,6 +1269,12 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_tunnel_udf_profile_cfg_get_func)(a_uint32_t dev_id, a_uint32_t profile_id,
 		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
+typedef sw_error_t
+(*adpt_tunnel_exp_decap_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, a_bool_t *enable);
+typedef sw_error_t
+(*adpt_tunnel_exp_decap_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, a_bool_t *enable);
 
 /*tunnel program*/
 typedef sw_error_t (*adpt_tunnel_program_entry_add_func)(a_uint32_t dev_id,
@@ -1942,6 +1948,9 @@ typedef struct
 	adpt_tunnel_udf_profile_entry_getnext_func adpt_tunnel_udf_profile_entry_getnext;
 	adpt_tunnel_udf_profile_cfg_set_func adpt_tunnel_udf_profile_cfg_set;
 	adpt_tunnel_udf_profile_cfg_get_func adpt_tunnel_udf_profile_cfg_get;
+	adpt_tunnel_exp_decap_set_func adpt_tunnel_exp_decap_set;
+	adpt_tunnel_exp_decap_get_func adpt_tunnel_exp_decap_get;
+
 	/*vxlan*/
 	a_uint32_t adpt_vxlan_func_bitmap;
 	adpt_vxlan_entry_add_func adpt_vxlan_entry_add;

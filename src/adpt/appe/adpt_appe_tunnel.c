@@ -27,6 +27,8 @@
 #include "appe_portvlan.h"
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
+#include "appe_l2_vp_reg.h"
+#include "appe_l2_vp.h"
 #include "adpt.h"
 
 #define TUNNEL_ENCAP_FROM_VP	0
@@ -2546,6 +2548,48 @@ adpt_appe_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
 	return SW_OK;
 }
 
+sw_error_t
+adpt_appe_tunnel_exp_decap_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_val = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(enable);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_val, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	l2_vp_port_tbl.bf.exception_fmt_ctrl = *enable;
+
+	rv = appe_l2_vp_port_tbl_set(dev_id, port_val, &l2_vp_port_tbl);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_tunnel_exp_decap_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_val = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(enable);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_val, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	*enable = l2_vp_port_tbl.bf.exception_fmt_ctrl;
+
+	return rv;
+}
+
 void adpt_appe_tunnel_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -2604,6 +2648,8 @@ static void adpt_appe_tunnel_func_unregister(a_uint32_t dev_id, adpt_api_t *p_ad
 	p_adpt_api->adpt_tunnel_decap_ecn_mode_get = NULL;
 	p_adpt_api->adpt_tunnel_encap_ecn_mode_set = NULL;
 	p_adpt_api->adpt_tunnel_encap_ecn_mode_get = NULL;
+	p_adpt_api->adpt_tunnel_exp_decap_set = NULL;
+	p_adpt_api->adpt_tunnel_exp_decap_get = NULL;
 
 	return;
 }
@@ -2746,6 +2792,12 @@ adpt_appe_tunnel_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_tunnel_udf_profile_cfg_get =
 			adpt_appe_tunnel_udf_profile_cfg_get;
 	}
+	if (p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_EXP_DECAP_SET % 32))
+		p_adpt_api->adpt_tunnel_exp_decap_set=
+			adpt_appe_tunnel_exp_decap_set;
+	if (p_adpt_api->adpt_tunnel_func_bitmap[1] & BIT(FUNC_TUNNEL_EXP_DECAP_GET % 32))
+		p_adpt_api->adpt_tunnel_exp_decap_get=
+			adpt_appe_tunnel_exp_decap_get;
 
 	return SW_OK;
 }

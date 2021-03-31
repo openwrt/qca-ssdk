@@ -5382,6 +5382,24 @@ extern "C" {
     SW_PARAM_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, SW_UINT32, \
 			sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "udf_offset"),
 
+#define SW_API_TUNNEL_EXP_DECAP_GET_DESC \
+	SW_PARAM_DEF(SW_API_TUNNEL_EXP_DECAP_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_TUNNEL_EXP_DECAP_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id "),\
+	SW_PARAM_DEF(SW_API_TUNNEL_EXP_DECAP_GET, SW_ENABLE, \
+			sizeof(a_bool_t), \
+			SW_PARAM_PTR|SW_PARAM_OUT, "decap exp fmt control"),
+
+#define SW_API_TUNNEL_EXP_DECAP_SET_DESC \
+	SW_PARAM_DEF(SW_API_TUNNEL_EXP_DECAP_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_TUNNEL_EXP_DECAP_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id "),\
+	SW_PARAM_DEF(SW_API_TUNNEL_EXP_DECAP_SET, SW_ENABLE, \
+			sizeof(a_bool_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "decap exp fmt control"),
+
 #define SW_API_VXLAN_ENTRY_ADD_DESC \
     SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_VXLAN_ENTRY_ADD, SW_VXLAN_TYPE, \

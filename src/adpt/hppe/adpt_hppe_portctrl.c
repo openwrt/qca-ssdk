@@ -160,6 +160,12 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 		phy_status->link_status = PORT_LINK_UP;
 		switch (reg_field & 0x7)
 		{
+			case MAC_SPEED_10M:
+				phy_status->speed = FAL_SPEED_10;
+				break;
+			case MAC_SPEED_100M:
+				phy_status->speed = FAL_SPEED_100;
+				break;
 			case MAC_SPEED_1000M:
 				phy_status->speed = FAL_SPEED_1000;
 				break;

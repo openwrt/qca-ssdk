@@ -1122,6 +1122,38 @@ extern "C" {
 	SW_PARAM_DEF(SW_API_PT_VLAN_VPGROUP_GET, SW_UINT32, \
 			sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "Vpgroup Id"),
 
+#define SW_API_PT_VLAN_ISOL_SET_DESC \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_SET, SW_ISOL_CTRL, \
+		    sizeof(fal_portvlan_isol_ctrl_t), SW_PARAM_PTR|SW_PARAM_IN, "Isol Control"),
+
+#define SW_API_PT_VLAN_ISOL_GET_DESC \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GET, SW_ISOL_CTRL, \
+		    sizeof(fal_portvlan_isol_ctrl_t), SW_PARAM_PTR|SW_PARAM_OUT, "Isol Control"),
+
+#define SW_API_PT_VLAN_ISOL_GROUP_SET_DESC \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GROUP_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GROUP_SET, SW_UINT8, \
+		    sizeof(a_uint8_t), SW_PARAM_IN, "Group Id"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GROUP_SET, SW_UINT64, \
+		    sizeof(a_uint64_t), SW_PARAM_PTR|SW_PARAM_IN, "Group member"),
+
+#define SW_API_PT_VLAN_ISOL_GROUP_GET_DESC \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GROUP_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GROUP_GET, SW_UINT8, \
+		    sizeof(a_uint8_t), SW_PARAM_IN, "Group Id"), \
+    SW_PARAM_DEF(SW_API_PT_VLAN_ISOL_GROUP_GET, SW_UINT64, \
+		    sizeof(a_uint64_t), SW_PARAM_PTR|SW_PARAM_OUT, "Group member"),
+
 #define SW_API_FDB_ADD_DESC \
     SW_PARAM_DEF(SW_API_FDB_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),\
     SW_PARAM_DEF(SW_API_FDB_ADD, SW_FDBENTRY, \

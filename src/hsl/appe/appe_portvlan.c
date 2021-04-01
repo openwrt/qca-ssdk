@@ -188,6 +188,41 @@ appe_tpr_vlan_tpid_set(
 }
 
 sw_error_t
+appe_vp_isol_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vp_isol_tbl_u *value)
+{
+	if (index >= VP_ISOL_TBL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	return hppe_reg_tbl_get(
+				dev_id,
+				IPE_L2_BASE_ADDR + VP_ISOL_TBL_ADDRESS + \
+				index * VP_ISOL_TBL_INC,
+				value->val,
+				2);
+}
+
+sw_error_t
+appe_vp_isol_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vp_isol_tbl_u *value)
+{
+	if (index >= VP_ISOL_TBL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	return hppe_reg_tbl_set(
+				dev_id,
+				IPE_L2_BASE_ADDR + VP_ISOL_TBL_ADDRESS + \
+				index * VP_ISOL_TBL_INC,
+				value->val,
+				2);
+}
+
+
+sw_error_t
 appe_vport_parsing_port_role_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -1360,5 +1395,40 @@ appe_tpr_vlan_tpid_ctag_tpid_set(
 		return ret;
 	reg_val.bf.ctag_tpid = value;
 	ret = appe_tpr_vlan_tpid_set(dev_id, &reg_val);
+	return ret;
+}
+
+sw_error_t
+appe_vp_isol_tbl_vp_profile_map_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint64_t *value)
+{
+	union vp_isol_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_vp_isol_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	*value = (a_uint64_t)reg_val.bf.vp_profile_map_1 << 32 | \
+		reg_val.bf.vp_profile_map_0;
+	return ret;
+}
+
+sw_error_t
+appe_vp_isol_tbl_vp_profile_map_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint64_t value)
+{
+	union vp_isol_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_vp_isol_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.vp_profile_map_1 = value >> 32;
+	reg_val.bf.vp_profile_map_0 = value & (((a_uint64_t)1<<32)-1);
+	ret = appe_vp_isol_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }

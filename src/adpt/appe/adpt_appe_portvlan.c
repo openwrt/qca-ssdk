@@ -76,6 +76,82 @@ adpt_appe_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
 }
 
 sw_error_t
+adpt_appe_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(isol_ctrl);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	l2_vp_port_tbl.bf.isol_en = isol_ctrl->enable;
+	l2_vp_port_tbl.bf.isol_profile = isol_ctrl->group_id;
+
+	rv = appe_l2_vp_port_tbl_set(dev_id, port_value, &l2_vp_port_tbl);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(isol_ctrl);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	isol_ctrl->enable = l2_vp_port_tbl.bf.isol_en;
+	isol_ctrl->group_id = l2_vp_port_tbl.bf.isol_profile;
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(isol_group_bmp);
+
+	rv = appe_vp_isol_tbl_vp_profile_map_set(dev_id,
+			isol_group_id, *isol_group_bmp);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(isol_group_bmp);
+
+	rv = appe_vp_isol_tbl_vp_profile_map_get(dev_id,
+			isol_group_id, isol_group_bmp);
+
+	return rv;
+}
+
+sw_error_t
 adpt_appe_portvlan_vpmember_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t * mem_port_map)
 {
 	ADPT_DEV_ID_CHECK(dev_id);

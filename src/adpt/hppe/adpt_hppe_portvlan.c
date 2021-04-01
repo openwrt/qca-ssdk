@@ -2728,7 +2728,11 @@ void adpt_hppe_portvlan_func_bitmap_init(a_uint32_t dev_id)
 						(1 << (FUNC_PORT_VLAN_MEMBER_UPDATE % 32)) |
 						(1 << (FUNC_PORT_VLAN_MEMBER_GET % 32)) |
 						(1 << (FUNC_PORT_VLAN_VPGROUP_SET % 32)) |
-						(1 << (FUNC_PORT_VLAN_VPGROUP_GET % 32)));
+						(1 << (FUNC_PORT_VLAN_VPGROUP_GET % 32)) |
+						(1 << (FUNC_PORT_VLAN_ISOL_SET % 32)) |
+						(1 << (FUNC_PORT_VLAN_ISOL_GET % 32)) |
+						(1 << (FUNC_PORT_VLAN_ISOL_GROUP_SET % 32)) |
+						(1 << (FUNC_PORT_VLAN_ISOL_GROUP_GET % 32)));
 
 	return;
 }
@@ -2787,6 +2791,10 @@ static void adpt_hppe_portvlan_func_unregister(a_uint32_t dev_id, adpt_api_t *p_
 	p_adpt_api->adpt_portvlan_member_get = NULL;
 	p_adpt_api->adpt_port_vlan_vpgroup_set = NULL;
 	p_adpt_api->adpt_port_vlan_vpgroup_get = NULL;
+	p_adpt_api->adpt_portvlan_isol_set = NULL;
+	p_adpt_api->adpt_portvlan_isol_get = NULL;
+	p_adpt_api->adpt_portvlan_isol_group_set = NULL;
+	p_adpt_api->adpt_portvlan_isol_group_get = NULL;
 
 	return;
 }
@@ -2909,6 +2917,14 @@ sw_error_t adpt_hppe_portvlan_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_port_vlan_vpgroup_set = adpt_appe_port_vlan_vpgroup_set;
 	if (p_adpt_api->adpt_portvlan_func_bitmap[1] & (1 << (FUNC_PORT_VLAN_VPGROUP_GET % 32)))
 		p_adpt_api->adpt_port_vlan_vpgroup_get = adpt_appe_port_vlan_vpgroup_get;
+	if (p_adpt_api->adpt_portvlan_func_bitmap[1] & (1 << (FUNC_PORT_VLAN_ISOL_SET % 32)))
+		p_adpt_api->adpt_portvlan_isol_set = adpt_appe_portvlan_isol_set;
+	if (p_adpt_api->adpt_portvlan_func_bitmap[1] & (1 << (FUNC_PORT_VLAN_ISOL_GET % 32)))
+		p_adpt_api->adpt_portvlan_isol_get = adpt_appe_portvlan_isol_get;
+	if (p_adpt_api->adpt_portvlan_func_bitmap[1] & (1 << (FUNC_PORT_VLAN_ISOL_GROUP_SET % 32)))
+		p_adpt_api->adpt_portvlan_isol_group_set = adpt_appe_portvlan_isol_group_set;
+	if (p_adpt_api->adpt_portvlan_func_bitmap[1] & (1 << (FUNC_PORT_VLAN_ISOL_GROUP_GET % 32)))
+		p_adpt_api->adpt_portvlan_isol_group_get = adpt_appe_portvlan_isol_group_get;
 #endif
 
 	return SW_OK;

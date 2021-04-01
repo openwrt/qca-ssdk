@@ -285,6 +285,7 @@ typedef enum
 	SW_L2_EXP_CTRL,
 	SW_TUNNEL_EXP_CTRL,
 	SW_TUNNEL_FLAGS_PARSER,
+	SW_ISOL_CTRL,
 /* auto_insert_flag */
 } sw_data_type_e;
 

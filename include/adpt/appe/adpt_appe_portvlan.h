@@ -27,7 +27,18 @@ adpt_appe_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
 sw_error_t
 adpt_appe_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
 		fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id);
-
+sw_error_t
+adpt_appe_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+sw_error_t
+adpt_appe_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+sw_error_t
+adpt_appe_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+sw_error_t
+adpt_appe_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
 sw_error_t
 adpt_appe_portvlan_vpmember_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t * mem_port_map);
 sw_error_t

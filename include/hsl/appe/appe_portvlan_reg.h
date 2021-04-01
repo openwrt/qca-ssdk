@@ -352,4 +352,26 @@ union tpr_vlan_tpid_u {
 	struct tpr_vlan_tpid bf;
 };
 
+/*[table] VP_ISOL_TBL*/
+#define VP_ISOL_TBL
+#define VP_ISOL_TBL_ADDRESS 0x3c000
+#define VP_ISOL_TBL_NUM     64
+#define VP_ISOL_TBL_INC     0x10
+#define VP_ISOL_TBL_TYPE    REG_TYPE_RW
+#define VP_ISOL_TBL_DEFAULT 0x0
+	/*[field] VP_PROFILE_MAP*/
+	#define VP_ISOL_TBL_VP_PROFILE_MAP
+	#define VP_ISOL_TBL_VP_PROFILE_MAP_OFFSET  0
+	#define VP_ISOL_TBL_VP_PROFILE_MAP_LEN     64
+	#define VP_ISOL_TBL_VP_PROFILE_MAP_DEFAULT 0x0
+
+struct vp_isol_tbl {
+	a_uint32_t  vp_profile_map_0:32;
+	a_uint32_t  vp_profile_map_1:32;
+};
+
+union vp_isol_tbl_u {
+	a_uint32_t val[2];
+	struct vp_isol_tbl bf;
+};
 #endif

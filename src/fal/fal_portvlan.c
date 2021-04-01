@@ -2216,6 +2216,74 @@ _fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
 }
 
 sw_error_t
+_fal_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_set(dev_id, port_id, isol_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_get(dev_id, port_id, isol_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_group_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_group_set(dev_id, isol_group_id, isol_group_bmp);
+    return rv;
+}
+
+sw_error_t
+_fal_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_group_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_group_get(dev_id, isol_group_id, isol_group_bmp);
+    return rv;
+}
+
+sw_error_t
 fal_global_qinq_mode_set(a_uint32_t dev_id, fal_global_qinq_mode_t *mode)
 {
     sw_error_t rv = SW_OK;
@@ -2550,6 +2618,58 @@ fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
     return rv;
 }
 
+sw_error_t
+fal_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_set(dev_id, port_id, isol_ctrl);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_get(dev_id, port_id, isol_ctrl);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_group_set(dev_id, isol_group_id, isol_group_bmp);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_group_get(dev_id, isol_group_id, isol_group_bmp);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+EXPORT_SYMBOL(fal_portvlan_isol_set);
+EXPORT_SYMBOL(fal_portvlan_isol_get);
+EXPORT_SYMBOL(fal_portvlan_isol_group_set);
+EXPORT_SYMBOL(fal_portvlan_isol_group_get);
 EXPORT_SYMBOL(fal_port_vlan_vpgroup_set);
 EXPORT_SYMBOL(fal_port_vlan_vpgroup_get);
 EXPORT_SYMBOL(fal_port_invlan_mode_set);

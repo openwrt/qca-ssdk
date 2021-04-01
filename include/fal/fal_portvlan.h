@@ -263,6 +263,10 @@ enum {
 	FUNC_PORT_VLAN_MEMBER_GET,
 	FUNC_PORT_VLAN_VPGROUP_SET,
 	FUNC_PORT_VLAN_VPGROUP_GET,
+	FUNC_PORT_VLAN_ISOL_SET,
+	FUNC_PORT_VLAN_ISOL_GET,
+	FUNC_PORT_VLAN_ISOL_GROUP_SET,
+	FUNC_PORT_VLAN_ISOL_GROUP_GET,
 };
 
 sw_error_t
@@ -616,6 +620,23 @@ typedef struct
 	a_uint64_t tx_byte_counter; /* egress vlan translation byte counter */
 } fal_port_vlan_counter_t;
 
+typedef struct {
+	a_bool_t enable; /*enable or not */
+	a_uint8_t group_id; /* isolation group id */
+} fal_portvlan_isol_ctrl_t;
+
+sw_error_t
+fal_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+sw_error_t
+fal_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+sw_error_t
+fal_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+sw_error_t
+fal_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
 sw_error_t
 fal_port_vlan_counter_get(a_uint32_t dev_id, a_uint32_t cnt_index,
 		fal_port_vlan_counter_t * counter);

@@ -566,7 +566,7 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 	a_uint32_t port_id, phy_addr, phy_i2c_addr, forced_speed, len;
 	const __be32 *paddr;
 	a_bool_t phy_c45, phy_combo, phy_i2c, phy_forced;
-	const char *mac_type = NULL;
+	const char *mac_type = NULL, *media_type = NULL;
 	sw_error_t rv = SW_OK;
 	struct device_node *mdio_node;
 	int phy_reset_gpio = 0;
@@ -662,6 +662,13 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 				}
 				else if (!strncmp("XGMAC_PORT", mac_type, 10)) {
 					port_phyinfo->phy_features |= PHY_F_XGMAC;
+				}
+			}
+
+			if (!of_property_read_string(port_node, "media-type", &media_type)) {
+				if (!strncmp("fiber", media_type, strlen(media_type))) {
+					port_phyinfo->phy_features |= PHY_F_FIBER;
+					SSDK_INFO("[PORT %d] media type is %s\n", port_id, media_type);
 				}
 			}
 

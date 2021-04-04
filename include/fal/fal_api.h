@@ -734,7 +734,9 @@ extern "C" {
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_ENTRY_GETFIRST, fal_acl_udf_profile_entry_getfirst),\
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_ENTRY_GETNEXT, fal_acl_udf_profile_entry_getnext),\
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_SET, fal_acl_udf_profile_cfg_set),\
-    SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_GET, fal_acl_udf_profile_cfg_get),
+    SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_GET, fal_acl_udf_profile_cfg_get),\
+    SW_API_DEF(SW_API_ACL_VPGROUP_SET, fal_acl_vpgroup_set),\
+    SW_API_DEF(SW_API_ACL_VPGROUP_GET, fal_acl_vpgroup_get),
 
 #define ACL_API_PARAM \
     SW_API_DESC(SW_API_ACL_LIST_CREAT) \
@@ -761,7 +763,9 @@ extern "C" {
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_ENTRY_GETFIRST)\
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_ENTRY_GETNEXT) \
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_SET) \
-    SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_GET)
+    SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_GET) \
+    SW_API_DESC(SW_API_ACL_VPGROUP_SET) \
+    SW_API_DESC(SW_API_ACL_VPGROUP_GET)
 #else
 #define ACL_API
 #define ACL_API_PARAM

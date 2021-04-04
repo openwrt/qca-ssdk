@@ -1599,6 +1599,24 @@ extern "C" {
     SW_PARAM_DEF(SW_API_ACL_UDF_PROFILE_CFG_GET, SW_UINT32, 4, \
 		    SW_PARAM_PTR|SW_PARAM_OUT, "udf_offset"),
 
+#define SW_API_ACL_VPGROUP_SET_DESC \
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "vport_id"), \
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_SET, SW_VPORT_TYPE, \
+		    sizeof(fal_vport_type_t), SW_PARAM_IN, "vport_type "),\
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "vpgroup_id"),
+
+#define SW_API_ACL_VPGROUP_GET_DESC \
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "vport_id"), \
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_GET, SW_VPORT_TYPE, \
+		    sizeof(fal_vport_type_t), SW_PARAM_IN, "vport_type "),\
+    SW_PARAM_DEF(SW_API_ACL_VPGROUP_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "vpgroup_id"),
+
 #define SW_API_QOS_SCH_MODE_SET_DESC \
     SW_PARAM_DEF(SW_API_QOS_SCH_MODE_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),\
     SW_PARAM_DEF(SW_API_QOS_SCH_MODE_SET, SW_SCH, \

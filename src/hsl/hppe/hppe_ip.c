@@ -5642,6 +5642,39 @@ hppe_l3_vp_port_tbl_ipv6_sg_cvlan_en_set(
 	return ret;
 }
 
+#if defined(APPE)
+sw_error_t
+appe_l3_vp_port_tbl_ipo_vp_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union l3_vp_port_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_l3_vp_port_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ipo_vp_profile= value;
+	ret = hppe_l3_vp_port_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+appe_l3_vp_port_tbl_ipo_vp_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union l3_vp_port_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_l3_vp_port_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ipo_vp_profile;
+	return ret;
+}
+#endif
+
 sw_error_t
 hppe_in_l3_if_tbl_ttl_dec_bypass_get(
 		a_uint32_t dev_id,

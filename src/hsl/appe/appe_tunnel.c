@@ -7990,6 +7990,37 @@ appe_tl_port_vp_tbl_set(
 }
 
 sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union tl_port_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_port_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.pre_ipo_profile;
+	return ret;
+}
+
+sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union tl_port_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_port_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.pre_ipo_profile = value;
+	ret = appe_tl_port_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
 appe_tl_vlan_tbl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

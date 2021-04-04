@@ -3114,6 +3114,18 @@ appe_tl_port_vp_tbl_set(
 		union tl_port_vp_tbl_u *value);
 
 sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
 appe_tl_vlan_tbl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

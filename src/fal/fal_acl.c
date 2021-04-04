@@ -448,6 +448,38 @@ _fal_acl_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
     rv = p_api->adpt_acl_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset);
     return rv;
 }
+
+sw_error_t
+_fal_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
+                fal_vport_type_t vport_type, a_uint32_t vpgroup_id)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_vpgroup_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_vpgroup_set(dev_id, vport_id, vport_type, vpgroup_id);
+    return rv;
+}
+
+sw_error_t
+_fal_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
+                fal_vport_type_t vport_type, a_uint32_t * vpgroup_id)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_acl_vpgroup_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_acl_vpgroup_get(dev_id, vport_id, vport_type, vpgroup_id);
+    return rv;
+}
 /*insert flag for inner fal, don't remove it*/
 
 sw_error_t
@@ -933,6 +965,45 @@ fal_acl_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
     return rv;
 }
 
+/**
+ * @brief set acl vpgroup
+ * @param[in] dev_id device id
+ * @param[in] vport_id vport id
+ * @param[in] vport_type vport type
+ * @param[in] vpgroup_id vpgroup id
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
+		fal_vport_type_t vport_type, a_uint32_t vpgroup_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_vpgroup_set(dev_id, vport_id, vport_type, vpgroup_id)
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+/**
+ * @brief set acl vpgroup
+ * @param[in] dev_id device id
+ * @param[in] vport_id vport id
+ * @param[in] vport_type vport type
+ * @param[out] vpgroup_id vpgroup id
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
+		fal_vport_type_t vport_type, a_uint32_t * vpgroup_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_acl_vpgroup_get(dev_id, vport_id, vport_type, vpgroup_id)
+    FAL_API_UNLOCK;
+    return rv;
+}
 /*insert flag for outter fal, don't remove it*/
 
 EXPORT_SYMBOL(fal_acl_list_creat);
@@ -958,4 +1029,5 @@ EXPORT_SYMBOL(fal_acl_udf_profile_entry_getfirst);
 EXPORT_SYMBOL(fal_acl_udf_profile_entry_getnext);
 EXPORT_SYMBOL(fal_acl_udf_profile_cfg_set);
 EXPORT_SYMBOL(fal_acl_udf_profile_cfg_get);
-
+EXPORT_SYMBOL(fal_acl_vpgroup_set);
+EXPORT_SYMBOL(fal_acl_vpgroup_get);

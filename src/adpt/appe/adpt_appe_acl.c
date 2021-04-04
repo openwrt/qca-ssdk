@@ -26,6 +26,10 @@
 #include "appe_acl.h"
 #include "adpt_appe_acl.h"
 #include "adpt_hppe_acl.h"
+#include "hppe_ip_reg.h"
+#include "hppe_ip.h"
+#include "appe_tunnel_reg.h"
+#include "appe_tunnel.h"
 
 #define NON_IP_PROFILE_ID 7
 #define IP4_PROFILE_ID 6
@@ -1880,6 +1884,45 @@ adpt_appe_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type
 	return adpt_appe_acl_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset);
 }
 
+sw_error_t
+adpt_appe_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
+       fal_vport_type_t vport_type, a_uint32_t vpgroup_id)
+{
+	if(vport_type == FAL_VPORT_TYPE_TUNNEL)
+	{
+		return appe_tl_port_vp_tbl_pre_ipo_profile_set(dev_id,
+				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+	}
+	else if(vport_type == FAL_VPORT_TYPE_NORMAL)
+	{
+		return appe_l3_vp_port_tbl_ipo_vp_profile_set(dev_id,
+				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+	}
+	else
+	{
+		return SW_BAD_VALUE;
+	}
+}
+
+sw_error_t
+adpt_appe_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
+       fal_vport_type_t vport_type, a_uint32_t * vpgroup_id)
+{
+	if(vport_type == FAL_VPORT_TYPE_TUNNEL)
+	{
+		return appe_tl_port_vp_tbl_pre_ipo_profile_get(dev_id,
+				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+	}
+	else if(vport_type == FAL_VPORT_TYPE_NORMAL)
+	{
+		return appe_l3_vp_port_tbl_ipo_vp_profile_get(dev_id,
+				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+	}
+	else
+	{
+		return SW_BAD_VALUE;
+	}
+}
 /**
  * @}
  */

@@ -4708,7 +4708,9 @@ void adpt_hppe_acl_func_bitmap_init(a_uint32_t dev_id)
 							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETFIRST)|
 							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETNEXT)|
 							(1<<FUNC_ACL_UDF_PROFILE_CFG_SET)|
-							(1<<FUNC_ACL_UDF_PROFILE_CFG_GET));
+							(1<<FUNC_ACL_UDF_PROFILE_CFG_GET)|
+							(1<<FUNC_ACL_VPGROUP_SET)|
+							(1<<FUNC_ACL_VPGROUP_GET));
 	}
 #endif
 	return;
@@ -4736,6 +4738,8 @@ static void adpt_hppe_acl_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_
 	p_adpt_api->adpt_acl_udf_profile_entry_getnext = NULL;
 	p_adpt_api->adpt_acl_udf_profile_cfg_set = NULL;
 	p_adpt_api->adpt_acl_udf_profile_cfg_get = NULL;
+	p_adpt_api->adpt_acl_vpgroup_set = NULL;
+	p_adpt_api->adpt_acl_vpgroup_get = NULL;
 
 	return;
 }
@@ -4857,6 +4861,16 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 		{
 			p_adpt_api->adpt_acl_udf_profile_cfg_get =
 					adpt_appe_acl_udf_profile_cfg_get;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_VPGROUP_SET))
+		{
+			p_adpt_api->adpt_acl_vpgroup_set =
+					adpt_appe_acl_vpgroup_set;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_VPGROUP_GET))
+		{
+			p_adpt_api->adpt_acl_vpgroup_get =
+					adpt_appe_acl_vpgroup_get;
 		}
 	}
 #endif

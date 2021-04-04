@@ -37,9 +37,9 @@ enum {
 };
 
 typedef enum {
-	FUNC_VPORT_TYPE_TUNNEL = 0,
-	FUNC_VPORT_TYPE_NORMAL,
-	FUNC_VPORT_TYPE_BUTT,
+	FAL_VPORT_TYPE_TUNNEL = 0,
+	FAL_VPORT_TYPE_NORMAL,
+	FAL_VPORT_TYPE_BUTT,
 } fal_vport_type_t;
 
 typedef struct {

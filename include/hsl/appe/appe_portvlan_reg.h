@@ -254,6 +254,11 @@ union vlan_port_vp_tbl_u {
 	#define EG_VP_TBL_TUNNEL_ID_OFFSET  44
 	#define EG_VP_TBL_TUNNEL_ID_LEN     7
 	#define EG_VP_TBL_TUNNEL_ID_DEFAULT 0x0
+	/*[field] CNT_MODE*/
+	#define EG_VP_TBL_CNT_MODE
+	#define EG_VP_TBL_CNT_MODE_OFFSET  51
+	#define EG_VP_TBL_CNT_MODE_LEN     1
+	#define EG_VP_TBL_CNT_MODE_DEFAULT 0x0
 
 struct eg_vp_tbl {
 	a_uint32_t  port_def_svid:12;
@@ -270,7 +275,8 @@ struct eg_vp_tbl {
 	a_uint32_t  xlat_profile:8;
 	a_uint32_t  tunnel_valid:1;
 	a_uint32_t  tunnel_id:7;
-	a_uint32_t  _reserved0:13;
+	a_uint32_t  cnt_mode:1;
+	a_uint32_t  _reserved0:12;
 };
 
 union eg_vp_tbl_u {

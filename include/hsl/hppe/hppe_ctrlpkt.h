@@ -252,6 +252,19 @@ appe_app_ctrl_port_type_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+
+sw_error_t
+appe_l2_cpu_code_ctrl_exception_fmt_ctrl_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_l2_cpu_code_ctrl_exception_fmt_ctrl_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
 #endif
 #endif
 

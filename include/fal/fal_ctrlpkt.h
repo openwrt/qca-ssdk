@@ -79,6 +79,8 @@ enum {
 	FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT,
 	FUNC_MGMTCTRL_VPGROUP_SET,
 	FUNC_MGMTCTRL_VPGROUP_GET,
+	FUNC_MGMTCTRL_TUNNEL_DECAP_SET,
+	FUNC_MGMTCTRL_TUNNEL_DECAP_GET,
 };
 
 sw_error_t fal_mgmtctrl_ethtype_profile_set(a_uint32_t dev_id, a_uint32_t profile_id, a_uint32_t ethtype);
@@ -93,7 +95,10 @@ sw_error_t fal_mgmtctrl_ctrlpkt_profile_getfirst(a_uint32_t dev_id, fal_ctrlpkt_
 sw_error_t fal_mgmtctrl_ctrlpkt_profile_getnext(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
 sw_error_t fal_mgmtctrl_vpgroup_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vpgroup_id);
 sw_error_t fal_mgmtctrl_vpgroup_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vpgroup_id);
-
+sw_error_t fal_mgmtctrl_tunnel_decap_set(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t enable);
+sw_error_t fal_mgmtctrl_tunnel_decap_get(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t *enable);
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

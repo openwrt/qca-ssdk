@@ -160,4 +160,28 @@ union app_ctrl_u {
 	struct app_ctrl bf;
 };
 
+#ifdef APPE
+/*[register] L2_CPU_CODE_CTRL*/
+#define L2_CPU_CODE_CTRL
+#define L2_CPU_CODE_CTRL_ADDRESS 0x1000
+#define L2_CPU_CODE_CTRL_NUM     256
+#define L2_CPU_CODE_CTRL_INC     0x4
+#define L2_CPU_CODE_CTRL_TYPE    REG_TYPE_RW
+#define L2_CPU_CODE_CTRL_DEFAULT 0x0
+	/*[field] EXCEPTION_FMT_CTRL_EN*/
+	#define L2_CPU_CODE_CTRL_EXCEPTION_FMT_CTRL_EN
+	#define L2_CPU_CODE_CTRL_EXCEPTION_FMT_CTRL_EN_OFFSET  0
+	#define L2_CPU_CODE_CTRL_EXCEPTION_FMT_CTRL_EN_LEN     1
+	#define L2_CPU_CODE_CTRL_EXCEPTION_FMT_CTRL_EN_DEFAULT 0x0
+
+struct l2_cpu_code_ctrl {
+	a_uint32_t  exception_fmt_ctrl_en:1;
+	a_uint32_t  _reserved0:31;
+};
+
+union l2_cpu_code_ctrl_u {
+	a_uint32_t val;
+	struct l2_cpu_code_ctrl bf;
+};
+#endif
 #endif

@@ -345,7 +345,9 @@ void adpt_hppe_ctrlpkt_func_bitmap_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_ctrlpkt_func_bitmap |= (
 						(1 << FUNC_MGMTCTRL_VPGROUP_SET) |
-						(1 << FUNC_MGMTCTRL_VPGROUP_GET));
+						(1 << FUNC_MGMTCTRL_VPGROUP_GET) |
+						(1 << FUNC_MGMTCTRL_TUNNEL_DECAP_SET) |
+						(1 << FUNC_MGMTCTRL_TUNNEL_DECAP_GET));
 	}
 #endif
 
@@ -370,6 +372,8 @@ static void adpt_hppe_ctrlpkt_func_unregister(a_uint32_t dev_id, adpt_api_t *p_a
 	{
 		p_adpt_api->adpt_mgmtctrl_vpgroup_set = NULL;
 		p_adpt_api->adpt_mgmtctrl_vpgroup_get = NULL;
+		p_adpt_api->adpt_mgmtctrl_tunnel_decap_set = NULL;
+		p_adpt_api->adpt_mgmtctrl_tunnel_decap_get = NULL;
 	}
 #endif
 	return;
@@ -411,6 +415,12 @@ sw_error_t adpt_hppe_ctrlpkt_init(a_uint32_t dev_id)
 		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_VPGROUP_GET))
 			p_adpt_api->adpt_mgmtctrl_vpgroup_get =
 				adpt_appe_mgmtctrl_vpgroup_get;
+		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_TUNNEL_DECAP_SET))
+			p_adpt_api->adpt_mgmtctrl_tunnel_decap_set =
+				adpt_appe_mgmtctrl_tunnel_decap_set;
+		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_TUNNEL_DECAP_GET))
+			p_adpt_api->adpt_mgmtctrl_tunnel_decap_get =
+				adpt_appe_mgmtctrl_tunnel_decap_get;
 	}
 #endif
 	return SW_OK;

@@ -609,4 +609,65 @@ appe_app_ctrl_port_type_set(
 	ret = hppe_app_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
+
+sw_error_t
+appe_l2_cpu_code_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union l2_cpu_code_ctrl_u *value)
+{
+	if (index >= L2_CPU_CODE_CTRL_NUM)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_get(
+				dev_id,
+				IPE_L2_BASE_ADDR + L2_CPU_CODE_CTRL_ADDRESS + \
+				index * L2_CPU_CODE_CTRL_INC,
+				&value->val);
+}
+
+sw_error_t
+appe_l2_cpu_code_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union l2_cpu_code_ctrl_u *value)
+{
+	if (index >= L2_CPU_CODE_CTRL_NUM)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_set(
+				dev_id,
+				IPE_L2_BASE_ADDR + L2_CPU_CODE_CTRL_ADDRESS + \
+				index * L2_CPU_CODE_CTRL_INC,
+				value->val);
+}
+
+sw_error_t
+appe_l2_cpu_code_ctrl_exception_fmt_ctrl_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union l2_cpu_code_ctrl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_l2_cpu_code_ctrl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.exception_fmt_ctrl_en;
+	return ret;
+}
+
+sw_error_t
+appe_l2_cpu_code_ctrl_exception_fmt_ctrl_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union l2_cpu_code_ctrl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_l2_cpu_code_ctrl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.exception_fmt_ctrl_en = value;
+	ret = appe_l2_cpu_code_ctrl_set(dev_id, index, &reg_val);
+	return ret;
+}
 #endif

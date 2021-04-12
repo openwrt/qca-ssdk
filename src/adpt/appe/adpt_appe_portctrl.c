@@ -19,6 +19,8 @@
 #include "appe_global.h"
 #include "adpt.h"
 #include "adpt_appe_portctrl.h"
+#include "hppe_portctrl_reg.h"
+#include "hppe_portctrl.h"
 
 sw_error_t
 _adpt_appe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -90,3 +92,40 @@ _adpt_appe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
+#ifndef IN_PORTCONTROL_MINI
+sw_error_t adpt_appe_port_8023ah_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if(!ADPT_IS_PPORT (port_id))
+	{
+		SSDK_ERROR ("port 0x%x is not supported", port_id);
+		return SW_OUT_OF_RANGE;
+	}
+	rv = appe_link_oam_ctrl_loopback_state_set (dev_id, port_id,
+		port_8023ah_ctrl->loopback_enable);
+
+	return rv;
+}
+
+sw_error_t adpt_appe_port_8023ah_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if(!ADPT_IS_PPORT (port_id))
+	{
+		SSDK_ERROR ("port 0x%x is not supported", port_id);
+		return SW_OUT_OF_RANGE;
+	}
+	rv = appe_link_oam_ctrl_loopback_state_get (dev_id, port_id,
+		&(port_8023ah_ctrl->loopback_enable));
+
+	return rv;
+}
+#endif

@@ -5763,6 +5763,14 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_switch_port_loopback_get = adpt_cppe_switch_port_loopback_get;
 	}
 #endif
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#ifndef IN_PORTCONTROL_MINI
+		p_adpt_api->adpt_port_8023ah_set = adpt_appe_port_8023ah_set;
+		p_adpt_api->adpt_port_8023ah_get = adpt_appe_port_8023ah_get;
+#endif
+	}
+#endif
 	return SW_OK;
 }
 

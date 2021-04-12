@@ -3501,4 +3501,68 @@ hppe_ipr_byte_high_reg_bytes_set(
 	return ret;
 }
 #endif
+#ifdef APPE
+#ifndef IN_PORTCONTROL_MINI
+sw_error_t
+appe_link_oam_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union link_oam_ctrl_u *value)
+{
+	if (index >= LINK_OAM_CTRL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_get(
+				dev_id,
+				IPE_L2_BASE_ADDR + LINK_OAM_CTRL_ADDRESS + \
+				index * LINK_OAM_CTRL_INC,
+				&value->val);
+}
 
+sw_error_t
+appe_link_oam_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union link_oam_ctrl_u *value)
+{
+	if (index >= LINK_OAM_CTRL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	return hppe_reg_set(
+				dev_id,
+				IPE_L2_BASE_ADDR + LINK_OAM_CTRL_ADDRESS + \
+				index * LINK_OAM_CTRL_INC,
+				value->val);
+}
+
+sw_error_t
+appe_link_oam_ctrl_loopback_state_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union link_oam_ctrl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_link_oam_ctrl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.loopback_state;
+	return ret;
+}
+
+sw_error_t
+appe_link_oam_ctrl_loopback_state_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union link_oam_ctrl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_link_oam_ctrl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.loopback_state = value;
+	ret = appe_link_oam_ctrl_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif
+#endif

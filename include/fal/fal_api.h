@@ -128,7 +128,9 @@ extern "C" {
     SW_API_DEF(SW_API_PT_SOURCE_FILTER_CONFIG_GET, fal_port_source_filter_config_get), \
     SW_API_DEF(SW_API_PT_SOURCE_FILTER_CONFIG_SET, fal_port_source_filter_config_set),  \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_SET, fal_switch_port_loopback_set),  \
-    SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get),
+    SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get),  \
+    SW_API_DEF(SW_API_PT_8023AH_SET, fal_port_8023ah_set),  \
+    SW_API_DEF(SW_API_PT_8023AH_GET, fal_port_8023ah_get),
 /*qca808x_start*/
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
@@ -235,7 +237,9 @@ extern "C" {
     SW_API_DESC(SW_API_PT_SOURCE_FILTER_CONFIG_GET) \
     SW_API_DESC(SW_API_PT_SOURCE_FILTER_CONFIG_SET)  \
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_SET)  \
-    SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_GET)
+    SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_GET)  \
+    SW_API_DESC(SW_API_PT_8023AH_SET)  \
+    SW_API_DESC(SW_API_PT_8023AH_GET)
 /*qca808x_start*/
 /*end of PORTCONTROL_API_PARAM*/
 /*qca808x_end*/

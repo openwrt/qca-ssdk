@@ -417,6 +417,10 @@ typedef struct {
 	a_uint32_t loopback_rate; /*Mpps*/
 }fal_loopback_config_t;
 
+typedef struct {
+	a_bool_t loopback_enable;
+} fal_port_8023ah_ctrl_t;
+
 sw_error_t
 fal_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t max_frame);
@@ -798,7 +802,15 @@ fal_switch_port_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_switch_port_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_loopback_config_t *loopback_cfg);
+#ifndef IN_PORTCONTROL_MINI
+sw_error_t
+fal_port_8023ah_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
 
+sw_error_t
+fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
+#endif
 /*qca808x_start*/
 #ifdef __cplusplus
 }

@@ -44,7 +44,9 @@
 #define IPR_BYTE_HIGH_REG_MAX_ENTRY	8
 #define DROP_CNT_MAX_ENTRY	8
 #define DROP_PKT_STAT_MAX_ENTRY	30
-
+#ifdef APPE
+#define LINK_OAM_CTRL_MAX_ENTRY	8
+#endif
 
 sw_error_t
 hppe_mac_enable_get(
@@ -1429,6 +1431,32 @@ ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_get(
 
 sw_error_t
 ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+#endif
+#ifdef APPE
+sw_error_t
+appe_link_oam_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union link_oam_ctrl_u *value);
+
+sw_error_t
+appe_link_oam_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union link_oam_ctrl_u *value);
+
+sw_error_t
+appe_link_oam_ctrl_loopback_state_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_link_oam_ctrl_loopback_state_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);

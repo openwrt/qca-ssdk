@@ -1979,7 +1979,41 @@ _fal_switch_port_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#ifndef IN_PORTCONTROL_MINI
+static sw_error_t
+_fal_port_8023ah_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl)
+{
 
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_port_8023ah_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_port_8023ah_set(dev_id, port_id, port_8023ah_ctrl);
+	return rv;
+
+}
+
+static sw_error_t
+_fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+	if (NULL == p_api->adpt_port_8023ah_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_port_8023ah_get(dev_id, port_id, port_8023ah_ctrl);
+	return rv;
+
+}
+#endif
 /*qca808x_start*/
 /*insert flag for inner fal, don't remove it*/
 /**
@@ -3627,7 +3661,31 @@ fal_switch_port_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
     FAL_API_UNLOCK;
     return rv;
 }
+#ifndef IN_PORTCONTROL_MINI
+sw_error_t
+fal_port_8023ah_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_8023ah_ctrl_t *port_8023ah_ctrl)
+{
+    sw_error_t rv = SW_OK;
 
+    FAL_API_LOCK;
+    rv = _fal_port_8023ah_set(dev_id, port_id, port_8023ah_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_8023ah_ctrl_t *port_8023ah_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_8023ah_get(dev_id, port_id, port_8023ah_ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+#endif
 /*insert flag for outter fal, don't remove it*/
 /**
  * @}
@@ -3725,4 +3783,7 @@ EXPORT_SYMBOL(fal_port_interface_eee_cfg_set);
 EXPORT_SYMBOL(fal_port_interface_eee_cfg_get);
 EXPORT_SYMBOL(fal_switch_port_loopback_set);
 EXPORT_SYMBOL(fal_switch_port_loopback_get);
-
+#ifndef IN_PORTCONTROL_MINI
+EXPORT_SYMBOL(fal_port_8023ah_set);
+EXPORT_SYMBOL(fal_port_8023ah_get);
+#endif

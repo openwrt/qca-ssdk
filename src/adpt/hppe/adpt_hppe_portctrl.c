@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -45,6 +45,7 @@
 #include "sfp_phy.h"
 #if defined(APPE)
 #include "adpt_appe_portctrl.h"
+#include "appe_l2_vp.h"
 #endif
 
 #define PORT4_PCS_SEL_GMII_FROM_PCS0 1
@@ -964,22 +965,72 @@ adpt_hppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
 {
 	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
+	a_uint32_t port_type = 0, port_value = 0;
 
 	memset(&mru_mtu_ctrl_tbl, 0, sizeof(mru_mtu_ctrl_tbl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
-	hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
+	port_type = FAL_PORT_ID_TYPE(port_id);
+	port_value = FAL_PORT_ID_VALUE(port_id);
+
+	hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
 	mru_mtu_ctrl_tbl.bf.mtu = ctrl->mtu_size;
 	mru_mtu_ctrl_tbl.bf.mtu_cmd = (a_uint32_t)ctrl->action;
-	hppe_mru_mtu_ctrl_tbl_set(dev_id, port_id, &mru_mtu_ctrl_tbl);
+	hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl);
 
-	if ((port_id >= SSDK_PHYSICAL_PORT0) && (port_id <= SSDK_PHYSICAL_PORT7))
+	if ((port_value >= SSDK_PHYSICAL_PORT0) && (port_value <= SSDK_PHYSICAL_PORT7))
 	{
-		hppe_mc_mtu_ctrl_tbl_mtu_set(dev_id, port_id, ctrl->mtu_size);
-		hppe_mc_mtu_ctrl_tbl_mtu_cmd_set(dev_id, port_id, (a_uint32_t)ctrl->action);
+		hppe_mc_mtu_ctrl_tbl_mtu_set(dev_id, port_value, ctrl->mtu_size);
+		hppe_mc_mtu_ctrl_tbl_mtu_cmd_set(dev_id, port_value, (a_uint32_t)ctrl->action);
 	}
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		union l2_vp_port_tbl_u l2_vp_port_tbl = {0};
 
+		SW_RTN_ON_ERROR(appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl));
+		l2_vp_port_tbl.bf.mtu_check_type = ctrl->mtu_type;
+		if(port_type == FAL_PORT_TYPE_VPORT)
+		{
+			if(!ctrl->mtu_enable)
+			{
+				l2_vp_port_tbl.bf.physical_port_mtu_check_en = A_TRUE;
+			}
+			else
+			{
+				l2_vp_port_tbl.bf.physical_port_mtu_check_en = A_FALSE;
+			}
+		}
+		else
+		{
+			if(!ctrl->mtu_enable)
+			{
+				SSDK_ERROR("physical port %d does not support mtu disable\n",
+					port_id);
+				return SW_NOT_SUPPORTED;
+			}
+		}
+		l2_vp_port_tbl.bf.extra_header_len = ctrl->extra_header_len;
+		l2_vp_port_tbl.bf.eg_vlan_fmt_valid = A_FALSE;
+		if(ctrl->eg_vlan_tag_flag != 0)
+		{
+			l2_vp_port_tbl.bf.eg_vlan_fmt_valid = A_TRUE;
+		}
+		l2_vp_port_tbl.bf.eg_ctag_fmt = A_FALSE;
+		if(ctrl->eg_vlan_tag_flag & BIT(0))
+		{
+			l2_vp_port_tbl.bf.eg_ctag_fmt = A_TRUE;
+		}
+		l2_vp_port_tbl.bf.eg_stag_fmt = A_FALSE;
+		if(ctrl->eg_vlan_tag_flag & BIT(1))
+		{
+			l2_vp_port_tbl.bf.eg_stag_fmt = A_TRUE;
+		}
+
+		SW_RTN_ON_ERROR(appe_l2_vp_port_tbl_set (dev_id, port_value, &l2_vp_port_tbl));
+	}
+#endif
 	return SW_OK;
 }
 
@@ -3475,12 +3526,16 @@ adpt_hppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 {
 	sw_error_t rv = SW_OK;
 	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
+	a_uint32_t port_type, port_value;
 
 	memset(&mru_mtu_ctrl_tbl, 0, sizeof(mru_mtu_ctrl_tbl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
-	rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
+	port_type = FAL_PORT_ID_TYPE(port_id);
+	port_value = FAL_PORT_ID_VALUE(port_id);
+
+	rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
 
 	if( rv != SW_OK )
 		return rv;
@@ -3488,6 +3543,36 @@ adpt_hppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 	ctrl->mtu_size = mru_mtu_ctrl_tbl.bf.mtu;
 	ctrl->action = (fal_fwd_cmd_t)mru_mtu_ctrl_tbl.bf.mtu_cmd;
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		union l2_vp_port_tbl_u l2_vp_port_tbl = {0};
+
+		SW_RTN_ON_ERROR(appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl));
+		ctrl->mtu_type = l2_vp_port_tbl.bf.mtu_check_type;
+		ctrl->mtu_enable = A_TRUE;
+		if(port_type == FAL_PORT_TYPE_VPORT)
+		{
+			if(l2_vp_port_tbl.bf.physical_port_mtu_check_en)
+			{
+				ctrl->mtu_enable = A_FALSE;
+			}
+		}
+		ctrl->extra_header_len = l2_vp_port_tbl.bf.extra_header_len;
+		ctrl->eg_vlan_tag_flag = 0;
+		if(l2_vp_port_tbl.bf.eg_vlan_fmt_valid == A_TRUE)
+		{
+			if(l2_vp_port_tbl.bf.eg_ctag_fmt)
+			{
+				ctrl->eg_vlan_tag_flag |= BIT(0);
+			}
+			if(l2_vp_port_tbl.bf.eg_stag_fmt)
+			{
+				ctrl->eg_vlan_tag_flag |= BIT(1);
+			}
+		}
+	}
+#endif
 	return SW_OK;
 }
 
@@ -4056,6 +4141,16 @@ adpt_hppe_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(enable);
 
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE &&
+		ADPT_IS_VPORT(port_id))
+	{
+		a_uint32_t port_value = 0;
+		port_value = FAL_PORT_ID_VALUE(port_id);
+		return appe_l2_vp_port_tbl_promisc_en_get(dev_id, port_value,
+			enable);
+	}
+#endif
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
 	if( rv != SW_OK )
@@ -4074,7 +4169,16 @@ adpt_hppe_port_promisc_mode_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t 
 	union port_bridge_ctrl_u port_bridge_ctrl = {0};
 
 	ADPT_DEV_ID_CHECK(dev_id);
-
+#ifdef APPE
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE &&
+		ADPT_IS_VPORT(port_id))
+	{
+		a_uint32_t port_value = 0;
+		port_value = FAL_PORT_ID_VALUE(port_id);
+		return appe_l2_vp_port_tbl_promisc_en_set(dev_id, port_value,
+			enable);
+	}
+#endif
 	rv = hppe_port_bridge_ctrl_get(dev_id, port_id, &port_bridge_ctrl);
 
 	if( rv != SW_OK )

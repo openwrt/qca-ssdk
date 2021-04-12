@@ -58,6 +58,22 @@ struct attr_des_t
 
 struct attr_des_t g_attr_des[] =
 {
+	{
+		"dest_info_type",
+		{
+			{"port_bmp", FAL_DEST_INFO_PORT_BMP},
+			{"port_id", FAL_DEST_INFO_PORT_ID},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"mtu_type",
+		{
+			{"ethernet", FAL_MTU_ETHERNET},
+			{"ip", FAL_MTU_IP},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -1148,6 +1164,28 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
+
+    cmd_data_check_element("mtu_enable", "enable",
+                        "usage: usage: enable/disable\n",
+                        cmd_data_check_enable, (cmd,
+                        &(entry.mtu_enable), sizeof(entry.mtu_enable)));
+
+    cmd_data_check_element("mtu_type", "ethernet",
+                        "usage:mtu_type:ethernet/ip, etc\n",
+                        cmd_data_check_attr, ("mtu_type", cmd,
+                        &(entry.mtu_type), sizeof(entry.mtu_type)));
+
+    cmd_data_check_element("extra_header_len", "0x80",
+                        "usage: extra_header_len\n",
+                        cmd_data_check_uint32, (cmd,
+                        &(entry.extra_header_len),
+                        sizeof(entry.extra_header_len)));
+
+    cmd_data_check_element("eg_vlan_tag_flag", "0",
+                        "usage: eg_vlan_tag_flag,bit 0 ctag, bit 1 stag\n",
+                        cmd_data_check_uint32, (cmd,
+                        &(entry.eg_vlan_tag_flag),
+                        sizeof(entry.eg_vlan_tag_flag)));
 
     *(fal_mtu_ctrl_t *)val = entry;
     return SW_OK;
@@ -9942,31 +9980,31 @@ cmd_data_check_vsi_bridge_vsi(char *cmd_str, void *arg_val, a_uint32_t size)
 sw_error_t
 cmd_data_check_vsi_invalidvsi_ctrl(char *cmd_str, void *arg_val, a_uint32_t size)
 {
-    sw_error_t rv;
+    char *cmd;
+
     fal_vsi_invalidvsi_ctrl_t invalidvsi_ctrl;
 
     aos_mem_zero(&invalidvsi_ctrl, sizeof (fal_vsi_invalidvsi_ctrl_t));
 
-    rv = __cmd_data_check_complex("dest_en", "disable",
+    cmd_data_check_element("dest_en", "disable",
                         "usage:dest_en,enable/disable\n",
-                        cmd_data_check_enable, &(invalidvsi_ctrl.dest_en),
-                        sizeof (invalidvsi_ctrl.dest_en));
-    SW_RTN_ON_ERROR(rv);
+                        cmd_data_check_enable, (cmd, &(invalidvsi_ctrl.dest_en),
+                        sizeof (invalidvsi_ctrl.dest_en)));
 
-    rv = __cmd_data_check_complex("dest_info_type", "1",
-                        "usage:dest_info_type,0 port_bmp, 1 port_id...\n",
-                        cmd_data_check_uint32, &(invalidvsi_ctrl.dest_info.dest_info_type),
-                        sizeof (invalidvsi_ctrl.dest_info.dest_info_type));
-    SW_RTN_ON_ERROR(rv);
-    rv = __cmd_data_check_complex("dest_info_value", "0",
-                        "usage:dest_info_value, port_id/port_bmp\n",
-                        cmd_data_check_uint32, &(invalidvsi_ctrl.dest_info.dest_info_value),
-                        sizeof (invalidvsi_ctrl.dest_info.dest_info_value));
-    SW_RTN_ON_ERROR(rv);
+    cmd_data_check_element("dest_info_type", "port_id",
+                        "usage:dest_info_type:port_id\n",
+                        cmd_data_check_attr, ("dest_info_type", cmd,
+                        &(invalidvsi_ctrl.dest_info.dest_info_type),
+                        sizeof(invalidvsi_ctrl.dest_info.dest_info_type)));
+
+    cmd_data_check_element("dest_info_value", "0",
+                        "usage:dest_info_value:port_id\n",
+                        cmd_data_check_uint32, (cmd, &(invalidvsi_ctrl.dest_info.dest_info_value),
+                        sizeof (invalidvsi_ctrl.dest_info.dest_info_value)));
 
     *(fal_vsi_invalidvsi_ctrl_t *)arg_val = invalidvsi_ctrl;
 
-    return rv;
+    return SW_OK;
 }
 #endif
 

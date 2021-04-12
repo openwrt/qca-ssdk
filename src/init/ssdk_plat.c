@@ -110,7 +110,6 @@
 /*qca808x_start*/
 
 extern struct qca_phy_priv **qca_phy_priv_global;
-extern ssdk_chip_type SSDK_CURRENT_CHIP_TYPE;
 /*qca808x_end*/
 struct mutex switch_mdio_lock;
 
@@ -170,6 +169,62 @@ static uint32_t switch_chip_id_adjuest(a_uint32_t dev_id)
 #endif
 
 static inline void
+mht_split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page,
+		uint16_t *switch_phy_id)
+{
+	*r1 = regaddr & 0x1c;
+
+	regaddr >>= 5;
+	*r2 = regaddr & 0x7;
+
+	regaddr >>= 3;
+	*page = regaddr & 0xffff;
+
+	regaddr >>= 16;
+	*switch_phy_id = regaddr & 0xff;
+}
+
+a_uint32_t
+qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+{
+	struct mii_bus *bus;
+	uint16_t r1, r2, page, switch_phy_id;
+	uint16_t lo, hi;
+
+	bus = qca_phy_priv_global[dev_id]->miibus;
+
+	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
+	mutex_lock(&switch_mdio_lock);
+	mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
+	udelay(100);
+	lo = mdiobus_read(bus, 0x10 | r2, r1);
+	hi = mdiobus_read(bus, 0x10 | r2, r1 + 2);
+	mutex_unlock(&switch_mdio_lock);
+	return (hi << 16) | lo;
+}
+
+void
+qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
+{
+	struct mii_bus *bus;
+	uint16_t r1, r2, page, switch_phy_id;
+	uint16_t lo, hi;
+
+	bus = qca_phy_priv_global[dev_id]->miibus;
+
+	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
+	lo = val & 0xffff;
+	hi = (a_uint16_t) (val >> 16);
+
+	mutex_lock(&switch_mdio_lock);
+	mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
+	udelay(100);
+	mdiobus_write(bus, 0x10 | r2, r1, lo);
+	mdiobus_write(bus, 0x10 | r2, r1 + 2, hi);
+	mutex_unlock(&switch_mdio_lock);
+}
+
+static inline void
 split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page)
 {
 	regaddr >>= 1;
@@ -208,6 +263,7 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	struct mii_bus *bus;
 	uint16_t r1, r2, r3;
 	uint16_t lo, hi;
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	bus = qca_phy_priv_global[dev_id]->miibus;
 
@@ -218,7 +274,7 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	mutex_lock(&switch_mdio_lock);
 	mdiobus_write(bus, switch_chip_id, switch_chip_reg, r3);
 	udelay(100);
-	if(SSDK_CURRENT_CHIP_TYPE != CHIP_SHIVA) {
+	if(chip_type != CHIP_SHIVA) {
 		mdiobus_write(bus, 0x10 | r2, r1, lo);
 		mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
 	} else {
@@ -227,6 +283,36 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	}
 	mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
 	mutex_unlock(&switch_mdio_lock);
+}
+
+a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+{
+	a_uint32_t val = 0xffffffff;
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
+
+	switch (chip_type) {
+		case CHIP_MHT:
+			val = qca_mht_mii_read(dev_id, reg);
+			break;
+		default:
+			val = qca_ar8216_mii_read(dev_id, reg);
+			break;
+	}
+	return val;
+}
+
+void qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
+{
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
+
+	switch (chip_type) {
+		case CHIP_MHT:
+			qca_mht_mii_write(dev_id, reg, val);
+			break;
+		default:
+			qca_ar8216_mii_write(dev_id, reg, val);
+			break;
+	}
 }
 
 /*qca808x_start*/

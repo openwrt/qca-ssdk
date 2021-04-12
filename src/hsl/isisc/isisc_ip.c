@@ -106,21 +106,20 @@ _isisc_ip_pt_learn_restore(a_uint32_t dev_id, a_uint32_t status)
 static sw_error_t
 _isisc_ip_feature_check(a_uint32_t dev_id)
 {
-    sw_error_t rv;
-    a_uint32_t entry = 0;
+	sw_error_t rv;
+	a_uint32_t entry = 0;
 
-    HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
-                      (a_uint8_t *) (&entry), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
+			(a_uint8_t *) (&entry), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    if (S17C_DEVICE_ID == entry)
-    {
-        return SW_OK;
-    }
-    else
-    {
-        return SW_NOT_SUPPORTED;
-    }
+	switch (entry) {
+		case S17C_DEVICE_ID:
+		case MHT_DEVICE_ID:
+			return SW_OK;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
 }
 
 static sw_error_t

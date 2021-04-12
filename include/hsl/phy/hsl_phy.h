@@ -531,6 +531,7 @@ typedef enum
 	QCA803X_PHY_CHIP,
 	SFP_PHY_CHIP,
 	MPGE_PHY_CHIP,
+	MHT_PHY_CHIP,
 /*qca808x_start*/
 	QCA808X_PHY_CHIP,
 	MAX_PHY_CHIP,
@@ -591,6 +592,8 @@ typedef struct {
 /*qca808x_end*/
 #define MP_GEPHY                0x004DD0C0
 #define SFP_PHY_MASK            0xffffffff
+
+#define MHT_PHY			0x004DD011
 
 #define CABLE_PAIR_A            0
 #define CABLE_PAIR_B            1

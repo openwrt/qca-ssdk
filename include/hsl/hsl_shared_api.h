@@ -19,8 +19,6 @@
 #include "hsl_api.h"
 #include "ssdk_init.h"
 
-extern ssdk_chip_type SSDK_CURRENT_CHIP_TYPE;  /*running chip type*/
-
 #if !defined (HSL_STANDALONG)
 /*MISC API*/
 #define PORT_BC_FILTER_SET fal_port_bc_filter_set

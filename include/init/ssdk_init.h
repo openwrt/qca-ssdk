@@ -131,6 +131,7 @@ enum ssdk_port_wrapper_cfg {
 	PORT_WRAPPER_PSGMII_FIBER,
 	PORT_WRAPPER_SGMII_FIBER,
 	PORT_WRAPPER_UQXGMII, /* for four channels manhattan phy mode*/
+	PORT_WRAPPER_UQXGMII_3CHANNELS, /* for three channels manhattan phy mode*/
 	PORT_WRAPPER_MAX = 0xFF
 };
 
@@ -179,6 +180,7 @@ enum ssdk_port_wrapper_cfg {
         CHIP_HPPE,
 	CHIP_SCOMPHY,
         CHIP_APPE,
+	CHIP_MHT,
     } ssdk_chip_type;
 /*qca808x_end*/
 	typedef struct

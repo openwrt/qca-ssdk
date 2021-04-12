@@ -156,25 +156,36 @@ isisc_dev_init(a_uint32_t dev_id, hsl_init_mode cpu_mode)
                       (a_uint8_t *) (&entry), sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
 
-    if (S17C_DEVICE_ID == entry)
-    {
-        pdev->nr_ports = 7;
-        pdev->nr_phy = 5;
-        pdev->cpu_port_nr = 0;
-        pdev->nr_vlans = 4096;
-        pdev->hw_vlan_query = A_TRUE;
-        pdev->nr_queue = 6;
-        pdev->cpu_mode = cpu_mode;
-    }
-    else
-    {
-        pdev->nr_ports = 6;
-        pdev->nr_phy = 5;
-        pdev->cpu_port_nr = 0;
-        pdev->nr_vlans = 4096;
-        pdev->hw_vlan_query = A_TRUE;
-        pdev->nr_queue = 6;
-        pdev->cpu_mode = cpu_mode;
+    switch (entry) {
+	    case S17C_DEVICE_ID:
+		    pdev->nr_ports = 7;
+		    pdev->nr_phy = 5;
+		    pdev->cpu_port_nr = 0;
+		    pdev->nr_vlans = 4096;
+		    pdev->hw_vlan_query = A_TRUE;
+		    pdev->nr_queue = 6;
+		    pdev->cpu_mode = cpu_mode;
+		    break;
+	    case MHT_DEVICE_ID:
+			pdev->nr_ports = 6;
+			pdev->nr_phy = 4;
+			pdev->cpu_port_nr = 0;
+			pdev->nr_vlans = 4096;
+			pdev->hw_vlan_query = A_TRUE;
+			pdev->nr_queue = 6;
+			pdev->cpu_mode = cpu_mode;
+			break;
+		    /* configured by mht_dev_init function */
+		    break;
+	    default:
+		    pdev->nr_ports = 6;
+		    pdev->nr_phy = 5;
+		    pdev->cpu_port_nr = 0;
+		    pdev->nr_vlans = 4096;
+		    pdev->hw_vlan_query = A_TRUE;
+		    pdev->nr_queue = 6;
+		    pdev->cpu_mode = cpu_mode;
+		    break;
     }
 
     return SW_OK;

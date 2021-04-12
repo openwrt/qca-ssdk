@@ -21,6 +21,7 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
+#define MHT_DEVICE_ID  0x17
 #define S16E_DEVICE_ID  0x11
 #define S17C_DEVICE_ID   0x13 /* TBD */
 #define S17_REVISION_A  0x01

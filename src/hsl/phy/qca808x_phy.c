@@ -27,6 +27,9 @@
 #ifdef IN_LED
 #include "qca808x_led.h"
 #endif
+#if defined(MHT)
+#include "mht_sec_ctrl.h"
+#endif
 
 static a_bool_t phy_dev_drv_init_flag = A_FALSE;
 /*qca808x_start*/
@@ -1520,8 +1523,26 @@ qca808x_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 	/* qca808x phy will automatically switch the interface mode according
 	 * to the speed, 2.5G works on SGMII+, other works on SGMII.
 	 */
+	sw_error_t rv = SW_OK;
 
-	return SW_OK;
+	/* configure the phy work mode of manhattan chip */
+#if defined(MHT)
+	if (phy_id == MHT_PHY) {
+		switch (interface_mode) {
+			case PORT_UQXGMII:
+				rv = qca_mht_work_mode_set(dev_id, PHY_USXGMII_MODE);
+				break;
+			case PORT_UQXGMII_3CHANNELS:
+				rv = qca_mht_work_mode_set(dev_id, PHY_SGMII_USXGMII_MODE);
+				break;
+			default:
+				SSDK_WARN("Unsupport interface mode: %d\n", interface_mode);
+				break;
+		}
+	}
+#endif
+
+	return rv;
 }
 
 /******************************************************************************

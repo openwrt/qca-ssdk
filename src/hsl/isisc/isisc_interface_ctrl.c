@@ -102,9 +102,12 @@ _isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enabl
     SW_RTN_ON_ERROR(rv);
 
     SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    if (S17C_DEVICE_ID != device_id)
-    {
-        return SW_NOT_SUPPORTED;
+    switch (device_id) {
+	    case S17C_DEVICE_ID:
+	    case MHT_DEVICE_ID:
+		    break;
+	    default:
+		    return SW_NOT_SUPPORTED;
     }
 
     SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
@@ -173,9 +176,12 @@ _isisc_port_3az_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * ena
     SW_RTN_ON_ERROR(rv);
 
     SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    if (S17C_DEVICE_ID != device_id)
-    {
-        return SW_NOT_SUPPORTED;
+    switch (device_id) {
+	    case S17C_DEVICE_ID:
+	    case MHT_DEVICE_ID:
+		    break;
+	    default:
+		    return SW_NOT_SUPPORTED;
     }
 
     SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);

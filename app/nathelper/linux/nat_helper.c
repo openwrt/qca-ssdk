@@ -46,11 +46,12 @@ void hnat_log_msg(int level, char *string, ...)
 a_uint32_t nat_dev_id = 0;
 static a_bool_t nat_mirror_status = A_FALSE;
 static fal_port_t nat_mirror_port = 0;
+extern ssdk_chip_type SSDK_CURRENT_CHIP_TYPE[SW_MAX_NR_DEV];
 
 sw_error_t
 nat_helper_init(uint32_t dev_id, uint32_t portbmp)
 {
-	if (fal_switch_devid_get(SSDK_CURRENT_CHIP_TYPE, &nat_dev_id) == SW_OK) {
+	if (fal_switch_devid_get(SSDK_CURRENT_CHIP_TYPE[dev_id], &nat_dev_id) == SW_OK) {
 		/*Add egress port6 if GMAC1 is connected to port6 via SGMII*/
 		if(1 == nat_dev_id) {
 			fal_mirr_analysis_port_get(nat_dev_id, &nat_mirror_port);

@@ -184,6 +184,7 @@ enum {
 	QCA_VER_AR8337 = 0x13,
 	QCA_VER_DESS = 0x14,
 	QCA_VER_HPPE = 0x15,
+	QCA_VER_MHT = 0x17,
 	QCA_VER_APPE = 0x20,
 	QCA_VER_SCOMPHY = 0xEE
 };
@@ -356,6 +357,14 @@ a_uint32_t
 qca_ar8216_mii_read(a_uint32_t dev_id, a_uint32_t reg);
 void
 qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+a_uint32_t
+qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg);
+void
+qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+a_uint32_t
+qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
+void
+qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
 /*qca808x_start*/
 sw_error_t
 qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,

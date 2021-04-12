@@ -335,7 +335,8 @@ __adpt_ppe_gcc_uniphy_software_reset(a_uint32_t dev_id,
 }
 
 static sw_error_t
-__adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
+__adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		fal_port_interface_mode_t mode)
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t i = 0;
@@ -465,6 +466,7 @@ __adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	hppe_sr_mii_ctrl_channel2_set(0, uniphy_index, &sr_mii_ctrl);
 	hppe_sr_mii_ctrl_channel3_set(0, uniphy_index, &sr_mii_ctrl);
 
+	rv = hsl_port_phy_mode_set(dev_id, mode);
 	return rv;
 }
 
@@ -1058,7 +1060,8 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 			clock = UNIPHY_CLK_RATE_312M;
 			break;
 		case PORT_WRAPPER_UQXGMII:
-			rv = __adpt_hppe_uniphy_uqxgmii_mode_set(dev_id, index);
+		case PORT_WRAPPER_UQXGMII_3CHANNELS:
+			rv = __adpt_hppe_uniphy_uqxgmii_mode_set(dev_id, index, mode);
 			clock = UNIPHY_CLK_RATE_312M;
 			break;
 		default:

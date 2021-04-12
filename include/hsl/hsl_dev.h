@@ -36,38 +36,39 @@ do { \
         return SW_OUT_OF_RANGE; \
 } while (0)
 
-    typedef struct
-    {
-        a_uint32_t dev_id;
-        a_uint8_t cpu_port_nr;
-        a_uint8_t nr_ports;
-        a_uint8_t nr_phy;
-        a_uint8_t nr_queue;
-        a_uint16_t nr_vlans;
-        a_bool_t hw_vlan_query;
-        hsl_acl_func_t acl_func;
-        hsl_init_mode  cpu_mode;
-        a_uint32_t wan_bmp;
-    } hsl_dev_t;
+typedef struct {
+	a_uint32_t dev_id;
+	a_uint8_t cpu_port_nr;
+	a_uint8_t nr_ports;
+	a_uint8_t nr_phy;
+	a_uint8_t nr_queue;
+	a_uint16_t nr_vlans;
+	a_bool_t hw_vlan_query;
+	hsl_acl_func_t acl_func;
+	hsl_init_mode  cpu_mode;
+	a_uint32_t wan_bmp;
+} hsl_dev_t;
 
-    hsl_dev_t *hsl_dev_ptr_get(a_uint32_t dev_id);
+hsl_dev_t *hsl_dev_ptr_get(a_uint32_t dev_id);
+ssdk_chip_type hsl_get_current_chip_type(a_uint32_t dev_id);
+
 /*qca808x_end*/
-    hsl_acl_func_t *hsl_acl_ptr_get(a_uint32_t dev_id);
+hsl_acl_func_t *hsl_acl_ptr_get(a_uint32_t dev_id);
 /*qca808x_start*/
-    sw_error_t
-    hsl_dev_init(a_uint32_t dev_id, ssdk_init_cfg * cfg);
+sw_error_t
+hsl_dev_init(a_uint32_t dev_id, ssdk_init_cfg * cfg);
 
-    sw_error_t
-    hsl_dev_cleanup(a_uint32_t dev_id);
+sw_error_t
+hsl_dev_cleanup(a_uint32_t dev_id);
 
 /*qca808x_end*/
-    sw_error_t
-    hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg);
+sw_error_t
+hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg);
 
-    sw_error_t
-    hsl_access_mode_set(a_uint32_t dev_id, hsl_access_mode reg_mode);
+sw_error_t
+hsl_access_mode_set(a_uint32_t dev_id, hsl_access_mode reg_mode);
 
-    a_uint32_t hsl_dev_inner_ports_get(a_uint32_t dev_id);
+a_uint32_t hsl_dev_inner_ports_get(a_uint32_t dev_id);
 
 /*qca808x_start*/
 #ifdef __cplusplus

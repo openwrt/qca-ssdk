@@ -244,6 +244,14 @@ adpt_mp_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 			GMAC_PAUSE_ZERO_QUANTA_ENABLE;
 		mac_operation_mode_ctrl.bf.enable_hw_flowctrl =
 			GMAC_HW_FLOWCTRL_ENABLE;
+		mac_operation_mode_ctrl.bf.disable_flushing_receiving_frame =
+			GMAC_FLUSH_RECEIVED_FRAMES_DISABLE;
+		/*activate flowctrl when 6KB FIFO is available*/
+		mac_operation_mode_ctrl.val &= ~(GMAC_ACTIVATE_FLOWCTRL_MASK);
+		mac_operation_mode_ctrl.val |= GMAC_ACTIVATE_FLOWCTRL_WITH_6KB;
+		/*dactivate flowctrl when 7KB FIFO is available*/
+		mac_operation_mode_ctrl.val &= ~(GMAC_DACTIVATE_FLOWCTRL_MASK);
+		mac_operation_mode_ctrl.val |= GMAC_DACTIVATE_FLOWCTRL_WITH_7KB;
 	} else {
 		mac_flow_ctrl.bf.flowctrl_tx_enable = 0;
 		mac_operation_mode_ctrl.bf.enable_hw_flowctrl =

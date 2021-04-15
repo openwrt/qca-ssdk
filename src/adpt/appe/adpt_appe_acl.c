@@ -155,6 +155,61 @@ _adpt_appe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id,
 }
 
 sw_error_t
+_adpt_appe_acl_policy_id_set(a_uint32_t dev_id, fal_acl_rule_t * rule,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t hw_index;
+
+	while(hw_entries != 0)
+	{
+		hw_index = _acl_bit_index(hw_entries, ADPT_PRE_ACL_ENTRY_NUM_PER_LIST, 0);
+		if(FAL_ACTION_FLG_TST(rule->action_flg, FAL_ACL_ACTION_METADATA_EN))
+		{
+			rv = appe_eg_ipo_ext_tbl_policy_id_set(dev_id,
+				hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index,
+				rule->policy_id);
+		}
+		hw_entries &= (~(1<<hw_index));
+	}
+	return rv;
+}
+
+sw_error_t
+_adpt_appe_acl_policy_id_get(a_uint32_t dev_id,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries, fal_acl_rule_t * rule)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t hw_index;
+	a_uint32_t policy_id;
+
+	hw_index = _acl_bit_index(hw_entries, ADPT_PRE_ACL_ENTRY_NUM_PER_LIST, 0);
+	rv = appe_eg_ipo_ext_tbl_policy_id_get(dev_id,
+			hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index, &policy_id);
+
+	rule->policy_id = policy_id;
+	return rv;
+}
+
+sw_error_t
+_adpt_appe_acl_policy_id_clear(a_uint32_t dev_id,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t hw_index;
+
+	while(hw_entries != 0)
+	{
+		hw_index = _acl_bit_index(hw_entries, ADPT_PRE_ACL_ENTRY_NUM_PER_LIST, 0);
+
+		rv = appe_eg_ipo_ext_tbl_policy_id_set(dev_id,
+				hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index, 0);
+		hw_entries &= (~(1<<hw_index));
+	}
+	return rv;
+}
+
+sw_error_t
 _adpt_appe_pre_acl_rule_ext_set(a_uint32_t dev_id, a_uint32_t hw_list_id,
 		a_uint32_t ext_1, a_uint32_t ext_2, a_uint32_t ext_4)
 {

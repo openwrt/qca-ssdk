@@ -1809,19 +1809,23 @@ static sw_error_t
 _adpt_ppe_acl_rule_sw_query(a_uint32_t dev_id,
 	a_uint32_t hw_list_id, a_uint32_t hw_entries, fal_acl_rule_t * rule)
 {
+	sw_error_t rv = SW_OK;
 	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
 	{
-		return _adpt_hppe_acl_rule_sw_query(dev_id, hw_list_id,
+		rv = _adpt_hppe_acl_rule_sw_query(dev_id, hw_list_id,
 				hw_entries, rule);
+		SW_RTN_ON_ERROR(rv);
 	}
 #if defined(APPE)
 	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
 	{
-		return _adpt_appe_pre_acl_rule_sw_query(dev_id,
+		rv = _adpt_appe_pre_acl_rule_sw_query(dev_id,
 				hw_list_id - ADPT_ACL_HW_LIST_NUM , hw_entries, rule);
+		SW_RTN_ON_ERROR(rv);
 	}
+	rv = _adpt_appe_acl_policy_id_get(dev_id, hw_list_id, hw_entries, rule);
 #endif
-	return SW_OK;
+	return rv;
 }
 
 sw_error_t
@@ -3573,20 +3577,25 @@ _adpt_ppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		fal_acl_rule_t * rule, fal_acl_rule_t *inner_rule, a_uint32_t rule_type_map,
 		a_uint32_t inner_rule_type_map, a_uint32_t allocated_entries)
 {
+	sw_error_t rv = SW_OK;
+
 	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
 	{
-		return _adpt_hppe_acl_rule_hw_add(dev_id, list_pri, hw_list_id,
+		rv = _adpt_hppe_acl_rule_hw_add(dev_id, list_pri, hw_list_id,
 			rule_id, rule_nr, rule, rule_type_map, allocated_entries);
+		SW_RTN_ON_ERROR(rv);
 	}
 #if defined(APPE)
 	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
 	{
-		return _adpt_appe_pre_acl_rule_hw_add(dev_id, list_pri,
+		rv = _adpt_appe_pre_acl_rule_hw_add(dev_id, list_pri,
 			hw_list_id - ADPT_ACL_HW_LIST_NUM, rule_id, rule_nr, rule, inner_rule,
 			rule_type_map, inner_rule_type_map, allocated_entries);
+		SW_RTN_ON_ERROR(rv);
 	}
+	rv = _adpt_appe_acl_policy_id_set(dev_id, rule, hw_list_id, allocated_entries);
 #endif
-	return SW_OK;
+	return rv;
 }
 
 static sw_error_t
@@ -4273,19 +4282,23 @@ static sw_error_t
 _adpt_ppe_acl_rule_hw_delete(a_uint32_t dev_id,
 		a_uint32_t hw_list_id, a_uint32_t hw_entries, a_uint32_t rule_nr)
 {
+	sw_error_t rv = SW_OK;
 	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
 	{
-		return _adpt_hppe_acl_rule_hw_delete(dev_id, hw_list_id,
+		rv = _adpt_hppe_acl_rule_hw_delete(dev_id, hw_list_id,
 					hw_entries, rule_nr);
+		SW_RTN_ON_ERROR(rv);
 	}
 #if defined(APPE)
 	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
 	{
-		return _adpt_appe_pre_acl_rule_hw_delete(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM,
+		rv = _adpt_appe_pre_acl_rule_hw_delete(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM,
 					hw_entries, rule_nr);
+		SW_RTN_ON_ERROR(rv);
 	}
+	rv = _adpt_appe_acl_policy_id_clear(dev_id, hw_list_id, hw_entries);
 #endif
-	return SW_OK;
+	return rv;
 }
 
 static sw_error_t

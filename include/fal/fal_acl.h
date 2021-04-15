@@ -179,7 +179,7 @@ typedef enum {
 #define    FAL_ACL_FIELD_UDF1            54
 #define    FAL_ACL_FIELD_UDF2            55
 #define    FAL_ACL_FIELD_UDF3            56
-/*new add for alder*/
+/*new add for IPQ95xx*/
 #define    FAL_ACL_FIELD_UDFPROFILE      57
 
 #define    FAL_ACL_FIELD_NUM             58
@@ -217,7 +217,7 @@ typedef enum {
 #define    FAL_ACL_ACTION_SYN_TOGGLE 29
 #define    FAL_ACL_ACTION_METADATA_EN 30
 /*extend action flg*/
-/*new add for alder*/
+/*new add for IPQ95xx*/
 #define    FAL_ACL_ACTION_CASCADE   0
 #define    FAL_ACL_ACTION_VPN       1
 #define    FAL_ACL_ACTION_LEARN_DIS 2
@@ -691,18 +691,19 @@ typedef struct
 	a_uint8_t dscp_mask;/*modify dscp mask,IPQ60xx support*/
 	a_uint8_t qos_res_prec;/*qos res prec,IPQ60xx support*/
 
-	/*new add acl udf for alder*/
+	/*new add acl udf for IPQ95xx*/
 	fal_acl_field_op_t udf2_op;
 	a_uint8_t udfprofile_val;
 	a_uint8_t udfprofile_mask;
-	/*new add acl action for alder*/
+	/*new add acl action for IPQ95xx*/
 	fal_acl_action_map_t  action_flg_ext;
 	a_uint8_t cascade_data;
 	a_uint8_t vpn_type; /*0 vsi; 1 vrf*/
 	a_uint8_t vpn_id;
 	a_uint16_t napt_l4_port; /*l4 port for NAPT*/
+	a_uint16_t policy_id; /*policy id used for tunnel encapsulation*/
 
-	/*new add acl rule fields for alder*/
+	/*new add acl rule fields for IPQ95xx*/
 	fal_acl_tunnel_info_t  tunnel_info; /*tunnel info fields*/
 	fal_acl_rule_field_t   inner_rule_field; /*tunnel inner packet rule fileds*/
 } fal_acl_rule_t;

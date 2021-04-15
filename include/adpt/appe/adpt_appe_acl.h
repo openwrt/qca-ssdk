@@ -82,6 +82,18 @@ typedef struct{
 }ADPT_APPE_ACL_EXT_UDF_RULE_MASK;
 
 sw_error_t
+_adpt_appe_acl_policy_id_set(a_uint32_t dev_id, fal_acl_rule_t * rule,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries);
+
+sw_error_t
+_adpt_appe_acl_policy_id_get(a_uint32_t dev_id,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries, fal_acl_rule_t * rule);
+
+sw_error_t
+_adpt_appe_acl_policy_id_clear(a_uint32_t dev_id,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries);
+
+sw_error_t
 _adpt_appe_pre_acl_tunnel_rule_sw_2_hw(fal_acl_tunnel_info_t *rule,
 	ADPT_APPE_ACL_TUNNEL_RULE *tunnelrule, ADPT_APPE_ACL_TUNNEL_RULE_MASK *tunnelrule_mask);
 

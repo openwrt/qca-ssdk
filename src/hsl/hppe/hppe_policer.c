@@ -448,6 +448,8 @@ hppe_vlan_dev_cnt_tbl_get(
 		a_uint32_t index,
 		union vlan_dev_cnt_tbl_u *value)
 {
+	if (index >= VLAN_DEV_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_get(
 				dev_id,
 				INGRESS_POLICER_BASE_ADDR + VLAN_DEV_CNT_TBL_ADDRESS + \
@@ -462,6 +464,8 @@ hppe_vlan_dev_cnt_tbl_set(
 		a_uint32_t index,
 		union vlan_dev_cnt_tbl_u *value)
 {
+	if (index >= VLAN_DEV_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_set(
 				dev_id,
 				INGRESS_POLICER_BASE_ADDR + VLAN_DEV_CNT_TBL_ADDRESS + \

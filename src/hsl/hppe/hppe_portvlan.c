@@ -3997,6 +3997,8 @@ hppe_vlan_dev_tx_counter_tbl_get(
 		a_uint32_t index,
 		union vlan_dev_tx_counter_tbl_u *value)
 {
+	if (index >= VLAN_DEV_TX_COUNTER_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_get(
 				dev_id,
 				NSS_PTX_CSR_BASE_ADDR + VLAN_DEV_TX_COUNTER_TBL_ADDRESS + \
@@ -4011,6 +4013,8 @@ hppe_vlan_dev_tx_counter_tbl_set(
 		a_uint32_t index,
 		union vlan_dev_tx_counter_tbl_u *value)
 {
+	if (index >= VLAN_DEV_TX_COUNTER_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_set(
 				dev_id,
 				NSS_PTX_CSR_BASE_ADDR + VLAN_DEV_TX_COUNTER_TBL_ADDRESS + \

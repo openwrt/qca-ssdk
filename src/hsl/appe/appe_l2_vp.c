@@ -41,6 +41,8 @@ appe_l2_vp_port_tbl_get(
 		a_uint32_t index,
 		union l2_vp_port_tbl_u *value)
 {
+	if (index >= L2_VP_PORT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_get(
 				dev_id,
 				ALDER_L2_BASE_ADDR + L2_VP_PORT_TBL_ADDRESS + \
@@ -55,6 +57,8 @@ appe_l2_vp_port_tbl_set(
 		a_uint32_t index,
 		union l2_vp_port_tbl_u *value)
 {
+	if (index >= L2_VP_PORT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_set(
 				dev_id,
 				ALDER_L2_BASE_ADDR + L2_VP_PORT_TBL_ADDRESS + \

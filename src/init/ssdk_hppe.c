@@ -788,7 +788,12 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 8, 0);
 
 	queue_dst.service_code = 7;
-	fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 240, 0);
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 252, 0);
+	else
+#endif
+		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 240, 0);
 
 	queue_dst.service_code_en = A_FALSE;
 	queue_dst.service_code = 0;

@@ -706,6 +706,10 @@ typedef sw_error_t (*adpt_portvlan_isol_group_set_func)(a_uint32_t dev_id,
 		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
 typedef sw_error_t (*adpt_portvlan_isol_group_get_func)(a_uint32_t dev_id,
 		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+typedef sw_error_t (*adpt_port_egress_vlan_filter_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+typedef sw_error_t (*adpt_port_egress_vlan_filter_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
 /*portvlan module end*/
 
 /*ctrlpkt module end*/
@@ -1651,6 +1655,8 @@ typedef struct
 	adpt_portvlan_isol_get_func adpt_portvlan_isol_get;
 	adpt_portvlan_isol_group_set_func adpt_portvlan_isol_group_set;
 	adpt_portvlan_isol_group_get_func adpt_portvlan_isol_group_get;
+	adpt_port_egress_vlan_filter_set_func adpt_port_egress_vlan_filter_set;
+	adpt_port_egress_vlan_filter_get_func adpt_port_egress_vlan_filter_get;
 	/*portvlan module end*/
 
 	/*ctrlpkt module begin*/

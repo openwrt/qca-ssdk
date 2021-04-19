@@ -152,6 +152,50 @@ adpt_appe_portvlan_isol_group_get(a_uint32_t dev_id,
 }
 
 sw_error_t
+adpt_appe_port_egress_vlan_filter_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(filter);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	l2_vp_port_tbl.bf.eg_vlan_fltr_cmd = filter->membership_filter;
+
+	rv = appe_l2_vp_port_tbl_set(dev_id, port_value, &l2_vp_port_tbl);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_port_egress_vlan_filter_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter)
+{
+	sw_error_t rv = SW_OK;
+	union l2_vp_port_tbl_u l2_vp_port_tbl;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(filter);
+
+	aos_mem_zero(&l2_vp_port_tbl, sizeof(union l2_vp_port_tbl_u));
+
+	rv = appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	filter->membership_filter = l2_vp_port_tbl.bf.eg_vlan_fltr_cmd;
+
+	return rv;
+}
+
+sw_error_t
 adpt_appe_portvlan_vpmember_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t * mem_port_map)
 {
 	ADPT_DEV_ID_CHECK(dev_id);

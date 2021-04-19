@@ -405,7 +405,9 @@ extern "C" {
     SW_API_DEF(SW_API_PT_VLAN_ISOL_SET, fal_portvlan_isol_set), \
     SW_API_DEF(SW_API_PT_VLAN_ISOL_GET, fal_portvlan_isol_get), \
     SW_API_DEF(SW_API_PT_VLAN_ISOL_GROUP_SET, fal_portvlan_isol_group_set), \
-    SW_API_DEF(SW_API_PT_VLAN_ISOL_GROUP_GET, fal_portvlan_isol_group_get),
+    SW_API_DEF(SW_API_PT_VLAN_ISOL_GROUP_GET, fal_portvlan_isol_group_get), \
+    SW_API_DEF(SW_API_PT_EGRESS_VLAN_FILTER_SET, fal_port_egress_vlan_filter_set), \
+    SW_API_DEF(SW_API_PT_EGRESS_VLAN_FILTER_GET, fal_port_egress_vlan_filter_get),
 
 #define PORTVLAN_API_PARAM \
     SW_API_DESC(SW_API_PT_ING_MODE_GET) \
@@ -487,7 +489,9 @@ extern "C" {
     SW_API_DESC(SW_API_PT_VLAN_ISOL_SET) \
     SW_API_DESC(SW_API_PT_VLAN_ISOL_GET) \
     SW_API_DESC(SW_API_PT_VLAN_ISOL_GROUP_SET) \
-    SW_API_DESC(SW_API_PT_VLAN_ISOL_GROUP_GET)
+    SW_API_DESC(SW_API_PT_VLAN_ISOL_GROUP_GET) \
+    SW_API_DESC(SW_API_PT_EGRESS_VLAN_FILTER_SET) \
+    SW_API_DESC(SW_API_PT_EGRESS_VLAN_FILTER_GET)
 
 #else
 #define PORTVLAN_API \

@@ -40,6 +40,12 @@ sw_error_t
 adpt_appe_portvlan_isol_set(a_uint32_t dev_id,
 		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
 sw_error_t
+adpt_appe_port_egress_vlan_filter_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+sw_error_t
+adpt_appe_port_egress_vlan_filter_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+sw_error_t
 adpt_appe_portvlan_vpmember_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t * mem_port_map);
 sw_error_t
 adpt_appe_portvlan_vpmember_update(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t mem_port_map);

@@ -267,6 +267,8 @@ enum {
 	FUNC_PORT_VLAN_ISOL_GET,
 	FUNC_PORT_VLAN_ISOL_GROUP_SET,
 	FUNC_PORT_VLAN_ISOL_GROUP_GET,
+	FUNC_PORT_EGRESS_VLAN_FILTER_SET,
+	FUNC_PORT_EGRESS_VLAN_FILTER_GET,
 };
 
 sw_error_t
@@ -625,6 +627,16 @@ typedef struct {
 	a_uint8_t group_id; /* isolation group id */
 } fal_portvlan_isol_ctrl_t;
 
+typedef struct {
+	a_bool_t membership_filter; /* membership filter or not for vport */
+} fal_egress_vlan_filter_t;
+
+sw_error_t
+fal_port_egress_vlan_filter_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+sw_error_t
+fal_port_egress_vlan_filter_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
 sw_error_t
 fal_portvlan_isol_set(a_uint32_t dev_id,
 		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);

@@ -448,7 +448,7 @@ ppe_port_vsi_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vsi_id)
 			a_uint32_t vport_value = 0;
 			vport_value = FAL_PORT_ID_VALUE(port_id) - SSDK_MIN_VIRTUAL_PORT_ID;
 			if((ref_vsi_mapping[dev_id][i].valid != 0)&&
-				(ref_vsi_mapping[dev_id][i].vport_bitmap[vport_value] &
+				(ref_vsi_mapping[dev_id][i].vport_bitmap[vport_value/32] &
 				(1 << (vport_value%32))))
 			{
 				*vsi_id = i;

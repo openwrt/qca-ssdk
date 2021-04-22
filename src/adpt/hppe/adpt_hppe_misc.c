@@ -188,7 +188,19 @@ char cpucode[][85] = {
 "Egress mirror to CPU",
 "Ingress mirror to CPU",
 #ifdef APPE
-"TUNNEL interface check fail",/*cpu code 186*/
+"L3 FLOW MTU CHECK FAIL",/*index 150, cpu code 93*/
+"L3 FLOW MTU CHECK DF FAIL",
+"L3 UDP CHECKSUM EXP",/*index 152, cpu code 95*/
+
+"8023ah OAM packet redirect/copy to CPU",/*index 153, cpu code 104*/
+
+"L3 ROUTE PRE IPO ROUTE ACTION",/*index 154, cpu code 181*/
+"L3 ROUTE PRE IPO SNAPT ACTION",
+"L3 ROUTE PRE IPO DNAPT ACTION",
+"L3 ROUTE PRE IPO SNAT ACTION",
+"L3_ROUTE PRE IPO DNAT ACTION",/*index 158, cpu code 185*/
+
+"TUNNEL interface check fail",/*index 159,cpu code 186*/
 "TUNNEL vlan check fail",
 "TUNNEL PPPOE multicast term",
 "TUNNEL de-accelate",
@@ -200,9 +212,9 @@ char cpucode[][85] = {
 "TUNNEL MAP destination check fail",
 "TUNNEL MAP UDP checksum zero",
 "TUNNEL MAP non TCP and UDP",
-"TUNNEL forward command",/*cpu code 198*/
+"TUNNEL forward command",/*index 171, cpu code 198*/
 
-"L2 PRE-ACL action",/*cpu code 210*/
+"L2 PRE-ACL action",/*index 172, cpu code 210*/
 "TUNNEL L2 context invalid",
 "reserve0",
 "reserve1",
@@ -223,7 +235,7 @@ char cpucode[][85] = {
 "TUNNEL PROGRAM2",
 "TUNNEL PROGRAM3",
 "TUNNEL PROGRAM4",
-"TUNNEL PROGRAM5",/*cpu code 231*/
+"TUNNEL PROGRAM5",/*index 193, cpu code 231*/
 #endif
 };
 
@@ -1069,10 +1081,14 @@ adpt_hppe_debug_cpu_code_counter_get(a_bool_t show_type)
 			else if (i >= 178 && i <= 180)
 				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 33], i);
 #ifdef APPE
-			else if (i >= 186 && i <= 198)
-				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 36], i);
+			else if (i >= 93 && i <= 95)
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i + 57], i);
+			else if (i == 104)
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i + 49], i);
+			else if (i >= 181 && i <= 198)
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 27], i);
 			else if (i >= 210 && i <= 231)
-				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 47], i);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 38], i);
 #endif
 			else if (i >= 254 && i <= 255)
 				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 106], i);

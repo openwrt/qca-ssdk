@@ -14194,6 +14194,28 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
     }
     while (talk_mode && (SW_OK != rv));
 
+    /* get mgt_8023ah_oam */
+    do
+    {
+        cmd = get_sub_cmd("8023ah_oam_en", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_8023ah_oam),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
+
     /* get mgt_mld */
     do
     {

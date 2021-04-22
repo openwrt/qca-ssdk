@@ -65,6 +65,13 @@ _get_mgmtctrl_ctrlpkt_profile_by_index(a_uint32_t dev_id, a_uint32_t index, fal_
 		ctrlpkt->protocol_types.mgt_ns = (entry.bf.protocol_bitmap & (0x1 << 7))?1:0;
 		ctrlpkt->protocol_types.mgt_na = (entry.bf.protocol_bitmap & (0x1 << 8))?1:0;
 		ctrlpkt->protocol_types.mgt_dhcp6 = (entry.bf.protocol_bitmap & (0x1 << 9))?1:0;
+#ifdef APPE
+		if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+		{
+			ctrlpkt->protocol_types.mgt_8023ah_oam =
+				(entry.bf.protocol_bitmap & (0x1 << 10))?1:0;
+		}
+#endif
 	}
 
 	return entry.bf.valid;
@@ -90,7 +97,8 @@ _check_if_ctrlpkt_equal(fal_ctrlpkt_profile_t *ctrlpkt1, fal_ctrlpkt_profile_t *
 		ctrlpkt1->protocol_types.mgt_mld == ctrlpkt2->protocol_types.mgt_mld &&
 		ctrlpkt1->protocol_types.mgt_ns == ctrlpkt2->protocol_types.mgt_ns &&
 		ctrlpkt1->protocol_types.mgt_na == ctrlpkt2->protocol_types.mgt_na &&
-		ctrlpkt1->protocol_types.mgt_dhcp6 == ctrlpkt2->protocol_types.mgt_dhcp6)
+		ctrlpkt1->protocol_types.mgt_dhcp6 == ctrlpkt2->protocol_types.mgt_dhcp6 &&
+		ctrlpkt1->protocol_types.mgt_8023ah_oam == ctrlpkt2->protocol_types.mgt_8023ah_oam)
 		return 1;
 
 	return 0;
@@ -228,7 +236,13 @@ adpt_hppe_mgmtctrl_ctrlpkt_profile_add(a_uint32_t dev_id, fal_ctrlpkt_profile_t 
 		entry.bf.protocol_bitmap |= (0x1 << 8);
 	if (ctrlpkt->protocol_types.mgt_dhcp6)
 		entry.bf.protocol_bitmap |= (0x1 << 9);
-
+#ifdef APPE
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	{
+		if (ctrlpkt->protocol_types.mgt_8023ah_oam)
+			entry.bf.protocol_bitmap |= (0x1 << 10);
+	}
+#endif
 	entry.bf.protocol_include = entry.bf.protocol_bitmap?1:0;
 
 	entry.bf.ethertype_include = ctrlpkt->ethtype_profile_bitmap?1:0;

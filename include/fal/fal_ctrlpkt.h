@@ -58,6 +58,7 @@ typedef struct
 	a_bool_t mgt_ns; /* ns protocol management type */
 	a_bool_t mgt_na; /* na protocol management type */
 	a_bool_t mgt_dhcp6; /* dhcp6 protocol management type */
+	a_bool_t mgt_8023ah_oam; /* 8023ah oam protocol management type add it for ipq95xx*/
 } fal_ctrlpkt_protocol_type_t;
 
 typedef struct {

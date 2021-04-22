@@ -903,6 +903,27 @@ void ssdk_uniphy_raw_clock_set(
 #endif
 }
 
+void ssdk_uniphy_port5_clock_source_set(void)
+{
+#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+	a_uint32_t id, mode, i;
+
+	mode = ssdk_dt_global_get_mac_mode(0, SSDK_UNIPHY_INSTANCE1);
+
+	for (i = UNIPHY_RX; i <= UNIPHY_TX; i++) {
+		if (mode == PORT_INTERFACE_MODE_MAX) {
+			id = SSDK_UNIPHY_INSTANCE0*2 + i;
+		} else {
+			id = SSDK_UNIPHY_INSTANCE1*2 + i;
+		}
+		if (clk_set_parent(uniphy_port_clks[PORT5_RX_SRC_E + i],
+			uniphy_raw_clks[id]->clk)) {
+			SSDK_ERROR("set parent fail!\n");
+		}
+	}
+#endif
+}
+
 static
 void ssdk_gcc_ppe_clock_init(a_uint32_t revision, enum cmnblk_clk_type mode)
 {
@@ -911,6 +932,7 @@ void ssdk_gcc_ppe_clock_init(a_uint32_t revision, enum cmnblk_clk_type mode)
 	/*fixme for cmn clock init*/
 	ssdk_cmnblk_init(mode);
 	ssdk_ppe_uniphy_clock_init(revision);
+	ssdk_uniphy_port5_clock_source_set();
 #endif
 }
 #endif
@@ -1250,6 +1272,34 @@ void ssdk_ppe_reset_init(void)
 		port_rsts[i-1] = of_reset_control_get(rst_node,
 							port_rst_ids[i-1]);
 #endif
+}
+
+void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+	a_bool_t enable)
+{
+	enum unphy_rst_type rst_type;
+
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq60xx")){
+		if (uniphy_index > SSDK_UNIPHY_INSTANCE1) {
+			return;
+		}
+	}
+
+	if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
+		rst_type = UNIPHY0_SOFT_RESET_E;
+	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
+		rst_type = UNIPHY1_SOFT_RESET_E;
+	} else {
+		rst_type = UNIPHY2_SOFT_RESET_E;
+	}
+
+	if (enable == A_TRUE) {
+		ssdk_uniphy_reset(dev_id, rst_type, SSDK_RESET_DEASSERT);
+	} else {
+		ssdk_uniphy_reset(dev_id, rst_type, SSDK_RESET_ASSERT);
+	}
+
+	return;
 }
 #endif
 

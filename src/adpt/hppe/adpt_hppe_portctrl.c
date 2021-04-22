@@ -3315,6 +3315,13 @@ _adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id, a_bool_t force_switch)
 	{
 		ssdk_dt_global_set_mac_mode(dev_id, mode_index, mode_new[mode_index]);
 	}
+
+	for (mode_index = SSDK_UNIPHY_INSTANCE0; mode_index <= SSDK_UNIPHY_INSTANCE2; mode_index++)
+	{
+		ssdk_gcc_uniphy_sys_set(dev_id, mode_index, A_TRUE);
+	}
+	ssdk_uniphy_port5_clock_source_set();
+
 	/*configure the mode according to mode_new*/
 	for(mode_index = SSDK_UNIPHY_INSTANCE0; mode_index <= SSDK_UNIPHY_INSTANCE2; mode_index++)
 	{
@@ -3328,6 +3335,9 @@ _adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id, a_bool_t force_switch)
 				SSDK_ERROR("config instance%x, rv:%x faild\n", mode_index,rv);
 				return rv;
 			}
+		}
+		if (mode_new[mode_index] == PORT_WRAPPER_MAX) {
+			ssdk_gcc_uniphy_sys_set(dev_id, mode_index, A_FALSE);
 		}
 	}
 

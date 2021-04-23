@@ -562,6 +562,9 @@ union port_in_forward_u {
 #if defined(APPE)
 #define MRU_MTU_CTRL_TBL_ADDRESS 0x5000
 #define MRU_MTU_CTRL_TBL_INC     0x10
+#elif defined(CPPE)
+#define MRU_MTU_CTRL_TBL_ADDRESS 0x3000
+#define MRU_MTU_CTRL_TBL_INC     0x10
 #else
 #define MRU_MTU_CTRL_TBL_ADDRESS 0x3000
 #define MRU_MTU_CTRL_TBL_INC     0x8
@@ -604,7 +607,7 @@ union port_in_forward_u {
 	#define MRU_MTU_CTRL_TBL_SRC_PROFILE_OFFSET  34
 	#define MRU_MTU_CTRL_TBL_SRC_PROFILE_LEN     2
 	#define MRU_MTU_CTRL_TBL_SRC_PROFILE_DEFAULT 0x0
-#if defined(APPE)
+#if defined(APPE) || defined(CPPE)
 	/*[field] PCP_QOS_GROUP_ID*/
 	#define MRU_MTU_CTRL_TBL_PCP_QOS_GROUP_ID
 	#define MRU_MTU_CTRL_TBL_PCP_QOS_GROUP_ID_OFFSET  36
@@ -665,6 +668,7 @@ union port_in_forward_u {
 	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE_OFFSET  59
 	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE_LEN     1
 	#define MRU_MTU_CTRL_TBL_SOURCE_FILTERING_MODE_DEFAULT 0x0
+#if defined(APPE)
 	/*[field] PRE_IPO_OUTER_RES_PREC*/
 	#define MRU_MTU_CTRL_TBL_PRE_IPO_OUTER_RES_PREC
 	#define MRU_MTU_CTRL_TBL_PRE_IPO_OUTER_RES_PREC_OFFSET  60
@@ -675,6 +679,7 @@ union port_in_forward_u {
 	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_OFFSET  63
 	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_LEN     3
 	#define MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_DEFAULT 0x0
+#endif
 #endif
 
 struct mru_mtu_ctrl_tbl {

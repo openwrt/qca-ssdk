@@ -25,11 +25,9 @@
 #include "hppe_flow.h"
 #include "adpt_hppe.h"
 #include "adpt.h"
-
-#if defined(CPPE)
+#if defined(CPPE) || defined(APPE)
 #include "adpt_cppe_flow.h"
 #endif
-
 
 #define FLOW_ENTRY_TYPE_IPV4 0
 #define FLOW_ENTRY_TYPE_IPV6 1
@@ -1928,8 +1926,8 @@ adpt_hppe_flow_global_cfg_get(
 		fal_flow_global_cfg_t *cfg)
 {
 	sw_error_t rv = SW_OK;
-#if defined(CPPE)
-	a_uint32_t chip_ver = 0;
+#if defined(CPPE) || defined(APPE)
+	a_uint32_t chip_ver = 0, chip_type = 0;
 	a_bool_t flow_cpy_escape = A_FALSE;
 #endif
 	union flow_ctrl0_u flow_ctrl0;
@@ -1952,9 +1950,11 @@ adpt_hppe_flow_global_cfg_get(
 	rv = hppe_l3_route_ctrl_ext_get(dev_id, &route_ctrl_ext);
 	SW_RTN_ON_ERROR(rv);
 
-#if defined(CPPE)
+#if defined(CPPE) || defined(APPE)
+	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION) {
+	if (chip_ver == CPPE_REVISION ||
+			chip_type == CHIP_APPE) {
 		rv = adpt_cppe_flow_copy_escape_get(dev_id, &flow_cpy_escape);
 		SW_RTN_ON_ERROR(rv);
 		cfg->flow_mismatch_copy_escape_en = flow_cpy_escape;
@@ -1989,8 +1989,8 @@ adpt_hppe_flow_global_cfg_set(
 		fal_flow_global_cfg_t *cfg)
 {
 	sw_error_t rv = SW_OK;
-#if defined(CPPE)
-	a_uint32_t chip_ver = 0;
+#if defined(CPPE) || defined(APPE)
+	a_uint32_t chip_ver = 0, chip_type = 0;
 #endif
 	union flow_ctrl0_u flow_ctrl0;
 	union l3_route_ctrl_u route_ctrl;
@@ -2040,9 +2040,11 @@ adpt_hppe_flow_global_cfg_set(
 	rv = hppe_l3_route_ctrl_ext_set(dev_id, &route_ctrl_ext);
 	SW_RTN_ON_ERROR(rv);
 
-#if defined(CPPE)
+#if defined(CPPE) || defined(APPE)
+	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION) {
+	if (chip_ver == CPPE_REVISION ||
+			chip_type == CHIP_APPE) {
 		rv = adpt_cppe_flow_copy_escape_set(dev_id,
 				cfg->flow_mismatch_copy_escape_en);
 		SW_RTN_ON_ERROR(rv);

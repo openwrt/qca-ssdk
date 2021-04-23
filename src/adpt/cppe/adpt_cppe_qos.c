@@ -19,8 +19,8 @@
  */
 #include "sw.h"
 #include "fal_qos.h"
-#include "cppe_portctrl_reg.h"
-#include "cppe_portctrl.h"
+#include "hppe_portctrl_reg.h"
+#include "hppe_portctrl.h"
 #include "cppe_qos_reg.h"
 #include "cppe_qos.h"
 #include "adpt.h"
@@ -88,24 +88,30 @@ sw_error_t
 adpt_cppe_qos_port_pri_set(a_uint32_t dev_id, fal_port_t port_id,
 			fal_qos_pri_precedence_t *pri)
 {
-	union cppe_mru_mtu_ctrl_tbl_u cppe_mru_mtu_ctrl;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl;
 
-	memset(&cppe_mru_mtu_ctrl, 0, sizeof(cppe_mru_mtu_ctrl));
+	memset(&mru_mtu_ctrl, 0, sizeof(mru_mtu_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(pri);
 
-	cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &cppe_mru_mtu_ctrl);
+	hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl);
 
-	cppe_mru_mtu_ctrl.bf.pcp_res_prec = pri->pcp_pri;
-	cppe_mru_mtu_ctrl.bf.dscp_res_prec = pri->dscp_pri;
-	cppe_mru_mtu_ctrl.bf.preheader_res_prec = pri->preheader_pri;
-	cppe_mru_mtu_ctrl.bf.flow_res_prec = pri->flow_pri;
-	cppe_mru_mtu_ctrl.bf.pre_acl_res_prec = pri->acl_pri;
-	cppe_mru_mtu_ctrl.bf.post_acl_res_prec = pri->post_acl_pri;
-	cppe_mru_mtu_ctrl.bf.pcp_res_prec_force = pri->pcp_pri_force;
-	cppe_mru_mtu_ctrl.bf.dscp_res_prec_force = pri->dscp_pri_force;
+	mru_mtu_ctrl.bf.pcp_res_prec = pri->pcp_pri;
+	mru_mtu_ctrl.bf.dscp_res_prec = pri->dscp_pri;
+	mru_mtu_ctrl.bf.preheader_res_prec = pri->preheader_pri;
+	mru_mtu_ctrl.bf.flow_res_prec = pri->flow_pri;
+	mru_mtu_ctrl.bf.pre_acl_res_prec = pri->acl_pri;
+	mru_mtu_ctrl.bf.post_acl_res_prec = pri->post_acl_pri;
+	mru_mtu_ctrl.bf.pcp_res_prec_force = pri->pcp_pri_force;
+	mru_mtu_ctrl.bf.dscp_res_prec_force = pri->dscp_pri_force;
+#if defined(APPE)
+	mru_mtu_ctrl.bf.pre_ipo_outer_res_prec = pri->pre_acl_outer_pri;
+	mru_mtu_ctrl.bf.pre_ipo_inner_res_prec_1 = pri->pre_acl_inner_pri >>
+		SW_FIELD_OFFSET_IN_WORD(MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_OFFSET);
+	mru_mtu_ctrl.bf.pre_ipo_inner_res_prec_0 = pri->pre_acl_inner_pri;
+#endif
 
-	return cppe_mru_mtu_ctrl_tbl_set(dev_id, port_id, &cppe_mru_mtu_ctrl);
+	return hppe_mru_mtu_ctrl_tbl_set(dev_id, port_id, &mru_mtu_ctrl);
 }
 
 sw_error_t
@@ -113,24 +119,30 @@ adpt_cppe_qos_port_pri_get(a_uint32_t dev_id, fal_port_t port_id,
 			fal_qos_pri_precedence_t *pri)
 {
 	sw_error_t rv = SW_OK;
-	union cppe_mru_mtu_ctrl_tbl_u cppe_mru_mtu_ctrl;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl;
 
-	memset(&cppe_mru_mtu_ctrl, 0, sizeof(cppe_mru_mtu_ctrl));
+	memset(&mru_mtu_ctrl, 0, sizeof(mru_mtu_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(pri);
 
-	rv = cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &cppe_mru_mtu_ctrl);
+	rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl);
 	if( rv != SW_OK )
 		return rv;
 
-	pri->pcp_pri = cppe_mru_mtu_ctrl.bf.pcp_res_prec;
-	pri->dscp_pri = cppe_mru_mtu_ctrl.bf.dscp_res_prec;
-	pri->preheader_pri = cppe_mru_mtu_ctrl.bf.preheader_res_prec;
-	pri->flow_pri = cppe_mru_mtu_ctrl.bf.flow_res_prec;
-	pri->acl_pri = cppe_mru_mtu_ctrl.bf.pre_acl_res_prec;
-	pri->post_acl_pri = cppe_mru_mtu_ctrl.bf.post_acl_res_prec;
-	pri->pcp_pri_force = cppe_mru_mtu_ctrl.bf.pcp_res_prec_force;
-	pri->dscp_pri_force = cppe_mru_mtu_ctrl.bf.dscp_res_prec_force;
+	pri->pcp_pri = mru_mtu_ctrl.bf.pcp_res_prec;
+	pri->dscp_pri = mru_mtu_ctrl.bf.dscp_res_prec;
+	pri->preheader_pri = mru_mtu_ctrl.bf.preheader_res_prec;
+	pri->flow_pri = mru_mtu_ctrl.bf.flow_res_prec;
+	pri->acl_pri = mru_mtu_ctrl.bf.pre_acl_res_prec;
+	pri->post_acl_pri = mru_mtu_ctrl.bf.post_acl_res_prec;
+	pri->pcp_pri_force = mru_mtu_ctrl.bf.pcp_res_prec_force;
+	pri->dscp_pri_force = mru_mtu_ctrl.bf.dscp_res_prec_force;
+#if defined(APPE)
+	pri->pre_acl_outer_pri = mru_mtu_ctrl.bf.pre_ipo_outer_res_prec;
+	pri->pre_acl_inner_pri = mru_mtu_ctrl.bf.pre_ipo_inner_res_prec_1 <<
+		SW_FIELD_OFFSET_IN_WORD(MRU_MTU_CTRL_TBL_PRE_IPO_INNER_RES_PREC_OFFSET) |
+		mru_mtu_ctrl.bf.pre_ipo_inner_res_prec_0;
+#endif
 
 	return SW_OK;
 }
@@ -213,18 +225,18 @@ sw_error_t
 adpt_cppe_qos_port_group_set(a_uint32_t dev_id, fal_port_t port_id,
 			fal_qos_group_t *group)
 {
-	union cppe_mru_mtu_ctrl_tbl_u cppe_mru_mtu_ctrl;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl;
 
-	memset(&cppe_mru_mtu_ctrl, 0, sizeof(cppe_mru_mtu_ctrl));
+	memset(&mru_mtu_ctrl, 0, sizeof(mru_mtu_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(group);
 
-	cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &cppe_mru_mtu_ctrl);
+	hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl);
 
-	cppe_mru_mtu_ctrl.bf.pcp_qos_group_id = group->pcp_group;
-	cppe_mru_mtu_ctrl.bf.dscp_qos_group_id = group->dscp_group;
+	mru_mtu_ctrl.bf.pcp_qos_group_id = group->pcp_group;
+	mru_mtu_ctrl.bf.dscp_qos_group_id = group->dscp_group;
 
-	return cppe_mru_mtu_ctrl_tbl_set(dev_id, port_id, &cppe_mru_mtu_ctrl);
+	return hppe_mru_mtu_ctrl_tbl_set(dev_id, port_id, &mru_mtu_ctrl);
 }
 
 sw_error_t
@@ -266,18 +278,18 @@ adpt_cppe_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 			fal_qos_group_t *group)
 {
 	sw_error_t rv = SW_OK;
-	union cppe_mru_mtu_ctrl_tbl_u cppe_mru_mtu_ctrl;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl;
 
-	memset(&cppe_mru_mtu_ctrl, 0, sizeof(cppe_mru_mtu_ctrl));
+	memset(&mru_mtu_ctrl, 0, sizeof(mru_mtu_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(group);
 
-	rv = cppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &cppe_mru_mtu_ctrl);
+	rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl);
 	if( rv != SW_OK )
 		return rv;
 
-	group->pcp_group = cppe_mru_mtu_ctrl.bf.pcp_qos_group_id;
-	group->dscp_group = cppe_mru_mtu_ctrl.bf.dscp_qos_group_id;
+	group->pcp_group = mru_mtu_ctrl.bf.pcp_qos_group_id;
+	group->dscp_group = mru_mtu_ctrl.bf.dscp_qos_group_id;
 
 	return SW_OK;
 }

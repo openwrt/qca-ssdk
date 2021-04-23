@@ -35,7 +35,7 @@ cppe_mru_mtu_ctrl_tbl_get(
 			IPE_L2_BASE_ADDR + CPPE_MRU_MTU_CTRL_TBL_ADDRESS + \
 			index * CPPE_MRU_MTU_CTRL_TBL_INC,
 			value->val,
-			2);
+			sizeof(union cppe_mru_mtu_ctrl_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -49,7 +49,7 @@ cppe_mru_mtu_ctrl_tbl_set(
 			IPE_L2_BASE_ADDR + CPPE_MRU_MTU_CTRL_TBL_ADDRESS + \
 			index * CPPE_MRU_MTU_CTRL_TBL_INC,
 			value->val,
-			2);
+			sizeof(union cppe_mru_mtu_ctrl_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t

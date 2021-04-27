@@ -1227,5 +1227,28 @@ union ipr_byte_high_reg_u {
 	struct ipr_byte_high_reg bf;
 };
 
+#ifdef APPE
+/*[register] LINK_OAM_CTRL*/
+#define LINK_OAM_CTRL
+#define LINK_OAM_CTRL_ADDRESS 0x1800
+#define LINK_OAM_CTRL_NUM     8
+#define LINK_OAM_CTRL_INC     0x4
+#define LINK_OAM_CTRL_TYPE    REG_TYPE_RW
+#define LINK_OAM_CTRL_DEFAULT 0x0
+	/*[field] LOOPBACK_STATE*/
+	#define LINK_OAM_CTRL_LOOPBACK_STATE
+	#define LINK_OAM_CTRL_LOOPBACK_STATE_OFFSET  0
+	#define LINK_OAM_CTRL_LOOPBACK_STATE_LEN     1
+	#define LINK_OAM_CTRL_LOOPBACK_STATE_DEFAULT 0x0
 
+struct link_oam_ctrl {
+	a_uint32_t  loopback_state:1;
+	a_uint32_t  _reserved0:31;
+};
+
+union link_oam_ctrl_u {
+	a_uint32_t val;
+	struct link_oam_ctrl bf;
+};
+#endif
 #endif

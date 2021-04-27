@@ -213,6 +213,7 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_SPEED, cmd_data_check_speed, NULL),
     SW_TYPE_DEF(SW_CAP, cmd_data_check_capable, NULL),
 #ifndef IN_PORTCONTROL_MINI
+    SW_TYPE_DEF(SW_PORT_8023AH_CTRL, (param_check_t)cmd_data_check_port_8023ah_ctrl, NULL),
     SW_TYPE_DEF(SW_PORT_EEE_CONFIG, (param_check_t)cmd_data_check_port_eee_config, NULL),
     SW_TYPE_DEF(SW_PORT_LOOPBACK_CONFIG, (param_check_t)cmd_data_check_switch_port_loopback_config, NULL),
 #endif
@@ -974,6 +975,24 @@ cmd_data_check_switch_port_loopback_config(char *cmd_str, void * val,
     while (talk_mode && (SW_OK != rv));
 
     *(fal_loopback_config_t *)val = cfg;
+    return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_port_8023ah_ctrl(char *cmd_str, void * val,
+	a_uint32_t size)
+{
+    char *cmd;
+    fal_port_8023ah_ctrl_t port_8023ah_ctrl;
+
+    aos_mem_zero(&port_8023ah_ctrl, sizeof (fal_port_8023ah_ctrl_t));
+
+    cmd_data_check_element("loopback_en", "disable",
+                        "usage:loopback_en,enable/disable\n",
+                        cmd_data_check_enable, (cmd, &(port_8023ah_ctrl.loopback_enable),
+                        sizeof (port_8023ah_ctrl.loopback_enable)));
+
+    *(fal_port_8023ah_ctrl_t *)val = port_8023ah_ctrl;
     return SW_OK;
 }
 

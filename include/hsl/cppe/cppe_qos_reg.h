@@ -23,7 +23,11 @@
 /*[table] QOS_MAPPING_TBL*/
 #define QOS_MAPPING_TBL
 #define QOS_MAPPING_TBL_ADDRESS 0x20000
+#if defined(APPE)
+#define QOS_MAPPING_TBL_NUM     4640
+#else
 #define QOS_MAPPING_TBL_NUM     2592
+#endif
 #define QOS_MAPPING_TBL_INC     0x10
 #define QOS_MAPPING_TBL_TYPE    REG_TYPE_RW
 #define QOS_MAPPING_TBL_DEFAULT 0x0

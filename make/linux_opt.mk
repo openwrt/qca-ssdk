@@ -359,6 +359,10 @@ ifneq (,$(findstring CPPE, $(SUPPORT_CHIP)))
 endif
 
 ifneq (,$(findstring APPE, $(SUPPORT_CHIP)))
+#APPE depends on CPPE flow & qos feature
+  MODULE_INC   += -I$(PRJ_PATH)/include/hsl/cppe
+  MODULE_INC   += -I$(PRJ_PATH)/include/adpt/cppe
+
   MODULE_INC   += -I$(PRJ_PATH)/include/hsl/appe
   MODULE_INC   += -I$(PRJ_PATH)/include/adpt/appe
   MODULE_CFLAG += -DAPPE

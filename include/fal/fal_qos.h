@@ -59,14 +59,18 @@ typedef struct {
 } fal_qos_group_t;
 
 typedef struct {
-	a_uint8_t pcp_pri;
-	a_uint8_t dscp_pri;
-	a_int8_t preheader_pri;
-	a_uint8_t flow_pri;
-	a_uint8_t acl_pri;
-	a_uint8_t post_acl_pri;
-	a_bool_t pcp_pri_force;
-	a_bool_t dscp_pri_force;
+	a_uint8_t pcp_pri; /* pcp precedence */
+	a_uint8_t dscp_pri; /* dscp precedence */
+	a_int8_t preheader_pri; /* preheader precedence */
+	a_uint8_t flow_pri; /* flow precedence */
+	a_uint8_t acl_pri; /* acl pre routing precedecne */
+	a_uint8_t post_acl_pri; /* acl post routing precedence */
+	a_bool_t pcp_pri_force; /* pcp priority force enabled or not */
+	a_bool_t dscp_pri_force; /* dscp priority force enabled or not */
+	a_uint8_t pre_acl_outer_pri; /* pre-acl for tunnel outter packet precedence,
+				      * added for ipq95xx*/
+	a_uint8_t pre_acl_inner_pri; /* pre-acl for tunnel inner packet precedence,
+				      * added for ipq95xx*/
 } fal_qos_pri_precedence_t;
 
 typedef struct {

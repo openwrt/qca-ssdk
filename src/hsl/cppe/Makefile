@@ -13,7 +13,11 @@ ifeq (TRUE, $(IN_QOS))
 endif
 
 ifeq (, $(findstring CPPE, $(SUPPORT_CHIP)))
-  SRC_LIST=
+ifneq (, $(filter APPE, $(SUPPORT_CHIP)))
+	SRC_LIST= cppe_qos.c
+else
+	SRC_LIST=
+endif
 endif
 
 include $(PRJ_PATH)/make/components.mk

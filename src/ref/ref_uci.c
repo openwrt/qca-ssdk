@@ -8359,7 +8359,7 @@ parse_acl_rule(struct switch_val *val, a_uint32_t dev_id)
 			FAL_ACTION_FLG_SET(rule.action_flg,
 					FAL_ACL_ACTION_REMARK_DSCP);
 		}
-#if defined(CPPE)
+#if defined(CPPE) || defined(APPE)
 		else if(!strcmp(ext_value_p->option_name, "dscp_of_remark_mask")) {
 			cmd_data_check_uint8((char*)ext_value_p->option_value,
 						&tmpdata, sizeof(tmpdata));
@@ -8557,7 +8557,7 @@ parse_acl_rule(struct switch_val *val, a_uint32_t dev_id)
 			if(tmpdata)
 				FAL_ACTION_FLG_SET(rule.action_flg, FAL_ACL_ACTION_SYN_TOGGLE);
 		}
-#if defined(CPPE)
+#if defined(CPPE) || defined(APPE)
 		else if(!strcmp(ext_value_p->option_name, "qos_res_prec")) {
 			cmd_data_check_uint8((char*)ext_value_p->option_value,
 				&tmpdata, sizeof(tmpdata));

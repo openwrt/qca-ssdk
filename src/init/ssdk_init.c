@@ -3031,8 +3031,10 @@ qca_dess_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	/*config psgmii,sgmii or rgmii mode for Dakota*/
 	ssdk_dess_mac_mode_init(dev_id, cfg->mac_mode);
 
+#ifdef IN_LED
 	/*add BGA Board led contorl*/
 	ssdk_dess_led_init(cfg);
+#endif
 #ifdef IN_TRUNK
 	SW_RTN_ON_ERROR(ssdk_dess_trunk_init(dev_id, cfg->port_cfg.wan_bmp));
 #endif

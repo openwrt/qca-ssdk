@@ -17,6 +17,8 @@
 #include "sw.h"
 #include "adpt.h"
 #include "appe_l2_vp.h"
+#include "hppe_ctrlpkt_reg.h"
+#include "hppe_ctrlpkt.h"
 
 sw_error_t
 adpt_appe_mgmtctrl_vpgroup_set(a_uint32_t dev_id, a_uint32_t port_id,
@@ -38,6 +40,28 @@ adpt_appe_mgmtctrl_vpgroup_get(a_uint32_t dev_id, a_uint32_t port_id,
 
 	rv = appe_l2_vp_port_tbl_app_ctrl_profile_get(dev_id,
 		FAL_PORT_ID_VALUE(port_id), vpgroup_id);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_mgmtctrl_tunnel_decap_set(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = appe_l2_cpu_code_ctrl_exception_fmt_ctrl_en_set(dev_id, cpu_code_id, enable);
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_mgmtctrl_tunnel_decap_get(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = appe_l2_cpu_code_ctrl_exception_fmt_ctrl_en_get(dev_id, cpu_code_id, enable);
 
 	return rv;
 }

@@ -180,6 +180,39 @@ _fal_mgmtctrl_vpgroup_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vpg
 }
 
 sw_error_t
+_fal_mgmtctrl_tunnel_decap_set(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t enable)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_mgmtctrl_tunnel_decap_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_mgmtctrl_tunnel_decap_set(dev_id, cpu_code_id, enable);
+    return rv;
+}
+
+sw_error_t
+_fal_mgmtctrl_tunnel_decap_get(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t *enable)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_mgmtctrl_tunnel_decap_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_mgmtctrl_tunnel_decap_get(dev_id, cpu_code_id,
+        enable);
+    return rv;
+}
+
+sw_error_t
 fal_mgmtctrl_ethtype_profile_set(a_uint32_t dev_id, a_uint32_t profile_id, a_uint32_t ethtype)
 {
     sw_error_t rv = SW_OK;
@@ -289,6 +322,28 @@ fal_mgmtctrl_vpgroup_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vpgr
     return rv;
 }
 
+sw_error_t fal_mgmtctrl_tunnel_decap_set(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+
+    FAL_CTRLPKT_API_LOCK;
+    rv = _fal_mgmtctrl_tunnel_decap_set(dev_id, cpu_code_id, enable);
+    FAL_CTRLPKT_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t fal_mgmtctrl_tunnel_decap_get(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+
+    FAL_CTRLPKT_API_LOCK;
+    rv = _fal_mgmtctrl_tunnel_decap_get(dev_id, cpu_code_id, enable);
+    FAL_CTRLPKT_API_UNLOCK;
+    return rv;
+}
+
 EXPORT_SYMBOL(fal_mgmtctrl_ethtype_profile_set);
 EXPORT_SYMBOL(fal_mgmtctrl_ethtype_profile_get);
 EXPORT_SYMBOL(fal_mgmtctrl_rfdb_profile_set);
@@ -299,3 +354,5 @@ EXPORT_SYMBOL(fal_mgmtctrl_ctrlpkt_profile_getfirst);
 EXPORT_SYMBOL(fal_mgmtctrl_ctrlpkt_profile_getnext);
 EXPORT_SYMBOL(fal_mgmtctrl_vpgroup_set);
 EXPORT_SYMBOL(fal_mgmtctrl_vpgroup_get);
+EXPORT_SYMBOL(fal_mgmtctrl_tunnel_decap_set);
+EXPORT_SYMBOL(fal_mgmtctrl_tunnel_decap_get);

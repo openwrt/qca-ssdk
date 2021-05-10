@@ -711,6 +711,8 @@ typedef sw_error_t (*adpt_mgmtctrl_ctrlpkt_profile_getfirst_func)(a_uint32_t dev
 typedef sw_error_t (*adpt_mgmtctrl_ctrlpkt_profile_getnext_func)(a_uint32_t dev_id, fal_ctrlpkt_profile_t *ctrlpkt);
 typedef sw_error_t (*adpt_mgmtctrl_vpgroup_set_func)(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t vpgroup_id);
 typedef sw_error_t (*adpt_mgmtctrl_vpgroup_get_func)(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *vpgroup_id);
+typedef sw_error_t (*adpt_mgmtctrl_tunnel_decap_set_func)(a_uint32_t dev_id, a_uint32_t cpu_code_id, a_bool_t enable);
+typedef sw_error_t (*adpt_mgmtctrl_tunnel_decap_get_func)(a_uint32_t dev_id, a_uint32_t cpu_code_id, a_bool_t *enable);
 /*ctrlpkt module end*/
 
 /*service module end*/
@@ -1618,6 +1620,8 @@ typedef struct
 	adpt_mgmtctrl_ctrlpkt_profile_getnext_func adpt_mgmtctrl_ctrlpkt_profile_getnext;
 	adpt_mgmtctrl_vpgroup_set_func adpt_mgmtctrl_vpgroup_set;
 	adpt_mgmtctrl_vpgroup_get_func adpt_mgmtctrl_vpgroup_get;
+	adpt_mgmtctrl_tunnel_decap_set_func adpt_mgmtctrl_tunnel_decap_set;
+	adpt_mgmtctrl_tunnel_decap_get_func adpt_mgmtctrl_tunnel_decap_get;
 	/*ctrlpkt module end*/
 
 	/*servcode module begin*/

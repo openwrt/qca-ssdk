@@ -23,4 +23,12 @@ adpt_appe_mgmtctrl_vpgroup_set(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 adpt_appe_mgmtctrl_vpgroup_get(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t *vpgroup_id);
+
+sw_error_t
+adpt_appe_mgmtctrl_tunnel_decap_set(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t enable);
+
+sw_error_t
+adpt_appe_mgmtctrl_tunnel_decap_get(a_uint32_t dev_id, a_uint32_t cpu_code_id,
+	a_bool_t *enable);
 #endif

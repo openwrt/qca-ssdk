@@ -9,6 +9,10 @@ ifeq (TRUE, $(IN_IP))
 	SRC_LIST += mht_ip.c
 endif
 
+ifeq (TRUE, $(IN_COSMAP))
+	SRC_LIST += mht_cosmap.c
+endif
+
 ifeq (, $(findstring MHT, $(SUPPORT_CHIP)))
 	SRC_LIST=
 endif

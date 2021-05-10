@@ -24,6 +24,10 @@
 #include "isisc_cosmap.h"
 #include "isisc_reg.h"
 
+#if defined(MHT)
+#include "mht_cosmap.h"
+#endif
+
 #define ISISC_MAX_DSCP                63
 #define ISISC_MAX_UP                  7
 #define ISISC_MAX_PRI                 7
@@ -634,6 +638,17 @@ isisc_cosmap_init(a_uint32_t dev_id)
         p_api->cosmap_pri_to_ehqueue_get = isisc_cosmap_pri_to_ehqueue_get;
         p_api->cosmap_egress_remark_set = isisc_cosmap_egress_remark_set;
         p_api->cosmap_egress_remark_get = isisc_cosmap_egress_remark_get;
+#endif
+
+#if defined(MHT)
+        p_api->cosmap_dscp_to_ehpri_set = mht_cosmap_dscp_to_ehpri_set;
+        p_api->cosmap_dscp_to_ehpri_get = mht_cosmap_dscp_to_ehpri_get;
+        p_api->cosmap_dscp_to_ehdp_set = mht_cosmap_dscp_to_ehdp_set;
+        p_api->cosmap_dscp_to_ehdp_get = mht_cosmap_dscp_to_ehdp_get;
+        p_api->cosmap_up_to_ehpri_set = mht_cosmap_up_to_ehpri_set;
+        p_api->cosmap_up_to_ehpri_get = mht_cosmap_up_to_ehpri_get;
+        p_api->cosmap_up_to_ehdp_set = mht_cosmap_up_to_ehdp_set;
+        p_api->cosmap_up_to_ehdp_get = mht_cosmap_up_to_ehdp_get;
 #endif
     }
 #endif

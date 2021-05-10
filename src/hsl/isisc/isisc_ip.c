@@ -25,6 +25,10 @@
 #include "isisc_ip.h"
 #include "isisc_reg.h"
 
+#if defined(MHT)
+#include "mht_ip.h"
+#endif
+
 #define ISISC_HOST_ENTRY_DATA0_ADDR              0x0e80
 #define ISISC_HOST_ENTRY_DATA1_ADDR              0x0e84
 #define ISISC_HOST_ENTRY_DATA2_ADDR              0x0e88
@@ -2542,6 +2546,28 @@ isisc_ip_init(a_uint32_t dev_id)
         p_api->ip_age_time_get = isisc_ip_age_time_get;
         p_api->ip_wcmp_hash_mode_set = isisc_ip_wcmp_hash_mode_set;
         p_api->ip_wcmp_hash_mode_get = isisc_ip_wcmp_hash_mode_get;
+
+#if defined(MHT)
+	p_api->ip_vrf_base_addr_set = mht_ip_vrf_base_addr_set;
+	p_api->ip_vrf_base_addr_get = mht_ip_vrf_base_addr_get;
+	p_api->ip_vrf_base_mask_set = mht_ip_vrf_base_mask_set;
+	p_api->ip_vrf_base_mask_get = mht_ip_vrf_base_mask_get;
+	p_api->ip_default_route_set = mht_ip_default_route_set;
+	p_api->ip_default_route_get = mht_ip_default_route_get;
+	p_api->ip_host_route_set = mht_ip_host_route_set;
+	p_api->ip_host_route_get = mht_ip_host_route_get;
+	p_api->ip_wcmp_entry_set = mht_ip_wcmp_entry_set;
+	p_api->ip_wcmp_entry_get = mht_ip_wcmp_entry_get;
+	p_api->ip_rfs_ip4_set = mht_ip_rfs_ip4_set;
+	p_api->ip_rfs_ip6_set = mht_ip_rfs_ip6_set;
+	p_api->ip_rfs_ip4_del = mht_ip_rfs_ip4_del;
+	p_api->ip_rfs_ip6_del = mht_ip_rfs_ip6_del;
+	p_api->ip_default_flow_cmd_set = mht_default_flow_cmd_set;
+	p_api->ip_default_flow_cmd_get = mht_default_flow_cmd_get;
+	p_api->ip_default_rt_flow_cmd_set = mht_default_rt_flow_cmd_set;
+	p_api->ip_default_rt_flow_cmd_get = mht_default_rt_flow_cmd_get;
+	p_api->ip_glb_lock_time_set = mht_ip_glb_lock_time_set;
+#endif
     }
 #endif
 

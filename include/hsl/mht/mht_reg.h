@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2012, The Linux Foundation. All rights reserved.
  * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -21,6 +22,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+#define MHT_DEVICE_ID  0x17
 
 #define HSL_RW 1
 #define HSL_RO 0
@@ -98,6 +101,393 @@ extern "C" {
 #define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_BOFFSET	0
 #define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_BLEN		1
 #define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_FLAG		HSL_RW
+
+/* WAN DSCP To Priority Register */
+#define DSCP_TO_EHPRI
+#define DSCP_TO_EHPRI_OFFSET     0x0730
+#define DSCP_TO_EHPRI_E_LENGTH   4
+#define DSCP_TO_EHPRI_E_OFFSET   0x0004
+#define DSCP_TO_EHPRI_NR_E       8
+
+/* WAN UP To Priority Register */
+#define UP_TO_EHPRI
+#define UP_TO_EHPRI_OFFSET     0x0750
+#define UP_TO_EHPRI_E_LENGTH   4
+#define UP_TO_EHPRI_E_OFFSET   0x0004
+#define UP_TO_EHPRI_NR_E       1
+
+/* port flow control threshold Register */
+#define PORT_FLOC_CTRL_THRESH
+#define PORT_FLOC_CTRL_THRESH_OFFSET	0x9b0
+#define PORT_FLOC_CTRL_THRESH_E_LENGTH   4
+#define PORT_FLOC_CTRL_THRESH_E_OFFSET   0x0004
+#define PORT_FLOC_CTRL_THRESH_NR_E       7
+
+#define FlOW_CMD_CTL
+#define FlOW_CMD_CTL_OFFSET                           0x0ea0
+#define FlOW_CMD_CTL_E_LENGTH                         4
+#define FlOW_CMD_CTL_E_OFFSET                         0x4
+#define FlOW_CMD_CTL_NR_E                             8
+
+#define LAN_2_LAN_DEFAULT
+#define FlOW_CMD_CTL_LAN_2_LAN_DEFAULT_BOFFSET        26
+#define FlOW_CMD_CTL_LAN_2_LAN_DEFAULT_BLEN           2
+#define FlOW_CMD_CTL_LAN_2_LAN_DEFAULT_FLAG           HSL_RW
+
+#define WAN_2_LAN_DEFAULT
+#define FlOW_CMD_CTL_WAN_2_LAN_DEFAULT_BOFFSET        24
+#define FlOW_CMD_CTL_WAN_2_LAN_DEFAULT_BLEN           2
+#define FlOW_CMD_CTL_WAN_2_LAN_DEFAULT_FLAG           HSL_RW
+
+#define LAN_2_WAN_DEFAULT
+#define FlOW_CMD_CTL_LAN_2_WAN_DEFAULT_BOFFSET        22
+#define FlOW_CMD_CTL_LAN_2_WAN_DEFAULT_BLEN           2
+#define FlOW_CMD_CTL_LAN_2_WAN_DEFAULT_FLAG           HSL_RW
+
+#define WAN_2_WAN_DEFAULT
+#define FlOW_CMD_CTL_WAN_2_WAN_DEFAULT_BOFFSET        20
+#define FlOW_CMD_CTL_WAN_2_WAN_DEFAULT_BLEN           2
+#define FlOW_CMD_CTL_WAN_2_WAN_DEFAULT_FLAG           HSL_RW
+
+#define FlOW_RT_CMD_CTL
+#define FlOW_RT_CMD_CTL_OFFSET                       0x0ec0
+#define FlOW_RT_CMD_CTL_E_LENGTH                     4
+#define FlOW_RT_CMD_CTL_E_OFFSET                     0x4
+#define FlOW_RT_CMD_CTL_NR_E                         8
+
+#define LAN_2_LAN_DEFAULT
+#define FlOW_RT_CMD_CTL_LAN_2_LAN_DEFAULT_BOFFSET    26
+#define FlOW_RT_CMD_CTL_LAN_2_LAN_DEFAULT_BLEN       2
+#define FlOW_RT_CMD_CTL_LAN_2_LAN_DEFAULT_FLAG       HSL_RW
+
+#define WAN_2_LAN_DEFAULT
+#define FlOW_RT_CMD_CTL_WAN_2_LAN_DEFAULT_BOFFSET    24
+#define FlOW_RT_CMD_CTL_WAN_2_LAN_DEFAULT_BLEN       2
+#define FlOW_RT_CMD_CTL_WAN_2_LAN_DEFAULT_FLAG       HSL_RW
+
+#define LAN_2_WAN_DEFAULT
+#define FlOW_RT_CMD_CTL_LAN_2_WAN_DEFAULT_BOFFSET    22
+#define FlOW_RT_CMD_CTL_LAN_2_WAN_DEFAULT_BLEN       2
+#define FlOW_RT_CMD_CTL_LAN_2_WAN_DEFAULT_FLAG       HSL_RW
+
+#define WAN_2_WAN_DEFAULT
+#define FlOW_RT_CMD_CTL_WAN_2_WAN_DEFAULT_BOFFSET    20
+#define FlOW_RT_CMD_CTL_WAN_2_WAN_DEFAULT_BLEN       2
+#define FlOW_RT_CMD_CTL_WAN_2_WAN_DEFAULT_FLAG       HSL_RW
+
+#define IP4_DEFAULT_ROUTE_ENTRY
+#define IP4_DEFAULT_ROUTE_ENTRY_OFFSET                     0x004c4
+#define IP4_DEFAULT_ROUTE_ENTRY_E_LENGTH                   4
+#define IP4_DEFAULT_ROUTE_ENTRY_E_OFFSET                   0x0
+#define IP4_DEFAULT_ROUTE_ENTRY_NR_E                       8
+
+#define VALID
+#define IP4_DEFAULT_ROUTE_ENTRY_VALID_BOFFSET          11
+#define IP4_DEFAULT_ROUTE_ENTRY_VALID_BLEN             1
+#define IP4_DEFAULT_ROUTE_ENTRY_VALID_FLAG             HSL_RW
+
+#define VRF
+#define IP4_DEFAULT_ROUTE_ENTRY_VRF_BOFFSET          8
+#define IP4_DEFAULT_ROUTE_ENTRY_VRF_BLEN             3
+#define IP4_DEFAULT_ROUTE_ENTRY_VRF_FLAG             HSL_RW
+
+#define ARP_WCMP_TYPE
+#define IP4_DEFAULT_ROUTE_ENTRY_ARP_WCMP_TYPE_BOFFSET          7
+#define IP4_DEFAULT_ROUTE_ENTRY_ARP_WCMP_TYPE_BLEN             1
+#define IP4_DEFAULT_ROUTE_ENTRY_ARP_WCMP_TYPE_FLAG             HSL_RW
+
+#define ARP_WCMP_INDEX
+#define IP4_DEFAULT_ROUTE_ENTRY_ARP_WCMP_INDEX_BOFFSET          0
+#define IP4_DEFAULT_ROUTE_ENTRY_ARP_WCMP_INDEX_BLEN             7
+#define IP4_DEFAULT_ROUTE_ENTRY_ARP_WCMP_INDEX_FLAG             HSL_RW
+
+#define IP6_DEFAULT_ROUTE_ENTRY
+#define IP6_DEFAULT_ROUTE_ENTRY_OFFSET                     0x004c4
+#define IP6_DEFAULT_ROUTE_ENTRY_E_LENGTH                   4
+#define IP6_DEFAULT_ROUTE_ENTRY_E_OFFSET                   0x0
+#define IP6_DEFAULT_ROUTE_ENTRY_NR_E                       8
+
+#define VALID
+#define IP6_DEFAULT_ROUTE_ENTRY_VALID_BOFFSET          11
+#define IP6_DEFAULT_ROUTE_ENTRY_VALID_BLEN             1
+#define IP6_DEFAULT_ROUTE_ENTRY_VALID_FLAG             HSL_RW
+
+#define VRF
+#define IP6_DEFAULT_ROUTE_ENTRY_VRF_BOFFSET          8
+#define IP6_DEFAULT_ROUTE_ENTRY_VRF_BLEN             3
+#define IP6_DEFAULT_ROUTE_ENTRY_VRF_FLAG             HSL_RW
+
+#define ARP_WCMP_TYPE
+#define IP6_DEFAULT_ROUTE_ENTRY_ARP_WCMP_TYPE_BOFFSET          7
+#define IP6_DEFAULT_ROUTE_ENTRY_ARP_WCMP_TYPE_BLEN             1
+#define IP6_DEFAULT_ROUTE_ENTRY_ARP_WCMP_TYPE_FLAG             HSL_RW
+
+#define ARP_WCMP_INDEX
+#define IP6_DEFAULT_ROUTE_ENTRY_ARP_WCMP_INDEX_BOFFSET          0
+#define IP6_DEFAULT_ROUTE_ENTRY_ARP_WCMP_INDEX_BLEN             7
+#define IP6_DEFAULT_ROUTE_ENTRY_ARP_WCMP_INDEX_FLAG             HSL_RW
+
+#define IP4_HOST_ROUTE_ENTRY0
+#define IP4_HOST_ROUTE_ENTRY0_OFFSET                     0x5b000
+#define IP4_HOST_ROUTE_ENTRY0_E_LENGTH                   4
+#define IP4_HOST_ROUTE_ENTRY0_E_OFFSET                   0x0
+#define IP4_HOST_ROUTE_ENTRY0_NR_E                       16
+
+#define IP4_ADDRL
+#define IP4_HOST_ROUTE_ENTRY0_IP4_ADDRL_BOFFSET          5
+#define IP4_HOST_ROUTE_ENTRY0_IP4_ADDRL_BLEN             27
+#define IP4_HOST_ROUTE_ENTRY0_IP4_ADDRL_FLAG             HSL_RW
+
+#define PREFIX_LENGTH
+#define IP4_HOST_ROUTE_ENTRY0_PREFIX_LENGTH_BOFFSET     0
+#define IP4_HOST_ROUTE_ENTRY0_PREFIX_LENGTH_BLEN        5
+#define IP4_HOST_ROUTE_ENTRY0_PREFIX_LENGTH_FLAG        HSL_RW
+
+#define IP4_HOST_ROUTE_ENTRY1
+#define IP4_HOST_ROUTE_ENTRY1_OFFSET                     0x5b004
+#define IP4_HOST_ROUTE_ENTRY1_E_LENGTH                   4
+#define IP4_HOST_ROUTE_ENTRY1_E_OFFSET                   0x0
+#define IP4_HOST_ROUTE_ENTRY1_NR_E                       16
+
+#define VALID
+#define IP4_HOST_ROUTE_ENTRY1_VALID_BOFFSET          8
+#define IP4_HOST_ROUTE_ENTRY1_VALID_BLEN             1
+#define IP4_HOST_ROUTE_ENTRY1_VALID_FLAG             HSL_RW
+
+#define VRF
+#define IP4_HOST_ROUTE_ENTRY1_VRF_BOFFSET          5
+#define IP4_HOST_ROUTE_ENTRY1_VRF_BLEN             3
+#define IP4_HOST_ROUTE_ENTRY1_VRF_FLAG             HSL_RW
+
+#define IP4_ADDRH
+#define IP4_HOST_ROUTE_ENTRY1_IP4_ADDRH_BOFFSET     0
+#define IP4_HOST_ROUTE_ENTRY1_IP4_ADDRH_BLEN        5
+#define IP4_HOST_ROUTE_ENTRY1_IP4_ADDRH_FLAG        HSL_RW
+
+#define IP6_HOST_ROUTE_ENTRY0
+#define IP6_HOST_ROUTE_ENTRY0_OFFSET                     0x5b100
+#define IP6_HOST_ROUTE_ENTRY0_E_LENGTH                   4
+#define IP6_HOST_ROUTE_ENTRY0_E_OFFSET                   0x0
+#define IP6_HOST_ROUTE_ENTRY0_NR_E                       16
+
+#define PREFIX_LENGTH
+#define IP6_HOST_ROUTE_ENTRY0_PREFIX_LENGTH_BOFFSET          0
+#define IP6_HOST_ROUTE_ENTRY0_PREFIX_LENGTH_BLEN             7
+#define IP6_HOST_ROUTE_ENTRY0_PREFIX_LENGTH_FLAG             HSL_RW
+
+#define IP6_ADDR0L
+#define IP6_HOST_ROUTE_ENTRY0_IP6_ADDR0L_BOFFSET          7
+#define IP6_HOST_ROUTE_ENTRY0_IP6_ADDR0L_BLEN             25
+#define IP6_HOST_ROUTE_ENTRY0_IP6_ADDR0L_FLAG             HSL_RW
+
+#define IP6_HOST_ROUTE_ENTRY1
+#define IP6_HOST_ROUTE_ENTRY1_OFFSET                     0x5b104
+#define IP6_HOST_ROUTE_ENTRY1_E_LENGTH                   4
+#define IP6_HOST_ROUTE_ENTRY1_E_OFFSET                   0x0
+#define IP6_HOST_ROUTE_ENTRY1_NR_E                       16
+
+#define IP6_ADDR0H
+#define IP6_HOST_ROUTE_ENTRY1_IP6_ADDR0H_BOFFSET          0
+#define IP6_HOST_ROUTE_ENTRY1_IP6_ADDR0H_BLEN             7
+#define IP6_HOST_ROUTE_ENTRY1_IP6_ADDR0H_FLAG             HSL_RW
+
+#define IP6_ADDR1L
+#define IP6_HOST_ROUTE_ENTRY1_IP6_ADDR1L_BOFFSET          7
+#define IP6_HOST_ROUTE_ENTRY1_IP6_ADDR1L_BLEN             25
+#define IP6_HOST_ROUTE_ENTRY1_IP6_ADDR1L_FLAG             HSL_RW
+
+#define IP6_HOST_ROUTE_ENTRY2
+#define IP6_HOST_ROUTE_ENTRY2_OFFSET                     0x5b108
+#define IP6_HOST_ROUTE_ENTRY2_E_LENGTH                   4
+#define IP6_HOST_ROUTE_ENTRY2_E_OFFSET                   0x0
+#define IP6_HOST_ROUTE_ENTRY2_NR_E                       16
+
+#define IP6_ADDR1H
+#define IP6_HOST_ROUTE_ENTRY2_IP6_ADDR1H_BOFFSET          0
+#define IP6_HOST_ROUTE_ENTRY2_IP6_ADDR1H_BLEN             7
+#define IP6_HOST_ROUTE_ENTRY2_IP6_ADDR1H_FLAG             HSL_RW
+
+#define IP6_ADDR2L
+#define IP6_HOST_ROUTE_ENTRY2_IP6_ADDR2L_BOFFSET          7
+#define IP6_HOST_ROUTE_ENTRY2_IP6_ADDR2L_BLEN             25
+#define IP6_HOST_ROUTE_ENTRY2_IP6_ADDR2L_FLAG             HSL_RW
+
+#define IP6_HOST_ROUTE_ENTRY3
+#define IP6_HOST_ROUTE_ENTRY3_OFFSET                     0x5b10c
+#define IP6_HOST_ROUTE_ENTRY3_E_LENGTH                   4
+#define IP6_HOST_ROUTE_ENTRY3_E_OFFSET                   0x0
+#define IP6_HOST_ROUTE_ENTRY3_NR_E                       16
+
+#define IP6_ADDR2H
+#define IP6_HOST_ROUTE_ENTRY3_IP6_ADDR2H_BOFFSET          0
+#define IP6_HOST_ROUTE_ENTRY3_IP6_ADDR2H_BLEN             7
+#define IP6_HOST_ROUTE_ENTRY3_IP6_ADDR2H_FLAG             HSL_RW
+
+#define IP6_ADDR3L
+#define IP6_HOST_ROUTE_ENTRY3_IP6_ADDR3L_BOFFSET          7
+#define IP6_HOST_ROUTE_ENTRY3_IP6_ADDR3L_BLEN             25
+#define IP6_HOST_ROUTE_ENTRY3_IP6_ADDR3L_FLAG             HSL_RW
+
+#define IP6_HOST_ROUTE_ENTRY4
+#define IP6_HOST_ROUTE_ENTRY4_OFFSET                     0x5b110
+#define IP6_HOST_ROUTE_ENTRY4_E_LENGTH                   4
+#define IP6_HOST_ROUTE_ENTRY4_E_OFFSET                   0x0
+#define IP6_HOST_ROUTE_ENTRY4_NR_E                       16
+
+#define IP6_ADDR3H
+#define IP6_HOST_ROUTE_ENTRY4_IP6_ADDR3H_BOFFSET          0
+#define IP6_HOST_ROUTE_ENTRY4_IP6_ADDR3H_BLEN             7
+#define IP6_HOST_ROUTE_ENTRY4_IP6_ADDR3H_FLAG             HSL_RW
+
+#define VRF
+#define IP6_HOST_ROUTE_ENTRY4_VRF_BOFFSET          7
+#define IP6_HOST_ROUTE_ENTRY4_VRF_BLEN             3
+#define IP6_HOST_ROUTE_ENTRY4_VRF_FLAG             HSL_RW
+
+#define VALID
+#define IP6_HOST_ROUTE_ENTRY4_VALID_BOFFSET          10
+#define IP6_HOST_ROUTE_ENTRY4_VALID_BLEN             1
+#define IP6_HOST_ROUTE_ENTRY4_VALID_FLAG             HSL_RW
+
+/* Flow Congestion Drop CTRL0 */
+#define FLOW_CONGE_DROP_CTRL0
+#define FLOW_CONGE_DROP_CTRL0_OFFSET         0x0b74
+#define FLOW_CONGE_DROP_CTRL0_E_LENGTH       4
+#define FLOW_CONGE_DROP_CTRL0_E_OFFSET       4
+#define FLOW_CONGE_DROP_CTRL0_NR_E           1
+
+#define EN5
+#define FLOW_CONGE_DROP_CTRL0_EN5_BOFFSET        22
+#define FLOW_CONGE_DROP_CTRL0_EN5_BLEN           6
+#define FLOW_CONGE_DROP_CTRL0_EN5_FLAG           HSL_RW
+
+#define EN4
+#define FLOW_CONGE_DROP_CTRL0_EN4_BOFFSET        18
+#define FLOW_CONGE_DROP_CTRL0_EN4_BLEN           4
+#define FLOW_CONGE_DROP_CTRL0_EN4_FLAG           HSL_RW
+
+#define EN3
+#define FLOW_CONGE_DROP_CTRL0_EN3_BOFFSET        14
+#define FLOW_CONGE_DROP_CTRL0_EN3_BLEN           4
+#define FLOW_CONGE_DROP_CTRL0_EN3_FLAG           HSL_RW
+
+#define EN2
+#define FLOW_CONGE_DROP_CTRL0_EN2_BOFFSET        10
+#define FLOW_CONGE_DROP_CTRL0_EN2_BLEN           4
+#define FLOW_CONGE_DROP_CTRL0_EN2_FLAG           HSL_RW
+
+#define EN1
+#define FLOW_CONGE_DROP_CTRL0_EN1_BOFFSET        6
+#define FLOW_CONGE_DROP_CTRL0_EN1_BLEN           4
+#define FLOW_CONGE_DROP_CTRL0_EN1_FLAG           HSL_RW
+
+#define EN0
+#define FLOW_CONGE_DROP_CTRL0_EN0_BOFFSET        0
+#define FLOW_CONGE_DROP_CTRL0_EN0_BLEN           6
+#define FLOW_CONGE_DROP_CTRL0_EN0_FLAG           HSL_RW
+
+#define FLOW_CONGE_DROP_CTRL1
+#define FLOW_CONGE_DROP_CTRL1_OFFSET         0x0b78
+#define FLOW_CONGE_DROP_CTRL1_E_LENGTH       4
+#define FLOW_CONGE_DROP_CTRL1_E_OFFSET       4
+#define FLOW_CONGE_DROP_CTRL1_NR_E           1
+
+#define EN6
+#define FLOW_CONGE_DROP_CTRL1_EN6_BOFFSET        0
+#define FLOW_CONGE_DROP_CTRL1_EN6_BLEN           6
+#define FLOW_CONGE_DROP_CTRL1_EN6_FLAG           HSL_RW
+
+/* SWITCH GLOBAL FLOW CTRL THRESHOLD REGISTER  */
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_OFFSET	0x800
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_E_LENGTH	4
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_E_OFFSET	0
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_NR_E		1
+
+#define XON_THRES
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_XON_THRES_BOFFSET	16
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_XON_THRES_BLEN	11
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_XON_THRES_FLAG	HSL_RW
+
+#define XOFF_THRES
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_XOFF_THRES_BOFFSET	0
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_XOFF_THRES_BLEN	11
+#define SWITCH_GLOBAL_FLOW_CTRL_THRESHOLD_XOFF_THRES_FLAG	HSL_RW
+
+/* Ring Flow Control Threshold Register*/
+#define RING_FLOW_CTRL_THRES
+#define RING_FLOW_CTRL_THRES_OFFSET         0x0b80
+#define RING_FLOW_CTRL_THRES_E_LENGTH       4
+#define RING_FLOW_CTRL_THRES_E_OFFSET       4
+#define RING_FLOW_CTRL_THRES_NR_E           8
+
+#define XON
+#define RING_FLOW_CTRL_THRES_XON_BOFFSET        16
+#define RING_FLOW_CTRL_THRES_XON_BLEN           10
+#define RING_FLOW_CTRL_THRES_XON_FLAG           HSL_RW
+
+#define XOFF
+#define RING_FLOW_CTRL_THRES_XOFF_BOFFSET        0
+#define RING_FLOW_CTRL_THRES_XOFF_BLEN           10
+#define RING_FLOW_CTRL_THRES_XOFF_FLAG           HSL_RW
+
+/* PORT5 Ring Flow Control Threshold Register*/
+#define PORT5_RING_FLOW_CTRL_THRES
+#define PORT5_RING_FLOW_CTRL_THRES_OFFSET         0x0ba0
+#define PORT5_RING_FLOW_CTRL_THRES_E_LENGTH       4
+#define PORT5_RING_FLOW_CTRL_THRES_E_OFFSET       4
+#define PORT5_RING_FLOW_CTRL_THRES_NR_E           8
+
+#define XON
+#define PORT5_RING_FLOW_CTRL_THRES_XON_BOFFSET        16
+#define PORT5_RING_FLOW_CTRL_THRES_XON_BLEN           10
+#define PORT5_RING_FLOW_CTRL_THRES_XON_FLAG           HSL_RW
+
+#define XOFF
+#define PORT5_RING_FLOW_CTRL_THRES_XOFF_BOFFSET        0
+#define PORT5_RING_FLOW_CTRL_THRES_XOFF_BLEN           10
+#define PORT5_RING_FLOW_CTRL_THRES_XOFF_FLAG           HSL_RW
+
+/* PORT0 PORT5 RING UNION */
+#define PORT0_PORT5_RING_UNION
+#define PORT0_PORT5_RING_UNION_OFFSET         0x0bc0
+#define PORT0_PORT5_RING_UNION_E_LENGTH       4
+#define PORT0_PORT5_RING_UNION_E_OFFSET       0
+#define PORT0_PORT5_RING_UNION_NR_E           1
+
+#define EN
+#define PORT0_PORT5_RING_UNION_EN_BOFFSET	0
+#define PORT0_PORT5_RING_UNION_EN_BLEN		1
+#define PORT0_PORT5_RING_UNION_EN_FLAG		HSL_RW
+
+
+/* Global Interrupt Register0 */
+#define GLOBAL_INT0
+#define GLOBAL_INT0_OFFSET    0x0020
+#define GLOBAL_INT0_E_LENGTH  4
+#define GLOBAL_INT0_E_OFFSET  0
+#define GLOBAL_INT0_NR_E      1
+
+/* Global Interrupt Register1 */
+#define GLOBAL_INT1
+#define GLOBAL_INT1_OFFSET    0x0024
+#define GLOBAL_INT1_E_LENGTH  4
+#define GLOBAL_INT1_E_OFFSET  0
+#define GLOBAL_INT1_NR_E      1
+
+/* Global Interrupt Mask Register0  */
+#define GLOBAL_INT0_MASK
+#define GLOBAL_INT0_MASK_OFFSET    0x0028
+#define GLOBAL_INT0_MASK_E_LENGTH  4
+#define GLOBAL_INT0_MASK_E_OFFSET  0
+#define GLOBAL_INT0_MASK_NR_E      1
+
+/* Global Interrupt Mask Register1  */
+#define GLOBAL_INT1_MASK
+#define GLOBAL_INT1_MASK_OFFSET    0x002c
+#define GLOBAL_INT1_MASK_E_LENGTH  4
+#define GLOBAL_INT1_MASK_E_OFFSET  0
+#define GLOBAL_INT1_MASK_NR_E      1
 
 #ifdef __cplusplus
 }

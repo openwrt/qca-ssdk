@@ -5,6 +5,10 @@ include $(PRJ_PATH)/make/config.mk
 
 SRC_LIST= mht_init.c mht_sec_ctrl.c
 
+ifeq (TRUE, $(IN_IP))
+	SRC_LIST += mht_ip.c
+endif
+
 ifeq (, $(findstring MHT, $(SUPPORT_CHIP)))
 	SRC_LIST=
 endif

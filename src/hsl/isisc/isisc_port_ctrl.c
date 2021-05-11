@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2015-2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup isisc_port_ctrl ISISC_PORT_CONTROL
@@ -24,6 +26,10 @@
 #include "isisc_port_ctrl.h"
 #include "isisc_reg.h"
 #include "hsl_phy.h"
+
+#if defined(MHT)
+#include "mht_port_ctrl.h"
+#endif
 
 static a_bool_t
 _isisc_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
@@ -2785,6 +2791,14 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
         p_api->port_mac_loopback_set=isisc_port_mac_loopback_set;
         p_api->port_mac_loopback_get=isisc_port_mac_loopback_get;
 #endif
+
+#if defined(MHT)
+	p_api->port_congestion_drop_set = mht_port_congestion_drop_set;
+	p_api->port_congestion_drop_get = mht_port_congestion_drop_get;
+	p_api->ring_flow_ctrl_thres_set = mht_ring_flow_ctrl_thres_set;
+	p_api->ring_flow_ctrl_thres_get = mht_ring_flow_ctrl_thres_get;
+#endif
+
     }
 #endif
 

@@ -17,6 +17,10 @@ ifeq (TRUE, $(IN_NAT))
 	SRC_LIST += mht_nat.c
 endif
 
+ifeq (TRUE, $(IN_PORTCONTROL))
+	SRC_LIST += mht_port_ctrl.c
+endif
+
 ifeq (, $(findstring MHT, $(SUPPORT_CHIP)))
 	SRC_LIST=
 endif

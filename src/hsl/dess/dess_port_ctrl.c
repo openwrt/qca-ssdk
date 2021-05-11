@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2014-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -1722,7 +1725,7 @@ _dess_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
 
 static sw_error_t
 _dess_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
-				a_uint8_t on_thres, a_uint8_t off_thres)
+				a_uint16_t on_thres, a_uint16_t off_thres)
 {
   sw_error_t rv;
   a_uint32_t val = 0;
@@ -1751,7 +1754,7 @@ _dess_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
 
 static sw_error_t
 _dess_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
-				a_uint8_t * on_thres, a_uint8_t * off_thres)
+				a_uint16_t * on_thres, a_uint16_t * off_thres)
 {
 
   sw_error_t rv;
@@ -3340,7 +3343,7 @@ dess_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
  */
 HSL_LOCAL sw_error_t
 dess_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
-			       a_uint8_t on_thres, a_uint8_t off_thres)
+			       a_uint16_t on_thres, a_uint16_t off_thres)
 {
   sw_error_t rv;
   HSL_API_LOCK;
@@ -3359,7 +3362,7 @@ dess_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
  */
 HSL_LOCAL sw_error_t
 dess_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
-			       a_uint8_t * on_thres, a_uint8_t * off_thres)
+			       a_uint16_t * on_thres, a_uint16_t * off_thres)
 {
   sw_error_t rv;
 

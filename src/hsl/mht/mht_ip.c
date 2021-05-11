@@ -54,9 +54,9 @@
 #define MHT_IP4_HOST_ROUTE_TBL0_ADDR                 0x5b000
 #define MHT_IP6_HOST_ROUTE_TBL0_ADDR                 0x5b100
 
+extern aos_lock_t mht_nat_lock;
 static a_uint32_t mht_mac_snap[SW_MAX_NR_DEV] = { 0 };
 static fal_intf_mac_entry_t mht_intf_snap[SW_MAX_NR_DEV][MHT_INTF_MAC_ADDR_NUM];
-aos_lock_t mht_nat_lock;
 
 static void
 _mht_ip_pt_learn_save(a_uint32_t dev_id, a_uint32_t * status)

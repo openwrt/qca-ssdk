@@ -13,6 +13,10 @@ ifeq (TRUE, $(IN_COSMAP))
 	SRC_LIST += mht_cosmap.c
 endif
 
+ifeq (TRUE, $(IN_NAT))
+	SRC_LIST += mht_nat.c
+endif
+
 ifeq (, $(findstring MHT, $(SUPPORT_CHIP)))
 	SRC_LIST=
 endif

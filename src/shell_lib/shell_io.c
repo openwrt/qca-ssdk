@@ -90,7 +90,14 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
-
+	{
+		"shaper_meter_type",
+		{
+			{"rfc", FAL_SHAPER_METER_RFC},
+			{"mef10_3", FAL_SHAPER_METER_MEF10_3},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -12253,25 +12260,10 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
 
     aos_mem_zero(&entry, sizeof (fal_shaper_config_t));
 
-    do
-    {
-        cmd = get_sub_cmd("meter_type", "0-1");
-        SW_RTN_ON_NULL_PARAM(cmd);
-
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_type), sizeof (fal_shaper_meter_type_t));
-        }
-    }
-    while (talk_mode && (SW_OK != rv));
+    cmd_data_check_element("meter_type", "rfc",
+                        "usage:meter_type:rfc/mef10_3, etc\n",
+                        cmd_data_check_attr, ("shaper_meter_type", cmd,
+                        &(entry.meter_type), sizeof(entry.meter_type)));
 
     do
     {

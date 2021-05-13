@@ -198,7 +198,7 @@ _mht_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
 }
 
 #define MHT_RX_DMA_RING_PAUSE_DEBUG_ADDR	0x28
-sw_error_t
+static sw_error_t
 _mht_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
 {
 
@@ -218,6 +218,76 @@ _mht_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *
 			(a_uint8_t *)(&val), sizeof(a_uint32_t));
 
 	*status = (val >> ring_id) & 1;
+
+	return rv;
+}
+
+static sw_error_t
+_mht_ring_union_set(a_uint32_t dev_id, a_bool_t enable)
+{
+	sw_error_t rv;
+	a_uint32_t val;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	val = enable ? 1 : 0;
+	HSL_REG_FIELD_SET(rv, dev_id, PORT0_PORT5_RING_UNION, 0, EN,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	return rv;
+}
+
+static sw_error_t
+_mht_ring_union_get(a_uint32_t dev_id, a_bool_t *enable)
+{
+	sw_error_t rv;
+	a_uint32_t val;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	HSL_REG_FIELD_GET(rv, dev_id, PORT0_PORT5_RING_UNION, 0, EN,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	*enable = val ? A_TRUE : A_FALSE;
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_flowctrl_thresh_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint16_t *on, a_uint16_t *off)
+{
+	sw_error_t rv;
+	a_uint32_t val = 0;
+	a_uint16_t hthres, lthres;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	HSL_REG_ENTRY_GET(rv, dev_id, PORT_FLOC_CTRL_THRESH, port_id,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	SW_GET_FIELD_BY_REG(PORT_FLOC_CTRL_THRESH, XON, hthres, val);
+	SW_GET_FIELD_BY_REG(PORT_FLOC_CTRL_THRESH, XOFF, lthres, val);
+
+	*on = hthres;
+	*off = lthres;
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_flowctrl_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint16_t on, a_uint16_t off)
+{
+	sw_error_t rv;
+	a_uint32_t val = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	SW_SET_REG_BY_FIELD(PORT_FLOC_CTRL_THRESH, XON, on, val);
+	SW_SET_REG_BY_FIELD(PORT_FLOC_CTRL_THRESH, XOFF, off, val);
+	HSL_REG_ENTRY_SET(rv, dev_id, PORT_FLOC_CTRL_THRESH, port_id,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
 
 	return rv;
 }
@@ -314,6 +384,78 @@ mht_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *s
 
 	HSL_API_LOCK;
 	rv = _mht_ring_flow_ctrl_status_get (dev_id, ring_id, status);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set port0 port5 ring union.
+ * @param[in] dev_id device id
+ * @param[in] enable or not
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_ring_union_set(a_uint32_t dev_id, a_bool_t en)
+{
+	sw_error_t rv;
+	HSL_API_LOCK;
+	rv = _mht_ring_union_set(dev_id, en);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get port0 port5 ring union.
+ * @param[in] dev_id device id
+ * @param[out] enable or not
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_ring_union_get(a_uint32_t dev_id, a_bool_t *en)
+{
+	sw_error_t rv;
+	HSL_API_LOCK;
+	rv = _mht_ring_union_get(dev_id, en);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get flow control(rx/tx/bp) threshold on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] on on threshold
+ * @param[out] off off threshold
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_flowctrl_thresh_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint16_t *on, a_uint16_t *off)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_flowctrl_thresh_get(dev_id, port_id, on, off);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set flow control(rx/tx/bp) threshold on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] on on threshold
+ * @param[in] off off threshold
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_flowctrl_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint16_t on, a_uint16_t off)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_flowctrl_thresh_set(dev_id, port_id, on, off);
 	HSL_API_UNLOCK;
 	return rv;
 }

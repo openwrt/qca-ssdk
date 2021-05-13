@@ -123,6 +123,16 @@ extern "C" {
 #define PORT_FLOC_CTRL_THRESH_E_OFFSET   0x0004
 #define PORT_FLOC_CTRL_THRESH_NR_E       7
 
+#define XON
+#define PORT_FLOC_CTRL_THRESH_XON_BOFFSET        16
+#define PORT_FLOC_CTRL_THRESH_XON_BLEN           10
+#define PORT_FLOC_CTRL_THRESH_XON_FLAG           HSL_RW
+
+#define XOFF
+#define PORT_FLOC_CTRL_THRESH_XOFF_BOFFSET        0
+#define PORT_FLOC_CTRL_THRESH_XOFF_BLEN           10
+#define PORT_FLOC_CTRL_THRESH_XOFF_FLAG           HSL_RW
+
 #define FlOW_CMD_CTL
 #define FlOW_CMD_CTL_OFFSET                           0x0ea0
 #define FlOW_CMD_CTL_E_LENGTH                         4

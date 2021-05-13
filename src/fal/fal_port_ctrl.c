@@ -2034,6 +2034,72 @@ _fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *
 	return rv;
 }
 
+sw_error_t
+_fal_ring_union_set(a_uint32_t dev_id, a_bool_t en)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_union_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_union_set(dev_id, en);
+
+	return rv;
+}
+
+sw_error_t
+_fal_ring_union_get(a_uint32_t dev_id, a_bool_t *en)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_union_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_union_get(dev_id, en);
+
+	return rv;
+}
+
+sw_error_t
+_fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t on_thres, a_uint16_t off_thres)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->port_flowctrl_thresh_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->port_flowctrl_thresh_set(dev_id, port_id, on_thres, off_thres);
+
+	return rv;
+}
+
+sw_error_t
+_fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t *on_thres, a_uint16_t *off_thres)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->port_flowctrl_thresh_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->port_flowctrl_thresh_get(dev_id, port_id, on_thres, off_thres);
+
+	return rv;
+}
+
 /*qca808x_start*/
 /*insert flag for inner fal, don't remove it*/
 /**
@@ -3718,6 +3784,52 @@ fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *s
     return rv;
 }
 
+sw_error_t
+fal_ring_union_set(a_uint32_t dev_id, a_bool_t en)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_union_set(dev_id, en);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_ring_union_get(a_uint32_t dev_id, a_bool_t *en)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_union_get(dev_id, en);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t on_thres, a_uint16_t off_thres)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_flow_ctrl_thres_set(dev_id, port_id, on_thres, off_thres);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t *on_thres, a_uint16_t *off_thres)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_flow_ctrl_thres_get(dev_id, port_id, on_thres, off_thres);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 /**
  * @}
@@ -3820,3 +3932,5 @@ EXPORT_SYMBOL(fal_port_8023ah_set);
 EXPORT_SYMBOL(fal_port_8023ah_get);
 #endif
 EXPORT_SYMBOL(fal_ring_flow_ctrl_status_get);
+EXPORT_SYMBOL(fal_ring_union_set);
+EXPORT_SYMBOL(fal_ring_union_get);

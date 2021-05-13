@@ -2795,9 +2795,13 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
 #if defined(MHT)
 	p_api->port_congestion_drop_set = mht_port_congestion_drop_set;
 	p_api->port_congestion_drop_get = mht_port_congestion_drop_get;
+	p_api->port_flowctrl_thresh_set = mht_port_flowctrl_thresh_set;
+	p_api->port_flowctrl_thresh_get = mht_port_flowctrl_thresh_get;
 	p_api->ring_flow_ctrl_thres_set = mht_ring_flow_ctrl_thres_set;
 	p_api->ring_flow_ctrl_thres_get = mht_ring_flow_ctrl_thres_get;
 	p_api->ring_flow_ctrl_status_get = mht_ring_flow_ctrl_status_get;
+	p_api->ring_union_set = mht_ring_union_set;
+	p_api->ring_union_get = mht_ring_union_get;
 #endif
 
     }

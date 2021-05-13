@@ -306,9 +306,13 @@ extern "C"
   typedef sw_error_t
     (*hsl_port_flowctrl_get) (a_uint32_t dev_id, fal_port_t port_id,
 			      a_bool_t * enable);
-typedef sw_error_t
+  typedef sw_error_t
     (*hsl_port_flowctrl_thresh_set) (a_uint32_t dev_id, fal_port_t port_id,
-			      a_uint8_t  on, a_uint8_t  off);
+			      a_uint16_t on, a_uint16_t off);
+
+  typedef sw_error_t
+    (*hsl_port_flowctrl_thresh_get) (a_uint32_t dev_id, fal_port_t port_id,
+			      a_uint16_t *on, a_uint16_t *off);
 
   typedef sw_error_t
     (*hsl_port_flowctrl_forcemode_set) (a_uint32_t dev_id, fal_port_t port_id,
@@ -449,6 +453,11 @@ typedef sw_error_t
   typedef sw_error_t
 	  (*hsl_ring_flow_ctrl_status_get) (a_uint32_t dev_id, a_uint32_t ring_id,
 			  a_bool_t *status);
+  typedef sw_error_t
+	  (*hsl_ring_union_set) (a_uint32_t dev_id, a_bool_t en);
+
+  typedef sw_error_t
+	  (*hsl_ring_union_get) (a_uint32_t dev_id, a_bool_t *en);
 
   typedef sw_error_t
     (*hsl_port_8023az_set) (a_uint32_t dev_id, fal_port_t port_id,
@@ -2105,7 +2114,8 @@ typedef sw_error_t
     hsl_port_flowctrl_set port_flowctrl_set;
     hsl_port_flowctrl_get port_flowctrl_get;
 /*qca808x_end*/
-	hsl_port_flowctrl_thresh_set port_flowctrl_thresh_set;
+    hsl_port_flowctrl_thresh_set port_flowctrl_thresh_set;
+    hsl_port_flowctrl_thresh_get port_flowctrl_thresh_get;
     hsl_port_flowctrl_forcemode_set port_flowctrl_forcemode_set;
     hsl_port_flowctrl_forcemode_get port_flowctrl_forcemode_get;
 /*qca808x_start*/
@@ -2144,6 +2154,8 @@ typedef sw_error_t
     hsl_ring_flow_ctrl_thres_set ring_flow_ctrl_thres_set;
     hsl_ring_flow_ctrl_thres_get ring_flow_ctrl_thres_get;
     hsl_ring_flow_ctrl_status_get ring_flow_ctrl_status_get;
+    hsl_ring_union_set ring_union_set;
+    hsl_ring_union_get ring_union_get;
 /*qca808x_start*/
     hsl_port_8023az_set port_8023az_set;
     hsl_port_8023az_get port_8023az_get;

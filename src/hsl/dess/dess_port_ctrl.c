@@ -526,7 +526,7 @@ _dess_port_flowctrl_set (a_uint32_t dev_id, fal_port_t port_id,
 
 static sw_error_t
 _dess_port_flowctrl_thresh_set (a_uint32_t dev_id, fal_port_t port_id,
-			 a_uint8_t on, a_uint8_t off)
+			 a_uint16_t on, a_uint16_t off)
 {
 	sw_error_t rv;
 	a_uint32_t reg = 0;
@@ -2724,7 +2724,7 @@ dess_port_flowctrl_set (a_uint32_t dev_id, fal_port_t port_id,
  */
 HSL_LOCAL sw_error_t
 dess_port_flowctrl_thresh_set (a_uint32_t dev_id, fal_port_t port_id,
-			a_uint8_t on, a_uint8_t off)
+			a_uint16_t on, a_uint16_t off)
 {
 	sw_error_t rv;
 
@@ -3913,7 +3913,7 @@ dess_port_ctrl_init (a_uint32_t dev_id)
     p_api->port_autoneg_adv_set = dess_port_autoneg_adv_set;
     p_api->port_flowctrl_set = dess_port_flowctrl_set;
     p_api->port_flowctrl_get = dess_port_flowctrl_get;
-	p_api->port_flowctrl_thresh_set = dess_port_flowctrl_thresh_set;
+    p_api->port_flowctrl_thresh_set = dess_port_flowctrl_thresh_set;
     p_api->port_flowctrl_forcemode_set = dess_port_flowctrl_forcemode_set;
     p_api->port_flowctrl_forcemode_get = dess_port_flowctrl_forcemode_get;
     p_api->port_powersave_set = dess_port_powersave_set;

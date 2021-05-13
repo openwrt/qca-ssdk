@@ -79,6 +79,10 @@ extern "C" {
     SW_API_DEF(SW_API_PT_RING_FLOW_CTRL_THRES_SET, fal_ring_flow_ctrl_thres_set), \
     SW_API_DEF(SW_API_PT_RING_FLOW_CTRL_THRES_GET, fal_ring_flow_ctrl_thres_get), \
     SW_API_DEF(SW_API_PT_RING_FLOW_CTRL_STATUS_GET, fal_ring_flow_ctrl_status_get), \
+    SW_API_DEF(SW_API_PT_RING_UNION_SET, fal_ring_union_set), \
+    SW_API_DEF(SW_API_PT_RING_UNION_GET, fal_ring_union_get), \
+    SW_API_DEF(SW_API_PT_FLOW_CTRL_THRES_SET, fal_port_flow_ctrl_thres_set), \
+    SW_API_DEF(SW_API_PT_FLOW_CTRL_THRES_GET, fal_port_flow_ctrl_thres_get), \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_PT_8023AZ_SET, fal_port_8023az_set), \
     SW_API_DEF(SW_API_PT_8023AZ_GET, fal_port_8023az_get), \
@@ -189,6 +193,10 @@ extern "C" {
     SW_API_DESC(SW_API_PT_RING_FLOW_CTRL_THRES_SET) \
     SW_API_DESC(SW_API_PT_RING_FLOW_CTRL_THRES_GET) \
     SW_API_DESC(SW_API_PT_RING_FLOW_CTRL_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_RING_UNION_SET) \
+    SW_API_DESC(SW_API_PT_RING_UNION_GET) \
+    SW_API_DESC(SW_API_PT_FLOW_CTRL_THRES_SET) \
+    SW_API_DESC(SW_API_PT_FLOW_CTRL_THRES_GET) \
 /*qca808x_start*/\
     SW_API_DESC(SW_API_PT_8023AZ_SET) \
     SW_API_DESC(SW_API_PT_8023AZ_GET) \

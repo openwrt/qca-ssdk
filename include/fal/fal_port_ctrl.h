@@ -821,7 +821,17 @@ fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
 #endif
 
 sw_error_t
+fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t on_thres, a_uint16_t off_thres);
+sw_error_t
+fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t *on_thres, a_uint16_t *off_thres);
+sw_error_t
 fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
+sw_error_t
+fal_ring_union_set(a_uint32_t dev_id, a_bool_t en);
+sw_error_t
+fal_ring_union_get(a_uint32_t dev_id, a_bool_t *en);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

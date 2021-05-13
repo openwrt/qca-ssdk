@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -24,9 +27,17 @@
 #include "isisc_qos.h"
 #include "isisc_reg.h"
 
+#if defined(MHT)
+#define MHT_PHYPORT_QUEUE_MAX	4
+#define MHT_QUEUE_BUFFER_LEN	6
+#define ISISC_QOS_QUEUE_TX_BUFFER_MAX 504
+#define ISISC_QOS_PORT_TX_BUFFER_MAX  2040
+#define ISISC_QOS_PORT_RX_BUFFER_MAX  504
+#else
 #define ISISC_QOS_QUEUE_TX_BUFFER_MAX 120
 #define ISISC_QOS_PORT_TX_BUFFER_MAX  504
 #define ISISC_QOS_PORT_RX_BUFFER_MAX  120
+#endif
 
 #define ISISC_QOS_HOL_STEP       8
 #define ISISC_QOS_HOL_MOD        3
@@ -36,6 +47,7 @@
 #define ISISC_MAX_PRI            7
 #define ISISC_MAX_QUEUE          3
 #define ISISC_MAX_EH_QUEUE       5
+
 
 static sw_error_t
 _isisc_qos_port_queue_check(fal_port_t port_id, fal_queue_t queue_id)
@@ -207,13 +219,9 @@ _isisc_qos_port_red_en_get(a_uint32_t dev_id, fal_port_t port_id,
     return SW_OK;
 }
 
-
-
-
-
 static sw_error_t
 _isisc_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
-                              fal_queue_t queue_id, a_uint32_t * number)
+		fal_queue_t queue_id, a_uint32_t * number)
 {
     a_uint32_t data = 0, val = 0;
     sw_error_t rv;
@@ -227,10 +235,11 @@ _isisc_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     SW_RTN_ON_ERROR(rv);
 
     HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
-                      sizeof (a_uint32_t));
+		    sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
 
     val = (data >> (queue_id << 2)) & 0xf;
+
     *number = val << ISISC_QOS_HOL_MOD;
     return SW_OK;
 }
@@ -306,6 +315,58 @@ _isisc_qos_port_red_en_set(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 
+#if defined(MHT)
+static sw_error_t
+_mht_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_queue_t queue_id, a_uint32_t * number)
+{
+	a_uint32_t data = 0, val = 0;
+	sw_error_t rv;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	if (ISISC_QOS_QUEUE_TX_BUFFER_MAX < *number)
+	{
+		return SW_BAD_PARAM;
+	}
+
+	rv = _isisc_qos_port_queue_check(port_id, queue_id);
+	SW_RTN_ON_ERROR(rv);
+
+	val = *number / ISISC_QOS_HOL_STEP;
+	*number = val << ISISC_QOS_HOL_MOD;
+
+	if (queue_id >= MHT_PHYPORT_QUEUE_MAX) {
+		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL1, port_id,
+				(a_uint8_t *)(&data), sizeof(a_uint32_t));
+		SW_RTN_ON_ERROR(rv);
+
+		data &= (~(0x3f << (PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
+				(queue_id - MHT_PHYPORT_QUEUE_MAX) * MHT_QUEUE_BUFFER_LEN)));
+		data |= (val << (PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
+				(queue_id - MHT_PHYPORT_QUEUE_MAX) * MHT_QUEUE_BUFFER_LEN));
+
+		HSL_REG_ENTRY_SET(rv, dev_id, PORT_HOL_CTL1, port_id, (a_uint8_t *) (&data),
+				sizeof (a_uint32_t));
+	} else {
+		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
+				sizeof (a_uint32_t));
+		SW_RTN_ON_ERROR(rv);
+
+		data &= (~(0x3f << (queue_id * MHT_QUEUE_BUFFER_LEN)));
+		data |= (val << (queue_id * MHT_QUEUE_BUFFER_LEN));
+
+		HSL_REG_ENTRY_SET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
+				sizeof (a_uint32_t));
+	}
+
+	return rv;
+}
+#endif
+
 static sw_error_t
 _isisc_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
                               fal_queue_t queue_id, a_uint32_t * number)
@@ -330,15 +391,14 @@ _isisc_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
     *number = val << ISISC_QOS_HOL_MOD;
 
     HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
-                      sizeof (a_uint32_t));
+		    sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
 
     data &= (~(0xf << (queue_id << 2)));
     data |= (val << (queue_id << 2));
 
     HSL_REG_ENTRY_SET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
-                      sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+		    sizeof (a_uint32_t));
 
     return rv;
 }
@@ -964,9 +1024,41 @@ _isisc_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
 
     return SW_OK;
 }
+
+#if defined(MHT)
+static sw_error_t
+_mht_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_queue_t queue_id, a_uint32_t * number)
+{
+	a_uint32_t data = 0, val = 0;
+	sw_error_t rv;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	rv = _isisc_qos_port_queue_check(port_id, queue_id);
+	SW_RTN_ON_ERROR(rv);
+
+	if (queue_id >= MHT_PHYPORT_QUEUE_MAX) {
+		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL1, port_id,
+				(a_uint8_t *)(&data), sizeof(a_uint32_t));
+		SW_RTN_ON_ERROR(rv);
+		val = (data >> (PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
+				(queue_id - MHT_PHYPORT_QUEUE_MAX) * MHT_QUEUE_BUFFER_LEN)) & 0x3f;
+	} else {
+		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL0, port_id,
+				(a_uint8_t *)(&data), sizeof(a_uint32_t));
+		SW_RTN_ON_ERROR(rv);
+		val = (data >> (queue_id * MHT_QUEUE_BUFFER_LEN)) & 0x3f;
+	}
+
+	*number = val << ISISC_QOS_HOL_MOD;
+	return SW_OK;
+}
 #endif
 
-#ifndef IN_QOS_MINI
 /**
  * @brief Set buffer aggsinment status of transmitting queue on one particular port.
  *   @details  Comments:
@@ -1088,12 +1180,20 @@ HSL_LOCAL sw_error_t
 isisc_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
                              fal_queue_t queue_id, a_uint32_t * number)
 {
-    sw_error_t rv;
+	sw_error_t rv;
+	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
 
-    HSL_API_LOCK;
-    rv = _isisc_qos_queue_tx_buf_nr_get(dev_id, port_id, queue_id, number);
-    HSL_API_UNLOCK;
-    return rv;
+	HSL_API_LOCK;
+	chip_type = hsl_get_current_chip_type(dev_id);
+#if defined(MHT)
+	if (chip_type == CHIP_MHT)
+		rv = _mht_qos_queue_tx_buf_nr_get(dev_id, port_id, queue_id, number);
+	else
+#endif
+		rv = _isisc_qos_queue_tx_buf_nr_get(dev_id, port_id, queue_id, number);
+	HSL_API_UNLOCK;
+
+	return rv;
 }
 
 
@@ -1138,6 +1238,7 @@ isisc_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 #endif
+
 /**
  * @brief Set status of port red on one particular port.
  * @param[in] dev_id device id
@@ -1173,12 +1274,20 @@ HSL_LOCAL sw_error_t
 isisc_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
                              fal_queue_t queue_id, a_uint32_t * number)
 {
-    sw_error_t rv;
+	sw_error_t rv;
+	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
 
-    HSL_API_LOCK;
-    rv = _isisc_qos_queue_tx_buf_nr_set(dev_id, port_id, queue_id, number);
-    HSL_API_UNLOCK;
-    return rv;
+	HSL_API_LOCK;
+	chip_type = hsl_get_current_chip_type(dev_id);
+#if defined(MHT)
+	if (chip_type == CHIP_MHT)
+		rv = _mht_qos_queue_tx_buf_nr_set(dev_id, port_id, queue_id, number);
+	else
+#endif
+		rv = _isisc_qos_queue_tx_buf_nr_set(dev_id, port_id, queue_id, number);
+	HSL_API_UNLOCK;
+
+	return rv;
 }
 /**
  * @brief Set max occupied buffer number of transmitting port on one particular port.
@@ -1593,11 +1702,12 @@ isisc_qos_init(a_uint32_t dev_id)
         hsl_api_t *p_api;
 
         SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-		p_api->qos_queue_tx_buf_nr_set = isisc_qos_queue_tx_buf_nr_set;
-		p_api->qos_port_red_en_set = isisc_qos_port_red_en_set;
-		p_api->qos_port_tx_buf_nr_set = isisc_qos_port_tx_buf_nr_set;
-		p_api->qos_port_rx_buf_nr_set = isisc_qos_port_rx_buf_nr_set;
-	#ifndef IN_QOS_MINI
+	p_api->qos_queue_tx_buf_nr_set = isisc_qos_queue_tx_buf_nr_set;
+	p_api->qos_port_red_en_set = isisc_qos_port_red_en_set;
+	p_api->qos_port_tx_buf_nr_set = isisc_qos_port_tx_buf_nr_set;
+	p_api->qos_port_rx_buf_nr_set = isisc_qos_port_rx_buf_nr_set;
+        p_api->qos_port_mode_set = isisc_qos_port_mode_set;
+#ifndef IN_QOS_MINI
         p_api->qos_queue_tx_buf_status_set = isisc_qos_queue_tx_buf_status_set;
         p_api->qos_queue_tx_buf_status_get = isisc_qos_queue_tx_buf_status_get;
         p_api->qos_port_tx_buf_status_set = isisc_qos_port_tx_buf_status_set;
@@ -1606,10 +1716,6 @@ isisc_qos_init(a_uint32_t dev_id)
         p_api->qos_queue_tx_buf_nr_get = isisc_qos_queue_tx_buf_nr_get;
         p_api->qos_port_tx_buf_nr_get = isisc_qos_port_tx_buf_nr_get;
         p_api->qos_port_rx_buf_nr_get = isisc_qos_port_rx_buf_nr_get;
-	#endif
-        p_api->qos_port_mode_set = isisc_qos_port_mode_set;
-        
-	#ifndef IN_QOS_MINI
 	p_api->qos_port_mode_get = isisc_qos_port_mode_get;
         p_api->qos_port_mode_pri_set = isisc_qos_port_mode_pri_set;
         p_api->qos_port_mode_pri_get = isisc_qos_port_mode_pri_get;
@@ -1627,7 +1733,7 @@ isisc_qos_init(a_uint32_t dev_id)
         p_api->qos_queue_remark_table_get = isisc_qos_queue_remark_table_get;
 	p_api->port_static_thresh_get = isisc_port_static_thresh_get;
 	p_api->port_static_thresh_set = isisc_port_static_thresh_set;
-	#endif
+#endif
     }
 #endif
 

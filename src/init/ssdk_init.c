@@ -1696,7 +1696,8 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	} else if (chip_type == CHIP_SCOMPHY) {
 #ifdef MP
 		if(adapt_scomphy_revision_get(priv->device_id) == MP_GEPHY) {
-			priv->ports = 2;
+			/*for ipq50xx, port id is 1 and 2, port 0 is not available*/
+			priv->ports = 3;
 		}
 #endif
 	} else {

@@ -331,10 +331,12 @@ sw_error_t
 fal_ucast_default_hash_get(
 		a_uint32_t dev_id,
 		a_uint8_t *hash_value);
+#endif
 
 sw_error_t
 fal_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en);
 
+#ifndef IN_QM_MINI
 sw_error_t
 fal_queue_counter_ctrl_get(a_uint32_t dev_id, a_bool_t *cnt_en);
 

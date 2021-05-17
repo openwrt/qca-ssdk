@@ -917,6 +917,9 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 		fal_ac_static_threshold_set(dev_id, &obj, &sthresh_cfg);
 	}
 
+	/* enable the queue counter */
+	fal_queue_counter_ctrl_set(dev_id, A_TRUE);
+
 	return SW_OK;
 }
 #endif

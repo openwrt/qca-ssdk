@@ -1106,6 +1106,7 @@ adpt_hppe_queue_counter_ctrl_get(a_uint32_t dev_id, a_bool_t *cnt_en)
 
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 adpt_hppe_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
@@ -1124,7 +1125,6 @@ adpt_hppe_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 	eg_bridge_config.bf.queue_cnt_en = cnt_en;
 	return hppe_eg_bridge_config_set(dev_id, &eg_bridge_config);
 }
-#endif
 
 sw_error_t
 adpt_hppe_qm_enqueue_ctrl_set(
@@ -1357,8 +1357,10 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_queue_counter_get = adpt_hppe_queue_counter_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_COUNTER_CTRL_GET))
 		p_adpt_api->adpt_queue_counter_ctrl_get = adpt_hppe_queue_counter_ctrl_get;
+#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_COUNTER_CTRL_SET))
 		p_adpt_api->adpt_queue_counter_ctrl_set = adpt_hppe_queue_counter_ctrl_set;
+#ifndef IN_QM_MINI
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_ENQUEUE_CTRL_GET))
 		p_adpt_api->adpt_qm_enqueue_ctrl_get = adpt_hppe_qm_enqueue_ctrl_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_PORT_SRCPROFILE_GET))

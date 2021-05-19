@@ -2751,7 +2751,7 @@ static int chip_ver_get(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 		a_uint32_t phy_id = qca_detect_phyid(dev_id, cfg);
 		a_uint16_t reg_val;
 		switch (phy_id) {
-			case MHT_PHY:
+			case QCA8084_PHY:
 				reg_val = qca_mht_mii_read(dev_id, 0);
 				break;
 			default:

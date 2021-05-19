@@ -531,7 +531,6 @@ typedef enum
 	QCA803X_PHY_CHIP,
 	SFP_PHY_CHIP,
 	MPGE_PHY_CHIP,
-	MHT_PHY_CHIP,
 /*qca808x_start*/
 	QCA808X_PHY_CHIP,
 	MAX_PHY_CHIP,
@@ -566,8 +565,8 @@ typedef struct {
 /*qca808x_start*/
 #define QCA8081_PHY_V1_1        0x004DD101
 #define INVALID_PHY_ID          0xFFFFFFFF
-
 /*qca808x_end*/
+#define QCA8084_PHY             0x004DD180
 #define F1V1_PHY                0x004DD033
 #define F1V2_PHY                0x004DD034
 #define F1V3_PHY                0x004DD035
@@ -592,8 +591,6 @@ typedef struct {
 /*qca808x_end*/
 #define MP_GEPHY                0x004DD0C0
 #define SFP_PHY_MASK            0xffffffff
-
-#define MHT_PHY			0x004DD011
 
 #define CABLE_PAIR_A            0
 #define CABLE_PAIR_B            1

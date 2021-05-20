@@ -793,6 +793,10 @@ struct sub_cmd_des_t g_acl_des[] =
 	{"status", "set",   SW_API_ACL_STATUS_SET, NULL},
 	{"udfprofile", "set",   SW_API_ACL_PT_UDF_PROFILE_SET, NULL},
 	{"udf", "set", SW_API_ACL_UDF_SET, NULL},
+#ifdef APPE
+	{"udfprofileEntry", "set", SW_API_ACL_UDF_PROFILE_ENTRY_ADD, NULL},
+	{"udfprofilecfg", "set", SW_API_ACL_UDF_PROFILE_CFG_SET, NULL},
+#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif
@@ -1337,6 +1341,16 @@ struct sub_cmd_des_t g_tunnelprogram_des[] =
 };
 #endif
 
+/*Tunnel*/
+#ifdef IN_TUNNEL
+struct sub_cmd_des_t g_tunnel_des[] =
+{
+    {"udfprofileEntry", "set", SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, NULL},
+    {"udfprofilecfg", "set", SW_API_TUNNEL_UDF_PROFILE_CFG_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
 struct cmd_des_t gcmd_des[] =
 {
     /*port ctrl*/
@@ -1553,6 +1567,11 @@ struct cmd_des_t gcmd_des[] =
 #ifdef IN_TUNNEL_PROGRAM
     {
         "tunnelprogram", g_tunnelprogram_des,
+    },
+#endif
+#ifdef IN_TUNNEL
+    {
+        "tunnel", g_tunnel_des,
     },
 #endif
     {NULL, NULL} /*end of desc*/

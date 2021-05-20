@@ -8667,7 +8667,79 @@ parse_acl_udf(struct switch_val *val)
 
 	return rv;
 }
+#ifdef APPE
+static int
+parse_acl_udfprofileentry(a_uint32_t dev_id, struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	a_uint32_t tmpdata = 0, profile_id = 0;
+	fal_acl_udf_profile_entry_t entry;
+	memset(&entry, 0, sizeof(fal_acl_udf_profile_entry_t));
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
 
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "profile_id")) {
+			cmd_data_check_uint32((char*)ext_value_p->option_value,
+					&profile_id, sizeof(a_uint32_t));
+		} else if(!strcmp(ext_value_p->option_name, "l3_type")) {
+			cmd_data_check_attr("l3_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.l3_type = tmpdata & 0x3;
+			FAL_FIELD_FLG_SET(entry.field_flag,
+					FAL_ACL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE);
+		} else if(!strcmp(ext_value_p->option_name, "l4_type")) {
+			cmd_data_check_attr("l4_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.l4_type = tmpdata & 0x7;
+			FAL_FIELD_FLG_SET(entry.field_flag,
+					FAL_ACL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE);
+		}
+		switch_ext_p = switch_ext_p->next;
+	}
+	rv = fal_acl_udf_profile_entry_add(dev_id, profile_id, &entry);
+	SSDK_DEBUG("uci set acl udfprofileentry rv %d\n", rv);
+
+	return rv;
+}
+
+static int
+parse_acl_udfprofilecfg(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "profile_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "index")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "user_defined_type")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "user_defined_offset")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+#endif
 #endif
 
 #ifdef IN_FLOW
@@ -11250,6 +11322,12 @@ parse_acl(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
 		rv = parse_acl_udfprofile(val);
 	} else if(!strcmp(command_name, "Udf")) {
 		rv = parse_acl_udf(val);
+#ifdef APPE
+	} else if(!strcmp(command_name, "UdfprofileEntry")) {
+		rv = parse_acl_udfprofileentry(dev_id, val);
+	} else if(!strcmp(command_name, "UdfprofileCfg")) {
+		rv = parse_acl_udfprofilecfg(val);
+#endif
 	}
 
 	return rv;
@@ -11981,6 +12059,103 @@ parse_tunnelprogram(a_uint32_t dev_id, const char *command_name, struct switch_v
 }
 #endif
 
+#ifdef IN_TUNNEL
+static int
+parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	a_uint32_t tmpdata = 0, profile_id = 0;
+	fal_tunnel_udf_profile_entry_t entry;
+	memset(&entry, 0, sizeof(fal_tunnel_udf_profile_entry_t));
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "profile_id")) {
+			cmd_data_check_uint32((char*)ext_value_p->option_value,
+					&profile_id, sizeof(a_uint32_t));
+		} else if(!strcmp(ext_value_p->option_name, "l3_type")) {
+			cmd_data_check_attr("l3_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.l3_type = tmpdata & 0x3;
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L3_TYPE);
+		} else if(!strcmp(ext_value_p->option_name, "l4_type")) {
+			cmd_data_check_attr("l4_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.l4_type = tmpdata & 0x7;
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_L4_TYPE);
+		} else if(!strcmp(ext_value_p->option_name, "overlay_type")) {
+			cmd_data_check_attr("tunnel_overlay_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.overlay_type = tmpdata & 0x3;
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_OVERLAY_TYPE);
+		} else if(!strcmp(ext_value_p->option_name, "program_type")) {
+			cmd_data_check_attr("tunnel_program_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.program_type = tmpdata & 0x7;
+			FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_UDF_PROFILE_ENTRY_FIELD_PROGRAM_TYPE);
+		}
+		switch_ext_p = switch_ext_p->next;
+	}
+	rv = fal_tunnel_udf_profile_entry_add(dev_id, profile_id, &entry);
+	SSDK_DEBUG("uci set tunnel udfprofileentry rv %d\n", rv);
+
+	return rv;
+}
+
+static int
+parse_tunnel_udfprofilecfg(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "profile_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "index")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "user_defined_type")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "user_defined_offset")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_tunnel(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
+{
+	int rv = -1;
+	if (!strcmp(command_name, "UdfprofileEntry")) {
+		rv = parse_tunnel_udfprofileentry(dev_id, val);
+	} else if (!strcmp(command_name, "UdfprofileCfg")) {
+		rv = parse_tunnel_udfprofilecfg(val);
+	}
+	return rv;
+}
+#endif
 static int name_transfer(char *name, char *module, char *cmd)
 {
         char *p;
@@ -12150,6 +12325,10 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 	} else if(!strcmp(module_name, "Tunnelprogram")) {
 #ifdef IN_TUNNEL_PROGRAM
 		rv = parse_tunnelprogram(priv->device_id, command_name, val);
+#endif
+	} else if(!strcmp(module_name, "Tunnel")) {
+#ifdef IN_TUNNEL
+		rv = parse_tunnel(priv->device_id, command_name, val);
 #endif
 	}
 

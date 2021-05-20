@@ -76,40 +76,6 @@ struct attr_des_t g_attr_des[] =
 		}
 	},
 	{
-		"policer_meter_type",
-		{
-			{"rfc", FAL_POLICER_METER_RFC},
-			{"mef10_3", FAL_POLICER_METER_MEF10_3},
-			{NULL, INVALID_ARRT_VALUE}
-		}
-	},
-	{
-		"policer_meter_color",
-		{
-			{"meter_yellow", FAL_POLICER_METER_YELLOW},
-			{"meter_red", FAL_POLICER_METER_RED},
-			{NULL, INVALID_ARRT_VALUE}
-		}
-	},
-	{
-		"shaper_meter_type",
-		{
-			{"rfc", FAL_SHAPER_METER_RFC},
-			{"mef10_3", FAL_SHAPER_METER_MEF10_3},
-			{NULL, INVALID_ARRT_VALUE}
-		}
-	},
-	{
-		"vxlan_type",
-		{
-			{"vxlan", FAL_VXLAN},
-			{"0", FAL_VXLAN},
-			{"vxlan-gpe", FAL_VXLAN_GPE},
-			{"1", FAL_VXLAN_GPE},
-			{NULL, INVALID_ARRT_VALUE}
-		}
-	},
-	{
 		"ip_ver",
 		{
 			{"ipv4", 1},
@@ -137,6 +103,86 @@ struct attr_des_t g_attr_des[] =
 		}
 	},
 	{
+		"hdr_type",
+		{
+			{"ethernet", FAL_ETHERNET_HDR},
+			{"ethernet-tag", FAL_ETHERNET_TAG_HDR},
+			{"ipv4", FAL_IPV4_HDR},
+			{"ipv6", FAL_IPV6_HDR},
+			{"udp", FAL_UDP_HDR},
+			{"udp-lite", FAL_UDP_LITE_HDR},
+			{"tcp", FAL_TCP_HDR},
+			{"gre", FAL_GRE_HDR},
+			{"vxlan", FAL_VXLAN_HDR},
+			{"vxlan-gpe", FAL_VXLAN_GPE_HDR},
+			{"geneve", FAL_GENEVE_HDR},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"l3_type",
+		{
+			{"others", FAL_L3_TYPE_OTHERS},
+			{"ipv4", FAL_L3_TYPE_IPV4},
+			{"arp", FAL_L3_TYPE_ARP},
+			{"ipv6", FAL_L3_TYPE_IPV6},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"l4_type",
+		{
+			{"others", FAL_L4_TYPE_OTHERS},
+			{"tcp", FAL_L4_TYPE_TCP},
+			{"udp", FAL_L4_TYPE_UDP},
+			{"udp-lite", FAL_L4_TYPE_UDP_LITE},
+			{"icmp", FAL_L4_TYPE_ICMP},
+			{"gre", FAL_L4_TYPE_GRE},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+#ifdef IN_POLICER
+	{
+		"policer_meter_type",
+		{
+			{"rfc", FAL_POLICER_METER_RFC},
+			{"mef10_3", FAL_POLICER_METER_MEF10_3},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"policer_meter_color",
+		{
+			{"meter_yellow", FAL_POLICER_METER_YELLOW},
+			{"meter_red", FAL_POLICER_METER_RED},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+#endif
+#ifdef IN_SHAPER
+	{
+		"shaper_meter_type",
+		{
+			{"rfc", FAL_SHAPER_METER_RFC},
+			{"mef10_3", FAL_SHAPER_METER_MEF10_3},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+#endif
+#ifdef IN_VXLAN
+	{
+		"vxlan_type",
+		{
+			{"vxlan", FAL_VXLAN},
+			{"0", FAL_VXLAN},
+			{"vxlan-gpe", FAL_VXLAN_GPE},
+			{"1", FAL_VXLAN_GPE},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+#endif
+#if defined(IN_TUNNEL_PROGRAM) || defined(IN_TUNNEL)
+	{
 		"tunnel_program_type",
 		{
 			{"program0", FAL_TUNNEL_PROGRAM_TYPE_0},
@@ -154,23 +200,8 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
-	{
-		"hdr_type",
-		{
-			{"ethernet", FAL_ETHERNET_HDR},
-			{"ethernet-tag", FAL_ETHERNET_TAG_HDR},
-			{"ipv4", FAL_IPV4_HDR},
-			{"ipv6", FAL_IPV6_HDR},
-			{"udp", FAL_UDP_HDR},
-			{"udp-lite", FAL_UDP_LITE_HDR},
-			{"tcp", FAL_TCP_HDR},
-			{"gre", FAL_GRE_HDR},
-			{"vxlan", FAL_VXLAN_HDR},
-			{"vxlan-gpe", FAL_VXLAN_GPE_HDR},
-			{"geneve", FAL_GENEVE_HDR},
-			{NULL, INVALID_ARRT_VALUE}
-		}
-	},
+#endif
+#ifdef IN_TUNNEL_PROGRAM
 	{
 		"tunnel_program_pos_mode",
 		{
@@ -197,6 +228,31 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
+#endif
+#ifdef IN_TUNNEL
+	{
+		"tunnel_overlay_type",
+		{
+			{"gre-tap", FAL_TUNNEL_OVERLAY_TYPE_GRE_TAP},
+			{"vxlan", FAL_TUNNEL_OVERLAY_TYPE_VXLAN},
+			{"vxlan-gpe", FAL_TUNNEL_OVERLAY_TYPE_VXLAN_GPE},
+			{"geneve", FAL_TUNNEL_OVERLAY_TYPE_GENEVE},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"tunnel_udf_type",
+		{
+			{"l2", FAL_TUNNEL_UDF_TYPE_L2},
+			{"l3", FAL_TUNNEL_UDF_TYPE_L3},
+			{"l4", FAL_TUNNEL_UDF_TYPE_L4},
+			{"overlay", FAL_TUNNEL_UDF_TYPE_OVERLAY},
+			{"program", FAL_TUNNEL_UDF_TYPE_PROGRAM},
+			{"payload", FAL_TUNNEL_UDF_TYPE_PAYLOAD},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+#endif
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -585,6 +641,9 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_TYPE, (param_check_t)cmd_data_check_tunnel_program_type, NULL),
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_ENTRY, (param_check_t)cmd_data_check_tunnel_program_entry, NULL),
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_CFG, (param_check_t)cmd_data_check_tunnel_program_cfg, NULL),
+#endif
+#ifdef IN_TUNNEL
+    SW_TYPE_DEF(SW_TUNNEL_UDF_TYPE, (param_check_t)cmd_data_check_tunnel_udf_type, NULL),
 #endif
 };
 
@@ -15468,5 +15527,15 @@ cmd_data_check_tunnel_program_cfg(char * cmd_str, void * val, a_uint32_t size)
 
     *(fal_tunnel_program_cfg_t *) val = entry;
     return SW_OK;
+}
+#endif
+
+#ifdef IN_TUNNEL
+sw_error_t
+cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
+{
+
+    return cmd_data_check_attr("tunnel_udf_type", cmd_str,
+                    arg_val, sizeof(*arg_val));
 }
 #endif

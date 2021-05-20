@@ -1326,6 +1326,17 @@ struct sub_cmd_des_t g_geneve_des[] =
 };
 #endif
 
+/*TunnelProgram*/
+#ifdef IN_TUNNEL_PROGRAM
+struct sub_cmd_des_t g_tunnelprogram_des[] =
+{
+    {"entry", "set", SW_API_TUNNEL_PROGRAM_ENTRY_ADD, NULL},
+    {"cfg", "set", SW_API_TUNNEL_PROGRAM_CFG_SET, NULL},
+    {"udf", "set", SW_API_TUNNEL_PROGRAM_UDF_ADD, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
 struct cmd_des_t gcmd_des[] =
 {
     /*port ctrl*/
@@ -1537,6 +1548,11 @@ struct cmd_des_t gcmd_des[] =
 #ifdef IN_GENEVE
     {
         "geneve", g_geneve_des,
+    },
+#endif
+#ifdef IN_TUNNEL_PROGRAM
+    {
+        "tunnelprogram", g_tunnelprogram_des,
     },
 #endif
     {NULL, NULL} /*end of desc*/

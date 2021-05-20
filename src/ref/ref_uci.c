@@ -7830,7 +7830,7 @@ parse_mib_cpukeep(struct switch_val *val)
 
 #ifdef IN_ACL
 static int
-parse_acl_rule(struct switch_val *val, a_uint32_t dev_id)
+parse_acl_rule(a_uint32_t dev_id, struct switch_val *val)
 {
 	a_uint32_t prio = 0;
 	a_uint32_t i;
@@ -9757,7 +9757,6 @@ parse_servcode_config(struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
-
 	switch_ext_p = val->value.ext_val;
 	while (switch_ext_p) {
 		ext_value_p = switch_ext_p;
@@ -11238,11 +11237,11 @@ parse_mib(const char *command_name, struct switch_val *val)
 
 #ifdef IN_ACL
 static int
-parse_acl(const char *command_name, struct switch_val *val, a_uint32_t dev_id)
+parse_acl(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
 {
 	int rv = -1;
 	if(!strcmp(command_name, "Rule")) {
-		rv = parse_acl_rule(val, dev_id);
+		rv = parse_acl_rule(dev_id, val);
 	} else if(!strcmp(command_name, "Udfprofile")) {
 		rv = parse_acl_udfprofile(val);
 	} else if(!strcmp(command_name, "Udf")) {
@@ -11773,6 +11772,211 @@ parse_geneve(const char *command_name, struct switch_val *val)
 }
 #endif
 
+#ifdef IN_TUNNEL_PROGRAM
+static int
+parse_tunnelprogram_entry(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "program_type")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "ip_ver")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "outer_hdr_type")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "ethernet_type")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "ethernet_type_mask")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "ip_protocol")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "ip_protocol_mask")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "tunnel_hdr_f32bit")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "tunnel_hdr_f32bit_mask")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "l4_dst_port")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "l4_dst_port_mask")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "l4_src_port")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "l4_src_port_mask")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_tunnelprogram_cfg(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "program_type")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "program_pos_mode")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "inner_type_mode")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "inner_hdr_type")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "basic_hdr_length")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "option_length_unit")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "option_length_mask")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "udf0_offset")) {
+			val_ptr[7] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "udf1_offset")) {
+			val_ptr[8] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "udf2_offset")) {
+			val_ptr[9] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+	if (val_ptr[3] == NULL) {
+		val_ptr[3] = "ethernet";
+		parameter_length ++;
+	}
+
+	return rv;
+}
+
+static int
+parse_tunnelprogram_udf(a_uint32_t dev_id, struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	a_uint32_t tmpdata = 0;
+	fal_tunnel_program_udf_t entry;
+	fal_tunnel_program_type_t program_type = 0;
+	memset(&entry, 0, sizeof(fal_tunnel_program_udf_t));
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "program_type")) {
+			cmd_data_check_attr("tunnel_program_type",
+					(char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			program_type = tmpdata;
+		} else if(!strcmp(ext_value_p->option_name, "udf0")) {
+			cmd_data_check_uint16((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_val[0] = tmpdata & 0xffff;
+			FAL_TUNNEL_PROGRAM_UDF_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_PROGRAM_UDF_FIELD_UDF0);
+		} else if(!strcmp(ext_value_p->option_name, "udf0_mask")) {
+			cmd_data_check_uint16((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_mask[0] = tmpdata & 0xffff;
+		} else if(!strcmp(ext_value_p->option_name, "udf1")) {
+			cmd_data_check_uint16((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_val[1] = tmpdata & 0xffff;
+			FAL_TUNNEL_PROGRAM_UDF_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_PROGRAM_UDF_FIELD_UDF1);
+		} else if(!strcmp(ext_value_p->option_name, "udf1_mask")) {
+			cmd_data_check_uint16((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_mask[1] = tmpdata & 0xffff;
+		} else if(!strcmp(ext_value_p->option_name, "udf2")) {
+			cmd_data_check_uint16((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_val[2] = tmpdata & 0xffff;
+			FAL_TUNNEL_PROGRAM_UDF_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_PROGRAM_UDF_FIELD_UDF2);
+		} else if(!strcmp(ext_value_p->option_name, "udf2_mask")) {
+			cmd_data_check_uint16((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_mask[2] = tmpdata & 0xffff;
+		} else if(!strcmp(ext_value_p->option_name, "rule_inverse")) {
+			if (!strcmp(ext_value_p->option_value, "y") ||
+				!strcmp(ext_value_p->option_value, "yes")) {
+				FAL_TUNNEL_PROGRAM_UDF_FIELD_FLG_SET(entry.field_flag,
+					FAL_TUNNEL_PROGRAM_UDF_FIELD_INVERSE);
+			} else if(!strcmp(ext_value_p->option_value, "n") ||
+				!strcmp(ext_value_p->option_value, "no")) {
+				FAL_TUNNEL_PROGRAM_UDF_FIELD_FLG_CLR(entry.field_flag,
+					FAL_TUNNEL_PROGRAM_UDF_FIELD_INVERSE);
+			}
+		} else if(!strcmp(ext_value_p->option_name, "inner_hdr_type")) {
+			cmd_data_check_attr("hdr_type", (char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.inner_hdr_type = tmpdata & 0x3;
+			FAL_TUNNEL_PROGRAM_UDF_ACTION_FLG_SET(entry.action_flag,
+					FAL_TUNNEL_PROGRAM_UDF_ACTION_INNER_HDR_TYPE);
+		} else if(!strcmp(ext_value_p->option_name, "udf_hdr_length")) {
+			cmd_data_check_uint8((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(tmpdata));
+			entry.udf_hdr_len = tmpdata;
+			FAL_TUNNEL_PROGRAM_UDF_ACTION_FLG_SET(entry.action_flag,
+					FAL_TUNNEL_PROGRAM_UDF_ACTION_UDF_HDR_LEN);
+		} else if(!strcmp(ext_value_p->option_name, "exception")) {
+			if(!strcmp(ext_value_p->option_value, "y") ||
+				!strcmp(ext_value_p->option_value, "yes")) {
+				FAL_TUNNEL_PROGRAM_UDF_ACTION_FLG_SET(entry.action_flag,
+					FAL_TUNNEL_PROGRAM_UDF_ACTION_EXCEPTION_EN);
+			} else if(!strcmp(ext_value_p->option_value, "n") ||
+				!strcmp(ext_value_p->option_value, "no")){
+				FAL_TUNNEL_PROGRAM_UDF_ACTION_FLG_CLR(entry.action_flag,
+					FAL_TUNNEL_PROGRAM_UDF_ACTION_EXCEPTION_EN);
+			}
+		}
+		switch_ext_p = switch_ext_p->next;
+	}
+	rv = fal_tunnel_program_udf_add(dev_id, program_type, &entry);
+	SSDK_DEBUG("uci set tunnelprogram udf rv %d\n", rv);
+	return rv;
+}
+
+static int
+parse_tunnelprogram(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
+{
+	int rv = -1;
+	if (!strcmp(command_name, "Entry")) {
+		rv = parse_tunnelprogram_entry(val);
+	} else if (!strcmp(command_name, "Cfg")) {
+		rv = parse_tunnelprogram_cfg(val);
+	} else if (!strcmp(command_name, "Udf")) {
+		rv = parse_tunnelprogram_udf(dev_id, val);
+	}
+	return rv;
+}
+#endif
+
 static int name_transfer(char *name, char *module, char *cmd)
 {
         char *p;
@@ -11895,7 +12099,7 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 #endif
 	} else if(!strcmp(module_name, "Acl")) {
 #ifdef IN_ACL
-		rv = parse_acl(command_name, val, priv->device_id);
+		rv = parse_acl(priv->device_id, command_name, val);
 #endif
 	} else if(!strcmp(module_name, "Flow")) {
 #ifdef IN_FLOW
@@ -11938,6 +12142,10 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 	} else if(!strcmp(module_name, "Geneve")) {
 #ifdef IN_GENEVE
 		rv = parse_geneve(command_name, val);
+#endif
+	} else if(!strcmp(module_name, "Tunnelprogram")) {
+#ifdef IN_TUNNEL_PROGRAM
+		rv = parse_tunnelprogram(priv->device_id, command_name, val);
 #endif
 	}
 

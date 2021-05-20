@@ -53,7 +53,9 @@ sw_error_t cmd_data_check_uint8(char *cmd_str, a_uint32_t * arg_val,
 sw_error_t cmd_data_check_enable(char *cmd_str, a_uint32_t * arg_val,
                                  a_uint32_t size);
 sw_error_t cmd_data_check_pbmp(char *cmd_str, a_uint32_t * arg_val,
-                               a_uint32_t size);
+                                 a_uint32_t size);
+sw_error_t cmd_data_check_attr(char * attr_name, char *cmd_str,
+                                 a_uint32_t *arg_val, a_uint32_t size);
 #ifdef IN_PORTCONTROL
 sw_error_t cmd_data_check_duplex(char *cmd_str, a_uint32_t * arg_val,
                                  a_uint32_t size);
@@ -512,6 +514,14 @@ sw_error_t
 cmd_data_check_vxlan_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
 sw_error_t
 cmd_data_check_vxlan_gpe_proto(char *cmd_str, void * val, a_uint32_t size);
+#ifdef IN_TUNNEL_PROGRAM
+sw_error_t
+cmd_data_check_tunnel_program_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_program_entry(char *cmd_str, void * val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_program_cfg(char *cmd_str, void * val, a_uint32_t size);
+#endif
 #endif
 #endif
 

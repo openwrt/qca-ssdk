@@ -3,7 +3,7 @@ LIB=HSL
 
 include $(PRJ_PATH)/make/config.mk
 
-SRC_LIST=appe_global.c appe_l2_vp.c
+SRC_LIST=appe_global.c appe_l2_vp.c appe_counter.c
 
 ifeq (TRUE, $(IN_PORTVLAN))
 	SRC_LIST+=appe_portvlan.c

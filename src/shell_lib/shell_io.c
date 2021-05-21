@@ -98,6 +98,43 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
+	{
+		"vxlan_type",
+		{
+			{"vxlan", FAL_VXLAN},
+			{"0", FAL_VXLAN},
+			{"vxlan-gpe", FAL_VXLAN_GPE},
+			{"1", FAL_VXLAN_GPE},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"ip_ver",
+		{
+			{"ipv4", 1},
+			{"ipv6", 2},
+			{"ipv4_and_ipv6", 3},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"udp_type",
+		{
+			{"udp", 1},
+			{"udp-lite", 2},
+			{"udp_and_udp-lite", 3},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"l4_port_type",
+		{
+			{"dst", 1},
+			{"src", 2},
+			{"dst_and_src", 3},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -474,6 +511,13 @@ static sw_data_type_t sw_data_type[] =
 #endif
 #ifdef IN_CTRLPKT
     SW_TYPE_DEF(SW_CTRLPKT_PROFILE, (param_check_t)cmd_data_check_ctrlpkt_appprofile, NULL),
+#endif
+#ifdef IN_TUNNEL
+    SW_TYPE_DEF(SW_TUNNEL_UDP_ENTRY, (param_check_t)cmd_data_check_tunnel_udp_entry, NULL),
+#endif
+#ifdef IN_VXLAN
+    SW_TYPE_DEF(SW_VXLAN_TYPE, (param_check_t)cmd_data_check_vxlan_type, NULL),
+    SW_TYPE_DEF(SW_VXLAN_GPE_PROTO, (param_check_t)cmd_data_check_vxlan_gpe_proto, NULL),
 #endif
 };
 
@@ -15049,6 +15093,20 @@ cmd_data_check_module(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
 		*arg_val = FAL_MODULE_CTRLPKT;
 	} else if (!strcasecmp(cmd_str, "policer")) {
 		*arg_val = FAL_MODULE_POLICER;
+#ifdef APPE
+	} else if (!strcasecmp(cmd_str, "vport")) {
+		*arg_val = FAL_MODULE_VPORT;
+	} else if (!strcasecmp(cmd_str, "tunnel")) {
+		*arg_val = FAL_MODULE_TUNNEL;
+	} else if (!strcasecmp(cmd_str, "vxlan")){
+		*arg_val = FAL_MODULE_VXLAN;
+	} else if (!strcasecmp(cmd_str, "geneve")){
+		*arg_val = FAL_MODULE_GENEVE;
+	} else if (!strcasecmp(cmd_str, "mapt")) {
+		*arg_val = FAL_MODULE_MAPT;
+	} else if (!strcasecmp(cmd_str, "tunnelprogram")){
+		*arg_val = FAL_MODULE_TUNNEL_PROGRAM;
+#endif
 	}
 	else
 	{
@@ -15088,3 +15146,82 @@ cmd_data_check_func_ctrl(char *cmd_str, void * val, a_uint32_t size)
 
 	return SW_OK;
 }
+#ifdef IN_TUNNEL
+sw_error_t
+cmd_data_check_tunnel_udp_entry(char * cmd_str, void * val, a_uint32_t size)
+{
+    char *cmd;
+    fal_tunnel_udp_entry_t entry;
+    a_uint32_t tmpdata = 0;
+
+    memset(&entry, 0, sizeof (fal_tunnel_udp_entry_t));
+
+    cmd_data_check_element("ip ver", "ipv4",
+                       "usage: ipv4, ipv6, ipv4_and_ipv6\n",
+                       cmd_data_check_attr, ("ip_ver", cmd,
+                               &tmpdata, sizeof(tmpdata)));
+    entry.ip_ver= tmpdata & 0x3;
+
+    cmd_data_check_element("udp type", "udp",
+                       "usage: udp, udp-lite, udp_and_udp-lite\n",
+                       cmd_data_check_attr, ("udp_type", cmd,
+                               &tmpdata, sizeof(tmpdata)));
+    entry.udp_type= tmpdata & 0x3;
+
+    cmd_data_check_element("l4 port type", "dst",
+                       "usage: dst, src, dst_and_src\n",
+                       cmd_data_check_attr, ("l4_port_type", cmd,
+                               &tmpdata, sizeof(tmpdata)));
+    entry.l4_port_type= tmpdata & 0x3;
+
+    cmd_data_check_element("l4 port", "0",
+                       "usage: the format is 0x0-0xffff or 0-65535\n",
+                       cmd_data_check_integer, (cmd, &tmpdata,
+                               0xffff, 0x0));
+    entry.l4_port = tmpdata & 0xffff;
+
+    *(fal_tunnel_udp_entry_t *) val = entry;
+    return SW_OK;
+}
+#endif
+
+#ifdef IN_VXLAN
+sw_error_t
+cmd_data_check_vxlan_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
+{
+
+    return cmd_data_check_attr("vxlan_type", cmd_str,
+                    arg_val, sizeof(*arg_val));
+}
+
+sw_error_t
+cmd_data_check_vxlan_gpe_proto(char * cmd_str, void * val, a_uint32_t size)
+{
+    char *cmd;
+    fal_vxlan_gpe_proto_cfg_t proto;
+    a_uint32_t tmpdata = 0;
+
+    memset(&proto, 0, sizeof (fal_vxlan_gpe_proto_cfg_t));
+
+    cmd_data_check_element("ipv4", "1",
+                       "usage: the format is 0x0-0xff or 0-255 \n",
+                       cmd_data_check_integer, (cmd, &tmpdata,
+                               0xff, 0x0));
+    proto.ipv4 = tmpdata & 0xff;
+
+    cmd_data_check_element("ipv6", "2",
+                       "usage: the format is 0x0-0xff or 0-255 \n",
+                       cmd_data_check_integer, (cmd, &tmpdata,
+                               0xff, 0x0));
+    proto.ipv6 = tmpdata & 0xff;
+
+    cmd_data_check_element("ethernet", "3",
+                       "usage: the format is 0x0-0xff or 0-255 \n",
+                       cmd_data_check_integer, (cmd, &tmpdata,
+                               0xff, 0x0));
+    proto.ethernet = tmpdata & 0xff;
+
+    *(fal_vxlan_gpe_proto_cfg_t *) val = proto;
+    return SW_OK;
+}
+#endif

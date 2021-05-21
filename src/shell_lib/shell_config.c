@@ -1307,6 +1307,25 @@ struct sub_cmd_des_t g_debug_des[] =
 	{NULL, NULL, 0, NULL},/*end of desc*/
 };
 
+/*VxLAN*/
+#ifdef IN_VXLAN
+struct sub_cmd_des_t g_vxlan_des[] =
+{
+    {"entry", "set", SW_API_VXLAN_ENTRY_ADD, NULL},
+    {"gpeprotocfg", "set", SW_API_VXLAN_GPE_PROTO_CFG_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
+/*GENEVE*/
+#ifdef IN_GENEVE
+struct sub_cmd_des_t g_geneve_des[] =
+{
+    {"entry", "set", SW_API_GENEVE_ENTRY_ADD, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
 struct cmd_des_t gcmd_des[] =
 {
     /*port ctrl*/
@@ -1508,9 +1527,18 @@ struct cmd_des_t gcmd_des[] =
     },
 #endif
     {
-	"debug", g_debug_des,
+        "debug", g_debug_des,
     },
-
+#ifdef IN_VXLAN
+    {
+        "vxlan", g_vxlan_des,
+    },
+#endif
+#ifdef IN_GENEVE
+    {
+        "geneve", g_geneve_des,
+    },
+#endif
     {NULL, NULL} /*end of desc*/
 };
 

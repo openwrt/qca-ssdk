@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2017-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2017-2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -67,6 +67,16 @@
 static hsl_dev_t dev_table[SW_MAX_NR_DEV];
 static ssdk_init_cfg *dev_ssdk_cfg[SW_MAX_NR_DEV] = { 0 };
 ssdk_chip_type SSDK_CURRENT_CHIP_TYPE = CHIP_UNSPECIFIED;
+
+ssdk_chip_type hsl_get_chip_type(a_uint32_t dev_id)
+{
+	if(dev_id < SW_MAX_NR_DEV && dev_ssdk_cfg[dev_id])
+	{
+		return dev_ssdk_cfg[dev_id]->chip_type;
+	}
+
+	return CHIP_UNSPECIFIED;
+}
 
 static sw_error_t hsl_set_current_chip_type(ssdk_chip_type chip_type)
 {
@@ -328,7 +338,7 @@ hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg)
 
         case CHIP_SCOMPHY:
 #ifdef MP
-            if(dev_ssdk_cfg[dev_id]->chip_revision == MP_GEPHY)
+            if(dev_ssdk_cfg[dev_id]->phy_id == MP_GEPHY)
             {
                 aos_mem_copy(ssdk_cfg->chip_type, "mp", sizeof("mp"));
             }

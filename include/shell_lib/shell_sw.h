@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013, 2017, 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,9 +21,12 @@
 extern "C" {
 #endif
 
+#include "ssdk_init.h"
+
     int get_devid(void);
     sw_error_t cmd_set_devid(a_uint32_t *arg_val);
     sw_error_t uci_set_devid(a_uint32_t dev_id);
+    ssdk_chip_type cmd_get_chip_type(void);
 
 #ifdef __cplusplus
 }

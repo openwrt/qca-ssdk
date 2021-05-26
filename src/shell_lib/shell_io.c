@@ -17,6 +17,7 @@
 //#include <stdio.h>
 #include "shell_io.h"
 #include "shell.h"
+#include "shell_sw.h"
 
 #define SW_RTN_ON_NULL_PARAM(rtn) \
     do { if ((rtn) == NULL) return SW_BAD_PARAM; } while(0);
@@ -14165,28 +14166,31 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
-
-	do
+#ifdef APPE
+	if (cmd_get_chip_type() == CHIP_APPE)
 	{
-		cmd = get_sub_cmd("bypass_bitmap[3]", "0");
-		SW_RTN_ON_NULL_PARAM(cmd);
+		do
+		{
+			cmd = get_sub_cmd("bypass_bitmap[3]", "0");
+			SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
+			if (!strncasecmp(cmd, "quit", 4))
+			{
+				return SW_BAD_VALUE;
+			}
+			else if (!strncasecmp(cmd, "help", 4))
+			{
+				rv = SW_BAD_VALUE;
+			}
+			else
+			{
+				rv = cmd_data_check_uint32(cmd,
+					&entry.bypass_bitmap[3], sizeof (a_uint32_t));
+			}
 		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd,
-				&entry.bypass_bitmap[3], sizeof (a_uint32_t));
-		}
+		while (talk_mode && (SW_OK != rv));
 	}
-	while (talk_mode && (SW_OK != rv));
-
+#endif
 	do
 	{
 		cmd = get_sub_cmd("direction", "0");

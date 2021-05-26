@@ -197,6 +197,31 @@ _mht_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
 	return rv;
 }
 
+#define MHT_RX_DMA_RING_PAUSE_DEBUG_ADDR	0x28
+sw_error_t
+_mht_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+
+	sw_error_t rv = SW_OK;
+	a_uint32_t val = 0;
+
+	HSL_DEV_ID_CHECK (dev_id);
+	if (ring_id >= PORT5_MAX_VIRT_RING) {
+		return SW_BAD_PARAM;
+	}
+
+	val = MHT_RX_DMA_RING_PAUSE_DEBUG_ADDR;
+	HSL_REG_ENTRY_SET(rv, dev_id, SWITCH_QM_DEBUG_ADDR, 0,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	HSL_REG_ENTRY_GET(rv, dev_id, SWITCH_QM_DEBUG_DATA, 0,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	*status = (val >> ring_id) & 1;
+
+	return rv;
+}
+
 /**
  * @brief Set flow congestion drop on a particular port queue.
  * @param[in] dev_id device id
@@ -256,7 +281,7 @@ mht_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
 }
 
 /**
- * @brief Set flow ctrl thres on a particular DMA ring.
+ * @brief Get flow ctrl thres on a particular DMA ring.
  * @param[in] dev_id device id
  * @param[in] ring_id ring id
  * @param[out] on_thres on_thres
@@ -271,6 +296,24 @@ mht_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
 
 	HSL_API_LOCK;
 	rv = _mht_ring_flow_ctrl_thres_get (dev_id, ring_id, on_thres, off_thres);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get flow ctrl status on a particular DMA ring.
+ * @param[in] dev_id device id
+ * @param[in] ring_id ring id
+ * @param[out] status backpressure status
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_ring_flow_ctrl_status_get (dev_id, ring_id, status);
 	HSL_API_UNLOCK;
 	return rv;
 }

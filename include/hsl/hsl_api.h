@@ -446,6 +446,9 @@ typedef sw_error_t
     (*hsl_ring_flow_ctrl_thres_get) (a_uint32_t dev_id, a_uint32_t ring_id,
 				     a_uint16_t * on_thres,
 				     a_uint16_t * off_thres);
+  typedef sw_error_t
+	  (*hsl_ring_flow_ctrl_status_get) (a_uint32_t dev_id, a_uint32_t ring_id,
+			  a_bool_t *status);
 
   typedef sw_error_t
     (*hsl_port_8023az_set) (a_uint32_t dev_id, fal_port_t port_id,
@@ -2140,6 +2143,7 @@ typedef sw_error_t
     hsl_port_congestion_drop_get port_congestion_drop_get;
     hsl_ring_flow_ctrl_thres_set ring_flow_ctrl_thres_set;
     hsl_ring_flow_ctrl_thres_get ring_flow_ctrl_thres_get;
+    hsl_ring_flow_ctrl_status_get ring_flow_ctrl_status_get;
 /*qca808x_start*/
     hsl_port_8023az_set port_8023az_set;
     hsl_port_8023az_get port_8023az_get;

@@ -819,6 +819,9 @@ sw_error_t
 fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
 #endif
+
+sw_error_t
+fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

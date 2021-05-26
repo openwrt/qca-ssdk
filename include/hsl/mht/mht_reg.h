@@ -489,6 +489,20 @@ extern "C" {
 #define GLOBAL_INT1_MASK_E_OFFSET  0
 #define GLOBAL_INT1_MASK_NR_E      1
 
+/* QM Debug Address Register */
+#define SWITCH_QM_DEBUG_ADDR
+#define SWITCH_QM_DEBUG_ADDR_OFFSET		0x820
+#define SWITCH_QM_DEBUG_ADDR_E_LENGTH		4
+#define SWITCH_QM_DEBUG_ADDR_E_OFFSET		0
+#define SWITCH_QM_DEBUG_ADDR_NR_E		1
+
+/* QM Debug Data Register */
+#define SWITCH_QM_DEBUG_DATA
+#define SWITCH_QM_DEBUG_DATA_OFFSET		0x824
+#define SWITCH_QM_DEBUG_DATA_E_LENGTH		4
+#define SWITCH_QM_DEBUG_DATA_E_OFFSET		0
+#define SWITCH_QM_DEBUG_DATA_NR_E		1
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

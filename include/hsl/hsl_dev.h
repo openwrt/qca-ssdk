@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -44,12 +44,13 @@ do { \
         a_uint8_t nr_phy;
         a_uint8_t nr_queue;
         a_uint16_t nr_vlans;
-		a_bool_t hw_vlan_query;
+        a_bool_t hw_vlan_query;
         hsl_acl_func_t acl_func;
         hsl_init_mode  cpu_mode;
-		a_uint32_t wan_bmp;
+        a_uint32_t wan_bmp;
     } hsl_dev_t;
 
+    ssdk_chip_type hsl_get_chip_type(a_uint32_t dev_id);
     hsl_dev_t *hsl_dev_ptr_get(a_uint32_t dev_id);
 /*qca808x_end*/
     hsl_acl_func_t *hsl_acl_ptr_get(a_uint32_t dev_id);

@@ -159,11 +159,13 @@ fal_port_policer_entry_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_port_policer_entry_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_policer_config_t *policer, fal_policer_action_t *atcion);
+#endif
 
 sw_error_t
 fal_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 		fal_policer_config_t *policer, fal_policer_action_t *action);
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 fal_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 		fal_policer_config_t *policer, fal_policer_action_t *action);

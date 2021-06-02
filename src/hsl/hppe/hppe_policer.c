@@ -160,6 +160,7 @@ hppe_pc_dbg_data_reg_set(
 {
 	return SW_NOT_SUPPORTED;
 }
+#endif
 
 sw_error_t
 hppe_in_acl_meter_cfg_tbl_get(
@@ -189,6 +190,7 @@ hppe_in_acl_meter_cfg_tbl_set(
 				(sizeof(union in_acl_meter_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 hppe_in_acl_meter_crdt_tbl_get(
 		a_uint32_t dev_id,

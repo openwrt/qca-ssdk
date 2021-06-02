@@ -1272,7 +1272,7 @@ hppe_in_nexthop_tbl_set(
 				4);
 }
 #endif
-#if ((!defined IN_IP_MINI) || (defined IN_PPPOE))
+
 sw_error_t
 hppe_eg_l3_if_tbl_get(
 		a_uint32_t dev_id,
@@ -1300,7 +1300,7 @@ hppe_eg_l3_if_tbl_set(
 				value->val,
 				3);
 }
-#endif
+
 #ifndef IN_IP_MINI
 sw_error_t
 hppe_my_mac_tbl_mac_da_get(

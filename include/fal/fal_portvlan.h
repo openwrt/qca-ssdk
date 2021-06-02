@@ -391,25 +391,31 @@ fal_port_default_cvid_get(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_port_vlan_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_vlan_propagation_mode_t * mode);
+#endif
 
 sw_error_t
 fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
 
+#ifndef IN_PORTVLAN_MINI
 sw_error_t
 fal_port_vlan_trans_del(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
 
 sw_error_t
 fal_port_vlan_trans_get(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
+#endif
 
 sw_error_t
 fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode);
 
+#ifndef IN_PORTVLAN_MINI
 sw_error_t
 fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode);
+#endif
 
 sw_error_t
 fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t role);
 
+#ifndef IN_PORTVLAN_MINI
 sw_error_t
 fal_port_qinq_role_get(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t * role);
 

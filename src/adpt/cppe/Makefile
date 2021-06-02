@@ -35,7 +35,10 @@ endif
 
 ifeq (, $(findstring CPPE, $(SUPPORT_CHIP)))
 ifneq (, $(filter APPE, $(SUPPORT_CHIP)))
-	SRC_LIST= adpt_cppe_qos.c adpt_cppe_flow.c
+	SRC_LIST= adpt_cppe_qos.c
+ifneq (TRUE, $(IN_FLOW_MINI))
+	SRC_LIST += adpt_cppe_flow.c
+endif
 else
 	SRC_LIST=
 endif

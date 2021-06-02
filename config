@@ -414,12 +414,14 @@ ifeq (MP, $(CHIP_TYPE))
 endif
 
 ifneq (, $(filter APPE , $(CHIP_TYPE)))
+ifneq ($(MINI_SSDK), enable)
 	IN_VPORT=TRUE
 	IN_TUNNEL=TRUE
 	IN_VXLAN=TRUE
 	IN_GENEVE=TRUE
 	IN_TUNNEL_PROGRAM=TRUE
 	IN_MAPT=TRUE
+endif
 endif
 
 #auto_insert_flag

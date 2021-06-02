@@ -620,7 +620,7 @@ hppe_in_nexthop_tbl_set(
 		a_uint32_t index,
 		union in_nexthop_tbl_u *value);
 #endif
-#if ((!defined IN_IP_MINI) || (defined IN_PPPOE))
+
 sw_error_t
 hppe_eg_l3_if_tbl_get(
 		a_uint32_t dev_id,
@@ -632,7 +632,7 @@ hppe_eg_l3_if_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union eg_l3_if_tbl_u *value);
-#endif
+
 #ifndef IN_IP_MINI
 sw_error_t
 hppe_my_mac_tbl_mac_da_get(

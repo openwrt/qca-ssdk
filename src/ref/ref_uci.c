@@ -113,7 +113,7 @@ parse_qos_qtxbufsts(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -125,7 +125,7 @@ parse_qos_qtxbufsts(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -141,7 +141,7 @@ parse_qos_qtxbufnr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -155,7 +155,7 @@ parse_qos_qtxbufnr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -171,7 +171,7 @@ parse_qos_pttxbufsts(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -183,7 +183,7 @@ parse_qos_pttxbufsts(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -199,7 +199,7 @@ parse_qos_pttxbufnr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -211,7 +211,7 @@ parse_qos_pttxbufnr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -227,7 +227,7 @@ parse_qos_ptrxbufnr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -239,7 +239,7 @@ parse_qos_ptrxbufnr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -255,7 +255,7 @@ parse_qos_ptreden(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -267,7 +267,7 @@ parse_qos_ptreden(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -283,7 +283,7 @@ parse_qos_ptmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -297,7 +297,7 @@ parse_qos_ptmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -313,7 +313,7 @@ parse_qos_ptmodepri(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -327,7 +327,7 @@ parse_qos_ptmodepri(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -343,7 +343,7 @@ parse_qos_ptschmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -357,7 +357,7 @@ parse_qos_ptschmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -373,7 +373,7 @@ parse_qos_ptdefaultspri(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -385,7 +385,7 @@ parse_qos_ptdefaultspri(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -401,7 +401,7 @@ parse_qos_ptdefaultcpri(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -413,7 +413,7 @@ parse_qos_ptdefaultcpri(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -429,7 +429,7 @@ parse_qos_ptfsprists(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -441,7 +441,7 @@ parse_qos_ptfsprists(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -457,7 +457,7 @@ parse_qos_ptfcprists(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -469,7 +469,7 @@ parse_qos_ptfcprists(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -485,7 +485,7 @@ parse_qos_ptquremark(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -501,7 +501,7 @@ parse_qos_ptquremark(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -971,7 +971,7 @@ parse_cos_mapdscp2pri(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -983,7 +983,7 @@ parse_cos_mapdscp2pri(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -999,7 +999,7 @@ parse_cos_mapdscp2dp(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1011,7 +1011,7 @@ parse_cos_mapdscp2dp(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1027,7 +1027,7 @@ parse_cos_mapup2pri(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1039,7 +1039,7 @@ parse_cos_mapup2pri(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1055,7 +1055,7 @@ parse_cos_mapup2dp(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1067,7 +1067,7 @@ parse_cos_mapup2dp(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1242,7 +1242,7 @@ parse_rate_portpolicer(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1282,7 +1282,7 @@ parse_rate_portpolicer(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1298,7 +1298,7 @@ parse_rate_portshaper(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1320,7 +1320,7 @@ parse_rate_portshaper(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1336,7 +1336,7 @@ parse_rate_queueshaper(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1360,7 +1360,7 @@ parse_rate_queueshaper(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1376,7 +1376,7 @@ parse_rate_aclpolicer(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1406,7 +1406,7 @@ parse_rate_aclpolicer(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1422,7 +1422,7 @@ parse_rate_ptaddratebyte(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1434,7 +1434,7 @@ parse_rate_ptaddratebyte(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1450,7 +1450,7 @@ parse_rate_ptgolflowen(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1462,7 +1462,7 @@ parse_rate_ptgolflowen(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1481,7 +1481,7 @@ parse_port_duplex(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1493,7 +1493,7 @@ parse_port_duplex(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1509,7 +1509,7 @@ parse_port_speed(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1521,7 +1521,7 @@ parse_port_speed(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1537,7 +1537,7 @@ parse_port_autoadv(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1549,7 +1549,7 @@ parse_port_autoadv(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1565,7 +1565,7 @@ parse_port_autonegenable(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1575,7 +1575,7 @@ parse_port_autonegenable(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1591,7 +1591,7 @@ parse_port_autonegrestart(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1601,7 +1601,7 @@ parse_port_autonegrestart(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1617,7 +1617,7 @@ parse_port_txhdr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1629,7 +1629,7 @@ parse_port_txhdr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1645,7 +1645,7 @@ parse_port_rxhdr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1657,7 +1657,7 @@ parse_port_rxhdr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1673,7 +1673,7 @@ parse_port_hdrtype(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1685,7 +1685,7 @@ parse_port_hdrtype(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1701,7 +1701,7 @@ parse_port_flowctrl(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1713,7 +1713,7 @@ parse_port_flowctrl(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1729,7 +1729,7 @@ parse_port_flowctrlforcemode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1741,7 +1741,7 @@ parse_port_flowctrlforcemode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1757,7 +1757,7 @@ parse_port_powersave(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1769,7 +1769,7 @@ parse_port_powersave(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1785,7 +1785,7 @@ parse_port_hibernate(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1797,7 +1797,7 @@ parse_port_hibernate(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1813,7 +1813,7 @@ parse_port_txmacstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1825,7 +1825,7 @@ parse_port_txmacstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1841,7 +1841,7 @@ parse_port_rxmacstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1853,7 +1853,7 @@ parse_port_rxmacstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1869,7 +1869,7 @@ parse_port_txfcstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1881,7 +1881,7 @@ parse_port_txfcstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1897,7 +1897,7 @@ parse_port_rxfcstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1909,7 +1909,7 @@ parse_port_rxfcstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1926,7 +1926,7 @@ parse_port_bpstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1938,7 +1938,7 @@ parse_port_bpstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1954,7 +1954,7 @@ parse_port_linkforcemode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -1966,7 +1966,7 @@ parse_port_linkforcemode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -1982,7 +1982,7 @@ parse_port_macloopback(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3729,7 +3729,7 @@ parse_vlan_entry(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3739,7 +3739,7 @@ parse_vlan_entry(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3755,7 +3755,7 @@ parse_vlan_member(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3769,7 +3769,7 @@ parse_vlan_member(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3785,7 +3785,7 @@ parse_vlan_learnsts(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3797,7 +3797,7 @@ parse_vlan_learnsts(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3817,7 +3817,7 @@ parse_fdb_entry(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3853,7 +3853,7 @@ parse_fdb_entry(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3873,7 +3873,7 @@ parse_fdb_resventry(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3905,7 +3905,7 @@ parse_fdb_resventry(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3921,7 +3921,7 @@ parse_fdb_portlearn(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3933,7 +3933,7 @@ parse_fdb_portlearn(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3949,7 +3949,7 @@ parse_fdb_agectrl(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3959,7 +3959,7 @@ parse_fdb_agectrl(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -3975,7 +3975,7 @@ parse_fdb_agetime(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -3985,7 +3985,7 @@ parse_fdb_agetime(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4001,7 +4001,7 @@ parse_fdb_vlansmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4011,7 +4011,7 @@ parse_fdb_vlansmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4027,7 +4027,7 @@ parse_fdb_ptlearnlimit(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4041,7 +4041,7 @@ parse_fdb_ptlearnlimit(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4057,7 +4057,7 @@ parse_fdb_ptlearnexceedcmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4069,7 +4069,7 @@ parse_fdb_ptlearnexceedcmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4085,7 +4085,7 @@ parse_fdb_learnlimit(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4097,7 +4097,7 @@ parse_fdb_learnlimit(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4113,7 +4113,7 @@ parse_fdb_learnexceedcmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4123,7 +4123,7 @@ parse_fdb_learnexceedcmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4139,7 +4139,7 @@ parse_fdb_ptlearnstatic(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4151,7 +4151,7 @@ parse_fdb_ptlearnstatic(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4341,7 +4341,7 @@ parse_igmp_mode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4353,7 +4353,7 @@ parse_igmp_mode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4369,7 +4369,7 @@ parse_igmp_cmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4379,7 +4379,7 @@ parse_igmp_cmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4395,7 +4395,7 @@ parse_igmp_portjoin(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4407,7 +4407,7 @@ parse_igmp_portjoin(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4423,7 +4423,7 @@ parse_igmp_portleave(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4435,7 +4435,7 @@ parse_igmp_portleave(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4451,7 +4451,7 @@ parse_igmp_rp(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4461,7 +4461,7 @@ parse_igmp_rp(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4477,7 +4477,7 @@ parse_igmp_createstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4487,7 +4487,7 @@ parse_igmp_createstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4503,7 +4503,7 @@ parse_igmp_static(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4513,7 +4513,7 @@ parse_igmp_static(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4529,7 +4529,7 @@ parse_igmp_leaky(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4539,7 +4539,7 @@ parse_igmp_leaky(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4555,7 +4555,7 @@ parse_igmp_version3(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4565,7 +4565,7 @@ parse_igmp_version3(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4581,7 +4581,7 @@ parse_igmp_queue(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4593,7 +4593,7 @@ parse_igmp_queue(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4609,7 +4609,7 @@ parse_igmp_ptlearnlimit(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4623,7 +4623,7 @@ parse_igmp_ptlearnlimit(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4639,7 +4639,7 @@ parse_igmp_ptlearnexceedcmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4651,7 +4651,7 @@ parse_igmp_ptlearnexceedcmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4667,7 +4667,7 @@ parse_igmp_multi(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4687,7 +4687,7 @@ parse_igmp_multi(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4705,7 +4705,7 @@ parse_sec_mac(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4717,7 +4717,7 @@ parse_sec_mac(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4733,7 +4733,7 @@ parse_sec_ip(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4745,7 +4745,7 @@ parse_sec_ip(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4761,7 +4761,7 @@ parse_sec_ip4(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4773,7 +4773,7 @@ parse_sec_ip4(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4789,7 +4789,7 @@ parse_sec_ip6(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4801,7 +4801,7 @@ parse_sec_ip6(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4817,7 +4817,7 @@ parse_sec_tcp(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4829,7 +4829,7 @@ parse_sec_tcp(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4845,7 +4845,7 @@ parse_sec_udp(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4857,7 +4857,7 @@ parse_sec_udp(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4873,7 +4873,7 @@ parse_sec_icmp4(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4885,7 +4885,7 @@ parse_sec_icmp4(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4901,7 +4901,7 @@ parse_sec_icmp6(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -4913,7 +4913,7 @@ parse_sec_icmp6(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -4950,7 +4950,14 @@ parse_sec_expctrl(struct switch_val *val)
 			val_ptr[6] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "multicast_en")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
-		}  else {
+#ifdef APPE
+		} else if (!strcmp(ext_value_p->option_name, "l2flow_type")) {
+			val_ptr[8] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "l3flow_type")) {
+			val_ptr[9] = (char*)ext_value_p->option_value;
+#endif
+		}
+		else {
 			rv = -1;
 			break;
 		}
@@ -5048,6 +5055,200 @@ parse_sec_l4parser(struct switch_val *val)
 	return rv;
 }
 #endif
+#ifdef APPE
+static int
+parse_sec_l2expctrl(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "excep_type")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "excep_cmd")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		}
+		else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_sec_tunnelexpctrl(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "excep_type")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "excep_cmd")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "deacclr_en")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "profile0_en")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "profile1_en")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "profile2_en")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "profile3_en")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+		}
+		else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_sec_tunnell3parser(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "small_ip4ttl")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "small_ip6hoplimit")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_sec_tunnell4parser(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag0")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag0_mask")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag1")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag1_mask")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag2")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag2_mask")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag3")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag3_mask")) {
+			val_ptr[7] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag4")) {
+			val_ptr[8] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag4_mask")) {
+			val_ptr[9] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag5")) {
+			val_ptr[10] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag5_mask")) {
+			val_ptr[11] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag6")) {
+			val_ptr[12] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag6_mask")) {
+			val_ptr[13] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag7")) {
+			val_ptr[14] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tcpflag7_mask")) {
+			val_ptr[15] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_sec_tunnelflagsparser(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "entry_index")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "entry_valid")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "equal")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "tunnel_header_type")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "flags")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "mask")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+#endif
 #endif
 
 #ifdef IN_MISC
@@ -5060,7 +5261,7 @@ parse_misc_framemaxsize(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5070,7 +5271,7 @@ parse_misc_framemaxsize(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5086,7 +5287,7 @@ parse_misc_ptunkucfilter(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5098,7 +5299,7 @@ parse_misc_ptunkucfilter(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5114,7 +5315,7 @@ parse_misc_ptunkmcfilter(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5126,7 +5327,7 @@ parse_misc_ptunkmcfilter(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5142,7 +5343,7 @@ parse_misc_ptbcfilter(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5154,7 +5355,7 @@ parse_misc_ptbcfilter(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5170,7 +5371,7 @@ parse_misc_autoneg(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5180,7 +5381,7 @@ parse_misc_autoneg(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5196,7 +5397,7 @@ parse_misc_cpuport(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5206,7 +5407,7 @@ parse_misc_cpuport(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5222,7 +5423,7 @@ parse_misc_pppoecmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5232,7 +5433,7 @@ parse_misc_pppoecmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5248,7 +5449,7 @@ parse_misc_pppoe(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5258,7 +5459,7 @@ parse_misc_pppoe(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5274,7 +5475,7 @@ parse_misc_ptdhcp(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5286,7 +5487,7 @@ parse_misc_ptdhcp(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5302,7 +5503,7 @@ parse_misc_arpcmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5312,7 +5513,7 @@ parse_misc_arpcmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5328,7 +5529,7 @@ parse_misc_eapolcmd(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5338,7 +5539,7 @@ parse_misc_eapolcmd(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5354,7 +5555,7 @@ parse_misc_eapolstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5366,7 +5567,7 @@ parse_misc_eapolstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5382,7 +5583,7 @@ parse_misc_rip(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5392,7 +5593,7 @@ parse_misc_rip(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5408,7 +5609,7 @@ parse_misc_ptarpreq(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5420,7 +5621,7 @@ parse_misc_ptarpreq(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5436,7 +5637,7 @@ parse_misc_ptarpack(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5448,7 +5649,7 @@ parse_misc_ptarpack(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5464,7 +5665,7 @@ parse_misc_extendpppoe(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5492,7 +5693,7 @@ parse_misc_extendpppoe(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5508,7 +5709,7 @@ parse_misc_pppoeid(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5520,7 +5721,7 @@ parse_misc_pppoeid(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5536,7 +5737,7 @@ parse_misc_cpuvid(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5546,7 +5747,7 @@ parse_misc_cpuvid(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5562,7 +5763,7 @@ parse_misc_rtdpppoe(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5572,7 +5773,7 @@ parse_misc_rtdpppoe(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5690,7 +5891,7 @@ parse_ip_hostentry(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5742,7 +5943,7 @@ parse_ip_hostentry(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5761,7 +5962,7 @@ parse_ip_intfentry(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5784,7 +5985,7 @@ parse_ip_intfentry(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5800,7 +6001,7 @@ parse_ip_ptarplearn(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5812,7 +6013,7 @@ parse_ip_ptarplearn(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5828,7 +6029,7 @@ parse_ip_arplearn(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5838,7 +6039,7 @@ parse_ip_arplearn(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5854,7 +6055,7 @@ parse_ip_ptipsrcguard(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5866,7 +6067,7 @@ parse_ip_ptipsrcguard(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5882,7 +6083,7 @@ parse_ip_ptarpsrcguard(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5894,7 +6095,7 @@ parse_ip_ptarpsrcguard(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5910,7 +6111,7 @@ parse_ip_routestatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5920,7 +6121,7 @@ parse_ip_routestatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5936,7 +6137,7 @@ parse_ip_ipunksrc(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5946,7 +6147,7 @@ parse_ip_ipunksrc(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5962,7 +6163,7 @@ parse_ip_arpunksrc(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5972,7 +6173,7 @@ parse_ip_arpunksrc(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -5988,7 +6189,7 @@ parse_ip_agetime(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -5998,7 +6199,7 @@ parse_ip_agetime(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -6014,7 +6215,7 @@ parse_ip_wcmphashmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -6024,7 +6225,7 @@ parse_ip_wcmphashmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -6869,7 +7070,7 @@ parse_nat_natentry(struct switch_val *val)
 	parameter_length ++;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -6905,7 +7106,7 @@ parse_nat_natentry(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7137,7 +7338,7 @@ parse_nat_natstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7147,7 +7348,7 @@ parse_nat_natstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7163,7 +7364,7 @@ parse_nat_naptstatus(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7173,7 +7374,7 @@ parse_nat_naptstatus(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7189,7 +7390,7 @@ parse_nat_nathash(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7199,7 +7400,7 @@ parse_nat_nathash(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7215,7 +7416,7 @@ parse_nat_naptmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7225,7 +7426,7 @@ parse_nat_naptmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7241,7 +7442,7 @@ parse_nat_prvbaseaddr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7251,7 +7452,7 @@ parse_nat_prvbaseaddr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7267,7 +7468,7 @@ parse_nat_prvaddrmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7277,7 +7478,7 @@ parse_nat_prvaddrmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7293,7 +7494,7 @@ parse_nat_pubaddr(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7305,7 +7506,7 @@ parse_nat_pubaddr(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7321,7 +7522,7 @@ parse_nat_natunksess(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7331,7 +7532,7 @@ parse_nat_natunksess(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7347,7 +7548,7 @@ parse_nat_prvbasemask(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7357,7 +7558,7 @@ parse_nat_prvbasemask(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7413,7 +7614,7 @@ parse_stp_portstate(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7427,7 +7628,7 @@ parse_stp_portstate(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7445,7 +7646,7 @@ parse_mirror_analypt(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7455,7 +7656,7 @@ parse_mirror_analypt(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7471,7 +7672,7 @@ parse_mirror_ptingress(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7483,7 +7684,7 @@ parse_mirror_ptingress(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7499,7 +7700,7 @@ parse_mirror_ptegress(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7511,7 +7712,7 @@ parse_mirror_ptegress(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7560,7 +7761,7 @@ parse_leaky_ucmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7570,7 +7771,7 @@ parse_leaky_ucmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7586,7 +7787,7 @@ parse_leaky_mcmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7596,7 +7797,7 @@ parse_leaky_mcmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7612,7 +7813,7 @@ parse_leaky_arpmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7624,7 +7825,7 @@ parse_leaky_arpmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7640,7 +7841,7 @@ parse_leaky_ptucmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7652,7 +7853,7 @@ parse_leaky_ptucmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7668,7 +7869,7 @@ parse_leaky_ptmcmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7680,7 +7881,7 @@ parse_leaky_ptmcmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7698,7 +7899,7 @@ parse_trunk_group(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7712,7 +7913,7 @@ parse_trunk_group(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7728,7 +7929,7 @@ parse_trunk_hashmode(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7738,7 +7939,7 @@ parse_trunk_hashmode(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7783,7 +7984,7 @@ parse_mib_status(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7793,7 +7994,7 @@ parse_mib_status(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -7809,7 +8010,7 @@ parse_mib_cpukeep(struct switch_val *val)
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
-		
+
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
@@ -7819,7 +8020,7 @@ parse_mib_cpukeep(struct switch_val *val)
 			rv = -1;
 			break;
 		}
-	
+
 		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
@@ -10710,7 +10911,7 @@ parse_rate(const char *command_name, struct switch_val *val)
 		rv = parse_rate_ptaddratebyte(val);
 	} else if(!strcmp(command_name, "PtGolflowen")) {
 		rv = parse_rate_ptgolflowen(val);
-	} 
+	}
 
 	return rv;
 }
@@ -10727,7 +10928,7 @@ parse_port(const char *command_name, struct switch_val *val)
 		rv = parse_port_rxhdr(val);
 	} else if(!strcmp(command_name, "HdrType")) {
 		rv = parse_port_hdrtype(val);
-	} 
+	}
 	#ifndef IN_PORTCONTROL_MINI
 	else if(!strcmp(command_name, "Duplex")) {
 		rv = parse_port_duplex(val);
@@ -10891,7 +11092,7 @@ parse_portvlan(const char *command_name, struct switch_val *val)
 		rv = parse_portvlan_egbypass(val);
 	} else if(!strcmp(command_name, "Ptvrfid")) {
 		rv = parse_portvlan_ptvrfid(val);
-	} 
+	}
 	#endif
 
 	return rv;
@@ -10955,7 +11156,7 @@ parse_fdb(const char *command_name, struct switch_val *val)
 		rv = parse_fdb_ptstationmove(val);
 	} else if (!strcmp(command_name, "PtMacLimitCtrl")) {
 		rv = parse_fdb_ptmaclimitctrl(val);
-	} 
+	}
 	#endif
 
 	return rv;
@@ -11006,7 +11207,7 @@ parse_igmp(const char *command_name, struct switch_val *val)
 		rv = parse_igmp_ptlearnexceedcmd(val);
 	} else if(!strcmp(command_name, "Multi")) {
 		rv = parse_igmp_multi(val);
-	} 
+	}
 
 	return rv;
 }
@@ -11040,6 +11241,18 @@ parse_sec(const char *command_name, struct switch_val *val)
 		rv = parse_sec_l3parser(val);
 	} else if (!strcmp(command_name, "L4parser")) {
 		rv = parse_sec_l4parser(val);
+#endif
+#ifdef APPE
+	} else if (!strcmp(command_name, "L2expctrl")) {
+		rv = parse_sec_l2expctrl(val);
+	} else if (!strcmp(command_name, "Tunnelexpctrl")) {
+		rv = parse_sec_tunnelexpctrl(val);
+	} else if (!strcmp(command_name, "Tunnell3parser")) {
+		rv = parse_sec_tunnell3parser(val);
+	} else if (!strcmp(command_name, "Tunnell4parser")) {
+		rv = parse_sec_tunnell4parser(val);
+	} else if (!strcmp(command_name, "Tunnelflagsparser")) {
+		rv = parse_sec_tunnelflagsparser(val);
 #endif
 	}
 
@@ -11233,7 +11446,7 @@ parse_stp(const char *command_name, struct switch_val *val)
 	int rv = -1;
 	if(!strcmp(command_name, "PortState")) {
 		rv = parse_stp_portstate(val);
-	} 
+	}
 
 	return rv;
 }
@@ -11273,7 +11486,7 @@ parse_leaky(const char *command_name, struct switch_val *val)
 		rv = parse_leaky_ptucmode(val);
 	} else if(!strcmp(command_name, "PtMcMode")) {
 		rv = parse_leaky_ptmcmode(val);
-	} 
+	}
 
 	return rv;
 }
@@ -11305,7 +11518,7 @@ parse_mib(const char *command_name, struct switch_val *val)
 		rv = parse_mib_status(val);
 	} else if(!strcmp(command_name, "CpuKeep")) {
 		rv = parse_mib_cpukeep(val);
-	} 
+	}
 
 	return rv;
 }
@@ -11351,7 +11564,7 @@ parse_flow(const char *command_name, struct switch_val *val)
 		rv = parse_flow_host(val);
 	} else if (!strcmp(command_name, "Global")) {
 		rv = parse_flow_global(val);
-	} 
+	}
 
 	return rv;
 }
@@ -11374,7 +11587,7 @@ parse_bm(const char *command_name, struct switch_val *val)
 		rv = parse_bm_portsthresh(val);
 	} else if (!strcmp(command_name, "Portdthresh")) {
 		rv = parse_bm_portdthresh(val);
-	} 
+	}
 
 	return rv;
 }
@@ -12174,14 +12387,14 @@ static int name_transfer(char *name, char *module, char *cmd)
 		strlcpy(cmd, p, COMMAND_NAME_MAX_LEN);
 		return 0;
         }
-	
+
         return -1;
 }
 
 int
 qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 				const struct switch_attr *attr,
-			 	struct switch_val *val) 
+			 	struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	struct qca_phy_priv *priv = qca_phy_priv_get(dev);

@@ -194,6 +194,7 @@ _fal_policer_ctrl_get(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl)
 	rv = p_api->adpt_policer_ctrl_get(dev_id, ctrl);
 	return rv;
 }
+
 #endif
 sw_error_t
 _fal_policer_timeslot_set(a_uint32_t dev_id, a_uint32_t timeslot)

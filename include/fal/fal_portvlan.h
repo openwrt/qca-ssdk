@@ -451,11 +451,13 @@ fal_port_vrf_id_get(a_uint32_t dev_id, fal_port_t port_id,
 
 #define FAL_GLOBAL_QINQ_MODE_INGRESS_EN (0x1UL << 0)
 #define FAL_GLOBAL_QINQ_MODE_EGRESS_EN (0x1UL << 1)
-typedef struct {
-	a_uint32_t mask;/*bit 0 for ingress and bit 1 for egress*/
-	fal_qinq_mode_t ingress_mode; /* ingress direction mode */
-	fal_qinq_mode_t egress_mode; /* egress direction mode */
-} fal_global_qinq_mode_t;
+#define FAL_GLOBAL_QINQ_MODE_EGRESS_UNTOUCHED_FOR_CPU_CODE (0x1UL << 2)
+	typedef struct {
+	    a_uint32_t mask;/*bit 0 for ingress and bit 1 for egress*/
+	    fal_qinq_mode_t ingress_mode; /* ingress direction mode */
+	    fal_qinq_mode_t egress_mode; /* egress direction mode */
+	    a_bool_t untouched_for_cpucode; /*egress untouched with cpu_code!=0 to cpu port 0 */
+	} fal_global_qinq_mode_t;
 
 #define FAL_PORT_QINQ_ROLE_INGRESS_EN (0x1UL << 0)
 #define FAL_PORT_QINQ_ROLE_EGRESS_EN (0x1UL << 1)

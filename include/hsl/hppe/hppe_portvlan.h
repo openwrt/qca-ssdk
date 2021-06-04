@@ -1370,6 +1370,14 @@ hppe_eg_bridge_config_bridge_type_set(
 		unsigned int value);
 
 sw_error_t
+hppe_eg_bridge_config_pkt_l2_edit_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t *value);
+sw_error_t
+hppe_eg_bridge_config_pkt_l2_edit_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t value);
+sw_error_t
 hppe_eg_bridge_config_queue_cnt_en_get(
 		a_uint32_t dev_id,
 		unsigned int *value);

@@ -627,6 +627,10 @@ adpt_hppe_global_qinq_mode_set(a_uint32_t dev_id, fal_global_qinq_mode_t *mode)
 		SW_RTN_ON_ERROR(rtn);
 	}
 
+	if (FAL_FLG_TST(mode->mask, FAL_GLOBAL_QINQ_MODE_EGRESS_UNTOUCHED_FOR_CPU_CODE)) {
+		SW_RTN_ON_ERROR(hppe_eg_bridge_config_pkt_l2_edit_en_set(dev_id,
+					(a_uint32_t)!mode->untouched_for_cpucode));
+	}
 	return rtn;
 }
 
@@ -634,6 +638,7 @@ sw_error_t
 adpt_hppe_global_qinq_mode_get(a_uint32_t dev_id, fal_global_qinq_mode_t *mode)
 {
 	sw_error_t rtn = SW_OK;
+	a_uint32_t l2_edit_en = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mode);
@@ -644,6 +649,10 @@ adpt_hppe_global_qinq_mode_get(a_uint32_t dev_id, fal_global_qinq_mode_t *mode)
 
 	rtn = hppe_eg_bridge_config_bridge_type_get(dev_id,
 			(a_uint32_t *)&mode->egress_mode);
+
+	SW_RTN_ON_ERROR(hppe_eg_bridge_config_pkt_l2_edit_en_get(dev_id, &l2_edit_en));
+
+	mode->untouched_for_cpucode = !l2_edit_en;
 
 	return rtn;
 }
@@ -746,6 +755,12 @@ adpt_hppe_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid)
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(tpid);
+
+	rtn = hppe_edma_vlan_tpid_reg_get(dev_id, &edma_tpid);
+	SW_RTN_ON_ERROR(rtn);
+
+	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
+	SW_RTN_ON_ERROR(rtn);
 
 	rtn = hppe_edma_vlan_tpid_reg_get(dev_id, &edma_tpid);
 	SW_RTN_ON_ERROR(rtn);

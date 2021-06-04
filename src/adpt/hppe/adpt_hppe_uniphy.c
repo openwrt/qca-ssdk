@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -37,27 +37,29 @@
 extern void adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id,
 				a_uint32_t port_id, fal_port_speed_t phy_speed);
 
-void
-__adpt_hppe_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
-	a_bool_t enable)
+static a_uint32_t
+adpt_hppe_port_get_by_uniphy(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t channel)
 {
-	enum unphy_rst_type rst_type;
+	a_uint32_t ssdk_port = 0;
 
 	if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
-		rst_type = UNIPHY0_SOFT_RESET_E;
+		if (channel == SSDK_UNIPHY_CHANNEL0) {
+			ssdk_port = SSDK_PHYSICAL_PORT1;
+		} else if (channel == SSDK_UNIPHY_CHANNEL1) {
+			ssdk_port = SSDK_PHYSICAL_PORT2;
+		} else if (channel == SSDK_UNIPHY_CHANNEL4) {
+			ssdk_port = SSDK_PHYSICAL_PORT5;
+		} else if (channel == SSDK_UNIPHY_CHANNEL3) {
+			ssdk_port = SSDK_PHYSICAL_PORT4;
+		}
 	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
-		rst_type = UNIPHY1_SOFT_RESET_E;
-	} else {
-		rst_type = UNIPHY2_SOFT_RESET_E;
+		ssdk_port = SSDK_PHYSICAL_PORT5;
+	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE2) {
+		ssdk_port = SSDK_PHYSICAL_PORT6;
 	}
 
-	if (enable == A_TRUE) {
-		ssdk_uniphy_reset(dev_id, rst_type, SSDK_RESET_DEASSERT);
-	} else {
-		ssdk_uniphy_reset(dev_id, rst_type, SSDK_RESET_ASSERT);
-	}
-
-	return;
+	return ssdk_port;
 }
 
 static sw_error_t
@@ -320,6 +322,7 @@ static sw_error_t
 __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
 	sw_error_t rv = SW_OK;
+	a_uint32_t ssdk_port = 0;
 
 	union uniphy_mode_ctrl_u uniphy_mode_ctrl;
 
@@ -356,6 +359,13 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 
 	/* configure uniphy to Athr mode and sgmiiplus mode */
 	hppe_uniphy_mode_ctrl_get(dev_id, uniphy_index, &uniphy_mode_ctrl);
+
+	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,
+		SSDK_UNIPHY_CHANNEL0);
+	if (A_TRUE == hsl_port_is_sfp(dev_id, ssdk_port)) {
+		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m = 2;
+		SSDK_DEBUG("uniphy %d is a sgmiiplus fiber port!\n", uniphy_index);
+	}
 
 	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_autoneg_mode =
 		UNIPHY_ATHEROS_NEGOTIATION;
@@ -395,9 +405,9 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 {
 	a_uint32_t i, max_port, mode, ssdk_port;
 	sw_error_t rv = SW_OK;
+	a_bool_t force_port = 0;
 
 	union uniphy_mode_ctrl_u uniphy_mode_ctrl;
-	a_bool_t force_port = 0;
 
 	memset(&uniphy_mode_ctrl, 0, sizeof(uniphy_mode_ctrl));
 	ADPT_DEV_ID_CHECK(dev_id);
@@ -458,10 +468,13 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	/* configure uniphy to Athr mode and sgmii mode */
 	hppe_uniphy_mode_ctrl_get(dev_id, uniphy_index, &uniphy_mode_ctrl);
 	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
-	if(mode == PORT_WRAPPER_SGMII_FIBER)
-	{
+
+	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,channel);
+	if (A_TRUE == hsl_port_is_sfp(dev_id, ssdk_port)) {
 		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m = 0;
+		SSDK_DEBUG("port_id %d is a fiber port!\n", ssdk_port);
 	}
+
 	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_autoneg_mode =
 		UNIPHY_ATHEROS_NEGOTIATION;
 	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_psgmii_qsgmii =
@@ -713,10 +726,7 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 
 	if (mode == PORT_WRAPPER_MAX) {
 		ssdk_uniphy_raw_clock_reset(index);
-		__adpt_hppe_gcc_uniphy_sys_set(dev_id, index, A_FALSE);
 		return SW_OK;
-	} else {
-		__adpt_hppe_gcc_uniphy_sys_set(dev_id, index, A_TRUE);
 	}
 
 	switch(mode) {

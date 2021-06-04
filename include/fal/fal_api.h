@@ -499,6 +499,9 @@ extern "C" {
     SW_API_DEF(SW_API_GLOBAL_QINQ_MODE_GET, fal_global_qinq_mode_get), \
     SW_API_DEF(SW_API_PORT_QINQ_MODE_SET, fal_port_qinq_mode_set), \
     SW_API_DEF(SW_API_PORT_QINQ_MODE_GET, fal_port_qinq_mode_get), \
+    SW_API_DEF(SW_API_QINQ_MODE_SET, fal_qinq_mode_set), \
+    SW_API_DEF(SW_API_PT_QINQ_ROLE_SET, fal_port_qinq_role_set), \
+    SW_API_DEF(SW_API_PT_VLAN_TRANS_ADD, fal_port_vlan_trans_add), \
     SW_API_DEF(SW_API_TPID_SET, fal_ingress_tpid_set), \
     SW_API_DEF(SW_API_TPID_GET, fal_ingress_tpid_get), \
     SW_API_DEF(SW_API_EGRESS_TPID_SET, fal_egress_tpid_set), \
@@ -542,6 +545,9 @@ extern "C" {
     SW_API_DESC(SW_API_GLOBAL_QINQ_MODE_GET) \
     SW_API_DESC(SW_API_PORT_QINQ_MODE_SET)  \
     SW_API_DESC(SW_API_PORT_QINQ_MODE_GET) \
+    SW_API_DESC(SW_API_QINQ_MODE_SET)    \
+    SW_API_DESC(SW_API_PT_QINQ_ROLE_SET) \
+    SW_API_DESC(SW_API_PT_VLAN_TRANS_ADD) \
     SW_API_DESC(SW_API_TPID_SET)  \
     SW_API_DESC(SW_API_TPID_GET) \
     SW_API_DESC(SW_API_EGRESS_TPID_SET)  \

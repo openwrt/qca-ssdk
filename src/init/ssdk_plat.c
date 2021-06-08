@@ -566,9 +566,11 @@ static int miibus_get(a_uint32_t dev_id)
 /*qca808x_end*/
 	reg_mode=ssdk_switch_reg_access_mode_get(dev_id);
 /*qca808x_start*/
-	if(reg_mode == HSL_REG_LOCAL_BUS)
+	if (reg_mode == HSL_REG_LOCAL_BUS) {
 		mdio_node = of_find_compatible_node(NULL, NULL, "qcom,ipq40xx-mdio");
-	else
+		if (!mdio_node)
+			mdio_node = of_find_compatible_node(NULL, NULL, "qcom,qca-mdio");
+	} else
 		mdio_node = of_find_compatible_node(NULL, NULL, "virtual,mdio-gpio");
 
 	if (!mdio_node) {

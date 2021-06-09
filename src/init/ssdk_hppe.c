@@ -1200,27 +1200,26 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 	SW_RTN_ON_NULL(p_api->adpt_port_mux_mac_type_set);
 
-	if (!ssdk_is_emulation(dev_id)) {
-		SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
+	SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
 
-		rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE0, mode0);
+	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE0, mode0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode1);
+	SW_RTN_ON_ERROR(rv);
+
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		rv = p_api->adpt_uniphy_mode_set(dev_id,
+				SSDK_UNIPHY_INSTANCE2, mode2);
 		SW_RTN_ON_ERROR(rv);
-
-		rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode1);
-		SW_RTN_ON_ERROR(rv);
-
-		if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	} else {
+		if(adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
 			rv = p_api->adpt_uniphy_mode_set(dev_id,
 					SSDK_UNIPHY_INSTANCE2, mode2);
 			SW_RTN_ON_ERROR(rv);
-		} else {
-			if(adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
-				rv = p_api->adpt_uniphy_mode_set(dev_id,
-						SSDK_UNIPHY_INSTANCE2, mode2);
-				SW_RTN_ON_ERROR(rv);
-			}
 		}
 	}
+
 	for (index = SSDK_UNIPHY_INSTANCE0; index <= SSDK_UNIPHY_INSTANCE2; index ++) {
 		if (mode[index] == PORT_WRAPPER_MAX) {
 			ssdk_gcc_uniphy_sys_set(dev_id, index, A_FALSE);

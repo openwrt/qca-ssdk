@@ -1460,10 +1460,11 @@ qca_mac_sw_sync_work_task(struct work_struct *work)
 int
 qca_mac_sw_sync_work_start(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY))
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)
+		&& (priv->version != QCA_VER_APPE))
 		return 0;
 
-	if (priv->version == QCA_VER_HPPE) {
+	if ((priv->version == QCA_VER_HPPE) || (priv->version == QCA_VER_APPE)) {
 		qca_mac_sw_sync_port_status_init(priv->device_id);
 	}
 

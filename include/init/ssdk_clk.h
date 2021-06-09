@@ -306,6 +306,13 @@ void ssdk_mp_gephy_icc_efuse_load_enable(
 
 #endif
 
+#if defined(APPE)
+void ssdk_appe_port_speed_clock_set(
+	a_uint32_t dev_id,
+	a_uint32_t port_id,
+	a_uint32_t *clk);
+#endif
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

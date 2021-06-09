@@ -4829,22 +4829,60 @@ adpt_hppe_sgmii_speed_clock_set(
 	a_uint32_t port_id,
 	fal_port_speed_t phy_speed)
 {
-	switch (phy_speed) {
-		case FAL_SPEED_10:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, SGMII_SPEED_10M_CLK);
-			break;
-		case FAL_SPEED_100:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, SGMII_SPEED_100M_CLK);
-			break;
-		case FAL_SPEED_1000:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, SGMII_SPEED_1000M_CLK);
-			break;
-		default:
-			break;
-               }
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
+		a_uint32_t clk[4] = {0};
+		if (phy_speed == FAL_SPEED_10) {
+			clk[1] = 0x9;
+			clk[3] = 0x9;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x409;
+				clk[2] = 0x509;
+			} else {
+				clk[0] = 0x209;
+				clk[2] = 0x309;
+			}
+		} else if (phy_speed == FAL_SPEED_100) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x409;
+				clk[2] = 0x509;
+			} else {
+				clk[0] = 0x209;
+				clk[2] = 0x309;
+			}
+		} else if (phy_speed == FAL_SPEED_1000) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x401;
+				clk[2] = 0x501;
+			} else {
+				clk[0] = 0x201;
+				clk[2] = 0x301;
+			}
+		}
+		ssdk_appe_port_speed_clock_set(dev_id, port_id, clk);
+#endif
+	} else {
+		switch (phy_speed) {
+			case FAL_SPEED_10:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, SGMII_SPEED_10M_CLK);
+				break;
+			case FAL_SPEED_100:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, SGMII_SPEED_100M_CLK);
+				break;
+			case FAL_SPEED_1000:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, SGMII_SPEED_1000M_CLK);
+				break;
+			default:
+				break;
+		}
+	}
 }
 static void
 adpt_hppe_pqsgmii_speed_clock_set(
@@ -4852,22 +4890,46 @@ adpt_hppe_pqsgmii_speed_clock_set(
 	a_uint32_t port_id,
 	fal_port_speed_t phy_speed)
 {
-	switch (phy_speed) {
-		case FAL_SPEED_10:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, PQSGMII_SPEED_10M_CLK);
-			break;
-		case FAL_SPEED_100:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, PQSGMII_SPEED_100M_CLK);
-			break;
-		case FAL_SPEED_1000:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, PQSGMII_SPEED_1000M_CLK);
-			break;
-		default:
-			break;
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
+		a_uint32_t clk[4] = {0};
+		if (phy_speed == FAL_SPEED_10) {
+			clk[0] = 0x209;
+			clk[1] = 0x9;
+			clk[2] = 0x309;
+			clk[3] = 0x9;
+		} else if (phy_speed == FAL_SPEED_100) {
+			clk[0] = 0x209;
+			clk[1] = 0x0;
+			clk[2] = 0x309;
+			clk[3] = 0x0;
+		} else if (phy_speed == FAL_SPEED_1000) {
+			clk[0] = 0x201;
+			clk[1] = 0x0;
+			clk[2] = 0x301;
+			clk[3] = 0x0;
+		}
+		ssdk_appe_port_speed_clock_set(dev_id, port_id, clk);
+#endif
+	} else {
+		switch (phy_speed) {
+			case FAL_SPEED_10:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, PQSGMII_SPEED_10M_CLK);
+				break;
+			case FAL_SPEED_100:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, PQSGMII_SPEED_100M_CLK);
+				break;
+			case FAL_SPEED_1000:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, PQSGMII_SPEED_1000M_CLK);
+				break;
+			default:
+				break;
+		}
 	}
+
 }
 
 static void
@@ -4876,35 +4938,102 @@ adpt_hppe_usxgmii_speed_clock_set(
 	a_uint32_t port_id,
 	fal_port_speed_t phy_speed)
 {
-	switch (phy_speed) {
-		case FAL_SPEED_10:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, USXGMII_SPEED_10M_CLK);
-			break;
-		case FAL_SPEED_100:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, USXGMII_SPEED_100M_CLK);
-			break;
-		case FAL_SPEED_1000:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, USXGMII_SPEED_1000M_CLK);
-			break;
-		case FAL_SPEED_2500:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, USXGMII_SPEED_2500M_CLK);
-			break;
-		case FAL_SPEED_5000:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, USXGMII_SPEED_5000M_CLK);
-			break;
-		case FAL_SPEED_10000:
-			ssdk_port_speed_clock_set(dev_id,
-					port_id, USXGMII_SPEED_10000M_CLK);
-			break;
-		default:
-			break;
-               }
-
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
+		a_uint32_t clk[4] = {0};
+		if (phy_speed == FAL_SPEED_10) {
+			clk[1] = 0x18;
+			clk[3] = 0x18;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x413;
+				clk[2] = 0x513;
+			} else {
+				clk[0] = 0x213;
+				clk[2] = 0x313;
+			}
+		} else if (phy_speed == FAL_SPEED_100) {
+			clk[1] = 0x4;
+			clk[3] = 0x4;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x409;
+				clk[2] = 0x509;
+			} else {
+				clk[0] = 0x209;
+				clk[2] = 0x309;
+			}
+		} else if (phy_speed == FAL_SPEED_1000) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x404;
+				clk[2] = 0x504;
+			} else {
+				clk[0] = 0x204;
+				clk[2] = 0x304;
+			}
+		} else if (phy_speed == FAL_SPEED_2500) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x407;
+				clk[2] = 0x507;
+			} else {
+				clk[0] = 0x207;
+				clk[2] = 0x307;
+			}
+		} else if (phy_speed == FAL_SPEED_5000) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x403;
+				clk[2] = 0x503;
+			} else {
+				clk[0] = 0x203;
+				clk[2] = 0x303;
+			}
+		} else if (phy_speed == FAL_SPEED_10000) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x401;
+				clk[2] = 0x501;
+			} else {
+				clk[0] = 0x201;
+				clk[2] = 0x301;
+			}
+		}
+		ssdk_appe_port_speed_clock_set(dev_id, port_id, clk);
+#endif
+	} else {
+		switch (phy_speed) {
+			case FAL_SPEED_10:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, USXGMII_SPEED_10M_CLK);
+				break;
+			case FAL_SPEED_100:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, USXGMII_SPEED_100M_CLK);
+				break;
+			case FAL_SPEED_1000:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, USXGMII_SPEED_1000M_CLK);
+				break;
+			case FAL_SPEED_2500:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, USXGMII_SPEED_2500M_CLK);
+				break;
+			case FAL_SPEED_5000:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, USXGMII_SPEED_5000M_CLK);
+				break;
+			case FAL_SPEED_10000:
+				ssdk_port_speed_clock_set(dev_id,
+						port_id, USXGMII_SPEED_10000M_CLK);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 static void
@@ -4913,7 +5042,25 @@ adpt_hppe_sgmiiplus_speed_clock_set(
 	a_uint32_t port_id,
 	fal_port_speed_t phy_speed)
 {
-               ssdk_port_speed_clock_set(dev_id, port_id, SGMII_PLUS_SPEED_2500M_CLK);
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+#if defined(APPE)
+		a_uint32_t clk[4] = {0};
+		if (phy_speed == FAL_SPEED_2500) {
+			clk[1] = 0x0;
+			clk[3] = 0x0;
+			if (port_id == HPPE_MUX_PORT1) {
+				clk[0] = 0x401;
+				clk[2] = 0x501;
+			} else {
+				clk[0] = 0x201;
+				clk[2] = 0x301;
+			}
+		}
+		ssdk_appe_port_speed_clock_set(dev_id, port_id, clk);
+#endif
+	} else {
+		ssdk_port_speed_clock_set(dev_id, port_id, SGMII_PLUS_SPEED_2500M_CLK);
+	}
 }
 
 

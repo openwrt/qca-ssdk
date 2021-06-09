@@ -141,6 +141,35 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
+	{
+		"vpn_type",
+		{
+			{"vsi", 0},
+			{"vrf", 1},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+	{
+		"tunnel_type",
+		{
+			{"gre_tap_ipv4", FAL_TUNNEL_TYPE_GRE_TAP_OVER_IPV4},
+			{"gre_tap_ipv6", FAL_TUNNEL_TYPE_GRE_TAP_OVER_IPV6},
+			{"vxlan_ipv4", FAL_TUNNEL_TYPE_VXLAN_OVER_IPV4},
+			{"vxlan_ipv6", FAL_TUNNEL_TYPE_VXLAN_OVER_IPV6},
+			{"vxlan_gpe_ipv4", FAL_TUNNEL_TYPE_VXLAN_GPE_OVER_IPV4},
+			{"vxlan_gpe_ipv6", FAL_TUNNEL_TYPE_VXLAN_GPE_OVER_IPV6},
+			{"ipv4_ipv6", FAL_TUNNEL_TYPE_IPV4_OVER_IPV6},
+			{"program0", FAL_TUNNEL_TYPE_PROGRAM0},
+			{"program1", FAL_TUNNEL_TYPE_PROGRAM1},
+			{"program2", FAL_TUNNEL_TYPE_PROGRAM2},
+			{"program3", FAL_TUNNEL_TYPE_PROGRAM3},
+			{"program4", FAL_TUNNEL_TYPE_PROGRAM4},
+			{"program5", FAL_TUNNEL_TYPE_PROGRAM5},
+			{"geneve_ipv4", FAL_TUNNEL_TYPE_GENEVE_OVER_IPV4},
+			{"geneve_ipv6", FAL_TUNNEL_TYPE_GENEVE_OVER_IPV6},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 #ifdef IN_POLICER
 	{
 		"policer_meter_type",
@@ -3379,7 +3408,35 @@ cmd_data_check_ruletype(char *cmd_str, fal_acl_rule_type_t * arg_val,
     }
     else
     {
-        return SW_BAD_VALUE;
+#ifdef APPE
+		if (cmd_get_chip_type() == CHIP_APPE)
+		{
+			if (!strcasecmp(cmd_str, "tunnel_mac"))
+			{
+				*arg_val = FAL_ACL_RULE_TUNNEL_MAC;
+			}
+			else if (!strcasecmp(cmd_str, "tunnel_ip4"))
+			{
+				*arg_val = FAL_ACL_RULE_TUNNEL_IP4;
+			}
+			else if (!strcasecmp(cmd_str, "tunnel_ip6"))
+			{
+				*arg_val = FAL_ACL_RULE_TUNNEL_IP6;
+			}
+			else if (!strcasecmp(cmd_str, "tunnel_udf"))
+			{
+				*arg_val = FAL_ACL_RULE_TUNNEL_UDF;
+			}
+			else
+			{
+				return SW_BAD_VALUE;
+			}
+		}
+		else
+#endif
+		{
+			return SW_BAD_VALUE;
+		}
     }
 
     return SW_OK;

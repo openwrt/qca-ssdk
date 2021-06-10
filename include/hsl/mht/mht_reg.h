@@ -33,74 +33,132 @@ extern "C" {
  */
 
 /* work mode */
-#define WORK_MODE					"work_mode"
-#define WORK_MODE_ID					0
-#define WORK_MODE_OFFSET				0xC907030
-#define WORK_MODE_E_LENGTH				4
-#define WORK_MODE_E_OFFSET				0
-#define WORK_MODE_NR_E					1
+#define WORK_MODE
+#define WORK_MODE_ID                                    0
+#define WORK_MODE_OFFSET                                0xC90F030
+#define WORK_MODE_E_LENGTH                              4
+#define WORK_MODE_E_OFFSET                              0
+#define WORK_MODE_NR_E                                  1
 
 /* port5 sel */
-#define WORK_MODE_PORT5_SEL				"port5_sel"
-#define WORK_MODE_PORT5_SEL_BOFFSET			5
-#define WORK_MODE_PORT5_SEL_BLEN			1
-#define WORK_MODE_PORT5_SEL_FLAG			HSL_RW
+#define WORK_MODE_PORT5_SEL
+#define WORK_MODE_PORT5_SEL_BOFFSET                     5
+#define WORK_MODE_PORT5_SEL_BLEN                        1
+#define WORK_MODE_PORT5_SEL_FLAG                        HSL_RW
 
 /* phy3 sel1 */
-#define WORK_MODE_PHY3_SEL1				"phy3_sel1"
-#define WORK_MODE_PHY3_SEL1_BOFFSET			4
-#define WORK_MODE_PHY3_SEL1_BLEN			1
-#define WORK_MODE_PHY3_SEL1_FLAG			HSL_RW
+#define WORK_MODE_PHY3_SEL1
+#define WORK_MODE_PHY3_SEL1_BOFFSET                     4
+#define WORK_MODE_PHY3_SEL1_BLEN                        1
+#define WORK_MODE_PHY3_SEL1_FLAG                        HSL_RW
 
 /* phy3 sel0 */
-#define WORK_MODE_PHY3_SEL0				"phy3_sel0"
-#define WORK_MODE_PHY3_SEL0_BOFFSET			3
-#define WORK_MODE_PHY3_SEL0_BLEN			1
-#define WORK_MODE_PHY3_SEL0_FLAG			HSL_RW
+#define WORK_MODE_PHY3_SEL0
+#define WORK_MODE_PHY3_SEL0_BOFFSET                     3
+#define WORK_MODE_PHY3_SEL0_BLEN                        1
+#define WORK_MODE_PHY3_SEL0_FLAG                        HSL_RW
 
 /* phy2 sel */
-#define WORK_MODE_PHY2_SEL				"phy2_sel"
-#define WORK_MODE_PHY2_SEL_BOFFSET			2
-#define WORK_MODE_PHY2_SEL_BLEN				1
-#define WORK_MODE_PHY2_SEL_FLAG				HSL_RW
+#define WORK_MODE_PHY2_SEL
+#define WORK_MODE_PHY2_SEL_BOFFSET                      2
+#define WORK_MODE_PHY2_SEL_BLEN                         1
+#define WORK_MODE_PHY2_SEL_FLAG                         HSL_RW
 
 /* phy1 sel */
-#define WORK_MODE_PHY1_SEL				"phy1_sel"
-#define WORK_MODE_PHY1_SEL_BOFFSET			1
-#define WORK_MODE_PHY1_SEL_BLEN				1
-#define WORK_MODE_PHY1_SEL_FLAG				HSL_RW
+#define WORK_MODE_PHY1_SEL
+#define WORK_MODE_PHY1_SEL_BOFFSET                      1
+#define WORK_MODE_PHY1_SEL_BLEN                         1
+#define WORK_MODE_PHY1_SEL_FLAG                         HSL_RW
 
 /* phy0 sel */
-#define WORK_MODE_PHY0_SEL				"phy0_sel"
-#define WORK_MODE_PHY0_SEL_BOFFSET			0
-#define WORK_MODE_PHY0_SEL_BLEN				1
-#define WORK_MODE_PHY0_SEL_FLAG				HSL_RW
+#define WORK_MODE_PHY0_SEL
+#define WORK_MODE_PHY0_SEL_BOFFSET                      0
+#define WORK_MODE_PHY0_SEL_BLEN                         1
+#define WORK_MODE_PHY0_SEL_FLAG                         HSL_RW
 
-#define GCC_SWITCH_CORE_CBCR				"switch_core"
-#define GCC_SWITCH_CORE_CBCR_ID				0
-#define GCC_SWITCH_CORE_CBCR_OFFSET			0xC800008
-#define GCC_SWITCH_CORE_CBCR_E_LENGTH			4
-#define GCC_SWITCH_CORE_CBCR_E_OFFSET			0
-#define GCC_SWITCH_CORE_CBCR_NR_E			0
+/* serdes cfg */
+#define SERDES_CFG
+#define SERDES_CFG_ID                                   0
+#define SERDES_CFG_OFFSET                               0xC90F014
+#define SERDES_CFG_E_LENGTH                             4
+#define SERDES_CFG_E_OFFSET                             0
+#define SERDES_CFG_NR_E                                 1
+
+/*serdes1 address*/
+#define SERDES_CFG_S1_XPCS_ADDR
+#define SERDES_CFG_S1_XPCS_ADDR_BOFFSET                 10
+#define SERDES_CFG_S1_XPCS_ADDR_BLEN                    5
+#define SERDES_CFG_S1_XPCS_ADDR_FLAG                    HSL_RW
+
+/*serdes1 address*/
+#define SERDES_CFG_S1_ADDR
+#define SERDES_CFG_S1_ADDR_BOFFSET                      5
+#define SERDES_CFG_S1_ADDR_BLEN                         5
+#define SERDES_CFG_S1_ADDR_FLAG                         HSL_RW
+
+/*serdes0 address*/
+#define SERDES_CFG_S0_ADDR
+#define SERDES_CFG_S0_ADDR_BOFFSET                      0
+#define SERDES_CFG_S0_ADDR_BLEN                         5
+#define SERDES_CFG_S0_ADDR_FLAG                         HSL_RW
+
+/* ephy cfg */
+#define EPHY_CFG
+#define EPHY_CFG_ID                                     0
+#define EPHY_CFG_OFFSET                                 0xC90F018
+#define EPHY_CFG_E_LENGTH                               4
+#define EPHY_CFG_E_OFFSET                               0
+#define EPHY_CFG_NR_E                                   1
+
+/*ephy3 phy address*/
+#define EPHY_CFG_EPHY3_ADDR
+#define EPHY_CFG_EPHY3_ADDR_BOFFSET                     15
+#define EPHY_CFG_EPHY3_ADDR_BLEN                        5
+#define EPHY_CFG_EPHY3_ADDR_FLAG                        HSL_RW
+
+/*ephy2 phy address*/
+#define EPHY_CFG_EPHY2_ADDR
+#define EPHY_CFG_EPHY2_ADDR_BOFFSET                     10
+#define EPHY_CFG_EPHY2_ADDR_BLEN                        5
+#define EPHY_CFG_EPHY2_ADDR_FLAG                        HSL_RW
+
+/*ephy1 phy address*/
+#define EPHY_CFG_EPHY1_ADDR
+#define EPHY_CFG_EPHY1_ADDR_BOFFSET                     5
+#define EPHY_CFG_EPHY1_ADDR_BLEN                        5
+#define EPHY_CFG_EPHY1_ADDR_FLAG                        HSL_RW
+
+/*ephy0 phy address*/
+#define EPHY_CFG_EPHY0_ADDR
+#define EPHY_CFG_EPHY0_ADDR_BOFFSET                     0
+#define EPHY_CFG_EPHY0_ADDR_BLEN                        5
+#define EPHY_CFG_EPHY0_ADDR_FLAG                        HSL_RW
+
+#define GCC_SWITCH_CORE_CBCR
+#define GCC_SWITCH_CORE_CBCR_ID                         0
+#define GCC_SWITCH_CORE_CBCR_OFFSET                     0xC800008
+#define GCC_SWITCH_CORE_CBCR_E_LENGTH                   4
+#define GCC_SWITCH_CORE_CBCR_E_OFFSET                   0
+#define GCC_SWITCH_CORE_CBCR_NR_E                       0
 
 /* reset switch core */
-#define GCC_SWITCH_CORE_CBCR_CLK_ARES			"clk_ares"
-#define GCC_SWITCH_CORE_CBCR_CLK_ARES_BOFFSET		2
-#define GCC_SWITCH_CORE_CBCR_CLK_ARES_BLEN		1
-#define GCC_SWITCH_CORE_CBCR_CLK_ARES_FLAG		HSL_RW
+#define GCC_SWITCH_CORE_CBCR_CLK_ARES
+#define GCC_SWITCH_CORE_CBCR_CLK_ARES_BOFFSET           2
+#define GCC_SWITCH_CORE_CBCR_CLK_ARES_BLEN              1
+#define GCC_SWITCH_CORE_CBCR_CLK_ARES_FLAG              HSL_RW
 
-#define GCC_GLOBAL_CTL					"global_ctl"
-#define GCC_GLOBAL_CTL_ID				1
-#define GCC_GLOBAL_CTL_OFFSET				0xC800308
-#define GCC_GLOBAL_CTL_E_LENGTH				4
-#define GCC_GLOBAL_CTL_E_OFFSET				0
-#define GCC_GLOBAL_CTL_NR_E				0
+#define GCC_GLOBAL_CTL
+#define GCC_GLOBAL_CTL_ID                               1
+#define GCC_GLOBAL_CTL_OFFSET                           0xC800308
+#define GCC_GLOBAL_CTL_E_LENGTH                         4
+#define GCC_GLOBAL_CTL_E_OFFSET                         0
+#define GCC_GLOBAL_CTL_NR_E                             0
 
 /* reset soc */
-#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES		"func_ares"
-#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_BOFFSET	0
-#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_BLEN		1
-#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_FLAG		HSL_RW
+#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES
+#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_BOFFSET        0
+#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_BLEN           1
+#define GCC_GLOBAL_CTL_GCC_TOP_FUNC_ARES_FLAG           HSL_RW
 
 /* WAN DSCP To Priority Register */
 #define DSCP_TO_EHPRI

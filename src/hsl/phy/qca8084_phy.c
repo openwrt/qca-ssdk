@@ -30,10 +30,10 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 	/* configure the phy work mode of manhattan chip */
 	switch (interface_mode) {
 		case PORT_UQXGMII:
-			rv = qca_mht_work_mode_set(dev_id, PHY_USXGMII_MODE);
+			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_UQXGMII_MODE);
 			break;
 		case PORT_UQXGMII_3CHANNELS:
-			rv = qca_mht_work_mode_set(dev_id, PHY_SGMII_USXGMII_MODE);
+			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);
 			break;
 		default:
 			rv = SW_NOT_SUPPORTED;

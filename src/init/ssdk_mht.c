@@ -40,11 +40,11 @@ qca_mht_work_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0, a_uint32_t mac_m
 	switch (mac_mode1) {
 		case PORT_WRAPPER_SGMII_PLUS:
 		case PORT_WRAPPER_SGMII_CHANNEL0:
-			ret = qca_mht_work_mode_set(dev_id, SWITCH_MODE);
+			ret = qca_mht_work_mode_set(dev_id, MHT_SWITCH_MODE);
 			SW_RTN_ON_ERROR(ret);
 			break;
 		case PORT_WRAPPER_MAX:
-			ret = qca_mht_work_mode_set(dev_id, SWITCH_BYPASS_PORT5_MODE);
+			ret = qca_mht_work_mode_set(dev_id, MHT_SWITCH_BYPASS_PORT5_MODE);
 			SW_RTN_ON_ERROR(ret);
 		default:
 			break;

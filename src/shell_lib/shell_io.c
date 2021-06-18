@@ -170,6 +170,16 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
+	{
+		"vport_type",
+		{
+			{"tunnel", FAL_VPORT_TYPE_TUNNEL},
+			{"0", FAL_VPORT_TYPE_TUNNEL},
+			{"normal", FAL_VPORT_TYPE_NORMAL},
+			{"1", FAL_VPORT_TYPE_NORMAL},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 #ifdef IN_POLICER
 	{
 		"policer_meter_type",
@@ -488,6 +498,9 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_ACLRULE, NULL, NULL),
     SW_TYPE_DEF(SW_ACL_UDF_PKT_TYPE, cmd_data_check_udf_pkt_type, NULL),
     SW_TYPE_DEF(SW_ACL_UDF_TYPE, cmd_data_check_udf_type, NULL),
+#ifdef APPE
+    SW_TYPE_DEF(SW_VPORT_TYPE, cmd_data_check_vport_type, NULL),
+#endif
 #endif
 #ifdef IN_LED
     SW_TYPE_DEF(SW_LEDPATTERN, (param_check_t)cmd_data_check_ledpattern, NULL),
@@ -692,6 +705,7 @@ static sw_data_type_t sw_data_type[] =
 #endif
 #ifdef IN_TUNNEL
     SW_TYPE_DEF(SW_TUNNEL_UDP_ENTRY, (param_check_t)cmd_data_check_tunnel_udp_entry, NULL),
+    SW_TYPE_DEF(SW_TUNNEL_UDF_TYPE, (param_check_t)cmd_data_check_tunnel_udf_type, NULL),
 #endif
 #ifdef IN_VXLAN
     SW_TYPE_DEF(SW_VXLAN_TYPE, (param_check_t)cmd_data_check_vxlan_type, NULL),
@@ -701,9 +715,6 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_TYPE, (param_check_t)cmd_data_check_tunnel_program_type, NULL),
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_ENTRY, (param_check_t)cmd_data_check_tunnel_program_entry, NULL),
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_CFG, (param_check_t)cmd_data_check_tunnel_program_cfg, NULL),
-#endif
-#ifdef IN_TUNNEL
-    SW_TYPE_DEF(SW_TUNNEL_UDF_TYPE, (param_check_t)cmd_data_check_tunnel_udf_type, NULL),
 #endif
 };
 
@@ -3596,7 +3607,14 @@ cmd_data_check_fieldop(char *cmdstr, fal_acl_field_op_t def,
     return SW_OK;
 }
 
-
+#ifdef APPE
+sw_error_t
+cmd_data_check_vport_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
+{
+    return cmd_data_check_attr("vport_type", cmd_str,
+                       arg_val, sizeof(*arg_val));
+}
+#endif
 #endif
 sw_error_t
 cmd_data_check_ip4addr(char *cmdstr, void * val, a_uint32_t size)

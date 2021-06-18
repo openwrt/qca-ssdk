@@ -515,7 +515,10 @@ sw_error_t
 cmd_data_check_udf_element(char *cmdstr, a_uint8_t * val, a_uint32_t * len);
 sw_error_t
 cmd_data_check_fieldop(char *cmdstr, fal_acl_field_op_t def, fal_acl_field_op_t * val);
-
+#ifdef APPE
+sw_error_t
+cmd_data_check_vport_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+#endif
 #endif
 sw_error_t
 cmd_data_check_module(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);

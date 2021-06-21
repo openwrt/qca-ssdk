@@ -44,6 +44,8 @@ void  cmd_strtol(char *str, a_uint32_t * arg_val);
 sw_error_t cmd_data_check_portmap(char *cmdstr, fal_pbmp_t * val, a_uint32_t size);
 sw_error_t cmd_data_check_confirm(char *cmdstr, a_bool_t def, a_bool_t * val, a_uint32_t size);
 
+sw_error_t cmd_data_check_uint64(char *cmd_str, a_uint32_t * arg_val,
+                                 a_uint32_t size);
 sw_error_t cmd_data_check_uint32(char *cmd_str, a_uint32_t * arg_val,
                                  a_uint32_t size);
 sw_error_t cmd_data_check_uint16(char *cmd_str, a_uint32_t * arg_val,
@@ -101,6 +103,10 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val,
 sw_error_t
 cmd_data_check_port_vlan_translation_adv_action(char *info, void *val,
 				a_uint32_t size);
+#endif
+#ifdef APPE
+sw_error_t
+cmd_data_check_isol_ctrl(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
 #endif
 #endif
 #ifdef IN_PORTCONTROL

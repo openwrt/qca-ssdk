@@ -368,7 +368,7 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_INT16, NULL, NULL),
     SW_TYPE_DEF(SW_UINT32, cmd_data_check_uint32, NULL),
     SW_TYPE_DEF(SW_INT32, NULL, NULL),
-    SW_TYPE_DEF(SW_UINT64, NULL, NULL),
+    SW_TYPE_DEF(SW_UINT64, cmd_data_check_uint64, NULL),
     SW_TYPE_DEF(SW_INT64, NULL, NULL),
 #ifdef IN_PORTCONTROL
     SW_TYPE_DEF(SW_DUPLEX, cmd_data_check_duplex, NULL),
@@ -456,6 +456,9 @@ static sw_data_type_t sw_data_type[] =
 		    (param_check_t)cmd_data_check_port_vlan_translation_adv_rule, NULL),
     SW_TYPE_DEF(SW_PT_VLAN_TRANS_ADV_ACTION,
 		    (param_check_t)cmd_data_check_port_vlan_translation_adv_action, NULL),
+#endif
+#ifdef APPE
+	SW_TYPE_DEF(SW_ISOL_CTRL, cmd_data_check_isol_ctrl, NULL),
 #endif
 #ifndef IN_PORTVLAN_MINI
     SW_TYPE_DEF(SW_VLANPROPAGATION, cmd_data_check_vlan_propagation, NULL),
@@ -761,6 +764,29 @@ cmd_data_check_uint8(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
     {
         return SW_BAD_PARAM;
     }
+
+    return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_uint64(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
+{
+    if (cmd_str == NULL)
+        return SW_BAD_PARAM;
+
+    if (0 == cmd_str[0])
+    {
+        return SW_BAD_VALUE;
+    }
+
+    if (strspn(cmd_str, "1234567890abcdefABCDEFXx") != strlen(cmd_str)){
+        return SW_BAD_VALUE;
+    }
+
+    if (cmd_str[0] == '0' && (cmd_str[1] == 'x' || cmd_str[1] == 'X'))
+        sscanf(cmd_str, "%llx", (a_uint64_t *)arg_val);
+    else
+        sscanf(cmd_str, "%lld", (a_uint64_t *)arg_val);
 
     return SW_OK;
 }
@@ -5559,7 +5585,58 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 	return SW_OK;
 }
 #endif
+#ifdef APPE
+sw_error_t
+cmd_data_check_isol_ctrl(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
+{
+	char *cmd;
+	sw_error_t rv;
+	fal_portvlan_isol_ctrl_t entry;
+	a_uint32_t tmp = 0;
 
+	aos_mem_zero(&entry, sizeof(fal_portvlan_isol_ctrl_t));
+
+	do {
+		cmd = get_sub_cmd("isol_en", "n");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4)) {
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4)) {
+			rv = SW_BAD_VALUE;
+		}
+		else {
+			rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.enable),
+					sizeof(a_bool_t));
+			if (SW_OK != rv)
+				rv = SW_BAD_VALUE;
+		}
+	} while(talk_mode && (SW_OK != rv));
+
+	do {
+		cmd = get_sub_cmd("group_id", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4)) {
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4)) {
+			rv = SW_BAD_VALUE;
+		} else {
+			rv = cmd_data_check_uint8(cmd, &tmp, sizeof(tmp));
+			if (SW_OK != rv)
+				rv = SW_BAD_VALUE;
+			else
+				entry.group_id = tmp;
+		}
+	} while(talk_mode && (SW_OK != rv));
+
+	*(fal_portvlan_isol_ctrl_t *)arg_val = entry;
+
+	return SW_OK;
+}
+#endif
 sw_error_t
 cmd_data_check_vlan_propagation(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
 {

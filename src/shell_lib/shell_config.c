@@ -718,6 +718,10 @@ struct sub_cmd_des_t g_portvlan_des[] =
 	{"counter", "set", SW_API_PT_VLAN_COUNTER_CLEANUP, NULL},
 	{"translationAdv", "set", SW_API_PT_VLAN_TRANS_ADV_ADD, NULL},
 #endif
+#ifdef APPE
+	{"Isol", "set", SW_API_PT_VLAN_ISOL_SET, NULL},
+	{"IsolGroup", "set", SW_API_PT_VLAN_ISOL_GROUP_SET, NULL},
+#endif
 	#ifndef IN_PORTVLAN_MINI
 	{"tlsMode", "set",   SW_API_PT_TLS_SET, NULL},
 	{"priPropagation", "set",   SW_API_PT_PRI_PROPAGATION_SET, NULL},

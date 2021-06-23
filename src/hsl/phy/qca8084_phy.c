@@ -20,6 +20,7 @@
 #include "qca808x_phy.h"
 #include "qca8084_phy.h"
 #include "mht_sec_ctrl.h"
+#include "mht_interface_ctrl.h"
 
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
@@ -27,10 +28,12 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 {
 	sw_error_t rv = SW_OK;
 
-	/* configure the phy work mode of manhattan chip */
 	switch (interface_mode) {
 		case PORT_UQXGMII:
-			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_UQXGMII_MODE);
+			SSDK_INFO("configure manhattan phy as PORT_UQXGMII\n");
+			/*the work mode is PORT_UQXGMII in default*/
+			rv = mht_interface_uqxgmii_mode_set(dev_id);
+			SW_RTN_ON_ERROR (rv);
 			break;
 		case PORT_UQXGMII_3CHANNELS:
 			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);

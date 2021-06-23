@@ -72,7 +72,7 @@ qca_mht_serdes_addr_get(a_uint32_t dev_id, a_uint32_t serdes_id,
 		case MHT_UNIPHY_SGMII_1:
 			*address = (data >> SERDES_CFG_S1_ADDR_BOFFSET) & 0x1f;
 			break;
-		case MHT_UNIPHY_XGMII:
+		case MHT_UNIPHY_XPCS:
 			*address = (data >> SERDES_CFG_S1_XPCS_ADDR_BOFFSET) & 0x1f;
 			break;
 		default:

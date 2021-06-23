@@ -580,6 +580,8 @@ typedef struct {
 #define AQUANTIA_PHY_112        0x03a1b660
 #define AQUANTIA_PHY_113C_A0    0x31c31C10
 #define AQUANTIA_PHY_113C_A1    0x31c31C11
+#define AQUANTIA_PHY_113C_B0    0x31c31C12
+#define AQUANTIA_PHY_113C_B1    0x31c31C13
 #define AQUANTIA_PHY_112C       0x03a1b792
 
 #define PHY_805XV2              0x004DD082

@@ -33,6 +33,9 @@
 #include "adpt_cppe_uniphy.h"
 #include "adpt_cppe_portctrl.h"
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
+#include <soc/qcom/socinfo.h>
+#endif
 
 extern void adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id,
 				a_uint32_t port_id, fal_port_speed_t phy_speed);
@@ -729,6 +732,15 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 		return SW_OK;
 	}
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
+	if (((index == SSDK_UNIPHY_INSTANCE1)
+		&& (cpu_is_uniphy1_enabled() == A_FALSE)) ||
+		((index == SSDK_UNIPHY_INSTANCE2)
+		&& (cpu_is_uniphy2_enabled() == A_FALSE))) {
+		SSDK_INFO("ssdk doesn't support uniphy:%d on platform\n", index);
+		return SW_OK;
+	}
+#endif
 	switch(mode) {
 		case PORT_WRAPPER_PSGMII:
 		case PORT_WRAPPER_PSGMII_FIBER:

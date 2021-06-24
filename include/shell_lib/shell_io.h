@@ -64,8 +64,10 @@ sw_error_t cmd_data_check_duplex(char *cmd_str, a_uint32_t * arg_val,
 sw_error_t cmd_data_check_speed(char *cmd_str, a_uint32_t * arg_val,
                                 a_uint32_t size);
 #ifndef IN_PORTCONTROL_MINI
+#if defined (APPE)
 sw_error_t cmd_data_check_port_8023ah_ctrl(char *cmd_str, void * val,
 	a_uint32_t size);
+#endif
 sw_error_t
 cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
@@ -390,13 +392,13 @@ cmd_data_check_stamove(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size);
-
+#if defined (APPE)
 sw_error_t
 cmd_data_check_vsi_bridge_vsi(char *cmd_str, void * arg_val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_vsi_invalidvsi_ctrl(char *cmd_str, void * arg_val, a_uint32_t size);
-
+#endif
 #endif
 #ifdef IN_BM
 sw_error_t

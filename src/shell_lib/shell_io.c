@@ -384,7 +384,9 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_SPEED, cmd_data_check_speed, NULL),
     SW_TYPE_DEF(SW_CAP, cmd_data_check_capable, NULL),
 #ifndef IN_PORTCONTROL_MINI
+#if defined (APPE)
     SW_TYPE_DEF(SW_PORT_8023AH_CTRL, (param_check_t)cmd_data_check_port_8023ah_ctrl, NULL),
+#endif
     SW_TYPE_DEF(SW_PORT_EEE_CONFIG, (param_check_t)cmd_data_check_port_eee_config, NULL),
     SW_TYPE_DEF(SW_PORT_LOOPBACK_CONFIG, (param_check_t)cmd_data_check_switch_port_loopback_config, NULL),
 #endif
@@ -582,8 +584,10 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_VSI_NEWADDR_LRN, (param_check_t)cmd_data_check_newadr_lrn, NULL),
     SW_TYPE_DEF(SW_VSI_STAMOVE, (param_check_t)cmd_data_check_stamove, NULL),
     SW_TYPE_DEF(SW_VSI_MEMBER, (param_check_t)cmd_data_check_vsi_member, NULL),
+#if defined (APPE)
     SW_TYPE_DEF(SW_VSI_BRIDGE_VSI,(param_check_t)cmd_data_check_vsi_bridge_vsi, NULL),
     SW_TYPE_DEF(SW_VSI_INVALIDVSI_CTRL,(param_check_t)cmd_data_check_vsi_invalidvsi_ctrl, NULL),
+#endif
     SW_TYPE_DEF(SW_VSI_COUNTER, NULL, NULL),
 #endif
 #ifdef IN_QM
@@ -1193,6 +1197,7 @@ cmd_data_check_switch_port_loopback_config(char *cmd_str, void * val,
     return SW_OK;
 }
 
+#if defined (APPE)
 sw_error_t
 cmd_data_check_port_8023ah_ctrl(char *cmd_str, void * val,
 	a_uint32_t size)
@@ -1210,6 +1215,7 @@ cmd_data_check_port_8023ah_ctrl(char *cmd_str, void * val,
     *(fal_port_8023ah_ctrl_t *)val = port_8023ah_ctrl;
     return SW_OK;
 }
+#endif
 
 sw_error_t
 cmd_data_check_crossover_mode(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
@@ -1418,7 +1424,7 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
-
+#if defined (APPE)
     cmd_data_check_element("mtu_enable", "enable",
                         "usage: usage: enable/disable\n",
                         cmd_data_check_enable, (cmd,
@@ -1440,7 +1446,7 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
                         cmd_data_check_uint32, (cmd,
                         &(entry.eg_vlan_tag_flag),
                         sizeof(entry.eg_vlan_tag_flag)));
-
+#endif
     *(fal_mtu_ctrl_t *)val = entry;
     return SW_OK;
 }
@@ -10501,7 +10507,7 @@ cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size)
                         sizeof (a_uint32_t));
 	if (rv)
 		return rv;
-
+#if defined (APPE)
 	rv = __cmd_data_check_complex("vports_bitmap(port64-port95)", 0,
                         "usage: Bit0-port64 Bit1-port65 ....\n",
                         cmd_data_check_pbmp, &(entry.member_vports[0]),
@@ -10543,11 +10549,12 @@ cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size)
                         sizeof (a_uint32_t));
 	if (rv)
 		return rv;
-
+#endif
 	*(fal_vsi_member_t *)val = entry;
 	return SW_OK;
 }
 
+#if defined (APPE)
 sw_error_t
 cmd_data_check_vsi_bridge_vsi(char *cmd_str, void *arg_val, a_uint32_t size)
 {
@@ -10602,6 +10609,7 @@ cmd_data_check_vsi_invalidvsi_ctrl(char *cmd_str, void *arg_val, a_uint32_t size
 
     return SW_OK;
 }
+#endif
 #endif
 
 #ifdef IN_FLOW
@@ -15352,7 +15360,7 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
-
+#if defined (APPE)
     /* get mgt_8023ah_oam */
     do
     {
@@ -15374,7 +15382,7 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
-
+#endif
     /* get mgt_mld */
     do
     {

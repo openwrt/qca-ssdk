@@ -616,7 +616,15 @@ parse_qos_ptpri(struct switch_val *val)
 			val_ptr[7] = (char*)ext_value_p->option_value;
 		}  else if (!strcmp(ext_value_p->option_name, "dscpprecforce")) {
 			val_ptr[8] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "preaclouterpriprece")) {
+			val_ptr[9] = (char*)ext_value_p->option_value;
+		}  else if (!strcmp(ext_value_p->option_name, "preaclinnerpriprece")) {
+			val_ptr[10] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else {
 			rv = -1;
 			break;
 		}

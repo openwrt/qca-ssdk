@@ -6292,6 +6292,22 @@ cmd_data_check_pppoe(char *cmd_str, void * val, a_uint32_t size)
     if (rv)
         return rv;
 
+#if defined(APPE)
+    rv = __cmd_data_check_complex("tl_l3_interface_index", "0",
+		    "usage: the range is 0 -- 255\n",
+		    cmd_data_check_uint32, &entry.tl_l3_if_index,
+		    sizeof (a_uint32_t));
+    if (rv)
+	    return rv;
+
+    rv = __cmd_data_check_boolean("tl_l3_interface_index_valid", "no",
+		    "usage: <yes/no/y/n>\n",
+		    cmd_data_check_confirm, A_FALSE, &entry.tl_l3_if_valid,
+		    sizeof (a_bool_t));
+    if (rv)
+	    return rv;
+#endif
+
     *(fal_pppoe_session_t*)val = entry;
     return SW_OK;
 }

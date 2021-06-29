@@ -5768,7 +5768,16 @@ parse_misc_extendpppoe(struct switch_val *val)
 			val_ptr[8] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "smacaddr_valid")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "tl_l3if_index")) {
+			val_ptr[10] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name,
+					"tl_l3if_index_valid")) {
+			val_ptr[11] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else {
 			rv = -1;
 			break;
 		}

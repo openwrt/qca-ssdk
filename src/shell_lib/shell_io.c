@@ -229,6 +229,18 @@ struct attr_des_t g_attr_des[] =
 		}
 	},
 #endif
+#ifdef IN_IP
+	{
+		"udp_zero_csum_action",
+		{
+			{"forward", FAL_UDP_ZERO_CSUM_FRWRD},
+			{"drop", FAL_UDP_ZERO_CSUM_DROP},
+			{"recalc_mapt", FAL_UDP_ZERO_CSUM_RECALC_MAPT},
+			{"rdtcpu", FAL_UDP_ZERO_CSUM_RDT_TO_CPU},
+			{NULL, FAL_UDP_ZERO_CSUM_BUTT}
+		}
+	},
+#endif
 #ifdef IN_TUNNEL
 	{
 		"tunnel_overlay_type",
@@ -9412,6 +9424,24 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
     }
     while (talk_mode && (SW_OK != rv));
 
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("route_fail_no_eth_action", "forward");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_maccmd(cmd, &(entry.rt_fail_no_eth_action),
+				    sizeof (fal_fwd_cmd_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
+
     *(fal_ip_global_cfg_t *)val = entry;
     return SW_OK;
 
@@ -10119,6 +10149,9 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
     char *cmd;
     sw_error_t rv;
     fal_intf_entry_t entry;
+#if defined(APPE)
+    a_uint32_t tmp = 0;
+#endif
 
     aos_mem_zero(&entry, sizeof (fal_intf_entry_t));
 
@@ -10310,6 +10343,81 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
     		sizeof (fal_mac_addr_t));
     if (rv)
     	return rv;
+
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("dmac_check_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_confirm(cmd, A_FALSE,
+				    &(entry.dmac_check_en), sizeof(a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ipv6_mru", "0x5dc");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+		    if (SW_OK == rv)
+			    entry.ip6_mru = tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ipv6_mtu", "0x5dc");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+		    if (SW_OK == rv)
+			    entry.ip6_mtu = tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    cmd_data_check_element("udp_zero_csum_action", "forward",
+		    "usage: action: forward, drop, recalc_mapt, rdtcpu\n",
+		    cmd_data_check_attr, ("udp_zero_csum_action", cmd,
+			    &tmp, sizeof(tmp)));
+    entry.udp_zero_csum_action = tmp;
+
+    do {
+	    cmd = get_sub_cmd("vpn_id", "0");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+		    if (SW_OK == rv)
+			    entry.vpn_id = tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
 
     *(fal_intf_entry_t *)val = entry;
     return SW_OK;

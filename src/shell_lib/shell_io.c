@@ -253,6 +253,15 @@ struct attr_des_t g_attr_des[] =
 		}
 	},
 #endif
+	{
+		"flow_excep_type",
+		{
+			{"flow_aware", FAL_FLOW_AWARE},
+			{"flow_hit", FAL_FLOW_HIT},
+			{"flow_miss", FAL_FLOW_MISS},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -527,6 +536,9 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_L4_PARSER, (param_check_t)cmd_data_check_l4_parser, NULL),
     SW_TYPE_DEF(SW_EXP_CTRL, (param_check_t)cmd_data_check_exp_ctrl, NULL),
 #endif
+    SW_TYPE_DEF(SW_L2_EXP_CTRL, (param_check_t)cmd_data_check_l2_exp_ctrl, NULL),
+    SW_TYPE_DEF(SW_TUNNEL_EXP_CTRL, (param_check_t)cmd_data_check_tunnel_exp_ctrl, NULL),
+    SW_TYPE_DEF(SW_TUNNEL_FLAGS_PARSER, (param_check_t)cmd_data_check_tunnel_flags_parser, NULL),
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI
@@ -7807,6 +7819,7 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
     char *cmd;
     sw_error_t rv;
     fal_l3_excep_ctrl_t entry;
+    a_uint32_t tmpdata = 0;
 
     aos_mem_zero(&entry, sizeof (fal_l3_excep_ctrl_t));
 
@@ -7960,14 +7973,304 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
             rv = cmd_data_check_uint8(cmd, &(entry.multicast_en),
                                        sizeof (a_uint8_t));
         }
-
     }
     while (talk_mode && (SW_OK != rv));
 
+    if (cmd_get_chip_type() == CHIP_APPE) {
+        do
+        {
+            cmd = get_sub_cmd("l2flow_type", "flow_aware");
+            SW_RTN_ON_NULL_PARAM(cmd);
+
+            if (!strncasecmp(cmd, "quit", 4))
+            {
+               return SW_BAD_VALUE;
+            }
+            else if (!strncasecmp(cmd, "help", 4))
+            {
+               rv = SW_BAD_VALUE;
+            }
+            else
+            {
+               rv = cmd_data_check_attr("flow_excep_type", cmd,
+                                                      &tmpdata, sizeof(tmpdata));
+               entry.l2flow_type = tmpdata & 0x3;
+            }
+        }
+        while (talk_mode && (SW_OK != rv));
+
+        do
+        {
+            cmd = get_sub_cmd("l3flow_type", "flow_aware");
+            SW_RTN_ON_NULL_PARAM(cmd);
+
+            if (!strncasecmp(cmd, "quit", 4))
+            {
+               return SW_BAD_VALUE;
+            }
+            else if (!strncasecmp(cmd, "help", 4))
+            {
+               rv = SW_BAD_VALUE;
+            }
+            else
+            {
+               rv = cmd_data_check_attr("flow_excep_type", cmd,
+                                                      &tmpdata, sizeof(tmpdata));
+               entry.l3flow_type = tmpdata & 0x3;
+            }
+        }
+        while (talk_mode && (SW_OK != rv));
+    }
     *(fal_l3_excep_ctrl_t *)val = entry;
     return SW_OK;
 }
 #endif
+sw_error_t
+cmd_data_check_l2_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
+{
+    char *cmd;
+    sw_error_t rv;
+    fal_l2_excep_ctrl_t entry;
+
+    aos_mem_zero(&entry, sizeof (fal_l2_excep_ctrl_t));
+
+    do
+    {
+        cmd = get_sub_cmd("excep_cmd", "forward");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
+                                       sizeof (fal_fwd_cmd_t));
+        }
+
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    *(fal_l2_excep_ctrl_t *)val = entry;
+    return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
+{
+    char *cmd;
+    sw_error_t rv;
+    int i = 0;
+    char Idstr[20];
+    fal_tunnel_excep_ctrl_t entry;
+
+
+    aos_mem_zero(&entry, sizeof (fal_tunnel_excep_ctrl_t));
+
+    do
+    {
+        cmd = get_sub_cmd("excep_cmd", "forward");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
+                                       sizeof (fal_fwd_cmd_t));
+        }
+
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("deacclr_en", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint8(cmd, &(entry.deacclr_en),
+                                       sizeof (a_uint8_t));
+        }
+
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    for(i = 0; i < EXP_PROFILE_ID_MAX; i++) {
+        memset(Idstr, 0, sizeof(Idstr));
+        snprintf(Idstr, sizeof(Idstr), "profile%d_en", i);
+
+        do
+        {
+            cmd = get_sub_cmd(Idstr, "0");
+            SW_RTN_ON_NULL_PARAM(cmd);
+
+            if (!strncasecmp(cmd, "quit", 4))
+            {
+                return SW_BAD_VALUE;
+            }
+            else if (!strncasecmp(cmd, "help", 4))
+            {
+                rv = SW_BAD_VALUE;
+            }
+            else
+            {
+                rv = cmd_data_check_uint8(cmd, &(entry.profile_exp_en[i]),
+                                           sizeof (a_uint8_t));
+            }
+        }
+        while (talk_mode && (SW_OK != rv));
+    }
+
+    *(fal_tunnel_excep_ctrl_t *)val = entry;
+    return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
+{
+    char *cmd;
+    a_bool_t tmpbool;
+    a_uint32_t tmpdata = 0;
+    sw_error_t rv;
+    fal_tunnel_flags_excep_parser_ctrl_t entry;
+
+    aos_mem_zero(&entry, sizeof (fal_tunnel_flags_excep_parser_ctrl_t));
+
+    do
+    {
+        cmd = get_sub_cmd("entry_valid", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &entry.entry_valid,
+                                           sizeof (a_bool_t));
+       }
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("equal", "yes");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &tmpbool, sizeof(tmpbool));
+
+            entry.comp_mode = !tmpbool;
+       }
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("tunnel_header_type", "vxlan");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_attr("tunnel_overlay_type", cmd,
+                                                   &tmpdata, sizeof(tmpdata));
+            entry.hdr_type = tmpdata & 0x3;
+        }
+
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("flags", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint16(cmd, &tmpdata,
+                                       sizeof (tmpdata));
+            entry.flags = tmpdata&0xffff;
+        }
+
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("mask", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint16(cmd, &tmpdata,
+                                       sizeof (tmpdata));
+            entry.mask = tmpdata&0xffff;
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    *(fal_tunnel_flags_excep_parser_ctrl_t *)val = entry;
+    return SW_OK;
+}
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI

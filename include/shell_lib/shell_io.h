@@ -294,6 +294,15 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
 #endif
+
+sw_error_t
+cmd_data_check_l2_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size);
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI

@@ -933,9 +933,9 @@ struct sub_cmd_des_t g_rate_des[] =
 #endif
 
 #ifdef IN_SEC
-#ifdef ISISC
 struct sub_cmd_des_t g_sec_des[] =
 {
+#ifdef ISISC
 	{"mac", "set", SW_API_SEC_MAC_SET, NULL},
 	{"ip", "set", SW_API_SEC_IP_SET, NULL},
 	{"ip4", "set", SW_API_SEC_IP4_SET, NULL},
@@ -944,12 +944,17 @@ struct sub_cmd_des_t g_sec_des[] =
 	{"udp", "set", SW_API_SEC_UDP_SET, NULL},
 	{"icmp4", "set", SW_API_SEC_ICMP4_SET, NULL},
 	{"icmp6", "set", SW_API_SEC_ICMP6_SET, NULL},
+#endif
 	{"l3parser", "set", SW_API_SEC_L3_PARSER_CTRL_SET, NULL},
 	{"l4parser", "set", SW_API_SEC_L4_PARSER_CTRL_SET, NULL},
 	{"expctrl", "set", SW_API_SEC_EXP_CTRL_SET, NULL},
+	{"l2expctrl", "set", SW_API_SEC_L2_EXP_CTRL_SET, NULL},
+	{"tunnelexpctrl", "set", SW_API_SEC_TUNNEL_EXP_CTRL_SET, NULL},
+	{"tunnell3parser", "set", SW_API_SEC_TUNNEL_L3_PARSER_CTRL_SET, NULL},
+	{"tunnell4parser", "set", SW_API_SEC_TUNNEL_L4_PARSER_CTRL_SET, NULL},
+	{"tunnelflagsparser", "set", SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_SET, NULL},
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
-#endif
 #endif
 
 #ifdef IN_STP
@@ -1428,11 +1433,9 @@ struct cmd_des_t gcmd_des[] =
 #endif
 
 #ifdef IN_SEC
-#ifdef ISISC
     {
         "sec", g_sec_des,
     },
-#endif
 #endif
 
     /*stp*/

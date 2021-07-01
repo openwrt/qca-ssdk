@@ -30,6 +30,10 @@ ifeq (TRUE, $(IN_VSI))
 	SRC_LIST_TMP += ref_vsi.c
 endif
 
+ifeq (TRUE, $(IN_TUNNEL))
+	SRC_LIST_TMP += ref_tunnel.c
+endif
+
 ifeq (FALSE, $(SWCONFIG))
 	SRC_LIST=$(filter-out $(SRC_SW_LIST), $(SRC_LIST_TMP))
 else

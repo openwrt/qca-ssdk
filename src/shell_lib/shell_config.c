@@ -1383,6 +1383,17 @@ struct sub_cmd_des_t g_tunnel_des[] =
 };
 #endif
 
+/*MAPT*/
+#ifdef IN_MAPT
+struct sub_cmd_des_t g_mapt_des[] =
+{
+    {"Decapctrl", "set", SW_API_MAPT_DECAP_CTRL_SET, NULL},
+    {"Decapruleentry", "set", SW_API_MAPT_DECAP_RULE_ENTRY_SET, NULL},
+    {"Decapentry", "set", SW_API_MAPT_DECAP_ENTRY_ADD, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
 struct cmd_des_t gcmd_des[] =
 {
     /*port ctrl*/
@@ -1602,6 +1613,11 @@ struct cmd_des_t gcmd_des[] =
 #ifdef IN_TUNNEL
     {
         "tunnel", g_tunnel_des,
+    },
+#endif
+#ifdef IN_MAPT
+    {
+        "mapt", g_mapt_des,
     },
 #endif
     {NULL, NULL} /*end of desc*/

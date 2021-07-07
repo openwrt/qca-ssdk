@@ -34,6 +34,10 @@ int parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val);
 int parse_tunnel_udfprofilecfg(struct switch_val *val);
 #endif
 
+#if defined(IN_MAPT)
+int parse_mapt(const char *command_name, struct switch_val *val);
+#endif
+
 
 
 

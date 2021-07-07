@@ -563,6 +563,17 @@ cmd_data_check_ecn_val(char *cmd_str, fal_tunnel_ecn_val_t *arg_val, a_uint32_t 
 sw_error_t
 cmd_data_check_tunnel_global_cfg(char *info, fal_tunnel_global_cfg_t *val, a_uint32_t size);
 #endif
+#if defined(IN_MAPT)
+sw_error_t
+cmd_data_check_mapt_decap_ctrl(char *info, void *val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_mapt_decap_rule_entry(char *info, void *val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_mapt_decap_entry(char *info, void *val, a_uint32_t size);
+#endif
+
 #ifdef IN_VXLAN
 sw_error_t
 cmd_data_check_vxlan_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);

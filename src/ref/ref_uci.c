@@ -13531,6 +13531,10 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 #ifdef IN_TUNNEL
 		rv = parse_tunnel(priv->device_id, command_name, val);
 #endif
+	} else if(!strcmp(module_name, "Mapt")) {
+#ifdef IN_MAPT
+		rv = parse_mapt(command_name, val);
+#endif
 	}
 
 	if(!rv) {

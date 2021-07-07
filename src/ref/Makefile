@@ -38,6 +38,10 @@ ifeq (TRUE, $(IN_MAPT))
 	SRC_LIST_TMP += ref_mapt.c
 endif
 
+ifeq (TRUE, $(IN_VPORT))
+	SRC_LIST_TMP += ref_vport.c
+endif
+
 ifeq (FALSE, $(SWCONFIG))
 	SRC_LIST=$(filter-out $(SRC_SW_LIST), $(SRC_LIST_TMP))
 else

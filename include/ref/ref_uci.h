@@ -38,8 +38,9 @@ int parse_tunnel_udfprofilecfg(struct switch_val *val);
 int parse_mapt(const char *command_name, struct switch_val *val);
 #endif
 
-
-
+#if defined(IN_VPORT)
+int parse_vport(const char *command_name, struct switch_val *val);
+#endif
 
 #ifdef __cplusplus
 }

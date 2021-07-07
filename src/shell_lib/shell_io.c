@@ -416,6 +416,24 @@ struct attr_des_t g_attr_des[] =
 		}
 	},
 #endif
+#ifdef IN_VPORT
+	{
+		"vport_type",
+		{
+			{"tunnel", FAL_VPORT_TYPE_TUNNEL},
+			{"normal", FAL_VPORT_TYPE_NORMAL},
+			{NULL, FAL_VPORT_TYPE_BUTT}
+		}
+	},
+	{
+		"cnt_mode",
+		{
+			{"ip_pkt", FAL_VPORT_CNT_MODE_IP_PKT},
+			{"full_pkt", FAL_VPORT_CNT_MODE_FULL_PKT},
+			{NULL, FAL_VPORT_CNT_MODE_BUTT}
+		}
+	},
+#endif
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -860,6 +878,10 @@ static sw_data_type_t sw_data_type[] =
 		    (param_check_t)cmd_data_check_mapt_decap_rule_entry, NULL),
     SW_TYPE_DEF(SW_MAPT_DECAP_ENTRY,
 		    (param_check_t)cmd_data_check_mapt_decap_entry, NULL),
+#endif
+#ifdef IN_VPORT
+    SW_TYPE_DEF(SW_VPORT_STATE, (param_check_t)cmd_data_check_vport_state, NULL),
+    SW_TYPE_DEF(SW_VPORT_CNT_CFG, (param_check_t)cmd_data_check_vport_cnt_cfg, NULL),
 #endif
 };
 
@@ -18441,4 +18463,66 @@ cmd_data_check_mapt_decap_entry(char *cmd_str, void *arg_val, a_uint32_t size)
 
 	return SW_OK;
 }
+#endif
+#ifdef IN_VPORT
+sw_error_t
+cmd_data_check_vport_state(char *cmd_str, fal_vport_state_t *arg_val, a_uint32_t size)
+{
+	char *cmd;
+	sw_error_t rv;
+	fal_vport_state_t entry;
+
+	aos_mem_zero(&entry, sizeof(fal_vport_state_t));
+
+        rv = __cmd_data_check_boolean("check_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &(entry.check_en),
+			sizeof (a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	cmd_data_check_element("vport_type", "normal",
+			"usage: normal or tunnel\n",
+			cmd_data_check_attr, ("vport_type", cmd,
+				&entry.vp_type, sizeof(entry.vp_type)));
+
+        rv = __cmd_data_check_boolean("vport_active", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &(entry.vp_active),
+			sizeof (a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+        rv = __cmd_data_check_boolean("tunnel_active", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &(entry.eg_data_valid),
+			sizeof (a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	*(fal_vport_state_t *)arg_val = entry;
+
+	return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_vport_cnt_cfg(char *cmd_str, fal_vport_cnt_cfg_t *arg_val, a_uint32_t size)
+{
+	char *cmd;
+	fal_vport_cnt_cfg_t entry;
+
+	aos_mem_zero(&entry, sizeof(fal_vport_cnt_cfg_t));
+
+	cmd_data_check_element("rx_cnt_mode", "full_pkt",
+			"usage: full_pkt or ip_pkt\n",
+			cmd_data_check_attr, ("cnt_mode", cmd,
+				&entry.rx_cnt_mode, sizeof(entry.rx_cnt_mode)));
+
+	cmd_data_check_element("tx_cnt_mode", "full_pkt",
+			"usage: full_pkt or ip_pkt\n",
+			cmd_data_check_attr, ("cnt_mode", cmd,
+				&entry.tx_cnt_mode, sizeof(entry.tx_cnt_mode)));
+
+	*(fal_vport_cnt_cfg_t *)arg_val = entry;
+
+	return SW_OK;
+}
+
 #endif

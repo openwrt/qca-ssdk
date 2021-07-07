@@ -1394,6 +1394,16 @@ struct sub_cmd_des_t g_mapt_des[] =
 };
 #endif
 
+#ifdef IN_VPORT
+struct sub_cmd_des_t g_vport_des[] =
+{
+    {"Phyport", "set", SW_API_VPORT_PHYSICAL_PORT_SET, NULL},
+    {"Statecheck", "set", SW_API_VPORT_STATE_CHECK_SET, NULL},
+    {"Cntcfg", "set", SW_API_VPORT_CNT_CFG_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
 struct cmd_des_t gcmd_des[] =
 {
     /*port ctrl*/
@@ -1618,6 +1628,11 @@ struct cmd_des_t gcmd_des[] =
 #ifdef IN_MAPT
     {
         "mapt", g_mapt_des,
+    },
+#endif
+#ifdef IN_VPORT
+    {
+        "vport", g_vport_des,
     },
 #endif
     {NULL, NULL} /*end of desc*/

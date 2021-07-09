@@ -10455,69 +10455,129 @@ parse_policer_portentry(struct switch_val *val)
 			continue;
 		} else if(!strcmp(ext_value_p->option_name, "port_id")) {
 			val_ptr[0] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "policer_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "metertype")) {
 			val_ptr[1] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "policer_en")) {
 			val_ptr[2] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "colormode")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "vppolicer_index")) {
 			val_ptr[3] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "frametype")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
 			val_ptr[4] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "metermode")) {
+		} else if(!strcmp(ext_value_p->option_name, "colormode")) {
 			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
+		} else if(!strcmp(ext_value_p->option_name, "frametype")) {
 			val_ptr[6] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cir")) {
+		} else if(!strcmp(ext_value_p->option_name, "metermode")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cbs")) {
+		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
 			val_ptr[8] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eir")) {
+		} else if(!strcmp(ext_value_p->option_name, "cir")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "ebs")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "cir_max")) {
 			val_ptr[10] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_priremark_en")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "cbs")) {
 			val_ptr[11] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec_remark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "eir")) {
 			val_ptr[12] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_pcpremark_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "eir_max")) {
 			val_ptr[13] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_deiremark_en")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "ebs")) {
 			val_ptr[14] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellowpri")) {
+		} 
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "next_ptr")) {
 			val_ptr[15] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec")) {
+		} else if(!strcmp(ext_value_p->option_name, "grp_end")) {
 			val_ptr[16] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellowpcp")) {
+		} else if(!strcmp(ext_value_p->option_name, "grp_coupling_en")) {
 			val_ptr[17] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellowdei")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "yellow_priremark_en")) {
 			val_ptr[18] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "redaction")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec_remark_en")) {
 			val_ptr[19] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_priremark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_pcpremark_en")) {
 			val_ptr[20] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_dropprec_remark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_deiremark_en")) {
 			val_ptr[21] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_pcpremark_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "yellow_dscpremark_en")) {
 			val_ptr[22] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_deiremark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_remap_en")) {
 			val_ptr[23] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "redpri")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "yellowpri")) {
 			val_ptr[24] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_dropprec")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec")) {
 			val_ptr[25] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "redpcp")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellowpcp")) {
 			val_ptr[26] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "reddei")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellowdei")) {
 			val_ptr[27] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "yellowdscp")) {
+			val_ptr[28] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "redaction")) {
+			val_ptr[29] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_priremark_en")) {
+			val_ptr[30] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_dropprec_remark_en")) {
+			val_ptr[31] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_pcpremark_en")) {
+			val_ptr[32] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_deiremark_en")) {
+			val_ptr[33] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "red_dscpremark_en")) {
+			val_ptr[34] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_remap_en")) {
+			val_ptr[35] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "redpri")) {
+			val_ptr[36] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_dropprec")) {
+			val_ptr[37] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "redpcp")) {
+			val_ptr[38] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "reddei")) {
+			val_ptr[39] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "reddscp")) {
+			val_ptr[40] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else {
 			rv = -1;
 			break;
 		}
-
-		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
-
+	parameter_length = 41;
 	return rv;
 }
 
@@ -10535,66 +10595,121 @@ parse_policer_aclentry(struct switch_val *val)
 			continue;
 		} else if(!strcmp(ext_value_p->option_name, "index")) {
 			val_ptr[0] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "policer_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "metertype")) {
 			val_ptr[1] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "policer_en")) {
 			val_ptr[2] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "colormode")) {
+		} else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
 			val_ptr[3] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "metermode")) {
+		} else if(!strcmp(ext_value_p->option_name, "colormode")) {
 			val_ptr[4] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
+		} else if(!strcmp(ext_value_p->option_name, "metermode")) {
 			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cir")) {
+		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
 			val_ptr[6] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cbs")) {
+		} else if(!strcmp(ext_value_p->option_name, "cir")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eir")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "cir_max")) {
 			val_ptr[8] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "ebs")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "cbs")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_priremark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "eir")) {
 			val_ptr[10] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec_remark_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "eir_max")) {
 			val_ptr[11] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_pcpremark_en")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "ebs")) {
 			val_ptr[12] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_deiremark_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "next_ptr")) {
 			val_ptr[13] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellowpri")) {
+		} else if(!strcmp(ext_value_p->option_name, "grp_end")) {
 			val_ptr[14] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec")) {
+		} else if(!strcmp(ext_value_p->option_name, "grp_coupling_en")) {
 			val_ptr[15] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellowpcp")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "yellow_priremark_en")) {
 			val_ptr[16] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "yellowdei")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec_remark_en")) {
 			val_ptr[17] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "redaction")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_pcpremark_en")) {
 			val_ptr[18] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_priremark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_deiremark_en")) {
 			val_ptr[19] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_dropprec_remark_en")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "yellow_dscpremark_en")) {
 			val_ptr[20] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_pcpremark_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_remap_en")) {
 			val_ptr[21] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_deiremark_en")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "yellowpri")) {
 			val_ptr[22] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "redpri")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellow_dropprec")) {
 			val_ptr[23] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "red_dropprec")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellowpcp")) {
 			val_ptr[24] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "redpcp")) {
+		} else if(!strcmp(ext_value_p->option_name, "yellowdei")) {
 			val_ptr[25] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "reddei")) {
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "yellowdscp")) {
 			val_ptr[26] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "redaction")) {
+			val_ptr[27] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_priremark_en")) {
+			val_ptr[28] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_dropprec_remark_en")) {
+			val_ptr[29] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_pcpremark_en")) {
+			val_ptr[30] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_deiremark_en")) {
+			val_ptr[31] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "red_dscpremark_en")) {
+			val_ptr[32] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_remap_en")) {
+			val_ptr[33] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "redpri")) {
+			val_ptr[34] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "red_dropprec")) {
+			val_ptr[35] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "redpcp")) {
+			val_ptr[36] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "reddei")) {
+			val_ptr[37] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "reddscp")) {
+			val_ptr[38] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else {
 			rv = -1;
 			break;
 		}
-
-		parameter_length++;
 		switch_ext_p = switch_ext_p->next;
 	}
+	parameter_length = 39;
 
 	return rv;
 }
@@ -10626,6 +10741,72 @@ parse_policer_bypass(struct switch_val *val)
 
 	return rv;
 }
+
+#ifdef APPE
+static int
+parse_policer_priremap(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "internal_pri")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "internal_dp")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "meter_color")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "remap_dscp")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "remap_pcp")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "remap_dei")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_policer_ctrl(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "head")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "tail")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+#endif
 
 #endif
 
@@ -10873,6 +11054,7 @@ parse_shaper_queueshaper(struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
+
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
@@ -10882,25 +11064,155 @@ parse_shaper_queueshaper(struct switch_val *val)
 			continue;
 		} else if(!strcmp(ext_value_p->option_name, "queue_id")) {
 			val_ptr[0] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "metertype")) {
 			val_ptr[1] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
 			val_ptr[2] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cshaper_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
 			val_ptr[3] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cir")) {
+		} else if(!strcmp(ext_value_p->option_name, "cshaper_en")) {
 			val_ptr[4] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cbs")) {
+		} else if(!strcmp(ext_value_p->option_name, "cir")) {
 			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eshaper_en")) {
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "cir_max")) {
 			val_ptr[6] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eir")) {
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "cbs")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "ebs")) {
+		} else if(!strcmp(ext_value_p->option_name, "eshaper_en")) {
 			val_ptr[8] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "framemode")) {
+		} else if(!strcmp(ext_value_p->option_name, "eir")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "eir_max")) {
+			val_ptr[10] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "ebs")) {
+			val_ptr[11] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "next_ptr")) {
+			val_ptr[12] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "grp_end")) {
+			val_ptr[13] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "grp_coupling_en")) {
+			val_ptr[14] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "framemode")) {
+			val_ptr[15] = (char*)ext_value_p->option_value;
+		}
+		else {
+			rv = -1;
+			break;
+		}
+		switch_ext_p = switch_ext_p->next;
+	}
+	parameter_length = 16;
+
+	return rv;
+}
+
+static int
+parse_shaper_flowshaper(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "flow_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "metertype")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "cshaper_en")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "cir")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "cir_max")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "cbs")) {
+			val_ptr[7] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "eshaper_en")) {
+			val_ptr[8] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "eir")) {
+			val_ptr[9] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "eir_max")) {
+			val_ptr[10] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "ebs")) {
+			val_ptr[11] = (char*)ext_value_p->option_value;
+		}
+#if defined(APPE)
+		else if(!strcmp(ext_value_p->option_name, "next_ptr")) {
+			val_ptr[12] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "grp_end")) {
+			val_ptr[13] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "grp_coupling_en")) {
+			val_ptr[14] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else if(!strcmp(ext_value_p->option_name, "framemode")) {
+			val_ptr[15] = (char*)ext_value_p->option_value;
+		}
+		else {
+			rv = -1;
+			break;
+		}
+			switch_ext_p = switch_ext_p->next;
+	}
+	parameter_length = 16;
+
+	return rv;
+}
+
+#ifdef APPE
+static int
+parse_shaper_queueshaperctrl(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "head")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "tail")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else {
 			rv = -1;
 			break;
 		}
@@ -10913,7 +11225,7 @@ parse_shaper_queueshaper(struct switch_val *val)
 }
 
 static int
-parse_shaper_flowshaper(struct switch_val *val)
+parse_shaper_flowshaperctrl(struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
@@ -10924,27 +11236,11 @@ parse_shaper_flowshaper(struct switch_val *val)
 		if(!strcmp(ext_value_p->option_name, "name")) {
 			switch_ext_p = switch_ext_p->next;
 			continue;
-		} else if(!strcmp(ext_value_p->option_name, "flow_id")) {
+		} else if(!strcmp(ext_value_p->option_name, "head")) {
 			val_ptr[0] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "coupling_en")) {
+		} else if(!strcmp(ext_value_p->option_name, "tail")) {
 			val_ptr[1] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "meterunit")) {
-			val_ptr[2] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cshaper_en")) {
-			val_ptr[3] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cir")) {
-			val_ptr[4] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "cbs")) {
-			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eshaper_en")) {
-			val_ptr[6] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eir")) {
-			val_ptr[7] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "ebs")) {
-			val_ptr[8] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "framemode")) {
-			val_ptr[9] = (char*)ext_value_p->option_value;
-		}  else {
+		} else {
 			rv = -1;
 			break;
 		}
@@ -10955,6 +11251,7 @@ parse_shaper_flowshaper(struct switch_val *val)
 
 	return rv;
 }
+#endif
 #endif
 
 #ifdef IN_QOS
@@ -11861,7 +12158,13 @@ parse_policer(const char *command_name, struct switch_val *val)
 	} else if(!strcmp(command_name, "Bypass")) {
 		rv = parse_policer_bypass(val);
 	}
-
+#if defined(APPE)
+	else if(!strcmp(command_name, "Priremap")) {
+		rv = parse_policer_priremap(val);
+	} else if(!strcmp(command_name, "Ctrl")) {
+		rv = parse_policer_ctrl(val);
+	}
+#endif
 	return rv;
 }
 #endif
@@ -11892,7 +12195,13 @@ parse_shaper(const char *command_name, struct switch_val *val)
 	} else if(!strcmp(command_name, "Flowshaper")) {
 		rv = parse_shaper_flowshaper(val);
 	}
-
+#if defined(APPE)
+	else if(!strcmp(command_name, "Queueshaperctrl")) {
+		rv = parse_shaper_queueshaperctrl(val);
+	} else if(!strcmp(command_name, "Flowshaperctrl")) {
+		rv = parse_shaper_flowshaperctrl(val);
+	}
+#endif
 	return rv;
 }
 #endif

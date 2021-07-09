@@ -2564,7 +2564,17 @@ parse_port_mtu(struct switch_val *val)
 			val_ptr[1] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "mtuaction")) {
 			val_ptr[2] = (char*)ext_value_p->option_value;
-		}  else {
+#if defined (APPE)
+		} else if(!strcmp(ext_value_p->option_name, "mtu_enable")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mtu_type")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "extra_header_len")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "eg_vlan_tag_flag")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+#endif
+		} else {
 			rv = -1;
 			break;
 		}
@@ -2665,7 +2675,35 @@ parse_switch_port_loopback(struct switch_val *val)
 
 	return rv;
 }
+#if defined (APPE)
+static int
+parse_port8023ah(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
 
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "loopback_en")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+#endif
 #endif
 #endif
 
@@ -10257,22 +10295,54 @@ parse_ctrlpkt_appprofile(struct switch_val *val)
 			val_ptr[8] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "dhcp6_en")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "mld_en")) {
+#if defined (APPE)
+		} else if (!strcmp(ext_value_p->option_name, "8023ah_oam_en")) {
 			val_ptr[10] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "ip6ns_en")) {
+#endif
+		} else if (!strcmp(ext_value_p->option_name, "mld_en")) {
 			val_ptr[11] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "ip6na_en")) {
+		} else if (!strcmp(ext_value_p->option_name, "ip6ns_en")) {
 			val_ptr[12] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "ctrlpkt_profile_action")) {
+		} else if (!strcmp(ext_value_p->option_name, "ip6na_en")) {
 			val_ptr[13] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "sourceguard_bypass")) {
+		} else if (!strcmp(ext_value_p->option_name, "ctrlpkt_profile_action")) {
 			val_ptr[14] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "l2filter_bypass")) {
+		} else if (!strcmp(ext_value_p->option_name, "sourceguard_bypass")) {
 			val_ptr[15] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "ingress_stp_bypass")) {
+		} else if (!strcmp(ext_value_p->option_name, "l2filter_bypass")) {
 			val_ptr[16] = (char*)ext_value_p->option_value;
-		} else if (!strcmp(ext_value_p->option_name, "ingress_vlan_filter_bypass")) {
+		} else if (!strcmp(ext_value_p->option_name, "ingress_stp_bypass")) {
 			val_ptr[17] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "ingress_vlan_filter_bypass")) {
+			val_ptr[18] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+		switch_ext_p = switch_ext_p->next;
+	}
+	parameter_length = 19;
+
+	return rv;
+}
+#if defined (APPE)
+static int
+parse_ctrlpkt_vpgroup(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vpgroup_id")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
 		}  else {
 			rv = -1;
 			break;
@@ -10284,6 +10354,36 @@ parse_ctrlpkt_appprofile(struct switch_val *val)
 
 	return rv;
 }
+
+static int
+parse_ctrlpkt_tunneldecap(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "cpu_code")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "enable")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+#endif
 #endif
 
 #ifdef IN_POLICER
@@ -11070,9 +11170,12 @@ parse_port(const char *command_name, struct switch_val *val)
 		rv = parse_port_srcfiltercfg(val);
 	} else if(!strcmp(command_name, "SwitchPortLoopback")) {
 		rv = parse_switch_port_loopback(val);
+#if defined (APPE)
+	} else if(!strcmp(command_name, "Port8023ah")) {
+		rv = parse_port8023ah(val);
+#endif
 	}
-	#endif
-
+#endif
 	return rv;
 }
 #endif
@@ -11730,6 +11833,12 @@ parse_ctrlpkt(const char *command_name, struct switch_val *val)
 		rv = parse_ctrlpkt_rfdb(val);
 	} else if (!strcmp(command_name, "AppProfile")) {
 		rv = parse_ctrlpkt_appprofile(val);
+#if defined (APPE)
+	} else if (!strcmp(command_name, "Vpgroup")) {
+		rv = parse_ctrlpkt_vpgroup(val);
+	} else if (!strcmp(command_name, "Tunneldecap")) {
+		rv = parse_ctrlpkt_tunneldecap(val);
+#endif
 	}
 
 	return rv;
@@ -11936,7 +12045,21 @@ parse_vsi_member(struct switch_val *val)
 			val_ptr[3] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "broadcast_membership")) {
 			val_ptr[4] = (char*)ext_value_p->option_value;
-		}  else {
+#if defined (APPE)
+		} else if (!strcmp(ext_value_p->option_name, "vports_bitmap0")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vports_bitmap1")) {
+			val_ptr[6] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vports_bitmap2")) {
+			val_ptr[7] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vports_bitmap3")) {
+			val_ptr[8] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vports_bitmap4")) {
+			val_ptr[9] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vports_bitmap5")) {
+			val_ptr[10] = (char*)ext_value_p->option_value;
+#endif
+		} else {
 			rv = -1;
 			break;
 		}
@@ -11947,6 +12070,72 @@ parse_vsi_member(struct switch_val *val)
 
 	return rv;
 }
+
+#if defined (APPE)
+static int
+parse_vsi_bridgevsi(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "vsi")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "bridge_vsi_en")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "bridge_vsi_id")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_vsi_invalidvsi_ctrl(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "dest_en")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "dest_info_type")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "dest_info_value")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+#endif
 
 static int
 parse_vsi(const char *command_name, struct switch_val *val)
@@ -11962,6 +12151,12 @@ parse_vsi(const char *command_name, struct switch_val *val)
 		rv = parse_vsi_stationmove(val);
 	} else if (!strcmp(command_name, "Member")) {
 		rv = parse_vsi_member(val);
+#if defined (APPE)
+	} else if (!strcmp(command_name, "Bridgevsi")) {
+		rv = parse_vsi_bridgevsi(val);
+	} else if (!strcmp(command_name, "Invalidvsi_ctrl")) {
+		rv = parse_vsi_invalidvsi_ctrl(val);
+#endif
 	}
 
 	return rv;

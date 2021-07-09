@@ -663,6 +663,9 @@ struct sub_cmd_des_t g_port_des[] =
 	{"eeecfg", "set", SW_API_PT_INTERFACE_EEE_CFG_SET, NULL},
 	{"srcfiltercfg", "set",   SW_API_PT_SOURCE_FILTER_CONFIG_SET, NULL},
 	{"switchportloopback", "set", SW_API_PT_SWITCH_PORT_LOOPBACK_SET, NULL},
+#if defined (APPE)
+	{"port8023ah", "set", SW_API_PT_8023AH_SET, NULL},
+#endif
 	#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
@@ -1202,8 +1205,10 @@ struct sub_cmd_des_t g_vsi_des[] =
 	{"stationmove", "set", SW_API_VSI_STAMOVE_SET, NULL},
 	{"member", "set", SW_API_VSI_MEMBER_SET, NULL},
 	{"counter", "cleanup", SW_API_VSI_COUNTER_CLEANUP, NULL},
+#if defined (APPE)
 	{"bridgevsi", "set", SW_API_VSI_BRIDGE_VSI_SET, NULL},
 	{"invalidvsi_ctrl", "set", SW_API_VSI_INVALIDVSI_CTRL_SET, NULL},
+#endif
 	{NULL, NULL, 0, NULL}/*end of desc*/
 };
 #endif
@@ -1310,6 +1315,10 @@ struct sub_cmd_des_t g_ctrlpkt_des[] =
     {"ethernetType", "set", SW_API_MGMTCTRL_ETHTYPE_PROFILE_SET, NULL},
     {"rfdb", "set", SW_API_MGMTCTRL_RFDB_PROFILE_SET, NULL},
     {"appProfile", "set", SW_API_MGMTCTRL_CTRLPKT_PROFILE_ADD, NULL},
+#if defined (APPE)
+    {"vpgroup", "set", SW_API_MGMTCTRL_VPGROUP_SET, NULL},
+    {"tunneldecap", "set", SW_API_MGMTCTRL_TUNNEL_DECAP_SET, NULL},
+#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif

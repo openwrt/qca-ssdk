@@ -1129,7 +1129,7 @@ static a_uint32_t ssdk_get_switch_port_nums(a_uint32_t dev_id)
 				for_each_available_child_of_node(port_np, child)
 					port_count++;
 			} else {
-				mdio_np = of_find_node_by_name(NULL, "mido");
+				mdio_np = of_find_node_by_name(NULL, "mdio");
 				if (mdio_np) {
 					for_each_available_child_of_node(mdio_np, child)
 						port_count++;

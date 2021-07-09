@@ -104,4 +104,26 @@ union phy_port_rx_cnt_tbl_u {
 	struct phy_port_rx_cnt_tbl bf;
 };
 
+/*[table] PORT_VP_RX_CNT_MODE*/
+#define PORT_VP_RX_CNT_MODE
+#define PORT_VP_RX_CNT_MODE_ADDRESS 0x100
+#define PORT_VP_RX_CNT_MODE_NUM     8
+#define PORT_VP_RX_CNT_MODE_INC     0x4
+#define PORT_VP_RX_CNT_MODE_TYPE    REG_TYPE_RW
+#define PORT_VP_RX_CNT_MODE_DEFAULT 0x0
+	/*[field] CNT_MODE*/
+	#define PORT_VP_RX_CNT_MODE_CNT_MODE
+	#define PORT_VP_RX_CNT_MODE_CNT_MODE_OFFSET  0
+	#define PORT_VP_RX_CNT_MODE_CNT_MODE_LEN     32
+	#define PORT_VP_RX_CNT_MODE_CNT_MODE_DEFAULT 0x0
+
+struct port_vp_rx_cnt_mode_tbl {
+	a_uint32_t  cnt_mode:32;
+};
+
+union port_vp_rx_cnt_mode_tbl_u {
+	a_uint32_t val;
+	struct port_vp_rx_cnt_mode_tbl bf;
+};
+
 #endif

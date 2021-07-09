@@ -34,6 +34,10 @@ enum {
 	FUNC_VPORT_PHYSICAL_PORT_GET,
 	FUNC_VPORT_STATE_CHECK_SET,
 	FUNC_VPORT_STATE_CHECK_GET,
+	FUNC_VPORT_CNT_CFG_SET,
+	FUNC_VPORT_CNT_CFG_GET,
+	FUNC_VPORT_CNT_FLUSH,
+	FUNC_VPORT_CNT_GET,
 };
 
 typedef enum {
@@ -48,6 +52,40 @@ typedef struct {
 	a_bool_t vp_active; /* actived or not */
 	a_bool_t eg_data_valid; /* eg_data valid or not for tunnel vp */
 } fal_vport_state_t;
+
+typedef enum {
+	FAL_VPORT_CNT_MODE_IP_PKT, /* the outer IP header + innder packet counted */
+	FAL_VPORT_CNT_MODE_FULL_PKT, /* for RX, inner packet length,
+				      * for TX vport, the full packet(outer header + inner packet)
+				      * lenght counter */
+	FAL_VPORT_CNT_MODE_BUTT,
+} fal_vport_cnt_mode_t;
+
+typedef struct {
+	fal_vport_cnt_mode_t rx_cnt_mode; /* as described as fal_vport_cnt_mode_t */
+	fal_vport_cnt_mode_t tx_cnt_mode; /* as described as fal_vport_cnt_mode_t */
+} fal_vport_cnt_cfg_t;
+
+typedef struct {
+	a_uint32_t rx_pkt_cnt; /* rx packet counter */
+	a_uint64_t rx_byte_cnt; /* rx byte counter */
+	a_uint32_t rx_drop_pkt_cnt; /* rx drop packet counter */
+	a_uint64_t rx_drop_byte_cnt; /* rx drop byte counter */
+	a_uint32_t tx_pkt_cnt; /* tx packet counter */
+	a_uint64_t tx_byte_cnt; /* tx byte counter */
+} fal_vport_cnt_t;
+
+sw_error_t
+fal_vport_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+
+sw_error_t
+fal_vport_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+
+sw_error_t
+fal_vport_cnt_flush(a_uint32_t dev_id, fal_port_t port_id);
+
+sw_error_t
+fal_vport_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_vport_cnt_t *vp_cnt);
 
 sw_error_t
 fal_vport_state_check_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport_state_t *vp_state);

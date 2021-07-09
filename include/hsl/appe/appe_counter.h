@@ -18,6 +18,8 @@
 #define _APPE_COUNTER_H_
 #include "appe_counter_reg.h"
 
+#define PORT_VP_RX_CNT_MODE_MAX_ENTRY	8
+
 sw_error_t
 appe_port_rx_cnt_tbl_get(
 		a_uint32_t dev_id,
@@ -29,6 +31,18 @@ appe_port_rx_cnt_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union port_rx_cnt_tbl_u *value);
+
+sw_error_t
+appe_port_vp_rx_cnt_mode_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union port_vp_rx_cnt_mode_tbl_u *value);
+
+sw_error_t
+appe_port_vp_rx_cnt_mode_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union port_vp_rx_cnt_mode_tbl_u *value);
 
 sw_error_t
 appe_port_rx_cnt_tbl_rx_pkt_cnt_get(

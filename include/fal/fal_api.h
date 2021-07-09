@@ -2428,12 +2428,20 @@ extern "C" {
     SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, fal_vport_physical_port_id_set), \
     SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, fal_vport_physical_port_id_get), \
     SW_API_DEF(SW_API_VPORT_STATE_CHECK_SET, fal_vport_state_check_set), \
-    SW_API_DEF(SW_API_VPORT_STATE_CHECK_GET, fal_vport_state_check_get),
+    SW_API_DEF(SW_API_VPORT_STATE_CHECK_GET, fal_vport_state_check_get), \
+    SW_API_DEF(SW_API_VPORT_CNT_CFG_SET, fal_vport_cnt_cfg_set), \
+    SW_API_DEF(SW_API_VPORT_CNT_CFG_GET, fal_vport_cnt_cfg_get), \
+    SW_API_DEF(SW_API_VPORT_CNT_GET, fal_vport_cnt_get), \
+    SW_API_DEF(SW_API_VPORT_CNT_FLUSH, fal_vport_cnt_flush),
 #define VPORT_API_PARAM \
     SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_SET) \
     SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_GET) \
     SW_API_DESC(SW_API_VPORT_STATE_CHECK_SET) \
-    SW_API_DESC(SW_API_VPORT_STATE_CHECK_GET)
+    SW_API_DESC(SW_API_VPORT_STATE_CHECK_GET) \
+    SW_API_DESC(SW_API_VPORT_CNT_CFG_SET) \
+    SW_API_DESC(SW_API_VPORT_CNT_CFG_GET) \
+    SW_API_DESC(SW_API_VPORT_CNT_GET) \
+    SW_API_DESC(SW_API_VPORT_CNT_FLUSH)
 #else
 #define VPORT_API
 #define VPORT_API_PARAM

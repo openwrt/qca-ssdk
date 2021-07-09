@@ -1150,6 +1150,15 @@ typedef sw_error_t (*adpt_vport_state_check_set_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
 typedef sw_error_t (*adpt_vport_state_check_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
+typedef sw_error_t (*adpt_vport_cnt_cfg_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_vport_cnt_cfg_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_vport_cnt_flush_func)(a_uint32_t dev_id,
+		fal_port_t port_id);
+typedef sw_error_t (*adpt_vport_cnt_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_t *vp_cnt);
+
 /*vxlan*/
 typedef sw_error_t (*adpt_vxlan_entry_add_func)(a_uint32_t dev_id,
 	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
@@ -1921,6 +1930,10 @@ typedef struct
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 	adpt_vport_state_check_set_func adpt_vport_state_check_set;
 	adpt_vport_state_check_get_func adpt_vport_state_check_get;
+	adpt_vport_cnt_cfg_set_func adpt_vport_cnt_cfg_set;
+	adpt_vport_cnt_cfg_get_func adpt_vport_cnt_cfg_get;
+	adpt_vport_cnt_flush_func adpt_vport_cnt_flush;
+	adpt_vport_cnt_get_func adpt_vport_cnt_get;
 
 	/* tunnel */
 	a_uint32_t adpt_tunnel_func_bitmap[2];

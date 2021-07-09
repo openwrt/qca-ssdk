@@ -288,6 +288,8 @@ typedef enum
 	SW_ISOL_CTRL,
 	SW_EGRESS_FILTER,
 	SW_VPORT_TYPE,
+	SW_VPORT_CNT_CFG,
+	SW_VPORT_CNT,
 /* auto_insert_flag */
 } sw_data_type_e;
 

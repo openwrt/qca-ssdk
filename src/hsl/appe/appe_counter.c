@@ -48,6 +48,36 @@ appe_port_rx_cnt_tbl_set(
 }
 
 sw_error_t
+appe_port_vp_rx_cnt_mode_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union port_vp_rx_cnt_mode_tbl_u *value)
+{
+	if (index >= PORT_VP_RX_CNT_MODE_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_get(
+			dev_id,
+			INGRESS_POLICER_BASE_ADDR + PORT_VP_RX_CNT_MODE_ADDRESS + \
+			index * PORT_VP_RX_CNT_MODE_INC,
+			&value->val);
+}
+
+sw_error_t
+appe_port_vp_rx_cnt_mode_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union port_vp_rx_cnt_mode_tbl_u *value)
+{
+	if (index >= PORT_VP_RX_CNT_MODE_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_reg_set(
+			dev_id,
+			INGRESS_POLICER_BASE_ADDR + PORT_VP_RX_CNT_MODE_ADDRESS + \
+			index * PORT_VP_RX_CNT_MODE_INC,
+			value->val);
+}
+
+sw_error_t
 appe_port_rx_cnt_tbl_rx_pkt_cnt_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

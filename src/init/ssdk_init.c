@@ -602,7 +602,7 @@ qca_ar8327_phy_enable(struct qca_phy_priv *priv)
 	for (i = 0; i < AR8327_NUM_PHYS; i++) {
 		a_uint16_t value = 0;
 
-		if (priv->version == QCA_VER_AR8327)
+		if (priv->version == QCA_VER_AR8327 || priv->version == QCA_VER_AR8337)
 			qca_ar8327_phy_fixup(priv, i);
 
 		/* start autoneg*/

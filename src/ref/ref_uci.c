@@ -6907,7 +6907,21 @@ parse_ip_intf(struct switch_val *val)
 			val_ptr[9] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "macaddr")) {
 			val_ptr[10] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "dmac_check_en")) {
+			val_ptr[11] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "ipv6_mru")) {
+			val_ptr[12] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "ipv6_mtu")) {
+			val_ptr[13] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "udp_zero_csum_action")) {
+			val_ptr[14] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vpn_id")) {
+			val_ptr[15] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else {
 			rv = -1;
 			break;
 		}
@@ -7160,7 +7174,13 @@ parse_ip_globalctrl(struct switch_val *val)
 			val_ptr[10] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "hash_mode_1")) {
 			val_ptr[11] = (char*)ext_value_p->option_value;
-		}  else {
+		}
+#if defined(APPE)
+		else if (!strcmp(ext_value_p->option_name, "route_fail_no_eth_action")) {
+			val_ptr[12] = (char*)ext_value_p->option_value;
+		}
+#endif
+		else {
 			rv = -1;
 			break;
 		}

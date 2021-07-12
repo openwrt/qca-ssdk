@@ -1834,6 +1834,9 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
     char *cmd;
     sw_error_t rv;
     fal_qos_pri_precedence_t entry;
+#if defined(APPE)
+    a_uint32_t tmp = 0;
+#endif
 
     aos_mem_zero(&entry, sizeof (fal_qos_pri_precedence_t));
 
@@ -2012,6 +2015,42 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
 
     }
     while (talk_mode && (SW_OK != rv));
+
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("pre_acl_outer_pri_prece", "0");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_uint8(cmd, &tmp, sizeof(a_uint32_t));
+		    if (SW_OK == rv)
+			    entry.pre_acl_outer_pri = tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("pre_acl_inner_pri_prece", "0");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_uint8(cmd, &tmp, sizeof(a_uint32_t));
+		    if (SW_OK == rv)
+			    entry.pre_acl_inner_pri = tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
 
     *(fal_qos_pri_precedence_t *)val = entry;
     return SW_OK;
@@ -6297,6 +6336,22 @@ cmd_data_check_pppoe(char *cmd_str, void * val, a_uint32_t size)
                         sizeof (a_bool_t));
     if (rv)
         return rv;
+
+#if defined(APPE)
+    rv = __cmd_data_check_complex("tl_l3_interface_index", "0",
+		    "usage: the range is 0 -- 255\n",
+		    cmd_data_check_uint32, &entry.tl_l3_if_index,
+		    sizeof (a_uint32_t));
+    if (rv)
+	    return rv;
+
+    rv = __cmd_data_check_boolean("tl_l3_interface_index_valid", "no",
+		    "usage: <yes/no/y/n>\n",
+		    cmd_data_check_confirm, A_FALSE, &entry.tl_l3_if_valid,
+		    sizeof (a_bool_t));
+    if (rv)
+	    return rv;
+#endif
 
     *(fal_pppoe_session_t*)val = entry;
     return SW_OK;

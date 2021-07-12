@@ -4083,6 +4083,20 @@ cmd_data_check_global_qinqmode(char *info, void *val, a_uint32_t size)
         }
     }while (talk_mode && (SW_OK != rv));
 
+    do {
+	    cmd = get_sub_cmd("untouched_for_cpucode", "enable");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    } else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    } else {
+		    rv = cmd_data_check_enable(cmd, &(pEntry->untouched_for_cpucode),
+				    sizeof(a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
     return SW_OK;
 }
 
@@ -4154,6 +4168,28 @@ cmd_data_check_port_qinqmode(char *info, void *val, a_uint32_t size)
             rv = cmd_data_check_qinq_role(cmd, &(pEntry->egress_port_role), sizeof(a_uint32_t));
         }
     }while (talk_mode && (SW_OK != rv));
+
+#if defined(APPE)
+    do
+    {
+	    cmd = get_sub_cmd("tunnel_qinq_role", "edge");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_qinq_role(cmd,
+				    &(pEntry->tunnel_port_role), sizeof(a_uint32_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
 
     return SW_OK;
 }
@@ -4231,6 +4267,48 @@ cmd_data_check_tpid(char *info, void *val, a_uint32_t size)
 	     pEntry->stpid = (a_uint16_t)tmp;
         }
     }while (talk_mode && (SW_OK != rv));
+
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("tunnel_ctagtpid", "0x8100");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+		    if (rv == SW_OK)
+			    pEntry->tunnel_ctpid = (a_uint16_t)tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("tunnel_stagtpid", "0x88a8");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+		    if (rv == SW_OK)
+			    pEntry->tunnel_stpid = (a_uint16_t)tmp;
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
 
     return SW_OK;
 }
@@ -4323,6 +4401,65 @@ cmd_data_check_ingress_filter(char *info, void *val, a_uint32_t size)
             rv = cmd_data_check_enable(cmd, &(pEntry->priority_filter), sizeof(a_uint32_t));
         }
     }while (talk_mode && (SW_OK != rv));
+
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("ctag_tagged_filter_en", "disable");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_tagged_filter),
+				    sizeof(a_uint32_t));
+	    }
+    } while(talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ctag_untagged_filter_en", "disable");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_untagged_filter),
+				    sizeof(a_uint32_t));
+	    }
+    } while(talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ctag_priority_tagged_filter_en", "disable");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_priority_filter),
+				    sizeof(a_uint32_t));
+	    }
+    } while(talk_mode && (SW_OK != rv));
+#endif
 
     return SW_OK;
 }
@@ -4738,6 +4875,9 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 {
 	char *cmd = NULL;
 	sw_error_t rv;
+#if defined(APPE)
+	a_uint32_t tmp;
+#endif
 	fal_vlan_trans_adv_rule_t *pEntry = (fal_vlan_trans_adv_rule_t *)val;
 
 	memset(pEntry, 0, sizeof(fal_vlan_trans_adv_rule_t));
@@ -5189,8 +5329,89 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 	}
 	while (talk_mode && (SW_OK != rv));
 
+#if defined(APPE)
+	do
+	{
+		cmd = get_sub_cmd("vni_resv_enable", "yes");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->vni_resv_enable,
+					sizeof (a_bool_t));
+		}
+	} while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("vni_resv_type", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_integer(cmd, &tmp, 0x1, 0x0);
+			if (SW_OK == rv)
+				pEntry->vni_resv_type = tmp;
+		}
+	} while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("vni_resv", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+
+		}
+		else
+		{
+			rv = cmd_data_check_uint32(cmd, &pEntry->vni_resv, sizeof (a_uint32_t));
+		}
+
+	} while (talk_mode && (SW_OK != rv));
+#endif
+
 	return SW_OK;
 }
+
+#if defined(APPE)
+sw_error_t
+cmd_data_check_srctype(char *cmdstr, a_uint8_t def, a_uint8_t *val, a_uint32_t size) {
+	if (0 == cmdstr[0]) {
+		*val = def;
+	} else if (!strcasecmp(cmdstr, "vp")) {
+		*val = 0;
+	} else if (!strcasecmp(cmdstr, "l3_if")) {
+		*val = 1;
+	} else {
+		return SW_BAD_VALUE;
+	}
+	return SW_OK;
+}
+#endif
 
 sw_error_t
 cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_t size)
@@ -5599,6 +5820,119 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
+
+#if defined(APPE)
+	do
+	{
+		cmd = get_sub_cmd("src_info_enable", "yes");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->src_info_enable,
+					sizeof (a_bool_t));
+		}
+	}
+	while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("src_info_type", "vp");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_srctype(cmd, 0, &pEntry->src_info_type,
+					sizeof(a_uint8_t));
+		}
+	}
+	while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("src_info", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+
+		}
+		else
+		{
+			rv = cmd_data_check_uint32(cmd, &pEntry->src_info,
+					sizeof(a_uint32_t));
+		}
+
+	}
+	while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("vni_resv_enable", "yes");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->vni_resv_enable,
+					sizeof (a_bool_t));
+		}
+	}
+	while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("vni_resv", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+
+		}
+		else
+		{
+			rv = cmd_data_check_uint32(cmd, &pEntry->vni_resv,
+					sizeof(a_uint32_t));
+		}
+
+	}
+	while (talk_mode && (SW_OK != rv));
+#endif
 
 	return SW_OK;
 }
@@ -10847,6 +11181,132 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
     }
     while (talk_mode && (SW_OK != rv));
 
+#if defined(CPPE) || defined(APPE)
+    do
+    {
+	    cmd = get_sub_cmd("flow_mismatch_copy_escape_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.flow_mismatch_copy_escape_en),
+				    sizeof (a_bool_t));
+	    }
+
+    }
+    while (talk_mode && (SW_OK != rv));
+#endif
+
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("ptmu_fail_action", "forward");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_maccmd(cmd, &(entry.ptmu_fail_action),
+				    sizeof (fal_fwd_cmd_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ptmu_fail_deacclr_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_confirm(cmd, A_FALSE,
+				    &(entry.ptmu_fail_deacclr_en),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ptmu_fail_df_action", "forward");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_maccmd(cmd, &(entry.ptmu_fail_df_action),
+				    sizeof (fal_fwd_cmd_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("ptmu_fail_df_deacclr_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_confirm(cmd, A_FALSE,
+				    &(entry.ptmu_fail_df_deacclr_en),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("l2_vpn_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_confirm(cmd, A_FALSE,
+				    &(entry.l2_vpn_en),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("l3_vpn_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_confirm(cmd, A_FALSE,
+				    &(entry.l3_vpn_en),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
+
     *(fal_flow_global_cfg_t *)val = entry;
     return SW_OK;
 
@@ -11398,6 +11858,150 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
+
+#if defined(APPE)
+    do {
+	    cmd = get_sub_cmd("pmtu_check_l3", "yes");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.pmtu_check_l3), sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("pmtu", "0x5dc");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_uint32(cmd, &(entry.pmtu), sizeof (a_uint32_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("vpn_id", "0");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_uint32(cmd, &(entry.vpn_id), sizeof (a_uint32_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("bridge_vlan_format_valid", "yes");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.vlan_fmt_valid),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("bridge_svlan_format", "yes");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.svlan_fmt),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("bridge_cvlan_format", "yes");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4))
+	    {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4))
+	    {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else
+	    {
+		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.cvlan_fmt),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("wifi_qos_en", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.wifi_qos_en),
+				    sizeof (a_bool_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+
+    do {
+	    cmd = get_sub_cmd("wifi_qos", "0");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    if (!strncasecmp(cmd, "quit", 4)) {
+		    return SW_BAD_VALUE;
+	    }
+	    else if (!strncasecmp(cmd, "help", 4)) {
+		    rv = SW_BAD_VALUE;
+	    }
+	    else {
+		    rv = cmd_data_check_uint32(cmd, &(entry.wifi_qos), sizeof(a_uint32_t));
+	    }
+    } while (talk_mode && (SW_OK != rv));
+#endif
 
     *(fal_flow_entry_t *)val = entry;
     return SW_OK;

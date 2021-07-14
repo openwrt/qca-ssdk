@@ -803,6 +803,7 @@ struct sub_cmd_des_t g_acl_des[] =
 #ifdef APPE
 	{"udfprofileEntry", "set", SW_API_ACL_UDF_PROFILE_ENTRY_ADD, NULL},
 	{"udfprofilecfg", "set", SW_API_ACL_UDF_PROFILE_CFG_SET, NULL},
+	{"vpgroup", "set", SW_API_ACL_VPGROUP_SET, NULL},
 #endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };

@@ -9485,6 +9485,37 @@ parse_acl_udfprofilecfg(struct switch_val *val)
 
 	return rv;
 }
+
+static int
+parse_acl_vpgroup(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "vport_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vport_type")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "vpgroup_id")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
 #endif
 #endif
 
@@ -12399,6 +12430,8 @@ parse_acl(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
 		rv = parse_acl_udfprofileentry(dev_id, val);
 	} else if(!strcmp(command_name, "UdfprofileCfg")) {
 		rv = parse_acl_udfprofilecfg(val);
+	} else if(!strcmp(command_name, "Vpgroup")) {
+		rv = parse_acl_vpgroup(val);
 #endif
 	}
 

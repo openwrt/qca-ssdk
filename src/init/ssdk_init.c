@@ -301,12 +301,15 @@ qca_ar8327_phy_fixup(struct qca_phy_priv *priv, int phy)
 		priv->phy_mmd_write(priv->device_id, phy, 0x4007, 0x0);
 		/* fallthrough */
 	case 4:
-		priv->phy_mmd_write(priv->device_id, phy, 0x3, 0x800d);
-		priv->phy_mmd_write(priv->device_id, phy, 0x4003, 0x803f);
+		if(priv->version == QCA_VER_AR8327)
+		{
+			priv->phy_mmd_write(priv->device_id, phy, 0x3, 0x800d);
+			priv->phy_mmd_write(priv->device_id, phy, 0x4003, 0x803f);
 
-		priv->phy_dbg_write(priv->device_id, phy, 0x3d, 0x6860);
-		priv->phy_dbg_write(priv->device_id, phy, 0x5, 0x2c46);
-		priv->phy_dbg_write(priv->device_id, phy, 0x3c, 0x6000);
+			priv->phy_dbg_write(priv->device_id, phy, 0x3d, 0x6860);
+			priv->phy_dbg_write(priv->device_id, phy, 0x5, 0x2c46);
+			priv->phy_dbg_write(priv->device_id, phy, 0x3c, 0x6000);
+		}
 		break;
 	}
 }

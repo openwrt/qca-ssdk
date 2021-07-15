@@ -37,6 +37,7 @@
 #include "ssdk_init.h"
 #include "ssdk_dts.h"
 #include "ssdk_clk.h"
+#include "ssdk_hppe.h"
 #include "adpt_hppe.h"
 #if defined(CPPE)
 #include "adpt_cppe_portctrl.h"
@@ -808,6 +809,79 @@ adpt_hppe_port_txmac_status_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_OK;
 }
+
+sw_error_t
+adpt_hppe_port_rxmac_status_set(a_uint32_t dev_id, fal_port_t port_id,
+				      a_bool_t enable)
+{
+	a_uint32_t port_mac_type;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	port_mac_type =qca_hppe_port_mac_type_get(dev_id, port_id);
+	if (port_mac_type == PORT_XGMAC_TYPE)
+		_adpt_xgmac_port_rx_status_set(dev_id, port_id, enable);
+	else if (port_mac_type == PORT_GMAC_TYPE)
+		_adpt_gmac_port_rx_status_set(dev_id, port_id, enable);
+	else
+		return SW_BAD_VALUE;
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_hppe_port_link_status_get(a_uint32_t dev_id, fal_port_t port_id,
+				     a_bool_t * status)
+{
+	sw_error_t rv = 0;
+	a_uint32_t phy_id;
+	hsl_phy_ops_t *phy_drv;
+	struct port_phy_status phy_status = {0};
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(status);
+
+	if (port_id == SSDK_PHYSICAL_PORT0 || port_id == SSDK_PHYSICAL_PORT7)
+	{
+		*status = A_TRUE;
+		return SW_OK;
+	}
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	/* for those ports without PHY device should be sfp port */
+	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id))
+	{
+		rv = _adpt_phy_status_get_from_ppe(dev_id,
+			port_id, &phy_status);
+		SW_RTN_ON_ERROR (rv);
+		*status = (a_bool_t) phy_status.link_status;
+	}
+	else
+	{
+		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+		if (NULL == phy_drv->phy_link_status_get)
+			return SW_NOT_SUPPORTED;
+
+		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
+		SW_RTN_ON_ERROR (rv);
+
+		if (A_TRUE == phy_drv->phy_link_status_get (dev_id, phy_id))
+		{
+			*status = A_TRUE;
+		}
+		else
+		{
+			*status = A_FALSE;
+		}
+	}
+
+	return SW_OK;
+
+}
+
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_combo_fiber_mode_set(a_uint32_t dev_id,
@@ -965,6 +1039,39 @@ adpt_hppe_port_hibernate_set(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 sw_error_t
+adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
+{
+	a_uint32_t port_id = 0;
+	a_bool_t link_status;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if(adpt_chip_type_get(dev_id) == CHIP_HPPE) {
+		/* control port tdm resouce*/
+		if (enable == A_FALSE) {
+			for (port_id = 1; port_id < 7; port_id++) {
+				adpt_hppe_port_link_status_get(dev_id, port_id, &link_status);
+				if (link_status == PORT_LINK_UP) {
+					/* contorl port mac */
+					adpt_hppe_port_rxmac_status_set(dev_id, port_id, enable);
+				}
+			}
+			qca_hppe_tdm_hw_init(dev_id, enable);
+		} else {
+			qca_hppe_tdm_hw_init(dev_id, enable);
+			for (port_id = 1; port_id < 7; port_id++) {
+				adpt_hppe_port_link_status_get(dev_id, port_id, &link_status);
+				if (link_status == PORT_LINK_UP) {
+					/* contorl port mac */
+					adpt_hppe_port_rxmac_status_set(dev_id, port_id, enable);
+				}
+			}
+		}
+	}
+	return SW_OK;
+}
+
+sw_error_t
 adpt_hppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
 {
@@ -981,21 +1088,24 @@ sw_error_t
 adpt_ppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
 {
+	sw_error_t rv = 0;
 	a_uint32_t chip_ver = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
 	if (chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
-		return adpt_cppe_port_mru_set(dev_id, port_id, ctrl);
+		rv = adpt_cppe_port_mru_set(dev_id, port_id, ctrl);
 #endif
 	} else {
-		return adpt_hppe_port_mru_set(dev_id, port_id, ctrl);
+		rv = adpt_hppe_port_mru_set(dev_id, port_id, ctrl);
 	}
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_TRUE));
 
-	return SW_NOT_SUPPORTED;
+	return rv;
 }
 
 sw_error_t
@@ -1076,21 +1186,24 @@ sw_error_t
 adpt_ppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
 {
+	sw_error_t rv = 0;
 	a_uint32_t chip_ver = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
 	if (chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
-		return adpt_cppe_port_mtu_set(dev_id, port_id, ctrl);
+		rv = adpt_cppe_port_mtu_set(dev_id, port_id, ctrl);
 #endif
 	} else {
-		return adpt_hppe_port_mtu_set(dev_id, port_id, ctrl);
+		rv = adpt_hppe_port_mtu_set(dev_id, port_id, ctrl);
 	}
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_TRUE));
 
-	return SW_NOT_SUPPORTED;
+	return rv;
 }
 #endif
 
@@ -1700,59 +1813,7 @@ adpt_hppe_port_mdix_status_get(a_uint32_t dev_id, fal_port_t port_id,
 
 }
 #endif
-sw_error_t
-adpt_hppe_port_link_status_get(a_uint32_t dev_id, fal_port_t port_id,
-				     a_bool_t * status)
-{
 
-	sw_error_t rv = 0;
-	a_uint32_t phy_id;
-	hsl_phy_ops_t *phy_drv;
-	struct port_phy_status phy_status = {0};
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(status);
-
-	if (port_id == SSDK_PHYSICAL_PORT0 || port_id == SSDK_PHYSICAL_PORT7)
-	{
-		*status = A_TRUE;
-		return SW_OK;
-	}
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	/* for those ports without PHY device should be sfp port */
-	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id))
-	{
-		rv = _adpt_phy_status_get_from_ppe(dev_id,
-			port_id, &phy_status);
-		SW_RTN_ON_ERROR (rv);
-		*status = (a_bool_t) phy_status.link_status;
-	}
-	else
-	{
-		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-		if (NULL == phy_drv->phy_link_status_get)
-			return SW_NOT_SUPPORTED;
-
-		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-		SW_RTN_ON_ERROR (rv);
-
-		if (A_TRUE == phy_drv->phy_link_status_get (dev_id, phy_id))
-		{
-			*status = A_TRUE;
-		}
-		else
-		{
-			*status = A_FALSE;
-		}
-	}
-
-	return SW_OK;
-
-}
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_8023az_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -2204,24 +2265,7 @@ adpt_hppe_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id,
 	return SW_OK;
 }
 #endif
-sw_error_t
-adpt_hppe_port_rxmac_status_set(a_uint32_t dev_id, fal_port_t port_id,
-				      a_bool_t enable)
-{
-	a_uint32_t port_mac_type;
 
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	port_mac_type =qca_hppe_port_mac_type_get(dev_id, port_id);
-	if (port_mac_type == PORT_XGMAC_TYPE)
-		_adpt_xgmac_port_rx_status_set(dev_id, port_id, enable);
-	else if (port_mac_type == PORT_GMAC_TYPE)
-		_adpt_gmac_port_rx_status_set(dev_id, port_id, enable);
-	else
-		return SW_BAD_VALUE;
-
-	return SW_OK;
-}
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_counter_get(a_uint32_t dev_id, fal_port_t port_id,

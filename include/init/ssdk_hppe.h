@@ -40,6 +40,8 @@ sw_error_t
 qca_hppe_bm_hw_init(a_uint32_t dev_id);
 sw_error_t
 qca_hppe_qm_hw_init(a_uint32_t dev_id);
+sw_error_t
+qca_hppe_tdm_hw_init(a_uint32_t dev_id, a_bool_t enable);
 
 #ifdef __cplusplus
 }

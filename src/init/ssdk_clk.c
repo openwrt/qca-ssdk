@@ -94,6 +94,9 @@ static struct clk *uniphy_port_clks[UNIPHYT_CLK_MAX] = {0};
 struct device_node *rst_node = NULL;
 struct reset_control *uniphy_rsts[UNIPHY_RST_MAX] = {0};
 struct reset_control *port_rsts[SSDK_MAX_PORT_NUM] = {0};
+#if defined(APPE)
+struct reset_control *port_mac_rsts[SSDK_MAX_PORT_NUM] = {0};
+#endif
 
 /* below 3 routines to be used as common */
 void ssdk_clock_rate_set_and_enable(
@@ -166,6 +169,7 @@ void ssdk_appe_uniphy_clock_enable(
 	}
 }
 
+#if 0
 void ssdk_appe_port_reset(
 	a_uint32_t dev_id,
 	a_uint32_t port_id,
@@ -359,29 +363,23 @@ void ssdk_appe_uniphy_reset(
 	return;
 }
 #endif
+#endif
 void ssdk_uniphy_reset(
 	a_uint32_t dev_id,
 	enum unphy_rst_type rst_type,
 	a_uint32_t action)
 {
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
-	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
-#ifdef APPE
-		ssdk_appe_uniphy_reset(dev_id, rst_type, action);
-#endif
-	} else {
-		struct reset_control *rst;
+	struct reset_control *rst;
 
-		rst = uniphy_rsts[rst_type];
-		if (IS_ERR(rst)) {
-			SSDK_ERROR("reset(%d) nof exist!\n", rst_type);
-			return;
-		}
-
-		ssdk_gcc_reset(rst, action);
+	rst = uniphy_rsts[rst_type];
+	if (IS_ERR(rst)) {
+		SSDK_ERROR("reset(%d) not exist!\n", rst_type);
+		return;
 	}
-#endif
 
+	ssdk_gcc_reset(rst, action);
+#endif
 }
 
 void ssdk_port_reset(
@@ -390,27 +388,30 @@ void ssdk_port_reset(
 	a_uint32_t action)
 {
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+	struct reset_control *rst;
 
+	if ((port_id < SSDK_PHYSICAL_PORT1) || (port_id > SSDK_PHYSICAL_PORT6))
+		return;
+
+#if defined(APPE)
 	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
-#ifdef APPE
-		ssdk_appe_port_reset(dev_id, port_id, action);
-#endif
-	} else {
-		struct reset_control *rst;
+		struct reset_control *mac_rst = NULL;
 
-		if ((port_id < SSDK_PHYSICAL_PORT1) || (port_id > SSDK_PHYSICAL_PORT6))
-			return;
-
-		rst = port_rsts[port_id-1];
-		if (IS_ERR(rst)) {
-			SSDK_ERROR("reset(%d) not exist!\n", port_id);
+		mac_rst = port_mac_rsts[port_id];
+		if (IS_ERR(mac_rst)) {
+			SSDK_ERROR("appe port mac reset(%d) not exist!\n", port_id);
 			return;
 		}
-
-		ssdk_gcc_reset(rst, action);
+		ssdk_gcc_reset(mac_rst, action);
 	}
 #endif
-
+	rst = port_rsts[port_id];
+	if (IS_ERR(rst)) {
+		SSDK_ERROR("port reset(%d) not exist!\n", port_id);
+		return;
+	}
+	ssdk_gcc_reset(rst, action);
+#endif
 }
 
 void ssdk_uniphy_clock_rate_set(
@@ -1347,6 +1348,7 @@ ssdk_appe_port_speed_clock_set(
 	return;
 }
 
+#if 0
 void ssdk_appe_reset_init(void)
 {
 	a_uint32_t reg_val;
@@ -1363,7 +1365,7 @@ void ssdk_appe_reset_init(void)
 		readl(gcc_ppe_reset_addr));
 	return;
 }
-
+#endif
 static void ssdk_appe_gcc_clock_remap(void)
 {
 	/* gcc ppe reset related register*/
@@ -2069,52 +2071,69 @@ static char *ppe_rst_ids[UNIPHY_RST_MAX] = {
 	UNIPHY0_PORT4_DISABLE_ID,
 	UNIPHY0_PORT5_DISABLE_ID,
 	UNIPHY0_PORT_4_5_RESET_ID,
-	UNIPHY0_PORT_4_RESET_ID
+	UNIPHY0_PORT_4_RESET_ID,
+	UNIPHY2_PORT_6_DISABLE_ID,
+	UNIPHY0_SYS_RESET_ID,
+	UNIPHY1_SYS_RESET_ID,
+	UNIPHY2_SYS_RESET_ID
 };
 static char *port_rst_ids[SSDK_MAX_PORT_NUM] = {
+	NULL,
 	SSDK_PORT1_RESET_ID,
 	SSDK_PORT2_RESET_ID,
 	SSDK_PORT3_RESET_ID,
 	SSDK_PORT4_RESET_ID,
 	SSDK_PORT5_RESET_ID,
 	SSDK_PORT6_RESET_ID,
-	NULL, NULL
+	NULL
 };
+#if defined(APPE)
+static char *port_mac_rst_ids[SSDK_MAX_PORT_NUM] = {
+	NULL,
+	SSDK_PORT1_MAC_RESET_ID,
+	SSDK_PORT2_MAC_RESET_ID,
+	SSDK_PORT3_MAC_RESET_ID,
+	SSDK_PORT4_MAC_RESET_ID,
+	SSDK_PORT5_MAC_RESET_ID,
+	SSDK_PORT6_MAC_RESET_ID,
+	NULL
+};
+#endif
 #endif
 
 void ssdk_ppe_reset_init(void)
 {
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
-	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")){
-#if defined APPE
-		ssdk_appe_reset_init();
+	struct reset_control *rst;
+	a_uint32_t i;
+
+	rst_node = of_find_node_by_name(NULL, "ess-switch");
+	rst = of_reset_control_get(rst_node, PPE_RESET_ID);
+	if (IS_ERR(rst)) {
+		SSDK_ERROR("%s not exist!\n", PPE_RESET_ID);
+		return;
+	}
+
+	ssdk_gcc_reset(rst, SSDK_RESET_ASSERT);
+	msleep(100);
+	ssdk_gcc_reset(rst, SSDK_RESET_DEASSERT);
+	msleep(100);
+	reset_control_put(rst);
+	SSDK_INFO("ppe reset successfully!\n");
+
+	for (i = UNIPHY0_SOFT_RESET_E; i < UNIPHY_RST_MAX; i++)
+		uniphy_rsts[i] = of_reset_control_get(rst_node,
+							ppe_rst_ids[i]);
+
+	for (i = SSDK_PHYSICAL_PORT1; i < SSDK_PHYSICAL_PORT7; i++)
+		port_rsts[i] = of_reset_control_get(rst_node,
+							port_rst_ids[i]);
+
+#if defined(APPE)
+	for (i = SSDK_PHYSICAL_PORT1; i < SSDK_PHYSICAL_PORT7; i++)
+		port_mac_rsts[i] = of_reset_control_get(rst_node,
+							port_mac_rst_ids[i]);
 #endif
-	 } else {
-		struct reset_control *rst;
-		a_uint32_t i;
-
-		rst_node = of_find_node_by_name(NULL, "ess-switch");
-		rst = of_reset_control_get(rst_node, PPE_RESET_ID);
-		if (IS_ERR(rst)) {
-			SSDK_ERROR("%s not exist!\n", PPE_RESET_ID);
-			return;
-		}
-
-		ssdk_gcc_reset(rst, SSDK_RESET_ASSERT);
-		msleep(100);
-		ssdk_gcc_reset(rst, SSDK_RESET_DEASSERT);
-		msleep(100);
-		reset_control_put(rst);
-		SSDK_INFO("ppe reset successfully!\n");
-
-		for (i = UNIPHY0_SOFT_RESET_E; i < UNIPHY_RST_MAX; i++)
-			uniphy_rsts[i] = of_reset_control_get(rst_node,
-								ppe_rst_ids[i]);
-
-		for (i = SSDK_PHYSICAL_PORT1; i < SSDK_PHYSICAL_PORT7; i++)
-			port_rsts[i-1] = of_reset_control_get(rst_node,
-								port_rst_ids[i-1]);
-		}
 #endif
 }
 
@@ -2128,11 +2147,40 @@ void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 			return;
 		}
 	}
+#if defined(APPE)
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
+		enum unphy_rst_type sys_rst;
+
+		if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
+			sys_rst = UNIPHY0_SYS_RESET_E;
+		} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
+			sys_rst = UNIPHY1_SYS_RESET_E;
+		} else {
+			sys_rst = UNIPHY2_SYS_RESET_E;
+		}
+		if (enable == A_TRUE) {
+			ssdk_uniphy_reset(dev_id, sys_rst, SSDK_RESET_DEASSERT);
+		} else {
+			ssdk_uniphy_reset(dev_id, sys_rst, SSDK_RESET_ASSERT);
+		}
+	}
+#endif
 
 	if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
 		rst_type = UNIPHY0_SOFT_RESET_E;
 	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
 		rst_type = UNIPHY1_SOFT_RESET_E;
+#if defined(APPE)
+		if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
+			a_uint32_t mode0, mode1;
+
+			mode0 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
+			mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
+			if ((mode0 == PORT_WRAPPER_PSGMII) && (mode1 == PORT_WRAPPER_MAX)) {
+				return;
+			}
+		}
+#endif
 	} else {
 		rst_type = UNIPHY2_SOFT_RESET_E;
 	}

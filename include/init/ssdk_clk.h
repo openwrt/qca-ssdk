@@ -33,6 +33,10 @@ extern "C" {
 #define UNIPHY0_PORT5_DISABLE_ID	"uniphy0_port5_dis"
 #define UNIPHY0_PORT_4_5_RESET_ID	"uniphy0_port_4_5_rst"
 #define UNIPHY0_PORT_4_RESET_ID	"uniphy0_port_4_rst"
+#define UNIPHY2_PORT_6_DISABLE_ID	"uniphy2_port6_dis"
+#define UNIPHY0_SYS_RESET_ID	"uniphy0_sys_rst"
+#define UNIPHY1_SYS_RESET_ID	"uniphy1_sys_rst"
+#define UNIPHY2_SYS_RESET_ID	"uniphy2_sys_rst"
 
 #define SSDK_PORT1_RESET_ID	"nss_port1_rst"
 #define SSDK_PORT2_RESET_ID	"nss_port2_rst"
@@ -40,6 +44,12 @@ extern "C" {
 #define SSDK_PORT4_RESET_ID	"nss_port4_rst"
 #define SSDK_PORT5_RESET_ID	"nss_port5_rst"
 #define SSDK_PORT6_RESET_ID	"nss_port6_rst"
+#define SSDK_PORT1_MAC_RESET_ID	"nss_port1_mac_rst"
+#define SSDK_PORT2_MAC_RESET_ID	"nss_port2_mac_rst"
+#define SSDK_PORT3_MAC_RESET_ID	"nss_port3_mac_rst"
+#define SSDK_PORT4_MAC_RESET_ID	"nss_port4_mac_rst"
+#define SSDK_PORT5_MAC_RESET_ID	"nss_port5_mac_rst"
+#define SSDK_PORT6_MAC_RESET_ID	"nss_port6_mac_rst"
 
 enum ssdk_rst_action {
         SSDK_RESET_DEASSERT      = 0,
@@ -60,6 +70,10 @@ enum unphy_rst_type {
 	UNIPHY0_PORT5_DISABLE_E,
 	UNIPHY0_PORT_4_5_RESET_E,
 	UNIPHY0_PORT_4_RESET_E,
+	UNIPHY2_PORT6_DISABLE_E,
+	UNIPHY0_SYS_RESET_E,
+	UNIPHY1_SYS_RESET_E,
+	UNIPHY2_SYS_RESET_E,
 	UNIPHY_RST_MAX
 };
 

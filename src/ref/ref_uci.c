@@ -103,6 +103,7 @@ static char *priority_dflt_str = "no";
 static char *param_dflt_str = " ";
 #endif
 
+#if defined(HPPE) || defined(IN_FLOW)
 static int
 parse_uci_option(struct switch_val *val, const char *option_names[], const int length)
 {
@@ -145,6 +146,7 @@ parse_uci_option(struct switch_val *val, const char *option_names[], const int l
 
 	return rv;
 }
+#endif
 
 #ifdef IN_QOS
 #ifndef IN_QOS_MINI

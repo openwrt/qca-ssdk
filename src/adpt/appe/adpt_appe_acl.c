@@ -1890,18 +1890,20 @@ adpt_appe_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
 {
 	if(vport_type == FAL_VPORT_TYPE_TUNNEL)
 	{
+#ifdef IN_TUNNEL
 		return appe_tl_port_vp_tbl_pre_ipo_profile_set(dev_id,
 				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+#endif
 	}
 	else if(vport_type == FAL_VPORT_TYPE_NORMAL)
 	{
+#ifndef IN_IP_MINI
 		return appe_l3_vp_port_tbl_ipo_vp_profile_set(dev_id,
 				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+#endif
 	}
-	else
-	{
-		return SW_BAD_VALUE;
-	}
+
+	return SW_BAD_VALUE;
 }
 
 sw_error_t
@@ -1910,18 +1912,20 @@ adpt_appe_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
 {
 	if(vport_type == FAL_VPORT_TYPE_TUNNEL)
 	{
+#ifdef IN_TUNNEL
 		return appe_tl_port_vp_tbl_pre_ipo_profile_get(dev_id,
 				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+#endif
 	}
 	else if(vport_type == FAL_VPORT_TYPE_NORMAL)
 	{
+#ifndef IN_IP_MINI
 		return appe_l3_vp_port_tbl_ipo_vp_profile_get(dev_id,
 				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
+#endif
 	}
-	else
-	{
-		return SW_BAD_VALUE;
-	}
+
+	return SW_BAD_VALUE;
 }
 /**
  * @}

@@ -1480,7 +1480,8 @@ qca_mac_sw_sync_work_start(struct qca_phy_priv *priv)
 void
 qca_mac_sw_sync_work_stop(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)) {
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY) &&
+			(priv->version != QCA_VER_APPE)) {
 		return;
 	}
 	cancel_delayed_work_sync(&priv->mac_sw_sync_dwork);
@@ -1489,7 +1490,8 @@ qca_mac_sw_sync_work_stop(struct qca_phy_priv *priv)
 void
 qca_mac_sw_sync_work_resume(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)) {
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY) &&
+			(priv->version != QCA_VER_APPE)) {
 		return;
 	}
 

@@ -65,6 +65,127 @@ adpt_hppe_port_get_by_uniphy(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	return ssdk_port;
 }
 
+sw_error_t
+adpt_hppe_uniphy_usxgmii_status_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union sr_mii_ctrl_u *sr_mii_ctrl)
+{
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(sr_mii_ctrl);
+
+	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == SSDK_PHYSICAL_PORT5) ||
+		(port_id == SSDK_PHYSICAL_PORT6)) {
+		hppe_sr_mii_ctrl_get(dev_id, uniphy_index, sr_mii_ctrl);
+	}
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (ssdk_dt_global_get_mac_mode(dev_id, uniphy_index) == PORT_WRAPPER_UQXGMII) {
+			if (port_id == SSDK_PHYSICAL_PORT2) {
+				hppe_sr_mii_ctrl_channel1_get(dev_id, uniphy_index, sr_mii_ctrl);
+			} else if (port_id == SSDK_PHYSICAL_PORT3) {
+				hppe_sr_mii_ctrl_channel2_get(dev_id, uniphy_index, sr_mii_ctrl);
+			} else if (port_id == SSDK_PHYSICAL_PORT4) {
+				hppe_sr_mii_ctrl_channel3_get(dev_id, uniphy_index, sr_mii_ctrl);
+			}
+		}
+	}
+#endif
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_hppe_uniphy_usxgmii_status_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union sr_mii_ctrl_u *sr_mii_ctrl)
+{
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(sr_mii_ctrl);
+
+	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == SSDK_PHYSICAL_PORT5) ||
+		(port_id == SSDK_PHYSICAL_PORT6)) {
+		hppe_sr_mii_ctrl_set(dev_id, uniphy_index, sr_mii_ctrl);
+	}
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (ssdk_dt_global_get_mac_mode(dev_id, uniphy_index) == PORT_WRAPPER_UQXGMII) {
+			if (port_id == SSDK_PHYSICAL_PORT2) {
+				hppe_sr_mii_ctrl_channel1_set(dev_id, uniphy_index, sr_mii_ctrl);
+			} else if (port_id == SSDK_PHYSICAL_PORT3) {
+				hppe_sr_mii_ctrl_channel2_set(dev_id, uniphy_index, sr_mii_ctrl);
+			} else if (port_id == SSDK_PHYSICAL_PORT4) {
+				hppe_sr_mii_ctrl_channel3_set(dev_id, uniphy_index, sr_mii_ctrl);
+			}
+			SSDK_DEBUG("uqxgmii uniphy %d port %d status set!\n", uniphy_index, port_id);
+		}
+	}
+#endif
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_hppe_uniphy_usxgmii_autoneg_status_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union vr_mii_an_intr_sts_u *vr_mii_an_intr_sts)
+{
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(vr_mii_an_intr_sts);
+
+	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == SSDK_PHYSICAL_PORT5) ||
+		(port_id == SSDK_PHYSICAL_PORT6)) {
+		hppe_vr_mii_an_intr_sts_get(dev_id, uniphy_index, vr_mii_an_intr_sts);
+	}
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (ssdk_dt_global_get_mac_mode(dev_id, uniphy_index) == PORT_WRAPPER_UQXGMII) {
+			if (port_id == SSDK_PHYSICAL_PORT2) {
+				hppe_vr_mii_an_intr_sts_channel1_get(dev_id,
+					uniphy_index, vr_mii_an_intr_sts);
+			} else if (port_id == SSDK_PHYSICAL_PORT3) {
+				hppe_vr_mii_an_intr_sts_channel2_get(dev_id,
+					uniphy_index, vr_mii_an_intr_sts);
+			} else if (port_id == SSDK_PHYSICAL_PORT4) {
+				hppe_vr_mii_an_intr_sts_channel3_get(dev_id,
+					uniphy_index, vr_mii_an_intr_sts);
+			}
+			SSDK_DEBUG("uqxgmii uniphy port %d autoneg check\n", port_id);
+		}
+	}
+#endif
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_hppe_uniphy_usxgmii_autoneg_status_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union vr_mii_an_intr_sts_u *vr_mii_an_intr_sts)
+{
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(vr_mii_an_intr_sts);
+
+	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == SSDK_PHYSICAL_PORT5) ||
+		(port_id == SSDK_PHYSICAL_PORT6)) {
+		hppe_vr_mii_an_intr_sts_set(dev_id, uniphy_index, vr_mii_an_intr_sts);
+	}
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if (ssdk_dt_global_get_mac_mode(dev_id, uniphy_index) == PORT_WRAPPER_UQXGMII) {
+			if (port_id == SSDK_PHYSICAL_PORT2) {
+				hppe_vr_mii_an_intr_sts_channel1_set(dev_id,
+					uniphy_index, vr_mii_an_intr_sts);
+			} else if (port_id == SSDK_PHYSICAL_PORT3) {
+				hppe_vr_mii_an_intr_sts_channel2_set(dev_id,
+					uniphy_index, vr_mii_an_intr_sts);
+			} else if (port_id == SSDK_PHYSICAL_PORT4) {
+				hppe_vr_mii_an_intr_sts_channel3_set(dev_id,
+					uniphy_index, vr_mii_an_intr_sts);
+			}
+			SSDK_DEBUG("uqxgmii uniphy port %d autoneg clear\n", port_id);
+		}
+	}
+#endif
+
+	return SW_OK;
+}
+
 static sw_error_t
 __adpt_hppe_uniphy_10g_r_linkup(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
@@ -212,6 +333,141 @@ __adpt_ppe_gcc_uniphy_software_reset(a_uint32_t dev_id,
 
 	return;
 }
+
+static sw_error_t
+__adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t i = 0;
+
+	union uniphy_mode_ctrl_u uniphy_mode_ctrl;
+	union vr_xs_pcs_dig_ctrl1_u vr_xs_pcs_dig_ctrl1;
+	union vr_mii_an_ctrl_u vr_mii_an_ctrl;
+	union sr_mii_ctrl_u sr_mii_ctrl;
+	union vr_xaui_mode_ctrl_u vr_xaui_mode_ctrl;
+	union vr_xs_pcs_kr_ctrl_u vr_xs_pcs_kr_ctrl;
+	union vr_xs_pcs_dig_sts_u vr_xs_pcs_dig_sts;
+	union qp_usxg_opiton1_u qp_usxg_opiton1;
+
+	memset(&uniphy_mode_ctrl, 0, sizeof(uniphy_mode_ctrl));
+	memset(&vr_xs_pcs_dig_ctrl1, 0, sizeof(vr_xs_pcs_dig_ctrl1));
+	memset(&vr_mii_an_ctrl, 0, sizeof(vr_mii_an_ctrl));
+	memset(&sr_mii_ctrl, 0, sizeof(sr_mii_ctrl));
+	memset(&vr_xaui_mode_ctrl, 0, sizeof(vr_xaui_mode_ctrl));
+	memset(&vr_xs_pcs_kr_ctrl, 0, sizeof(vr_xs_pcs_kr_ctrl));
+	memset(&vr_xs_pcs_dig_sts, 0, sizeof(vr_xs_pcs_dig_sts));
+	memset(&qp_usxg_opiton1, 0, sizeof(qp_usxg_opiton1));
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	hppe_uniphy_reg_set(dev_id, UNIPHY_MISC2_REG_OFFSET,
+		uniphy_index, UNIPHY_MISC2_REG_VALUE);
+	/*reset uniphy*/
+	hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
+		uniphy_index, UNIPHY_PLL_RESET_REG_VALUE);
+	msleep(500);
+	hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
+		uniphy_index, UNIPHY_PLL_RESET_REG_DEFAULT_VALUE);
+	msleep(500);
+
+	/* disable instance clock */
+	for (i = SSDK_PHYSICAL_PORT1; i <= SSDK_PHYSICAL_PORT4; i++) {
+		qca_gcc_uniphy_port_clock_set(dev_id, uniphy_index,
+				i, A_FALSE);
+	}
+
+	/* keep xpcs to reset status */
+	__adpt_hppe_gcc_uniphy_xpcs_reset(dev_id, uniphy_index, A_TRUE);
+
+	/* configure uniphy to usxgmii mode */
+	hppe_uniphy_mode_ctrl_get(dev_id, uniphy_index, &uniphy_mode_ctrl);
+	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_psgmii_qsgmii =
+		UNIPHY_CH0_QSGMII_SGMII_MODE;
+	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_qsgmii_sgmii =
+		UNIPHY_CH0_SGMII_MODE;
+	uniphy_mode_ctrl.bf.newaddedfromhere_sg_mode =
+		UNIPHY_SGMII_MODE_DISABLE;
+	uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
+		UNIPHY_SGMIIPLUS_MODE_DISABLE;
+	uniphy_mode_ctrl.bf.newaddedfromhere_xpcs_mode =
+		UNIPHY_XPCS_MODE_ENABLE;
+	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
+
+	hppe_qp_usxg_opiton1_get(dev_id, uniphy_index, &qp_usxg_opiton1);
+	qp_usxg_opiton1.bf.gmii_src_sel = 0x1;
+	hppe_qp_usxg_opiton1_set(dev_id, uniphy_index, &qp_usxg_opiton1);
+
+	/* configure uniphy usxgmii gcc software reset */
+	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
+
+	msleep(100);
+
+	/* wait calibration done to uniphy */
+	__adpt_hppe_uniphy_calibrate(dev_id, uniphy_index);
+
+	/* enable instance clock */
+	for (i = SSDK_PHYSICAL_PORT1; i <= SSDK_PHYSICAL_PORT4; i++) {
+		qca_gcc_uniphy_port_clock_set(dev_id, uniphy_index,
+				i, A_TRUE);
+	}
+
+	/* release xpcs reset status */
+	__adpt_hppe_gcc_uniphy_xpcs_reset(dev_id, uniphy_index, A_FALSE);
+
+	/* wait 10g base_r link up */
+	__adpt_hppe_uniphy_10g_r_linkup(dev_id, uniphy_index);
+
+	/* enable uniphy usxgmii */
+	hppe_vr_xs_pcs_dig_ctrl1_get(dev_id, uniphy_index, &vr_xs_pcs_dig_ctrl1);
+	vr_xs_pcs_dig_ctrl1.bf.usxg_en = 1;
+	hppe_vr_xs_pcs_dig_ctrl1_set(dev_id, uniphy_index, &vr_xs_pcs_dig_ctrl1);
+
+	/* set qxgmii mode */
+	hppe_vr_xs_pcs_kr_ctrl_get(dev_id, uniphy_index, &vr_xs_pcs_kr_ctrl);
+	vr_xs_pcs_kr_ctrl.bf.usxg_mode = 5;
+	hppe_vr_xs_pcs_kr_ctrl_set(dev_id, uniphy_index, &vr_xs_pcs_kr_ctrl);
+
+	/* set AM interval mode */
+	hppe_vr_xs_pcs_dig_sts_get(dev_id, uniphy_index, &vr_xs_pcs_dig_sts);
+	vr_xs_pcs_dig_sts.bf.am_count = 0x6018;
+	hppe_vr_xs_pcs_dig_sts_set(dev_id, uniphy_index, &vr_xs_pcs_dig_sts);
+
+	/* xpcs software reset */
+	hppe_vr_xs_pcs_dig_ctrl1_get(dev_id, uniphy_index, &vr_xs_pcs_dig_ctrl1);
+	vr_xs_pcs_dig_ctrl1.bf.vr_rst = 1;
+	hppe_vr_xs_pcs_dig_ctrl1_set(dev_id, uniphy_index, &vr_xs_pcs_dig_ctrl1);
+
+	/* enable uniphy autoneg complete interrupt and 10M/100M 8-bits MII width */
+	hppe_vr_mii_an_ctrl_get(dev_id, uniphy_index, &vr_mii_an_ctrl);
+	vr_mii_an_ctrl.bf.mii_an_intr_en = 1;
+	vr_mii_an_ctrl.bf.mii_ctrl = 1;
+	hppe_vr_mii_an_ctrl_set(dev_id, uniphy_index, &vr_mii_an_ctrl);
+	hppe_vr_mii_an_ctrl_channel1_set(dev_id, uniphy_index, &vr_mii_an_ctrl);
+	hppe_vr_mii_an_ctrl_channel2_set(dev_id, uniphy_index, &vr_mii_an_ctrl);
+	hppe_vr_mii_an_ctrl_channel3_set(dev_id, uniphy_index, &vr_mii_an_ctrl);
+
+	/* disable TICD */
+	hppe_vr_xaui_mode_ctrl_get(dev_id, uniphy_index, &vr_xaui_mode_ctrl);
+	vr_xaui_mode_ctrl.bf.ipg_check = 1;
+	hppe_vr_xaui_mode_ctrl_set(dev_id, uniphy_index, &vr_xaui_mode_ctrl);
+	hppe_vr_xaui_mode_ctrl_channel1_set(dev_id, uniphy_index, &vr_xaui_mode_ctrl);
+	hppe_vr_xaui_mode_ctrl_channel2_set(dev_id, uniphy_index, &vr_xaui_mode_ctrl);
+	hppe_vr_xaui_mode_ctrl_channel3_set(dev_id, uniphy_index, &vr_xaui_mode_ctrl);
+
+	/* enable uniphy autoneg ability and usxgmii 10g speed and full duplex */
+	hppe_sr_mii_ctrl_get(dev_id, uniphy_index, &sr_mii_ctrl);
+	sr_mii_ctrl.bf.an_enable = 1;
+	sr_mii_ctrl.bf.ss5 = 0;
+	sr_mii_ctrl.bf.ss6 = 1;
+	sr_mii_ctrl.bf.ss13 = 1;
+	sr_mii_ctrl.bf.duplex_mode = 1;
+	hppe_sr_mii_ctrl_set(dev_id, uniphy_index, &sr_mii_ctrl);
+	hppe_sr_mii_ctrl_channel1_set(0, uniphy_index, &sr_mii_ctrl);
+	hppe_sr_mii_ctrl_channel2_set(0, uniphy_index, &sr_mii_ctrl);
+	hppe_sr_mii_ctrl_channel3_set(0, uniphy_index, &sr_mii_ctrl);
+
+	return rv;
+}
+
 static sw_error_t
 __adpt_hppe_uniphy_usxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
@@ -801,7 +1057,10 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 			rv = __adpt_hppe_uniphy_usxgmii_mode_set(dev_id, index);
 			clock = UNIPHY_CLK_RATE_312M;
 			break;
-
+		case PORT_WRAPPER_UQXGMII:
+			rv = __adpt_hppe_uniphy_uqxgmii_mode_set(dev_id, index);
+			clock = UNIPHY_CLK_RATE_312M;
+			break;
 		default:
 			rv = SW_FAIL;
 	}

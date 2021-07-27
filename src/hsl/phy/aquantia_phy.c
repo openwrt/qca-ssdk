@@ -561,7 +561,7 @@ aquantia_phy_cdt_get(a_uint32_t dev_id, a_uint32_t phy_id,
 	sw_error_t rv = SW_OK;
 	a_uint16_t phy_data;
 
-	if ((!port_cdt) || (phy_id > 7)) {
+	if (!port_cdt) {
 		return SW_FAIL;
 	}
 	/* Get cable status */
@@ -647,7 +647,7 @@ aquantia_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 	fal_port_cdt_t aquantia_port_cdt;
 	sw_error_t rv = SW_OK;
 
-	if ((mdi_pair >= 4) || (phy_id > 7)) {
+	if (mdi_pair >= 4) {
 		return SW_BAD_PARAM;
 	}
 	rv = aquatia_phy_cdt_start(dev_id, phy_id);

@@ -3551,16 +3551,16 @@ _adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		SSDK_DEBUG("rule and mask set hw_entry = %d\n",
 				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry);
 
+		_adpt_hppe_acl_action_sw_2_hw(dev_id,rule, &hw_act);
+		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
+		rv |= hppe_ipo_action_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
+			&hw_act);
 		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_reg, sizeof(hw_reg));*/
 		rv |= hppe_ipo_rule_reg_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
 			&hw_reg);
 		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_mask, sizeof(hw_mask));*/
 		rv |= hppe_ipo_mask_reg_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
 			&hw_mask);
-		_adpt_hppe_acl_action_sw_2_hw(dev_id,rule, &hw_act);
-		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
-		rv |= hppe_ipo_action_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
-			&hw_act);
 
 		if(rv != SW_OK)
 		{

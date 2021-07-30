@@ -26,6 +26,7 @@
 #if defined(APPE)
 #include "adpt_appe_servcode.h"
 #endif
+#include "adpt_hppe.h"
 
 #define MAX_PHYSICAL_PORT 8
 
@@ -48,7 +49,13 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	in_l2_service_tbl.bf.bypass_bitmap = entry->bypass_bitmap[1];
 	in_l2_service_tbl.bf.rx_cnt_en = (entry->bypass_bitmap[2] >> 1) & 0x1;
 	in_l2_service_tbl.bf.tx_cnt_en = (entry->bypass_bitmap[2] >> 3) & 0x1;
+#ifdef IN_PORTCONTROL
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
+#endif
 	SW_RTN_ON_ERROR(hppe_in_l2_service_tbl_set(dev_id, servcode_index, &in_l2_service_tbl));
+#ifdef IN_PORTCONTROL
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_TRUE));
+#endif
 
 	service_tbl.bf.bypass_bitmap = entry->bypass_bitmap[0];
 	service_tbl.bf.rx_counting_en = entry->bypass_bitmap[2] & 0x1;

@@ -1037,6 +1037,7 @@ adpt_hppe_port_hibernate_set(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
 
 sw_error_t
 adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
@@ -1071,6 +1072,7 @@ adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
 	return SW_OK;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)

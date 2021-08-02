@@ -2304,6 +2304,10 @@ _adpt_hppe_xgmac_speed_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_speed
 	memset(&mac_tx_configuration, 0, sizeof(mac_tx_configuration));
 	ADPT_DEV_ID_CHECK(dev_id);
 
+	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &mode);
+	SW_RTN_ON_ERROR (rv);
+	SSDK_DEBUG ("port %d interface mode is 0x%x\n", port_id, mode);
+
 	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
 	hppe_mac_tx_configuration_get(dev_id, port_id, &mac_tx_configuration);
 
@@ -2314,15 +2318,7 @@ _adpt_hppe_xgmac_speed_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_speed
 	}
 	else if(FAL_SPEED_10000 == speed)
 	{
-		if (port_id == SSDK_PHYSICAL_PORT0)
-		{
-			mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
-		}
-		else
-		{
-			mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE2);
-		}
-		if (mode == PORT_WRAPPER_USXGMII)
+		if (mode == PORT_USXGMII)
 		{
 			mac_tx_configuration.bf.uss= XGMAC_USXGMII_ENABLE;
 			mac_tx_configuration.bf.ss= XGMAC_SPEED_SELECT_10000M;
@@ -2340,15 +2336,7 @@ _adpt_hppe_xgmac_speed_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_speed
 	}
 	else if(FAL_SPEED_2500 == speed)
 	{
-		if (port_id == SSDK_PHYSICAL_PORT0)
-		{
-			mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
-		}
-		else
-		{
-			mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE2);
-		}
-		if (mode == PORT_WRAPPER_USXGMII)
+		if (mode == PORT_USXGMII)
 		{
 			mac_tx_configuration.bf.uss= XGMAC_USXGMII_ENABLE;
 			mac_tx_configuration.bf.ss= XGMAC_SPEED_SELECT_2500M;

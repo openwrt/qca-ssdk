@@ -104,6 +104,9 @@ aquantia_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		AQUANTIA_REG_AUTONEG_VENDOR_STATUS, &phy_data);
 	SW_RTN_ON_ERROR(rv);
 	switch ((phy_data & AQUANTIA_STATUS_SPEED_MASK) >> 1) {
+		case AQUANTIA_STATUS_SPEED_10MBS:
+			*speed = FAL_SPEED_10;
+			break;
 		case AQUANTIA_STATUS_SPEED_100MBS:
 			*speed = FAL_SPEED_100;
 			break;
@@ -361,6 +364,9 @@ aquantia_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
 		SW_RTN_ON_ERROR(rv);
 		switch(old_speed)
 		{
+			case FAL_SPEED_10:
+				phy_data |= AQUANTIA_10M_LOOPBACK;
+				break;
 			case FAL_SPEED_100:
 				phy_data |= AQUANTIA_100M_LOOPBACK;
 				break;
@@ -436,6 +442,9 @@ aquantia_phy_set_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
 		SW_RTN_ON_ERROR(rv);
 		switch(speed)
 		{
+			case FAL_SPEED_10:
+				phy_data |= AQUANTIA_10M_LOOPBACK;
+				break;
 			case FAL_SPEED_100:
 				phy_data |= AQUANTIA_100M_LOOPBACK;
 				break;
@@ -819,8 +828,7 @@ aquantia_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 	a_uint16_t phy_data = 0, phy_data1 = 0 ;
 	sw_error_t rv = SW_OK;
 
-	if ((autoneg & FAL_PHY_ADV_10T_FD) ||(autoneg & FAL_PHY_ADV_10T_HD)||
-		(autoneg & FAL_PHY_ADV_100TX_HD))
+	if ((autoneg & FAL_PHY_ADV_10T_HD) || (autoneg & FAL_PHY_ADV_100TX_HD))
 	{
 		return SW_NOT_SUPPORTED;
 	}
@@ -831,6 +839,10 @@ aquantia_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 	phy_data &= ~AQUANTIA_ADVERTISE_MEGA_ALL;
 	phy_data &=
 	    ~(AQUANTIA_ADVERTISE_PAUSE | AQUANTIA_ADVERTISE_ASYM_PAUSE);
+	if (autoneg & FAL_PHY_ADV_10T_FD)
+	{
+		phy_data |= AQUANTIA_ADVERTISE_10FULL;
+	}
 	if (autoneg & FAL_PHY_ADV_100TX_FD)
 	{
 		phy_data |= AQUANTIA_ADVERTISE_100FULL;
@@ -898,6 +910,10 @@ aquantia_phy_get_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 	rv = aquantia_phy_reg_read(dev_id, phy_id, AQUANTIA_MMD_AUTONEG,
 		AQUANTIA_AUTONEG_ADVERTISEMENT_REGISTER, &phy_data);
 	SW_RTN_ON_ERROR(rv);
+	if (phy_data & AQUANTIA_ADVERTISE_10FULL)
+	{
+		*autoneg |= FAL_PHY_ADV_10T_FD;
+	}
 	if (phy_data & AQUANTIA_ADVERTISE_100FULL)
 	{
 		*autoneg |= FAL_PHY_ADV_100TX_FD;
@@ -1430,6 +1446,9 @@ aquantia_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id, fal_port_i
 	SW_RTN_ON_ERROR(rv);
 	switch (speed)
 	{
+		case FAL_SPEED_10:
+			phy_register = AQUANTIA_GLOBAL_SYS_CONFIG_FOR_10M;
+			break;
 		case FAL_SPEED_100:
 			phy_register = AQUANTIA_GLOBAL_SYS_CONFIG_FOR_100M;
 			break;
@@ -1505,6 +1524,9 @@ aquantia_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	SW_RTN_ON_ERROR(rv);
 	switch (speed)
 	{
+		case FAL_SPEED_10:
+			phy_register = AQUANTIA_GLOBAL_SYS_CONFIG_FOR_10M;
+			break;
 		case FAL_SPEED_100:
 			phy_register = AQUANTIA_GLOBAL_SYS_CONFIG_FOR_100M;
 			break;
@@ -1804,6 +1826,9 @@ aquantia_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	SW_RTN_ON_ERROR(rv);
 	switch ((phy_data & AQUANTIA_STATUS_SPEED_MASK) >>1)
 	{
+		case AQUANTIA_STATUS_SPEED_10MBS:
+			phy_status->speed = FAL_SPEED_10;
+			break;
 		case AQUANTIA_STATUS_SPEED_100MBS:
 			phy_status->speed = FAL_SPEED_100;
 			break;
@@ -2099,7 +2124,7 @@ aquantia_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_bmp)
 			/*add all ability of aq phy*/
 			rv = aquantia_phy_set_autoneg_adv(dev_id, phy_addr,
 				FAL_PHY_ADV_XGE_SPEED_ALL | FAL_PHY_ADV_100TX_FD |
-				FAL_PHY_ADV_1000T_FD);
+				FAL_PHY_ADV_10T_FD | FAL_PHY_ADV_1000T_FD);
 			SW_RTN_ON_ERROR(rv);
 #if 0
 			rv = aquantia_phy_set_eee_adv(dev_id, phy_addr, FAL_PHY_EEE_1000BASE_T

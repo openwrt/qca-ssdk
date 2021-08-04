@@ -289,6 +289,27 @@ _adpt_gmac_port_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 static sw_error_t
+adpt_hppe_port_xgmac_promiscuous_mode_set(a_uint32_t dev_id,
+	a_uint32_t port_id)
+{
+	sw_error_t rv = 0;
+
+	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
+
+	rv = hppe_mac_packet_filter_pr_set(dev_id, port_id, PROMISCUOUS_MODE);
+
+	SW_RTN_ON_ERROR (rv);
+
+	rv = hppe_mac_packet_filter_pcf_set(dev_id, port_id, PASS_CONTROL_PACKET);
+
+	SW_RTN_ON_ERROR (rv);
+
+	rv = hppe_mac_packet_filter_ra_set (dev_id, port_id, (a_uint32_t)A_TRUE);
+
+	return rv;
+}
+
+static sw_error_t
 _adpt_xgmac_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t max_frame)
 {
@@ -299,8 +320,7 @@ _adpt_xgmac_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 	rv |= hppe_mac_rx_configuration_gpsl_set(dev_id, port_id, max_frame);
 	rv |= hppe_mac_rx_configuration_wd_set(dev_id, port_id, 1);
 	rv |= hppe_mac_rx_configuration_gmpslce_set(dev_id, port_id, 1);
-	rv |= hppe_mac_packet_filter_pr_set(dev_id, port_id, PROMISCUOUS_MODE);
-	rv |= hppe_mac_packet_filter_pcf_set(dev_id, port_id, PASS_CONTROL_PACKET);
+	rv |= adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id, port_id);
 
 	return rv;
 }
@@ -2475,22 +2495,6 @@ _adpt_hppe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t po
 	return rv;
 }
 
-static sw_error_t
-adpt_hppe_port_xgmac_promiscuous_mode_set(a_uint32_t dev_id,
-	a_uint32_t port_id)
-{
-	sw_error_t rv = 0;
-
-	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
-
-	rv = hppe_mac_packet_filter_pr_set(dev_id, port_id, PROMISCUOUS_MODE);
-
-	SW_RTN_ON_ERROR (rv);
-
-	rv = hppe_mac_packet_filter_pcf_set(dev_id, port_id, PASS_CONTROL_PACKET);
-
-	return rv;
-}
 static sw_error_t
 adpt_hppe_port_speed_change_mac_reset(a_uint32_t dev_id, a_uint32_t port_id)
 {

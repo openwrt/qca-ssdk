@@ -1766,23 +1766,6 @@ hppe_mac_packet_filter_ra_get(
 }
 
 sw_error_t
-hppe_mac_packet_filter_ra_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		a_uint32_t value)
-{
-	union mac_packet_filter_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_mac_packet_filter_get(dev_id, index, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.ra = value;
-	ret = hppe_mac_packet_filter_set(dev_id, index, &reg_val);
-	return ret;
-}
-
-sw_error_t
 hppe_mac_packet_filter_hpf_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -1905,6 +1888,24 @@ hppe_mac_packet_filter_pr_set(
 	ret = hppe_mac_packet_filter_set(dev_id, index, &reg_val);
 	return ret;
 }
+
+sw_error_t
+hppe_mac_packet_filter_ra_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union mac_packet_filter_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mac_packet_filter_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ra = value;
+	ret = hppe_mac_packet_filter_set(dev_id, index, &reg_val);
+	return ret;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t

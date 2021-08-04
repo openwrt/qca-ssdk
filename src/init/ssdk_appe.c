@@ -537,14 +537,13 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	rv = qca_hppe_flow_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif
-#if 0
+
 #if defined(IN_ACL)
 	rv = qca_hppe_acl_byp_intf_mac_learn(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #if defined(IN_PTP)
 	rv = qca_hppe_acl_remark_ptp_servcode(dev_id);
 	SW_RTN_ON_ERROR(rv);
-#endif
 #endif
 #endif
 

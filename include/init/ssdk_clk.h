@@ -264,6 +264,9 @@ enum mp_bcr_rst_type {
 #define CPPE_XGMAC_CLK_SIZE         0x10
 #define CPPE_XGMAC_CLK_ENABLE       0x20
 
+#define APPE_UNIPHY_SYS_CLK_RATE    24000000
+#define APPE_CLK_RATE               353000000
+
 enum {
 	UNIPHY_RX = 0,
 	UNIPHY_TX,

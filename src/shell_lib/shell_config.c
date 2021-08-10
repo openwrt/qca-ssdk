@@ -1366,6 +1366,19 @@ struct sub_cmd_des_t g_tunnel_des[] =
 {
     {"udfprofileEntry", "set", SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, NULL},
     {"udfprofilecfg", "set", SW_API_TUNNEL_UDF_PROFILE_CFG_SET, NULL},
+    {"Globalcfg", "set", SW_API_TUNNEL_GLOBAL_CFG_SET, NULL},
+    {"Portintf", "set", SW_API_TUNNEL_PORT_INTF_SET, NULL},
+    {"Intf", "set", SW_API_TUNNEL_INTF_SET, NULL},
+    {"Vlanintf", "set", SW_API_TUNNEL_VLAN_INTF_ADD, NULL},
+    {"Encaprule", "set", SW_API_TUNNEL_ENCAP_RULE_ENTRY_SET, NULL},
+    {"Encapintftunnelid", "set", SW_API_TUNNEL_ENCAP_INTF_TUNNELID_SET, NULL},
+    {"Encapporttunnelid", "set", SW_API_TUNNEL_ENCAP_PORT_TUNNELID_SET, NULL},
+    {"Decapentry", "set", SW_API_TUNNEL_DECAP_ENTRY_ADD, NULL},
+    {"Encapentry", "set", SW_API_TUNNEL_ENCAP_ENTRY_ADD, NULL},
+    {"Encapheaderctrl", "set", SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET, NULL},
+    {"Encapecn", "set", SW_API_TUNNEL_ENCAP_ECN_MODE_SET, NULL},
+    {"Decapecn", "set", SW_API_TUNNEL_DECAP_ECN_MODE_SET, NULL},
+    {"Decapexpfmtctrl", "set", SW_API_TUNNEL_EXP_DECAP_SET, NULL},
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif

@@ -86,6 +86,10 @@
 #include <linux/string.h>
 #include "ref_uci.h"
 
+#if defined(IN_TUNNEL)
+#include "ref_tunnel.h"
+#endif
+
 #define MOD_NAME_MAX_LEN	32
 #define COMMAND_NAME_MAX_LEN	128
 #define	COMMAND_LINE_MAX_LEN	1024
@@ -103,9 +107,8 @@ static char *priority_dflt_str = "no";
 static char *param_dflt_str = " ";
 #endif
 
-#if defined(HPPE) || defined(IN_FLOW)
-static int
-parse_uci_option(struct switch_val *val, const char *option_names[], const int length)
+#if defined(HPPE)
+int parse_uci_option(struct switch_val *val, const char *option_names[], const int length)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0, index = 0;
@@ -13271,8 +13274,7 @@ parse_tunnelprogram(a_uint32_t dev_id, const char *command_name, struct switch_v
 #endif
 
 #ifdef IN_TUNNEL
-static int
-parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val)
+int parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
@@ -13322,8 +13324,7 @@ parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val)
 	return rv;
 }
 
-static int
-parse_tunnel_udfprofilecfg(struct switch_val *val)
+int parse_tunnel_udfprofilecfg(struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
@@ -13354,19 +13355,8 @@ parse_tunnel_udfprofilecfg(struct switch_val *val)
 
 	return rv;
 }
-
-static int
-parse_tunnel(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
-{
-	int rv = -1;
-	if (!strcmp(command_name, "UdfprofileEntry")) {
-		rv = parse_tunnel_udfprofileentry(dev_id, val);
-	} else if (!strcmp(command_name, "UdfprofileCfg")) {
-		rv = parse_tunnel_udfprofilecfg(val);
-	}
-	return rv;
-}
 #endif
+
 static int name_transfer(char *name, char *module, char *cmd)
 {
         char *p;

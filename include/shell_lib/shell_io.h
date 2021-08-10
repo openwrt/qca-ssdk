@@ -533,6 +533,35 @@ sw_error_t
 cmd_data_check_tunnel_udp_entry(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_intf(char *info, fal_tunnel_intf_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_port_intf(char *info, fal_tunnel_port_intf_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_rule_entry(char *info, fal_tunnel_encap_rule_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_tunnelid(char *info, fal_tunnel_id_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_vlan_intf(char *info, fal_tunnel_vlan_intf_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_decap_entry(char *info, fal_tunnel_decap_entry_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_entry(char *info, fal_tunnel_encap_cfg_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_header_ctrl(char *info,
+		fal_tunnel_encap_header_ctrl_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_decap_ecn_rule(char *info,
+		fal_tunnel_decap_ecn_rule_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_decap_ecn_action(char *cmd_str,
+		fal_tunnel_decap_ecn_action_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_encap_ecn_rule(char *cmd_str, fal_tunnel_encap_ecn_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_ecn_val(char *cmd_str, fal_tunnel_ecn_val_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_global_cfg(char *info, fal_tunnel_global_cfg_t *val, a_uint32_t size);
 #endif
 #ifdef IN_VXLAN
 sw_error_t

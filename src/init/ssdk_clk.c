@@ -884,6 +884,7 @@ void ssdk_uniphy_raw_clock_set(
 {
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	a_uint32_t old_clock, id, mode;
+	a_uint32_t rate = 0;
 
 	if ((uniphy_index >= SSDK_MAX_UNIPHY_INSTANCE) ||
 	     ((direction != UNIPHY_TX) && (direction != UNIPHY_RX)) ||
@@ -896,16 +897,26 @@ void ssdk_uniphy_raw_clock_set(
 	id = uniphy_index*2 + direction;
 	old_clock = clk_get_rate(uniphy_raw_clks[id]->clk);
 
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
+		rate = NSS_APPE_PORT5_DFLT_RATE;
+	} else if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq807x")) {
+		rate = NSS_HPPE_PORT5_DFLT_RATE;
+	} else if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq60xx")) {
+		rate = NSS_CPPE_PORT5_DFLT_RATE;
+	} else {
+		SSDK_INFO("invalid device in uniphy raw clock set!\n");
+	}
+
 	if (clock != old_clock) {
 		if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
 			if (UNIPHY_RX == direction)
 				ssdk_uniphy_clock_rate_set(0,
 						NSS_PORT5_RX_CLK_E,
-						NSS_PORT5_DFLT_RATE);
+						rate);
 			else
 				ssdk_uniphy_clock_rate_set(0,
 						NSS_PORT5_TX_CLK_E,
-						NSS_PORT5_DFLT_RATE);
+						rate);
 		}
 		if (clk_set_rate(uniphy_raw_clks[id]->clk, clock))
 			SSDK_ERROR("set rate: %d fail!\n", clock);

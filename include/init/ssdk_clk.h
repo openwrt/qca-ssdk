@@ -238,7 +238,9 @@ enum mp_bcr_rst_type {
 #define NSS_IMEM_RATE               400000000
 #define PTP_REF_RARE                150000000
 #define NSS_AXI_RATE                461500000
-#define NSS_PORT5_DFLT_RATE         19200000
+#define NSS_HPPE_PORT5_DFLT_RATE    19200000
+#define NSS_CPPE_PORT5_DFLT_RATE    24000000
+#define NSS_APPE_PORT5_DFLT_RATE    24000000
 
 #define UNIPHY_CLK_RATE_25M         25000000
 #define UNIPHY_CLK_RATE_50M         50000000

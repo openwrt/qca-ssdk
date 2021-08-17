@@ -603,7 +603,7 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 			in_acl_meter_cfg_tbl.bf.nxt_ptr_0;
 		action->yellow_dscp_en = in_acl_meter_cfg_tbl.bf.exceed_chg_dscp_cmd;
 		action->yellow_dscp = in_acl_meter_cfg_tbl.bf.exceed_dscp;
-		action->red_dscp_en = in_acl_meter_cfg_tbl.bf.violate_chg_dp_cmd;
+		action->red_dscp_en = in_acl_meter_cfg_tbl.bf.violate_chg_dscp_cmd;
 		action->red_dscp = in_acl_meter_cfg_tbl.bf.violate_dscp;
 		action->yellow_remap_en = in_acl_meter_cfg_tbl.bf.exceed_remap_cmd;
 		action->red_remap_en = in_acl_meter_cfg_tbl.bf.violate_remap_cmd;
@@ -801,7 +801,7 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 		}
 		in_acl_meter_cfg_tbl.bf.exceed_chg_dscp_cmd = action->yellow_dscp_en;
 		in_acl_meter_cfg_tbl.bf.exceed_dscp = action->yellow_dscp;
-		in_acl_meter_cfg_tbl.bf.violate_chg_dp_cmd = action->red_dscp_en;
+		in_acl_meter_cfg_tbl.bf.violate_chg_dscp_cmd = action->red_dscp_en;
 		in_acl_meter_cfg_tbl.bf.violate_dscp = action->red_dscp;
 		in_acl_meter_cfg_tbl.bf.exceed_remap_cmd = action->yellow_remap_en;
 		in_acl_meter_cfg_tbl.bf.violate_remap_cmd = action->red_remap_en;

@@ -625,7 +625,7 @@ sw_error_t aquatia_phy_cdt_start(a_uint32_t dev_id, a_uint32_t phy_id)
 	rv  = aquantia_phy_reg_read(dev_id, phy_id, AQUANTIA_MMD_GLOBAL_REGISTERS,
 		AQUANTIA_GLOBAL_CDT_CONTROL, &phy_data);
 	SW_RTN_ON_ERROR(rv);
-	if(aq_phy_id == AQUANTIA_PHY_109)
+	if(aq_phy_id == AQUANTIA_PHY_109 || aq_phy_id == AQUANTIA_PHY_113C_B0)
 	{
 		phy_data |= AQUANTIA_PHY_CDT_MODE2;
 	}

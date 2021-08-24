@@ -40,6 +40,7 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 			fal_port_txmac_status_set (dev_id, i, A_FALSE);
 			fal_port_rxmac_status_set (dev_id, i, A_FALSE);
 			/* init mac's lpi wake up timer to 70us */
+			fal_port_interface_eee_cfg_get(dev_id, i, &port_eee_cfg);
 			port_eee_cfg.lpi_wakeup_timer = MP_LPI_WAKEUP_TIMER;
 			fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
 		} else {

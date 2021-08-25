@@ -619,8 +619,8 @@ fal_port_tdm_tick_cfg_t cppe_port_tdm0_tbl[] = {
 	{1, FAL_PORT_TDB_DIR_EGRESS, 7},
 };
 
-static sw_error_t
-qca_hppe_tdm_hw_init(a_uint32_t dev_id)
+sw_error_t
+qca_hppe_tdm_hw_init(a_uint32_t dev_id, a_bool_t enable)
 {
 	adpt_api_t *p_api;
 	a_uint32_t i = 0;
@@ -676,13 +676,23 @@ qca_hppe_tdm_hw_init(a_uint32_t dev_id)
 		return SW_BAD_VALUE;
 	}
 	for (i = 0; i < num; i++) {
+		if (adpt_chip_type_get(dev_id) == CHIP_HPPE) {
+			if ((bm_cfg[i].port == SSDK_PHYSICAL_PORT0) ||
+				(bm_cfg[i].port == SSDK_PHYSICAL_PORT7)) {
+				if (enable == A_FALSE) {
+					bm_cfg[i].valid = A_FALSE;
+				} else {
+					bm_cfg[i].valid = A_TRUE;
+				}
+			}
+		}
 		p_api->adpt_port_tdm_tick_cfg_set(dev_id, i, &bm_cfg[i]);
 	}
 	tdm_ctrl.enable = A_TRUE;
 	tdm_ctrl.offset = A_FALSE;
 	tdm_ctrl.depth = num;
 	p_api->adpt_port_tdm_ctrl_set(dev_id, &tdm_ctrl);
-	SSDK_INFO("tdm setup num=%d\n", num);
+	SSDK_DEBUG("tdm setup num=%d\n", num);
 	return SW_OK;
 }
 #endif
@@ -1294,7 +1304,7 @@ sw_error_t qca_hppe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(IN_BM) && defined(IN_QOS)
-	rv = qca_hppe_tdm_hw_init(dev_id);
+	rv = qca_hppe_tdm_hw_init(dev_id, A_TRUE);
 	SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(IN_FDB)

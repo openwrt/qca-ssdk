@@ -1667,7 +1667,7 @@ isisc_acl_rule_get_offset(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule
 
     for (i = 0; i < ISISC_MAX_FILTER; i++)
     {
-        sw_rule = &(sw_rule_ent[0][i]);
+        sw_rule = &(sw_rule_ent[dev_id][i]);
 
         if ((ENT_USED & sw_rule->status)
                 && (list_id == sw_rule->list_id) && (sw_rule->rule_id == rule_id)

@@ -695,11 +695,13 @@ extern "C" {
 #else
 #define FDB_API \
     SW_API_DEF(SW_API_FDB_PT_LEARN_SET,   fal_fdb_port_learn_set), \
+    SW_API_DEF(SW_API_FDB_FIND,           fal_fdb_entry_search), \
     SW_API_DEF(SW_API_FDB_EXTEND_FIRST,   fal_fdb_entry_extend_getfirst), \
     SW_API_DEF(SW_API_FDB_EXTEND_NEXT,    fal_fdb_entry_extend_getnext),
 
 #define FDB_API_PARAM \
     SW_API_DESC(SW_API_FDB_PT_LEARN_SET) \
+    SW_API_DESC(SW_API_FDB_FIND) \
     SW_API_DESC(SW_API_FDB_EXTEND_FIRST) \
     SW_API_DESC(SW_API_FDB_EXTEND_NEXT)
 #endif

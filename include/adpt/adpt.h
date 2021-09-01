@@ -1920,6 +1920,7 @@ typedef struct
 	adpt_sfp_enhanced_cfg_get_func adpt_sfp_enhanced_cfg_get;
 	adpt_sfp_rate_encode_get_func adpt_sfp_rate_encode_get;
 	/*led*/
+	a_uint32_t adpt_led_func_bitmap;
 	adpt_led_ctrl_pattern_set_func adpt_led_ctrl_pattern_set;
 	adpt_led_ctrl_pattern_get_func adpt_led_ctrl_pattern_get;
 	adpt_led_ctrl_source_set_func adpt_led_ctrl_source_set;

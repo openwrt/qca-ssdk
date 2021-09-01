@@ -21,6 +21,9 @@
 #include "ssdk_dts.h"
 #include "adpt.h"
 #include "fal.h"
+#ifdef IN_LED
+#include "ssdk_led.h"
+#endif
 
 #if defined(IN_BM) && defined(IN_QOS)
 fal_port_scheduler_cfg_t appe_port_scheduler1_tbl[] = {
@@ -488,5 +491,8 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 #endif
 
+#if defined(IN_LED)
+	rv = ssdk_led_init(dev_id, cfg);
+#endif
 	return rv;
 }

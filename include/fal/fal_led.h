@@ -114,9 +114,13 @@ extern "C" {
         led_blink_freq_t    freq;
     } led_ctrl_pattern_t;
 
-
-
-
+    enum
+    {
+        /*led contorl*/
+        FUNC_LED_CTRL_PATTERN_SET = 0,
+        FUNC_LED_CTRL_PATTERN_GET,
+        FUNC_LED_CTRL_SOURCE_SET,
+    };
 
     sw_error_t
     fal_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,

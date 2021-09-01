@@ -50,7 +50,6 @@ do { \
         a_uint32_t wan_bmp;
     } hsl_dev_t;
 
-    ssdk_chip_type hsl_get_chip_type(a_uint32_t dev_id);
     hsl_dev_t *hsl_dev_ptr_get(a_uint32_t dev_id);
 /*qca808x_end*/
     hsl_acl_func_t *hsl_acl_ptr_get(a_uint32_t dev_id);

@@ -10552,7 +10552,7 @@ parse_qm_srcprofile(struct switch_val *val)
 
 #ifdef IN_SERVCODE
 static int
-parse_servcode_config(a_uint32_t dev_id, struct switch_val *val)
+parse_servcode_config(struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
@@ -10577,9 +10577,7 @@ parse_servcode_config(a_uint32_t dev_id, struct switch_val *val)
 			val_ptr[5] = (char*)ext_value_p->option_value;
 #ifdef APPE
 		} else if (!strcmp(ext_value_p->option_name, "bypass_bitmap_3")) {
-			if(hsl_get_chip_type(dev_id) == CHIP_APPE) {
-				val_ptr[6] = (char*)ext_value_p->option_value;
-			}
+			val_ptr[6] = (char*)ext_value_p->option_value;
 #endif
 		} else if (!strcmp(ext_value_p->option_name, "direction")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
@@ -12537,11 +12535,11 @@ parse_qm(const char *command_name, struct switch_val *val)
 
 #ifdef IN_SERVCODE
 static int
-parse_servcode(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
+parse_servcode(const char *command_name, struct switch_val *val)
 {
 	int rv = -1;
 	if (!strcmp(command_name, "Config")) {
-		rv = parse_servcode_config(dev_id, val);
+		rv = parse_servcode_config(val);
 	} else if (!strcmp(command_name, "Loopcheck")) {
 		rv = parse_servcode_loopcheck(val);
 	}
@@ -13495,7 +13493,7 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 #endif
 	} else if(!strcmp(module_name, "Servcode")) {
 #ifdef IN_SERVCODE
-		rv = parse_servcode(priv->device_id, command_name, val);
+		rv = parse_servcode(command_name, val);
 #endif
 	} else if(!strcmp(module_name, "Ctrlpkt")) {
 #ifdef IN_CTRLPKT

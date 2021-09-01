@@ -29,13 +29,13 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 #define APPE_MAX_E_TOKEN_NUM                0x3fffffff
 #define APPE_PORT_SHAPER_TIMESLOT_DFT       8
 #define APPE_FLOW_SHAPER_TIMESLOT_DFT       128
-#define APPE_QUEUE_SHAPER_TIMESLOT_DFT      600
+#define APPE_QUEUE_SHAPER_TIMESLOT_DFT      353*2
 #define APPE_SHAPER_IPG_PREAMBLE_LEN_DFT    20
 #define APPE_QUEUE_SHAPER_HEAD              0
 #define APPE_QUEUE_SHAPER_TAIL              299
 #define APPE_FLOW_SHAPER_HEAD               0
 #define APPE_FLOW_SHAPER_TAIL               63
-#define APPE_POLICER_TIMESLOT_DFT           1200
+#define APPE_POLICER_TIMESLOT_DFT           353*4
 #define APPE_POLICER_HEAD                   0
 #define APPE_POLICER_TAIL                   511
 

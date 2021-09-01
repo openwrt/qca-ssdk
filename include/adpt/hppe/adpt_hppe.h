@@ -106,6 +106,11 @@ sw_error_t
 adpt_hppe_fdb_del_by_port(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t flag);
 #endif
 
+#ifdef IN_PORTCONTROL
+sw_error_t
+adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable);
+#endif
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

@@ -663,6 +663,9 @@ struct sub_cmd_des_t g_port_des[] =
 	{"eeecfg", "set", SW_API_PT_INTERFACE_EEE_CFG_SET, NULL},
 	{"srcfiltercfg", "set",   SW_API_PT_SOURCE_FILTER_CONFIG_SET, NULL},
 	{"switchportloopback", "set", SW_API_PT_SWITCH_PORT_LOOPBACK_SET, NULL},
+#if defined (APPE)
+	{"port8023ah", "set", SW_API_PT_8023AH_SET, NULL},
+#endif
 	#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
@@ -717,6 +720,10 @@ struct sub_cmd_des_t g_portvlan_des[] =
 	{"vsiEgModeEn", "set", SW_API_PT_VLANTAG_VSI_EGMODE_EN_SET, NULL},
 	{"counter", "set", SW_API_PT_VLAN_COUNTER_CLEANUP, NULL},
 	{"translationAdv", "set", SW_API_PT_VLAN_TRANS_ADV_ADD, NULL},
+#endif
+#ifdef APPE
+	{"Isol", "set", SW_API_PT_VLAN_ISOL_SET, NULL},
+	{"IsolGroup", "set", SW_API_PT_VLAN_ISOL_GROUP_SET, NULL},
 #endif
 	#ifndef IN_PORTVLAN_MINI
 	{"tlsMode", "set",   SW_API_PT_TLS_SET, NULL},
@@ -793,6 +800,11 @@ struct sub_cmd_des_t g_acl_des[] =
 	{"status", "set",   SW_API_ACL_STATUS_SET, NULL},
 	{"udfprofile", "set",   SW_API_ACL_PT_UDF_PROFILE_SET, NULL},
 	{"udf", "set", SW_API_ACL_UDF_SET, NULL},
+#ifdef APPE
+	{"udfprofileEntry", "set", SW_API_ACL_UDF_PROFILE_ENTRY_ADD, NULL},
+	{"udfprofilecfg", "set", SW_API_ACL_UDF_PROFILE_CFG_SET, NULL},
+	{"vpgroup", "set", SW_API_ACL_VPGROUP_SET, NULL},
+#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif
@@ -925,9 +937,9 @@ struct sub_cmd_des_t g_rate_des[] =
 #endif
 
 #ifdef IN_SEC
-#ifdef ISISC
 struct sub_cmd_des_t g_sec_des[] =
 {
+#ifdef ISISC
 	{"mac", "set", SW_API_SEC_MAC_SET, NULL},
 	{"ip", "set", SW_API_SEC_IP_SET, NULL},
 	{"ip4", "set", SW_API_SEC_IP4_SET, NULL},
@@ -936,12 +948,17 @@ struct sub_cmd_des_t g_sec_des[] =
 	{"udp", "set", SW_API_SEC_UDP_SET, NULL},
 	{"icmp4", "set", SW_API_SEC_ICMP4_SET, NULL},
 	{"icmp6", "set", SW_API_SEC_ICMP6_SET, NULL},
+#endif
 	{"l3parser", "set", SW_API_SEC_L3_PARSER_CTRL_SET, NULL},
 	{"l4parser", "set", SW_API_SEC_L4_PARSER_CTRL_SET, NULL},
 	{"expctrl", "set", SW_API_SEC_EXP_CTRL_SET, NULL},
+	{"l2expctrl", "set", SW_API_SEC_L2_EXP_CTRL_SET, NULL},
+	{"tunnelexpctrl", "set", SW_API_SEC_TUNNEL_EXP_CTRL_SET, NULL},
+	{"tunnell3parser", "set", SW_API_SEC_TUNNEL_L3_PARSER_CTRL_SET, NULL},
+	{"tunnell4parser", "set", SW_API_SEC_TUNNEL_L4_PARSER_CTRL_SET, NULL},
+	{"tunnelflagsparser", "set", SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_SET, NULL},
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
-#endif
 #endif
 
 #ifdef IN_STP
@@ -1189,8 +1206,10 @@ struct sub_cmd_des_t g_vsi_des[] =
 	{"stationmove", "set", SW_API_VSI_STAMOVE_SET, NULL},
 	{"member", "set", SW_API_VSI_MEMBER_SET, NULL},
 	{"counter", "cleanup", SW_API_VSI_COUNTER_CLEANUP, NULL},
+#if defined (APPE)
 	{"bridgevsi", "set", SW_API_VSI_BRIDGE_VSI_SET, NULL},
 	{"invalidvsi_ctrl", "set", SW_API_VSI_INVALIDVSI_CTRL_SET, NULL},
+#endif
 	{NULL, NULL, 0, NULL}/*end of desc*/
 };
 #endif
@@ -1297,6 +1316,10 @@ struct sub_cmd_des_t g_ctrlpkt_des[] =
     {"ethernetType", "set", SW_API_MGMTCTRL_ETHTYPE_PROFILE_SET, NULL},
     {"rfdb", "set", SW_API_MGMTCTRL_RFDB_PROFILE_SET, NULL},
     {"appProfile", "set", SW_API_MGMTCTRL_CTRLPKT_PROFILE_ADD, NULL},
+#if defined (APPE)
+    {"vpgroup", "set", SW_API_MGMTCTRL_VPGROUP_SET, NULL},
+    {"tunneldecap", "set", SW_API_MGMTCTRL_TUNNEL_DECAP_SET, NULL},
+#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif
@@ -1306,6 +1329,80 @@ struct sub_cmd_des_t g_debug_des[] =
 	{"module_func", "set", SW_API_MODULE_FUNC_CTRL_SET, NULL},
 	{NULL, NULL, 0, NULL},/*end of desc*/
 };
+
+/*VxLAN*/
+#ifdef IN_VXLAN
+struct sub_cmd_des_t g_vxlan_des[] =
+{
+    {"entry", "set", SW_API_VXLAN_ENTRY_ADD, NULL},
+    {"gpeprotocfg", "set", SW_API_VXLAN_GPE_PROTO_CFG_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
+/*GENEVE*/
+#ifdef IN_GENEVE
+struct sub_cmd_des_t g_geneve_des[] =
+{
+    {"entry", "set", SW_API_GENEVE_ENTRY_ADD, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
+/*TunnelProgram*/
+#ifdef IN_TUNNEL_PROGRAM
+struct sub_cmd_des_t g_tunnelprogram_des[] =
+{
+    {"entry", "set", SW_API_TUNNEL_PROGRAM_ENTRY_ADD, NULL},
+    {"cfg", "set", SW_API_TUNNEL_PROGRAM_CFG_SET, NULL},
+    {"udf", "set", SW_API_TUNNEL_PROGRAM_UDF_ADD, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
+/*Tunnel*/
+#ifdef IN_TUNNEL
+struct sub_cmd_des_t g_tunnel_des[] =
+{
+    {"udfprofileEntry", "set", SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, NULL},
+    {"udfprofilecfg", "set", SW_API_TUNNEL_UDF_PROFILE_CFG_SET, NULL},
+    {"Globalcfg", "set", SW_API_TUNNEL_GLOBAL_CFG_SET, NULL},
+    {"Portintf", "set", SW_API_TUNNEL_PORT_INTF_SET, NULL},
+    {"Intf", "set", SW_API_TUNNEL_INTF_SET, NULL},
+    {"Vlanintf", "set", SW_API_TUNNEL_VLAN_INTF_ADD, NULL},
+    {"Encaprule", "set", SW_API_TUNNEL_ENCAP_RULE_ENTRY_SET, NULL},
+    {"Encapintftunnelid", "set", SW_API_TUNNEL_ENCAP_INTF_TUNNELID_SET, NULL},
+    {"Encapporttunnelid", "set", SW_API_TUNNEL_ENCAP_PORT_TUNNELID_SET, NULL},
+    {"Decapentry", "set", SW_API_TUNNEL_DECAP_ENTRY_ADD, NULL},
+    {"Encapentry", "set", SW_API_TUNNEL_ENCAP_ENTRY_ADD, NULL},
+    {"Encapheaderctrl", "set", SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET, NULL},
+    {"Encapecn", "set", SW_API_TUNNEL_ENCAP_ECN_MODE_SET, NULL},
+    {"Decapecn", "set", SW_API_TUNNEL_DECAP_ECN_MODE_SET, NULL},
+    {"Decapexpfmtctrl", "set", SW_API_TUNNEL_EXP_DECAP_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
+/*MAPT*/
+#ifdef IN_MAPT
+struct sub_cmd_des_t g_mapt_des[] =
+{
+    {"Decapctrl", "set", SW_API_MAPT_DECAP_CTRL_SET, NULL},
+    {"Decapruleentry", "set", SW_API_MAPT_DECAP_RULE_ENTRY_SET, NULL},
+    {"Decapentry", "set", SW_API_MAPT_DECAP_ENTRY_ADD, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
+#ifdef IN_VPORT
+struct sub_cmd_des_t g_vport_des[] =
+{
+    {"Phyport", "set", SW_API_VPORT_PHYSICAL_PORT_SET, NULL},
+    {"Statecheck", "set", SW_API_VPORT_STATE_CHECK_SET, NULL},
+    {"Cntcfg", "set", SW_API_VPORT_CNT_CFG_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
 
 struct cmd_des_t gcmd_des[] =
 {
@@ -1380,11 +1477,9 @@ struct cmd_des_t gcmd_des[] =
 #endif
 
 #ifdef IN_SEC
-#ifdef ISISC
     {
         "sec", g_sec_des,
     },
-#endif
 #endif
 
     /*stp*/
@@ -1508,9 +1603,38 @@ struct cmd_des_t gcmd_des[] =
     },
 #endif
     {
-	"debug", g_debug_des,
+        "debug", g_debug_des,
     },
-
+#ifdef IN_VXLAN
+    {
+        "vxlan", g_vxlan_des,
+    },
+#endif
+#ifdef IN_GENEVE
+    {
+        "geneve", g_geneve_des,
+    },
+#endif
+#ifdef IN_TUNNEL_PROGRAM
+    {
+        "tunnelprogram", g_tunnelprogram_des,
+    },
+#endif
+#ifdef IN_TUNNEL
+    {
+        "tunnel", g_tunnel_des,
+    },
+#endif
+#ifdef IN_MAPT
+    {
+        "mapt", g_mapt_des,
+    },
+#endif
+#ifdef IN_VPORT
+    {
+        "vport", g_vport_des,
+    },
+#endif
     {NULL, NULL} /*end of desc*/
 };
 

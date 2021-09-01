@@ -23,6 +23,7 @@
 #include "hppe_acl_reg.h"
 #include "hppe_acl.h"
 #include <linux/list.h>
+#include "adpt_hppe_acl.h"
 #if defined(APPE)
 #include "adpt_appe_acl.h"
 #endif
@@ -40,20 +41,20 @@
 #define ADPT_ACL_HPPE_IPV6_SIP1_RULE 10
 #define ADPT_ACL_HPPE_IPV6_SIP2_RULE 11
 #define ADPT_ACL_HPPE_IPMISC_RULE 12
-#define ADPT_ACL_HPPE_UDF0_RULE 13
-#define ADPT_ACL_HPPE_UDF1_RULE 14
-#define ADPT_ACL_HPPE_RULE_TYPE_NUM 15
 
-
+#define ADPT_ACL_HW_LIST_NUM 64 /*hw list number*/
+#define ADPT_ACL_ENTRY_NUM_PER_LIST 8 /*hw rule entries number per hw list */
+#if defined(APPE)
+#define ADPT_ACL_SW_LIST_NUM 1024
+#else
 #define ADPT_ACL_SW_LIST_NUM 512
-#define ADPT_ACL_HW_LIST_NUM 64
+#endif
 #define ADPT_ACL_RULE_NUM_PER_LIST 8 /* can change this MACRO to support more rules per ACL list */
-#define ADPT_ACL_ENTRY_NUM_PER_LIST 8
 
 typedef struct{
 	struct list_head list;
 	a_uint16_t rule_id;
-	a_uint8_t rule_type;
+	a_uint8_t rule_type[2];
 	a_uint8_t rule_hw_entry;
 	a_uint8_t rule_hw_list_id;
 	a_uint8_t ext1_val;
@@ -303,7 +304,11 @@ typedef struct{
 }ADPT_HPPE_ACL_IPMISC_RULE_MASK;
 
 static ADPT_HPPE_ACL_SW_LIST_HEAD g_acl_sw_list[SW_MAX_NR_DEV];
+#if defined(APPE)
+static ADPT_HPPE_ACL_HW_LIST g_acl_hw_list[SW_MAX_NR_DEV][ADPT_ACL_HW_LIST_NUM+ADPT_PRE_ACL_HW_LIST_NUM];
+#else
 static ADPT_HPPE_ACL_HW_LIST g_acl_hw_list[SW_MAX_NR_DEV][ADPT_ACL_HW_LIST_NUM];
+#endif
 static aos_lock_t hppe_acl_lock[SW_MAX_NR_DEV];
 
 const a_uint8_t s_acl_ext2[7][2] = {
@@ -361,7 +366,7 @@ const ADPT_HPPE_ACL_ENTRY_EXTEND_INFO s_acl_entries[] = {
 	{8, 0xf, 0x3, 0x1, 0xff},
 };
 
-static void _adpt_acl_reg_dump(a_uint8_t *reg, a_uint32_t len)
+void _adpt_acl_reg_dump(a_uint8_t *reg, a_uint32_t len)
 {
 	a_int32_t i = 0;
 
@@ -402,7 +407,7 @@ static a_uint32_t _acl_bits_count(a_uint32_t bits, a_uint32_t max, a_uint32_t ty
 }
 
 /*type = 0, count all; type = 1 count odd; type = 2 count even*/
-static a_uint32_t _acl_bit_index(a_uint32_t bits, a_uint32_t max, a_uint32_t type)
+a_uint32_t _acl_bit_index(a_uint32_t bits, a_uint32_t max, a_uint32_t type)
 {
 	a_uint32_t i = 0;
 	while(i < max)
@@ -527,26 +532,12 @@ enum{
 	HPPE_ACL_TYPE_PORT,
 	HPPE_ACL_TYPE_SERVICE_CODE,
 	HPPE_ACL_TYPE_L3_IF,
+#if defined(APPE)
+	APPE_ACL_TYPE_VP_GROUP,
+	APPE_ACL_TYPE_SERVICE_PORTBITMAP,
+#endif
 	HPPE_ACL_TYPE_INVALID,
 };
-
-enum{
-	HPPE_ACL_ACTION_FWD = 0,
-	HPPE_ACL_ACTION_DROP,
-	HPPE_ACL_ACTION_COPYCPU,
-	HPPE_ACL_ACTION_RDTCPU,
-};
-
-enum{
-	HPPE_ACL_DEST_INVALID = 0,
-	HPPE_ACL_DEST_NEXTHOP,
-	HPPE_ACL_DEST_PORT_ID,
-	HPPE_ACL_DEST_PORT_BMP,
-};
-
-#define HPPE_ACL_DEST_INFO(type,value) (((type)<<12)|((value)&0xfff))
-#define HPPE_ACL_DEST_TYPE(dest) (((dest)>>12)&0x3)
-#define HPPE_ACL_DEST_VALUE(dest) ((dest)&0xfff)
 
 static a_uint32_t _adpt_hppe_acl_srctype_to_hw(fal_acl_bind_obj_t obj_t)
 {
@@ -566,22 +557,26 @@ static a_uint32_t _adpt_hppe_acl_srctype_to_hw(fal_acl_bind_obj_t obj_t)
 		case FAL_ACL_BIND_L3_IF:
 			src_type = HPPE_ACL_TYPE_L3_IF;
 			break;
+#if defined(APPE)
+		case FAL_ACL_BIND_VP_GROUP:
+			src_type = APPE_ACL_TYPE_VP_GROUP;
+			break;
+		case FAL_ACL_BIND_SERVICE_PORTBITMAP:
+			src_type = APPE_ACL_TYPE_SERVICE_PORTBITMAP;
+			break;
+#endif
+		default:
+			break;
 	}
 	return src_type;
 }
 
 static sw_error_t
-_adpt_hppe_acl_rule_bind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW_RULE *rule_entry,
+_adpt_hppe_acl_rule_bind(a_uint32_t dev_id, a_uint32_t hw_list_id, a_uint32_t hw_entries,
 	fal_acl_direc_t direc, fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx)
 {
-	a_uint32_t hw_index = 0, hw_entries = 0, hw_srctype = 0, hw_list_id = 0;
+	a_uint32_t hw_index = 0, hw_srctype = 0;
 	union ipo_rule_reg_u hw_reg = {0};
-
-	hw_entries = rule_entry->rule_hw_entry;
-	hw_list_id = rule_entry->rule_hw_list_id;
-	/* msg for debug */
-	SSDK_DEBUG("ACL bind rule: list_id=%d, rule_id=%d, hw_entries=0x%x, hw_list_id=%d\n",
-		list_id, rule_entry->rule_id, hw_entries, hw_list_id);
 
 	while(hw_entries != 0)
 	{
@@ -615,6 +610,15 @@ _adpt_hppe_acl_rule_bind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW
 			hw_reg.bf.src_1 |= obj_idx>>
 				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET);
 		}
+#if defined(APPE)
+		else if(hw_srctype == APPE_ACL_TYPE_SERVICE_PORTBITMAP &&
+			hw_reg.bf.src_type == APPE_ACL_TYPE_SERVICE_PORTBITMAP)
+		{
+			hw_reg.bf.src_0 |= obj_idx;
+			hw_reg.bf.src_1 |= obj_idx>>
+				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET);
+		}
+#endif
 		else
 		{
 			hw_reg.bf.src_0 = obj_idx;
@@ -657,6 +661,34 @@ _adpt_hppe_acl_list_entry_get(a_uint32_t dev_id, a_uint32_t list_id)
 	}
 }
 
+static sw_error_t
+_adpt_ppe_acl_rule_bind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW_RULE *rule_entry,
+	fal_acl_direc_t direc, fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx)
+{
+	a_uint32_t hw_list_id = 0, hw_entries = 0;
+
+	hw_entries = rule_entry->rule_hw_entry;
+	hw_list_id = rule_entry->rule_hw_list_id;
+
+	/* msg for debug */
+	SSDK_DEBUG("ACL bind rule: list_id=%d, rule_id=%d, hw_entries=0x%x, hw_list_id=%d\n",
+		list_id, rule_entry->rule_id, hw_entries, hw_list_id);
+
+	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		return _adpt_hppe_acl_rule_bind(dev_id, hw_list_id,
+				hw_entries, direc, obj_t, obj_idx);
+	}
+#if defined(APPE)
+	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		return _adpt_appe_pre_acl_rule_bind(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM ,
+				hw_entries, direc, obj_t, obj_idx);
+	}
+#endif
+	return SW_OK;
+}
+
 sw_error_t
 adpt_hppe_acl_list_bind(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t direc,
 		fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx)
@@ -686,7 +718,7 @@ adpt_hppe_acl_list_bind(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t d
 		if(rule_bind_entry->rule_hw_entry)
 		{
 			sw_error_t rc;
-			rc = _adpt_hppe_acl_rule_bind(dev_id, list_id, rule_bind_entry,
+			rc = _adpt_ppe_acl_rule_bind(dev_id, list_id, rule_bind_entry,
 					direc, obj_t, obj_idx);
 			if(rc != SW_OK)
 			{
@@ -700,12 +732,10 @@ adpt_hppe_acl_list_bind(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t d
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_mac_rule_hw_2_sw(a_uint32_t is_mac_da,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask, fal_acl_rule_t * rule)
+sw_error_t _adpt_hppe_acl_mac_rule_hw_2_sw(a_uint32_t is_mac_da,
+	ADPT_HPPE_ACL_MAC_RULE * macrule, ADPT_HPPE_ACL_MAC_RULE_MASK * macrule_mask,
+	fal_acl_rule_t * rule)
 {
-	ADPT_HPPE_ACL_MAC_RULE *macrule = (ADPT_HPPE_ACL_MAC_RULE *)hw_reg;
-	ADPT_HPPE_ACL_MAC_RULE_MASK *macrule_mask = (ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_mask;
-
 	if(is_mac_da)
 	{
 		rule->dest_mac_val.uc[0] = macrule->mac[5];
@@ -778,19 +808,16 @@ static sw_error_t _adpt_hppe_acl_mac_rule_hw_2_sw(a_uint32_t is_mac_da,
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg,
-		union ipo_mask_reg_u *hw_mask, fal_acl_rule_t * rule)
+sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(ADPT_HPPE_ACL_VLAN_RULE * vlanrule,
+	ADPT_HPPE_ACL_VLAN_RULE_MASK * vlanrule_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
 {
-	ADPT_HPPE_ACL_VLAN_RULE * vlanrule = (ADPT_HPPE_ACL_VLAN_RULE *)hw_reg;
-	ADPT_HPPE_ACL_VLAN_RULE_MASK *vlanrule_mask = (ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_mask;
-
 	/*ctag*/
 	if(vlanrule_mask->cvid_mask)
 	{
 		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_VID);
 		rule->ctag_vid_mask = vlanrule_mask->cvid_mask;
 	}
-	if(hw_reg->bf.range_en)
+	if(range_en)
 	{
 		if(vlanrule->cvid == 0)
 		{
@@ -918,19 +945,16 @@ static sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg,
 
 	return SW_OK;
 }
-static sw_error_t _adpt_hppe_acl_l2_misc_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg,
-		union ipo_mask_reg_u *hw_mask, fal_acl_rule_t * rule)
+sw_error_t _adpt_hppe_acl_l2_misc_rule_hw_2_sw(ADPT_HPPE_ACL_L2MISC_RULE * l2misc_rule,
+	ADPT_HPPE_ACL_L2MISC_RULE_MASK * l2misc_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
 {
-	ADPT_HPPE_ACL_L2MISC_RULE * l2misc_rule = (ADPT_HPPE_ACL_L2MISC_RULE *)hw_reg;
-	ADPT_HPPE_ACL_L2MISC_RULE_MASK *l2misc_mask = (ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_mask;
-
 	/*stag*/
 	if(l2misc_mask->svid_mask)
 	{
 		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
 		rule->stag_vid_mask = l2misc_mask->svid_mask;
 	}
-	if(hw_reg->bf.range_en)
+	if(range_en)
 	{
 		if(l2misc_rule->svid == 0)
 		{
@@ -1002,12 +1026,10 @@ static sw_error_t _adpt_hppe_acl_l2_misc_rule_hw_2_sw(union ipo_rule_reg_u *hw_r
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask, fal_acl_rule_t *rule)
+sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
+	ADPT_HPPE_ACL_IPV4_RULE * ipv4rule, ADPT_HPPE_ACL_IPV4_RULE_MASK * ipv4rule_mask,
+	a_uint8_t range_en, fal_acl_rule_t *rule)
 {
-	ADPT_HPPE_ACL_IPV4_RULE * ipv4rule = (ADPT_HPPE_ACL_IPV4_RULE *)hw_reg;
-	ADPT_HPPE_ACL_IPV4_RULE_MASK *ipv4rule_mask = (ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_mask;
-
 	if(is_ip_da)
 	{
 		if(ipv4rule_mask->ip_mask_0 || ipv4rule_mask->ip_mask_1)
@@ -1021,7 +1043,7 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_DPORT);
 			rule->dest_l4port_mask = ipv4rule_mask->l4_port_mask;
 		}
-		if(hw_reg->bf.range_en)
+		if(range_en)
 		{
 			if(ipv4rule->l4_port == 0)
 			{
@@ -1058,7 +1080,7 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_SPORT);
 			rule->src_l4port_mask = ipv4rule_mask->l4_port_mask;
 		}
-		if(hw_reg->bf.range_en)
+		if(range_en)
 		{
 			if(ipv4rule->l4_port == 0)
 			{
@@ -1105,12 +1127,10 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 }
 
 /*ip_bit_range: 0 mean DIP0 or SIP0, 1 mean DIP1 or SIP1, 2 mean DIP2 or SIP2,*/
-static sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_bit_range,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask, fal_acl_rule_t *rule)
+sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_bit_range,
+	ADPT_HPPE_ACL_IPV6_RULE * ipv6rule, ADPT_HPPE_ACL_IPV6_RULE_MASK * ipv6rule_mask,
+	a_uint8_t range_en, fal_acl_rule_t *rule)
 {
-	ADPT_HPPE_ACL_IPV6_RULE * ipv6rule = (ADPT_HPPE_ACL_IPV6_RULE *)hw_reg;
-	ADPT_HPPE_ACL_IPV6_RULE_MASK *ipv6rule_mask = (ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_mask;
-
 	if(is_ip_da)
 	{
 		if(ip_bit_range == 0)
@@ -1158,7 +1178,7 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32
 				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_DPORT);
 				rule->dest_l4port_mask = ipv6rule_mask->ip_port_mask;
 			}
-			if(hw_reg->bf.range_en)
+			if(range_en)
 			{
 				if(ipv6rule->ip_port == 0)
 				{
@@ -1229,7 +1249,7 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32
 				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_SPORT);
 				rule->src_l4port_mask = ipv6rule_mask->ip_port_mask;
 			}
-			if(hw_reg->bf.range_en)
+			if(range_en)
 			{
 				if(ipv6rule->ip_port == 0)
 				{
@@ -1271,18 +1291,15 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_ipmisc_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg,
-		union ipo_mask_reg_u *hw_mask, fal_acl_rule_t *rule)
+sw_error_t _adpt_hppe_acl_ipmisc_rule_hw_2_sw(ADPT_HPPE_ACL_IPMISC_RULE * ipmisc_rule,
+	ADPT_HPPE_ACL_IPMISC_RULE_MASK * ipmisc_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
 {
-	ADPT_HPPE_ACL_IPMISC_RULE * ipmisc_rule = (ADPT_HPPE_ACL_IPMISC_RULE *)hw_reg;
-	ADPT_HPPE_ACL_IPMISC_RULE_MASK *ipmisc_mask = (ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_mask;
-
 	if(ipmisc_mask->l3_length_mask)
 	{
 		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH);
 		rule->l3_length_mask = ipmisc_mask->l3_length_mask;
 	}
-	if(hw_reg->bf.range_en)
+	if(range_en)
 	{
 		if(ipmisc_rule->l3_length == 0)
 		{
@@ -1379,12 +1396,9 @@ static sw_error_t _adpt_hppe_acl_ipmisc_rule_hw_2_sw(union ipo_rule_reg_u *hw_re
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg, a_uint32_t is_win1,
-		union ipo_mask_reg_u *hw_mask, fal_acl_rule_t *rule)
+sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(a_uint32_t is_win1, ADPT_HPPE_ACL_UDF_RULE * udfrule, 
+	ADPT_HPPE_ACL_UDF_RULE_MASK * udfrule_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
 {
-	ADPT_HPPE_ACL_UDF_RULE * udfrule = (ADPT_HPPE_ACL_UDF_RULE *)hw_reg;
-	ADPT_HPPE_ACL_UDF_RULE_MASK *udfrule_mask = (ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_mask;
-
 	if(is_win1)
 	{
 		if(udfrule->udf2_valid == 1)
@@ -1402,7 +1416,7 @@ static sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg, 
 		if(udfrule->udf0_valid == 1)
 		{
 			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF1);
-			if(hw_reg->bf.range_en == 1)
+			if(range_en == 1)
 			{
 				if(udfrule->udf0 == 0)
 				{
@@ -1447,7 +1461,7 @@ static sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(union ipo_rule_reg_u *hw_reg, 
 		if(udfrule->udf0_valid == 1)
 		{
 			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF0);
-			if(hw_reg->bf.range_en == 1)
+			if(range_en == 1)
 			{
 				if(udfrule->udf0 == 0)
 				{
@@ -1634,16 +1648,192 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 #endif
 	return SW_OK;
 }
+
+sw_error_t
+_adpt_hppe_acl_rule_hw_2_sw(a_uint32_t dev_id, a_uint32_t rule_type,
+	a_uint8_t range_en, void * hw_rule,
+	void * hw_rule_mask, fal_acl_rule_t * rule)
+{
+	if(rule_type == ADPT_ACL_HPPE_MAC_DA_RULE)
+	{
+		_adpt_hppe_acl_mac_rule_hw_2_sw(1, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_MAC_SA_RULE)
+	{
+		_adpt_hppe_acl_mac_rule_hw_2_sw(0, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_VLAN_RULE)
+	{
+		_adpt_hppe_acl_vlan_rule_hw_2_sw((ADPT_HPPE_ACL_VLAN_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_L2_MISC_RULE)
+	{
+		_adpt_hppe_acl_l2_misc_rule_hw_2_sw((ADPT_HPPE_ACL_L2MISC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV4_DIP_RULE)
+	{
+		_adpt_hppe_acl_ipv4_rule_hw_2_sw(1, (ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV4_SIP_RULE)
+	{
+		_adpt_hppe_acl_ipv4_rule_hw_2_sw(0, (ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV6_DIP0_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 0, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV6_DIP1_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 1, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV6_DIP2_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 2, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV6_SIP0_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 0, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV6_SIP1_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 1, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPV6_SIP2_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 2, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_IPMISC_RULE)
+	{
+		_adpt_hppe_acl_ipmisc_rule_hw_2_sw((ADPT_HPPE_ACL_IPMISC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_UDF0_RULE)
+	{
+		_adpt_hppe_acl_udf_rule_hw_2_sw(0, (ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_HPPE_UDF1_RULE)
+	{
+		_adpt_hppe_acl_udf_rule_hw_2_sw(1, (ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+#if defined(APPE)
+	if(rule_type == ADPT_ACL_APPE_EXT_UDF0_RULE)
+	{
+		_adpt_appe_acl_ext_udf_rule_hw_2_sw(0,
+		(ADPT_APPE_ACL_EXT_UDF_RULE *)hw_rule,
+		(ADPT_APPE_ACL_EXT_UDF_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_APPE_EXT_UDF1_RULE)
+	{
+		_adpt_appe_acl_ext_udf_rule_hw_2_sw(1,
+		(ADPT_APPE_ACL_EXT_UDF_RULE *)hw_rule,
+		(ADPT_APPE_ACL_EXT_UDF_RULE_MASK *)hw_rule_mask, range_en, rule);
+	}
+	if(rule_type == ADPT_ACL_APPE_TUNNEL_RULE)
+	{
+		_adpt_appe_pre_acl_tunnel_rule_hw_2_sw((ADPT_APPE_ACL_TUNNEL_RULE *)hw_rule,
+		(ADPT_APPE_ACL_TUNNEL_RULE_MASK *)hw_rule_mask, &rule->tunnel_info);
+	}
+#endif
+	return SW_OK;
+}
+
+static sw_error_t
+_adpt_hppe_acl_rule_sw_query(a_uint32_t dev_id,
+	a_uint32_t hw_list_id, a_uint32_t hw_entries, fal_acl_rule_t * rule)
+{
+	a_uint32_t hw_index;
+	sw_error_t rv = SW_OK;
+	union ipo_rule_reg_u hw_reg = {0};
+	union ipo_mask_reg_u hw_mask = {0};
+	union ipo_action_u hw_act = {0};
+	union ipo_cnt_tbl_u hw_match = {0};
+
+	hw_index = _acl_bit_index(hw_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
+	if(hw_index >= ADPT_ACL_ENTRY_NUM_PER_LIST)
+	{
+		return SW_FAIL;
+	}
+	hppe_ipo_cnt_tbl_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index, &hw_match);
+
+	rule->match_cnt = hw_match.bf.hit_pkt_cnt;
+	rule->match_bytes = hw_match.bf.hit_byte_cnt_1;
+	rule->match_bytes = rule->match_bytes<<32|hw_match.bf.hit_byte_cnt_0;
+	while(hw_entries != 0)
+	{
+		hw_index = _acl_bit_index(hw_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
+		if(hw_index >= ADPT_ACL_ENTRY_NUM_PER_LIST)
+		{
+			break;
+		}
+		rv |= hppe_ipo_rule_reg_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index,
+			&hw_reg);
+		rv |= hppe_ipo_mask_reg_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index,
+			&hw_mask);
+		rv |= hppe_ipo_action_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index,
+			&hw_act);
+
+		rule->post_routing = hw_reg.bf.post_routing_en;
+		rule->acl_pool = hw_reg.bf.res_chain;
+		rule->pri = hw_reg.bf.pri&0x7;
+
+		/*get sw rule info from first 53bit hw rule reg fields*/
+		_adpt_hppe_acl_rule_hw_2_sw(dev_id, hw_reg.bf.rule_type,
+			hw_reg.bf.range_en, &hw_reg, &hw_mask, rule);
+
+		if(hw_reg.bf.inverse_en == 1)
+		{
+			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_INVERSE_ALL);
+		}
+
+		_adpt_hppe_acl_action_hw_2_sw(dev_id, &hw_act, rule);
+		hw_entries &= (~(1<<hw_index));
+	}
+	return rv;
+}
+
+static sw_error_t
+_adpt_ppe_acl_rule_sw_query(a_uint32_t dev_id,
+	a_uint32_t hw_list_id, a_uint32_t hw_entries, fal_acl_rule_t * rule)
+{
+	sw_error_t rv = SW_OK;
+	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		rv = _adpt_hppe_acl_rule_sw_query(dev_id, hw_list_id,
+				hw_entries, rule);
+		SW_RTN_ON_ERROR(rv);
+	}
+#if defined(APPE)
+	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		rv = _adpt_appe_pre_acl_rule_sw_query(dev_id,
+				hw_list_id - ADPT_ACL_HW_LIST_NUM , hw_entries, rule);
+		SW_RTN_ON_ERROR(rv);
+	}
+	rv = _adpt_appe_acl_policy_id_get(dev_id, hw_list_id, hw_entries, rule);
+#endif
+	return rv;
+}
+
 sw_error_t
 adpt_hppe_acl_rule_query(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_id,
 		fal_acl_rule_t * rule)
 {
 	sw_error_t rv = 0;
-	a_uint32_t hw_index = 0, hw_entries = 0, hw_list_id = 0;
-	union ipo_rule_reg_u hw_reg = {0};
-	union ipo_mask_reg_u hw_mask = {0};
-	union ipo_action_u hw_act = {0};
-	union ipo_cnt_tbl_u hw_match = {0};
+	a_uint32_t hw_entries = 0, hw_list_id = 0;
 	struct list_head *rule_pos = NULL;
 	ADPT_HPPE_ACL_SW_RULE *rule_query_entry = NULL;
 	ADPT_HPPE_ACL_SW_LIST *list_query_entry = NULL;
@@ -1674,7 +1864,8 @@ adpt_hppe_acl_rule_query(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_
 		rule_query_entry = list_entry(rule_pos, ADPT_HPPE_ACL_SW_RULE, list);
 		if((rule_query_entry->rule_id == rule_id) && (rule_query_entry->rule_hw_entry != 0))
 		{
-			rule->rule_type = rule_query_entry->rule_type;
+			rule->rule_type = rule_query_entry->rule_type[0];
+			rule->inner_rule_field.rule_type = rule_query_entry->rule_type[1];
 			hw_entries = rule_query_entry->rule_hw_entry;
 			hw_list_id = rule_query_entry->rule_hw_list_id;
 			break;
@@ -1686,118 +1877,17 @@ adpt_hppe_acl_rule_query(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_
 		return SW_NOT_FOUND;
 	}
 	aos_unlock_bh(&hppe_acl_lock[dev_id]);
-
-	hw_index = _acl_bit_index(hw_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
-	if(hw_index >= ADPT_ACL_ENTRY_NUM_PER_LIST)
-	{
-		return SW_FAIL;
-	}
-	hppe_ipo_cnt_tbl_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index, &hw_match);
-
-	rule->match_cnt = hw_match.bf.hit_pkt_cnt;
-	rule->match_bytes = hw_match.bf.hit_byte_cnt_1;
-	rule->match_bytes = rule->match_bytes<<32|hw_match.bf.hit_byte_cnt_0;
-	while(hw_entries != 0)
-	{
-		hw_index = _acl_bit_index(hw_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
-		if(hw_index >= ADPT_ACL_ENTRY_NUM_PER_LIST)
-		{
-			break;
-		}
-		rv |= hppe_ipo_rule_reg_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index,
-			&hw_reg);
-		rv |= hppe_ipo_mask_reg_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index,
-			&hw_mask);
-		rv |= hppe_ipo_action_get(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index,
-			&hw_act);
-		rule->post_routing = hw_reg.bf.post_routing_en;
-		rule->acl_pool = hw_reg.bf.res_chain;
-		rule->pri = hw_reg.bf.pri&0x7;
-
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_MAC_DA_RULE)
-		{
-			_adpt_hppe_acl_mac_rule_hw_2_sw(1, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_MAC_SA_RULE)
-		{
-			_adpt_hppe_acl_mac_rule_hw_2_sw(0, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_VLAN_RULE)
-		{
-			_adpt_hppe_acl_vlan_rule_hw_2_sw(&hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_L2_MISC_RULE)
-		{
-			_adpt_hppe_acl_l2_misc_rule_hw_2_sw(&hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV4_DIP_RULE)
-		{
-			_adpt_hppe_acl_ipv4_rule_hw_2_sw(1, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV4_SIP_RULE)
-		{
-			_adpt_hppe_acl_ipv4_rule_hw_2_sw(0, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV6_DIP0_RULE)
-		{
-			_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 0, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV6_DIP1_RULE)
-		{
-			_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 1, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV6_DIP2_RULE)
-		{
-			_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 2, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV6_SIP0_RULE)
-		{
-			_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 0, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV6_SIP1_RULE)
-		{
-			_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 1, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPV6_SIP2_RULE)
-		{
-			_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 2, &hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_IPMISC_RULE)
-		{
-			_adpt_hppe_acl_ipmisc_rule_hw_2_sw(&hw_reg, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_UDF0_RULE)
-		{
-			_adpt_hppe_acl_udf_rule_hw_2_sw(&hw_reg, 0, &hw_mask, rule);
-		}
-		if(hw_reg.bf.rule_type == ADPT_ACL_HPPE_UDF1_RULE)
-		{
-			_adpt_hppe_acl_udf_rule_hw_2_sw(&hw_reg, 1, &hw_mask, rule);
-		}
-
-		if(hw_reg.bf.inverse_en == 1)
-		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_INVERSE_ALL);
-		}
-
-		_adpt_hppe_acl_action_hw_2_sw(dev_id,&hw_act, rule);
-		hw_entries &= (~(1<<hw_index));
-	}
-
-	return SW_OK;
+	/*query rule*/
+	rv = _adpt_ppe_acl_rule_sw_query(dev_id, hw_list_id, hw_entries, rule);
+	return rv;
 }
+
 static sw_error_t
-_adpt_hppe_acl_rule_unbind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW_RULE *rule_entry,
+_adpt_hppe_acl_rule_unbind(a_uint32_t dev_id, a_uint32_t hw_list_id, a_uint32_t hw_entries,
 	fal_acl_direc_t direc, fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx)
 {
-	a_uint32_t hw_index = 0, hw_entries = 0, hw_list_id = 0;
+	a_uint32_t hw_index = 0;
 	union ipo_rule_reg_u hw_reg = {0};
-
-	hw_entries = rule_entry->rule_hw_entry;
-	hw_list_id = rule_entry->rule_hw_list_id;
-	/* msg for debug */
-	SSDK_DEBUG("ACL unbind rule: list_id=%d, rule_id=%d, hw_entries=0x%x, hw_list_id=%d\n",
-		list_id, rule_entry->rule_id, hw_entries, hw_list_id);
 
 	while(hw_entries != 0)
 	{
@@ -1828,6 +1918,14 @@ _adpt_hppe_acl_rule_unbind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_
 			hw_reg.bf.src_1 &= ~(obj_idx>>
 				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET));
 		}
+#if defined(APPE)
+		else if(hw_reg.bf.src_type == APPE_ACL_TYPE_SERVICE_PORTBITMAP)
+		{
+			hw_reg.bf.src_0 &= ~obj_idx;
+			hw_reg.bf.src_1 &= ~(obj_idx>>
+				SW_FIELD_OFFSET_IN_WORD(IPO_RULE_REG_SRC_OFFSET));
+		}
+#endif
 		else
 		{
 			hw_reg.bf.src_type = HPPE_ACL_TYPE_PORTBITMAP;
@@ -1841,6 +1939,34 @@ _adpt_hppe_acl_rule_unbind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_
 		hw_entries &= (~(1<<hw_index));
 	}
 
+	return SW_OK;
+}
+
+static sw_error_t
+_adpt_ppe_acl_rule_unbind(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW_RULE *rule_entry,
+	fal_acl_direc_t direc, fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx)
+{
+	a_uint32_t hw_list_id = 0, hw_entries = 0;
+
+	hw_entries = rule_entry->rule_hw_entry;
+	hw_list_id = rule_entry->rule_hw_list_id;
+
+	/* msg for debug */
+	SSDK_DEBUG("ACL unbind rule: list_id=%d, rule_id=%d, hw_entries=0x%x, hw_list_id=%d\n",
+		list_id, rule_entry->rule_id, hw_entries, hw_list_id);
+
+	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		return _adpt_hppe_acl_rule_unbind(dev_id, hw_list_id,
+				hw_entries, direc, obj_t, obj_idx);
+	}
+#if defined(APPE)
+	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		return _adpt_appe_pre_acl_rule_unbind(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM ,
+				hw_entries, direc, obj_t, obj_idx);
+	}
+#endif
 	return SW_OK;
 }
 
@@ -1868,7 +1994,7 @@ adpt_hppe_acl_list_unbind(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t
 			rule_unbind_entry = list_entry(rule_pos, ADPT_HPPE_ACL_SW_RULE, list);
 			if(rule_unbind_entry->rule_hw_entry)
 			{
-				_adpt_hppe_acl_rule_unbind(dev_id, list_id, rule_unbind_entry,
+				_adpt_ppe_acl_rule_unbind(dev_id, list_id, rule_unbind_entry,
 						direc, obj_t, obj_idx);
 			}
 		}
@@ -1886,10 +2012,11 @@ adpt_hppe_acl_rule_active(a_uint32_t dev_id, a_uint32_t list_id,
 	return SW_NOT_SUPPORTED;
 }
 
-static sw_error_t _adpt_hppe_acl_rule_range_match(a_uint32_t dev_id, a_uint32_t hw_list_index,
-		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule, a_uint8_t entries)
+static a_uint8_t
+_adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
+		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule)
 {
-	a_uint8_t rangecount = 0, even_entry_count = 0;
+	a_uint8_t rangecount = 0;
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->stag_vid_op)
@@ -1950,7 +2077,38 @@ static sw_error_t _adpt_hppe_acl_rule_range_match(a_uint32_t dev_id, a_uint32_t 
 			rangecount++;
 		}
 	}
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
+		{
+			if (FAL_ACL_FIELD_MASK != rule->udf2_op)
+			{
+				rangecount++;
+			}
+		}
+	}
+#endif
+	return rangecount;
+}
 
+static sw_error_t _adpt_hppe_acl_rule_range_match(a_uint32_t dev_id, a_uint32_t hw_list_index,
+		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule,
+		fal_acl_rule_t *inner_rule, a_uint8_t entries)
+{
+	a_uint8_t rangecount = 0, even_entry_count = 0;
+
+	rangecount = _adpt_hppe_acl_rule_range_count(dev_id, rule_id, rule_nr, rule);
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		if(hw_list_index >= ADPT_ACL_HW_LIST_NUM)
+		{
+			rangecount += _adpt_hppe_acl_rule_range_count(dev_id,
+						rule_id, rule_nr, inner_rule);
+		}
+	}
+#endif
 	even_entry_count = _acl_bits_count(entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 2);
 
 	if(rangecount <= even_entry_count)
@@ -1959,15 +2117,27 @@ static sw_error_t _adpt_hppe_acl_rule_range_match(a_uint32_t dev_id, a_uint32_t 
 	}
 	return SW_NO_RESOURCE;
 }
+
 sw_error_t _adpt_hppe_acl_alloc_entries(a_uint32_t dev_id, a_uint32_t *hw_list_index,
-			a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule,
-			a_uint32_t rule_type_map, a_uint32_t rule_type_count, a_uint32_t *index)
+		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule,
+		fal_acl_rule_t *inner_rule, a_uint32_t rule_type_count, a_uint32_t *index)
 {
 	a_uint8_t free_hw_entry_bitmap = 0, free_hw_entry_count = 0, i = 0;
-	a_uint32_t j = 0;
+	a_uint32_t j = 0, start = 0, end = ADPT_ACL_HW_LIST_NUM;
 	a_uint8_t map_info_count = sizeof(s_acl_entries)/sizeof(ADPT_HPPE_ACL_ENTRY_EXTEND_INFO);
 
-	for(j = 0 ; j < ADPT_ACL_HW_LIST_NUM; j++)
+#if defined(APPE)
+	if(rule->rule_type == FAL_ACL_RULE_TUNNEL_MAC ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4 ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP6 ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_UDF)
+
+	{ /* pre-ipo */
+		start = ADPT_ACL_HW_LIST_NUM;
+		end = ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM;
+	}
+#endif
+	for(j = start ; j < end; j++)
 	{
 		free_hw_entry_bitmap = g_acl_hw_list[dev_id][j].free_hw_entry_bitmap;
 		free_hw_entry_count = g_acl_hw_list[dev_id][j].free_hw_entry_count;
@@ -1986,8 +2156,8 @@ sw_error_t _adpt_hppe_acl_alloc_entries(a_uint32_t dev_id, a_uint32_t *hw_list_i
 				((free_hw_entry_bitmap & s_acl_entries[i].entries) ==
 				s_acl_entries[i].entries))
 			{
-				if(SW_OK == _adpt_hppe_acl_rule_range_match(dev_id, j,
-						rule_id, rule_nr, rule, s_acl_entries[i].entries))
+				if(SW_OK == _adpt_hppe_acl_rule_range_match(dev_id, j, rule_id,
+					rule_nr, rule, inner_rule, s_acl_entries[i].entries))
 				{
 					SSDK_DEBUG("\n{%d, 0x%x, 0x%x, 0x%x, 0x%x},\n",
 						s_acl_entries[i].num, s_acl_entries[i].ext_1,
@@ -2004,7 +2174,7 @@ sw_error_t _adpt_hppe_acl_alloc_entries(a_uint32_t dev_id, a_uint32_t *hw_list_i
 }
 
 static sw_error_t
-_adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
+_adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
 	a_uint32_t l2_rule_type_map = 0;
@@ -2048,8 +2218,8 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 		{
-				SSDK_DEBUG("select VLAN rule\n");
-				l2_rule_type_map |= (1<<ADPT_ACL_HPPE_VLAN_RULE);
+			SSDK_DEBUG("select VLAN rule\n");
+			l2_rule_type_map |= (1<<ADPT_ACL_HPPE_VLAN_RULE);
 		}
 	}
 
@@ -2070,7 +2240,7 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t
 	return SW_OK;
 }
 static sw_error_t
-_adpt_hppe_acl_ipv4_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
+_adpt_hppe_acl_ipv4_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
 	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
@@ -2124,7 +2294,7 @@ _adpt_hppe_acl_ipv4_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32
 }
 
 static sw_error_t
-_adpt_hppe_acl_ipv6_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
+_adpt_hppe_acl_ipv6_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
 	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
@@ -2203,7 +2373,7 @@ _adpt_hppe_acl_ipv6_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32
 }
 
 static sw_error_t
-_adpt_hppe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
+_adpt_hppe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
 	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
@@ -2237,12 +2407,9 @@ _adpt_hppe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_mac_da,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_mac_da,
+		ADPT_HPPE_ACL_MAC_RULE * macrule, ADPT_HPPE_ACL_MAC_RULE_MASK *macrule_mask)
 {
-	ADPT_HPPE_ACL_MAC_RULE * macrule = (ADPT_HPPE_ACL_MAC_RULE *)hw_reg;
-	ADPT_HPPE_ACL_MAC_RULE_MASK *macrule_mask = (ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_mask;
-
 	if(is_mac_da)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_DA))
@@ -2309,12 +2476,10 @@ static sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
+	ADPT_HPPE_ACL_VLAN_RULE * vlanrule, ADPT_HPPE_ACL_VLAN_RULE_MASK *vlanrule_mask,
+	a_uint8_t *range_en)
 {
-	ADPT_HPPE_ACL_VLAN_RULE * vlanrule = (ADPT_HPPE_ACL_VLAN_RULE *)hw_reg;
-	ADPT_HPPE_ACL_VLAN_RULE_MASK *vlanrule_mask = (ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_mask;
-
 	/*ctag*/
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_VID))
 	{
@@ -2345,7 +2510,7 @@ static sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 				return SW_NOT_SUPPORTED;
 			vlanrule->cvid = min;
 			vlanrule_mask->cvid_mask = max;
-			hw_reg->bf.range_en = 1;
+			*range_en = 1;
 		}
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI))
@@ -2433,12 +2598,10 @@ static sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 }
 
 
-static sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
+	ADPT_HPPE_ACL_L2MISC_RULE * l2misc_rule, ADPT_HPPE_ACL_L2MISC_RULE_MASK * l2misc_mask,
+	a_uint8_t *range_en)
 {
-	ADPT_HPPE_ACL_L2MISC_RULE * l2misc_rule = (ADPT_HPPE_ACL_L2MISC_RULE *)hw_reg;
-	ADPT_HPPE_ACL_L2MISC_RULE_MASK *l2misc_mask = (ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_mask;
-
 	/*stag*/
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 	{
@@ -2471,7 +2634,7 @@ static sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
 			}
 			l2misc_rule->svid = min;
 			l2misc_mask->svid_mask = max;
-			hw_reg->bf.range_en = 1;
+			*range_en = 1;
 		}
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_ETHTYPE))
@@ -2513,12 +2676,10 @@ static sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_ip_da,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_ip_da,
+	ADPT_HPPE_ACL_IPV4_RULE * ipv4rule, ADPT_HPPE_ACL_IPV4_RULE_MASK *ipv4rule_mask,
+	a_uint8_t *range_en)
 {
-	ADPT_HPPE_ACL_IPV4_RULE * ipv4rule = (ADPT_HPPE_ACL_IPV4_RULE *)hw_reg;
-	ADPT_HPPE_ACL_IPV4_RULE_MASK *ipv4rule_mask = (ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_mask;
-
 	if(is_ip_da)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP4_DIP))
@@ -2557,7 +2718,7 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 					return SW_NOT_SUPPORTED;
 				ipv4rule->l4_port = min;
 				ipv4rule_mask->l4_port_mask = max;
-				hw_reg->bf.range_en = 1;
+				*range_en = 1;
 			}
 		}
 	}
@@ -2599,7 +2760,7 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 					return SW_NOT_SUPPORTED;
 				ipv4rule->l4_port = min;
 				ipv4rule_mask->l4_port_mask = max;
-				hw_reg->bf.range_en = 1;
+				*range_en = 1;
 			}
 		}
 	}
@@ -2634,7 +2795,7 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 				return SW_NOT_SUPPORTED;
 			ipv4rule->l4_port = min;
 			ipv4rule_mask->l4_port_mask = max;
-			hw_reg->bf.range_en = 1;
+			*range_en = 1;
 		}
 	}
 
@@ -2658,12 +2819,10 @@ static sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 }
 
 /*ip_bit_range: 0 mean DIP0 or SIP0, 1 mean DIP1 or SIP1, 2 mean DIP2 or SIP2,*/
-static sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_ip_da, a_uint32_t ip_bit_range,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_ip_da,
+	a_uint32_t ip_bit_range, ADPT_HPPE_ACL_IPV6_RULE *ipv6rule,
+	ADPT_HPPE_ACL_IPV6_RULE_MASK *ipv6rule_mask, a_uint8_t *range_en)
 {
-	ADPT_HPPE_ACL_IPV6_RULE * ipv6rule = (ADPT_HPPE_ACL_IPV6_RULE *)hw_reg;
-	ADPT_HPPE_ACL_IPV6_RULE_MASK *ipv6rule_mask = (ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_mask;
-
 	if(is_ip_da)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP6_DIP))
@@ -2723,7 +2882,7 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 					return SW_NOT_SUPPORTED;
 				ipv6rule->ip_port = min;
 				ipv6rule_mask->ip_port_mask = max;
-				hw_reg->bf.range_en = 1;
+				*range_en = 1;
 			}
 		}
 	}
@@ -2786,7 +2945,7 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 					return SW_NOT_SUPPORTED;
 				ipv6rule->ip_port = min;
 				ipv6rule_mask->ip_port_mask = max;
-				hw_reg->bf.range_en = 1;
+				*range_en = 1;
 			}
 		}
 	}
@@ -2821,7 +2980,7 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 				return SW_NOT_SUPPORTED;
 			ipv6rule->ip_port = min;
 			ipv6rule_mask->ip_port_mask = max;
-			hw_reg->bf.range_en = 1;
+			*range_en = 1;
 		}
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
@@ -2837,12 +2996,10 @@ static sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint3
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
+	ADPT_HPPE_ACL_IPMISC_RULE * ipmisc_rule, ADPT_HPPE_ACL_IPMISC_RULE_MASK *ipmisc_mask,
+	a_uint8_t *range_en)
 {
-	ADPT_HPPE_ACL_IPMISC_RULE * ipmisc_rule = (ADPT_HPPE_ACL_IPMISC_RULE *)hw_reg;
-	ADPT_HPPE_ACL_IPMISC_RULE_MASK *ipmisc_mask = (ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_mask;
-
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH))
 	{
 		if(FAL_ACL_FIELD_MASK == rule->l3_length_op)
@@ -2872,7 +3029,7 @@ static sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
 				return SW_NOT_SUPPORTED;
 			ipmisc_rule->l3_length = min;
 			ipmisc_mask->l3_length_mask = max;
-			hw_reg->bf.range_en = 1;
+			*range_en = 1;
 		}
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PROTO))
@@ -2943,12 +3100,10 @@ static sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
 	return SW_OK;
 }
 
-static sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_win1,
-		union ipo_rule_reg_u *hw_reg, union ipo_mask_reg_u *hw_mask)
+sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_win1,
+	ADPT_HPPE_ACL_UDF_RULE * udfrule, ADPT_HPPE_ACL_UDF_RULE_MASK *udfrule_mask,
+	a_uint8_t *range_en)
 {
-	ADPT_HPPE_ACL_UDF_RULE * udfrule = (ADPT_HPPE_ACL_UDF_RULE *)hw_reg;
-	ADPT_HPPE_ACL_UDF_RULE_MASK *udfrule_mask = (ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_mask;
-
 	if(is_win1)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF3))
@@ -2958,7 +3113,8 @@ static sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32
 			udfrule_mask->udf2_valid = 1;
 			udfrule_mask->udf2_mask = rule->udf3_mask;
 		}
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
+		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) &&
+			FAL_ACL_FIELD_MASK == rule->udf2_op)
 		{
 			udfrule->udf1_valid = 1;
 			udfrule->udf1 = rule->udf2_val;
@@ -2997,7 +3153,7 @@ static sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32
 					return SW_NOT_SUPPORTED;
 				udfrule->udf0 = min;
 				udfrule_mask->udf0_mask = max;
-				hw_reg->bf.range_en = 1;
+				*range_en = 1;
 			}
 		}
 	}
@@ -3011,7 +3167,8 @@ static sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32
 			udfrule_mask->udf1_valid = 1;
 			udfrule_mask->udf1_mask = rule->udf1_mask;
 		}
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
+		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) &&
+			FAL_ACL_FIELD_MASK == rule->udf2_op)
 		{
 			udfrule->udf2_valid = 1;
 			udfrule->udf2 = rule->udf2_val;
@@ -3050,7 +3207,7 @@ static sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32
 					return SW_NOT_SUPPORTED;
 				udfrule->udf0 = min;
 				udfrule_mask->udf0_mask = max;
-				hw_reg->bf.range_en = 1;
+				*range_en = 1;
 			}
 		}
 	}
@@ -3215,7 +3372,140 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 }
 
 sw_error_t
-_adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, ADPT_HPPE_ACL_SW_LIST *list_entry,
+_adpt_hppe_acl_rule_sw_2_hw(a_uint32_t dev_id, fal_acl_rule_t * rule, a_uint32_t rule_type,
+	a_uint32_t *hw_entry, a_uint32_t *allocated_entries, a_uint8_t *range_en,
+	void *hw_rule, void *hw_rule_mask)
+{
+	*range_en = 0;
+	if(rule_type == ADPT_ACL_HPPE_VLAN_RULE)
+	{
+		_adpt_hppe_acl_vlan_rule_sw_2_hw(rule, (ADPT_HPPE_ACL_VLAN_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_MAC_DA_RULE)
+	{
+		_adpt_hppe_acl_mac_rule_sw_2_hw(rule, 1, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_MAC_SA_RULE)
+	{
+		_adpt_hppe_acl_mac_rule_sw_2_hw(rule, 0, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_L2_MISC_RULE)
+	{
+		_adpt_hppe_acl_l2_misc_rule_sw_2_hw(rule,
+		(ADPT_HPPE_ACL_L2MISC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV4_DIP_RULE)
+	{
+		_adpt_hppe_acl_ipv4_rule_sw_2_hw(rule, 1,
+		(ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV4_SIP_RULE)
+	{
+		_adpt_hppe_acl_ipv4_rule_sw_2_hw(rule, 0,
+		(ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV6_DIP0_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 0,
+		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV6_DIP1_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 1,
+		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV6_DIP2_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 2,
+		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV6_SIP0_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 0,
+		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV6_SIP1_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 1,
+		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPV6_SIP2_RULE)
+	{
+		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 2,
+		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_IPMISC_RULE)
+	{
+		_adpt_hppe_acl_ipmisc_rule_sw_2_hw(rule,
+		(ADPT_HPPE_ACL_IPMISC_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_UDF0_RULE)
+	{
+		_adpt_hppe_acl_udf_rule_sw_2_hw(rule, 0,
+		(ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_HPPE_UDF1_RULE)
+	{
+		_adpt_hppe_acl_udf_rule_sw_2_hw(rule, 1,
+		(ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en);
+	}
+#if defined(APPE)
+	else if(rule_type == ADPT_ACL_APPE_EXT_UDF0_RULE)
+	{
+		_adpt_appe_acl_ext_udf_rule_sw_2_hw(rule, 0,
+		(ADPT_APPE_ACL_EXT_UDF_RULE *)hw_rule,
+		(ADPT_APPE_ACL_EXT_UDF_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_APPE_EXT_UDF1_RULE)
+	{
+		_adpt_appe_acl_ext_udf_rule_sw_2_hw(rule, 1,
+		(ADPT_APPE_ACL_EXT_UDF_RULE *)hw_rule,
+		(ADPT_APPE_ACL_EXT_UDF_RULE_MASK *)hw_rule_mask, range_en);
+	}
+	else if(rule_type == ADPT_ACL_APPE_TUNNEL_RULE)
+	{
+		_adpt_appe_pre_acl_tunnel_rule_sw_2_hw(&rule->tunnel_info,
+		(ADPT_APPE_ACL_TUNNEL_RULE *)hw_rule,
+		(ADPT_APPE_ACL_TUNNEL_RULE_MASK *)hw_rule_mask);
+	}
+#endif
+
+	if(*range_en == 0)
+	{
+		*hw_entry = _acl_bit_index(*allocated_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 1);
+	}
+	if(*hw_entry == 0xff || *range_en)
+	{
+		*hw_entry = _acl_bit_index(*allocated_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 2);
+	}
+	if(*hw_entry == 0xff)
+	{
+		printk("%s, %d, fail find hw_entry in 0x%x\n",
+			__FUNCTION__, __LINE__, *allocated_entries);
+		return SW_NO_RESOURCE;
+	}
+	*allocated_entries &= (~(1<<(*hw_entry)));
+
+	return SW_OK;
+}
+
+sw_error_t
+_adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		a_uint32_t hw_list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 		fal_acl_rule_t * rule, a_uint32_t rule_type_map, a_uint32_t allocated_entries)
 {
@@ -3223,139 +3513,54 @@ _adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, ADPT_HPPE_ACL_SW_LIST *list_entry,
 	union ipo_mask_reg_u hw_mask = {0};
 	union ipo_action_u hw_act = {0};
 	sw_error_t rv = 0;
-	a_uint32_t hw_entry = 0;
-	a_uint32_t i = 0;
+	a_uint32_t hw_entry = 0, rule_type = 0;
+	a_uint8_t range_en = 0;
 
 	hw_reg.bf.post_routing_en = rule->post_routing;
 	hw_reg.bf.res_chain = rule->acl_pool;
-	hw_reg.bf.pri = ((list_entry->list_pri)<<3)|rule->pri;
+	hw_reg.bf.pri = (list_pri<<3)|rule->pri;
 
-	for( i = 0; i < ADPT_ACL_HPPE_RULE_TYPE_NUM; i++)
+	for(rule_type = 0; rule_type < ADPT_ACL_HPPE_RULE_TYPE_NUM; rule_type++)
 	{
-		if(!((1<<i)&rule_type_map))
+		if(!((1<<rule_type)&rule_type_map))
 		{
 			continue;
 		}
 		hw_reg.bf.rule_field_0 = 0;
 		hw_reg.bf.rule_field_1 = 0;
-
 		memset(&hw_mask, 0, sizeof(hw_mask));
 		memset(&hw_act, 0, sizeof(hw_act));
 
-		if(i == ADPT_ACL_HPPE_VLAN_RULE)
-		{
-			hw_reg.bf.rule_type = 2;
-			_adpt_hppe_acl_vlan_rule_sw_2_hw(rule, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_MAC_DA_RULE)
-		{
-			hw_reg.bf.rule_type = 0;
-			_adpt_hppe_acl_mac_rule_sw_2_hw(rule, 1, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_MAC_SA_RULE)
-		{
-			hw_reg.bf.rule_type = 1;
-			_adpt_hppe_acl_mac_rule_sw_2_hw(rule, 0, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_L2_MISC_RULE)
-		{
-			hw_reg.bf.rule_type = 3;
-			_adpt_hppe_acl_l2_misc_rule_sw_2_hw(rule, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV4_DIP_RULE)
-		{
-			hw_reg.bf.rule_type = 4;
-			_adpt_hppe_acl_ipv4_rule_sw_2_hw(rule, 1, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV4_SIP_RULE)
-		{
-			hw_reg.bf.rule_type = 5;
-			_adpt_hppe_acl_ipv4_rule_sw_2_hw(rule, 0, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV6_DIP0_RULE)
-		{
-			hw_reg.bf.rule_type = 6;
-			_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 0, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV6_DIP1_RULE)
-		{
-			hw_reg.bf.rule_type = 7;
-			_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 1, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV6_DIP2_RULE)
-		{
-			hw_reg.bf.rule_type = 8;
-			_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 2, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV6_SIP0_RULE)
-		{
-			hw_reg.bf.rule_type = 9;
-			_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 0, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV6_SIP1_RULE)
-		{
-			hw_reg.bf.rule_type = 10;
-			_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 1, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPV6_SIP2_RULE)
-		{
-			hw_reg.bf.rule_type = 11;
-			_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 2, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_IPMISC_RULE)
-		{
-			hw_reg.bf.rule_type = 12;
-			_adpt_hppe_acl_ipmisc_rule_sw_2_hw(rule, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_UDF0_RULE)
-		{
-			hw_reg.bf.rule_type = 13;
-			_adpt_hppe_acl_udf_rule_sw_2_hw(rule, 0, &hw_reg, &hw_mask);
-		}
-		else if(i == ADPT_ACL_HPPE_UDF1_RULE)
-		{
-			hw_reg.bf.rule_type = 14;
-			_adpt_hppe_acl_udf_rule_sw_2_hw(rule, 1, &hw_reg, &hw_mask);
-		}
-
-		if(!hw_reg.bf.range_en)
-		{
-			hw_entry = _acl_bit_index(allocated_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 1);
-		}
-		if(hw_entry == 0xff || hw_reg.bf.range_en)
-		{
-			hw_entry = _acl_bit_index(allocated_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 2);
-		}
-		if(hw_entry == 0xff)
-		{
-			printk("%s, %d, fail find hw_entry in 0x%x\n",
-				__FUNCTION__, __LINE__, allocated_entries);
-			return SW_NO_RESOURCE;
-		}
-		allocated_entries &= (~(1<<hw_entry));
-
+		/*set 53bit rule fields of hw rule reg*/
+		_adpt_hppe_acl_rule_sw_2_hw(dev_id, rule, rule_type,
+			&hw_entry, &allocated_entries, &range_en,
+			&hw_reg, &hw_mask);
+		/*set rule_type, range_en, inverse_en fields of hw rule reg*/
+		hw_reg.bf.rule_type = rule_type;
+		hw_reg.bf.range_en = range_en;
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_INVERSE_ALL))
 		{
-		    hw_reg.bf.inverse_en = 1;
+			hw_reg.bf.inverse_en = 1;
 		}
 
-		SSDK_DEBUG("rule and mask set hw_entry = %d\n",
-				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry);
 		SSDK_DEBUG("post_route %d, chain %d, pri %d, src_1 %d, src_0 %d, src_type %d "
 			"rule_type %d, inverse %d, range %d\n", hw_reg.bf.post_routing_en,
 			hw_reg.bf.res_chain, hw_reg.bf.pri, hw_reg.bf.src_1, hw_reg.bf.src_0,
 			hw_reg.bf.src_type, hw_reg.bf.rule_type, hw_reg.bf.inverse_en,
 			hw_reg.bf.range_en);
+		SSDK_DEBUG("rule and mask set hw_entry = %d\n",
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry);
+
+		_adpt_hppe_acl_action_sw_2_hw(dev_id,rule, &hw_act);
+		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
+		rv |= hppe_ipo_action_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
+			&hw_act);
 		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_reg, sizeof(hw_reg));*/
 		rv |= hppe_ipo_rule_reg_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
 			&hw_reg);
 		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_mask, sizeof(hw_mask));*/
 		rv |= hppe_ipo_mask_reg_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
 			&hw_mask);
-		_adpt_hppe_acl_action_sw_2_hw(dev_id,rule, &hw_act);
-		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
-		rv |= hppe_ipo_action_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
-			&hw_act);
 
 		if(rv != SW_OK)
 		{
@@ -3367,16 +3572,44 @@ _adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, ADPT_HPPE_ACL_SW_LIST *list_entry,
 }
 
 static sw_error_t
+_adpt_ppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
+		a_uint32_t hw_list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
+		fal_acl_rule_t * rule, fal_acl_rule_t *inner_rule, a_uint32_t rule_type_map,
+		a_uint32_t inner_rule_type_map, a_uint32_t allocated_entries)
+{
+	sw_error_t rv = SW_OK;
+
+	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		rv = _adpt_hppe_acl_rule_hw_add(dev_id, list_pri, hw_list_id,
+			rule_id, rule_nr, rule, rule_type_map, allocated_entries);
+		SW_RTN_ON_ERROR(rv);
+	}
+#if defined(APPE)
+	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		rv = _adpt_appe_pre_acl_rule_hw_add(dev_id, list_pri,
+			hw_list_id - ADPT_ACL_HW_LIST_NUM, rule_id, rule_nr, rule, inner_rule,
+			rule_type_map, inner_rule_type_map, allocated_entries);
+		SW_RTN_ON_ERROR(rv);
+	}
+	rv = _adpt_appe_acl_policy_id_set(dev_id, rule, hw_list_id, allocated_entries);
+#endif
+	return rv;
+}
+
+static sw_error_t
 _adpt_hppe_acl_hw_list_resort(a_uint32_t dev_id, a_uint32_t hw_list_index, a_bool_t move_up)
 {
-	a_uint32_t i = 0;
+	a_uint32_t i = 0, start = 0, end = ADPT_ACL_HW_LIST_NUM;
 	ADPT_HPPE_ACL_HW_LIST temp = {0};
-
+#if defined(APPE)
 	if(hw_list_index >= ADPT_ACL_HW_LIST_NUM)
 	{
-		return SW_OUT_OF_RANGE;
+		start = ADPT_ACL_HW_LIST_NUM;
+		end += ADPT_PRE_ACL_HW_LIST_NUM;
 	}
-
+#endif
 	if(move_up)
 	{
 		temp.hw_list_id = g_acl_hw_list[dev_id][hw_list_index].hw_list_id;
@@ -3384,7 +3617,7 @@ _adpt_hppe_acl_hw_list_resort(a_uint32_t dev_id, a_uint32_t hw_list_index, a_boo
 			g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_bitmap;
 		temp.free_hw_entry_count =
 			g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_count;
-		for(i = hw_list_index; i > 0; i--)
+		for(i = hw_list_index; i > start; i--)
 		{
 			if(temp.free_hw_entry_count <
 				g_acl_hw_list[dev_id][i-1].free_hw_entry_count)
@@ -3412,7 +3645,7 @@ _adpt_hppe_acl_hw_list_resort(a_uint32_t dev_id, a_uint32_t hw_list_index, a_boo
 			g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_bitmap;
 		temp.free_hw_entry_count =
 			g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_count;
-		for(i = hw_list_index; i < ADPT_ACL_HW_LIST_NUM-1; i++)
+		for(i = hw_list_index; i < end-1; i++)
 		{
 			if(temp.free_hw_entry_count >
 				g_acl_hw_list[dev_id][i+1].free_hw_entry_count)
@@ -3436,20 +3669,452 @@ _adpt_hppe_acl_hw_list_resort(a_uint32_t dev_id, a_uint32_t hw_list_index, a_boo
 	return SW_OK;
 }
 
+static sw_error_t
+_adpt_hppe_acl_rule_ext_set(a_uint32_t dev_id, a_uint32_t hw_list_id,
+		a_uint32_t ext_1, a_uint32_t ext_2, a_uint32_t ext_4)
+{
+	sw_error_t rv = SW_OK;
+	union rule_ext_1_reg_u reg_ext_1 = {0};
+	union rule_ext_2_reg_u reg_ext_2 = {0};
+	union rule_ext_4_reg_u reg_ext_4 = {0};
+
+	if(ext_1 != 0)
+	{
+		rv |= hppe_rule_ext_1_reg_get(dev_id, hw_list_id, &reg_ext_1);
+		reg_ext_1.val |= ext_1;
+		SSDK_DEBUG("ext_1.val = 0x%x\n", reg_ext_1.val);
+		rv |= hppe_rule_ext_1_reg_set(dev_id, hw_list_id, &reg_ext_1);
+	}
+	if(ext_2 != 0)
+	{
+		rv |= hppe_rule_ext_2_reg_get(dev_id, hw_list_id, &reg_ext_2);
+		reg_ext_2.val |= ext_2;
+		SSDK_DEBUG("ext_2.val = 0x%x\n", reg_ext_2.val);
+		rv |= hppe_rule_ext_2_reg_set(dev_id, hw_list_id, &reg_ext_2);
+	}
+	if(ext_4 != 0)
+	{
+		rv |= hppe_rule_ext_4_reg_get(dev_id, hw_list_id, &reg_ext_4);
+		reg_ext_4.val |= ext_4;
+		SSDK_DEBUG("ext_4.val = 0x%x\n", reg_ext_4.val);
+		rv |= hppe_rule_ext_4_reg_set(dev_id, hw_list_id, &reg_ext_4);
+	}
+	return rv;
+}
+
+static sw_error_t
+_adpt_hppe_acl_rule_ext_clear(a_uint32_t dev_id, a_uint32_t hw_list_id,
+		a_uint32_t ext_1, a_uint32_t ext_2, a_uint32_t ext_4)
+{
+	sw_error_t rv = SW_OK;
+	union rule_ext_1_reg_u reg_ext_1 = {0};
+	union rule_ext_2_reg_u reg_ext_2 = {0};
+	union rule_ext_4_reg_u reg_ext_4 = {0};
+
+	if(ext_1 != 0)
+	{
+		rv |= hppe_rule_ext_1_reg_get(dev_id, hw_list_id, &reg_ext_1);
+		reg_ext_1.val &= (~ext_1);
+		SSDK_DEBUG("ext_1.val = 0x%x\n", reg_ext_1.val);
+		rv |= hppe_rule_ext_1_reg_set(dev_id, hw_list_id, &reg_ext_1);
+	}
+	if(ext_2 != 0)
+	{
+		rv |= hppe_rule_ext_2_reg_get(dev_id, hw_list_id, &reg_ext_2);
+		reg_ext_2.val &= (~ext_2);
+		SSDK_DEBUG("ext_2.val = 0x%x\n", reg_ext_2.val);
+		rv |= hppe_rule_ext_2_reg_set(dev_id, hw_list_id, &reg_ext_2);
+	}
+	if(ext_4 != 0)
+	{
+		rv |= hppe_rule_ext_4_reg_get(dev_id, hw_list_id, &reg_ext_4);
+		reg_ext_4.val &= (~ext_4);
+		SSDK_DEBUG("ext_4.val = 0x%x\n", reg_ext_4.val);
+		rv |= hppe_rule_ext_4_reg_set(dev_id, hw_list_id, &reg_ext_4);
+	}
+	return rv;
+}
+
+static sw_error_t
+_adpt_ppe_acl_rule_ext_set(a_uint32_t dev_id, a_uint32_t hw_list_id,
+		a_uint32_t ext_1, a_uint32_t ext_2, a_uint32_t ext_4)
+{
+	if(hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		return _adpt_hppe_acl_rule_ext_set(dev_id, hw_list_id, ext_1, ext_2, ext_4);
+	}
+#if defined(APPE)
+	else if(hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		return _adpt_appe_pre_acl_rule_ext_set(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM,
+				ext_1, ext_2, ext_4);
+	}
+#endif
+	return SW_OK;
+}
+
+static sw_error_t
+_adpt_ppe_acl_rule_ext_clear(a_uint32_t dev_id, a_uint32_t hw_list_id,
+		a_uint32_t ext_1, a_uint32_t ext_2, a_uint32_t ext_4)
+{
+	if(hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		return _adpt_hppe_acl_rule_ext_clear(dev_id, hw_list_id, ext_1, ext_2, ext_4);
+	}
+#if defined(APPE)
+	else if(hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		return _adpt_appe_pre_acl_rule_ext_clear(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM,
+				ext_1, ext_2, ext_4);
+	}
+#endif
+	return SW_OK;
+}
+
+void acl_rule_field_convert(fal_acl_rule_t * rule,
+            fal_acl_rule_field_t * rule_field, a_bool_t to_inner)
+{
+    if(to_inner)
+    {
+        /*fields flag*/
+        aos_mem_copy(rule_field->field_flg,
+            rule->field_flg, sizeof(fal_acl_field_map_t));
+
+        /*mac fields*/
+        rule_field->is_fake_mac_header_mask = rule->is_fake_mac_header_mask;
+        rule_field->is_fake_mac_header_val = rule->is_fake_mac_header_val;
+        rule_field->is_snap_mask = rule->is_snap_mask;
+        rule_field->is_snap_val = rule->is_snap_val;
+        rule_field->is_ethernet_mask = rule->is_ethernet_mask;
+        rule_field->is_ethernet_val = rule->is_ethernet_val;
+        rule_field->is_ip_mask = rule->is_ip_mask;
+        rule_field->is_ip_val= rule->is_ip_val;
+        rule_field->is_ipv6_mask = rule->is_ipv6_mask;
+        rule_field->is_ipv6_val = rule->is_ipv6_val;
+        aos_mem_copy(rule_field->dest_mac_val.uc,
+            rule->dest_mac_val.uc, sizeof(fal_mac_addr_t));
+        aos_mem_copy(rule_field->dest_mac_mask.uc,
+            rule->dest_mac_mask.uc, sizeof(fal_mac_addr_t));
+        aos_mem_copy(rule_field->src_mac_val.uc,
+            rule->src_mac_val.uc, sizeof(fal_mac_addr_t));
+        aos_mem_copy(rule_field->src_mac_mask.uc,
+            rule->src_mac_mask.uc, sizeof(fal_mac_addr_t));
+        rule_field->ethtype_val = rule->ethtype_val;
+        rule_field->ethtype_mask = rule->ethtype_mask;
+        rule_field->stagged_val = rule->stagged_val;
+        rule_field->stagged_mask = rule->stagged_mask;
+        rule_field->stag_vid_op = rule->stag_vid_op;
+        rule_field->stag_vid_val = rule->stag_vid_val;
+        rule_field->stag_vid_mask = rule->stag_vid_mask;
+        rule_field->stag_pri_val = rule->stag_pri_val;
+        rule_field->stag_pri_mask = rule->stag_pri_mask;
+        rule_field->stag_dei_val = rule->stag_dei_val;
+        rule_field->stag_dei_mask = rule->stag_dei_mask;
+        rule_field->ctagged_val = rule->ctagged_val;
+        rule_field->ctagged_mask = rule->ctagged_mask;
+        rule_field->ctag_vid_op = rule->ctag_vid_op;
+        rule_field->ctag_vid_val = rule->ctag_vid_val;
+        rule_field->ctag_vid_mask = rule->ctag_vid_mask;
+        rule_field->ctag_pri_val = rule->ctag_pri_val;
+        rule_field->ctag_pri_mask = rule->ctag_pri_mask;
+        rule_field->ctag_cfi_val = rule->ctag_cfi_val;
+        rule_field->ctag_cfi_mask = rule->ctag_cfi_mask;
+        rule_field->pppoe_sessionid = rule->pppoe_sessionid;
+        rule_field->pppoe_sessionid_mask = rule->pppoe_sessionid_mask;
+
+        /*ipv4 fields*/
+        rule_field->src_ip4_val = rule->src_ip4_val;
+        rule_field->src_ip4_mask = rule->src_ip4_mask;
+        rule_field->dest_ip4_val = rule->dest_ip4_val;
+        rule_field->dest_ip4_mask = rule->dest_ip4_mask;
+        rule_field->is_ipv4_option_mask = rule->is_ipv4_option_mask;
+        rule_field->is_ipv4_option_val = rule->is_ipv4_option_val;
+
+        /*ipv6 fields*/
+        aos_mem_copy(rule_field->src_ip6_val.ul,
+            rule->src_ip6_val.ul, sizeof(fal_ip6_addr_t));
+        aos_mem_copy(rule_field->src_ip6_mask.ul,
+            rule->src_ip6_mask.ul, sizeof(fal_ip6_addr_t));
+        aos_mem_copy(rule_field->dest_ip6_val.ul,
+            rule->dest_ip6_val.ul, sizeof(fal_ip6_addr_t));
+        aos_mem_copy(rule_field->dest_ip6_mask.ul,
+            rule->dest_ip6_mask.ul, sizeof(fal_ip6_addr_t));
+        rule_field->is_mobility_header_mask = rule->is_mobility_header_mask;
+        rule_field->is_mobility_header_val = rule->is_mobility_header_val;
+        rule_field->is_fragment_header_mask = rule->is_fragment_header_mask;
+        rule_field->is_fragment_header_val = rule->is_fragment_header_val;
+        rule_field->is_other_header_mask = rule->is_other_header_mask;
+        rule_field->is_other_header_val = rule->is_other_header_val;
+
+        /*ip fields*/
+        rule_field->ip_proto_val = rule->ip_proto_val;
+        rule_field->ip_proto_mask = rule->ip_proto_mask;
+        rule_field->ip_dscp_val = rule->ip_dscp_val;
+        rule_field->ip_dscp_mask = rule->ip_dscp_mask;
+        rule_field->dest_l4port_op = rule->dest_l4port_op;
+        rule_field->dest_l4port_val = rule->dest_l4port_val;
+        rule_field->dest_l4port_mask = rule->dest_l4port_mask;
+        rule_field->src_l4port_op = rule->src_l4port_op;
+        rule_field->src_l4port_val = rule->src_l4port_val;
+        rule_field->src_l4port_mask = rule->src_l4port_mask;
+        rule_field->tcp_flag_val = rule->tcp_flag_val;
+        rule_field->tcp_flag_mask = rule->tcp_flag_mask;
+        rule_field->icmp_type_code_op = rule->icmp_type_code_op;
+        rule_field->icmp_type_val = rule->icmp_type_val;
+        rule_field->icmp_type_mask = rule->icmp_type_mask;
+        rule_field->icmp_code_val = rule->icmp_code_val;
+        rule_field->icmp_code_mask = rule->icmp_code_mask;
+        rule_field->is_fragement_mask = rule->is_fragement_mask;
+        rule_field->is_fragement_val = rule->is_fragement_val;
+        rule_field->is_first_frag_mask = rule->is_first_frag_mask;
+        rule_field->is_first_frag_val = rule->is_first_frag_val;
+        rule_field->l3_ttl_mask = rule->l3_ttl_mask;
+        rule_field->l3_ttl = rule->l3_ttl;
+        rule_field->l3_length_op = rule->l3_length_op;
+        rule_field->l3_length = rule->l3_length;
+        rule_field->l3_length_mask = rule->l3_length_mask;
+        rule_field->l3_pkt_type_mask = rule->l3_pkt_type_mask;
+        rule_field->l3_pkt_type = rule->l3_pkt_type;
+        rule_field->is_ah_header_mask = rule->is_ah_header_mask;
+        rule_field->is_ah_header_val = rule->is_ah_header_val;
+        rule_field->is_esp_header_mask = rule->is_esp_header_mask;
+        rule_field->is_esp_header_val = rule->is_esp_header_val;
+
+        /*udf fields*/
+        rule_field->udf0_op = rule->udf0_op;
+        rule_field->udf0_val = rule->udf0_val;
+        rule_field->udf0_mask = rule->udf0_mask;
+        rule_field->udf1_op = rule->udf1_op;
+        rule_field->udf1_val = rule->udf1_val;
+        rule_field->udf1_mask = rule->udf1_mask;
+        rule_field->udf2_op = rule->udf2_op;
+        rule_field->udf2_val = rule->udf2_val;
+        rule_field->udf2_mask = rule->udf2_mask;
+        rule_field->udf3_val = rule->udf3_val;
+        rule_field->udf3_mask = rule->udf3_mask;
+        rule_field->udfprofile_val = rule->udfprofile_val;
+        rule_field->udfprofile_mask = rule->udfprofile_mask;
+    }
+    else
+    {
+        /*fields flag*/
+        aos_mem_copy(rule->field_flg,
+            rule_field->field_flg, sizeof(fal_acl_field_map_t));
+
+        /*mac fields*/
+        rule->is_fake_mac_header_mask = rule_field->is_fake_mac_header_mask;
+        rule->is_fake_mac_header_val = rule_field->is_fake_mac_header_val;
+        rule->is_snap_mask = rule_field->is_snap_mask;
+        rule->is_snap_val = rule_field->is_snap_val;
+        rule->is_ethernet_mask = rule_field->is_ethernet_mask;
+        rule->is_ethernet_val = rule_field->is_ethernet_val;
+        rule->is_ip_mask = rule_field->is_ip_mask;
+        rule->is_ip_val = rule_field->is_ip_val;
+        rule->is_ipv6_mask = rule_field->is_ipv6_mask;
+        rule->is_ipv6_val = rule_field->is_ipv6_val;
+        aos_mem_copy(rule->dest_mac_val.uc,
+            rule_field->dest_mac_val.uc, sizeof(fal_mac_addr_t));
+        aos_mem_copy(rule->dest_mac_mask.uc,
+            rule_field->dest_mac_mask.uc, sizeof(fal_mac_addr_t));
+        aos_mem_copy(rule->src_mac_val.uc,
+            rule_field->src_mac_val.uc, sizeof(fal_mac_addr_t));
+        aos_mem_copy(rule->src_mac_mask.uc,
+            rule_field->src_mac_mask.uc, sizeof(fal_mac_addr_t));
+        rule->ethtype_val = rule_field->ethtype_val;
+
+        rule->ethtype_mask = rule_field->ethtype_mask;
+        rule->stagged_val = rule_field->stagged_val;
+        rule->stagged_mask = rule_field->stagged_mask;
+        rule->stag_vid_op = rule_field->stag_vid_op;
+        rule->stag_vid_val = rule_field->stag_vid_val;
+        rule->stag_vid_mask = rule_field->stag_vid_mask;
+        rule->stag_pri_val = rule_field->stag_pri_val;
+        rule->stag_pri_mask = rule_field->stag_pri_mask;
+        rule->stag_dei_val = rule_field->stag_dei_val;
+        rule->stag_dei_mask = rule_field->stag_dei_mask;
+        rule->ctagged_val = rule_field->ctagged_val;
+        rule->ctagged_mask = rule_field->ctagged_mask;
+        rule->ctag_vid_op = rule_field->ctag_vid_op;
+        rule->ctag_vid_val = rule_field->ctag_vid_val;
+        rule->ctag_vid_mask = rule_field->ctag_vid_mask;
+        rule->ctag_pri_val = rule_field->ctag_pri_val;
+        rule->ctag_pri_mask = rule_field->ctag_pri_mask;
+        rule->ctag_cfi_val = rule_field->ctag_cfi_val;
+        rule->ctag_cfi_mask = rule_field->ctag_cfi_mask;
+        rule->pppoe_sessionid = rule_field->pppoe_sessionid;
+        rule->pppoe_sessionid_mask = rule_field->pppoe_sessionid_mask;
+
+        /*ipv4 fields*/
+        rule->src_ip4_val = rule_field->src_ip4_val;
+        rule->src_ip4_mask = rule_field->src_ip4_mask;
+        rule->dest_ip4_val = rule_field->dest_ip4_val;
+        rule->dest_ip4_mask = rule_field->dest_ip4_mask;
+        rule->is_ipv4_option_mask = rule_field->is_ipv4_option_mask;
+        rule->is_ipv4_option_val = rule_field->is_ipv4_option_val;
+
+        /*ipv6 fields*/
+        aos_mem_copy(rule->src_ip6_val.ul,
+            rule_field->src_ip6_val.ul, sizeof(fal_ip6_addr_t));
+        aos_mem_copy(rule->src_ip6_mask.ul,
+            rule_field->src_ip6_mask.ul, sizeof(fal_ip6_addr_t));
+        aos_mem_copy(rule->dest_ip6_val.ul,
+            rule_field->dest_ip6_val.ul, sizeof(fal_ip6_addr_t));
+        aos_mem_copy(rule->dest_ip6_mask.ul,
+            rule_field->dest_ip6_mask.ul, sizeof(fal_ip6_addr_t));
+        rule->is_mobility_header_mask = rule_field->is_mobility_header_mask;
+        rule->is_mobility_header_val = rule_field->is_mobility_header_val;
+        rule->is_fragment_header_mask = rule_field->is_fragment_header_mask;
+        rule->is_fragment_header_val = rule_field->is_fragment_header_val;
+        rule->is_other_header_mask = rule_field->is_other_header_mask;
+        rule->is_other_header_val = rule_field->is_other_header_val;
+
+        /*ip fields*/
+        rule->ip_proto_val = rule_field->ip_proto_val;
+        rule->ip_proto_mask = rule_field->ip_proto_mask;
+        rule->ip_dscp_val = rule_field->ip_dscp_val;
+        rule->ip_dscp_mask = rule_field->ip_dscp_mask;
+        rule->dest_l4port_op = rule_field->dest_l4port_op;
+        rule->dest_l4port_val = rule_field->dest_l4port_val;
+        rule->dest_l4port_mask = rule_field->dest_l4port_mask;
+        rule->src_l4port_op = rule_field->src_l4port_op;
+        rule->src_l4port_val = rule_field->src_l4port_val;
+        rule->src_l4port_mask = rule_field->src_l4port_mask;
+        rule->tcp_flag_val = rule_field->tcp_flag_val;
+        rule->tcp_flag_mask = rule_field->tcp_flag_mask;
+        rule->icmp_type_code_op = rule_field->icmp_type_code_op;
+        rule->icmp_type_val = rule_field->icmp_type_val;
+        rule->icmp_type_mask = rule_field->icmp_type_mask;
+        rule->icmp_code_val = rule_field->icmp_code_val;
+        rule->icmp_code_mask = rule_field->icmp_code_mask;
+        rule->is_fragement_mask = rule_field->is_fragement_mask;
+        rule->is_fragement_val = rule_field->is_fragement_val;
+        rule->is_first_frag_mask = rule_field->is_first_frag_mask;
+        rule->is_first_frag_val = rule_field->is_first_frag_val;
+        rule->l3_ttl_mask = rule_field->l3_ttl_mask;
+        rule->l3_ttl = rule_field->l3_ttl;
+        rule->l3_length_op = rule_field->l3_length_op;
+        rule->l3_length = rule_field->l3_length;
+        rule->l3_length_mask = rule_field->l3_length_mask;
+        rule->l3_pkt_type_mask = rule_field->l3_pkt_type_mask;
+        rule->l3_pkt_type = rule_field->l3_pkt_type;
+        rule->is_ah_header_mask = rule_field->is_ah_header_mask;
+        rule->is_ah_header_val = rule_field->is_ah_header_val;
+        rule->is_esp_header_mask = rule_field->is_esp_header_mask;
+        rule->is_esp_header_val = rule_field->is_esp_header_val;
+
+        /*udf fields*/
+        rule->udf0_op = rule_field->udf0_op;
+        rule->udf0_val = rule_field->udf0_val;
+        rule->udf0_mask = rule_field->udf0_mask;
+        rule->udf1_op = rule_field->udf1_op;
+        rule->udf1_val = rule_field->udf1_val;
+        rule->udf1_mask = rule_field->udf1_mask;
+        rule->udf2_op = rule_field->udf2_op;
+        rule->udf2_val = rule_field->udf2_val;
+        rule->udf2_mask = rule_field->udf2_mask;
+        rule->udf3_val = rule_field->udf3_val;
+        rule->udf3_mask = rule_field->udf3_mask;
+        rule->udfprofile_val = rule_field->udfprofile_val;
+        rule->udfprofile_mask = rule_field->udfprofile_mask;
+    }
+    return;
+}
+
+sw_error_t
+_adpt_hppe_acl_rule_type_map(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
+		fal_acl_rule_t * rule, fal_acl_rule_t * inner_rule,
+		a_uint32_t * rule_type_map, a_uint32_t * inner_rule_type_map)
+{
+	a_uint32_t tunnel_rule_type_map = 0;
+	if(rule->rule_type == FAL_ACL_RULE_IP4 ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4)
+	{
+		_adpt_hppe_acl_ipv4_fields_check(dev_id, rule_id, rule_nr, rule,
+			rule_type_map);
+	}
+	else if(rule->rule_type == FAL_ACL_RULE_IP6 ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP6)
+	{
+		_adpt_hppe_acl_ipv6_fields_check(dev_id, rule_id, rule_nr, rule,
+			rule_type_map);
+	}
+	_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
+
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+#if defined(APPE)
+		_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
+
+		if(rule->rule_type == FAL_ACL_RULE_TUNNEL_MAC ||
+			rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4 ||
+			rule->rule_type == FAL_ACL_RULE_TUNNEL_IP6 ||
+			rule->rule_type == FAL_ACL_RULE_TUNNEL_UDF)
+		{
+			if(rule->inner_rule_field.rule_type == FAL_ACL_RULE_IP4)
+			{
+				_adpt_hppe_acl_ipv4_fields_check(dev_id, rule_id, rule_nr,
+					inner_rule, inner_rule_type_map);
+			}
+			if(rule->inner_rule_field.rule_type == FAL_ACL_RULE_IP6)
+			{
+				_adpt_hppe_acl_ipv6_fields_check(dev_id, rule_id, rule_nr,
+					inner_rule, inner_rule_type_map);
+			}
+			_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, inner_rule,
+					inner_rule_type_map);
+			_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, inner_rule,
+					inner_rule_type_map);
+			_adpt_appe_pre_acl_tunnel_info_fields_check(dev_id, rule_id, rule_nr,
+					&rule->tunnel_info, &tunnel_rule_type_map);
+			if(*inner_rule_type_map == 0)
+			{ /*inner ip_nonip/ip_ver*/
+				if((FAL_FIELD_FLG_TST(inner_rule->field_flg, FAL_ACL_FIELD_IP)) ||
+				(FAL_FIELD_FLG_TST(inner_rule->field_flg, FAL_ACL_FIELD_IPV6)))
+				{
+					*inner_rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
+				}
+			}
+		}
+#endif
+	}
+	else
+	{
+		_adpt_hppe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
+	}
+
+	if(*rule_type_map == 0)
+	{/*outer ip_nonip/ip_ver*/
+		if((FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP)) ||
+			(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6)))
+		{
+			*rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
+		}
+	}
+	if(tunnel_rule_type_map != 0)
+	{
+		*rule_type_map |= tunnel_rule_type_map;
+	}
+	if(*rule_type_map == 0 && *inner_rule_type_map == 0)
+	{ /*match all*/
+		*rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
+	}
+
+	return SW_OK;
+}
+
 sw_error_t
 adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule)
 {
-	a_uint32_t rule_type_map = 0;
+	a_uint32_t rule_type_map = 0, inner_rule_type_map = 0;
 	a_uint32_t rule_type_count = 0;
 	a_uint32_t index = 0, hw_list_index = 0, hw_list_id = 0;
 	sw_error_t rv = 0;
-	union rule_ext_1_reg_u ext_1 = {0};
-	union rule_ext_2_reg_u ext_2 = {0};
-	union rule_ext_4_reg_u ext_4 = {0};
 	struct list_head *rule_pos = NULL;
 	ADPT_HPPE_ACL_SW_RULE *rule_exist_entry = NULL, *rule_add_entry = NULL;
 	ADPT_HPPE_ACL_SW_LIST *list_find_entry = NULL;
+	fal_acl_rule_t inner_rule;
+	aos_mem_zero(&inner_rule, sizeof(fal_acl_rule_t));
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(rule);
@@ -3463,7 +4128,14 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	{
 		return SW_OUT_OF_RANGE;
 	}
-
+	/*convert inner_rule_field*/
+	if(rule->rule_type == FAL_ACL_RULE_TUNNEL_MAC ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4 ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP6 ||
+		rule->rule_type == FAL_ACL_RULE_TUNNEL_UDF)
+	{
+		acl_rule_field_convert(&inner_rule, &rule->inner_rule_field, A_FALSE);
+	}
 	aos_lock_bh(&hppe_acl_lock[dev_id]);
 	list_find_entry = _adpt_hppe_acl_list_entry_get(dev_id, list_id);
 	if(list_find_entry == NULL)
@@ -3483,30 +4155,15 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		}
 	}
 
-	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
-				rule->field_flg[0], rule->field_flg[1]);
-	if(rule->rule_type == FAL_ACL_RULE_IP4)/*input ipv4 type*/
-	{
-		_adpt_hppe_acl_ipv4_fields_check(dev_id, list_id, rule_id, rule_nr, rule,
-			&rule_type_map);
-	}
-	else if(rule->rule_type == FAL_ACL_RULE_IP6)/*input ipv6 type*/
-	{
-		_adpt_hppe_acl_ipv6_fields_check(dev_id, list_id, rule_id, rule_nr, rule,
-			&rule_type_map);
-	}
-	_adpt_hppe_acl_udf_fields_check(dev_id, list_id, rule_id, rule_nr, rule, &rule_type_map);
-	_adpt_hppe_acl_l2_fields_check(dev_id, list_id, rule_id, rule_nr, rule, &rule_type_map);
+	/*caculate rule_type_map and inner_rule_type_map*/
+	_adpt_hppe_acl_rule_type_map(dev_id, rule_id, rule_nr, rule, &inner_rule,
+					&rule_type_map, &inner_rule_type_map);
 
-	if(rule_type_map == 0)
-	{
-		rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
-	}
-
-	SSDK_DEBUG("rule_type_map = 0x%x\n", rule_type_map);
-
+	/*caculate rule type counts */
 	rule_type_count = _acl_bits_count(rule_type_map, ADPT_ACL_HPPE_RULE_TYPE_NUM, 0);
-	SSDK_DEBUG("rule_type_count = %d\n", rule_type_count);
+	rule_type_count += _acl_bits_count(inner_rule_type_map, ADPT_ACL_HPPE_RULE_TYPE_NUM, 0);
+	SSDK_DEBUG("rule_type_map = 0x%x, inner_rule_type_map = 0x%x, rule_type_count = %d\n",
+				rule_type_map, inner_rule_type_map, rule_type_count);
 
 	if(rule_type_count == 0 || rule_type_count > ADPT_ACL_ENTRY_NUM_PER_LIST)
 	{
@@ -3515,8 +4172,9 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		return SW_NOT_SUPPORTED;
 	}
 
-	rv = _adpt_hppe_acl_alloc_entries(dev_id, &hw_list_index, rule_id, rule_nr, rule,
-		rule_type_map, rule_type_count, &index);
+	/*allocate hw entries */
+	rv = _adpt_hppe_acl_alloc_entries(dev_id, &hw_list_index, rule_id, rule_nr,
+			rule, &inner_rule, rule_type_count, &index);
 	if(rv != SW_OK)
 	{
 		SSDK_ERROR("Alloc hw entries fail for rule %d\n", rule_id);
@@ -3531,34 +4189,23 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_count);
 
 	hw_list_id = g_acl_hw_list[dev_id][hw_list_index].hw_list_id;
-	rv = _adpt_hppe_acl_rule_hw_add(dev_id, list_find_entry, hw_list_id, rule_id, rule_nr, rule,
-		rule_type_map, s_acl_entries[index].entries);
+	/* set hw acl rule and action reg*/
+	rv = _adpt_ppe_acl_rule_hw_add(dev_id, list_find_entry->list_pri, hw_list_id,
+		rule_id, rule_nr, rule, &inner_rule, rule_type_map, inner_rule_type_map,
+		s_acl_entries[index].entries);
 	if(rv != SW_OK)
 	{
 		aos_unlock_bh(&hppe_acl_lock[dev_id]);
 		return rv;
 	}
 
-	if(s_acl_entries[index].ext_1 != 0)
+	/* set hw rule ext reg */
+	rv = _adpt_ppe_acl_rule_ext_set(dev_id, hw_list_id, s_acl_entries[index].ext_1,
+		s_acl_entries[index].ext_2, s_acl_entries[index].ext_4);
+	if(rv != SW_OK)
 	{
-		rv |= hppe_rule_ext_1_reg_get(dev_id, hw_list_id, &ext_1);
-		ext_1.val |= s_acl_entries[index].ext_1;
-		SSDK_DEBUG("ext_1.val = 0x%x\n", ext_1.val);
-		rv |= hppe_rule_ext_1_reg_set(dev_id, hw_list_id, &ext_1);
-	}
-	if(s_acl_entries[index].ext_2 != 0)
-	{
-		rv |= hppe_rule_ext_2_reg_get(dev_id, hw_list_id, &ext_2);
-		ext_2.val |= s_acl_entries[index].ext_2;
-		SSDK_DEBUG("ext_2.val = 0x%x\n", ext_2.val);
-		rv |= hppe_rule_ext_2_reg_set(dev_id, hw_list_id, &ext_2);
-	}
-	if(s_acl_entries[index].ext_4 != 0)
-	{
-		rv |= hppe_rule_ext_4_reg_get(dev_id, hw_list_id, &ext_4);
-		ext_4.val |= s_acl_entries[index].ext_4;
-		SSDK_DEBUG("ext_4.val = 0x%x\n", ext_4.val);
-		rv |= hppe_rule_ext_4_reg_set(dev_id, hw_list_id, &ext_4);
+		aos_unlock_bh(&hppe_acl_lock[dev_id]);
+		return rv;
 	}
 
 	/*record sw info and insert the sw rule entry to the sw list entry*/
@@ -3570,7 +4217,8 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		return SW_FAIL;
 	}
 	rule_add_entry->rule_id = rule_id;
-	rule_add_entry->rule_type = rule->rule_type;
+	rule_add_entry->rule_type[0] = rule->rule_type;
+	rule_add_entry->rule_type[1] = rule->inner_rule_field.rule_type;
 	rule_add_entry->rule_hw_entry = s_acl_entries[index].entries;
 	rule_add_entry->rule_hw_list_id = hw_list_id;
 	rule_add_entry->ext1_val = s_acl_entries[index].ext_1;
@@ -3596,28 +4244,17 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 }
 
 static sw_error_t
-_adpt_hppe_acl_rule_delete(a_uint32_t dev_id, a_uint32_t list_id,
-		ADPT_HPPE_ACL_SW_RULE *rule_entry, a_uint32_t rule_nr)
+_adpt_hppe_acl_rule_hw_delete(a_uint32_t dev_id,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries, a_uint32_t rule_nr)
 {
-	sw_error_t rv = 0;
-	a_uint32_t hw_index = 0, hw_entries = 0, hw_list_id = 0, hw_list_index = 0, i = 0;
+	a_uint32_t hw_index = 0;
+	sw_error_t rv = SW_OK;
 	union ipo_rule_reg_u hw_reg = {0};
 	union ipo_mask_reg_u hw_mask = {0};
 	union ipo_action_u hw_act = {0};
-	union rule_ext_1_reg_u ext_1 = {0};
-	union rule_ext_2_reg_u ext_2 = {0};
-	union rule_ext_4_reg_u ext_4 = {0};
-
-	hw_entries = rule_entry->rule_hw_entry;
-	hw_list_id = rule_entry->rule_hw_list_id;
-	/* msg for debug */
-	SSDK_DEBUG("ACL delete rule entry before:list_id=%d, rule_id=%d, "
-		"hw_entries=0x%x, hw_list_id=%d\n", list_id,
-		rule_entry->rule_id, rule_entry->rule_hw_entry,
-		rule_entry->rule_hw_list_id);
+	union ipo_cnt_tbl_u counters = {0};
 	while(hw_entries != 0)
 	{
-		union ipo_cnt_tbl_u counters = {0};
 		hw_index = _acl_bit_index(hw_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
 		if(hw_index >= ADPT_ACL_ENTRY_NUM_PER_LIST)
 		{
@@ -3638,31 +4275,60 @@ _adpt_hppe_acl_rule_delete(a_uint32_t dev_id, a_uint32_t list_id,
 		hppe_ipo_cnt_tbl_set(dev_id,
 			hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_index, &counters);
 	}
+	return rv;
+}
 
-	if(rule_entry->ext1_val)
+static sw_error_t
+_adpt_ppe_acl_rule_hw_delete(a_uint32_t dev_id,
+		a_uint32_t hw_list_id, a_uint32_t hw_entries, a_uint32_t rule_nr)
+{
+	sw_error_t rv = SW_OK;
+	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
 	{
-		rv |= hppe_rule_ext_1_reg_get(dev_id, hw_list_id, &ext_1);
-		ext_1.val &= (~rule_entry->ext1_val);
-		SSDK_DEBUG("ext_1.val = 0x%x\n", ext_1.val);
-		rv |= hppe_rule_ext_1_reg_set(dev_id, hw_list_id, &ext_1);
+		rv = _adpt_hppe_acl_rule_hw_delete(dev_id, hw_list_id,
+					hw_entries, rule_nr);
+		SW_RTN_ON_ERROR(rv);
 	}
-	if(rule_entry->ext2_val)
+#if defined(APPE)
+	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
 	{
-		rv |= hppe_rule_ext_2_reg_get(dev_id, hw_list_id, &ext_2);
-		ext_2.val &= (~rule_entry->ext2_val);
-		SSDK_DEBUG("ext_2.val = 0x%x\n", ext_2.val);
-		rv |= hppe_rule_ext_2_reg_set(dev_id, hw_list_id, &ext_2);
+		rv = _adpt_appe_pre_acl_rule_hw_delete(dev_id, hw_list_id - ADPT_ACL_HW_LIST_NUM,
+					hw_entries, rule_nr);
+		SW_RTN_ON_ERROR(rv);
 	}
-	if(rule_entry->ext4_val)
-	{
-		rv |= hppe_rule_ext_4_reg_get(dev_id, hw_list_id, &ext_4);
-		ext_4.val &= (~rule_entry->ext4_val);
-		SSDK_DEBUG("ext_4.val = 0x%x\n", ext_4.val);
-		rv |= hppe_rule_ext_4_reg_set(dev_id, hw_list_id, &ext_4);
-	}
+	rv = _adpt_appe_acl_policy_id_clear(dev_id, hw_list_id, hw_entries);
+#endif
+	return rv;
+}
+
+static sw_error_t
+_adpt_hppe_acl_rule_delete(a_uint32_t dev_id, a_uint32_t list_id,
+		ADPT_HPPE_ACL_SW_RULE *rule_entry, a_uint32_t rule_nr)
+{
+	sw_error_t rv = 0;
+	a_uint32_t hw_entries = 0, hw_list_id = 0, hw_list_index = 0;
+	a_uint32_t i = 0, end = ADPT_ACL_HW_LIST_NUM;
+
+	hw_entries = rule_entry->rule_hw_entry;
+	hw_list_id = rule_entry->rule_hw_list_id;
+	/* msg for debug */
+	SSDK_DEBUG("ACL delete rule entry before:list_id=%d, rule_id=%d, "
+		"hw_entries=0x%x, hw_list_id=%d\n", list_id,
+		rule_entry->rule_id, rule_entry->rule_hw_entry,
+		rule_entry->rule_hw_list_id);
+
+	/*clear hw rule reg and action reg*/
+	rv = _adpt_ppe_acl_rule_hw_delete(dev_id, hw_list_id, hw_entries, rule_nr);
+
+	/*clear hw rule ext reg */
+	rv |= _adpt_ppe_acl_rule_ext_clear(dev_id, hw_list_id,
+			rule_entry->ext1_val, rule_entry->ext2_val, rule_entry->ext4_val);
 
 	/*find hw_list_index*/
-	for(i = 0; i < ADPT_ACL_HW_LIST_NUM; i++)
+#if defined(APPE)
+	end += ADPT_PRE_ACL_HW_LIST_NUM;
+#endif
+	for(i = 0; i < end; i++)
 	{
 		if(g_acl_hw_list[dev_id][i].hw_list_id == hw_list_id)
 		{
@@ -3730,19 +4396,15 @@ adpt_hppe_acl_rule_delete(a_uint32_t dev_id, a_uint32_t list_id,
 }
 
 static sw_error_t
-_adpt_hppe_acl_rule_dump(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW_RULE *rule_entry)
+_adpt_hppe_acl_rule_dump(a_uint32_t dev_id, a_uint32_t hw_list_id, a_uint32_t hw_entries)
 {
 	a_uint8_t i = 0;
-	a_uint8_t hw_entries = rule_entry->rule_hw_entry;
-	a_uint32_t hw_list_id = rule_entry->rule_hw_list_id;
 	union ipo_rule_reg_u hw_reg = {0};
 	union ipo_mask_reg_u hw_mask = {0};
 	union ipo_action_u hw_act = {0};
 
 	if(hw_entries != 0)
 	{
-		printk("######list_id %d, rule_id %d, hw_list_id %d\n", list_id,
-			rule_entry->rule_id, hw_list_id);
 		for(i = 0; i < ADPT_ACL_ENTRY_NUM_PER_LIST; i++)
 		{
 			if((1<<i) & hw_entries)
@@ -3767,18 +4429,41 @@ _adpt_hppe_acl_rule_dump(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW
 	return SW_OK;
 }
 
+static sw_error_t
+_adpt_ppe_acl_rule_dump(a_uint32_t dev_id, a_uint32_t list_id, ADPT_HPPE_ACL_SW_RULE *rule_entry)
+{
+	a_uint32_t hw_entries = rule_entry->rule_hw_entry;
+	a_uint32_t hw_list_id = rule_entry->rule_hw_list_id;
+	printk("######list_id %d, rule_id %d, hw_list_id %d, hw_entries 0x%x\n", list_id,
+				rule_entry->rule_id, hw_list_id, hw_entries);
+	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
+	{
+		return _adpt_hppe_acl_rule_dump(dev_id, hw_list_id, hw_entries);
+	}
+#if defined(APPE)
+	else if (hw_list_id < ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM)
+	{
+		return _adpt_appe_pre_acl_rule_dump(dev_id,
+				hw_list_id - ADPT_ACL_HW_LIST_NUM , hw_entries);
+	}
+#endif
+	return SW_OK;
+}
+
 sw_error_t
 adpt_hppe_acl_rule_dump(a_uint32_t dev_id)
 {
-	a_uint8_t hw_list_index = 0;
+	a_uint8_t hw_list_index = 0, end = ADPT_ACL_HW_LIST_NUM;
 	struct list_head *list_pos = NULL, *rule_pos = NULL;
 	ADPT_HPPE_ACL_SW_LIST *list_dump_entry = NULL;
 	ADPT_HPPE_ACL_SW_RULE *rule_dump_entry = NULL;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-
+#if defined(APPE)
+	end += ADPT_PRE_ACL_HW_LIST_NUM;
+#endif
 	/*dump the hw list status for debug*/
-	for(hw_list_index = 0; hw_list_index < ADPT_ACL_HW_LIST_NUM; hw_list_index++)
+	for(hw_list_index = 0; hw_list_index < end; hw_list_index++)
 	{
 		SSDK_DEBUG("hw_list_index=%d, hw_list_valid=%d, hw_list_id=%d, "
 			"free_hw_entry_bitmap=0x%x, free_hw_entry_count=%d\n", hw_list_index,
@@ -3795,7 +4480,7 @@ adpt_hppe_acl_rule_dump(a_uint32_t dev_id)
 		list_for_each(rule_pos, &list_dump_entry->list_sw_rule)
 		{
 			rule_dump_entry = list_entry(rule_pos, ADPT_HPPE_ACL_SW_RULE, list);
-			_adpt_hppe_acl_rule_dump(dev_id, list_dump_entry->list_id, rule_dump_entry);
+			_adpt_ppe_acl_rule_dump(dev_id, list_dump_entry->list_id, rule_dump_entry);
 		}
 	}
 	aos_unlock_bh(&hppe_acl_lock[dev_id]);
@@ -4023,7 +4708,9 @@ void adpt_hppe_acl_func_bitmap_init(a_uint32_t dev_id)
 							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETFIRST)|
 							(1<<FUNC_ACL_UDF_PROFILE_ENTRY_GETNEXT)|
 							(1<<FUNC_ACL_UDF_PROFILE_CFG_SET)|
-							(1<<FUNC_ACL_UDF_PROFILE_CFG_GET));
+							(1<<FUNC_ACL_UDF_PROFILE_CFG_GET)|
+							(1<<FUNC_ACL_VPGROUP_SET)|
+							(1<<FUNC_ACL_VPGROUP_GET));
 	}
 #endif
 	return;
@@ -4051,22 +4738,19 @@ static void adpt_hppe_acl_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_
 	p_adpt_api->adpt_acl_udf_profile_entry_getnext = NULL;
 	p_adpt_api->adpt_acl_udf_profile_cfg_set = NULL;
 	p_adpt_api->adpt_acl_udf_profile_cfg_get = NULL;
+	p_adpt_api->adpt_acl_vpgroup_set = NULL;
+	p_adpt_api->adpt_acl_vpgroup_get = NULL;
 
 	return;
 }
 
-sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
+static sw_error_t
+_adpt_hppe_acl_hw_list_init(a_uint32_t dev_id, a_uint32_t hw_list_start, a_uint32_t hw_list_end)
+
 {
-	adpt_api_t *p_adpt_api = NULL;
-	a_uint8_t hw_list_index = 0;
-	p_adpt_api = adpt_api_ptr_get(dev_id);
+	a_uint32_t hw_list_index;
 
-	if(p_adpt_api == NULL)
-	{
-		return SW_FAIL;
-	}
-
-	for(hw_list_index = 0; hw_list_index < ADPT_ACL_HW_LIST_NUM; hw_list_index++)
+	for(hw_list_index = hw_list_start; hw_list_index < hw_list_end; hw_list_index++)
 	{
 		if(g_acl_hw_list[dev_id][hw_list_index].hw_list_valid == A_FALSE)
 		{
@@ -4074,11 +4758,29 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 			g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_count =
 				ADPT_ACL_ENTRY_NUM_PER_LIST;
 			g_acl_hw_list[dev_id][hw_list_index].hw_list_id =
-				ADPT_ACL_HW_LIST_NUM - 1 - hw_list_index;
+				hw_list_start + hw_list_end - 1 - hw_list_index;
 			g_acl_hw_list [dev_id][hw_list_index].hw_list_valid = A_TRUE;
 			INIT_LIST_HEAD(&g_acl_sw_list[dev_id].list_sw_list);
 		}
 	}
+
+	return SW_OK;
+}
+sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
+{
+	adpt_api_t *p_adpt_api = NULL;
+	p_adpt_api = adpt_api_ptr_get(dev_id);
+
+	ADPT_NULL_POINT_CHECK(p_adpt_api);
+
+	_adpt_hppe_acl_hw_list_init(dev_id, 0, ADPT_ACL_HW_LIST_NUM);
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		_adpt_hppe_acl_hw_list_init(dev_id, ADPT_ACL_HW_LIST_NUM,
+			ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM);
+	}
+#endif
 
 	adpt_hppe_acl_func_unregister(dev_id, p_adpt_api);
 
@@ -4159,6 +4861,16 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 		{
 			p_adpt_api->adpt_acl_udf_profile_cfg_get =
 					adpt_appe_acl_udf_profile_cfg_get;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_VPGROUP_SET))
+		{
+			p_adpt_api->adpt_acl_vpgroup_set =
+					adpt_appe_acl_vpgroup_set;
+		}
+		if(p_adpt_api->adpt_acl_func_bitmap & (1<<FUNC_ACL_VPGROUP_GET))
+		{
+			p_adpt_api->adpt_acl_vpgroup_get =
+					adpt_appe_acl_vpgroup_get;
 		}
 	}
 #endif

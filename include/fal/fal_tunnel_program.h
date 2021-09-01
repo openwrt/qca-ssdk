@@ -30,21 +30,6 @@ extern "C" {
 #include "fal_type.h"
 #include "fal_tunnel.h"
 
-typedef enum {
-	FAL_ETHERNET_HDR =0,
-	FAL_ETHERNET_TAG_HDR,
-	FAL_IPV4_HDR,
-	FAL_IPV6_HDR,
-	FAL_UDP_HDR,
-	FAL_UDP_LITE_HDR,
-	FAL_TCP_HDR,
-	FAL_GRE_HDR,
-	FAL_VXLAN_HDR,
-	FAL_VXLAN_GPE_HDR,
-	FAL_GENEVE_HDR,
-	FAL_BUTT,
-} fal_hdr_type_t;
-
 typedef struct {
 	a_uint8_t ip_ver;  /*ip version of outer packet, 1 ipv4, 2 ipv6, 3 ipv4 or ipv6 */
 	fal_hdr_type_t outer_hdr_type; /*current(outer) hdr type*/

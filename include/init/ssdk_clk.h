@@ -33,6 +33,10 @@ extern "C" {
 #define UNIPHY0_PORT5_DISABLE_ID	"uniphy0_port5_dis"
 #define UNIPHY0_PORT_4_5_RESET_ID	"uniphy0_port_4_5_rst"
 #define UNIPHY0_PORT_4_RESET_ID	"uniphy0_port_4_rst"
+#define UNIPHY2_PORT_6_DISABLE_ID	"uniphy2_port6_dis"
+#define UNIPHY0_SYS_RESET_ID	"uniphy0_sys_rst"
+#define UNIPHY1_SYS_RESET_ID	"uniphy1_sys_rst"
+#define UNIPHY2_SYS_RESET_ID	"uniphy2_sys_rst"
 
 #define SSDK_PORT1_RESET_ID	"nss_port1_rst"
 #define SSDK_PORT2_RESET_ID	"nss_port2_rst"
@@ -40,6 +44,12 @@ extern "C" {
 #define SSDK_PORT4_RESET_ID	"nss_port4_rst"
 #define SSDK_PORT5_RESET_ID	"nss_port5_rst"
 #define SSDK_PORT6_RESET_ID	"nss_port6_rst"
+#define SSDK_PORT1_MAC_RESET_ID	"nss_port1_mac_rst"
+#define SSDK_PORT2_MAC_RESET_ID	"nss_port2_mac_rst"
+#define SSDK_PORT3_MAC_RESET_ID	"nss_port3_mac_rst"
+#define SSDK_PORT4_MAC_RESET_ID	"nss_port4_mac_rst"
+#define SSDK_PORT5_MAC_RESET_ID	"nss_port5_mac_rst"
+#define SSDK_PORT6_MAC_RESET_ID	"nss_port6_mac_rst"
 
 enum ssdk_rst_action {
         SSDK_RESET_DEASSERT      = 0,
@@ -60,6 +70,10 @@ enum unphy_rst_type {
 	UNIPHY0_PORT5_DISABLE_E,
 	UNIPHY0_PORT_4_5_RESET_E,
 	UNIPHY0_PORT_4_RESET_E,
+	UNIPHY2_PORT6_DISABLE_E,
+	UNIPHY0_SYS_RESET_E,
+	UNIPHY1_SYS_RESET_E,
+	UNIPHY2_SYS_RESET_E,
 	UNIPHY_RST_MAX
 };
 
@@ -224,7 +238,9 @@ enum mp_bcr_rst_type {
 #define NSS_IMEM_RATE               400000000
 #define PTP_REF_RARE                150000000
 #define NSS_AXI_RATE                461500000
-#define NSS_PORT5_DFLT_RATE         19200000
+#define NSS_HPPE_PORT5_DFLT_RATE    19200000
+#define NSS_CPPE_PORT5_DFLT_RATE    24000000
+#define NSS_APPE_PORT5_DFLT_RATE    24000000
 
 #define UNIPHY_CLK_RATE_25M         25000000
 #define UNIPHY_CLK_RATE_50M         50000000
@@ -249,6 +265,9 @@ enum mp_bcr_rst_type {
 #define CPPE_XGMAC_CLK_REG          0x0194900c
 #define CPPE_XGMAC_CLK_SIZE         0x10
 #define CPPE_XGMAC_CLK_ENABLE       0x20
+
+#define APPE_UNIPHY_SYS_CLK_RATE    24000000
+#define APPE_CLK_RATE               353000000
 
 enum {
 	UNIPHY_RX = 0,
@@ -291,6 +310,9 @@ void ssdk_uniphy_raw_clock_set(
 	a_uint8_t uniphy_index,
 	a_uint8_t direction,
 	a_uint32_t clock);
+void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+	a_bool_t enable);
+void ssdk_uniphy_port5_clock_source_set(void);
 #endif
 
 #if defined(MP)
@@ -298,6 +320,16 @@ void ssdk_mp_raw_clock_set(
 	a_uint8_t uniphy_index,
 	a_uint8_t direction,
 	a_uint32_t clock);
+void ssdk_mp_gephy_icc_efuse_load_enable(
+	a_bool_t enable);
+
+#endif
+
+#if defined(APPE)
+void ssdk_appe_port_speed_clock_set(
+	a_uint32_t dev_id,
+	a_uint32_t port_id,
+	a_uint32_t *clk);
 #endif
 
 #ifdef __cplusplus

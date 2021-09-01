@@ -263,6 +263,12 @@ enum {
 	FUNC_PORT_VLAN_MEMBER_GET,
 	FUNC_PORT_VLAN_VPGROUP_SET,
 	FUNC_PORT_VLAN_VPGROUP_GET,
+	FUNC_PORT_VLAN_ISOL_SET,
+	FUNC_PORT_VLAN_ISOL_GET,
+	FUNC_PORT_VLAN_ISOL_GROUP_SET,
+	FUNC_PORT_VLAN_ISOL_GROUP_GET,
+	FUNC_PORT_EGRESS_VLAN_FILTER_SET,
+	FUNC_PORT_EGRESS_VLAN_FILTER_GET,
 };
 
 sw_error_t
@@ -385,25 +391,31 @@ fal_port_default_cvid_get(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_port_vlan_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_vlan_propagation_mode_t * mode);
+#endif
 
 sw_error_t
 fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
 
+#ifndef IN_PORTVLAN_MINI
 sw_error_t
 fal_port_vlan_trans_del(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
 
 sw_error_t
 fal_port_vlan_trans_get(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
+#endif
 
 sw_error_t
 fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode);
 
+#ifndef IN_PORTVLAN_MINI
 sw_error_t
 fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode);
+#endif
 
 sw_error_t
 fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t role);
 
+#ifndef IN_PORTVLAN_MINI
 sw_error_t
 fal_port_qinq_role_get(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t * role);
 
@@ -445,11 +457,13 @@ fal_port_vrf_id_get(a_uint32_t dev_id, fal_port_t port_id,
 
 #define FAL_GLOBAL_QINQ_MODE_INGRESS_EN (0x1UL << 0)
 #define FAL_GLOBAL_QINQ_MODE_EGRESS_EN (0x1UL << 1)
-typedef struct {
-	a_uint32_t mask;/*bit 0 for ingress and bit 1 for egress*/
-	fal_qinq_mode_t ingress_mode; /* ingress direction mode */
-	fal_qinq_mode_t egress_mode; /* egress direction mode */
-} fal_global_qinq_mode_t;
+#define FAL_GLOBAL_QINQ_MODE_EGRESS_UNTOUCHED_FOR_CPU_CODE (0x1UL << 2)
+	typedef struct {
+	    a_uint32_t mask;/*bit 0 for ingress and bit 1 for egress*/
+	    fal_qinq_mode_t ingress_mode; /* ingress direction mode */
+	    fal_qinq_mode_t egress_mode; /* egress direction mode */
+	    a_bool_t untouched_for_cpucode; /*egress untouched with cpu_code!=0 to cpu port 0 */
+	} fal_global_qinq_mode_t;
 
 #define FAL_PORT_QINQ_ROLE_INGRESS_EN (0x1UL << 0)
 #define FAL_PORT_QINQ_ROLE_EGRESS_EN (0x1UL << 1)
@@ -616,6 +630,33 @@ typedef struct
 	a_uint64_t tx_byte_counter; /* egress vlan translation byte counter */
 } fal_port_vlan_counter_t;
 
+typedef struct {
+	a_bool_t enable; /*enable or not */
+	a_uint8_t group_id; /* isolation group id */
+} fal_portvlan_isol_ctrl_t;
+
+typedef struct {
+	a_bool_t membership_filter; /* membership filter or not for vport */
+} fal_egress_vlan_filter_t;
+
+sw_error_t
+fal_port_egress_vlan_filter_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+sw_error_t
+fal_port_egress_vlan_filter_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+sw_error_t
+fal_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+sw_error_t
+fal_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+sw_error_t
+fal_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+sw_error_t
+fal_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
 sw_error_t
 fal_port_vlan_counter_get(a_uint32_t dev_id, a_uint32_t cnt_index,
 		fal_port_vlan_counter_t * counter);

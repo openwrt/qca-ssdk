@@ -2881,6 +2881,29 @@ union ecn_map_mode0_0_u {
 	struct ecn_map_mode0_0 bf;
 };
 
+/*[register] ECN_MAP_MODE0_1*/
+#define ECN_MAP_MODE0_1
+#define ECN_MAP_MODE0_1_ADDRESS 0x43c4
+#define ECN_MAP_MODE0_1_NUM     1
+#define ECN_MAP_MODE0_1_INC     0x4
+#define ECN_MAP_MODE0_1_TYPE    REG_TYPE_RW
+#define ECN_MAP_MODE0_1_DEFAULT 0x1000
+	/*[field] EXCEPTION_EN*/
+	#define ECN_MAP_MODE0_1_EXCEPTION_EN
+	#define ECN_MAP_MODE0_1_EXCEPTION_EN_OFFSET  0
+	#define ECN_MAP_MODE0_1_EXCEPTION_EN_LEN     16
+	#define ECN_MAP_MODE0_1_EXCEPTION_EN_DEFAULT 0x1000
+
+struct ecn_map_mode0_1 {
+	a_uint32_t  exception_en:16;
+	a_uint32_t  _reserved0:16;
+};
+
+union ecn_map_mode0_1_u {
+	a_uint32_t val;
+	struct ecn_map_mode0_1 bf;
+};
+
 /*[register] ECN_MAP_MODE1_0*/
 #define ECN_MAP_MODE1_0
 #define ECN_MAP_MODE1_0_ADDRESS 0x43d0
@@ -2903,6 +2926,29 @@ union ecn_map_mode1_0_u {
 	struct ecn_map_mode1_0 bf;
 };
 
+/*[register] ECN_MAP_MODE1_1*/
+#define ECN_MAP_MODE1_1
+#define ECN_MAP_MODE1_1_ADDRESS 0x43d4
+#define ECN_MAP_MODE1_1_NUM     1
+#define ECN_MAP_MODE1_1_INC     0x4
+#define ECN_MAP_MODE1_1_TYPE    REG_TYPE_RW
+#define ECN_MAP_MODE1_1_DEFAULT 0x0
+	/*[field] EXCEPTION_EN*/
+	#define ECN_MAP_MODE1_1_EXCEPTION_EN
+	#define ECN_MAP_MODE1_1_EXCEPTION_EN_OFFSET  0
+	#define ECN_MAP_MODE1_1_EXCEPTION_EN_LEN     16
+	#define ECN_MAP_MODE1_1_EXCEPTION_EN_DEFAULT 0x0
+
+struct ecn_map_mode1_1 {
+	a_uint32_t  exception_en:16;
+	a_uint32_t  _reserved0:16;
+};
+
+union ecn_map_mode1_1_u {
+	a_uint32_t val;
+	struct ecn_map_mode1_1 bf;
+};
+
 /*[register] ECN_MAP_MODE2_0*/
 #define ECN_MAP_MODE2_0
 #define ECN_MAP_MODE2_0_ADDRESS 0x43e0
@@ -2923,5 +2969,28 @@ struct ecn_map_mode2_0 {
 union ecn_map_mode2_0_u {
 	a_uint32_t val;
 	struct ecn_map_mode2_0 bf;
+};
+
+/*[register] ECN_MAP_MODE2_1*/
+#define ECN_MAP_MODE2_1
+#define ECN_MAP_MODE2_1_ADDRESS 0x43e4
+#define ECN_MAP_MODE2_1_NUM     1
+#define ECN_MAP_MODE2_1_INC     0x4
+#define ECN_MAP_MODE2_1_TYPE    REG_TYPE_RW
+#define ECN_MAP_MODE2_1_DEFAULT 0x1000
+	/*[field] EXCEPTION_EN*/
+	#define ECN_MAP_MODE2_1_EXCEPTION_EN
+	#define ECN_MAP_MODE2_1_EXCEPTION_EN_OFFSET  0
+	#define ECN_MAP_MODE2_1_EXCEPTION_EN_LEN     16
+	#define ECN_MAP_MODE2_1_EXCEPTION_EN_DEFAULT 0x1000
+
+struct ecn_map_mode2_1 {
+	a_uint32_t  exception_en:16;
+	a_uint32_t  _reserved0:16;
+};
+
+union ecn_map_mode2_1_u {
+	a_uint32_t val;
+	struct ecn_map_mode2_1 bf;
 };
 #endif

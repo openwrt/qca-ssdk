@@ -698,6 +698,18 @@ typedef sw_error_t (*adpt_port_vlan_vpgroup_set_func)(a_uint32_t dev_id,
 		a_uint32_t vport, fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id);
 typedef sw_error_t (*adpt_port_vlan_vpgroup_get_func)(a_uint32_t dev_id,
 		a_uint32_t vport, fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id);
+typedef sw_error_t (*adpt_portvlan_isol_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+typedef sw_error_t (*adpt_portvlan_isol_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl);
+typedef sw_error_t (*adpt_portvlan_isol_group_set_func)(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+typedef sw_error_t (*adpt_portvlan_isol_group_get_func)(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp);
+typedef sw_error_t (*adpt_port_egress_vlan_filter_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
+typedef sw_error_t (*adpt_port_egress_vlan_filter_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
 /*portvlan module end*/
 
 /*ctrlpkt module end*/
@@ -743,6 +755,7 @@ typedef sw_error_t (*adpt_pppoe_en_get_func)(
 		a_uint32_t l3_if,
 		a_uint32_t *enable);
 
+/*sec module*/
 typedef sw_error_t (*adpt_sec_l3_excep_parser_ctrl_set_func)(
 		a_uint32_t dev_id,
 		fal_l3_excep_parser_ctrl *ctrl);
@@ -756,6 +769,26 @@ typedef sw_error_t (*adpt_sec_l3_excep_ctrl_set_func)(
 		a_uint32_t dev_id, a_uint32_t excep_type, fal_l3_excep_ctrl_t *ctrl);
 typedef sw_error_t (*adpt_sec_l4_excep_parser_ctrl_get_func)(
 		a_uint32_t dev_id, fal_l4_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_l2_excep_ctrl_set_func)(
+        a_uint32_t dev_id, a_uint32_t excep_type, fal_l2_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_l2_excep_ctrl_get_func)(
+		a_uint32_t dev_id, a_uint32_t excep_type, fal_l2_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_excep_ctrl_set_func)(
+		a_uint32_t dev_id, a_uint32_t excep_type, fal_tunnel_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_excep_ctrl_get_func)(
+		a_uint32_t dev_id, a_uint32_t excep_type, fal_tunnel_excep_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l3_excep_parser_ctrl_set_func)(
+		a_uint32_t dev_id, fal_l3_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l3_excep_parser_ctrl_get_func)(
+		a_uint32_t dev_id, fal_l3_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l4_excep_parser_ctrl_set_func)(
+		a_uint32_t dev_id, fal_l4_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_l4_excep_parser_ctrl_get_func)(
+		a_uint32_t dev_id, fal_l4_excep_parser_ctrl *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_flags_excep_parser_ctrl_set_func)(
+		a_uint32_t dev_id, a_uint32_t index, fal_tunnel_flags_excep_parser_ctrl_t *ctrl);
+typedef sw_error_t (*adpt_sec_tunnel_flags_excep_parser_ctrl_get_func)(
+		a_uint32_t dev_id, a_uint32_t index, fal_tunnel_flags_excep_parser_ctrl_t *ctrl);
 
 typedef sw_error_t (*adpt_acl_list_bind_func)(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t direc, fal_acl_bind_obj_t obj_t, a_uint32_t obj_idx);
 typedef sw_error_t (*adpt_acl_list_dump_func)(a_uint32_t dev_id);
@@ -786,6 +819,12 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_acl_udf_profile_cfg_get_func)(a_uint32_t dev_id, a_uint32_t profile_id,
 		a_uint32_t udf_idx, fal_acl_udf_type_t * udf_type, a_uint32_t * offset);
+typedef sw_error_t
+(*adpt_acl_vpgroup_set_func)(a_uint32_t dev_id, a_uint32_t vport_id,
+		fal_vport_type_t vport_type, a_uint32_t vpgroup_id);
+typedef sw_error_t
+(*adpt_acl_vpgroup_get_func)(a_uint32_t dev_id, a_uint32_t vport_id,
+		fal_vport_type_t vport_type, a_uint32_t * vpgroup_id);
 
 typedef sw_error_t (*adpt_qos_port_pri_set_func)(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_pri_precedence_t *pri);
@@ -1111,6 +1150,15 @@ typedef sw_error_t (*adpt_vport_state_check_set_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
 typedef sw_error_t (*adpt_vport_state_check_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
+typedef sw_error_t (*adpt_vport_cnt_cfg_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_vport_cnt_cfg_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_vport_cnt_flush_func)(a_uint32_t dev_id,
+		fal_port_t port_id);
+typedef sw_error_t (*adpt_vport_cnt_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_t *vp_cnt);
+
 /*vxlan*/
 typedef sw_error_t (*adpt_vxlan_entry_add_func)(a_uint32_t dev_id,
 	fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
@@ -1151,11 +1199,17 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_tunnel_decap_entry_flush_func)(a_uint32_t dev_id);
 typedef sw_error_t
-(*adpt_tunnel_decap_header_ctrl_set_func)(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+(*adpt_tunnel_encap_ecn_mode_get_func)(a_uint32_t dev_id,
+		fal_tunnel_encap_ecn_t *ecn_rule, fal_tunnel_ecn_val_t *ecn_value);
 typedef sw_error_t
-(*adpt_tunnel_decap_header_ctrl_get_func)(a_uint32_t dev_id,
-		fal_tunnel_decap_header_ctrl_t *header_ctrl);
+(*adpt_tunnel_encap_ecn_mode_set_func)(a_uint32_t dev_id,
+		fal_tunnel_encap_ecn_t *ecn_rule, fal_tunnel_ecn_val_t *ecn_value);
+typedef sw_error_t
+(*adpt_tunnel_decap_ecn_mode_get_func)(a_uint32_t dev_id,
+		fal_tunnel_decap_ecn_rule_t *ecn_rule, fal_tunnel_decap_ecn_action_t *ecn_action);
+typedef sw_error_t
+(*adpt_tunnel_decap_ecn_mode_set_func)(a_uint32_t dev_id,
+		fal_tunnel_decap_ecn_rule_t *ecn_rule, fal_tunnel_decap_ecn_action_t *ecn_action);
 typedef sw_error_t
 (*adpt_tunnel_encap_header_ctrl_set_func)(a_uint32_t dev_id,
 		fal_tunnel_encap_header_ctrl_t *header_ctrl);
@@ -1234,6 +1288,12 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_tunnel_udf_profile_cfg_get_func)(a_uint32_t dev_id, a_uint32_t profile_id,
 		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
+typedef sw_error_t
+(*adpt_tunnel_exp_decap_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, a_bool_t *enable);
+typedef sw_error_t
+(*adpt_tunnel_exp_decap_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, a_bool_t *enable);
 
 /*tunnel program*/
 typedef sw_error_t (*adpt_tunnel_program_entry_add_func)(a_uint32_t dev_id,
@@ -1606,6 +1666,12 @@ typedef struct
 	adpt_portvlan_member_get_func adpt_portvlan_member_get;
 	adpt_port_vlan_vpgroup_set_func adpt_port_vlan_vpgroup_set;
 	adpt_port_vlan_vpgroup_get_func adpt_port_vlan_vpgroup_get;
+	adpt_portvlan_isol_set_func adpt_portvlan_isol_set;
+	adpt_portvlan_isol_get_func adpt_portvlan_isol_get;
+	adpt_portvlan_isol_group_set_func adpt_portvlan_isol_group_set;
+	adpt_portvlan_isol_group_get_func adpt_portvlan_isol_group_get;
+	adpt_port_egress_vlan_filter_set_func adpt_port_egress_vlan_filter_set;
+	adpt_port_egress_vlan_filter_get_func adpt_port_egress_vlan_filter_get;
 	/*portvlan module end*/
 
 	/*ctrlpkt module begin*/
@@ -1648,6 +1714,16 @@ typedef struct
 	adpt_sec_l4_excep_parser_ctrl_set_func adpt_sec_l4_excep_parser_ctrl_set;
 	adpt_sec_l3_excep_ctrl_set_func adpt_sec_l3_excep_ctrl_set;
 	adpt_sec_l4_excep_parser_ctrl_get_func adpt_sec_l4_excep_parser_ctrl_get;
+	adpt_sec_l2_excep_ctrl_set_func adpt_sec_l2_excep_ctrl_set;
+	adpt_sec_l2_excep_ctrl_get_func adpt_sec_l2_excep_ctrl_get;
+	adpt_sec_tunnel_excep_ctrl_set_func adpt_sec_tunnel_excep_ctrl_set;
+	adpt_sec_tunnel_excep_ctrl_get_func adpt_sec_tunnel_excep_ctrl_get;
+	adpt_sec_tunnel_l3_excep_parser_ctrl_set_func adpt_sec_tunnel_l3_excep_parser_ctrl_set;
+	adpt_sec_tunnel_l3_excep_parser_ctrl_get_func adpt_sec_tunnel_l3_excep_parser_ctrl_get;
+	adpt_sec_tunnel_l4_excep_parser_ctrl_set_func adpt_sec_tunnel_l4_excep_parser_ctrl_set;
+	adpt_sec_tunnel_l4_excep_parser_ctrl_get_func adpt_sec_tunnel_l4_excep_parser_ctrl_get;
+	adpt_sec_tunnel_flags_excep_parser_ctrl_set_func adpt_sec_tunnel_flags_excep_parser_ctrl_set;
+	adpt_sec_tunnel_flags_excep_parser_ctrl_get_func adpt_sec_tunnel_flags_excep_parser_ctrl_get;
 
 	/*acl*/
 	a_uint32_t adpt_acl_func_bitmap;
@@ -1668,6 +1744,8 @@ typedef struct
 	adpt_acl_udf_profile_entry_getnext_func adpt_acl_udf_profile_entry_getnext;
 	adpt_acl_udf_profile_cfg_set_func adpt_acl_udf_profile_cfg_set;
 	adpt_acl_udf_profile_cfg_get_func adpt_acl_udf_profile_cfg_get;
+	adpt_acl_vpgroup_set_func adpt_acl_vpgroup_set;
+	adpt_acl_vpgroup_get_func adpt_acl_vpgroup_get;
 
 	/* qos */
 	a_uint32_t adpt_qos_func_bitmap;
@@ -1852,6 +1930,10 @@ typedef struct
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 	adpt_vport_state_check_set_func adpt_vport_state_check_set;
 	adpt_vport_state_check_get_func adpt_vport_state_check_get;
+	adpt_vport_cnt_cfg_set_func adpt_vport_cnt_cfg_set;
+	adpt_vport_cnt_cfg_get_func adpt_vport_cnt_cfg_get;
+	adpt_vport_cnt_flush_func adpt_vport_cnt_flush;
+	adpt_vport_cnt_get_func adpt_vport_cnt_get;
 
 	/* tunnel */
 	a_uint32_t adpt_tunnel_func_bitmap[2];
@@ -1860,8 +1942,10 @@ typedef struct
 	adpt_tunnel_decap_entry_get_func adpt_tunnel_decap_entry_get;
 	adpt_tunnel_decap_entry_getnext_func adpt_tunnel_decap_entry_getnext;
 	adpt_tunnel_decap_entry_flush_func adpt_tunnel_decap_entry_flush;
-	adpt_tunnel_decap_header_ctrl_set_func adpt_tunnel_decap_header_ctrl_set;
-	adpt_tunnel_decap_header_ctrl_get_func adpt_tunnel_decap_header_ctrl_get;
+	adpt_tunnel_decap_ecn_mode_get_func adpt_tunnel_decap_ecn_mode_get;
+	adpt_tunnel_decap_ecn_mode_set_func adpt_tunnel_decap_ecn_mode_set;
+	adpt_tunnel_encap_ecn_mode_get_func adpt_tunnel_encap_ecn_mode_get;
+	adpt_tunnel_encap_ecn_mode_set_func adpt_tunnel_encap_ecn_mode_set;
 	adpt_tunnel_encap_header_ctrl_set_func adpt_tunnel_encap_header_ctrl_set;
 	adpt_tunnel_encap_header_ctrl_get_func adpt_tunnel_encap_header_ctrl_get;
 	adpt_tunnel_global_cfg_get_func adpt_tunnel_global_cfg_get;
@@ -1891,6 +1975,9 @@ typedef struct
 	adpt_tunnel_udf_profile_entry_getnext_func adpt_tunnel_udf_profile_entry_getnext;
 	adpt_tunnel_udf_profile_cfg_set_func adpt_tunnel_udf_profile_cfg_set;
 	adpt_tunnel_udf_profile_cfg_get_func adpt_tunnel_udf_profile_cfg_get;
+	adpt_tunnel_exp_decap_set_func adpt_tunnel_exp_decap_set;
+	adpt_tunnel_exp_decap_get_func adpt_tunnel_exp_decap_get;
+
 	/*vxlan*/
 	a_uint32_t adpt_vxlan_func_bitmap;
 	adpt_vxlan_entry_add_func adpt_vxlan_entry_add;

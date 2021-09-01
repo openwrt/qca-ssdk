@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -27,6 +27,20 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 			 	struct switch_val *val);
 #endif
 
+int parse_uci_option(struct switch_val *val, const char *option_names[], const int length);
+
+#if defined(IN_TUNNEL)
+int parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val);
+int parse_tunnel_udfprofilecfg(struct switch_val *val);
+#endif
+
+#if defined(IN_MAPT)
+int parse_mapt(const char *command_name, struct switch_val *val);
+#endif
+
+#if defined(IN_VPORT)
+int parse_vport(const char *command_name, struct switch_val *val);
+#endif
 
 #ifdef __cplusplus
 }

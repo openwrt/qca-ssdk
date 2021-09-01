@@ -3434,6 +3434,35 @@ hppe_eg_bridge_config_bridge_type_set(
 }
 
 sw_error_t
+hppe_eg_bridge_config_pkt_l2_edit_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t *value)
+{
+	union eg_bridge_config_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_bridge_config_get(dev_id, &reg_val);
+	*value = reg_val.bf.pkt_l2_edit_en;
+	return ret;
+}
+
+sw_error_t
+hppe_eg_bridge_config_pkt_l2_edit_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t value)
+{
+	union eg_bridge_config_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_bridge_config_get(dev_id, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.pkt_l2_edit_en = value;
+	ret = hppe_eg_bridge_config_set(dev_id, &reg_val);
+	return ret;
+}
+
+sw_error_t
 hppe_eg_bridge_config_queue_cnt_en_get(
 		a_uint32_t dev_id,
 		a_uint32_t *value)

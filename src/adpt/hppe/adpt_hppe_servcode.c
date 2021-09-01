@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -23,6 +23,10 @@
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
 #include "adpt.h"
+#if defined(APPE)
+#include "adpt_appe_servcode.h"
+#endif
+#include "adpt_hppe.h"
 
 #define MAX_PHYSICAL_PORT 8
 
@@ -45,7 +49,13 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	in_l2_service_tbl.bf.bypass_bitmap = entry->bypass_bitmap[1];
 	in_l2_service_tbl.bf.rx_cnt_en = (entry->bypass_bitmap[2] >> 1) & 0x1;
 	in_l2_service_tbl.bf.tx_cnt_en = (entry->bypass_bitmap[2] >> 3) & 0x1;
+#ifdef IN_PORTCONTROL
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
+#endif
 	SW_RTN_ON_ERROR(hppe_in_l2_service_tbl_set(dev_id, servcode_index, &in_l2_service_tbl));
+#ifdef IN_PORTCONTROL
+	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_TRUE));
+#endif
 
 	service_tbl.bf.bypass_bitmap = entry->bypass_bitmap[0];
 	service_tbl.bf.rx_counting_en = entry->bypass_bitmap[2] & 0x1;
@@ -58,6 +68,12 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	eg_service_tbl.bf.tx_counting_en = (entry->bypass_bitmap[2] >> 2) & 0x1;
 	SW_RTN_ON_ERROR(hppe_eg_service_tbl_set(dev_id, servcode_index, &eg_service_tbl));
 
+#if defined (APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_set(dev_id, servcode_index, entry));
+	}
+#endif
 	return SW_OK;
 }
 
@@ -93,6 +109,12 @@ sw_error_t adpt_hppe_servcode_config_get(a_uint32_t dev_id, a_uint32_t servcode_
 	entry->offset_sel = eg_service_tbl.bf.offset_sel;
 	entry->bypass_bitmap[2] |= eg_service_tbl.bf.tx_counting_en << 2;
 
+#if defined (APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_get(dev_id, servcode_index, entry));
+	}
+#endif
 	return SW_OK;
 }
 

@@ -7990,6 +7990,37 @@ appe_tl_port_vp_tbl_set(
 }
 
 sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union tl_port_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_port_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.pre_ipo_profile;
+	return ret;
+}
+
+sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union tl_port_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_port_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.pre_ipo_profile = value;
+	ret = appe_tl_port_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
 appe_tl_vlan_tbl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -8040,6 +8071,28 @@ appe_ecn_map_mode0_0_set(
 }
 
 sw_error_t
+appe_ecn_map_mode0_1_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode0_1_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE0_1_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode0_1_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode0_1_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE0_1_ADDRESS,
+				value->val);
+}
+
+sw_error_t
 appe_ecn_map_mode1_0_get(
 		a_uint32_t dev_id,
 		union ecn_map_mode1_0_u *value)
@@ -8062,6 +8115,28 @@ appe_ecn_map_mode1_0_set(
 }
 
 sw_error_t
+appe_ecn_map_mode1_1_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode1_1_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE1_1_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode1_1_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode1_1_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE1_1_ADDRESS,
+				value->val);
+}
+
+sw_error_t
 appe_ecn_map_mode2_0_get(
 		a_uint32_t dev_id,
 		union ecn_map_mode2_0_u *value)
@@ -8080,5 +8155,27 @@ appe_ecn_map_mode2_0_set(
 	return hppe_reg_set(
 				dev_id,
 				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE2_0_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode2_1_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode2_1_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE2_1_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+appe_ecn_map_mode2_1_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode2_1_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE2_1_ADDRESS,
 				value->val);
 }

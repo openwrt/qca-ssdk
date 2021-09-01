@@ -401,7 +401,13 @@ extern "C" {
     SW_API_DEF(SW_API_PT_VLAN_COUNTER_GET, fal_port_vlan_counter_get), \
     SW_API_DEF(SW_API_PT_VLAN_COUNTER_CLEANUP, fal_port_vlan_counter_cleanup), \
     SW_API_DEF(SW_API_PT_VLAN_VPGROUP_SET, fal_port_vlan_vpgroup_set), \
-    SW_API_DEF(SW_API_PT_VLAN_VPGROUP_GET, fal_port_vlan_vpgroup_get),
+    SW_API_DEF(SW_API_PT_VLAN_VPGROUP_GET, fal_port_vlan_vpgroup_get), \
+    SW_API_DEF(SW_API_PT_VLAN_ISOL_SET, fal_portvlan_isol_set), \
+    SW_API_DEF(SW_API_PT_VLAN_ISOL_GET, fal_portvlan_isol_get), \
+    SW_API_DEF(SW_API_PT_VLAN_ISOL_GROUP_SET, fal_portvlan_isol_group_set), \
+    SW_API_DEF(SW_API_PT_VLAN_ISOL_GROUP_GET, fal_portvlan_isol_group_get), \
+    SW_API_DEF(SW_API_PT_EGRESS_VLAN_FILTER_SET, fal_port_egress_vlan_filter_set), \
+    SW_API_DEF(SW_API_PT_EGRESS_VLAN_FILTER_GET, fal_port_egress_vlan_filter_get),
 
 #define PORTVLAN_API_PARAM \
     SW_API_DESC(SW_API_PT_ING_MODE_GET) \
@@ -479,7 +485,13 @@ extern "C" {
     SW_API_DESC(SW_API_PT_VLAN_COUNTER_GET) \
     SW_API_DESC(SW_API_PT_VLAN_COUNTER_CLEANUP) \
     SW_API_DESC(SW_API_PT_VLAN_VPGROUP_SET) \
-    SW_API_DESC(SW_API_PT_VLAN_VPGROUP_GET)
+    SW_API_DESC(SW_API_PT_VLAN_VPGROUP_GET) \
+    SW_API_DESC(SW_API_PT_VLAN_ISOL_SET) \
+    SW_API_DESC(SW_API_PT_VLAN_ISOL_GET) \
+    SW_API_DESC(SW_API_PT_VLAN_ISOL_GROUP_SET) \
+    SW_API_DESC(SW_API_PT_VLAN_ISOL_GROUP_GET) \
+    SW_API_DESC(SW_API_PT_EGRESS_VLAN_FILTER_SET) \
+    SW_API_DESC(SW_API_PT_EGRESS_VLAN_FILTER_GET)
 
 #else
 #define PORTVLAN_API \
@@ -487,6 +499,9 @@ extern "C" {
     SW_API_DEF(SW_API_GLOBAL_QINQ_MODE_GET, fal_global_qinq_mode_get), \
     SW_API_DEF(SW_API_PORT_QINQ_MODE_SET, fal_port_qinq_mode_set), \
     SW_API_DEF(SW_API_PORT_QINQ_MODE_GET, fal_port_qinq_mode_get), \
+    SW_API_DEF(SW_API_QINQ_MODE_SET, fal_qinq_mode_set), \
+    SW_API_DEF(SW_API_PT_QINQ_ROLE_SET, fal_port_qinq_role_set), \
+    SW_API_DEF(SW_API_PT_VLAN_TRANS_ADD, fal_port_vlan_trans_add), \
     SW_API_DEF(SW_API_TPID_SET, fal_ingress_tpid_set), \
     SW_API_DEF(SW_API_TPID_GET, fal_ingress_tpid_get), \
     SW_API_DEF(SW_API_EGRESS_TPID_SET, fal_egress_tpid_set), \
@@ -530,6 +545,9 @@ extern "C" {
     SW_API_DESC(SW_API_GLOBAL_QINQ_MODE_GET) \
     SW_API_DESC(SW_API_PORT_QINQ_MODE_SET)  \
     SW_API_DESC(SW_API_PORT_QINQ_MODE_GET) \
+    SW_API_DESC(SW_API_QINQ_MODE_SET)    \
+    SW_API_DESC(SW_API_PT_QINQ_ROLE_SET) \
+    SW_API_DESC(SW_API_PT_VLAN_TRANS_ADD) \
     SW_API_DESC(SW_API_TPID_SET)  \
     SW_API_DESC(SW_API_TPID_GET) \
     SW_API_DESC(SW_API_EGRESS_TPID_SET)  \
@@ -677,11 +695,13 @@ extern "C" {
 #else
 #define FDB_API \
     SW_API_DEF(SW_API_FDB_PT_LEARN_SET,   fal_fdb_port_learn_set), \
+    SW_API_DEF(SW_API_FDB_FIND,           fal_fdb_entry_search), \
     SW_API_DEF(SW_API_FDB_EXTEND_FIRST,   fal_fdb_entry_extend_getfirst), \
     SW_API_DEF(SW_API_FDB_EXTEND_NEXT,    fal_fdb_entry_extend_getnext),
 
 #define FDB_API_PARAM \
     SW_API_DESC(SW_API_FDB_PT_LEARN_SET) \
+    SW_API_DESC(SW_API_FDB_FIND) \
     SW_API_DESC(SW_API_FDB_EXTEND_FIRST) \
     SW_API_DESC(SW_API_FDB_EXTEND_NEXT)
 #endif
@@ -716,7 +736,9 @@ extern "C" {
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_ENTRY_GETFIRST, fal_acl_udf_profile_entry_getfirst),\
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_ENTRY_GETNEXT, fal_acl_udf_profile_entry_getnext),\
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_SET, fal_acl_udf_profile_cfg_set),\
-    SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_GET, fal_acl_udf_profile_cfg_get),
+    SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_GET, fal_acl_udf_profile_cfg_get),\
+    SW_API_DEF(SW_API_ACL_VPGROUP_SET, fal_acl_vpgroup_set),\
+    SW_API_DEF(SW_API_ACL_VPGROUP_GET, fal_acl_vpgroup_get),
 
 #define ACL_API_PARAM \
     SW_API_DESC(SW_API_ACL_LIST_CREAT) \
@@ -743,7 +765,9 @@ extern "C" {
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_ENTRY_GETFIRST)\
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_ENTRY_GETNEXT) \
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_SET) \
-    SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_GET)
+    SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_GET) \
+    SW_API_DESC(SW_API_ACL_VPGROUP_SET) \
+    SW_API_DESC(SW_API_ACL_VPGROUP_GET)
 #else
 #define ACL_API
 #define ACL_API_PARAM
@@ -1329,7 +1353,17 @@ extern "C" {
     SW_API_DEF(SW_API_SEC_L4_PARSER_CTRL_GET, fal_sec_l4_excep_parser_ctrl_get), \
     SW_API_DEF(SW_API_SEC_L4_PARSER_CTRL_SET, fal_sec_l4_excep_parser_ctrl_set), \
     SW_API_DEF(SW_API_SEC_EXP_CTRL_GET, fal_sec_l3_excep_ctrl_get), \
-    SW_API_DEF(SW_API_SEC_EXP_CTRL_SET, fal_sec_l3_excep_ctrl_set),
+    SW_API_DEF(SW_API_SEC_EXP_CTRL_SET, fal_sec_l3_excep_ctrl_set), \
+    SW_API_DEF(SW_API_SEC_L2_EXP_CTRL_GET, fal_sec_l2_excep_ctrl_get), \
+    SW_API_DEF(SW_API_SEC_L2_EXP_CTRL_SET, fal_sec_l2_excep_ctrl_set), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_EXP_CTRL_SET, fal_sec_tunnel_excep_ctrl_set), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_EXP_CTRL_GET, fal_sec_tunnel_excep_ctrl_get), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_L3_PARSER_CTRL_SET, fal_sec_tunnel_l3_excep_parser_ctrl_set), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_L3_PARSER_CTRL_GET, fal_sec_tunnel_l3_excep_parser_ctrl_get), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_L4_PARSER_CTRL_SET, fal_sec_tunnel_l4_excep_parser_ctrl_set), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_L4_PARSER_CTRL_GET, fal_sec_tunnel_l4_excep_parser_ctrl_get), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_SET, fal_sec_tunnel_flags_excep_parser_ctrl_set), \
+    SW_API_DEF(SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_GET, fal_sec_tunnel_flags_excep_parser_ctrl_get),
 
 #define SEC_API_PARAM \
     SW_API_DESC(SW_API_SEC_NORM_SET) \
@@ -1355,7 +1389,17 @@ extern "C" {
     SW_API_DESC(SW_API_SEC_L4_PARSER_CTRL_GET) \
     SW_API_DESC(SW_API_SEC_L4_PARSER_CTRL_SET) \
     SW_API_DESC(SW_API_SEC_EXP_CTRL_GET) \
-    SW_API_DESC(SW_API_SEC_EXP_CTRL_SET)
+    SW_API_DESC(SW_API_SEC_EXP_CTRL_SET) \
+    SW_API_DESC(SW_API_SEC_L2_EXP_CTRL_SET) \
+    SW_API_DESC(SW_API_SEC_L2_EXP_CTRL_GET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_EXP_CTRL_SET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_EXP_CTRL_GET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_L3_PARSER_CTRL_SET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_L3_PARSER_CTRL_GET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_L4_PARSER_CTRL_SET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_L4_PARSER_CTRL_GET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_SET) \
+    SW_API_DESC(SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_GET)
 #else
 #define SEC_API
 #define SEC_API_PARAM
@@ -2225,12 +2269,14 @@ extern "C" {
 #define POLICER_API \
     SW_API_DEF(SW_API_POLICER_TIMESLOT_SET, fal_policer_timeslot_set), \
     SW_API_DEF(SW_API_POLICER_COMPENSATION_SET, fal_port_policer_compensation_byte_set), \
+    SW_API_DEF(SW_API_POLICER_ACL_ENTRY_SET, fal_acl_policer_entry_set), \
     SW_API_DEF(SW_API_POLICER_BYPASS_EN_SET, fal_policer_bypass_en_set), \
     SW_API_DEF(SW_API_POLICER_CTRL_SET, fal_policer_ctrl_set),
 
 #define POLICER_API_PARAM \
     SW_API_DESC(SW_API_POLICER_TIMESLOT_SET)  \
     SW_API_DESC(SW_API_POLICER_COMPENSATION_SET) \
+    SW_API_DESC(SW_API_POLICER_ACL_ENTRY_SET) \
     SW_API_DESC(SW_API_POLICER_BYPASS_EN_SET) \
     SW_API_DESC(SW_API_POLICER_CTRL_SET)
 #endif
@@ -2384,12 +2430,20 @@ extern "C" {
     SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, fal_vport_physical_port_id_set), \
     SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, fal_vport_physical_port_id_get), \
     SW_API_DEF(SW_API_VPORT_STATE_CHECK_SET, fal_vport_state_check_set), \
-    SW_API_DEF(SW_API_VPORT_STATE_CHECK_GET, fal_vport_state_check_get),
+    SW_API_DEF(SW_API_VPORT_STATE_CHECK_GET, fal_vport_state_check_get), \
+    SW_API_DEF(SW_API_VPORT_CNT_CFG_SET, fal_vport_cnt_cfg_set), \
+    SW_API_DEF(SW_API_VPORT_CNT_CFG_GET, fal_vport_cnt_cfg_get), \
+    SW_API_DEF(SW_API_VPORT_CNT_GET, fal_vport_cnt_get), \
+    SW_API_DEF(SW_API_VPORT_CNT_FLUSH, fal_vport_cnt_flush),
 #define VPORT_API_PARAM \
     SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_SET) \
     SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_GET) \
     SW_API_DESC(SW_API_VPORT_STATE_CHECK_SET) \
-    SW_API_DESC(SW_API_VPORT_STATE_CHECK_GET)
+    SW_API_DESC(SW_API_VPORT_STATE_CHECK_GET) \
+    SW_API_DESC(SW_API_VPORT_CNT_CFG_SET) \
+    SW_API_DESC(SW_API_VPORT_CNT_CFG_GET) \
+    SW_API_DESC(SW_API_VPORT_CNT_GET) \
+    SW_API_DESC(SW_API_VPORT_CNT_FLUSH)
 #else
 #define VPORT_API
 #define VPORT_API_PARAM
@@ -2425,8 +2479,10 @@ extern "C" {
 	SW_API_DEF(SW_API_TUNNEL_PORT_INTF_GET, fal_tunnel_port_intf_get), \
 	SW_API_DEF(SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET, fal_tunnel_encap_header_ctrl_set), \
 	SW_API_DEF(SW_API_TUNNEL_ENCAP_HEADER_CTRL_GET, fal_tunnel_encap_header_ctrl_get), \
-	SW_API_DEF(SW_API_TUNNEL_DECAP_HEADER_CTRL_SET, fal_tunnel_decap_header_ctrl_set), \
-	SW_API_DEF(SW_API_TUNNEL_DECAP_HEADER_CTRL_GET, fal_tunnel_decap_header_ctrl_get), \
+	SW_API_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_SET, fal_tunnel_encap_ecn_mode_set), \
+	SW_API_DEF(SW_API_TUNNEL_ENCAP_ECN_MODE_GET, fal_tunnel_encap_ecn_mode_get), \
+	SW_API_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_SET, fal_tunnel_decap_ecn_mode_set), \
+	SW_API_DEF(SW_API_TUNNEL_DECAP_ECN_MODE_GET, fal_tunnel_decap_ecn_mode_get), \
 	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, fal_tunnel_udf_profile_entry_add), \
 	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_DEL, fal_tunnel_udf_profile_entry_del), \
 	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST, \
@@ -2434,8 +2490,9 @@ extern "C" {
 	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT, \
 				fal_tunnel_udf_profile_entry_getnext), \
 	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_SET, fal_tunnel_udf_profile_cfg_set),\
-	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, fal_tunnel_udf_profile_cfg_get),
-
+	SW_API_DEF(SW_API_TUNNEL_UDF_PROFILE_CFG_GET, fal_tunnel_udf_profile_cfg_get), \
+	SW_API_DEF(SW_API_TUNNEL_EXP_DECAP_SET, fal_tunnel_exp_decap_set), \
+	SW_API_DEF(SW_API_TUNNEL_EXP_DECAP_GET, fal_tunnel_exp_decap_get),
 #define TUNNEL_API_PARAM \
 	SW_API_DESC(SW_API_TUNNEL_INTF_SET) \
 	SW_API_DESC(SW_API_TUNNEL_INTF_GET) \
@@ -2465,14 +2522,18 @@ extern "C" {
 	SW_API_DESC(SW_API_TUNNEL_PORT_INTF_GET) \
 	SW_API_DESC(SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET) \
 	SW_API_DESC(SW_API_TUNNEL_ENCAP_HEADER_CTRL_GET) \
-	SW_API_DESC(SW_API_TUNNEL_DECAP_HEADER_CTRL_SET) \
-	SW_API_DESC(SW_API_TUNNEL_DECAP_HEADER_CTRL_GET) \
+	SW_API_DESC(SW_API_TUNNEL_ENCAP_ECN_MODE_SET) \
+	SW_API_DESC(SW_API_TUNNEL_ENCAP_ECN_MODE_GET) \
+	SW_API_DESC(SW_API_TUNNEL_DECAP_ECN_MODE_SET) \
+	SW_API_DESC(SW_API_TUNNEL_DECAP_ECN_MODE_GET) \
 	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD) \
 	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_ENTRY_DEL) \
 	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETFIRST) \
 	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_ENTRY_GETNEXT) \
 	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_CFG_SET) \
-	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_CFG_GET)
+	SW_API_DESC(SW_API_TUNNEL_UDF_PROFILE_CFG_GET) \
+	SW_API_DESC(SW_API_TUNNEL_EXP_DECAP_SET) \
+	SW_API_DESC(SW_API_TUNNEL_EXP_DECAP_GET)
 #else
 #define TUNNEL_API
 #define TUNNEL_API_PARAM

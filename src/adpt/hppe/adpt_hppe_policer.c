@@ -48,7 +48,8 @@
 #define ADPT_HPPE_ACL_POLICER_MIN_ENTRY  0
 #define ADPT_HPPE_ACL_POLICER_MAX_ENTRY 511
 #define ADPT_APPE_POLICER_MAX           0x3ffff
-#ifdef APPE
+
+#if defined(APPE)
 static a_uint32_t appe_policer_type[SW_MAX_NR_DEV][APPE_POLICER_ID_MAX + 1] = {0};
 #endif
 static a_uint32_t hppe_policer_token_unit[NR_ADPT_HPPE_POLICER_METER_UNIT]
@@ -205,6 +206,7 @@ adpt_hppe_port_compensation_byte_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_OK;
 }
+#endif
 
 static sw_error_t
 __adpt_hppe_policer_rate_to_refresh(a_uint32_t rate,
@@ -266,6 +268,7 @@ __adpt_hppe_policer_burst_size_to_bucket_size(a_uint32_t burst_size,
 	return SW_OK;
 }
 
+#ifndef IN_POLICER_MINI
 static sw_error_t
 __adpt_hppe_policer_refresh_to_rate(a_uint32_t refresh,
 							a_uint32_t *rate,
@@ -419,7 +422,6 @@ __adpt_hppe_policer_max_burst_size(void)
 	return SW_OK;
 }
 
-#ifndef IN_POLICER_MINI
 static sw_error_t
 __adpt_hppe_policer_two_bucket_parameter_select(a_uint64_t c_rate,
 						a_uint64_t c_burst_size,
@@ -465,6 +467,7 @@ __adpt_hppe_policer_two_bucket_parameter_select(a_uint64_t c_rate,
 	return SW_OK;
 }
 
+#ifndef IN_POLICER_MINI
 #if 0
 static sw_error_t
 __adpt_hppe_policer_one_bucket_parameter_select(a_uint64_t c_rate,
@@ -600,7 +603,7 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 			in_acl_meter_cfg_tbl.bf.nxt_ptr_0;
 		action->yellow_dscp_en = in_acl_meter_cfg_tbl.bf.exceed_chg_dscp_cmd;
 		action->yellow_dscp = in_acl_meter_cfg_tbl.bf.exceed_dscp;
-		action->red_dscp_en = in_acl_meter_cfg_tbl.bf.violate_chg_dp_cmd;
+		action->red_dscp_en = in_acl_meter_cfg_tbl.bf.violate_chg_dscp_cmd;
 		action->red_dscp = in_acl_meter_cfg_tbl.bf.violate_dscp;
 		action->yellow_remap_en = in_acl_meter_cfg_tbl.bf.exceed_remap_cmd;
 		action->red_remap_en = in_acl_meter_cfg_tbl.bf.violate_remap_cmd;
@@ -608,6 +611,7 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 #endif
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
@@ -797,7 +801,7 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 		}
 		in_acl_meter_cfg_tbl.bf.exceed_chg_dscp_cmd = action->yellow_dscp_en;
 		in_acl_meter_cfg_tbl.bf.exceed_dscp = action->yellow_dscp;
-		in_acl_meter_cfg_tbl.bf.violate_chg_dp_cmd = action->red_dscp_en;
+		in_acl_meter_cfg_tbl.bf.violate_chg_dscp_cmd = action->red_dscp_en;
 		in_acl_meter_cfg_tbl.bf.violate_dscp = action->red_dscp;
 		in_acl_meter_cfg_tbl.bf.exceed_remap_cmd = action->yellow_remap_en;
 		in_acl_meter_cfg_tbl.bf.violate_remap_cmd = action->red_remap_en;
@@ -809,6 +813,7 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 	return SW_OK;
 }
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 adpt_hppe_port_policer_entry_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_policer_config_t *policer, fal_policer_action_t *action)
@@ -1292,10 +1297,12 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_acl_policer_entry_get = adpt_hppe_acl_policer_entry_get;
 	}
+#endif
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_ACL_POLICER_ENTRY_SET))
 	{
 		p_adpt_api->adpt_acl_policer_entry_set = adpt_hppe_acl_policer_entry_set;
 	}
+#ifndef IN_POLICER_MINI
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_TIME_SLOT_GET))
 	{
 		p_adpt_api->adpt_policer_time_slot_get = adpt_hppe_policer_time_slot_get;

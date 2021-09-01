@@ -20,6 +20,7 @@
 #include "ssdk_mp.h"
 #include "adpt.h"
 #include "ssdk_led.h"
+#include "ssdk_clk.h"
 
 #ifdef IN_PORTCONTROL
 sw_error_t
@@ -39,6 +40,7 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 			fal_port_txmac_status_set (dev_id, i, A_FALSE);
 			fal_port_rxmac_status_set (dev_id, i, A_FALSE);
 			/* init mac's lpi wake up timer to 70us */
+			fal_port_interface_eee_cfg_get(dev_id, i, &port_eee_cfg);
 			port_eee_cfg.lpi_wakeup_timer = MP_LPI_WAKEUP_TIMER;
 			fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
 		} else {
@@ -52,6 +54,8 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 		fal_port_promisc_mode_set(dev_id, i, A_TRUE);
 		/* init software level port status */
 		qca_mac_port_status_init(dev_id, i);
+		/*enable ICC efuse loading*/
+		ssdk_mp_gephy_icc_efuse_load_enable(A_TRUE);
 	}
 	return rv;
 }

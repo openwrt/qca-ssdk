@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2017-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2015, 2017-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -21,6 +21,7 @@ extern "C" {
 
 #include "fal.h"
 #include <linux/version.h>
+#include <linux/phy.h>
 
 	/** Phy function reset type */
 	typedef enum {
@@ -563,7 +564,7 @@ typedef struct {
 #define QCA8035_PHY             0x004DD072
 /*qca808x_start*/
 #define QCA8081_PHY_V1_1        0x004DD101
-#define INVALID_PHY_ID          0
+#define INVALID_PHY_ID          0xFFFFFFFF
 
 /*qca808x_end*/
 #define F1V1_PHY                0x004DD033
@@ -579,6 +580,8 @@ typedef struct {
 #define AQUANTIA_PHY_112        0x03a1b660
 #define AQUANTIA_PHY_113C_A0    0x31c31C10
 #define AQUANTIA_PHY_113C_A1    0x31c31C11
+#define AQUANTIA_PHY_113C_B0    0x31c31C12
+#define AQUANTIA_PHY_113C_B1    0x31c31C13
 #define AQUANTIA_PHY_112C       0x03a1b792
 
 #define PHY_805XV2              0x004DD082
@@ -695,6 +698,8 @@ hsl_port_phy_dac_get(a_uint32_t dev_id, a_uint32_t port_id,
 void
 hsl_port_phy_dac_set(a_uint32_t dev_id, a_uint32_t port_id,
 	phy_dac_t phy_dac);
+
+a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id);
 /*qca808x_start*/
 sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id);
 /*qca808x_end*/
@@ -708,6 +713,10 @@ qca_ssdk_phy_address_set(a_uint32_t dev_id, a_uint32_t port_id,
 
 sw_error_t
 hsl_port_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_id);
+
+sw_error_t
+hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
+	struct phy_device **phydev);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
 sw_error_t

@@ -254,6 +254,11 @@ union vlan_port_vp_tbl_u {
 	#define EG_VP_TBL_TUNNEL_ID_OFFSET  44
 	#define EG_VP_TBL_TUNNEL_ID_LEN     7
 	#define EG_VP_TBL_TUNNEL_ID_DEFAULT 0x0
+	/*[field] CNT_MODE*/
+	#define EG_VP_TBL_CNT_MODE
+	#define EG_VP_TBL_CNT_MODE_OFFSET  51
+	#define EG_VP_TBL_CNT_MODE_LEN     1
+	#define EG_VP_TBL_CNT_MODE_DEFAULT 0x0
 
 struct eg_vp_tbl {
 	a_uint32_t  port_def_svid:12;
@@ -270,7 +275,8 @@ struct eg_vp_tbl {
 	a_uint32_t  xlat_profile:8;
 	a_uint32_t  tunnel_valid:1;
 	a_uint32_t  tunnel_id:7;
-	a_uint32_t  _reserved0:13;
+	a_uint32_t  cnt_mode:1;
+	a_uint32_t  _reserved0:12;
 };
 
 union eg_vp_tbl_u {
@@ -352,4 +358,26 @@ union tpr_vlan_tpid_u {
 	struct tpr_vlan_tpid bf;
 };
 
+/*[table] VP_ISOL_TBL*/
+#define VP_ISOL_TBL
+#define VP_ISOL_TBL_ADDRESS 0x3c000
+#define VP_ISOL_TBL_NUM     64
+#define VP_ISOL_TBL_INC     0x10
+#define VP_ISOL_TBL_TYPE    REG_TYPE_RW
+#define VP_ISOL_TBL_DEFAULT 0x0
+	/*[field] VP_PROFILE_MAP*/
+	#define VP_ISOL_TBL_VP_PROFILE_MAP
+	#define VP_ISOL_TBL_VP_PROFILE_MAP_OFFSET  0
+	#define VP_ISOL_TBL_VP_PROFILE_MAP_LEN     64
+	#define VP_ISOL_TBL_VP_PROFILE_MAP_DEFAULT 0x0
+
+struct vp_isol_tbl {
+	a_uint32_t  vp_profile_map_0:32;
+	a_uint32_t  vp_profile_map_1:32;
+};
+
+union vp_isol_tbl_u {
+	a_uint32_t val[2];
+	struct vp_isol_tbl bf;
+};
 #endif

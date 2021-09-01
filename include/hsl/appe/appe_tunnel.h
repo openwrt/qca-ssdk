@@ -3114,6 +3114,18 @@ appe_tl_port_vp_tbl_set(
 		union tl_port_vp_tbl_u *value);
 
 sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+appe_tl_port_vp_tbl_pre_ipo_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
 appe_tl_vlan_tbl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -3136,6 +3148,16 @@ appe_ecn_map_mode0_0_set(
 		union ecn_map_mode0_0_u *value);
 
 sw_error_t
+appe_ecn_map_mode0_1_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode0_1_u *value);
+
+sw_error_t
+appe_ecn_map_mode0_1_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode0_1_u *value);
+
+sw_error_t
 appe_ecn_map_mode1_0_get(
 		a_uint32_t dev_id,
 		union ecn_map_mode1_0_u *value);
@@ -3146,6 +3168,16 @@ appe_ecn_map_mode1_0_set(
 		union ecn_map_mode1_0_u *value);
 
 sw_error_t
+appe_ecn_map_mode1_1_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode1_1_u *value);
+
+sw_error_t
+appe_ecn_map_mode1_1_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode1_1_u *value);
+
+sw_error_t
 appe_ecn_map_mode2_0_get(
 		a_uint32_t dev_id,
 		union ecn_map_mode2_0_u *value);
@@ -3154,4 +3186,14 @@ sw_error_t
 appe_ecn_map_mode2_0_set(
 		a_uint32_t dev_id,
 		union ecn_map_mode2_0_u *value);
+
+sw_error_t
+appe_ecn_map_mode2_1_get(
+		a_uint32_t dev_id,
+		union ecn_map_mode2_1_u *value);
+
+sw_error_t
+appe_ecn_map_mode2_1_set(
+		a_uint32_t dev_id,
+		union ecn_map_mode2_1_u *value);
 #endif

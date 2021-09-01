@@ -579,6 +579,7 @@ _fal_port_vlan_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
     rv = p_api->port_vlan_propagation_get(dev_id, port_id, mode);
     return rv;
 }
+#endif
 
 static sw_error_t
 _fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry)
@@ -604,6 +605,7 @@ _fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_e
     return rv;
 }
 
+#ifndef IN_PORTVLAN_MINI
 static sw_error_t
 _fal_port_vlan_trans_del(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry)
 {
@@ -651,6 +653,7 @@ _fal_port_vlan_trans_get(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_e
     rv = p_api->port_vlan_trans_get(dev_id, port_id, entry);
     return rv;
 }
+#endif
 
 static sw_error_t
 _fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode)
@@ -676,6 +679,7 @@ _fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode)
     return rv;
 }
 
+#ifndef IN_PORTVLAN_MINI
 static sw_error_t
 _fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode)
 {
@@ -699,6 +703,7 @@ _fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode)
     rv = p_api->qinq_mode_get(dev_id, mode);
     return rv;
 }
+#endif
 
 static sw_error_t
 _fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t role)
@@ -724,6 +729,7 @@ _fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_rol
     return rv;
 }
 
+#ifndef IN_PORTVLAN_MINI
 static sw_error_t
 _fal_port_qinq_role_get(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t * role)
 {
@@ -1463,6 +1469,7 @@ fal_port_vlan_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
     FAL_API_UNLOCK;
     return rv;
 }
+#endif
 
 /**
  * @brief Add a vlan translation entry to a particular port.
@@ -1482,6 +1489,7 @@ fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_en
     return rv;
 }
 
+#ifndef IN_PORTVLAN_MINI
 /**
  * @brief Delete a vlan translation entry from a particular port.
  * @param[in] dev_id device id
@@ -1517,6 +1525,7 @@ fal_port_vlan_trans_get(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_en
     FAL_API_UNLOCK;
     return rv;
 }
+#endif
 
 /**
  * @brief Set switch qinq work mode on a particular device.
@@ -1535,6 +1544,7 @@ fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode)
     return rv;
 }
 
+#ifndef IN_PORTVLAN_MINI
 /**
  * @brief Get switch qinq work mode on a particular device.
  * @param[in] dev_id device id
@@ -1551,6 +1561,7 @@ fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode)
     FAL_API_UNLOCK;
     return rv;
 }
+#endif
 
 /**
  * @brief Set qinq role on a particular port.
@@ -1570,6 +1581,7 @@ fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role
     return rv;
 }
 
+#ifndef IN_PORTVLAN_MINI
 /**
  * @brief Get qinq role on a particular port.
  * @param[in] dev_id device id
@@ -2216,6 +2228,108 @@ _fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
 }
 
 sw_error_t
+_fal_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_set(dev_id, port_id, isol_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_get(dev_id, port_id, isol_ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_group_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_group_set(dev_id, isol_group_id, isol_group_bmp);
+    return rv;
+}
+
+sw_error_t
+_fal_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_portvlan_isol_group_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_portvlan_isol_group_get(dev_id, isol_group_id, isol_group_bmp);
+    return rv;
+}
+
+sw_error_t
+_fal_port_egress_vlan_filter_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_port_egress_vlan_filter_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_egress_vlan_filter_set(dev_id, port_id, filter);
+    return rv;
+}
+
+sw_error_t
+_fal_port_egress_vlan_filter_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_port_egress_vlan_filter_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_egress_vlan_filter_get(dev_id, port_id, filter);
+    return rv;
+}
+
+sw_error_t
 fal_global_qinq_mode_set(a_uint32_t dev_id, fal_global_qinq_mode_t *mode)
 {
     sw_error_t rv = SW_OK;
@@ -2550,6 +2664,84 @@ fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
     return rv;
 }
 
+sw_error_t
+fal_portvlan_isol_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_set(dev_id, port_id, isol_ctrl);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_portvlan_isol_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_portvlan_isol_ctrl_t *isol_ctrl)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_get(dev_id, port_id, isol_ctrl);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_portvlan_isol_group_set(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_group_set(dev_id, isol_group_id, isol_group_bmp);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_portvlan_isol_group_get(a_uint32_t dev_id,
+		a_uint8_t isol_group_id, a_uint64_t *isol_group_bmp)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_portvlan_isol_group_get(dev_id, isol_group_id, isol_group_bmp);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_egress_vlan_filter_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_port_egress_vlan_filter_set(dev_id, port_id, filter);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_egress_vlan_filter_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_egress_vlan_filter_t *filter)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_PORTVLAN_API_LOCK;
+    rv = _fal_port_egress_vlan_filter_get(dev_id, port_id, filter);
+    FAL_PORTVLAN_API_UNLOCK;
+    return rv;
+}
+
+EXPORT_SYMBOL(fal_port_egress_vlan_filter_get);
+EXPORT_SYMBOL(fal_port_egress_vlan_filter_set);
+EXPORT_SYMBOL(fal_portvlan_isol_set);
+EXPORT_SYMBOL(fal_portvlan_isol_get);
+EXPORT_SYMBOL(fal_portvlan_isol_group_set);
+EXPORT_SYMBOL(fal_portvlan_isol_group_get);
 EXPORT_SYMBOL(fal_port_vlan_vpgroup_set);
 EXPORT_SYMBOL(fal_port_vlan_vpgroup_get);
 EXPORT_SYMBOL(fal_port_invlan_mode_set);
@@ -2584,13 +2776,13 @@ EXPORT_SYMBOL(fal_port_vlan_counter_cleanup);
 EXPORT_SYMBOL(fal_portvlan_member_add);
 EXPORT_SYMBOL(fal_portvlan_member_del);
 EXPORT_SYMBOL(fal_portvlan_member_update);
-#ifndef IN_PORTVLAN_MINI
 EXPORT_SYMBOL(fal_qinq_mode_set);
-EXPORT_SYMBOL(fal_qinq_mode_get);
 EXPORT_SYMBOL(fal_port_qinq_role_set);
+EXPORT_SYMBOL(fal_port_vlan_trans_add);
+#ifndef IN_PORTVLAN_MINI
+EXPORT_SYMBOL(fal_qinq_mode_get);
 EXPORT_SYMBOL(fal_port_qinq_role_get);
 EXPORT_SYMBOL(fal_port_vlan_trans_iterate);
-EXPORT_SYMBOL(fal_port_vlan_trans_add);
 EXPORT_SYMBOL(fal_port_vlan_trans_del);
 EXPORT_SYMBOL(fal_port_vlan_trans_get);
 EXPORT_SYMBOL(fal_portvlan_member_get);

@@ -20,11 +20,17 @@
 #ifndef _HPPE_VSI_H_
 #define _HPPE_VSI_H_
 
+#ifdef APPE
+#define VSI_TBL_MAX_ENTRY	64
+#define VLAN_CNT_TBL_MAX_ENTRY	64
+#define EG_VSI_COUNTER_TBL_MAX_ENTRY	64
+#define PRE_L2_CNT_TBL_MAX_ENTRY	64
+#else
 #define VSI_TBL_MAX_ENTRY	32
 #define VLAN_CNT_TBL_MAX_ENTRY	32
 #define EG_VSI_COUNTER_TBL_MAX_ENTRY	32
 #define PRE_L2_CNT_TBL_MAX_ENTRY	32
-
+#endif
 sw_error_t
 hppe_vsi_tbl_get(
 		a_uint32_t dev_id,

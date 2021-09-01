@@ -51,6 +51,17 @@ hppe_meter_cmpst_length_reg_set(
 				value->val);
 }
 
+sw_error_t
+hppe_pc_drop_bypass_reg_set(
+		a_uint32_t dev_id,
+		union pc_drop_bypass_reg_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				INGRESS_POLICER_BASE_ADDR + PC_DROP_BYPASS_REG_ADDRESS,
+				value->val);
+}
+
 #ifndef IN_POLICER_MINI
 sw_error_t
 hppe_pc_drop_bypass_reg_get(
@@ -61,17 +72,6 @@ hppe_pc_drop_bypass_reg_get(
 				dev_id,
 				INGRESS_POLICER_BASE_ADDR + PC_DROP_BYPASS_REG_ADDRESS,
 				&value->val);
-}
-
-sw_error_t
-hppe_pc_drop_bypass_reg_set(
-		a_uint32_t dev_id,
-		union pc_drop_bypass_reg_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				INGRESS_POLICER_BASE_ADDR + PC_DROP_BYPASS_REG_ADDRESS,
-				value->val);
 }
 
 sw_error_t
@@ -160,6 +160,7 @@ hppe_pc_dbg_data_reg_set(
 {
 	return SW_NOT_SUPPORTED;
 }
+#endif
 
 sw_error_t
 hppe_in_acl_meter_cfg_tbl_get(
@@ -189,6 +190,7 @@ hppe_in_acl_meter_cfg_tbl_set(
 				(sizeof(union in_acl_meter_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 hppe_in_acl_meter_crdt_tbl_get(
 		a_uint32_t dev_id,

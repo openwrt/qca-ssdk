@@ -28,6 +28,7 @@
 #define VLAN_PORT_VP_TBL_MAX_ENTRY	256
 #define EG_VSI_VP_TAG_MAX_ENTRY         2048
 #define TPR_PORT_PARSING_MAX_ENTRY	8
+#define VP_ISOL_TBL_MAX_ENTRY	64
 
 sw_error_t
 appe_ipr_vp_parsing_get(
@@ -98,6 +99,18 @@ sw_error_t
 appe_tpr_vlan_tpid_set(
 		a_uint32_t dev_id,
 		union tpr_vlan_tpid_u *value);
+
+sw_error_t
+appe_vp_isol_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vp_isol_tbl_u *value);
+
+sw_error_t
+appe_vp_isol_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vp_isol_tbl_u *value);
 
 sw_error_t
 appe_vport_parsing_port_role_get(
@@ -550,4 +563,15 @@ sw_error_t
 appe_tpr_vlan_tpid_ctag_tpid_set(
 		a_uint32_t dev_id,
 		unsigned int value);
+sw_error_t
+appe_vp_isol_tbl_vp_profile_map_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint64_t *value);
+
+sw_error_t
+appe_vp_isol_tbl_vp_profile_map_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint64_t value);
 #endif

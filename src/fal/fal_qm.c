@@ -462,7 +462,6 @@ _fal_ac_group_buffer_set(
 	return rv;
 }
 
-#ifndef IN_QM_MINI
 sw_error_t
 _fal_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 {
@@ -478,6 +477,7 @@ _fal_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 	return rv;
 }
 
+#ifndef IN_QM_MINI
 sw_error_t
 _fal_queue_counter_ctrl_get(a_uint32_t dev_id, a_bool_t *cnt_en)
 {
@@ -960,7 +960,6 @@ fal_ac_group_buffer_set(
 	return rv;
 }
 
-#ifndef IN_QM_MINI
 sw_error_t
 fal_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 {
@@ -972,6 +971,7 @@ fal_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 	return rv;
 }
 
+#ifndef IN_QM_MINI
 sw_error_t
 fal_queue_counter_ctrl_get(a_uint32_t dev_id, a_bool_t *cnt_en)
 {
@@ -1100,6 +1100,8 @@ EXPORT_SYMBOL(fal_queue_flush);
 
 EXPORT_SYMBOL(fal_qm_enqueue_ctrl_set);
 
+EXPORT_SYMBOL(fal_queue_counter_ctrl_set);
+
 #ifndef IN_QM_MINI
 EXPORT_SYMBOL(fal_qm_port_source_profile_set);
 
@@ -1136,8 +1138,6 @@ EXPORT_SYMBOL(fal_mcast_cpu_code_class_get);
 EXPORT_SYMBOL(fal_port_mcast_priority_class_set);
 
 EXPORT_SYMBOL(fal_port_mcast_priority_class_get);
-
-EXPORT_SYMBOL(fal_queue_counter_ctrl_set);
 
 EXPORT_SYMBOL(fal_queue_counter_ctrl_get);
 

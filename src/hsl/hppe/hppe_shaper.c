@@ -227,7 +227,6 @@ hppe_l1_shp_credit_tbl_set(
 				2);
 }
 
-#ifndef IN_SHAPER_MINI
 sw_error_t
 hppe_l1_shp_cfg_tbl_get(
 		a_uint32_t dev_id,
@@ -241,7 +240,6 @@ hppe_l1_shp_cfg_tbl_get(
 				value->val,
 				(sizeof(union l1_shp_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
-#endif
 
 sw_error_t
 hppe_l1_shp_cfg_tbl_set(

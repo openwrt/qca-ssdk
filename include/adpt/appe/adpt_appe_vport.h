@@ -29,4 +29,15 @@ adpt_appe_vport_state_check_get(a_uint32_t dev_id,
 sw_error_t
 adpt_appe_vport_state_check_set(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
+sw_error_t
+adpt_appe_vport_cnt_cfg_set(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+sw_error_t
+adpt_appe_vport_cnt_cfg_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
+sw_error_t
+adpt_appe_vport_cnt_get(a_uint32_t dev_id,
+		fal_port_t port_id, fal_vport_cnt_t *vp_cnt);
+sw_error_t
+adpt_appe_vport_cnt_flush(a_uint32_t dev_id, fal_port_t port_id);
 #endif

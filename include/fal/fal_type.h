@@ -85,6 +85,22 @@ extern "C" {
         FAL_L4_TYPE_BUTT,
     } fal_l4_type_t;
 
+    typedef enum
+    {
+        FAL_ETHERNET_HDR =0,
+        FAL_ETHERNET_TAG_HDR,
+        FAL_IPV4_HDR,
+        FAL_IPV6_HDR,
+        FAL_UDP_HDR,
+        FAL_UDP_LITE_HDR,
+        FAL_TCP_HDR,
+        FAL_GRE_HDR,
+        FAL_VXLAN_HDR,
+        FAL_VXLAN_GPE_HDR,
+        FAL_GENEVE_HDR,
+        FAL_HDR_BUTT,
+    } fal_hdr_type_t;
+
     /**
     @brief This enum defines several forwarding command type.
     * Field description:

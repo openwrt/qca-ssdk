@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2015-2017, 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013, 2015-2017, 2019, 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -44,6 +44,8 @@ void  cmd_strtol(char *str, a_uint32_t * arg_val);
 sw_error_t cmd_data_check_portmap(char *cmdstr, fal_pbmp_t * val, a_uint32_t size);
 sw_error_t cmd_data_check_confirm(char *cmdstr, a_bool_t def, a_bool_t * val, a_uint32_t size);
 
+sw_error_t cmd_data_check_uint64(char *cmd_str, a_uint32_t * arg_val,
+                                 a_uint32_t size);
 sw_error_t cmd_data_check_uint32(char *cmd_str, a_uint32_t * arg_val,
                                  a_uint32_t size);
 sw_error_t cmd_data_check_uint16(char *cmd_str, a_uint32_t * arg_val,
@@ -53,15 +55,19 @@ sw_error_t cmd_data_check_uint8(char *cmd_str, a_uint32_t * arg_val,
 sw_error_t cmd_data_check_enable(char *cmd_str, a_uint32_t * arg_val,
                                  a_uint32_t size);
 sw_error_t cmd_data_check_pbmp(char *cmd_str, a_uint32_t * arg_val,
-                               a_uint32_t size);
+                                 a_uint32_t size);
+sw_error_t cmd_data_check_attr(char * attr_name, char *cmd_str,
+                                 a_uint32_t *arg_val, a_uint32_t size);
 #ifdef IN_PORTCONTROL
 sw_error_t cmd_data_check_duplex(char *cmd_str, a_uint32_t * arg_val,
                                  a_uint32_t size);
 sw_error_t cmd_data_check_speed(char *cmd_str, a_uint32_t * arg_val,
                                 a_uint32_t size);
 #ifndef IN_PORTCONTROL_MINI
+#if defined (APPE)
 sw_error_t cmd_data_check_port_8023ah_ctrl(char *cmd_str, void * val,
 	a_uint32_t size);
+#endif
 sw_error_t
 cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
@@ -99,6 +105,10 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val,
 sw_error_t
 cmd_data_check_port_vlan_translation_adv_action(char *info, void *val,
 				a_uint32_t size);
+#endif
+#ifdef APPE
+sw_error_t
+cmd_data_check_isol_ctrl(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
 #endif
 #endif
 #ifdef IN_PORTCONTROL
@@ -286,6 +296,15 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
 #endif
+
+sw_error_t
+cmd_data_check_l2_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size);
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI
@@ -373,13 +392,13 @@ cmd_data_check_stamove(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_vsi_member(char *cmd_str, void * val, a_uint32_t size);
-
+#if defined (APPE)
 sw_error_t
 cmd_data_check_vsi_bridge_vsi(char *cmd_str, void * arg_val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_vsi_invalidvsi_ctrl(char *cmd_str, void * arg_val, a_uint32_t size);
-
+#endif
 #endif
 #ifdef IN_BM
 sw_error_t
@@ -430,6 +449,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size);
 
+#if defined(APPE)
 sw_error_t
 cmd_data_check_policer_remap(char *cmd_str, void * val, a_uint32_t size);
 
@@ -438,6 +458,7 @@ cmd_data_check_policer_priority(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_policer_ctrl(char *cmd_str, void * val, a_uint32_t size);
+#endif
 #endif
 
 #ifdef IN_SHAPER
@@ -453,12 +474,13 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size);
 sw_error_t
 cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size);
 
+#if defined(APPE)
 sw_error_t
 cmd_data_check_queue_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_flow_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size);
-
+#endif
 #endif
 
 #ifdef IN_SERVCODE
@@ -496,11 +518,82 @@ sw_error_t
 cmd_data_check_udf_element(char *cmdstr, a_uint8_t * val, a_uint32_t * len);
 sw_error_t
 cmd_data_check_fieldop(char *cmdstr, fal_acl_field_op_t def, fal_acl_field_op_t * val);
-
+#ifdef APPE
+sw_error_t
+cmd_data_check_vport_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+#endif
 #endif
 sw_error_t
 cmd_data_check_module(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
 sw_error_t
 cmd_data_check_func_ctrl(char *cmd_str, void * val, a_uint32_t size);
+
+#ifdef IN_TUNNEL
+sw_error_t
+cmd_data_check_tunnel_udp_entry(char *cmd_str, void * val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_intf(char *info, fal_tunnel_intf_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_port_intf(char *info, fal_tunnel_port_intf_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_rule_entry(char *info, fal_tunnel_encap_rule_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_tunnelid(char *info, fal_tunnel_id_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_vlan_intf(char *info, fal_tunnel_vlan_intf_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_decap_entry(char *info, fal_tunnel_decap_entry_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_entry(char *info, fal_tunnel_encap_cfg_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_encap_header_ctrl(char *info,
+		fal_tunnel_encap_header_ctrl_t *val, a_uint32_t size);
+sw_error_t
+cmd_data_check_decap_ecn_rule(char *info,
+		fal_tunnel_decap_ecn_rule_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_decap_ecn_action(char *cmd_str,
+		fal_tunnel_decap_ecn_action_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_encap_ecn_rule(char *cmd_str, fal_tunnel_encap_ecn_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_ecn_val(char *cmd_str, fal_tunnel_ecn_val_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_global_cfg(char *info, fal_tunnel_global_cfg_t *val, a_uint32_t size);
+#endif
+#if defined(IN_MAPT)
+sw_error_t
+cmd_data_check_mapt_decap_ctrl(char *info, void *val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_mapt_decap_rule_entry(char *info, void *val, a_uint32_t size);
+
+sw_error_t
+cmd_data_check_mapt_decap_entry(char *info, void *val, a_uint32_t size);
+#endif
+
+#if defined(IN_MAPT)
+sw_error_t
+cmd_data_check_vport_state(char *cmd_str, fal_vport_state_t *arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_vport_cnt_cfg(char *cmd_str, fal_vport_cnt_cfg_t *arg_val, a_uint32_t size);
+#endif
+
+#ifdef IN_VXLAN
+sw_error_t
+cmd_data_check_vxlan_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_vxlan_gpe_proto(char *cmd_str, void * val, a_uint32_t size);
+#ifdef IN_TUNNEL_PROGRAM
+sw_error_t
+cmd_data_check_tunnel_program_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_program_entry(char *cmd_str, void * val, a_uint32_t size);
+sw_error_t
+cmd_data_check_tunnel_program_cfg(char *cmd_str, void * val, a_uint32_t size);
+#endif
+#endif
 #endif
 

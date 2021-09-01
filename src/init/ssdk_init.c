@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2014-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -301,12 +301,15 @@ qca_ar8327_phy_fixup(struct qca_phy_priv *priv, int phy)
 		priv->phy_mmd_write(priv->device_id, phy, 0x4007, 0x0);
 		/* fallthrough */
 	case 4:
-		priv->phy_mmd_write(priv->device_id, phy, 0x3, 0x800d);
-		priv->phy_mmd_write(priv->device_id, phy, 0x4003, 0x803f);
+		if(priv->version == QCA_VER_AR8327)
+		{
+			priv->phy_mmd_write(priv->device_id, phy, 0x3, 0x800d);
+			priv->phy_mmd_write(priv->device_id, phy, 0x4003, 0x803f);
 
-		priv->phy_dbg_write(priv->device_id, phy, 0x3d, 0x6860);
-		priv->phy_dbg_write(priv->device_id, phy, 0x5, 0x2c46);
-		priv->phy_dbg_write(priv->device_id, phy, 0x3c, 0x6000);
+			priv->phy_dbg_write(priv->device_id, phy, 0x3d, 0x6860);
+			priv->phy_dbg_write(priv->device_id, phy, 0x5, 0x2c46);
+			priv->phy_dbg_write(priv->device_id, phy, 0x3c, 0x6000);
+		}
 		break;
 	}
 }
@@ -602,7 +605,7 @@ qca_ar8327_phy_enable(struct qca_phy_priv *priv)
 	for (i = 0; i < AR8327_NUM_PHYS; i++) {
 		a_uint16_t value = 0;
 
-		if (priv->version == QCA_VER_AR8327)
+		if (priv->version == QCA_VER_AR8327 || priv->version == QCA_VER_AR8337)
 			qca_ar8327_phy_fixup(priv, i);
 
 		/* start autoneg*/
@@ -1109,8 +1112,8 @@ static struct switch_attr qca_ar8327_globals[] = {
 	},
 };
 
-#if defined(IN_MIB)
 static struct switch_attr qca_ar8327_port[] = {
+#if defined(IN_MIB)
 	{
 		.name = "reset_mib",
 		.description = "Reset Mib Counters",
@@ -1124,8 +1127,18 @@ static struct switch_attr qca_ar8327_port[] = {
 		.set = NULL,
 		.get = qca_ar8327_sw_get_port_mib,
 	},
-};
 #endif
+#if defined(IN_PORTCONTROL)
+	{
+		.type = SWITCH_TYPE_INT,
+		.name = "enable_eee",
+		.description = "Enable EEE",
+		.set = qca_ar8327_sw_set_eee,
+		.get = qca_ar8327_sw_get_eee,
+		.max = 1,
+	},
+#endif
+};
 
 #if defined(IN_VLAN)
 static struct switch_attr qca_ar8327_vlan[] = {
@@ -1145,12 +1158,10 @@ const struct switch_dev_ops qca_ar8327_sw_ops = {
 		.attr = qca_ar8327_globals,
 		.n_attr = ARRAY_SIZE(qca_ar8327_globals),
 	},
-#if defined(IN_MIB)
 	.attr_port = {
 		.attr = qca_ar8327_port,
 		.n_attr = ARRAY_SIZE(qca_ar8327_port),
 	},
-#endif
 #if defined(IN_VLAN)
 	.attr_vlan = {
 		.attr = qca_ar8327_vlan,
@@ -1401,6 +1412,11 @@ dess_rgmii_mac_work_stop(struct qca_phy_priv *priv)
 void
 qca_mac_port_status_init(a_uint32_t dev_id, a_uint32_t port_id)
 {
+	if(port_id < SSDK_PHYSICAL_PORT1 || port_id >= SW_MAX_NR_PORT)
+	{
+		SSDK_ERROR("port %d does not support status init\n", port_id);
+		return;
+	}
 	qca_phy_priv_global[dev_id]->port_old_link[port_id - 1] = 0;
 	qca_phy_priv_global[dev_id]->port_old_speed[port_id - 1] = FAL_SPEED_BUTT;
 	qca_phy_priv_global[dev_id]->port_old_duplex[port_id - 1] = FAL_DUPLEX_BUTT;
@@ -1444,10 +1460,11 @@ qca_mac_sw_sync_work_task(struct work_struct *work)
 int
 qca_mac_sw_sync_work_start(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY))
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)
+		&& (priv->version != QCA_VER_APPE))
 		return 0;
 
-	if (priv->version == QCA_VER_HPPE) {
+	if ((priv->version == QCA_VER_HPPE) || (priv->version == QCA_VER_APPE)) {
 		qca_mac_sw_sync_port_status_init(priv->device_id);
 	}
 
@@ -1464,7 +1481,8 @@ qca_mac_sw_sync_work_start(struct qca_phy_priv *priv)
 void
 qca_mac_sw_sync_work_stop(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)) {
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY) &&
+			(priv->version != QCA_VER_APPE)) {
 		return;
 	}
 	cancel_delayed_work_sync(&priv->mac_sw_sync_dwork);
@@ -1473,7 +1491,8 @@ qca_mac_sw_sync_work_stop(struct qca_phy_priv *priv)
 void
 qca_mac_sw_sync_work_resume(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)) {
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY) &&
+			(priv->version != QCA_VER_APPE)) {
 		return;
 	}
 
@@ -1554,7 +1573,7 @@ static int qca_switchdev_register(struct qca_phy_priv *priv)
 
 	sw_dev->ops = &qca_ar8327_sw_ops;
 	sw_dev->vlans = AR8327_MAX_VLANS;
-	sw_dev->ports = SSDK_MAX_PORT_NUM;
+	sw_dev->ports = priv->ports;
 
 	ret = register_switch(sw_dev, NULL);
 	if (ret != SW_OK) {
@@ -1682,7 +1701,22 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	priv->phy_dbg_write = qca_ar8327_phy_dbg_write;
 	priv->phy_dbg_read = qca_ar8327_phy_dbg_read;
 	priv->phy_mmd_write = qca_ar8327_mmd_write;
-	priv->ports = SSDK_MAX_PORT_NUM;
+
+	if (chip_type == CHIP_DESS) {
+		priv->ports = 6;
+	} else if ((chip_type == CHIP_ISIS) || (chip_type == CHIP_ISISC)) {
+		priv->ports = 7;
+	} else if (chip_type == CHIP_SCOMPHY) {
+#ifdef MP
+		if(adapt_scomphy_revision_get(priv->device_id) == MP_GEPHY) {
+			/*for ipq50xx, port id is 1 and 2, port 0 is not available*/
+			priv->ports = 3;
+		}
+#endif
+	} else {
+		priv->ports = SSDK_MAX_PORT_NUM;
+	}
+
 #ifdef MP
 	if(chip_type == CHIP_SCOMPHY)
 	{
@@ -3031,8 +3065,10 @@ qca_dess_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	/*config psgmii,sgmii or rgmii mode for Dakota*/
 	ssdk_dess_mac_mode_init(dev_id, cfg->mac_mode);
 
+#ifdef IN_LED
 	/*add BGA Board led contorl*/
 	ssdk_dess_led_init(cfg);
+#endif
 #ifdef IN_TRUNK
 	SW_RTN_ON_ERROR(ssdk_dess_trunk_init(dev_id, cfg->port_cfg.wan_bmp));
 #endif
@@ -3276,15 +3312,27 @@ static int ssdk_dev_event(struct notifier_block *this, unsigned long event, void
 #endif
 		case NETDEV_CHANGEMTU:
 			if(dev->type == ARPHRD_ETHER) {
-				if (strstr(dev->name, "eth")) {
-					if (cfg.chip_type == CHIP_DESS ||
-					   cfg.chip_type == CHIP_ISIS ||
-					   cfg.chip_type == CHIP_ISISC) {
-#ifdef IN_MISC
-						fal_frame_max_size_set(0,
-							dev->mtu + 18);
-#endif
+				if (cfg.chip_type == CHIP_DESS ||
+					cfg.chip_type == CHIP_ISIS ||
+					cfg.chip_type == CHIP_ISISC) {
+					struct net_device *eth_dev = NULL;
+					unsigned int mtu= 0;
+
+					if(!strcmp(dev->name, "eth0")) {
+						eth_dev = dev_get_by_name(&init_net, "eth1");
+					} else if (!strcmp(dev->name, "eth1")) {
+						eth_dev = dev_get_by_name(&init_net, "eth0");
+					} else {
+						return NOTIFY_DONE;
 					}
+					if (!eth_dev) {
+						return NOTIFY_DONE;
+					}
+					mtu = dev->mtu > eth_dev->mtu ? dev->mtu : eth_dev->mtu;
+#ifdef IN_MISC
+					fal_frame_max_size_set(0, mtu + 18);
+#endif
+					dev_put(eth_dev);
 				}
 			}
 			break;
@@ -3449,19 +3497,21 @@ static void qca_ar8327_gpio_reset(struct qca_phy_priv *priv)
 #endif
 	if(!np)
 		return;
-
-	reset_gpio = of_get_property(np, "reset_gpio", &len);
-	if (!reset_gpio )
+	gpio_num = of_get_named_gpio(np, "reset_gpio", 0);
+	if(gpio_num < 0)
 	{
-		SSDK_INFO("reset_gpio node does not exist\n");
-		return;
-	}
-
-	gpio_num = be32_to_cpup(reset_gpio);
-	if(gpio_num <= 0)
-	{
-		SSDK_INFO("reset gpio doesn't exist\n ");
-		return;
+		reset_gpio = of_get_property(np, "reset_gpio", &len);
+		if (!reset_gpio )
+		{
+			SSDK_INFO("reset_gpio node does not exist\n");
+			return;
+		}
+		gpio_num = be32_to_cpup(reset_gpio);
+		if(gpio_num <= 0)
+		{
+			SSDK_INFO("reset gpio doesn't exist\n ");
+			return;
+		}
 	}
 	ret = gpio_request(gpio_num, "reset_gpio");
 	if(ret)

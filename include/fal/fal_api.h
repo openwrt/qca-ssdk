@@ -1917,6 +1917,7 @@ extern "C" {
 #else
 #define QM_API \
     SW_API_DEF(SW_API_UCAST_QUEUE_BASE_PROFILE_SET, fal_ucast_queue_base_profile_set), \
+    SW_API_DEF(SW_API_UCAST_PRIORITY_CLASS_SET, fal_ucast_priority_class_set), \
     SW_API_DEF(SW_API_QUEUE_FLUSH, fal_queue_flush), \
     SW_API_DEF(SW_API_AC_CTRL_SET, fal_ac_ctrl_set), \
     SW_API_DEF(SW_API_AC_PRE_BUFFER_SET, fal_ac_prealloc_buffer_set), \
@@ -1928,6 +1929,7 @@ extern "C" {
 
 #define QM_API_PARAM \
     SW_API_DESC(SW_API_UCAST_QUEUE_BASE_PROFILE_SET) \
+    SW_API_DESC(SW_API_UCAST_PRIORITY_CLASS_SET) \
     SW_API_DESC(SW_API_QUEUE_FLUSH) \
     SW_API_DESC(SW_API_AC_CTRL_SET) \
     SW_API_DESC(SW_API_AC_PRE_BUFFER_SET) \

@@ -770,6 +770,8 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 #endif
 
 #if defined(IN_QM)
+#define SSDK_PRI_MAX		16
+#define SSDK_CPU_QUEUE_NUM	1
 sw_error_t
 qca_hppe_qm_hw_init(a_uint32_t dev_id)
 {
@@ -782,6 +784,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	fal_ac_static_threshold_t sthresh_cfg;
 	a_uint32_t qbase = 0;
 	a_uint32_t chip_ver = 0;
+	a_uint32_t max_pri_supported, pri, class;
 
 	memset(&queue_dst, 0, sizeof(queue_dst));
 
@@ -821,6 +824,26 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 		queue_dst.dst_port = i;
 		qbase = ssdk_ucast_queue_start_get(dev_id, i);
 		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, qbase, i);
+
+		/* Initializes the ucast priority map, cpu queue number depends on the
+		 * queue number mapped with the EDMA RX ring by EDMA_QID2RID_TABLE,
+		 * only queue 0 is enabled for host EDMA rings by default.
+		 * physical port has different queue number between hppe and appe.
+		 * 16 queues per port for hppe, class 0~15 matches with priority 0~15.
+		 * 8 queues per port for appe, class 0~6 matches with priority 0~6, and
+		 * class 7 matches with priority >=7.
+		 */
+		if (i == 0)
+			max_pri_supported = SSDK_CPU_QUEUE_NUM;
+		else
+			max_pri_supported = ssdk_ucast_queue_num_get(dev_id, i);
+		for (pri = 0; pri < SSDK_PRI_MAX; pri++) {
+			if (pri >= max_pri_supported)
+				class = max_pri_supported - 1;
+			else
+				class = pri;
+			fal_ucast_priority_class_set(dev_id, i, pri, class);
+		}
 	}
 
 	/*

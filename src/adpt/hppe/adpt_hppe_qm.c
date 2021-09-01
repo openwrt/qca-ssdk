@@ -821,6 +821,7 @@ adpt_hppe_mcast_cpu_code_class_set(
 	mcast_queue_map_tbl.bf.class = queue_class;
 	return hppe_mcast_queue_map_tbl_set(dev_id, cpu_code, &mcast_queue_map_tbl);
 }
+#endif
 
 sw_error_t
 adpt_hppe_ucast_priority_class_set(
@@ -841,6 +842,7 @@ adpt_hppe_ucast_priority_class_set(
 	return hppe_ucast_priority_map_tbl_set(dev_id, index, &ucast_priority_map_tbl);
 }
 
+#ifndef IN_QM_MINI
 sw_error_t
 adpt_hppe_ac_static_threshold_get(
 		a_uint32_t dev_id,
@@ -1347,8 +1349,10 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_ucast_priority_class_get = adpt_hppe_ucast_priority_class_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_MCAST_CPU_CODE_CLASS_SET))
 		p_adpt_api->adpt_mcast_cpu_code_class_set = adpt_hppe_mcast_cpu_code_class_set;
+#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_PRIORITY_CLASS_SET))
 		p_adpt_api->adpt_ucast_priority_class_set = adpt_hppe_ucast_priority_class_set;
+#ifndef IN_QM_MINI
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_AC_STATIC_THRESHOLD_GET))
 		p_adpt_api->adpt_ac_static_threshold_get = adpt_hppe_ac_static_threshold_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_COUNTER_CLEANUP))

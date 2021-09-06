@@ -783,6 +783,93 @@ union vr_xs_pcs_dig_ctrl1_u {
 	struct vr_xs_pcs_dig_ctrl1 bf;
 };
 
+/*[register] VR_XS_PCS_EEE_MCTRL0 */
+#define VR_XS_PCS_EEE_MCTRL0
+#define VR_XS_PCS_EEE_MCTRL0_ADDRESS 0x38006
+#define VR_XS_PCS_EEE_MCTRL0_NUM     3
+#define VR_XS_PCS_EEE_MCTRL0_INC     0x1
+#define VR_XS_PCS_EEE_MCTRL0_TYPE    REG_TYPE_RW
+#define VR_XS_PCS_EEE_MCTRL0_DEFAULT 0x0
+
+struct vr_xs_pcs_eee_ctrl0 {
+	a_uint32_t  ltx_en:1;
+	a_uint32_t  lrx_en:1;
+	a_uint32_t  tx_quiet_en:1;
+	a_uint32_t  rx_quiet_en:1;
+	a_uint32_t  tx_en_ctrl:1;
+	a_uint32_t  eee_slr_byp:1;
+	a_uint32_t  sign_bit:1;
+	a_uint32_t  rx_en_ctrl:1;
+	a_uint32_t  mult_fact_100ns:4;
+	a_uint32_t  clkstop:4;
+	a_uint32_t  _reserved0:16;
+};
+
+union vr_xs_pcs_eee_ctrl0_u {
+	a_uint32_t val;
+	struct vr_xs_pcs_eee_ctrl0 bf;
+};
+
+/*[register] VR_XS_PCS_EEE_TXTIMER */
+#define VR_XS_PCS_EEE_TXTIMER
+#define VR_XS_PCS_EEE_TXTIMER_ADDRESS 0x38008
+#define VR_XS_PCS_EEE_TXTIMER_NUM     3
+#define VR_XS_PCS_EEE_TXTIMER_INC     0x1
+#define VR_XS_PCS_EEE_TXTIMER_TYPE    REG_TYPE_RW
+#define VR_XS_PCS_EEE_TXTIMER_DEFAULT 0x0
+
+struct vr_xs_pcs_eee_txtimer {
+	a_uint32_t  tsl_res:6;
+	a_uint32_t  t1u_res:2;
+	a_uint32_t  twl_res:5;
+	a_uint32_t  _reserved0:19;
+};
+
+union vr_xs_pcs_eee_txtimer_u {
+	a_uint32_t val;
+	struct vr_xs_pcs_eee_txtimer bf;
+};
+
+/*[register] VR_XS_PCS_EEE_RXTIMER  */
+#define VR_XS_PCS_EEE_RXTIMER
+#define VR_XS_PCS_EEE_RXTIMER_ADDRESS 0x38009
+#define VR_XS_PCS_EEE_RXTIMER_NUM     3
+#define VR_XS_PCS_EEE_RXTIMER_INC     0x1
+#define VR_XS_PCS_EEE_RXTIMER_TYPE    REG_TYPE_RW
+#define VR_XS_PCS_EEE_RXTIMER_DEFAULT 0x0
+
+struct vr_xs_pcs_eee_rxtimer {
+	a_uint32_t  res_100u:8;
+	a_uint32_t  twr_res:6;
+	a_uint32_t  _reserved0:18;
+};
+
+union vr_xs_pcs_eee_rxtimer_u {
+	a_uint32_t val;
+	struct vr_xs_pcs_eee_rxtimer bf;
+};
+
+/*[register] VR_XS_PCS_EEE_MCTRL1 */
+#define VR_XS_PCS_EEE_MCTRL1
+#define VR_XS_PCS_EEE_MCTRL1_ADDRESS 0x3800b
+#define VR_XS_PCS_EEE_MCTRL1_NUM     3
+#define VR_XS_PCS_EEE_MCTRL1_INC     0x1
+#define VR_XS_PCS_EEE_MCTRL1_TYPE    REG_TYPE_RW
+#define VR_XS_PCS_EEE_MCTRL1_DEFAULT 0x0
+
+struct vr_xs_pcs_eee_ctrl1 {
+	a_uint32_t  trn_lpi:1;
+	a_uint32_t  txen_ea_tmr:6;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  trn_rxlpi:1;
+	a_uint32_t  _reserved1:23;
+};
+
+union vr_xs_pcs_eee_ctrl1_u {
+	a_uint32_t val;
+	struct vr_xs_pcs_eee_ctrl1 bf;
+};
+
 /*[register] VR_XS_PCS_KR_CTRL */
 #define VR_XS_PCS_KR_CTRL
 #define VR_XS_PCS_KR_CTRL_ADDRESS 0x38007

@@ -21,6 +21,12 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
+#define UNIPHY_XPCS_TSL_TIMER         0xa
+#define UNIPHY_XPCS_TLU_TIMER         0x3
+#define UNIPHY_XPCS_TWL_TIMER         0x16
+#define UNIPHY_XPCS_100US_TIMER       0xc8
+#define UNIPHY_XPCS_TWR_TIMER         0x1c
+
 sw_error_t
 adpt_hppe_uniphy_usxgmii_status_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		a_uint32_t port_id, union sr_mii_ctrl_u *sr_mii_ctrl);

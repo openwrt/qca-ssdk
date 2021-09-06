@@ -35,6 +35,10 @@
 #define VR_XAUI_MODE_CTRL_MAX_ENTRY                     3
 #define VR_XS_PCS_KR_CTRL_MAX_ENTRY                     3
 #define VR_XS_PCS_DIG_STS_MAX_ENTRY                     3
+#define VR_XS_PCS_EEE_MCTRL0_MAX_ENTRY                  3
+#define VR_XS_PCS_EEE_MCTRL1_MAX_ENTRY                  3
+#define VR_XS_PCS_EEE_TXTIMER_MAX_ENTRY                 3
+#define VR_XS_PCS_EEE_RXTIMER_MAX_ENTRY                 3
 
 #define UNIPHY_PLL_CONTROL_VCO_RELATED_SELECTION_MAX_ENTRY      3
 #define UNIPHY_TX_AC_JTAG_MUX_DRIVER_SELECTION_MAX_ENTRY        3
@@ -181,6 +185,54 @@ hppe_vr_xs_pcs_dig_ctrl1_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_xs_pcs_dig_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl0_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl0_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_txtimer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_txtimer_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_txtimer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_txtimer_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_rxtimer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_rxtimer_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_rxtimer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_rxtimer_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl1_u *value);
 
 sw_error_t
 hppe_vr_xs_pcs_kr_ctrl_get(

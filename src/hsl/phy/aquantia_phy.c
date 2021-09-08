@@ -58,7 +58,7 @@ aquantia_phy_reg_write(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_mmd,
 
 	return rv;
 }
-#ifndef IN_PORTCONTROL_MINI
+
 /******************************************************************************
 *
 * aquantia_phy_get_phy_id - get the phy id
@@ -82,7 +82,7 @@ aquantia_phy_get_phy_id(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	return rv;
 }
-#endif
+
 sw_error_t
 aquantia_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		     fal_port_speed_t * speed)
@@ -2097,7 +2097,7 @@ sw_error_t
 aquantia_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_bmp)
 {
 	a_uint16_t phy_data = 0;
-	a_uint32_t port_id = 0, phy_addr = 0;
+	a_uint32_t port_id = 0, phy_addr = 0, aq_phy_id = 0;
 	sw_error_t rv = SW_OK;
 
 	for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++)
@@ -2137,14 +2137,39 @@ aquantia_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_bmp)
 			SW_RTN_ON_ERROR(rv);
 
 			/* config aq phy ACT and LINK led behavior*/
-			phy_data = AQUANTIA_ACT_LED_VALUE;
-			rv = aquantia_phy_reg_write(dev_id, phy_addr, AQUANTIA_MMD_GLOBAL_REGISTERS,
-				AQUANTIA_ACT_LED_STATUS, phy_data);
+			rv = aquantia_phy_get_phy_id (dev_id, phy_addr, &aq_phy_id);
 			SW_RTN_ON_ERROR(rv);
-			phy_data = AQUANTIA_LINK_LED_VALUE;
-			rv = aquantia_phy_reg_write(dev_id, phy_addr, AQUANTIA_MMD_GLOBAL_REGISTERS,
-				AQUANTIA_LINK_LED_STATUS, phy_data);
-			SW_RTN_ON_ERROR(rv);
+			if(aq_phy_id == AQUANTIA_PHY_113C_B0)
+			{
+				rv = aquantia_phy_reg_write(dev_id, phy_addr,
+					AQUANTIA_MMD_GLOBAL_REGISTERS,
+					AQUANTIA_PROVISIONING_LED0_STATUS,
+					AQUANTIA_LINK_ACT_LED_DISABLE_VALUE);
+				SW_RTN_ON_ERROR(rv);
+				rv = aquantia_phy_reg_write(dev_id, phy_addr,
+					AQUANTIA_MMD_GLOBAL_REGISTERS,
+					AQUANTIA_PROVISIONING_LED1_STATUS,
+					AQUANTIA_LINK_ACT_LED_VALUE);
+				SW_RTN_ON_ERROR(rv);
+				rv = aquantia_phy_reg_write(dev_id, phy_addr,
+					AQUANTIA_MMD_GLOBAL_REGISTERS,
+					AQUANTIA_PROVISIONING_LED2_STATUS,
+					AQUANTIA_LINK_ACT_LED_DISABLE_VALUE);
+				SW_RTN_ON_ERROR(rv);
+			}
+			else
+			{
+				rv = aquantia_phy_reg_write(dev_id, phy_addr,
+					AQUANTIA_MMD_GLOBAL_REGISTERS,
+					AQUANTIA_PROVISIONING_LED0_STATUS,
+					AQUANTIA_LINK_ACT_LED_VALUE);
+				SW_RTN_ON_ERROR(rv);
+				rv = aquantia_phy_reg_write(dev_id, phy_addr,
+					AQUANTIA_MMD_GLOBAL_REGISTERS,
+					AQUANTIA_PROVISIONING_LED1_STATUS,
+					AQUANTIA_LINK_LED_VALUE);
+				SW_RTN_ON_ERROR(rv);
+			}
 			/*add all ability of aq phy*/
 			rv = aquantia_phy_set_autoneg_adv(dev_id, phy_addr,
 				FAL_PHY_ADV_XGE_SPEED_ALL | FAL_PHY_ADV_100TX_FD |

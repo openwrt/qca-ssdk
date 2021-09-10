@@ -1972,6 +1972,7 @@ hppe_l3_vp_port_tbl_ipv6_sg_cvlan_en_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 #if defined(APPE)
 sw_error_t
@@ -1985,6 +1986,8 @@ appe_l3_vp_port_tbl_ipo_vp_profile_get(
 		a_uint32_t index,
 		a_uint32_t *value);
 #endif
+
+#ifndef IN_IP_MINI
 sw_error_t
 hppe_in_l3_if_tbl_ttl_dec_bypass_get(
 		a_uint32_t dev_id,

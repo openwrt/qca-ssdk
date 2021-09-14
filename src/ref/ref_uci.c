@@ -8629,12 +8629,12 @@ parse_acl_action_field(struct switch_ext *ext_value_p, fal_acl_rule_t *rule)
 		cmd_data_check_integer((char*)ext_value_p->option_value,
 			&(tmpdata), 0x7f, 0);
 		rule->cascade_data = tmpdata & 0x7f;
-		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_CASCADE);
+		FAL_ACTION_FLG_SET(rule->action_flg_ext, FAL_ACL_ACTION_CASCADE);
 	} else if(!strcmp(ext_value_p->option_name, "vpn_type")) {
 		cmd_data_check_attr("vpn_type", (char*)ext_value_p->option_value,
 			&tmpdata, sizeof(tmpdata));
 		rule->vpn_type= tmpdata & 0x1;
-		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_VPN);
+		FAL_ACTION_FLG_SET(rule->action_flg_ext, FAL_ACL_ACTION_VPN);
 	} else if(!strcmp(ext_value_p->option_name, "vpn_id")) {
 		cmd_data_check_integer((char*)ext_value_p->option_value,
 			&(tmpdata), 0x3f, 0);
@@ -8643,7 +8643,7 @@ parse_acl_action_field(struct switch_ext *ext_value_p, fal_acl_rule_t *rule)
 		cmd_data_check_confirm((char*)ext_value_p->option_value, A_FALSE,
 			(a_bool_t *)&tmpdata, sizeof(tmpdata));
 		if(tmpdata)
-			FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_LEARN_DIS);
+			FAL_ACTION_FLG_SET(rule->action_flg_ext, FAL_ACL_ACTION_LEARN_DIS);
 	} else if(!strcmp(ext_value_p->option_name, "policy_id")) {
 		cmd_data_check_uint16((char*)ext_value_p->option_value,
 			&(tmpdata), sizeof(tmpdata));
@@ -9238,12 +9238,21 @@ parse_acl_rule(a_uint32_t dev_id, struct switch_val *val)
 	a_uint32_t obj_value = 0;
 	a_uint32_t list_id = 0xffffffff;
 	fal_acl_rule_t rule;
-	fal_acl_rule_t inner_rule;
+#if defined(APPE)
+	fal_acl_rule_t *inner_rule = NULL;
+#endif
 	struct switch_ext *switch_ext_p, *ext_value_p;
 	int rv = 0;
 	a_uint32_t tmpdata = 0;
 	memset(&rule, 0, sizeof(fal_acl_rule_t));
-	memset(&inner_rule, 0, sizeof(fal_acl_rule_t));
+#if defined(APPE)
+	inner_rule = (fal_acl_rule_t *)aos_mem_alloc(sizeof(fal_acl_rule_t));
+	if(inner_rule == NULL)
+	{
+		SSDK_ERROR("inner rule allocate fail\n");
+		return SW_FAIL;
+	}
+#endif
 	switch_ext_p = val->value.ext_val;
 	while(switch_ext_p) {
 		ext_value_p = switch_ext_p;
@@ -9302,7 +9311,7 @@ parse_acl_rule(a_uint32_t dev_id, struct switch_val *val)
 				cmd_data_check_ruletype((char*)ext_value_p->option_value,
 					&(rule.inner_rule_field.rule_type), sizeof(a_uint32_t));
 			}
-			parse_acl_rule_field(ext_value_p, &inner_rule, A_TRUE);
+			parse_acl_rule_field(ext_value_p, inner_rule, A_TRUE);
 			parse_acl_tunnel_info_field(ext_value_p, &rule.tunnel_info);
 		}
 #endif
@@ -9316,8 +9325,10 @@ parse_acl_rule(a_uint32_t dev_id, struct switch_val *val)
 		rule.rule_type == FAL_ACL_RULE_TUNNEL_IP6 ||
 		rule.rule_type == FAL_ACL_RULE_TUNNEL_UDF)
 	{
-		acl_rule_field_convert(&inner_rule, &rule.inner_rule_field, A_TRUE);
+		acl_rule_field_convert(inner_rule, &rule.inner_rule_field, A_TRUE);
 	}
+	aos_mem_free(inner_rule);
+	inner_rule = NULL;
 #endif
 	/*to be compatible with previous version which didn't define list id*/
 	if(0xffffffff == list_id) {

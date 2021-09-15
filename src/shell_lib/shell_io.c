@@ -425,15 +425,16 @@ struct attr_des_t g_attr_des[] =
 			{NULL, FAL_VPORT_TYPE_BUTT}
 		}
 	},
+#endif
 	{
 		"cnt_mode",
 		{
-			{"ip_pkt", FAL_VPORT_CNT_MODE_IP_PKT},
-			{"full_pkt", FAL_VPORT_CNT_MODE_FULL_PKT},
-			{NULL, FAL_VPORT_CNT_MODE_BUTT}
+			{"ip_pkt", FAL_PORT_CNT_MODE_IP_PKT},
+			{"full_pkt", FAL_PORT_CNT_MODE_FULL_PKT},
+			{NULL, FAL_PORT_CNT_MODE_BUTT}
 		}
 	},
-#endif
+
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -562,6 +563,7 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_PORT_EEE_CONFIG, (param_check_t)cmd_data_check_port_eee_config, NULL),
     SW_TYPE_DEF(SW_PORT_LOOPBACK_CONFIG, (param_check_t)cmd_data_check_switch_port_loopback_config, NULL),
 #endif
+	SW_TYPE_DEF(SW_PORT_CNT_CFG, (param_check_t)cmd_data_check_port_cnt_cfg, NULL),
 #endif
 #ifdef IN_PORTVLAN
     SW_TYPE_DEF(SW_1QMODE, cmd_data_check_1qmode, NULL),
@@ -881,7 +883,6 @@ static sw_data_type_t sw_data_type[] =
 #endif
 #ifdef IN_VPORT
     SW_TYPE_DEF(SW_VPORT_STATE, (param_check_t)cmd_data_check_vport_state, NULL),
-    SW_TYPE_DEF(SW_VPORT_CNT_CFG, (param_check_t)cmd_data_check_vport_cnt_cfg, NULL),
 #endif
 };
 
@@ -1724,7 +1725,52 @@ cmd_data_check_mru_entry(char *cmd_str, void * val, a_uint32_t size)
 }
 
 #endif
+
+sw_error_t
+cmd_data_check_port_cnt_cfg(char *cmd_str, fal_port_cnt_cfg_t *arg_val, a_uint32_t size)
+{
+	char *cmd;
+	fal_port_cnt_cfg_t entry;
+
+	aos_mem_zero(&entry, sizeof(fal_port_cnt_cfg_t));
+
+	cmd_data_check_element("rx_cnt_enable", "disable",
+						"usage: usage: enable/disable\n",
+						cmd_data_check_enable, (cmd,
+						&(entry.rx_cnt_en), sizeof(entry.rx_cnt_en)));
+	cmd_data_check_element("uc_tx_cnt_enable", "disable",
+						"usage: usage: enable/disable\n",
+						cmd_data_check_enable, (cmd,
+						&(entry.uc_tx_cnt_en), sizeof(entry.uc_tx_cnt_en)));
+	cmd_data_check_element("mc_tx_cnt_enable", "disable",
+						"usage: usage: enable/disable\n",
+						cmd_data_check_enable, (cmd,
+						&(entry.mc_tx_cnt_en), sizeof(entry.mc_tx_cnt_en)));
+
+#if defined(APPE)
+	cmd_data_check_element("tl_rx_cnt_enable", "disable",
+						"usage: usage: enable/disable\n",
+						cmd_data_check_enable, (cmd,
+						&(entry.tl_rx_cnt_en), sizeof(entry.tl_rx_cnt_en)));
+
+	cmd_data_check_element("rx_cnt_mode", "full_pkt",
+						"usage: full_pkt or ip_pkt\n",
+						cmd_data_check_attr, ("cnt_mode", cmd,
+						&entry.rx_cnt_mode, sizeof(entry.rx_cnt_mode)));
+
+	cmd_data_check_element("tx_cnt_mode", "full_pkt",
+						"usage: full_pkt or ip_pkt\n",
+						cmd_data_check_attr, ("cnt_mode", cmd,
+						&entry.tx_cnt_mode, sizeof(entry.tx_cnt_mode)));
 #endif
+
+	*(fal_port_cnt_cfg_t *)arg_val = entry;
+
+	return SW_OK;
+}
+
+#endif
+
 #ifdef IN_INTERFACECONTROL
 sw_error_t
 cmd_data_check_interface_mode(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
@@ -18453,29 +18499,6 @@ cmd_data_check_vport_state(char *cmd_str, fal_vport_state_t *arg_val, a_uint32_t
 	SW_RTN_ON_ERROR(rv);
 
 	*(fal_vport_state_t *)arg_val = entry;
-
-	return SW_OK;
-}
-
-sw_error_t
-cmd_data_check_vport_cnt_cfg(char *cmd_str, fal_vport_cnt_cfg_t *arg_val, a_uint32_t size)
-{
-	char *cmd;
-	fal_vport_cnt_cfg_t entry;
-
-	aos_mem_zero(&entry, sizeof(fal_vport_cnt_cfg_t));
-
-	cmd_data_check_element("rx_cnt_mode", "full_pkt",
-			"usage: full_pkt or ip_pkt\n",
-			cmd_data_check_attr, ("cnt_mode", cmd,
-				&entry.rx_cnt_mode, sizeof(entry.rx_cnt_mode)));
-
-	cmd_data_check_element("tx_cnt_mode", "full_pkt",
-			"usage: full_pkt or ip_pkt\n",
-			cmd_data_check_attr, ("cnt_mode", cmd,
-				&entry.tx_cnt_mode, sizeof(entry.tx_cnt_mode)));
-
-	*(fal_vport_cnt_cfg_t *)arg_val = entry;
 
 	return SW_OK;
 }

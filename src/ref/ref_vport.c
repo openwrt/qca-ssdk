@@ -35,13 +35,6 @@ static const char *vport_statecheck[] = {
 	"tunnel_active",
 };
 
-static const char *vport_cntcfg[] = {
-	"port_id",
-	"rx_cnt_mode",
-	"tx_cnt_mode",
-};
-
-
 int parse_vport(const char *command_name, struct switch_val *val)
 {
 	int rv = -1;
@@ -52,9 +45,6 @@ int parse_vport(const char *command_name, struct switch_val *val)
 	} else if (!strcmp(command_name, "Statecheck")) {
 		rv = parse_uci_option(val, vport_statecheck,
 				sizeof(vport_statecheck)/sizeof(char *));
-	} else if (!strcmp(command_name, "Cntcfg")) {
-		rv = parse_uci_option(val, vport_cntcfg,
-				sizeof(vport_cntcfg)/sizeof(char *));
 	}
 
 	return rv;

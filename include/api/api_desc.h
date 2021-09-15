@@ -566,6 +566,36 @@ extern "C" {
     SW_PARAM_DEF(SW_API_PT_8023AH_GET, SW_PORT_8023AH_CTRL,\
         sizeof(fal_port_8023ah_ctrl_t), SW_PARAM_PTR|SW_PARAM_OUT, "8023ah"),
 
+#define SW_API_PT_CNT_CFG_SET_DESC \
+		SW_PARAM_DEF(SW_API_PT_CNT_CFG_SET, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_CFG_SET, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_CFG_SET, SW_PORT_CNT_CFG, \
+				sizeof(fal_port_cnt_cfg_t), SW_PARAM_IN|SW_PARAM_PTR, "counter config"),
+
+#define SW_API_PT_CNT_CFG_GET_DESC \
+		SW_PARAM_DEF(SW_API_PT_CNT_CFG_GET, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_CFG_GET, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_CFG_GET, SW_PORT_CNT_CFG, \
+				sizeof(fal_port_cnt_cfg_t), SW_PARAM_OUT|SW_PARAM_PTR, "counter config"),
+
+#define SW_API_PT_CNT_GET_DESC \
+		SW_PARAM_DEF(SW_API_PT_CNT_GET, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_GET, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_GET, SW_PORT_CNT, \
+				sizeof(fal_port_cnt_t), SW_PARAM_OUT|SW_PARAM_PTR, "counter"),
+
+#define SW_API_PT_CNT_FLUSH_DESC \
+		SW_PARAM_DEF(SW_API_PT_CNT_FLUSH, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+		SW_PARAM_DEF(SW_API_PT_CNT_FLUSH, SW_UINT32, \
+				sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"),
+
 #define SW_API_VLAN_ADD_DESC \
     SW_PARAM_DEF(SW_API_VLAN_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_VLAN_ADD, SW_UINT32, 4, SW_PARAM_IN, "Vlan Id"),
@@ -2737,18 +2767,6 @@ extern "C" {
 #define SW_API_FRAME_CRC_RESERVE_GET_DESC \
     SW_PARAM_DEF(SW_API_FRAME_CRC_RESERVE_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_FRAME_CRC_RESERVE_GET, SW_ENABLE, 4, SW_PARAM_PTR|SW_PARAM_OUT, "Enable"),
-
-#define SW_API_DEBUG_PORT_COUNTER_ENABLE_DESC \
-    SW_PARAM_DEF(SW_API_DEBUG_PORT_COUNTER_ENABLE, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),    \
-    SW_PARAM_DEF(SW_API_DEBUG_PORT_COUNTER_ENABLE, SW_UINT32, 4, SW_PARAM_IN, "Port ID"),   \
-    SW_PARAM_DEF(SW_API_DEBUG_PORT_COUNTER_ENABLE, SW_DEBUG_COUNTER_EN, \
-		    sizeof(fal_counter_en_t), SW_PARAM_PTR|SW_PARAM_IN, "enable"),
-
-#define SW_API_DEBUG_PORT_COUNTER_STATUS_GET_DESC \
-    SW_PARAM_DEF(SW_API_DEBUG_PORT_COUNTER_STATUS_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),    \
-    SW_PARAM_DEF(SW_API_DEBUG_PORT_COUNTER_STATUS_GET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"),   \
-    SW_PARAM_DEF(SW_API_DEBUG_PORT_COUNTER_STATUS_GET, SW_DEBUG_COUNTER_EN, \
-		    sizeof(fal_counter_en_t), SW_PARAM_PTR|SW_PARAM_OUT, "enable"),
 
 #define SW_API_LED_PATTERN_SET_DESC \
     SW_PARAM_DEF(SW_API_LED_PATTERN_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),\
@@ -5097,36 +5115,6 @@ extern "C" {
 		    sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
     SW_PARAM_DEF(SW_API_VPORT_STATE_CHECK_GET, SW_VPORT_STATE, \
 		    sizeof(fal_vport_state_t), SW_PARAM_OUT|SW_PARAM_PTR, "state check"),
-
-#define SW_API_VPORT_CNT_CFG_SET_DESC \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_CFG_SET, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_CFG_SET, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_CFG_SET, SW_VPORT_CNT_CFG, \
-		    sizeof(fal_vport_cnt_cfg_t), SW_PARAM_IN|SW_PARAM_PTR, "counter config"),
-
-#define SW_API_VPORT_CNT_CFG_GET_DESC \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_CFG_GET, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_CFG_GET, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_CFG_GET, SW_VPORT_CNT_CFG, \
-		    sizeof(fal_vport_cnt_cfg_t), SW_PARAM_OUT|SW_PARAM_PTR, "counter config"),
-
-#define SW_API_VPORT_CNT_GET_DESC \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_GET, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_GET, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_GET, SW_VPORT_CNT, \
-		    sizeof(fal_vport_cnt_t), SW_PARAM_OUT|SW_PARAM_PTR, "counter"),
-
-#define SW_API_VPORT_CNT_FLUSH_DESC \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_FLUSH, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
-    SW_PARAM_DEF(SW_API_VPORT_CNT_FLUSH, SW_UINT32, \
-		    sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"),
 
 #define SW_API_TUNNEL_INTF_SET_DESC \
 	SW_PARAM_DEF(SW_API_TUNNEL_INTF_SET, SW_UINT32, \

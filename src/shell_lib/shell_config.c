@@ -667,6 +667,7 @@ struct sub_cmd_des_t g_port_des[] =
 	{"port8023ah", "set", SW_API_PT_8023AH_SET, NULL},
 #endif
 	#endif
+	{"Cntcfg", "set", SW_API_PT_CNT_CFG_SET, NULL},
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif
@@ -1399,7 +1400,6 @@ struct sub_cmd_des_t g_vport_des[] =
 {
     {"Phyport", "set", SW_API_VPORT_PHYSICAL_PORT_SET, NULL},
     {"Statecheck", "set", SW_API_VPORT_STATE_CHECK_SET, NULL},
-    {"Cntcfg", "set", SW_API_VPORT_CNT_CFG_SET, NULL},
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif

@@ -2761,6 +2761,19 @@ parse_port8023ah(struct switch_val *val)
 }
 #endif
 #endif
+
+static const char *port_cntcfg[] = {
+	"port_id",
+	"rx_cnt_enable",
+	"uc_tx_cnt_enable",
+	"mc_tx_cnt_enable",
+#if defined(APPE)
+	"tl_rx_cnt_enable",
+	"rx_cnt_mode",
+	"tx_cnt_mode",
+#endif
+};
+
 #endif
 
 #ifdef IN_PORTVLAN
@@ -11910,6 +11923,11 @@ parse_port(const char *command_name, struct switch_val *val)
 #endif
 	}
 #endif
+	else if (!strcmp(command_name, "Cntcfg")) {
+		rv = parse_uci_option(val, port_cntcfg,
+				sizeof(port_cntcfg)/sizeof(char *));
+	}
+
 	return rv;
 }
 #endif

@@ -338,6 +338,15 @@ typedef sw_error_t (*adpt_port_netdev_notify_func)(struct qca_phy_priv *priv,
 			a_uint32_t port_id);
 typedef sw_error_t (*adpt_port_phy_status_get_func)(a_uint32_t dev_id,
 			fal_port_t port_id, struct port_phy_status *phy_status);
+typedef sw_error_t (*adpt_port_cnt_cfg_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_port_cnt_cfg_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_port_cnt_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_port_cnt_t *port_cnt);
+typedef sw_error_t (*adpt_port_cnt_flush_func)(a_uint32_t dev_id,
+		fal_port_t port_id);
+
 // mirror
 typedef sw_error_t (*adpt_mirr_port_in_set_func)(a_uint32_t dev_id, fal_port_t port_id,
                          a_bool_t enable);
@@ -988,10 +997,6 @@ typedef sw_error_t (*adpt_policer_ctrl_set_func)(a_uint32_t dev_id, fal_policer_
 typedef sw_error_t (*adpt_policer_ctrl_get_func)(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 /* misc */
-typedef sw_error_t (*adpt_debug_port_counter_enable_func)(a_uint32_t dev_id,
-			fal_port_t port_id, fal_counter_en_t * cnt_en);
-typedef sw_error_t (*adpt_debug_port_counter_status_get_func)(a_uint32_t dev_id,
-			fal_port_t port_id, fal_counter_en_t * cnt_en);
 typedef sw_error_t (*adpt_debug_counter_get_func)(a_bool_t show_type);
 typedef sw_error_t (*adpt_debug_counter_set_func)(void);
 typedef sw_error_t (*adpt_intr_port_link_mask_set_func) (a_uint32_t dev_id,
@@ -1150,14 +1155,6 @@ typedef sw_error_t (*adpt_vport_state_check_set_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
 typedef sw_error_t (*adpt_vport_state_check_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
-typedef sw_error_t (*adpt_vport_cnt_cfg_set_func)(a_uint32_t dev_id,
-		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
-typedef sw_error_t (*adpt_vport_cnt_cfg_get_func)(a_uint32_t dev_id,
-		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
-typedef sw_error_t (*adpt_vport_cnt_flush_func)(a_uint32_t dev_id,
-		fal_port_t port_id);
-typedef sw_error_t (*adpt_vport_cnt_get_func)(a_uint32_t dev_id,
-		fal_port_t port_id, fal_vport_cnt_t *vp_cnt);
 
 /*vxlan*/
 typedef sw_error_t (*adpt_vxlan_entry_add_func)(a_uint32_t dev_id,
@@ -1506,6 +1503,11 @@ typedef struct
 	adpt_port_phy_status_get_func adpt_port_phy_status_get;
 	adpt_port_8023ah_set_func adpt_port_8023ah_set;
 	adpt_port_8023ah_get_func adpt_port_8023ah_get;
+	adpt_port_cnt_cfg_set_func adpt_port_cnt_cfg_set;
+	adpt_port_cnt_cfg_get_func adpt_port_cnt_cfg_get;
+	adpt_port_cnt_get_func adpt_port_cnt_get;
+	adpt_port_cnt_flush_func adpt_port_cnt_flush;
+
 // mirror
 	a_uint32_t adpt_mirror_func_bitmap;
 	adpt_mirr_port_in_set_func adpt_mirr_port_in_set;
@@ -1843,8 +1845,6 @@ typedef struct
 	adpt_policer_ctrl_get_func adpt_policer_ctrl_get;
 
 	/* misc */
-	adpt_debug_port_counter_enable_func adpt_debug_port_counter_enable;
-	adpt_debug_port_counter_status_get_func adpt_debug_port_counter_status_get;
 	adpt_debug_counter_set_func adpt_debug_counter_set;
 	adpt_debug_counter_get_func adpt_debug_counter_get;
 	adpt_intr_port_link_mask_set_func adpt_intr_port_link_mask_set;
@@ -1931,10 +1931,6 @@ typedef struct
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 	adpt_vport_state_check_set_func adpt_vport_state_check_set;
 	adpt_vport_state_check_get_func adpt_vport_state_check_get;
-	adpt_vport_cnt_cfg_set_func adpt_vport_cnt_cfg_set;
-	adpt_vport_cnt_cfg_get_func adpt_vport_cnt_cfg_get;
-	adpt_vport_cnt_flush_func adpt_vport_cnt_flush;
-	adpt_vport_cnt_get_func adpt_vport_cnt_get;
 
 	/* tunnel */
 	a_uint32_t adpt_tunnel_func_bitmap[2];

@@ -454,16 +454,16 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 		case CHIP_HPPE:
 			if (g_adpt_api[dev_id] == NULL) {
 				g_adpt_api[dev_id] = aos_mem_alloc(sizeof(adpt_api_t));
-			}
 
-			if(g_adpt_api[dev_id] == NULL)
-			{
-				SSDK_ERROR("%s, %d:malloc fail for adpt api\n",
-						__FUNCTION__, __LINE__);
-				return SW_FAIL;
-			}
-			aos_mem_zero(g_adpt_api[dev_id], sizeof(adpt_api_t));
+				if(g_adpt_api[dev_id] == NULL)
+				{
+					SSDK_ERROR("%s, %d:malloc fail for adpt api\n",
+							__FUNCTION__, __LINE__);
+					return SW_FAIL;
+				}
 
+				aos_mem_zero(g_adpt_api[dev_id], sizeof(adpt_api_t));
+			}
 			g_chip_ver[dev_id].chip_type = cfg->chip_type;
 			g_chip_ver[dev_id].chip_revision = cfg->chip_revision;
 			g_adpt_api[dev_id]->adpt_mirror_func_bitmap = 0xffffffff;

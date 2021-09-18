@@ -2620,16 +2620,6 @@ parse_port_mtu(struct switch_val *val)
 			val_ptr[1] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "mtuaction")) {
 			val_ptr[2] = (char*)ext_value_p->option_value;
-#if defined (APPE)
-		} else if(!strcmp(ext_value_p->option_name, "mtu_enable")) {
-			val_ptr[3] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "mtu_type")) {
-			val_ptr[4] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "extra_header_len")) {
-			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eg_vlan_tag_flag")) {
-			val_ptr[6] = (char*)ext_value_p->option_value;
-#endif
 		} else {
 			rv = -1;
 			break;
@@ -2748,6 +2738,40 @@ parse_port8023ah(struct switch_val *val)
 			val_ptr[0] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "loopback_en")) {
 			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_port_mtu_cfg(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mtu_enable")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mtu_type")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "extra_header_len")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "eg_vlan_tag_flag")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
 		} else {
 			rv = -1;
 			break;
@@ -11922,6 +11946,8 @@ parse_port(const char *command_name, struct switch_val *val)
 #if defined (APPE)
 	} else if(!strcmp(command_name, "Port8023ah")) {
 		rv = parse_port8023ah(val);
+	} else if(!strcmp(command_name, "Mtucfg")) {
+		rv = parse_port_mtu_cfg(val);
 #endif
 	}
 #endif

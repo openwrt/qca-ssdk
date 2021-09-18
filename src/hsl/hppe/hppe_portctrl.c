@@ -2193,6 +2193,37 @@ hppe_mru_mtu_ctrl_tbl_mtu_cmd_set(
 }
 
 sw_error_t
+hppe_mru_mtu_ctrl_tbl_mtu_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.mtu;
+	return ret;
+}
+
+sw_error_t
+hppe_mru_mtu_ctrl_tbl_mtu_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.mtu = value;
+	ret = hppe_mru_mtu_ctrl_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
 hppe_mru_mtu_ctrl_tbl_rx_cnt_en_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

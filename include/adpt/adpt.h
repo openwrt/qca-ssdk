@@ -334,6 +334,10 @@ typedef sw_error_t (*adpt_port_8023ah_set_func)(a_uint32_t dev_id,
 			fal_port_t port_id, fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
 typedef sw_error_t (*adpt_port_8023ah_get_func)(a_uint32_t dev_id,
 			fal_port_t port_id, fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
+typedef sw_error_t (*adpt_port_mtu_cfg_set_func)(a_uint32_t dev_id,
+			fal_port_t port_id, fal_mtu_cfg_t *mtu_cfg);
+typedef sw_error_t (*adpt_port_mtu_cfg_get_func)(a_uint32_t dev_id,
+			fal_port_t port_id, fal_mtu_cfg_t *mtu_cfg);
 typedef sw_error_t (*adpt_port_netdev_notify_func)(struct qca_phy_priv *priv,
 			a_uint32_t port_id);
 typedef sw_error_t (*adpt_port_phy_status_get_func)(a_uint32_t dev_id,
@@ -1507,7 +1511,8 @@ typedef struct
 	adpt_port_cnt_cfg_get_func adpt_port_cnt_cfg_get;
 	adpt_port_cnt_get_func adpt_port_cnt_get;
 	adpt_port_cnt_flush_func adpt_port_cnt_flush;
-
+	adpt_port_mtu_cfg_set_func adpt_port_mtu_cfg_set;
+	adpt_port_mtu_cfg_get_func adpt_port_mtu_cfg_get;
 // mirror
 	a_uint32_t adpt_mirror_func_bitmap;
 	adpt_mirr_port_in_set_func adpt_mirr_port_in_set;

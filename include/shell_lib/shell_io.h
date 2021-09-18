@@ -377,8 +377,10 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_mru_entry(char *cmd_str, void * val, a_uint32_t size);
-
-
+#ifdef APPE
+sw_error_t
+cmd_data_check_mtu_cfg(char *cmd_str, void * val, a_uint32_t size);
+#endif
 #endif
 #endif
 #ifdef IN_INTERFACECONTROL

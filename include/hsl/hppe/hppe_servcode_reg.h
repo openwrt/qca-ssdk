@@ -109,11 +109,12 @@ union in_l2_service_tbl_u {
 #define EG_SERVICE_TBL
 #if defined(APPE)
 #define EG_SERVICE_TBL_ADDRESS 0x23000
+#define EG_SERVICE_TBL_INC     0x10
 #else
 #define EG_SERVICE_TBL_ADDRESS 0xc000
+#define EG_SERVICE_TBL_INC     0x8
 #endif
 #define EG_SERVICE_TBL_NUM     256
-#define EG_SERVICE_TBL_INC     0x8
 #define EG_SERVICE_TBL_TYPE    REG_TYPE_RW
 #define EG_SERVICE_TBL_DEFAULT 0x0
 	/*[field] FIELD_UPDATE_ACTION*/

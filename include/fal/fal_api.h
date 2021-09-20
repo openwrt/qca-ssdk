@@ -117,6 +117,8 @@ extern "C" {
     SW_API_DEF(SW_API_PT_MRU_GET, fal_port_mru_get), \
     SW_API_DEF(SW_API_PT_MTU_CFG_SET, fal_port_mtu_cfg_set), \
     SW_API_DEF(SW_API_PT_MTU_CFG_GET, fal_port_mtu_cfg_get), \
+    SW_API_DEF(SW_API_PT_MRU_MTU_SET, fal_port_mru_mtu_set), \
+    SW_API_DEF(SW_API_PT_MRU_MTU_GET, fal_port_mru_mtu_get), \
     SW_API_DEF(SW_API_PT_SOURCE_FILTER_GET, fal_port_source_filter_status_get), \
     SW_API_DEF(SW_API_PT_SOURCE_FILTER_SET, fal_port_source_filter_enable), \
     SW_API_DEF(SW_API_PT_FRAME_MAX_SIZE_GET, fal_port_max_frame_size_get), \
@@ -232,6 +234,8 @@ extern "C" {
     SW_API_DESC(SW_API_PT_MRU_GET) \
     SW_API_DESC(SW_API_PT_MTU_CFG_SET) \
     SW_API_DESC(SW_API_PT_MTU_CFG_GET) \
+    SW_API_DESC(SW_API_PT_MRU_MTU_SET) \
+    SW_API_DESC(SW_API_PT_MRU_MTU_GET) \
     SW_API_DESC(SW_API_PT_SOURCE_FILTER_GET) \
     SW_API_DESC(SW_API_PT_SOURCE_FILTER_SET) \
     SW_API_DESC(SW_API_PT_FRAME_MAX_SIZE_GET) \
@@ -262,22 +266,30 @@ extern "C" {
     SW_API_DEF(SW_API_PT_AN_ENABLE, fal_port_autoneg_enable), \
     SW_API_DEF(SW_API_PT_AN_RESTART, fal_port_autoneg_restart), \
     SW_API_DEF(SW_API_PT_AN_ADV_SET, fal_port_autoneg_adv_set), \
-    SW_API_DEF(SW_API_PT_LINK_MODE_SET, fal_port_link_forcemode_set),   \
+    SW_API_DEF(SW_API_PT_LINK_MODE_SET, fal_port_link_forcemode_set), \
     SW_API_DEF(SW_API_PT_TXHDR_SET, fal_port_txhdr_mode_set), \
     SW_API_DEF(SW_API_PT_RXHDR_SET, fal_port_rxhdr_mode_set), \
-    SW_API_DEF(SW_API_HEADER_TYPE_SET, fal_header_type_set),  \
+    SW_API_DEF(SW_API_HEADER_TYPE_SET, fal_header_type_set), \
     SW_API_DEF(SW_API_TXMAC_STATUS_SET, fal_port_txmac_status_set), \
     SW_API_DEF(SW_API_RXMAC_STATUS_SET, fal_port_rxmac_status_set), \
     SW_API_DEF(SW_API_PT_POWER_OFF, fal_port_power_off), \
     SW_API_DEF(SW_API_PT_POWER_ON, fal_port_power_on), \
-    SW_API_DEF(SW_API_TXFC_STATUS_SET, fal_port_txfc_status_set),   \
+    SW_API_DEF(SW_API_TXFC_STATUS_SET, fal_port_txfc_status_set), \
     SW_API_DEF(SW_API_RXFC_STATUS_SET, fal_port_rxfc_status_set), \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_SET, fal_switch_port_loopback_set),  \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get), \
     SW_API_DEF(SW_API_PT_CNT_CFG_SET, fal_port_cnt_cfg_set), \
     SW_API_DEF(SW_API_PT_CNT_CFG_GET, fal_port_cnt_cfg_get), \
     SW_API_DEF(SW_API_PT_CNT_GET, fal_port_cnt_get), \
-    SW_API_DEF(SW_API_PT_CNT_FLUSH, fal_port_cnt_flush),
+    SW_API_DEF(SW_API_PT_CNT_FLUSH, fal_port_cnt_flush),\
+    SW_API_DEF(SW_API_PT_MTU_SET, fal_port_mtu_set), \
+    SW_API_DEF(SW_API_PT_MTU_GET, fal_port_mtu_get), \
+    SW_API_DEF(SW_API_PT_MRU_SET, fal_port_mru_set), \
+    SW_API_DEF(SW_API_PT_MRU_GET, fal_port_mru_get), \
+    SW_API_DEF(SW_API_PT_MTU_CFG_SET, fal_port_mtu_cfg_set), \
+    SW_API_DEF(SW_API_PT_MTU_CFG_GET, fal_port_mtu_cfg_get), \
+    SW_API_DEF(SW_API_PT_MRU_MTU_SET, fal_port_mru_mtu_set), \
+    SW_API_DEF(SW_API_PT_MRU_MTU_GET, fal_port_mru_mtu_get), \
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
     SW_API_DESC(SW_API_PT_DUPLEX_SET) \
@@ -300,7 +312,15 @@ extern "C" {
     SW_API_DESC(SW_API_PT_CNT_CFG_SET) \
     SW_API_DESC(SW_API_PT_CNT_CFG_GET) \
     SW_API_DESC(SW_API_PT_CNT_GET) \
-    SW_API_DESC(SW_API_PT_CNT_FLUSH)
+    SW_API_DESC(SW_API_PT_CNT_FLUSH) \
+    SW_API_DESC(SW_API_PT_MTU_SET) \
+    SW_API_DESC(SW_API_PT_MTU_GET) \
+    SW_API_DESC(SW_API_PT_MRU_SET) \
+    SW_API_DESC(SW_API_PT_MRU_GET) \
+    SW_API_DESC(SW_API_PT_MTU_CFG_SET) \
+    SW_API_DESC(SW_API_PT_MTU_CFG_GET) \
+    SW_API_DESC(SW_API_PT_MRU_MTU_SET) \
+    SW_API_DESC(SW_API_PT_MRU_MTU_GET)
 /*end of PORTCONTROL_API_PARAM*/
 #endif
 

@@ -1084,7 +1084,6 @@ adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
 	return SW_OK;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
@@ -1166,7 +1165,6 @@ adpt_ppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-#endif
 
 sw_error_t
 adpt_hppe_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -1544,6 +1542,8 @@ adpt_hppe_port_phy_id_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
+
 sw_error_t
 adpt_hppe_port_mru_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
@@ -1587,7 +1587,6 @@ adpt_ppe_port_mru_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_NOT_SUPPORTED;
 }
-#endif
 
 sw_error_t
 adpt_hppe_port_power_on(a_uint32_t dev_id, fal_port_t port_id)
@@ -3611,6 +3610,8 @@ adpt_hppe_port_counter_show(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
+
 sw_error_t
 adpt_hppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
@@ -3631,7 +3632,6 @@ adpt_hppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 	return SW_OK;
 }
 
-#endif
 sw_error_t
 adpt_hppe_port_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id)
 {
@@ -3661,7 +3661,6 @@ adpt_hppe_port_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id)
 
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_ppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
@@ -3683,7 +3682,47 @@ adpt_ppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_NOT_SUPPORTED;
 }
-#endif
+
+sw_error_t
+adpt_ppe_port_mru_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_uint32_t mru_size, a_uint32_t mtu_size)
+{
+	sw_error_t rv = SW_OK;
+	fal_mru_ctrl_t mru = {0};
+	fal_mtu_ctrl_t mtu = {0};
+
+	rv = adpt_ppe_port_mru_get (dev_id, port_id,  &mru);
+	SW_RTN_ON_ERROR (rv);
+	mru.mru_size = mru_size;
+	rv = adpt_ppe_port_mru_set (dev_id, port_id,  &mru);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = adpt_ppe_port_mtu_get (dev_id, port_id,  &mtu);
+	SW_RTN_ON_ERROR (rv);
+	mtu.mtu_size = mtu_size;
+	rv = adpt_ppe_port_mtu_set (dev_id, port_id,  &mtu);
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_mru_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_uint32_t *mru_size, a_uint32_t *mtu_size)
+{
+	sw_error_t rv = SW_OK;
+	fal_mru_ctrl_t mru = {0};
+	fal_mtu_ctrl_t mtu = {0};
+
+	rv = adpt_ppe_port_mru_get (dev_id, port_id,  &mru);
+	SW_RTN_ON_ERROR (rv);
+	*mru_size = mru.mru_size;
+
+	rv = adpt_ppe_port_mtu_get (dev_id, port_id,  &mtu);
+	SW_RTN_ON_ERROR (rv);
+	*mtu_size = mtu.mtu_size;
+
+	return rv;
+}
 
 sw_error_t
 adpt_hppe_port_interface_mode_status_get(a_uint32_t dev_id, fal_port_t port_id,
@@ -5976,7 +6015,9 @@ void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 		(1<< (FUNC_ADPT_PORT_8023AH_SET% 32))|
 		(1<< (FUNC_ADPT_PORT_8023AH_GET% 32))|
 		(1<< (FUNC_ADPT_PORT_MTU_CFG_SET% 32))|
-		(1<< (FUNC_ADPT_PORT_MTU_CFG_GET% 32)));
+		(1<< (FUNC_ADPT_PORT_MTU_CFG_GET% 32)) |
+		(1<< (FUNC_ADPT_PORT_MRU_MTU_SET% 32)) |
+		(1<< (FUNC_ADPT_PORT_MRU_MTU_GET% 32)));
 
 	return;
 
@@ -6066,6 +6107,8 @@ static void adpt_hppe_port_ctrl_func_unregister(a_uint32_t dev_id, adpt_api_t *p
 	p_adpt_api->adpt_port_8023ah_get = NULL;
 	p_adpt_api->adpt_port_mtu_cfg_set = NULL;
 	p_adpt_api->adpt_port_mtu_cfg_get = NULL;
+	p_adpt_api->adpt_port_mru_mtu_set = NULL;
+	p_adpt_api->adpt_port_mru_mtu_get = NULL;
 
 	return;
 
@@ -6155,12 +6198,10 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_flowctrl_set = adpt_hppe_port_flowctrl_set;
 	}
-#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_MRU_SET))
 	{
 		p_adpt_api->adpt_port_mru_set = adpt_ppe_port_mru_set;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_AUTONEG_STATUS_GET))
 	{
 		p_adpt_api->adpt_port_autoneg_status_get = adpt_hppe_port_autoneg_status_get;
@@ -6216,11 +6257,11 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_mdix_status_get = adpt_hppe_port_mdix_status_get;
 	}
+#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_MTU_SET))
 	{
 		p_adpt_api->adpt_port_mtu_set = adpt_ppe_port_mtu_set;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_LINK_STATUS_GET))
 	{
 		p_adpt_api->adpt_port_link_status_get = adpt_hppe_port_link_status_get;
@@ -6332,12 +6373,10 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_autoneg_enable = adpt_hppe_port_autoneg_enable;
 	}
-#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] & (1 <<  (FUNC_ADPT_PORT_MTU_GET % 32)))
 	{
 		p_adpt_api->adpt_port_mtu_get = adpt_ppe_port_mtu_get;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] &
 		(1 <<  (FUNC_ADPT_PORT_INTERFACE_MODE_STATUS_GET % 32)))
 	{
@@ -6462,6 +6501,7 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		{
 			p_adpt_api->adpt_port_8023ah_get = adpt_appe_port_8023ah_get;
 		}
+#endif
 		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
 			(1 << (FUNC_ADPT_PORT_MTU_CFG_SET% 32)))
 		{
@@ -6472,7 +6512,6 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		{
 			p_adpt_api->adpt_port_mtu_cfg_get = adpt_appe_port_mtu_cfg_get;
 		}
-#endif
 	}
 #endif
 	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_CFG_SET % 32)))
@@ -6484,6 +6523,16 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_FLUSH % 32)))
 		p_adpt_api->adpt_port_cnt_flush = adpt_ppe_port_cnt_flush;
 
+	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+		(1 << (FUNC_ADPT_PORT_MRU_MTU_SET% 32)))
+	{
+		p_adpt_api->adpt_port_mru_mtu_set = adpt_ppe_port_mru_mtu_set;
+	}
+	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+		(1 << (FUNC_ADPT_PORT_MRU_MTU_GET% 32)))
+	{
+		p_adpt_api->adpt_port_mru_mtu_get = adpt_ppe_port_mru_mtu_get;
+	}
 	return SW_OK;
 }
 

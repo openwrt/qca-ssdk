@@ -654,8 +654,10 @@ struct sub_cmd_des_t g_port_des[] =
 	{"wolstatus", "set",   SW_API_PT_WOL_STATUS_SET, NULL},
 	{"interfaceMode", "set",   SW_API_PT_INTERFACE_MODE_SET, NULL},
 	{"InterfaceModeApply", "set",   SW_API_PT_INTERFACE_MODE_APPLY, NULL},
+#endif
 	{"mtu", "set",   SW_API_PT_MTU_SET, NULL},
 	{"mru", "set",   SW_API_PT_MRU_SET, NULL},
+#ifndef IN_PORTCONTROL_MINI
 	{"srcfilter", "set",   SW_API_PT_SOURCE_FILTER_SET, NULL},
 	{"frameMaxSize", "set",   SW_API_PT_FRAME_MAX_SIZE_SET, NULL},
 	{"interface3az", "set", SW_API_PT_INTERFACE_3AZ_STATUS_SET, NULL},
@@ -663,11 +665,14 @@ struct sub_cmd_des_t g_port_des[] =
 	{"eeecfg", "set", SW_API_PT_INTERFACE_EEE_CFG_SET, NULL},
 	{"srcfiltercfg", "set",   SW_API_PT_SOURCE_FILTER_CONFIG_SET, NULL},
 	{"switchportloopback", "set", SW_API_PT_SWITCH_PORT_LOOPBACK_SET, NULL},
+#endif
 #if defined (APPE)
+#ifndef IN_PORTCONTROL_MINI
 	{"port8023ah", "set", SW_API_PT_8023AH_SET, NULL},
+#endif
 	{"mtucfg", "set", SW_API_PT_MTU_CFG_SET, NULL},
 #endif
-	#endif
+	{"mrumtu", "set", SW_API_PT_MRU_MTU_SET, NULL},
 	{"Cntcfg", "set", SW_API_PT_CNT_CFG_SET, NULL},
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };

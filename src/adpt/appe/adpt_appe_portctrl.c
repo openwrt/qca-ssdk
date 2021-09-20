@@ -133,6 +133,7 @@ sw_error_t adpt_appe_port_8023ah_get(a_uint32_t dev_id, a_uint32_t port_id,
 
 	return rv;
 }
+#endif
 
 sw_error_t
 adpt_appe_port_mtu_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -232,7 +233,6 @@ adpt_appe_port_mtu_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_appe_port_cnt_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
@@ -386,4 +386,3 @@ adpt_appe_port_rx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 
 	return rv;
 }
-

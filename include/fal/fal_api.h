@@ -1492,7 +1492,17 @@ extern "C" {
     SW_API_DEF(SW_API_IP_VSI_MC_MODE_SET, fal_ip_vsi_mc_mode_set), \
     SW_API_DEF(SW_API_IP_VSI_MC_MODE_GET, fal_ip_vsi_mc_mode_get), \
     SW_API_DEF(SW_API_GLOBAL_CTRL_GET, fal_ip_global_ctrl_get), \
-    SW_API_DEF(SW_API_GLOBAL_CTRL_SET, fal_ip_global_ctrl_set),
+    SW_API_DEF(SW_API_GLOBAL_CTRL_SET, fal_ip_global_ctrl_set), \
+    SW_API_DEF(SW_API_IP_INTF_MTU_MRU_SET, fal_ip_intf_mtu_mru_set), \
+    SW_API_DEF(SW_API_IP_INTF_MTU_MRU_GET, fal_ip_intf_mtu_mru_get), \
+    SW_API_DEF(SW_API_IP6_INTF_MTU_MRU_SET, fal_ip6_intf_mtu_mru_set), \
+    SW_API_DEF(SW_API_IP6_INTF_MTU_MRU_GET, fal_ip6_intf_mtu_mru_get), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_ADD, fal_ip_intf_macaddr_add), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_DEL, fal_ip_intf_macaddr_del), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_GET_FIRST, fal_ip_intf_macaddr_get_first), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_GET_NEXT, fal_ip_intf_macaddr_get_next), \
+    SW_API_DEF(SW_API_IP_INTF_DMAC_CHECK_SET, fal_ip_intf_dmac_check_set), \
+    SW_API_DEF(SW_API_IP_INTF_DMAC_CHECK_GET, fal_ip_intf_dmac_check_get),
 
 #define IP_API_PARAM \
     SW_API_DESC(SW_API_IP_HOST_ADD) \
@@ -1568,7 +1578,17 @@ extern "C" {
     SW_API_DESC(SW_API_IP_VSI_MC_MODE_SET) \
     SW_API_DESC(SW_API_IP_VSI_MC_MODE_GET) \
     SW_API_DESC(SW_API_GLOBAL_CTRL_GET) \
-    SW_API_DESC(SW_API_GLOBAL_CTRL_SET)
+    SW_API_DESC(SW_API_GLOBAL_CTRL_SET) \
+    SW_API_DESC(SW_API_IP_INTF_MTU_MRU_SET) \
+    SW_API_DESC(SW_API_IP_INTF_MTU_MRU_GET) \
+    SW_API_DESC(SW_API_IP6_INTF_MTU_MRU_SET) \
+    SW_API_DESC(SW_API_IP6_INTF_MTU_MRU_GET) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_ADD) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_DEL) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_GET_FIRST) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_GET_NEXT) \
+    SW_API_DESC(SW_API_IP_INTF_DMAC_CHECK_SET) \
+    SW_API_DESC(SW_API_IP_INTF_DMAC_CHECK_GET)
 #else
 #define IP_API
 #define IP_API_PARAM

@@ -468,6 +468,27 @@ typedef sw_error_t (*adpt_ip_global_ctrl_get_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_ip_global_ctrl_set_func)(a_uint32_t dev_id,
 			fal_ip_global_cfg_t *cfg);
 
+typedef sw_error_t (*adpt_ip_intf_mtu_mru_set_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+typedef sw_error_t (*adpt_ip_intf_mtu_mru_get_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+typedef sw_error_t (*adpt_ip6_intf_mtu_mru_set_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+typedef sw_error_t (*adpt_ip6_intf_mtu_mru_get_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+typedef sw_error_t (*adpt_ip_intf_macaddr_add_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_macaddr_del_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_macaddr_get_first_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_macaddr_get_next_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_dmac_check_set_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable);
+typedef sw_error_t (*adpt_ip_intf_dmac_check_get_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable);
+
 typedef sw_error_t (*adpt_flow_global_cfg_get_func)(
 		a_uint32_t dev_id,
 		fal_flow_global_cfg_t *cfg);
@@ -1566,6 +1587,17 @@ typedef struct
 	adpt_ip_nexthop_set_func adpt_ip_nexthop_set;
 	adpt_ip_global_ctrl_get_func adpt_ip_global_ctrl_get;
 	adpt_ip_global_ctrl_set_func adpt_ip_global_ctrl_set;
+	adpt_ip_intf_mtu_mru_set_func adpt_ip_intf_mtu_mru_set;
+	adpt_ip_intf_mtu_mru_get_func adpt_ip_intf_mtu_mru_get;
+	adpt_ip6_intf_mtu_mru_set_func adpt_ip6_intf_mtu_mru_set;
+	adpt_ip6_intf_mtu_mru_get_func adpt_ip6_intf_mtu_mru_get;
+	adpt_ip_intf_macaddr_add_func adpt_ip_intf_macaddr_add;
+	adpt_ip_intf_macaddr_del_func adpt_ip_intf_macaddr_del;
+	adpt_ip_intf_macaddr_get_first_func adpt_ip_intf_macaddr_get_first;
+	adpt_ip_intf_macaddr_get_next_func adpt_ip_intf_macaddr_get_next;
+	adpt_ip_intf_dmac_check_set_func adpt_ip_intf_dmac_check_set;
+	adpt_ip_intf_dmac_check_get_func adpt_ip_intf_dmac_check_get;
+
 	/* flow */
 	a_uint32_t adpt_flow_func_bitmap;
 	adpt_flow_host_add_func adpt_flow_host_add;

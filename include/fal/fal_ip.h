@@ -374,7 +374,49 @@ enum {
 	FUNC_IP_NEXTHOP_SET,
 	FUNC_IP_GLOBAL_CTRL_GET,
 	FUNC_IP_GLOBAL_CTRL_SET,
+	FUNC_IP_INTF_MTU_MRU_SET,
+	FUNC_IP_INTF_MTU_MRU_GET,
+	FUNC_IP6_INTF_MTU_MRU_SET,
+	FUNC_IP6_INTF_MTU_MRU_GET,
+	FUNC_IP_INTF_MACADDR_ADD,
+	FUNC_IP_INTF_MACADDR_DEL,
+	FUNC_IP_INTF_MACADDR_GET_FIRST,
+	FUNC_IP_INTF_MACADDR_GET_NEXT,
+	FUNC_IP_INTF_DMAC_CHECK_SET,
+	FUNC_IP_INTF_DMAC_CHECK_GET,
 };
+
+typedef enum {
+	FAL_IP_BOTH = 0,
+	FAL_IP_INGRESS,
+	FAL_IP_EGRESS,
+} fal_ip_direction_t;
+
+typedef struct {
+	fal_ip_direction_t direction;
+	fal_mac_addr_t mac_addr; /* mac address */
+} fal_intf_macaddr_t;
+
+sw_error_t
+fal_ip_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+sw_error_t
+fal_ip_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+sw_error_t
+fal_ip6_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+sw_error_t
+fal_ip6_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+sw_error_t
+fal_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_macaddr_get_first(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_macaddr_get_next(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_dmac_check_set(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable);
+sw_error_t
+fal_ip_intf_dmac_check_get(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable);
 
 #ifndef IN_IP_MINI
 sw_error_t

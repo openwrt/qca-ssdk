@@ -374,7 +374,6 @@ adpt_mp_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 	if(!ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
 	{
 		hsl_port_phy_gpio_reset(dev_id, SSDK_PHYSICAL_PORT2);
-		msleep(100);
 		hsl_port_phy_hw_init(dev_id, SSDK_PHYSICAL_PORT2);
 	}
 

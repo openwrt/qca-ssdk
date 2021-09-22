@@ -3522,6 +3522,7 @@ static void qca_ar8327_gpio_reset(struct qca_phy_priv *priv)
 	gpio_direction_output(gpio_num, SSDK_GPIO_RESET);
 	msleep(200);
 	gpio_set_value(gpio_num, SSDK_GPIO_RELEASE);
+	msleep(10);
 	SSDK_INFO("GPIO%d reset switch done\n", gpio_num);
 
 	gpio_free(gpio_num);

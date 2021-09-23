@@ -693,6 +693,7 @@ void hsl_port_phy_gpio_reset(a_uint32_t dev_id, a_uint32_t port_id)
 	}
 	msleep(200);
 	gpio_set_value(gpio_num, SSDK_GPIO_RELEASE);
+	msleep(10);
 	SSDK_INFO("GPIO%d reset PHY done\n", gpio_num);
 
 	gpio_free(gpio_num);

@@ -24,6 +24,9 @@
 #ifdef IN_LED
 #include "ssdk_led.h"
 #endif
+#ifdef IN_RSS_HASH
+#include <linux/random.h>
+#endif
 
 #if defined(IN_BM) && defined(IN_QOS)
 fal_port_scheduler_cfg_t appe_port_scheduler1_tbl[] = {
@@ -408,6 +411,52 @@ qca_appe_policer_hw_init(a_uint32_t dev_id)
 }
 #endif
 
+#if defined(IN_RSS_HASH)
+#define RSS_HASH_MASK 0xFFF
+#define RSS_HASH_FIN_INNER 0x129c85
+#define RSS_HASH_FIN_OUTER 0x1094670
+#define RSS_HASH_PROTOCOL_MIX 0x13
+#define RSS_HASH_DPORT_MIX 0xb
+#define RSS_HASH_SPORT_MIX 0x13
+#define RSS_HASH_SIP4_MIX 0x13
+#define RSS_HASH_DIP4_MIX 0xb
+#define RSS_HASH_SIP6_MIX 0x5cd73
+#define RSS_HASH_DIP6_MIX 0x5cd73
+
+static sw_error_t
+qca_appe_rss_hash_hw_init(a_uint32_t dev_id)
+{
+	sw_error_t rv = SW_OK;
+	fal_rss_hash_config_t config = {0};
+
+	/* get a 32bit random seed */
+	get_random_bytes(&config.hash_seed, sizeof(a_uint32_t));
+
+	config.hash_mask = RSS_HASH_MASK;
+	config.hash_fragment_mode = A_FALSE;
+
+	config.hash_fin_inner = RSS_HASH_FIN_INNER;
+	config.hash_fin_outer = RSS_HASH_FIN_OUTER;
+
+	config.hash_protocol_mix = RSS_HASH_PROTOCOL_MIX;
+	config.hash_dport_mix = RSS_HASH_DPORT_MIX;
+	config.hash_sport_mix = RSS_HASH_SPORT_MIX;
+
+	/* set ipv4 rss hash configuraion */
+	config.hash_sip_mix = RSS_HASH_SIP4_MIX;
+	config.hash_dip_mix = RSS_HASH_DIP4_MIX;
+	rv = fal_rss_hash_config_set(dev_id, FAL_RSS_HASH_IPV4ONLY, &config);
+	SW_RTN_ON_ERROR(rv);
+
+	/* set ipv6 rss hash configuration */
+	config.hash_sip_mix = RSS_HASH_SIP6_MIX;
+	config.hash_dip_mix = RSS_HASH_DIP6_MIX;
+	rv = fal_rss_hash_config_set(dev_id, FAL_RSS_HASH_IPV6ONLY, &config);
+	SSDK_INFO("appe rss hash initialization: hash_seed 0x%x\n",config.hash_seed);
+	return rv;
+}
+#endif
+
 sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
@@ -493,6 +542,12 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 
 #if defined(IN_LED)
 	rv = ssdk_led_init(dev_id, cfg);
+	SW_RTN_ON_ERROR(rv);
+#endif
+
+#if defined(IN_RSS_HASH)
+	rv = qca_appe_rss_hash_hw_init(dev_id);
+	SW_RTN_ON_ERROR(rv);
 #endif
 	return rv;
 }

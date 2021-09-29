@@ -49,7 +49,7 @@ else
   endif
 
   ifeq (ISISC, $(CHIP_TYPE))
-     SUPPORT_CHIP = ISISC MHT
+     SUPPORT_CHIP = ISISC
   endif
 
   ifeq (DESS, $(CHIP_TYPE))

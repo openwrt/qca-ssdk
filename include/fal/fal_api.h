@@ -1619,7 +1619,12 @@ extern "C" {
     SW_API_DEF(SW_API_FLOW_HOST_ADD, fal_flow_host_add), \
     SW_API_DEF(SW_API_FLOW_HOST_GET, fal_flow_host_get), \
     SW_API_DEF(SW_API_FLOW_HOST_DEL, fal_flow_host_del), \
-    SW_API_DEF(SW_API_FLOWENTRY_NEXT, fal_flow_entry_next),
+    SW_API_DEF(SW_API_FLOWENTRY_NEXT, fal_flow_entry_next), \
+    SW_API_DEF(SW_API_FLOW_COUNTER_GET, fal_flow_counter_get), \
+    SW_API_DEF(SW_API_FLOW_ENTRY_EN_SET, fal_flow_entry_en_set), \
+    SW_API_DEF(SW_API_FLOW_ENTRY_EN_GET, fal_flow_entry_en_get), \
+    SW_API_DEF(SW_API_FLOW_QOS_SET, fal_flow_qos_set), \
+    SW_API_DEF(SW_API_FLOW_QOS_GET, fal_flow_qos_get),
 
 #define FLOW_API_PARAM \
     SW_API_DESC(SW_API_FLOW_STATUS_SET) \
@@ -1636,7 +1641,12 @@ extern "C" {
     SW_API_DESC(SW_API_FLOW_HOST_ADD) \
     SW_API_DESC(SW_API_FLOW_HOST_GET) \
     SW_API_DESC(SW_API_FLOW_HOST_DEL) \
-    SW_API_DESC(SW_API_FLOWENTRY_NEXT)
+    SW_API_DESC(SW_API_FLOWENTRY_NEXT) \
+    SW_API_DESC(SW_API_FLOW_COUNTER_GET) \
+    SW_API_DESC(SW_API_FLOW_ENTRY_EN_SET) \
+    SW_API_DESC(SW_API_FLOW_ENTRY_EN_GET) \
+    SW_API_DESC(SW_API_FLOW_QOS_SET) \
+    SW_API_DESC(SW_API_FLOW_QOS_GET)
 #else
 #define FLOW_API \
     SW_API_DEF(SW_API_FLOW_CTRL_SET, fal_flow_mgmt_set), \

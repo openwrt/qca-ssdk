@@ -291,6 +291,8 @@ typedef enum
 	SW_PORT_CNT_CFG,
 	SW_PORT_CNT,
 	SW_INTF_MAC_ENTRY,
+	SW_ENTRY_COUNTER,
+	SW_FLOW_QOS,
 /* auto_insert_flag */
 } sw_data_type_e;
 

@@ -545,6 +545,22 @@ typedef sw_error_t (*adpt_flow_entry_add_func)(
 		a_uint32_t dev_id,
 		a_uint32_t add_mode, /*index or hash*/
 		fal_flow_entry_t *flow_entry);
+
+typedef sw_error_t (*adpt_flow_counter_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_entry_counter_t *flow_counter);
+
+typedef sw_error_t (*adpt_flow_entry_en_set_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, a_bool_t enable);
+
+typedef sw_error_t (*adpt_flow_entry_en_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, a_bool_t *enable);
+
+typedef sw_error_t (*adpt_flow_qos_set_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_flow_qos_t *flow_qos);
+
+typedef sw_error_t (*adpt_flow_qos_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_flow_qos_t *flow_qos);
+
 typedef sw_error_t (*adpt_ucast_hash_map_set_func)(
 		a_uint32_t dev_id,
 		a_uint8_t profile,
@@ -1620,6 +1636,11 @@ typedef struct
 	adpt_flow_entry_add_func adpt_flow_entry_add;
 	adpt_flow_global_cfg_get_func adpt_flow_global_cfg_get;
 	adpt_flow_global_cfg_set_func adpt_flow_global_cfg_set;
+	adpt_flow_counter_get_func adpt_flow_counter_get;
+	adpt_flow_entry_en_set_func adpt_flow_entry_en_set;
+	adpt_flow_entry_en_get_func adpt_flow_entry_en_get;
+	adpt_flow_qos_set_func adpt_flow_qos_set;
+	adpt_flow_qos_get_func adpt_flow_qos_get;
 
 	/* qm */
 	a_uint32_t adpt_qm_func_bitmap[2];

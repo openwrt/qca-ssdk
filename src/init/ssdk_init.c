@@ -157,6 +157,10 @@ extern void dess_rgmii_sw_mac_polling_task(struct qca_phy_priv *priv);
 extern void qca_ar8327_sw_mac_polling_task(struct qca_phy_priv *priv);
 extern void qca_ar8327_sw_mib_task(struct qca_phy_priv *priv);
 
+int pinctrl_module_init (void);
+void pinctrl_module_exit (void);
+
+
 //#define PSGMII_DEBUG
 
 #define QCA_QM_WORK_DELAY	100
@@ -3671,6 +3675,8 @@ static int __init regi_init(void)
 	}
 /*qca808x_start*/
 
+pinctrl_module_init();
+
 out:
 	if (rv == 0)
 		SSDK_INFO("qca-%s module init succeeded!\n", SSDK_STR);
@@ -3692,6 +3698,9 @@ regi_exit(void)
 {
 	a_uint32_t dev_id, dev_num = 1;
 	sw_error_t rv = SW_OK;
+
+	pinctrl_module_exit();
+
 /*qca808x_end*/
 	dev_num = ssdk_switch_device_num_get();
 	for (dev_id = 0; dev_id < dev_num; dev_id++) {

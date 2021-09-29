@@ -20,6 +20,11 @@ ifeq (TRUE, $(IN_ACL))
         endif
 endif
 
+ifeq (TRUE, $(IN_PINCTRL))
+     SRC_LIST += hsl_pinctrl.c
+     SRC_LIST += hsl_gpio.c     
+endif
+
 ifeq (linux, $(OS))
 	ifeq (KSLIB, $(MODULE_TYPE))
     ifneq (TRUE, $(KERNEL_MODE))

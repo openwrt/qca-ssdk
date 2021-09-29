@@ -48,6 +48,9 @@
 #include "adpt_appe_portctrl.h"
 #include "appe_l2_vp.h"
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
+#include <soc/qcom/socinfo.h>
+#endif
 
 #define PORT4_PCS_SEL_GMII_FROM_PCS0 1
 #define PORT4_PCS_SEL_RGMII 0
@@ -4580,6 +4583,20 @@ adpt_hppe_uniphy_psgmii_port_reset(a_uint32_t dev_id, a_uint32_t uniphy_index,
 
 	if (port_id == SSDK_PHYSICAL_PORT1)
 	{
+#if defined(APPE) && (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
+		if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
+			if (cpu_is_uniphy1_enabled() == A_FALSE) {
+				SSDK_INFO("UNIPHY 1 is not available on this SKU!\n");
+				return;
+			}
+		}
+		if (uniphy_index == SSDK_UNIPHY_INSTANCE2) {
+			if (cpu_is_uniphy2_enabled() == A_FALSE) {
+					SSDK_INFO("UNIPHY 2 is not available on this SKU!\n");
+					return;
+			}
+		}
+#endif
 		hppe_uniphy_channel0_input_output_4_get(dev_id, uniphy_index,
 			&uniphy_channel0_input_output_4);
 		uniphy_channel0_input_output_4.bf.newaddedfromhere_ch0_adp_sw_rstn = 0;

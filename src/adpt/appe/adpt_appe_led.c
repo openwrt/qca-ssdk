@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,10 +20,10 @@
 #include "hsl_dev.h"
 #include "hsl_phy.h"
 #include "hsl_port_prop.h"
-#include "adpt_mp.h"
+#include "adpt_appe.h"
 
 static sw_error_t
-adpt_mp_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
+adpt_appe_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
 	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern)
 {
 	sw_error_t rv;
@@ -48,7 +48,7 @@ adpt_mp_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
 }
 
 static sw_error_t
-adpt_mp_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
+adpt_appe_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
 	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern)
 {
 	sw_error_t rv;
@@ -73,7 +73,7 @@ adpt_mp_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
 }
 
 static sw_error_t
-adpt_mp_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
+adpt_appe_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	led_ctrl_pattern_t *pattern)
 {
 	sw_error_t rv;
@@ -93,17 +93,55 @@ adpt_mp_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	return rv;
 }
 
-sw_error_t adpt_mp_led_init(a_uint32_t dev_id)
+void adpt_appe_led_func_bitmap_init(a_uint32_t dev_id)
+{
+	adpt_api_t *p_adpt_api = NULL;
+
+	p_adpt_api = adpt_api_ptr_get(dev_id);
+
+	if(p_adpt_api == NULL)
+		return;
+
+	p_adpt_api->adpt_led_func_bitmap = \
+		((1 << FUNC_LED_CTRL_PATTERN_SET)|
+		(1 << FUNC_LED_CTRL_PATTERN_GET)|
+		(1 << FUNC_LED_CTRL_SOURCE_SET));
+
+	return;
+}
+
+static void adpt_appe_led_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
+{
+	if(p_adpt_api == NULL)
+		return;
+
+	p_adpt_api->adpt_led_ctrl_pattern_set = NULL;
+	p_adpt_api->adpt_led_ctrl_pattern_get = NULL;
+	p_adpt_api->adpt_led_ctrl_source_set = NULL;
+
+	return;
+}
+
+sw_error_t adpt_appe_led_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
 
 	p_adpt_api = adpt_api_ptr_get(dev_id);
 
 	SW_RTN_ON_NULL (p_adpt_api);
-
-	p_adpt_api->adpt_led_ctrl_pattern_set = adpt_mp_led_ctrl_pattern_set;
-	p_adpt_api->adpt_led_ctrl_pattern_get = adpt_mp_led_ctrl_pattern_get;
-	p_adpt_api->adpt_led_ctrl_source_set = adpt_mp_led_ctrl_source_set;
+	adpt_appe_led_func_unregister(dev_id, p_adpt_api);
+	if (p_adpt_api->adpt_led_func_bitmap & BIT(FUNC_LED_CTRL_PATTERN_SET))
+	{
+		p_adpt_api->adpt_led_ctrl_pattern_set = adpt_appe_led_ctrl_pattern_set;
+	}
+	if (p_adpt_api->adpt_led_func_bitmap & BIT(FUNC_LED_CTRL_PATTERN_GET))
+	{
+		p_adpt_api->adpt_led_ctrl_pattern_get = adpt_appe_led_ctrl_pattern_get;
+	}
+	if (p_adpt_api->adpt_led_func_bitmap & BIT(FUNC_LED_CTRL_SOURCE_SET))
+	{
+		p_adpt_api->adpt_led_ctrl_source_set = adpt_appe_led_ctrl_source_set;
+	}
 
 	return SW_OK;
 }

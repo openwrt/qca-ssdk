@@ -805,6 +805,15 @@ typedef sw_error_t (*adpt_pppoe_en_get_func)(
 		a_uint32_t l3_if,
 		a_uint32_t *enable);
 
+typedef sw_error_t (*adpt_pppoe_l3_intf_set_func)(a_uint32_t dev_id,
+		a_uint32_t pppoe_index, fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+typedef sw_error_t (*adpt_pppoe_l3_intf_get_func)(a_uint32_t dev_id,
+		a_uint32_t pppoe_index, fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+typedef sw_error_t (*adpt_pppoe_global_ctrl_set_func) (a_uint32_t dev_id,
+		fal_pppoe_global_cfg_t *cfg);
+typedef sw_error_t (*adpt_pppoe_global_ctrl_get_func) (a_uint32_t dev_id,
+		fal_pppoe_global_cfg_t *cfg);
+
 /*sec module*/
 typedef sw_error_t (*adpt_sec_l3_excep_parser_ctrl_set_func)(
 		a_uint32_t dev_id,
@@ -1765,6 +1774,10 @@ typedef struct
 	adpt_pppoe_session_table_get_func adpt_pppoe_session_table_get;
 	adpt_pppoe_en_set_func adpt_pppoe_en_set;
 	adpt_pppoe_en_get_func adpt_pppoe_en_get;
+	adpt_pppoe_l3_intf_set_func adpt_pppoe_l3_intf_set;
+	adpt_pppoe_l3_intf_get_func adpt_pppoe_l3_intf_get;
+	adpt_pppoe_global_ctrl_set_func adpt_pppoe_global_ctrl_set;
+	adpt_pppoe_global_ctrl_get_func adpt_pppoe_global_ctrl_get;
 
 	/*sec */
 	a_uint32_t adpt_sec_func_bitmap;

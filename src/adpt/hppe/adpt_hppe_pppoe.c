@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -322,6 +325,47 @@ adpt_hppe_pppoe_en_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *enable)
 	return rv;
 }
 
+sw_error_t
+adpt_hppe_pppoe_global_ctrl_set(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
+{
+	sw_error_t rv = SW_OK;
+	union l3_route_ctrl_u l3_route_ctrl;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cfg);
+
+	aos_mem_zero(&l3_route_ctrl, sizeof(l3_route_ctrl));
+
+	rv = hppe_l3_route_ctrl_get(dev_id, &l3_route_ctrl);
+	SW_RTN_ON_ERROR(rv);
+
+	l3_route_ctrl.bf.pppoe_multicast_cmd = cfg->pppoe_multicast_cmd;
+	l3_route_ctrl.bf.pppoe_multicast_de_acce = cfg->pppoe_multicast_deacclr_en;
+
+	rv = hppe_l3_route_ctrl_set(dev_id, &l3_route_ctrl);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_pppoe_global_ctrl_get(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
+{
+	sw_error_t rv = SW_OK;
+	union l3_route_ctrl_u l3_route_ctrl;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cfg);
+
+	aos_mem_zero(&l3_route_ctrl, sizeof(l3_route_ctrl));
+
+	rv = hppe_l3_route_ctrl_get(dev_id, &l3_route_ctrl);
+	SW_RTN_ON_ERROR(rv);
+
+	cfg->pppoe_multicast_cmd = l3_route_ctrl.bf.pppoe_multicast_cmd;
+	cfg->pppoe_multicast_deacclr_en = l3_route_ctrl.bf.pppoe_multicast_de_acce;
+
+	return rv;
+}
+
 void adpt_hppe_pppoe_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -346,6 +390,10 @@ static void adpt_hppe_pppoe_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adp
 	p_adpt_api->adpt_pppoe_session_table_get = NULL;
 	p_adpt_api->adpt_pppoe_en_set = NULL;
 	p_adpt_api->adpt_pppoe_en_get = NULL;
+	p_adpt_api->adpt_pppoe_l3_intf_set = NULL;
+	p_adpt_api->adpt_pppoe_l3_intf_get = NULL;
+	p_adpt_api->adpt_pppoe_global_ctrl_set = NULL;
+	p_adpt_api->adpt_pppoe_global_ctrl_get = NULL;
 
 	return;
 }
@@ -371,6 +419,16 @@ sw_error_t adpt_hppe_pppoe_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_pppoe_en_set = adpt_hppe_pppoe_en_set;
 	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_EN_GET))
 		p_adpt_api->adpt_pppoe_en_get = adpt_hppe_pppoe_en_get;
+#if defined(APPE)
+	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_L3_INTF_SET))
+		p_adpt_api->adpt_pppoe_l3_intf_set = adpt_appe_pppoe_l3_intf_set;
+	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_L3_INTF_GET))
+		p_adpt_api->adpt_pppoe_l3_intf_get = adpt_appe_pppoe_l3_intf_get;
+#endif
+	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_GLOBAL_CTRL_SET))
+		p_adpt_api->adpt_pppoe_global_ctrl_set = adpt_hppe_pppoe_global_ctrl_set;
+	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_GLOBAL_CTRL_GET))
+		p_adpt_api->adpt_pppoe_global_ctrl_get = adpt_hppe_pppoe_global_ctrl_get;
 
 
 	return SW_OK;

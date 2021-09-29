@@ -268,12 +268,6 @@ typedef struct {
 	a_uint16_t vpn_id; /* vpn id, added for ipq95xx */
 } fal_intf_entry_t;
 
-typedef struct
-{
-	a_bool_t l3_if_valid; /*0 for disable and 1 for enable*/
-	a_uint32_t l3_if_index; /*index for interface table*/        	  
-} fal_intf_id_t;
-
 typedef enum
 {
 	FAL_NEXTHOP_L3 = 0,

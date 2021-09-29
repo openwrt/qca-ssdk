@@ -342,6 +342,71 @@ adpt_appe_pppoe_session_table_get(a_uint32_t dev_id, fal_pppoe_session_t *sessio
 	return SW_NOT_FOUND;
 }
 
+sw_error_t
+adpt_appe_pppoe_l3_intf_get(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf)
+{
+	sw_error_t rv = SW_OK;
+	union pppoe_session_ext2_u pppoe_session_ext2 = {0};
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(pppoe_intf);
+
+	if (pppoe_index >= PPPOE_SESSION_EXT2_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	rv = appe_pppoe_session_ext2_get(dev_id, pppoe_index, &pppoe_session_ext2);
+	SW_RTN_ON_ERROR(rv);
+
+	switch (l3_type) {
+		case FAL_INTF_TYPE_TUNNEL:
+			pppoe_intf->l3_if_valid = pppoe_session_ext2.bf.tl_l3_if_valid;
+			pppoe_intf->l3_if_index = pppoe_session_ext2.bf.tl_l3_if_index;
+			break;
+		case FAL_INTF_TYPE_NORMAL:
+			pppoe_intf->l3_if_valid = pppoe_session_ext2.bf.l3_if_valid;
+			pppoe_intf->l3_if_index = pppoe_session_ext2.bf.l3_if_index;
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+
+	return rv;
+}
+
+sw_error_t
+adpt_appe_pppoe_l3_intf_set(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf)
+{
+	sw_error_t rv = SW_OK;
+	union pppoe_session_ext2_u pppoe_session_ext2 = {0};
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(pppoe_intf);
+
+	if (pppoe_index >= PPPOE_SESSION_EXT2_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	rv = appe_pppoe_session_ext2_get(dev_id, pppoe_index, &pppoe_session_ext2);
+	SW_RTN_ON_ERROR(rv);
+
+	switch (l3_type) {
+		case FAL_INTF_TYPE_TUNNEL:
+			pppoe_session_ext2.bf.tl_l3_if_valid = pppoe_intf->l3_if_valid;
+			pppoe_session_ext2.bf.tl_l3_if_index = pppoe_intf->l3_if_index;
+			break;
+		case FAL_INTF_TYPE_NORMAL:
+			pppoe_session_ext2.bf.l3_if_valid = pppoe_intf->l3_if_valid;
+			pppoe_session_ext2.bf.l3_if_index = pppoe_intf->l3_if_index;
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+
+	rv = appe_pppoe_session_ext2_set(dev_id, pppoe_index, &pppoe_session_ext2);
+	return rv;
+}
+
 /**
  * @}
  */

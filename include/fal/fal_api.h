@@ -2007,7 +2007,11 @@ extern "C" {
     SW_API_DEF(SW_API_RTD_PPPOE_EN_SET, fal_rtd_pppoe_en_set), \
     SW_API_DEF(SW_API_RTD_PPPOE_EN_GET, fal_rtd_pppoe_en_get), \
     SW_API_DEF(SW_API_PPPOE_EN_SET, fal_pppoe_l3intf_enable), \
-    SW_API_DEF(SW_API_PPPOE_EN_GET, fal_pppoe_l3intf_status_get),
+    SW_API_DEF(SW_API_PPPOE_EN_GET, fal_pppoe_l3intf_status_get), \
+    SW_API_DEF(SW_API_PPPOE_L3_INTF_SET, fal_pppoe_l3_intf_set), \
+    SW_API_DEF(SW_API_PPPOE_L3_INTF_GET, fal_pppoe_l3_intf_get), \
+    SW_API_DEF(SW_API_PPPOE_GLOBAL_CTRL_SET, fal_pppoe_global_ctrl_set), \
+    SW_API_DEF(SW_API_PPPOE_GLOBAL_CTRL_GET, fal_pppoe_global_ctrl_get),
 
 #define PPPOE_API_PARAM \
     SW_API_DESC(SW_API_PPPOE_CMD_SET) \
@@ -2025,7 +2029,11 @@ extern "C" {
     SW_API_DESC(SW_API_RTD_PPPOE_EN_SET) \
     SW_API_DESC(SW_API_RTD_PPPOE_EN_GET) \
     SW_API_DESC(SW_API_PPPOE_EN_SET) \
-    SW_API_DESC(SW_API_PPPOE_EN_GET)
+    SW_API_DESC(SW_API_PPPOE_EN_GET) \
+    SW_API_DESC(SW_API_PPPOE_L3_INTF_SET) \
+    SW_API_DESC(SW_API_PPPOE_L3_INTF_GET) \
+    SW_API_DESC(SW_API_PPPOE_GLOBAL_CTRL_SET) \
+    SW_API_DESC(SW_API_PPPOE_GLOBAL_CTRL_GET)
 
 #else
 #define PPPOE_API

@@ -2754,6 +2754,38 @@ extern "C" {
     SW_PARAM_DEF(SW_API_PPPOE_EN_GET, SW_UINT32, 4, SW_PARAM_IN, "L3 Interface"), \
     SW_PARAM_DEF(SW_API_PPPOE_EN_GET, SW_ENABLE, 4, SW_PARAM_PTR|SW_PARAM_OUT, "Enable"),
 
+#define SW_API_PPPOE_L3_INTF_SET_DESC \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "PPPoE entry index"), \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_SET, SW_INTF_TYPE, \
+		    sizeof(fal_intf_type_t), SW_PARAM_IN, "PPPoE L3 intf type"), \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_SET, SW_IP_VSI_INTF, \
+		    sizeof(fal_intf_id_t), SW_PARAM_PTR|SW_PARAM_IN, "Enable"),
+
+#define SW_API_PPPOE_L3_INTF_GET_DESC \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "PPPoE entry index"), \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_GET, SW_INTF_TYPE, \
+		    sizeof(fal_intf_type_t), SW_PARAM_IN, "PPPoE L3 intf type"), \
+    SW_PARAM_DEF(SW_API_PPPOE_L3_INTF_GET, SW_IP_VSI_INTF, \
+		    sizeof(fal_intf_id_t), SW_PARAM_PTR|SW_PARAM_OUT, "Enable"),
+
+#define SW_API_PPPOE_GLOBAL_CTRL_SET_DESC \
+    SW_PARAM_DEF(SW_API_PPPOE_GLOBAL_CTRL_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PPPOE_GLOBAL_CTRL_SET, SW_PPPOE_CTRL, sizeof(fal_pppoe_global_cfg_t), \
+		    SW_PARAM_PTR|SW_PARAM_IN, "PPPoE global control"),
+
+#define SW_API_PPPOE_GLOBAL_CTRL_GET_DESC \
+    SW_PARAM_DEF(SW_API_PPPOE_GLOBAL_CTRL_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PPPOE_GLOBAL_CTRL_GET, SW_PPPOE_CTRL, sizeof(fal_pppoe_global_cfg_t), \
+		    SW_PARAM_PTR|SW_PARAM_OUT, "PPPoE global control"),
+
 #define SW_API_GLOBAL_MACADDR_SET_DESC \
     SW_PARAM_DEF(SW_API_GLOBAL_MACADDR_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_GLOBAL_MACADDR_SET, SW_MACADDR, \

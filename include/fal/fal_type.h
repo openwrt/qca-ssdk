@@ -185,6 +185,16 @@ typedef struct {
 	a_uint64_t matched_bytes; /* entry byte counter */
 } fal_entry_counter_t;
 
+typedef struct {
+	a_bool_t l3_if_valid; /* 0 for disable and 1 for enable */
+	a_uint32_t l3_if_index; /* index for interface table */
+} fal_intf_id_t;
+
+typedef enum {
+	FAL_INTF_TYPE_TUNNEL,
+	FAL_INTF_TYPE_NORMAL,
+} fal_intf_type_t;
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

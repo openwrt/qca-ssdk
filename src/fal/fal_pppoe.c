@@ -302,6 +302,69 @@ _fal_pppoe_l3intf_enable(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t enable)
     rv = p_api->adpt_pppoe_en_set(dev_id, l3_if, enable);
     return rv;
 }
+
+sw_error_t
+_fal_pppoe_l3_intf_set(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_pppoe_l3_intf_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_pppoe_l3_intf_set(dev_id, pppoe_index, l3_type, pppoe_intf);
+	return rv;
+}
+
+sw_error_t
+_fal_pppoe_l3_intf_get(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_pppoe_l3_intf_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_pppoe_l3_intf_get(dev_id, pppoe_index, l3_type, pppoe_intf);
+	return rv;
+}
+
+sw_error_t
+_fal_pppoe_global_ctrl_set(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_pppoe_global_ctrl_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_pppoe_global_ctrl_set(dev_id, cfg);
+	return rv;
+}
+
+sw_error_t
+_fal_pppoe_global_ctrl_get(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_pppoe_global_ctrl_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_pppoe_global_ctrl_get(dev_id, cfg);
+	return rv;
+}
+
 /*insert flag for inner fal, don't remove it*/
 
 /**
@@ -595,6 +658,57 @@ fal_pppoe_l3intf_enable(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t enable)
     FAL_API_UNLOCK;
     return rv;
 }
+
+sw_error_t
+fal_pppoe_l3_intf_set(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_pppoe_l3_intf_set(dev_id, pppoe_index, l3_type, pppoe_intf);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+	sw_error_t
+fal_pppoe_l3_intf_get(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_pppoe_l3_intf_get(dev_id, pppoe_index, l3_type, pppoe_intf);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+	sw_error_t
+fal_pppoe_global_ctrl_set(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_pppoe_global_ctrl_set(dev_id, cfg);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+	sw_error_t
+fal_pppoe_global_ctrl_get(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_pppoe_global_ctrl_get(dev_id, cfg);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 
 EXPORT_SYMBOL(fal_pppoe_session_table_add);
@@ -602,6 +716,10 @@ EXPORT_SYMBOL(fal_pppoe_session_table_del);
 EXPORT_SYMBOL(fal_pppoe_session_table_get);
 EXPORT_SYMBOL(fal_pppoe_l3intf_status_get);
 EXPORT_SYMBOL(fal_pppoe_l3intf_enable);
+EXPORT_SYMBOL(fal_pppoe_l3_intf_set);
+EXPORT_SYMBOL(fal_pppoe_l3_intf_get);
+EXPORT_SYMBOL(fal_pppoe_global_ctrl_set);
+EXPORT_SYMBOL(fal_pppoe_global_ctrl_get);
 
 /**
  * @}

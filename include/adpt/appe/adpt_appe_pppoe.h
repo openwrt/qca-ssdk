@@ -26,4 +26,12 @@ adpt_appe_pppoe_session_table_del(a_uint32_t dev_id, fal_pppoe_session_t *sessio
 sw_error_t
 adpt_appe_pppoe_session_table_get(a_uint32_t dev_id, fal_pppoe_session_t *session_tbl);
 
+sw_error_t
+adpt_appe_pppoe_l3_intf_set(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+
+sw_error_t
+adpt_appe_pppoe_l3_intf_get(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+
 #endif

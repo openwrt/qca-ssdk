@@ -32,6 +32,9 @@
 #define SR_MII_CTRL_MAX_ENTRY                           3
 #define VR_MII_AN_CTRL_MAX_ENTRY                        3
 #define VR_MII_AN_INTR_STS_MAX_ENTRY                    3
+#define VR_XAUI_MODE_CTRL_MAX_ENTRY                     3
+#define VR_XS_PCS_KR_CTRL_MAX_ENTRY                     3
+#define VR_XS_PCS_DIG_STS_MAX_ENTRY                     3
 
 #define UNIPHY_PLL_CONTROL_VCO_RELATED_SELECTION_MAX_ENTRY      3
 #define UNIPHY_TX_AC_JTAG_MUX_DRIVER_SELECTION_MAX_ENTRY        3
@@ -143,6 +146,17 @@ hppe_uniphy_instance_link_detect_set(
 		a_uint32_t index,
 		union uniphy_instance_link_detect_u *value);
 
+sw_error_t
+hppe_qp_usxg_opiton1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union qp_usxg_opiton1_u *value);
+
+sw_error_t
+hppe_qp_usxg_opiton1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union qp_usxg_opiton1_u *value);
 
 sw_error_t
 hppe_sr_xs_pcs_kr_sts1_get(
@@ -169,6 +183,66 @@ hppe_vr_xs_pcs_dig_ctrl1_set(
 		union vr_xs_pcs_dig_ctrl1_u *value);
 
 sw_error_t
+hppe_vr_xs_pcs_kr_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_kr_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_kr_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_kr_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_dig_sts_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_dig_sts_u *value);
+
+sw_error_t
+hppe_vr_xs_pcs_dig_sts_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_dig_sts_u *value);
+
+sw_error_t
+hppe_vr_mii_dig_ctrl1_channel1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_dig_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_mii_dig_ctrl1_channel1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_dig_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_mii_dig_ctrl1_channel2_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_dig_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_mii_dig_ctrl1_channel2_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_dig_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_mii_dig_ctrl1_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_dig_ctrl1_u *value);
+
+sw_error_t
+hppe_vr_mii_dig_ctrl1_channel3_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_dig_ctrl1_u *value);
+
+sw_error_t
 hppe_sr_mii_ctrl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -176,6 +250,42 @@ hppe_sr_mii_ctrl_get(
 
 sw_error_t
 hppe_sr_mii_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union sr_mii_ctrl_u *value);
+
+sw_error_t
+hppe_sr_mii_ctrl_channel1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union sr_mii_ctrl_u *value);
+
+sw_error_t
+hppe_sr_mii_ctrl_channel1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union sr_mii_ctrl_u *value);
+
+sw_error_t
+hppe_sr_mii_ctrl_channel2_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union sr_mii_ctrl_u *value);
+
+sw_error_t
+hppe_sr_mii_ctrl_channel2_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union sr_mii_ctrl_u *value);
+
+sw_error_t
+hppe_sr_mii_ctrl_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union sr_mii_ctrl_u *value);
+
+sw_error_t
+hppe_sr_mii_ctrl_channel3_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union sr_mii_ctrl_u *value);
@@ -193,6 +303,42 @@ hppe_vr_mii_an_ctrl_set(
 		union vr_mii_an_ctrl_u *value);
 
 sw_error_t
+hppe_vr_mii_an_ctrl_channel1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_ctrl_channel1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_ctrl_channel2_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_ctrl_channel2_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_ctrl_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_ctrl_channel3_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
 hppe_vr_mii_an_intr_sts_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -200,6 +346,90 @@ hppe_vr_mii_an_intr_sts_get(
 
 sw_error_t
 hppe_vr_mii_an_intr_sts_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_intr_sts_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel2_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel2_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel3_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_intr_sts_channel1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_intr_sts_u *value);
+
+sw_error_t
+hppe_vr_mii_an_intr_sts_channel1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_intr_sts_u *value);
+
+sw_error_t
+hppe_vr_mii_an_intr_sts_channel2_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_intr_sts_u *value);
+
+sw_error_t
+hppe_vr_mii_an_intr_sts_channel2_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_intr_sts_u *value);
+
+sw_error_t
+hppe_vr_mii_an_intr_sts_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_intr_sts_u *value);
+
+sw_error_t
+hppe_vr_mii_an_intr_sts_channel3_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_mii_an_intr_sts_u *value);

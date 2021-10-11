@@ -606,6 +606,34 @@ union uniphy_instance_link_detect_u {
 	struct uniphy_instance_link_detect  bf;
 };
 
+/*[register] UNIPHY_1_QP_USXG_OPITON1 */
+#define UNIPHY_1_QP_USXG_OPITON1
+#define UNIPHY_1_QP_USXG_OPITON1_ADDRESS 0x584
+#define UNIPHY_1_QP_USXG_OPITON1_NUM     3
+#define UNIPHY_1_QP_USXG_OPITON1_INC     0x1
+#define UNIPHY_1_QP_USXG_OPITON1_TYPE    REG_TYPE_RW
+#define UNIPHY_1_QP_USXG_OPITON1_DEFAULT 0x0
+
+struct qp_usxg_opiton1 {
+	a_uint32_t  gmii_src_sel:1;
+	a_uint32_t  _reserved0:3;
+	a_uint32_t  xpcs_ch0_ipg_tune_enable:1;
+	a_uint32_t  xpcs_ch1_ipg_tune_enable:1;
+	a_uint32_t  xpcs_ch2_ipg_tune_enable:1;
+	a_uint32_t  xpcs_ch3_ipg_tune_enable:1;
+	a_uint32_t  xpcs_ch0_ipg_tune_rst:1;
+	a_uint32_t  xpcs_ch1_ipg_tune_rst:1;
+	a_uint32_t  xpcs_ch2_ipg_tune_rst:1;
+	a_uint32_t  xpcs_ch3_ipg_tune_rst:1;
+	a_uint32_t  _reserved1:20;
+};
+
+union qp_usxg_opiton1_u {
+	a_uint32_t val;
+	struct qp_usxg_opiton1  bf;
+};
+
+
 /*[register] SR_XS_PCS_KR_STS1*/
 #define SR_XS_PCS_KR_STS1
 #define SR_XS_PCS_KR_STS1_ADDRESS 0x30020
@@ -755,7 +783,89 @@ union vr_xs_pcs_dig_ctrl1_u {
 	struct vr_xs_pcs_dig_ctrl1 bf;
 };
 
+/*[register] VR_XS_PCS_KR_CTRL */
+#define VR_XS_PCS_KR_CTRL
+#define VR_XS_PCS_KR_CTRL_ADDRESS 0x38007
+#define VR_XS_PCS_KR_CTRL_NUM     3
+#define VR_XS_PCS_KR_CTRL_INC     0x1
+#define VR_XS_PCS_KR_CTRL_TYPE    REG_TYPE_RW
+#define VR_XS_PCS_KR_CTRL_DEFAULT 0x0
+
+struct vr_xs_pcs_kr_ctrl {
+	a_uint32_t  vr_tp_en:1;
+	a_uint32_t  pr_data:1;
+	a_uint32_t  nval_sel:3;
+	a_uint32_t  prbs9rxen:3;
+	a_uint32_t  dis_scr:1;
+	a_uint32_t  dis_descr:1;
+	a_uint32_t  usxg_mode:3;
+	a_uint32_t  usxg_2pt5g_gmii:1;
+	a_uint32_t  _reserved0:18;
+};
+
+union vr_xs_pcs_kr_ctrl_u {
+	a_uint32_t val;
+	struct vr_xs_pcs_kr_ctrl bf;
+};
+
+/*[register] VR_XS_PCS_DIG_STS */
+#define VR_XS_PCS_DIG_STS
+#define VR_XS_PCS_DIG_STS_ADDRESS 0x3800a
+#define VR_XS_PCS_DIG_STS_NUM     3
+#define VR_XS_PCS_DIG_STS_INC     0x1
+#define VR_XS_PCS_DIG_STS_TYPE    REG_TYPE_RW
+#define VR_XS_PCS_DIG_STS_DEFAULT 0x0
+
+struct vr_xs_pcs_dig_sts {
+	a_uint32_t  am_count:15;
+	a_uint32_t  _reserved0:17;
+};
+
+union vr_xs_pcs_dig_sts_u {
+	a_uint32_t val;
+	struct vr_xs_pcs_dig_sts bf;
+};
+
+/*[register] VR_MII_1_DIG_CTRL1 */
+#define VR_MII_DIG_CTRL1_CHANNEL2_ADDRESS 0x1b8000
+#define VR_MII_DIG_CTRL1_CHANNEL3_ADDRESS 0x1c8000
+
+#define VR_MII_DIG_CTRL1_CHANNEL1
+#define VR_MII_DIG_CTRL1_CHANNEL1_ADDRESS 0x1a8000
+#define VR_MII_DIG_CTRL1_CHANNEL1_NUM     3
+#define VR_MII_DIG_CTRL1_CHANNEL1_INC     0x1
+#define VR_MII_DIG_CTRL1_CHANNEL1_TYPE    REG_TYPE_RW
+#define VR_MII_DIG_CTRL1_CHANNEL1_DEFAULT 0x0
+
+struct vr_mii_dig_ctrl1 {
+	a_uint32_t  phy_mode:1;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  en_2_5g_mode:1;
+	a_uint32_t  cr_cjn:1;
+	a_uint32_t  dtxlaned:1;
+	a_uint32_t  usra_rst:1;
+	a_uint32_t  pre_emp:1;
+	a_uint32_t  msk_rd_err:1;
+	a_uint32_t  init:1;
+	a_uint32_t  mac_auto_sw:1;
+	a_uint32_t  cs_en:1;
+	a_uint32_t  _reserved1:1;
+	a_uint32_t  cl37_bp:1;
+	a_uint32_t  en_vsmmd1:1;
+	a_uint32_t  r2tlbe:1;
+	a_uint32_t  vr_rst:1;
+	a_uint32_t  _reserved2:16;
+};
+
+union vr_mii_dig_ctrl1_u {
+	a_uint32_t val;
+	struct vr_mii_dig_ctrl1 bf;
+};
+
 /*[register] SR_MII_CTRL*/
+#define SR_MII_CTRL_CHANNEL1_ADDRESS 0x1a0000
+#define SR_MII_CTRL_CHANNEL2_ADDRESS 0x1b0000
+#define SR_MII_CTRL_CHANNEL3_ADDRESS 0x1c0000
 #define SR_MII_CTRL
 #define SR_MII_CTRL_ADDRESS 0x1f0000
 #define SR_MII_CTRL_NUM     3
@@ -829,6 +939,9 @@ union sr_mii_ctrl_u {
 	struct sr_mii_ctrl bf;
 };
 
+#define VR_MII_AN_CTRL_CHANNEL1_ADDRESS 0x1a8001
+#define VR_MII_AN_CTRL_CHANNEL2_ADDRESS 0x1b8001
+#define VR_MII_AN_CTRL_CHANNEL3_ADDRESS 0x1c8001
 /*[register] VR_MII_AN_CTRL*/
 #define VR_MII_AN_CTRL
 #define VR_MII_AN_CTRL_ADDRESS 0x1f8001
@@ -878,6 +991,9 @@ union vr_mii_an_ctrl_u {
 };
 
 /*[register] VR_MII_AN_INTR_STS*/
+#define VR_MII_AN_INTR_STS_CHANNEL1_ADDRESS 0x1a8002
+#define VR_MII_AN_INTR_STS_CHANNEL2_ADDRESS 0x1b8002
+#define VR_MII_AN_INTR_STS_CHANNEL3_ADDRESS 0x1c8002
 #define VR_MII_AN_INTR_STS
 #define VR_MII_AN_INTR_STS_ADDRESS 0x1f8002
 #define VR_MII_AN_INTR_STS_NUM     3
@@ -911,6 +1027,27 @@ struct vr_mii_an_intr_sts {
 union vr_mii_an_intr_sts_u {
 	a_uint32_t val;
 	struct vr_mii_an_intr_sts bf;
+};
+
+/*[register] VR_XAUI_MODE_CTRL*/
+#define VR_XAUI_MODE_CTRL_CHANNEL1_ADDRESS 0x1a8004
+#define VR_XAUI_MODE_CTRL_CHANNEL2_ADDRESS 0x1b8004
+#define VR_XAUI_MODE_CTRL_CHANNEL3_ADDRESS 0x1c8004
+
+#define VR_XAUI_MODE_CTRL_ADDRESS 0x1f8004
+#define VR_XAUI_MODE_CTRL_NUM     3
+#define VR_XAUI_MODE_CTRL_INC     0x1
+#define VR_XAUI_MODE_CTRL_TYPE    REG_TYPE_RW
+#define VR_XAUI_MODE_CTRL_DEFAULT 0x0
+
+struct vr_xaui_mode_ctrl {
+	a_uint32_t  ipg_check:1;
+	a_uint32_t  _reserved0:31;
+};
+
+union vr_xaui_mode_ctrl_u {
+	a_uint32_t val;
+	struct vr_xaui_mode_ctrl bf;
 };
 
 /*[register] UNIPHY_PLL_CONTROL_VCO_RELATED_SELECTION*/

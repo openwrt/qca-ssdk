@@ -276,6 +276,8 @@ FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE)
 				/** <PHY_PSGMII_FIBER mode */
 		PORT_SGMII_FIBER,
 				/** <PORT SGMII_FIBER mode*/
+		PORT_UQXGMII,
+				/**<PORT_UQXGMII mode*/
 		PORT_INTERFACE_MODE_MAX = 0xFF
 	} fal_port_interface_mode_t;
 

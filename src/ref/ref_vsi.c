@@ -420,7 +420,8 @@ ppe_port_vsi_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vsi_id)
 		SSDK_ERROR("invalid VSI port %d, vsi %d\n", port_id, vsi_id);
 		return SW_BAD_VALUE;
 	}
-
+	rv = fal_port_vsi_set(dev_id, port_id, vsi_id);
+	SW_RTN_ON_ERROR (rv);
 	rv = _ppe_port_vsi_mapping_update(dev_id, port_id, vsi_id);
 
 	return rv;

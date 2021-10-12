@@ -705,3 +705,31 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 
 	return rv;
 }
+
+sw_error_t
+mht_interface_mac_mode_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_mac_config_t *config)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t uniphy_index = 0;
+
+	if(config->mac_mode != FAL_MAC_MODE_SGMII && config->mac_mode !=
+		FAL_MAC_MODE_SGMII_PLUS)
+		return SW_NOT_SUPPORTED;
+
+	/*get uniphy index*/
+	if(port_id == SSDK_PHYSICAL_PORT0)
+		uniphy_index = MHT_UNIPHY_SGMII_1;
+	else if(port_id == SSDK_PHYSICAL_PORT5)
+		uniphy_index = MHT_UNIPHY_SGMII_0;
+	else
+		return SW_NOT_SUPPORTED;
+
+	rv = mht_interface_sgmii_mode_set(dev_id, uniphy_index, port_id, config);
+	SW_RTN_ON_ERROR (rv);
+	/*do sgmii function reset*/
+	SSDK_INFO("ipg_tune reset and function reset\n");
+	rv = mht_uniphy_sgmii_function_reset(dev_id, uniphy_index);
+
+	return rv;
+}

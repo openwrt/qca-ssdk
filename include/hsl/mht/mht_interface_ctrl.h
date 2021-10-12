@@ -151,3 +151,7 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 sw_error_t
 mht_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_port_speed_t speed);
+
+sw_error_t
+mht_interface_mac_mode_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_mac_config_t *config);

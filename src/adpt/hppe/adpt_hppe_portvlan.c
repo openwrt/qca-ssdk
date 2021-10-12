@@ -2253,6 +2253,7 @@ adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 	}
 
 	entry_sign = A_FALSE;
+	insert_entry_ready = A_FALSE;
 	for (idx = XLT_RULE_TBL_NUM - 1; idx >= 0; idx--) {
 		aos_mem_zero(&temp_rule, sizeof (fal_vlan_trans_adv_rule_t));
 		aos_mem_zero(&temp_action, sizeof (fal_vlan_trans_adv_action_t));

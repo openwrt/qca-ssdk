@@ -545,7 +545,7 @@ static void ssdk_dt_parse_scheduler_cfg(a_uint32_t dev_id, struct device_node *s
 {
 	struct device_node *scheduler_node;
 	struct device_node *child;
-	a_uint32_t port_id;
+	a_uint32_t port_id = SSDK_MAX_PORT_NUM;
 
 	scheduler_node = of_find_node_by_name(switch_node, "port_scheduler_resource");
 	if (!scheduler_node) {

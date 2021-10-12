@@ -80,11 +80,104 @@ qca8084_phy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return rv;
 }
 
+static sw_error_t
+_qca8084_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
+	fal_port_interface_mode_t *interface_mode_status)
+{
+	a_uint32_t mht_port_id = 0;
+	fal_port_speed_t speed = 0;
+	sw_error_t rv = SW_OK;
+
+	rv = qca_mht_port_id_get(dev_id, phy_id, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	*interface_mode_status = PORT_INTERFACE_MODE_MAX;
+
+	if(mht_port_id >= SSDK_PHYSICAL_PORT1 && mht_port_id <= SSDK_PHYSICAL_PORT3)
+	{
+		/*if uniphy1 is UQXGMII mode, then port interface mode is PORT_UQXGMII,
+			if not, then port1~port3 is switch port and port interface mode is
+			PORT_INTERFACE_MODE_MAX*/
+		if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_1, MHT_UNIPHY_UQXGMII))
+		{
+			*interface_mode_status = PORT_UQXGMII;
+		}
+	}
+	else
+	{
+		/*if uniphy0 is mac mode, then there are two case: 1. uniphy0 is not
+			used(uniphy0 is not sgmii or sgmii+), and if uniphy1 is uqxgmii,
+			then port4 interface mode is PORT_UQXGMII, 2. uniphy0 is used as
+			sgmii or sgmii+, means uniphy0 is used for switch mode, the the
+			port4 interface mode is PORT_INTERFACE_MODE_MAX*/
+		if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_MAC) &&
+			(!mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_SGMII |
+			MHT_UNIPHY_SGMII_PLUS)) && mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_1,
+			MHT_UNIPHY_UQXGMII))
+		{
+			*interface_mode_status = PORT_UQXGMII;
+		}
+		/*if uniphy0 is phy mode, then uniphy0 connect to port4, so the current
+			interface mode depend on current speed, sgmii+ for 2.5G and sgmii
+			for 1G/100M/10M*/
+		if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_PHY))
+		{
+			rv = qca808x_phy_get_speed(dev_id, phy_id, &speed);
+			SW_RTN_ON_ERROR(rv);
+			if(speed == FAL_SPEED_2500)
+				*interface_mode_status = PORT_SGMII_PLUS;
+			else
+				*interface_mode_status = PHY_SGMII_BASET;
+		}
+	}
+
+	return SW_OK;
+}
+
+static sw_error_t
+qca8084_phy_interface_mode_fixup(a_uint32_t dev_id, a_uint32_t phy_id,
+	fal_port_interface_mode_t mode_new)
+{
+	sw_error_t rv = SW_OK;
+	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
+	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_id);
+
+	/*only SGMII and SGMII+ may need to change interface mode*/
+	if(mode_new != PHY_SGMII_BASET && mode_new != PORT_SGMII_PLUS)
+		return SW_OK;
+
+	if(phy_info->port_mode[port_id] != mode_new)
+	{
+		SSDK_INFO("interface mode change from mode 0x%x to mode 0x%x\n",
+			phy_info->port_mode[port_id], mode_new);
+		rv = qca8084_phy_sgmii_mode_set(dev_id, phy_id, mode_new);
+		SW_RTN_ON_ERROR (rv);
+		phy_info->port_mode[port_id] = mode_new;
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+qca8084_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
+	fal_port_interface_mode_t *interface_mode_status)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = _qca8084_phy_interface_get_mode_status(dev_id, phy_id, interface_mode_status);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = qca8084_phy_interface_mode_fixup(dev_id, phy_id, *interface_mode_status);
+
+	return rv;
+}
+
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 		fal_port_interface_mode_t interface_mode)
 {
 	sw_error_t rv = SW_OK;
+	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
 
 	switch (interface_mode) {
 		case PORT_UQXGMII:
@@ -96,12 +189,14 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 		case PHY_SGMII_BASET:
 		case PORT_SGMII_PLUS:
 			SSDK_INFO("configure manhattan work mode:PHY_SGMII_USXGMII_MODE,"
-			"interface_mode:%d\n", interface_mode);
+				"interface_mode:%d\n", interface_mode);
 			/*need to configure work mode as MHT_PHY_SGMII_USXGMII_MODE*/
 			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);
 			SW_RTN_ON_ERROR (rv);
 			rv = qca8084_phy_sgmii_mode_set(dev_id, phy_id, interface_mode);
 			SW_RTN_ON_ERROR (rv);
+			phy_info->port_mode[qca_ssdk_phy_addr_to_port(dev_id, phy_id)] =
+				interface_mode;
 			break;
 		default:
 			rv = SW_NOT_SUPPORTED;
@@ -306,7 +401,7 @@ qca8084_phy_function_reset(a_uint32_t dev_id, a_uint32_t phy_id,
 }
 
 static sw_error_t
-_qca8084_phy_speed_fixup (a_uint32_t dev_id, a_uint32_t phy_addr,
+_qca8084_phy_uqxgmii_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t link, fal_port_speed_t new_speed)
 {
 	sw_error_t rv = SW_OK;
@@ -354,6 +449,77 @@ _qca8084_phy_speed_fixup (a_uint32_t dev_id, a_uint32_t phy_addr,
 	return rv;
 }
 
+static sw_error_t
+_qca8084_phy_sgmii_speed_fixup (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t link, fal_port_speed_t new_speed)
+{
+	sw_error_t rv = SW_OK;
+
+	/*disable ethphy3 and uniphy0 clock*/
+	SSDK_INFO("disable ethphy3 and uniphy0 clock\n");
+	rv = ssdk_mht_port_clk_en_set(dev_id, SSDK_PHYSICAL_PORT4,
+		MHT_CLK_TYPE_EPHY, A_FALSE);
+	SW_RTN_ON_ERROR(rv);
+	rv = ssdk_mht_port_clk_en_set(dev_id, SSDK_PHYSICAL_PORT5,
+		MHT_CLK_TYPE_UNIPHY, A_FALSE);
+	SW_RTN_ON_ERROR(rv);
+	/*set gmii clock for ethphy3 and uniphy0*/
+	SSDK_INFO("set speed clock for uniphy3 and uniphy0\n");
+	rv = mht_port_speed_clock_set(dev_id, SSDK_PHYSICAL_PORT4, new_speed);
+	SW_RTN_ON_ERROR(rv);
+	/*uniphy and ethphy gmii clock enable/disable*/
+	SSDK_INFO("uniphy and ethphy GMII clock enable/disable\n");
+	if(link)
+	{
+		SSDK_INFO("enable ethphy3 and uniphy0 clock\n");
+		rv = ssdk_mht_port_clk_en_set(dev_id, SSDK_PHYSICAL_PORT4,
+			MHT_CLK_TYPE_EPHY, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+		rv = ssdk_mht_port_clk_en_set(dev_id, SSDK_PHYSICAL_PORT5,
+			MHT_CLK_TYPE_UNIPHY, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+	}
+	/*uniphy and ethphy gmii reset and release*/
+	SSDK_INFO("uniphy and ethphy GMII interface reset and release\n");
+	rv = ssdk_mht_port_clk_reset(dev_id, SSDK_PHYSICAL_PORT4,
+		MHT_CLK_TYPE_EPHY);
+	SW_RTN_ON_ERROR(rv);
+	rv = ssdk_mht_port_clk_reset(dev_id, SSDK_PHYSICAL_PORT5,
+		MHT_CLK_TYPE_UNIPHY);
+	SW_RTN_ON_ERROR(rv);
+	/*uniphy and ethphy ipg_tune reset, function reset*/
+	SSDK_INFO("uniphy and ethphy ipg_tune reset, function reset\n");
+	rv = mht_uniphy_sgmii_function_reset(dev_id, MHT_UNIPHY_SGMII_0);
+	SW_RTN_ON_ERROR(rv);
+	/*do ethphy function reset*/
+	SSDK_INFO("do ethphy function reset\n");
+	rv = qca8084_phy_function_reset(dev_id, phy_addr, PHY_FIFO_RESET);
+
+	return rv;
+}
+
+static sw_error_t
+_qca8084_phy_speed_fixup (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t link, fal_port_interface_mode_t mode, fal_port_speed_t new_speed)
+{
+	sw_error_t rv = SW_OK;
+
+	if(mode == PORT_SGMII_PLUS || mode == PHY_SGMII_BASET)
+	{
+		rv = _qca8084_phy_sgmii_speed_fixup(dev_id, phy_addr, link,
+			new_speed);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else if(mode == PORT_UQXGMII)
+	{
+		rv = _qca8084_phy_uqxgmii_speed_fixup(dev_id, phy_addr, link,
+			new_speed);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+
 sw_error_t
 qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct port_phy_status *phy_status)
@@ -362,15 +528,16 @@ qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
 
 	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
-	if(phy_info->port_link_status[port_id-1] != phy_status->link_status)
+	if(phy_info->port_link_status[port_id] != phy_status->link_status)
 	{
-		SSDK_INFO("link status is from %s to %s, speed is:%d\n",
-			phy_info->port_link_status[port_id-1] ? "link up" :"link down",
+		SSDK_INFO("port %d link status is from %s to %s, speed is:%d\n",
+			port_id,
+			phy_info->port_link_status[port_id] ? "link up" :"link down",
 			phy_status->link_status ? "link up" : "link down",
 			phy_status->speed);
 		_qca8084_phy_speed_fixup(dev_id, phy_addr, phy_status->link_status,
-			phy_status->speed);
-		phy_info->port_link_status[port_id-1] = phy_status->link_status;
+			phy_info->port_mode[port_id], phy_status->speed);
+		phy_info->port_link_status[port_id] = phy_status->link_status;
 	}
 
 	return SW_OK;

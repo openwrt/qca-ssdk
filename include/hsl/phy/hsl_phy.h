@@ -556,6 +556,7 @@ typedef struct {
 	a_uint32_t phy_reset_gpio[SW_MAX_NR_PORT];
 	phy_dac_t phy_dac[SW_MAX_NR_PORT];
 	a_bool_t port_link_status[SW_MAX_NR_PORT];
+	a_uint32_t port_mode[SW_MAX_NR_PORT];
 } phy_info_t;
 /*qca808x_end*/
 #define MALIBU5PORT_PHY         0x004DD0B1

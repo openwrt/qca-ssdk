@@ -88,6 +88,10 @@ qca8084_phy_ipg_config(a_uint32_t dev_id, a_uint32_t phy_id,
 	fal_port_speed_t speed);
 
 sw_error_t
+qca8084_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
+	fal_port_interface_mode_t *interface_mode_status);
+
+sw_error_t
 qca8084_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_id);
 
 sw_error_t

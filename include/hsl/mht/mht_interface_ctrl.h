@@ -117,6 +117,17 @@
 #define MHT_UNIPHY_MMD_XPC_SPEED_10                                      0
 #define MHT_UNIPHY_MMD_TX_IPG_CHECK_DISABLE                              0x1
 
+typedef enum {
+	MHT_UNIPHY_MAC = MHT_UNIPHY_MMD1_SGMII_MAC_MODE,
+	MHT_UNIPHY_PHY = MHT_UNIPHY_MMD1_SGMII_PHY_MODE,
+	MHT_UNIPHY_SGMII = MHT_UNIPHY_MMD1_SGMII_MODE,
+	MHT_UNIPHY_SGMII_PLUS = MHT_UNIPHY_MMD1_SGMII_PLUS_MODE,
+	MHT_UNIPHY_UQXGMII = MHT_UNIPHY_MMD1_XPCS_MODE,
+}mht_uniphy_mode_t;
+
+a_bool_t mht_uniphy_mode_check(a_uint32_t dev_id, a_uint32_t uniphy_index,
+	mht_uniphy_mode_t uniphy_mode);
+
 sw_error_t
 mht_uniphy_xpcs_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id);
 
@@ -131,9 +142,12 @@ sw_error_t
 mht_interface_uqxgmii_mode_set(a_uint32_t dev_id);
 
 sw_error_t
-mht_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
-	fal_port_speed_t speed);
+mht_uniphy_sgmii_function_reset(a_uint32_t dev_id, a_uint32_t uniphy_index);
 
 sw_error_t
 mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	a_uint32_t mht_port_id, fal_mac_config_t *config);
+
+sw_error_t
+mht_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_speed_t speed);

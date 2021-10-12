@@ -77,6 +77,28 @@ mht_uniphy_xpcs_modify_mmd(a_uint32_t dev_id, a_uint32_t mmd_num, a_uint32_t mmd
 	return rv;
 }
 
+a_bool_t mht_uniphy_mode_check(a_uint32_t dev_id, a_uint32_t uniphy_index,
+	mht_uniphy_mode_t uniphy_mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t uniphy_addr = 0;
+	a_uint16_t uniphy_mode_ctrl_data = 0;
+
+	rv = qca_mht_serdes_addr_get (dev_id, uniphy_index, &uniphy_addr);
+	if(rv != SW_OK)
+		return A_FALSE;
+
+	uniphy_mode_ctrl_data = qca808x_phy_mmd_read(dev_id, uniphy_addr,
+		MHT_UNIPHY_MMD1, MHT_UNIPHY_MMD1_MODE_CTRL);
+	if(uniphy_mode_ctrl_data == PHY_INVALID_DATA)
+		return A_FALSE;
+
+	if(!(uniphy_mode & uniphy_mode_ctrl_data))
+		return A_FALSE;
+
+	return A_TRUE;
+}
+
 static a_uint32_t
 mht_uniphy_xpcs_port_to_mmd(a_uint32_t dev_id, a_uint32_t mht_port_id)
 {
@@ -355,6 +377,36 @@ mht_uniphy_xpcs_autoneg_restart(a_uint32_t dev_id, a_uint32_t mht_port_id)
 	}
 
 	return SW_OK;
+}
+
+sw_error_t
+mht_uniphy_sgmii_function_reset(a_uint32_t dev_id, a_uint32_t uniphy_index)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t uniphy_addr = 0;
+
+	rv = qca_mht_serdes_addr_get(dev_id, uniphy_index, &uniphy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	/*sgmii channel0 adpt reset*/
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_CHANNEL0_CFG, MHT_UNIPHY_MMD1_SGMII_ADPT_RESET, 0);
+	SW_RTN_ON_ERROR (rv);
+	mdelay(1);
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_CHANNEL0_CFG, MHT_UNIPHY_MMD1_SGMII_ADPT_RESET,
+		MHT_UNIPHY_MMD1_SGMII_ADPT_RESET);
+	SW_RTN_ON_ERROR (rv);
+	/*ipg tune reset*/
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_USXGMII_RESET, MHT_UNIPHY_MMD1_SGMII_FUNC_RESET, 0);
+	SW_RTN_ON_ERROR (rv);
+	mdelay(1);
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_USXGMII_RESET, MHT_UNIPHY_MMD1_SGMII_FUNC_RESET,
+		MHT_UNIPHY_MMD1_SGMII_FUNC_RESET);
+
+	return rv;
 }
 
 static sw_error_t

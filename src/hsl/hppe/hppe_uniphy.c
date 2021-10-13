@@ -329,6 +329,118 @@ hppe_vr_xs_pcs_dig_ctrl1_set(
 }
 
 sw_error_t
+hppe_vr_xs_pcs_eee_ctrl0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl0_u *value)
+{
+	if (index >= VR_XS_PCS_EEE_MCTRL0_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_MCTRL0_ADDRESS,
+				index * VR_XS_PCS_EEE_MCTRL0_INC,
+				&value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl0_u *value)
+{
+	return hppe_uniphy_reg_set(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_MCTRL0_ADDRESS,
+				index * VR_XS_PCS_EEE_MCTRL0_INC,
+				value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_txtimer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_txtimer_u *value)
+{
+	if (index >= VR_XS_PCS_EEE_TXTIMER_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_TXTIMER_ADDRESS,
+				index * VR_XS_PCS_EEE_TXTIMER_INC,
+				&value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_txtimer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_txtimer_u *value)
+{
+	return hppe_uniphy_reg_set(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_TXTIMER_ADDRESS,
+				index * VR_XS_PCS_EEE_TXTIMER_INC,
+				value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_rxtimer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_rxtimer_u *value)
+{
+	if (index >= VR_XS_PCS_EEE_RXTIMER_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_RXTIMER_ADDRESS,
+				index * VR_XS_PCS_EEE_RXTIMER_INC,
+				&value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_rxtimer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_rxtimer_u *value)
+{
+	return hppe_uniphy_reg_set(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_RXTIMER_ADDRESS,
+				index * VR_XS_PCS_EEE_RXTIMER_INC,
+				value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl1_u *value)
+{
+	if (index >= VR_XS_PCS_EEE_MCTRL1_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_MCTRL1_ADDRESS,
+				index * VR_XS_PCS_EEE_MCTRL1_INC,
+				&value->val);
+}
+
+sw_error_t
+hppe_vr_xs_pcs_eee_ctrl1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xs_pcs_eee_ctrl1_u *value)
+{
+	return hppe_uniphy_reg_set(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + VR_XS_PCS_EEE_MCTRL1_ADDRESS,
+				index * VR_XS_PCS_EEE_MCTRL1_INC,
+				value->val);
+}
+
+sw_error_t
 hppe_vr_xs_pcs_kr_ctrl_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

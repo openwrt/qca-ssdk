@@ -413,15 +413,27 @@ qca_appe_policer_hw_init(a_uint32_t dev_id)
 
 #if defined(IN_RSS_HASH)
 #define RSS_HASH_MASK 0xFFF
-#define RSS_HASH_FIN_INNER 0x129c85
-#define RSS_HASH_FIN_OUTER 0x1094670
+
+#define RSS_HASH_FIN_INNER_OUTER_0 0x205
+#define RSS_HASH_FIN_INNER_OUTER_1 0x264
+#define RSS_HASH_FIN_INNER_OUTER_2 0x227
+#define RSS_HASH_FIN_INNER_OUTER_3 0x245
+#define RSS_HASH_FIN_INNER_OUTER_4 0x201
+
 #define RSS_HASH_PROTOCOL_MIX 0x13
 #define RSS_HASH_DPORT_MIX 0xb
 #define RSS_HASH_SPORT_MIX 0x13
-#define RSS_HASH_SIP4_MIX 0x13
-#define RSS_HASH_DIP4_MIX 0xb
-#define RSS_HASH_SIP6_MIX 0x5cd73
-#define RSS_HASH_DIP6_MIX 0x5cd73
+
+#define RSS_HASH_SIPV4_MIX 0x13
+#define RSS_HASH_DIPV4_MIX 0xb
+#define RSS_HASH_SIPV6_MIX_0 0x13
+#define RSS_HASH_SIPV6_MIX_1 0xb
+#define RSS_HASH_SIPV6_MIX_2 0x13
+#define RSS_HASH_SIPV6_MIX_3 0xb
+#define RSS_HASH_DIPV6_MIX_0 0x13
+#define RSS_HASH_DIPV6_MIX_1 0xb
+#define RSS_HASH_DIPV6_MIX_2 0x13
+#define RSS_HASH_DIPV6_MIX_3 0xb
 
 static sw_error_t
 qca_appe_rss_hash_hw_init(a_uint32_t dev_id)
@@ -435,22 +447,35 @@ qca_appe_rss_hash_hw_init(a_uint32_t dev_id)
 	config.hash_mask = RSS_HASH_MASK;
 	config.hash_fragment_mode = A_FALSE;
 
-	config.hash_fin_inner = RSS_HASH_FIN_INNER;
-	config.hash_fin_outer = RSS_HASH_FIN_OUTER;
-
+	config.hash_fin_inner[0] = RSS_HASH_FIN_INNER_OUTER_0 & 0x1f;
+	config.hash_fin_outer[0] = (RSS_HASH_FIN_INNER_OUTER_0 >> 5) & 0x1f;
+	config.hash_fin_inner[1] = RSS_HASH_FIN_INNER_OUTER_1 & 0x1f;
+	config.hash_fin_outer[1] = (RSS_HASH_FIN_INNER_OUTER_1 >> 5) & 0x1f;
+	config.hash_fin_inner[2] = RSS_HASH_FIN_INNER_OUTER_2 & 0x1f;
+	config.hash_fin_outer[2] = (RSS_HASH_FIN_INNER_OUTER_2 >> 5) & 0x1f;
+	config.hash_fin_inner[3] = RSS_HASH_FIN_INNER_OUTER_3 & 0x1f;
+	config.hash_fin_outer[3] = (RSS_HASH_FIN_INNER_OUTER_3 >> 5) & 0x1f;
+	config.hash_fin_inner[4] = RSS_HASH_FIN_INNER_OUTER_4 & 0x1f;
+	config.hash_fin_outer[4] = (RSS_HASH_FIN_INNER_OUTER_4 >> 5) & 0x1f;
 	config.hash_protocol_mix = RSS_HASH_PROTOCOL_MIX;
 	config.hash_dport_mix = RSS_HASH_DPORT_MIX;
 	config.hash_sport_mix = RSS_HASH_SPORT_MIX;
 
 	/* set ipv4 rss hash configuraion */
-	config.hash_sip_mix = RSS_HASH_SIP4_MIX;
-	config.hash_dip_mix = RSS_HASH_DIP4_MIX;
+	config.hash_sip_mix[0] = RSS_HASH_SIPV4_MIX;
+	config.hash_dip_mix[0] = RSS_HASH_DIPV4_MIX;
 	rv = fal_rss_hash_config_set(dev_id, FAL_RSS_HASH_IPV4ONLY, &config);
 	SW_RTN_ON_ERROR(rv);
 
 	/* set ipv6 rss hash configuration */
-	config.hash_sip_mix = RSS_HASH_SIP6_MIX;
-	config.hash_dip_mix = RSS_HASH_DIP6_MIX;
+	config.hash_sip_mix[0] = RSS_HASH_SIPV6_MIX_0;
+	config.hash_dip_mix[0] = RSS_HASH_DIPV6_MIX_0;
+	config.hash_sip_mix[1] = RSS_HASH_SIPV6_MIX_1;
+	config.hash_dip_mix[1] = RSS_HASH_DIPV6_MIX_1;
+	config.hash_sip_mix[2] = RSS_HASH_SIPV6_MIX_2;
+	config.hash_dip_mix[2] = RSS_HASH_DIPV6_MIX_2;
+	config.hash_sip_mix[3] = RSS_HASH_SIPV6_MIX_3;
+	config.hash_dip_mix[3] = RSS_HASH_DIPV6_MIX_3;
 	rv = fal_rss_hash_config_set(dev_id, FAL_RSS_HASH_IPV6ONLY, &config);
 	SSDK_INFO("appe rss hash initialization: hash_seed 0x%x\n",config.hash_seed);
 	return rv;

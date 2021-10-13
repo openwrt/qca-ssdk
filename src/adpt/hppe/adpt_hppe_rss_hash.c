@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -21,6 +21,8 @@
 #include "hppe_rss_reg.h"
 #include "hppe_rss.h"
 #include "adpt.h"
+
+#define ADPT_RSS_HASH_IP_MIX_MAX_NUM 4
 
 sw_error_t
 adpt_hppe_rss_hash_config_set(a_uint32_t dev_id, fal_rss_hash_mode_t mode,
@@ -45,29 +47,32 @@ adpt_hppe_rss_hash_config_set(a_uint32_t dev_id, fal_rss_hash_mode_t mode,
 
 		rss_hash_seed_ipv4.bf.seed = config->hash_seed;
 
-		rss_hash_mix_ipv4[0].bf.hash_mix = config->hash_sip_mix & 0x1f;
-		rss_hash_mix_ipv4[1].bf.hash_mix = config->hash_dip_mix & 0x1f;
+		rss_hash_mix_ipv4[0].bf.hash_mix = config->hash_sip_mix[0] & 0x1f;
+		rss_hash_mix_ipv4[1].bf.hash_mix = config->hash_dip_mix[0] & 0x1f;
 		rss_hash_mix_ipv4[2].bf.hash_mix = config->hash_protocol_mix & 0x1f;
 		rss_hash_mix_ipv4[3].bf.hash_mix = config->hash_dport_mix & 0x1f;
 		rss_hash_mix_ipv4[4].bf.hash_mix = config->hash_sport_mix & 0x1f;
 
-		rss_hash_fin_ipv4[0].bf.fin_inner = config->hash_fin_inner & 0x1f;
-		rss_hash_fin_ipv4[0].bf.fin_outer = config->hash_fin_outer & 0x1f;
-		rss_hash_fin_ipv4[1].bf.fin_inner = (config->hash_fin_inner >> 0x5) & 0x1f;
-		rss_hash_fin_ipv4[1].bf.fin_outer = (config->hash_fin_outer >> 0x5) & 0x1f;
-		rss_hash_fin_ipv4[2].bf.fin_inner = (config->hash_fin_inner >> 0xa) & 0x1f;
-		rss_hash_fin_ipv4[2].bf.fin_outer = (config->hash_fin_outer >> 0xa) & 0x1f;
-		rss_hash_fin_ipv4[3].bf.fin_inner = (config->hash_fin_inner >> 0xf) & 0x1f;
-		rss_hash_fin_ipv4[3].bf.fin_outer = (config->hash_fin_outer >> 0xf) & 0x1f;
-		rss_hash_fin_ipv4[4].bf.fin_inner = (config->hash_fin_inner >> 0x14) & 0x1f;
-		rss_hash_fin_ipv4[4].bf.fin_outer = (config->hash_fin_outer >> 0x14) & 0x1f;
+		for (index = 0; index < RSS_HASH_FIN_IPV4_REG_NUM; index++)
+		{
+			rss_hash_fin_ipv4[index].bf.fin_inner =
+					config->hash_fin_inner[index] & 0x1f;
+			rss_hash_fin_ipv4[index].bf.fin_outer =
+					config->hash_fin_outer[index] & 0x1f;
+		}
 
 		SW_RTN_ON_ERROR(hppe_rss_hash_mask_ipv4_reg_set(dev_id, &rss_hash_mask_ipv4));
 		SW_RTN_ON_ERROR(hppe_rss_hash_seed_ipv4_reg_set(dev_id, &rss_hash_seed_ipv4));
-		for (index = 0; index < 5; index++)
-			SW_RTN_ON_ERROR(hppe_rss_hash_mix_ipv4_reg_set(dev_id, index, &rss_hash_mix_ipv4[index]));
-		for (index = 0; index < 5; index++)
-			SW_RTN_ON_ERROR(hppe_rss_hash_fin_ipv4_reg_set(dev_id, index, &rss_hash_fin_ipv4[index]));
+		for (index = 0; index < RSS_HASH_MIX_IPV4_REG_NUM; index++)
+		{
+			SW_RTN_ON_ERROR(hppe_rss_hash_mix_ipv4_reg_set(dev_id, index,
+					&rss_hash_mix_ipv4[index]));
+		}
+		for (index = 0; index < RSS_HASH_FIN_IPV4_REG_NUM; index++)
+		{
+			SW_RTN_ON_ERROR(hppe_rss_hash_fin_ipv4_reg_set(dev_id, index,
+					&rss_hash_fin_ipv4[index]));
+		}
 	}
 
 	if (mode == FAL_RSS_HASH_IPV4V6 || mode == FAL_RSS_HASH_IPV6ONLY)
@@ -77,37 +82,37 @@ adpt_hppe_rss_hash_config_set(a_uint32_t dev_id, fal_rss_hash_mode_t mode,
 
 		rss_hash_seed_ipv6.bf.seed = config->hash_seed;
 
-		rss_hash_mix_ipv6[0].bf.hash_mix = config->hash_sip_mix & 0x1f;
-		rss_hash_mix_ipv6[1].bf.hash_mix = (config->hash_sip_mix >> 0x5) & 0x1f;
-		rss_hash_mix_ipv6[2].bf.hash_mix = (config->hash_sip_mix >> 0xa) & 0x1f;
-		rss_hash_mix_ipv6[3].bf.hash_mix = (config->hash_sip_mix >> 0xf) & 0x1f;
-
-		rss_hash_mix_ipv6[4].bf.hash_mix = config->hash_dip_mix & 0x1f;
-		rss_hash_mix_ipv6[5].bf.hash_mix = (config->hash_dip_mix >> 0x5) & 0x1f;
-		rss_hash_mix_ipv6[6].bf.hash_mix = (config->hash_dip_mix >> 0xa) & 0x1f;
-		rss_hash_mix_ipv6[7].bf.hash_mix = (config->hash_dip_mix >> 0xf) & 0x1f;
-
+		for (index = 0; index < ADPT_RSS_HASH_IP_MIX_MAX_NUM; index++)
+		{
+			rss_hash_mix_ipv6[index].bf.hash_mix =
+					config->hash_sip_mix[index] & 0x1f;
+			rss_hash_mix_ipv6[index + ADPT_RSS_HASH_IP_MIX_MAX_NUM].bf.hash_mix =
+					config->hash_dip_mix[index] & 0x1f;
+		}
 		rss_hash_mix_ipv6[8].bf.hash_mix = config->hash_protocol_mix & 0x1f;
 		rss_hash_mix_ipv6[9].bf.hash_mix = config->hash_dport_mix & 0x1f;
 		rss_hash_mix_ipv6[10].bf.hash_mix = config->hash_sport_mix & 0x1f;
 
-		rss_hash_fin_ipv6[0].bf.fin_inner = config->hash_fin_inner & 0x1f;
-		rss_hash_fin_ipv6[0].bf.fin_outer = config->hash_fin_outer & 0x1f;
-		rss_hash_fin_ipv6[1].bf.fin_inner = (config->hash_fin_inner >> 0x5) & 0x1f;
-		rss_hash_fin_ipv6[1].bf.fin_outer = (config->hash_fin_outer >> 0x5) & 0x1f;
-		rss_hash_fin_ipv6[2].bf.fin_inner = (config->hash_fin_inner >> 0xa) & 0x1f;
-		rss_hash_fin_ipv6[2].bf.fin_outer = (config->hash_fin_outer >> 0xa) & 0x1f;
-		rss_hash_fin_ipv6[3].bf.fin_inner = (config->hash_fin_inner >> 0xf) & 0x1f;
-		rss_hash_fin_ipv6[3].bf.fin_outer = (config->hash_fin_outer >> 0xf) & 0x1f;
-		rss_hash_fin_ipv6[4].bf.fin_inner = (config->hash_fin_inner >> 0x14) & 0x1f;
-		rss_hash_fin_ipv6[4].bf.fin_outer = (config->hash_fin_outer >> 0x14) & 0x1f;
+		for (index = 0; index < RSS_HASH_FIN_REG_NUM; index++)
+		{
+			rss_hash_fin_ipv6[index].bf.fin_inner =
+					config->hash_fin_inner[index] & 0x1f;
+			rss_hash_fin_ipv6[index].bf.fin_outer =
+					config->hash_fin_outer[index] & 0x1f;
+		}
 
 		SW_RTN_ON_ERROR(hppe_rss_hash_mask_reg_set(dev_id, &rss_hash_mask_ipv6));
 		SW_RTN_ON_ERROR(hppe_rss_hash_seed_reg_set(dev_id, &rss_hash_seed_ipv6));
-		for (index = 0; index < 11; index++)
-			SW_RTN_ON_ERROR(hppe_rss_hash_mix_reg_set(dev_id, index, &rss_hash_mix_ipv6[index]));
-		for (index = 0; index < 5; index++)
-			SW_RTN_ON_ERROR(hppe_rss_hash_fin_reg_set(dev_id, index, &rss_hash_fin_ipv6[index]));
+		for (index = 0; index < RSS_HASH_MIX_REG_NUM; index++)
+		{
+			SW_RTN_ON_ERROR(hppe_rss_hash_mix_reg_set(dev_id, index,
+					&rss_hash_mix_ipv6[index]));
+		}
+		for (index = 0; index < RSS_HASH_FIN_REG_NUM; index++)
+		{
+			SW_RTN_ON_ERROR(hppe_rss_hash_fin_reg_set(dev_id, index,
+					&rss_hash_fin_ipv6[index]));
+		}
 	}
 
 	return SW_OK;
@@ -131,65 +136,65 @@ adpt_hppe_rss_hash_config_get(a_uint32_t dev_id, fal_rss_hash_mode_t mode,
 
 	SW_RTN_ON_ERROR(hppe_rss_hash_mask_ipv4_reg_get(dev_id, &rss_hash_mask_ipv4));
 	SW_RTN_ON_ERROR(hppe_rss_hash_seed_ipv4_reg_get(dev_id, &rss_hash_seed_ipv4));
-	for (index = 0; index < 5; index++)
-		SW_RTN_ON_ERROR(hppe_rss_hash_mix_ipv4_reg_get(dev_id, index, &rss_hash_mix_ipv4[index]));
-	for (index = 0; index < 5; index++)
-		SW_RTN_ON_ERROR(hppe_rss_hash_fin_ipv4_reg_get(dev_id, index, &rss_hash_fin_ipv4[index]));
+	for (index = 0; index < RSS_HASH_MIX_IPV4_REG_NUM; index++)
+	{
+		SW_RTN_ON_ERROR(hppe_rss_hash_mix_ipv4_reg_get(dev_id, index,
+				&rss_hash_mix_ipv4[index]));
+	}
+	for (index = 0; index < RSS_HASH_FIN_IPV4_REG_NUM; index++)
+	{
+		SW_RTN_ON_ERROR(hppe_rss_hash_fin_ipv4_reg_get(dev_id, index,
+				&rss_hash_fin_ipv4[index]));
+	}
 
 	SW_RTN_ON_ERROR(hppe_rss_hash_mask_reg_get(dev_id, &rss_hash_mask_ipv6));
 	SW_RTN_ON_ERROR(hppe_rss_hash_seed_reg_get(dev_id, &rss_hash_seed_ipv6));
-	for (index = 0; index < 11; index++)
-		SW_RTN_ON_ERROR(hppe_rss_hash_mix_reg_get(dev_id, index, &rss_hash_mix_ipv6[index]));
-	for (index = 0; index < 5; index++)
-		SW_RTN_ON_ERROR(hppe_rss_hash_fin_reg_get(dev_id, index, &rss_hash_fin_ipv6[index]));
+	for (index = 0; index < RSS_HASH_MIX_REG_NUM; index++)
+	{
+		SW_RTN_ON_ERROR(hppe_rss_hash_mix_reg_get(dev_id, index,
+				&rss_hash_mix_ipv6[index]));
+	}
+	for (index = 0; index < RSS_HASH_FIN_REG_NUM; index++)
+	{
+		SW_RTN_ON_ERROR(hppe_rss_hash_fin_reg_get(dev_id, index,
+				&rss_hash_fin_ipv6[index]));
+	}
 
 	if (mode == FAL_RSS_HASH_IPV4ONLY)
 	{
 		config->hash_mask = rss_hash_mask_ipv4.bf.mask;
 		config->hash_fragment_mode = rss_hash_mask_ipv4.bf.fragment;
 		config->hash_seed = rss_hash_seed_ipv4.bf.seed;
-		config->hash_sip_mix = rss_hash_mix_ipv4[0].bf.hash_mix;
-		config->hash_dip_mix = rss_hash_mix_ipv4[1].bf.hash_mix;
+		config->hash_sip_mix[0] = rss_hash_mix_ipv4[0].bf.hash_mix;
+		config->hash_dip_mix[0] = rss_hash_mix_ipv4[1].bf.hash_mix;
 		config->hash_protocol_mix = rss_hash_mix_ipv4[2].bf.hash_mix;
 		config->hash_dport_mix = rss_hash_mix_ipv4[3].bf.hash_mix;
 		config->hash_sport_mix = rss_hash_mix_ipv4[4].bf.hash_mix;
-		config->hash_fin_inner = rss_hash_fin_ipv4[0].bf.fin_inner +
-				(rss_hash_fin_ipv4[1].bf.fin_inner << 0x5) +
-				(rss_hash_fin_ipv4[2].bf.fin_inner << 0xa) +
-				(rss_hash_fin_ipv4[3].bf.fin_inner << 0xf) +
-				(rss_hash_fin_ipv4[4].bf.fin_inner << 0x14);
-		config->hash_fin_outer = rss_hash_fin_ipv4[0].bf.fin_outer +
-				(rss_hash_fin_ipv4[1].bf.fin_outer << 0x5) +
-				(rss_hash_fin_ipv4[2].bf.fin_outer << 0xa) +
-				(rss_hash_fin_ipv4[3].bf.fin_outer << 0xf) +
-				(rss_hash_fin_ipv4[4].bf.fin_outer << 0x14);
+		for (index = 0; index < RSS_HASH_FIN_IPV4_REG_NUM; index++)
+		{
+			config->hash_fin_inner[index] = rss_hash_fin_ipv4[index].bf.fin_inner;
+			config->hash_fin_outer[index] = rss_hash_fin_ipv4[index].bf.fin_outer;
+		}
 	}
 	else if (mode == FAL_RSS_HASH_IPV6ONLY)
 	{
 		config->hash_mask = rss_hash_mask_ipv6.bf.mask;
 		config->hash_fragment_mode = rss_hash_mask_ipv6.bf.fragment;
 		config->hash_seed = rss_hash_seed_ipv6.bf.seed;
-		config->hash_sip_mix = rss_hash_mix_ipv6[0].bf.hash_mix +
-				(rss_hash_mix_ipv6[1].bf.hash_mix << 0x5) +
-				(rss_hash_mix_ipv6[2].bf.hash_mix << 0xa) +
-				(rss_hash_mix_ipv6[3].bf.hash_mix << 0xf);
-		config->hash_dip_mix = rss_hash_mix_ipv6[4].bf.hash_mix +
-				(rss_hash_mix_ipv6[5].bf.hash_mix << 0x5) +
-				(rss_hash_mix_ipv6[6].bf.hash_mix << 0xa) +
-				(rss_hash_mix_ipv6[7].bf.hash_mix << 0xf);
+		for (index = 0; index < ADPT_RSS_HASH_IP_MIX_MAX_NUM; index++)
+		{
+			config->hash_sip_mix[index] = rss_hash_mix_ipv6[index].bf.hash_mix;
+			config->hash_dip_mix[index] =
+				rss_hash_mix_ipv6[index + ADPT_RSS_HASH_IP_MIX_MAX_NUM].bf.hash_mix;
+		}
 		config->hash_protocol_mix = rss_hash_mix_ipv6[8].bf.hash_mix;
 		config->hash_dport_mix = rss_hash_mix_ipv6[9].bf.hash_mix;
 		config->hash_sport_mix = rss_hash_mix_ipv6[10].bf.hash_mix;
-		config->hash_fin_inner = rss_hash_fin_ipv6[0].bf.fin_inner +
-				(rss_hash_fin_ipv6[1].bf.fin_inner << 0x5) +
-				(rss_hash_fin_ipv6[2].bf.fin_inner << 0xa) +
-				(rss_hash_fin_ipv6[3].bf.fin_inner << 0xf) +
-				(rss_hash_fin_ipv6[4].bf.fin_inner << 0x14);
-		config->hash_fin_outer = rss_hash_fin_ipv6[0].bf.fin_outer +
-				(rss_hash_fin_ipv6[1].bf.fin_outer << 0x5) +
-				(rss_hash_fin_ipv6[2].bf.fin_outer << 0xa) +
-				(rss_hash_fin_ipv6[3].bf.fin_outer << 0xf) +
-				(rss_hash_fin_ipv6[4].bf.fin_outer << 0x14);
+		for (index = 0; index < RSS_HASH_FIN_REG_NUM; index++)
+		{
+			config->hash_fin_inner[index] = rss_hash_fin_ipv6[index].bf.fin_inner;
+			config->hash_fin_outer[index] = rss_hash_fin_ipv6[index].bf.fin_outer;
+		}
 	}
 	else
 	{
@@ -215,27 +220,22 @@ adpt_hppe_rss_hash_config_get(a_uint32_t dev_id, fal_rss_hash_mode_t mode,
 			config->hash_mask = rss_hash_mask_ipv6.bf.mask;
 			config->hash_fragment_mode = rss_hash_mask_ipv6.bf.fragment;
 			config->hash_seed = rss_hash_seed_ipv6.bf.seed;
-			config->hash_sip_mix = rss_hash_mix_ipv6[0].bf.hash_mix +
-					(rss_hash_mix_ipv6[1].bf.hash_mix << 0x5) +
-					(rss_hash_mix_ipv6[2].bf.hash_mix << 0xa) +
-					(rss_hash_mix_ipv6[3].bf.hash_mix << 0xf);
-			config->hash_dip_mix = rss_hash_mix_ipv6[4].bf.hash_mix +
-					(rss_hash_mix_ipv6[5].bf.hash_mix << 0x5) +
-					(rss_hash_mix_ipv6[6].bf.hash_mix << 0xa) +
-					(rss_hash_mix_ipv6[7].bf.hash_mix << 0xf);
+			for (index = 0; index < ADPT_RSS_HASH_IP_MIX_MAX_NUM; index++)
+			{
+				config->hash_sip_mix[index] = rss_hash_mix_ipv6[index].bf.hash_mix;
+				config->hash_dip_mix[index] =
+				rss_hash_mix_ipv6[index + ADPT_RSS_HASH_IP_MIX_MAX_NUM].bf.hash_mix;
+			}
 			config->hash_protocol_mix = rss_hash_mix_ipv6[8].bf.hash_mix;
 			config->hash_dport_mix = rss_hash_mix_ipv6[9].bf.hash_mix;
 			config->hash_sport_mix = rss_hash_mix_ipv6[10].bf.hash_mix;
-			config->hash_fin_inner = rss_hash_fin_ipv6[0].bf.fin_inner +
-					(rss_hash_fin_ipv6[1].bf.fin_inner << 0x5) +
-					(rss_hash_fin_ipv6[2].bf.fin_inner << 0xa) +
-					(rss_hash_fin_ipv6[3].bf.fin_inner << 0xf) +
-					(rss_hash_fin_ipv6[4].bf.fin_inner << 0x14);
-			config->hash_fin_outer = rss_hash_fin_ipv6[0].bf.fin_outer +
-					(rss_hash_fin_ipv6[1].bf.fin_outer << 0x5) +
-					(rss_hash_fin_ipv6[2].bf.fin_outer << 0xa) +
-					(rss_hash_fin_ipv6[3].bf.fin_outer << 0xf) +
-					(rss_hash_fin_ipv6[4].bf.fin_outer << 0x14);
+			for (index = 0; index < RSS_HASH_FIN_REG_NUM; index++)
+			{
+				config->hash_fin_inner[index] =
+						rss_hash_fin_ipv6[index].bf.fin_inner;
+				config->hash_fin_outer[index] =
+						rss_hash_fin_ipv6[index].bf.fin_outer;
+			}
 		}
 		else
 			return SW_FAIL;

@@ -15870,6 +15870,61 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 }
 #endif
 
+sw_error_t
+cmd_data_check_uint8_array(char *cmdstr, void *val, a_uint32_t size)
+{
+    char *tmp = NULL;
+    a_uint32_t i = 0, j;
+    a_uint32_t addr;
+    a_uint8_t *dst = (a_uint8_t*)val;
+
+    if (NULL == cmdstr)
+    {
+        return SW_BAD_VALUE;
+    }
+
+    if (0 == cmdstr[0])
+    {
+        return SW_OK;
+    }
+
+    tmp = (void *) strsep(&cmdstr, "-");
+    while (tmp)
+    {
+        if (size <= i)
+        {
+            return SW_BAD_VALUE;
+        }
+
+        if ((2 < strlen(tmp)) || (0 == strlen(tmp)))
+        {
+            return SW_BAD_VALUE;
+        }
+
+        for (j = 0; j < strlen(tmp); j++)
+        {
+            if (A_FALSE == is_hex(tmp[j]))
+                return SW_BAD_VALUE;
+        }
+
+        sscanf(tmp, "%x", &addr);
+        if (0xff < addr)
+        {
+            return SW_BAD_VALUE;
+        }
+
+        dst[i++] = addr;
+        tmp = (void *) strsep(&cmdstr, "-");
+    }
+
+    if (size != i)
+    {
+        return SW_BAD_VALUE;
+    }
+
+    return SW_OK;
+}
+
 #ifdef IN_RSS_HASH
 sw_error_t
 cmd_data_check_rss_hash_mode(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
@@ -15901,6 +15956,7 @@ sw_error_t
 cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_t size)
 {
 	char *cmd = NULL;
+	a_uint32_t tmp;
 	sw_error_t rv;
 	fal_rss_hash_config_t entry;
 
@@ -15982,7 +16038,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, &entry.hash_sip_mix, sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8_array(cmd, &entry.hash_sip_mix[0],
+						sizeof (entry.hash_sip_mix));
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16002,7 +16059,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, &entry.hash_dip_mix, sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8_array(cmd, &entry.hash_dip_mix[0],
+						sizeof (entry.hash_dip_mix));
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16022,7 +16080,11 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(entry.hash_protocol_mix), sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+			if (SW_OK == rv)
+			{
+				entry.hash_protocol_mix = tmp;
+			}
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16042,7 +16104,11 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(entry.hash_sport_mix), sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+			if (SW_OK == rv)
+			{
+				entry.hash_sport_mix = tmp;
+			}
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16062,7 +16128,11 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(entry.hash_dport_mix), sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+			if (SW_OK == rv)
+			{
+				entry.hash_dport_mix = tmp;
+			}
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16082,7 +16152,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, &entry.hash_fin_inner, sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8_array(cmd, &entry.hash_fin_inner[0],
+						sizeof (entry.hash_fin_inner));
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16102,7 +16173,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, &entry.hash_fin_outer, sizeof (a_uint32_t));
+			rv = cmd_data_check_uint8_array(cmd, &entry.hash_fin_outer[0],
+						sizeof (entry.hash_fin_outer));
 		}
 	}
 	while (talk_mode && (SW_OK != rv));

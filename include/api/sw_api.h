@@ -303,7 +303,7 @@ typedef enum
     {
         a_uint32_t api_id;
         a_uint16_t data_size;
-	a_uint8_t  data_type;
+	a_uint16_t  data_type;
         a_uint8_t  param_type;
     } sw_api_param_t;
 

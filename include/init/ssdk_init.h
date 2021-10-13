@@ -130,6 +130,7 @@ enum ssdk_port_wrapper_cfg {
 	PORT_WRAPPER_RGMII,
 	PORT_WRAPPER_PSGMII_FIBER,
 	PORT_WRAPPER_SGMII_FIBER,
+	PORT_WRAPPER_UQXGMII, /* for four channels manhattan phy mode*/
 	PORT_WRAPPER_MAX = 0xFF
 };
 

@@ -795,6 +795,7 @@ hppe_ucast_priority_map_tbl_get(
 				index * UCAST_PRIORITY_MAP_TBL_INC,
 				&value->val);
 }
+#endif
 
 sw_error_t
 hppe_ucast_priority_map_tbl_set(
@@ -809,6 +810,7 @@ hppe_ucast_priority_map_tbl_set(
 				value->val);
 }
 
+#ifndef IN_QM_MINI
 sw_error_t
 hppe_mcast_queue_map_tbl_get(
 		a_uint32_t dev_id,

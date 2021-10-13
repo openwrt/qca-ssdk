@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,19 +14,27 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef _SHELL_SW_H_
-#define _SHELL_SW_H_
+#ifndef _ADPT_HPPE_UNIPHY_H_
+#define _ADPT_HPPE_UNIPHY_H_
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif                          /* __cplusplus */
 
-    int get_devid(void);
-    sw_error_t cmd_set_devid(a_uint32_t *arg_val);
-    sw_error_t uci_set_devid(a_uint32_t dev_id);
+sw_error_t
+adpt_hppe_uniphy_usxgmii_status_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union sr_mii_ctrl_u *sr_mii_ctrl);
+sw_error_t
+adpt_hppe_uniphy_usxgmii_status_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union sr_mii_ctrl_u *sr_mii_ctrl);
+sw_error_t
+adpt_hppe_uniphy_usxgmii_autoneg_status_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union vr_mii_an_intr_sts_u *vr_mii_an_intr_sts);
+sw_error_t
+adpt_hppe_uniphy_usxgmii_autoneg_status_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id, union vr_mii_an_intr_sts_u *vr_mii_an_intr_sts);
 
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */
-
-#endif                          /* _SHELL_SW_H_ */
+#endif

@@ -260,6 +260,8 @@ fal_ucast_queue_base_profile_get(
 		fal_ucast_queue_dest_t *queue_dest,
 		a_uint32_t *queue_base, a_uint8_t *profile);
 
+#endif
+
 sw_error_t
 fal_ucast_priority_class_set(
 		a_uint32_t dev_id,
@@ -267,6 +269,7 @@ fal_ucast_priority_class_set(
 		a_uint8_t priority,
 		a_uint8_t class);
 
+#ifndef IN_QM_MINI
 sw_error_t
 fal_ucast_priority_class_get(
 		a_uint32_t dev_id,

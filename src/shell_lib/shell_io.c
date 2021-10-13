@@ -3590,34 +3590,29 @@ cmd_data_check_ruletype(char *cmd_str, fal_acl_rule_type_t * arg_val,
     else
     {
 #ifdef APPE
-		if (cmd_get_chip_type() == CHIP_APPE)
-		{
-			if (!strcasecmp(cmd_str, "tunnel_mac"))
-			{
-				*arg_val = FAL_ACL_RULE_TUNNEL_MAC;
-			}
-			else if (!strcasecmp(cmd_str, "tunnel_ip4"))
-			{
-				*arg_val = FAL_ACL_RULE_TUNNEL_IP4;
-			}
-			else if (!strcasecmp(cmd_str, "tunnel_ip6"))
-			{
-				*arg_val = FAL_ACL_RULE_TUNNEL_IP6;
-			}
-			else if (!strcasecmp(cmd_str, "tunnel_udf"))
-			{
-				*arg_val = FAL_ACL_RULE_TUNNEL_UDF;
-			}
-			else
-			{
-				return SW_BAD_VALUE;
-			}
-		}
-		else
+        if (!strcasecmp(cmd_str, "tunnel_mac"))
+        {
+            *arg_val = FAL_ACL_RULE_TUNNEL_MAC;
+        }
+        else if (!strcasecmp(cmd_str, "tunnel_ip4"))
+        {
+            *arg_val = FAL_ACL_RULE_TUNNEL_IP4;
+        }
+        else if (!strcasecmp(cmd_str, "tunnel_ip6"))
+        {
+            *arg_val = FAL_ACL_RULE_TUNNEL_IP6;
+        }
+        else if (!strcasecmp(cmd_str, "tunnel_udf"))
+        {
+            *arg_val = FAL_ACL_RULE_TUNNEL_UDF;
+        }
+        else
+        {
+            return SW_BAD_VALUE;
+        }
+        return SW_OK;
 #endif
-		{
-			return SW_BAD_VALUE;
-		}
+        return SW_BAD_VALUE;
     }
 
     return SW_OK;
@@ -8471,7 +8466,6 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
     char *cmd;
     sw_error_t rv;
     fal_l3_excep_ctrl_t entry;
-    a_uint32_t tmpdata = 0;
 
     aos_mem_zero(&entry, sizeof (fal_l3_excep_ctrl_t));
 
@@ -8628,51 +8622,49 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
     }
     while (talk_mode && (SW_OK != rv));
 
-    if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+#ifdef APPE
+    do
+    {
+        cmd = get_sub_cmd("l2flow_type", "flow_aware");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("l2flow_type", "flow_aware");
-            SW_RTN_ON_NULL_PARAM(cmd);
-
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-               return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-               rv = SW_BAD_VALUE;
-            }
-            else
-            {
-               rv = cmd_data_check_attr("flow_excep_type", cmd,
-                                                      &tmpdata, sizeof(tmpdata));
-               entry.l2flow_type = tmpdata & 0x3;
-            }
+           return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-
-        do
+        else if (!strncasecmp(cmd, "help", 4))
         {
-            cmd = get_sub_cmd("l3flow_type", "flow_aware");
-            SW_RTN_ON_NULL_PARAM(cmd);
-
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-               return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-               rv = SW_BAD_VALUE;
-            }
-            else
-            {
-               rv = cmd_data_check_attr("flow_excep_type", cmd,
-                                                      &tmpdata, sizeof(tmpdata));
-               entry.l3flow_type = tmpdata & 0x3;
-            }
+           rv = SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else
+        {
+           rv = cmd_data_check_attr("flow_excep_type", cmd,
+                                     &entry.l2flow_type, sizeof(entry.l2flow_type));
+        }
     }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("l3flow_type", "flow_aware");
+        SW_RTN_ON_NULL_PARAM(cmd);
+
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+           return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+           rv = SW_BAD_VALUE;
+        }
+        else
+        {
+           rv = cmd_data_check_attr("flow_excep_type", cmd,
+                                     &entry.l3flow_type, sizeof(entry.l3flow_type));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
+#endif
     *(fal_l3_excep_ctrl_t *)val = entry;
     return SW_OK;
 }
@@ -13830,12 +13822,10 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
 
     aos_mem_zero(&entry, sizeof (fal_shaper_config_t));
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        cmd_data_check_element("meter_type", "rfc",
-                            "usage:meter_type:rfc/mef10_3, etc\n",
-                            cmd_data_check_attr, ("shaper_meter_type", cmd,
-                            &(entry.meter_type), sizeof(entry.meter_type)));
-	}
+    cmd_data_check_element("meter_type", "rfc",
+                        "usage:meter_type:rfc/mef10_3, etc\n",
+                        cmd_data_check_attr, ("shaper_meter_type", cmd,
+                        &(entry.meter_type), sizeof(entry.meter_type)));
 #endif
 
     do
@@ -13923,26 +13913,24 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("cir_max", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("cir_max", "0");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14008,26 +13996,24 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("eir_max", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("eir_max", "0");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14051,66 +14037,64 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("next_ptr", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("next_ptr", "0");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 
-        do
+    do
+    {
+        cmd = get_sub_cmd("grp_end", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("grp_end", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
-                                            sizeof (a_bool_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 
-        do
+    do
+    {
+        cmd = get_sub_cmd("grp_couple_enable", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("grp_couple_enable", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
-                                            sizeof (a_bool_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14257,12 +14241,10 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     aos_mem_zero(&entry, sizeof (fal_policer_config_t));
 
 #if defined(APPE)
-    if (cmd_get_chip_type() == CHIP_APPE) {
-        cmd_data_check_element("meter_type", "rfc",
-                            "usage:meter_type:rfc/mef10_3, etc\n",
-                            cmd_data_check_attr, ("policer_meter_type", cmd,
-                            &(entry.meter_type), sizeof(entry.meter_type)));
-	}
+    cmd_data_check_element("meter_type", "rfc",
+                        "usage:meter_type:rfc/mef10_3, etc\n",
+                        cmd_data_check_attr, ("policer_meter_type", cmd,
+                        &(entry.meter_type), sizeof(entry.meter_type)));
 #endif
 
     do
@@ -14288,26 +14270,24 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("vp_policer_index", "0-511");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("vp_policer_index", "0-511");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.vp_meter_index), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.vp_meter_index), sizeof (a_uint32_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14434,26 +14414,24 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("cir_max", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("cir_max", "0");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14497,26 +14475,24 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("eir_max", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("eir_max", "0");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14540,67 +14516,65 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("next_ptr", "0");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("next_ptr", "0");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-
-        do
+        else if (!strncasecmp(cmd, "help", 4))
         {
-            cmd = get_sub_cmd("grp_end", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
-                                            sizeof (a_bool_t));
-            }
+            rv = SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-
-        do
+        else
         {
-            cmd = get_sub_cmd("grp_couple_enable", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
-                                            sizeof (a_bool_t));
-            }
+            rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
         }
-        while (talk_mode && (SW_OK != rv));
-	}
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("grp_end", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("grp_couple_enable", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     *(fal_policer_config_t *)val = entry;
@@ -14617,12 +14591,10 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
     aos_mem_zero(&entry, sizeof (fal_policer_config_t));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-        cmd_data_check_element("meter_type", "rfc",
-                            "usage:meter_type:rfc/mef10_3, etc\n",
-                            cmd_data_check_attr, ("policer_meter_type", cmd,
-                            &(entry.meter_type), sizeof(entry.meter_type)));
-	}
+    cmd_data_check_element("meter_type", "rfc",
+                        "usage:meter_type:rfc/mef10_3, etc\n",
+                        cmd_data_check_attr, ("policer_meter_type", cmd,
+                        &(entry.meter_type), sizeof(entry.meter_type)));
 #endif
 
     do
@@ -14751,27 +14723,25 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-		do
-		{
-			cmd = get_sub_cmd("cir_max", "0");
-			SW_RTN_ON_NULL_PARAM(cmd);
+	do
+	{
+		cmd = get_sub_cmd("cir_max", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
 
-			if (!strncasecmp(cmd, "quit", 4))
-			{
-				return SW_BAD_VALUE;
-			}
-			else if (!strncasecmp(cmd, "help", 4))
-			{
-				rv = SW_BAD_VALUE;
-			}
-			else
-			{
-				rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
-			}
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
 		}
-		while (talk_mode && (SW_OK != rv));
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
+		}
 	}
+	while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14815,27 +14785,25 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-		do
-		{
-			cmd = get_sub_cmd("eir_max", "0");
-			SW_RTN_ON_NULL_PARAM(cmd);
+	do
+	{
+		cmd = get_sub_cmd("eir_max", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
 
-			if (!strncasecmp(cmd, "quit", 4))
-			{
-				return SW_BAD_VALUE;
-			}
-			else if (!strncasecmp(cmd, "help", 4))
-			{
-				rv = SW_BAD_VALUE;
-			}
-			else
-			{
-				rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
-			}
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
 		}
-		while (talk_mode && (SW_OK != rv));
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
+		}
 	}
+	while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -14859,69 +14827,67 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-	if (cmd_get_chip_type() == CHIP_APPE) {
-		do
+	do
+	{
+		cmd = get_sub_cmd("next_ptr", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
 		{
-			cmd = get_sub_cmd("next_ptr", "0");
-			SW_RTN_ON_NULL_PARAM(cmd);
-
-			if (!strncasecmp(cmd, "quit", 4))
-			{
-				return SW_BAD_VALUE;
-			}
-			else if (!strncasecmp(cmd, "help", 4))
-			{
-				rv = SW_BAD_VALUE;
-			}
-			else
-			{
-				rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
-			}
+			return SW_BAD_VALUE;
 		}
-		while (talk_mode && (SW_OK != rv));
-
-		do
+		else if (!strncasecmp(cmd, "help", 4))
 		{
-			cmd = get_sub_cmd("grp_end", "no");
-			SW_RTN_ON_NULL_PARAM(cmd);
-
-			if (!strncasecmp(cmd, "quit", 4))
-			{
-				return SW_BAD_VALUE;
-			}
-			else if (!strncasecmp(cmd, "help", 4))
-			{
-				rv = SW_BAD_VALUE;
-			}
-			else
-			{
-				rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
-					sizeof (a_bool_t));
-			}
+			rv = SW_BAD_VALUE;
 		}
-		while (talk_mode && (SW_OK != rv));
-
-		do
+		else
 		{
-			cmd = get_sub_cmd("grp_couple_enable", "no");
-			SW_RTN_ON_NULL_PARAM(cmd);
-
-			if (!strncasecmp(cmd, "quit", 4))
-			{
-				return SW_BAD_VALUE;
-		    }
-			else if (!strncasecmp(cmd, "help", 4))
-			{
-				rv = SW_BAD_VALUE;
-			}
-			else
-			{
-				rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
-					sizeof (a_bool_t));
-			}
+			rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
 		}
-		while (talk_mode && (SW_OK != rv));
 	}
+	while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("grp_end", "no");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+		}
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
+				sizeof (a_bool_t));
+		}
+	}
+	while (talk_mode && (SW_OK != rv));
+
+	do
+	{
+		cmd = get_sub_cmd("grp_couple_enable", "no");
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
+	    }
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
+				sizeof (a_bool_t));
+		}
+	}
+	while (talk_mode && (SW_OK != rv));
 #endif
 
     *(fal_policer_config_t *)val = entry;
@@ -15023,47 +14989,45 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-    if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("yellow_dscp_remark", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("yellow_dscp_remark", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_dscp_en),
-                                            sizeof (a_bool_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-
-        do
+        else if (!strncasecmp(cmd, "help", 4))
         {
-            cmd = get_sub_cmd("yellow_remap", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_remap_en),
-                                            sizeof (a_bool_t));
-            }
+            rv = SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_dscp_en),
+                                        sizeof (a_bool_t));
+        }
     }
+    while (talk_mode && (SW_OK != rv));
+
+    do
+    {
+        cmd = get_sub_cmd("yellow_remap", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_remap_en),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -15147,26 +15111,24 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-    if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("yellow_dscp", "0-63");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("yellow_dscp", "0-63");
-    		SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.yellow_dscp), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.yellow_dscp), sizeof (a_uint32_t));
+        }
     }
+    while (talk_mode && (SW_OK != rv));
 #endif
        do
     {
@@ -15275,46 +15237,44 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-    if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("red_dscp_remark", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("red_dscp_remark", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_dscp_en),
-                                            sizeof (a_bool_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
-        do
+        else if (!strncasecmp(cmd, "help", 4))
         {
-            cmd = get_sub_cmd("red_remap", "no");
-            SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_remap_en),
-                                            sizeof (a_bool_t));
-            }
+            rv = SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_dscp_en),
+                                        sizeof (a_bool_t));
+        }
     }
+    while (talk_mode && (SW_OK != rv));
+    do
+    {
+        cmd = get_sub_cmd("red_remap", "no");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
+        {
+            return SW_BAD_VALUE;
+        }
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_remap_en),
+                                        sizeof (a_bool_t));
+        }
+    }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     do
@@ -15398,26 +15358,24 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
-    if (cmd_get_chip_type() == CHIP_APPE) {
-        do
+    do
+    {
+        cmd = get_sub_cmd("red_dscp", "0-63");
+        SW_RTN_ON_NULL_PARAM(cmd);
+        if (!strncasecmp(cmd, "quit", 4))
         {
-            cmd = get_sub_cmd("red_dscp", "0-63");
-    		SW_RTN_ON_NULL_PARAM(cmd);
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint32(cmd, &(entry.red_dscp), sizeof (a_uint32_t));
-            }
+            return SW_BAD_VALUE;
         }
-        while (talk_mode && (SW_OK != rv));
+        else if (!strncasecmp(cmd, "help", 4))
+        {
+            rv = SW_BAD_VALUE;
+        }
+        else
+        {
+            rv = cmd_data_check_uint32(cmd, &(entry.red_dscp), sizeof (a_uint32_t));
+        }
     }
+    while (talk_mode && (SW_OK != rv));
 #endif
 
     *(fal_policer_action_t *)val = entry;
@@ -15726,29 +15684,26 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 	}
 	while (talk_mode && (SW_OK != rv));
 #ifdef APPE
-	if (cmd_get_chip_type() == CHIP_APPE)
+	do
 	{
-		do
-		{
-			cmd = get_sub_cmd("bypass_bitmap[3]", "0");
-			SW_RTN_ON_NULL_PARAM(cmd);
+		cmd = get_sub_cmd("bypass_bitmap[3]", "0");
+		SW_RTN_ON_NULL_PARAM(cmd);
 
-			if (!strncasecmp(cmd, "quit", 4))
-			{
-				return SW_BAD_VALUE;
-			}
-			else if (!strncasecmp(cmd, "help", 4))
-			{
-				rv = SW_BAD_VALUE;
-			}
-			else
-			{
-				rv = cmd_data_check_uint32(cmd,
-					&entry.bypass_bitmap[3], sizeof (a_uint32_t));
-			}
+		if (!strncasecmp(cmd, "quit", 4))
+		{
+			return SW_BAD_VALUE;
 		}
-		while (talk_mode && (SW_OK != rv));
+		else if (!strncasecmp(cmd, "help", 4))
+		{
+			rv = SW_BAD_VALUE;
+		}
+		else
+		{
+			rv = cmd_data_check_uint32(cmd,
+				&entry.bypass_bitmap[3], sizeof (a_uint32_t));
+		}
 	}
+	while (talk_mode && (SW_OK != rv));
 #endif
 	do
 	{

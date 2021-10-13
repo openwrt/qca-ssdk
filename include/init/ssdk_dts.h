@@ -139,6 +139,7 @@ a_uint8_t ssdk_bm_tick_mode_get(a_uint32_t dev_id);
 #endif
 #ifdef IN_QM
 a_uint16_t ssdk_ucast_queue_start_get(a_uint32_t dev_id, a_uint32_t port);
+a_uint16_t ssdk_ucast_queue_num_get(a_uint32_t dev_id, a_uint32_t port);
 #endif
 a_uint32_t ssdk_intf_mac_num_get(void);
 a_uint8_t* ssdk_intf_macaddr_get(a_uint32_t index);

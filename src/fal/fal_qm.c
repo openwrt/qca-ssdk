@@ -391,6 +391,8 @@ _fal_mcast_cpu_code_class_set(
 	rv = p_api->adpt_mcast_cpu_code_class_set(dev_id, cpu_code, queue_class);
 	return rv;
 }
+#endif
+
 sw_error_t
 _fal_ucast_priority_class_set(
 		a_uint32_t dev_id,
@@ -409,6 +411,8 @@ _fal_ucast_priority_class_set(
 	rv = p_api->adpt_ucast_priority_class_set(dev_id, profile, priority, class);
 	return rv;
 }
+
+#ifndef IN_QM_MINI
 sw_error_t
 _fal_ac_static_threshold_get(
 		a_uint32_t dev_id,
@@ -905,6 +909,8 @@ fal_mcast_cpu_code_class_set(
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
+
 sw_error_t
 fal_ucast_priority_class_set(
 		a_uint32_t dev_id,
@@ -919,6 +925,8 @@ fal_ucast_priority_class_set(
 	FAL_API_UNLOCK;
 	return rv;
 }
+
+#ifndef IN_QM_MINI
 sw_error_t
 fal_ac_static_threshold_get(
 		a_uint32_t dev_id,
@@ -1102,6 +1110,8 @@ EXPORT_SYMBOL(fal_qm_enqueue_ctrl_set);
 
 EXPORT_SYMBOL(fal_queue_counter_ctrl_set);
 
+EXPORT_SYMBOL(fal_ucast_priority_class_set);
+
 #ifndef IN_QM_MINI
 EXPORT_SYMBOL(fal_qm_port_source_profile_set);
 
@@ -1122,8 +1132,6 @@ EXPORT_SYMBOL(fal_ac_dynamic_threshold_get);
 EXPORT_SYMBOL(fal_ac_group_buffer_get);
 
 EXPORT_SYMBOL(fal_ucast_queue_base_profile_get);
-
-EXPORT_SYMBOL(fal_ucast_priority_class_set);
 
 EXPORT_SYMBOL(fal_ucast_priority_class_get);
 

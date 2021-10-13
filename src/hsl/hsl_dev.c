@@ -68,16 +68,6 @@ static hsl_dev_t dev_table[SW_MAX_NR_DEV];
 static ssdk_init_cfg *dev_ssdk_cfg[SW_MAX_NR_DEV] = { 0 };
 ssdk_chip_type SSDK_CURRENT_CHIP_TYPE = CHIP_UNSPECIFIED;
 
-ssdk_chip_type hsl_get_chip_type(a_uint32_t dev_id)
-{
-	if(dev_id < SW_MAX_NR_DEV && dev_ssdk_cfg[dev_id])
-	{
-		return dev_ssdk_cfg[dev_id]->chip_type;
-	}
-
-	return CHIP_UNSPECIFIED;
-}
-
 static sw_error_t hsl_set_current_chip_type(ssdk_chip_type chip_type)
 {
     sw_error_t rv = SW_OK;

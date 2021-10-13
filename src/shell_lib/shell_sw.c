@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2017, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2013, 2017, The Linux Foundation. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,7 +17,6 @@
 #include "sw.h"
 #include "sw_error.h"
 #include "shell.h"
-#include "fal.h"
 
 static int sw_devid = 0;
 
@@ -52,16 +51,4 @@ get_devid(void)
     return sw_devid;
 }
 
-ssdk_chip_type
-cmd_get_chip_type(void)
-{
-    sw_error_t rtn;
-    ssdk_cfg_t ssdk_cfg;
-    rtn = fal_ssdk_cfg(sw_devid, &ssdk_cfg);
-    if (rtn == SW_OK)
-    {
-       return ssdk_cfg.init_cfg.chip_type;
-    }
-    return CHIP_UNSPECIFIED;
-}
 

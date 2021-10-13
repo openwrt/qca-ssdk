@@ -693,6 +693,7 @@ void hsl_port_phy_gpio_reset(a_uint32_t dev_id, a_uint32_t port_id)
 	}
 	msleep(200);
 	gpio_set_value(gpio_num, SSDK_GPIO_RELEASE);
+	msleep(10);
 	SSDK_INFO("GPIO%d reset PHY done\n", gpio_num);
 
 	gpio_free(gpio_num);
@@ -816,6 +817,64 @@ hsl_port_phydev_adv_update(a_uint32_t dev_id, a_uint32_t port_id,
 	return rv;
 }
 #endif
+
+sw_error_t
+hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
+	led_ctrl_pattern_t * pattern)
+{
+	sw_error_t rv;
+	a_uint32_t phy_addr;
+	hsl_phy_ops_t *phy_drv;
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	SW_RTN_ON_NULL (phy_drv->phy_led_ctrl_pattern_set);
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = phy_drv->phy_led_ctrl_pattern_set(dev_id, phy_addr, pattern);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
+	led_ctrl_pattern_t * pattern)
+{
+	sw_error_t rv;
+	a_uint32_t phy_addr;
+	hsl_phy_ops_t *phy_drv;
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	SW_RTN_ON_NULL (phy_drv->phy_led_ctrl_pattern_get);
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = phy_drv->phy_led_ctrl_pattern_get(dev_id, phy_addr, pattern);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
+{
+	sw_error_t rv;
+	a_uint32_t phy_addr;
+	hsl_phy_ops_t *phy_drv;
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	SW_RTN_ON_NULL (phy_drv->phy_led_ctrl_source_set);
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = phy_drv->phy_led_ctrl_source_set(dev_id, phy_addr, source_id,
+		pattern);
+
+	return rv;
+}
 
 /*qca808x_start*/
 sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)

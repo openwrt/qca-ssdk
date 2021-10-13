@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2016-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014, 2016-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -227,6 +227,7 @@ enum{
 	FAL_ACL_BYPASS_IN_VLAN_MISS = 0,
 	FAL_ACL_BYPASS_SOUCE_GUARD,
 	FAL_ACL_BYPASS_MRU_MTU_CHECK,
+	FAL_ACL_BYPASS_FLOW_QOS = 4, /*new add for IPQ60xx*/
 	FAL_ACL_BYPASS_EG_VSI_MEMBER_CHECK = 8,
 	FAL_ACL_BYPASS_EG_VLAN_TRANSLATION,
 	FAL_ACL_BYPASS_EG_VLAN_TAG_CTRL = 10,
@@ -243,6 +244,15 @@ enum{
 	FAL_ACL_BYPASS_L3_EDIT,/*Edit MAC address, PPPoE, IP address, TTL, DSCP, L4 port*/
 	FAL_ACL_BYPASS_POST_ACL_CHECK_ROUTING,
 	FAL_ACL_BYPASS_PORT_ISOLATION,
+	/*new add for IPQ60xx*/
+	FAL_ACL_BYPASS_PRE_ACL_QOS,/*ACL pre-routing qos*/
+	FAL_ACL_BYPASS_POST_ACL_QOS,/*ACL post-routing qos*/
+	FAL_ACL_BYPASS_DSCP_QOS,
+	FAL_ACL_BYPASS_PCP_QOS,
+	FAL_ACL_BYPASS_PREHEADER_QOS,
+	/*new add for IPQ95xx*/
+	FAL_ACL_BYPASS_FAKE_MAC_DROP,
+	FAL_ACL_BYPASS_TUNL_CONTEXT,
 };
 
 

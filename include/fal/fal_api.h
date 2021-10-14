@@ -130,7 +130,11 @@ extern "C" {
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_SET, fal_switch_port_loopback_set),  \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get),  \
     SW_API_DEF(SW_API_PT_8023AH_SET, fal_port_8023ah_set),  \
-    SW_API_DEF(SW_API_PT_8023AH_GET, fal_port_8023ah_get),
+    SW_API_DEF(SW_API_PT_8023AH_GET, fal_port_8023ah_get), \
+    SW_API_DEF(SW_API_PT_CNT_CFG_SET, fal_port_cnt_cfg_set), \
+    SW_API_DEF(SW_API_PT_CNT_CFG_GET, fal_port_cnt_cfg_get), \
+    SW_API_DEF(SW_API_PT_CNT_GET, fal_port_cnt_get), \
+    SW_API_DEF(SW_API_PT_CNT_FLUSH, fal_port_cnt_flush),
 /*qca808x_start*/
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
@@ -239,7 +243,11 @@ extern "C" {
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_SET)  \
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_GET)  \
     SW_API_DESC(SW_API_PT_8023AH_SET)  \
-    SW_API_DESC(SW_API_PT_8023AH_GET)
+    SW_API_DESC(SW_API_PT_8023AH_GET) \
+    SW_API_DESC(SW_API_PT_CNT_CFG_SET) \
+    SW_API_DESC(SW_API_PT_CNT_CFG_GET) \
+    SW_API_DESC(SW_API_PT_CNT_GET) \
+    SW_API_DESC(SW_API_PT_CNT_FLUSH)
 /*qca808x_start*/
 /*end of PORTCONTROL_API_PARAM*/
 /*qca808x_end*/
@@ -261,7 +269,11 @@ extern "C" {
     SW_API_DEF(SW_API_TXFC_STATUS_SET, fal_port_txfc_status_set),   \
     SW_API_DEF(SW_API_RXFC_STATUS_SET, fal_port_rxfc_status_set), \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_SET, fal_switch_port_loopback_set),  \
-    SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get),
+    SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get), \
+    SW_API_DEF(SW_API_PT_CNT_CFG_SET, fal_port_cnt_cfg_set), \
+    SW_API_DEF(SW_API_PT_CNT_CFG_GET, fal_port_cnt_cfg_get), \
+    SW_API_DEF(SW_API_PT_CNT_GET, fal_port_cnt_get), \
+    SW_API_DEF(SW_API_PT_CNT_FLUSH, fal_port_cnt_flush),
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
     SW_API_DESC(SW_API_PT_DUPLEX_SET) \
@@ -280,7 +292,11 @@ extern "C" {
     SW_API_DESC(SW_API_TXFC_STATUS_SET) \
     SW_API_DESC(SW_API_RXFC_STATUS_SET) \
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_SET)  \
-    SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_GET)
+    SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_GET) \
+    SW_API_DESC(SW_API_PT_CNT_CFG_SET) \
+    SW_API_DESC(SW_API_PT_CNT_CFG_GET) \
+    SW_API_DESC(SW_API_PT_CNT_GET) \
+    SW_API_DESC(SW_API_PT_CNT_FLUSH)
 /*end of PORTCONTROL_API_PARAM*/
 #endif
 
@@ -1168,10 +1184,7 @@ extern "C" {
     SW_API_DEF(SW_API_LLDP_STATUS_SET, fal_lldp_status_set), \
     SW_API_DEF(SW_API_LLDP_STATUS_GET, fal_lldp_status_get), \
     SW_API_DEF(SW_API_FRAME_CRC_RESERVE_SET, fal_frame_crc_reserve_set), \
-    SW_API_DEF(SW_API_FRAME_CRC_RESERVE_GET, fal_frame_crc_reserve_get), \
-    SW_API_DEF(SW_API_DEBUG_PORT_COUNTER_ENABLE, fal_debug_port_counter_enable), \
-    SW_API_DEF(SW_API_DEBUG_PORT_COUNTER_STATUS_GET, fal_debug_port_counter_status_get),
-
+    SW_API_DEF(SW_API_FRAME_CRC_RESERVE_GET, fal_frame_crc_reserve_get),
 
 
 #define MISC_API_PARAM \
@@ -1223,9 +1236,7 @@ extern "C" {
     SW_API_DESC(SW_API_LLDP_STATUS_SET) \
     SW_API_DESC(SW_API_LLDP_STATUS_GET) \
     SW_API_DESC(SW_API_FRAME_CRC_RESERVE_SET) \
-    SW_API_DESC(SW_API_FRAME_CRC_RESERVE_GET) \
-    SW_API_DESC(SW_API_DEBUG_PORT_COUNTER_ENABLE) \
-    SW_API_DESC(SW_API_DEBUG_PORT_COUNTER_STATUS_GET)
+    SW_API_DESC(SW_API_FRAME_CRC_RESERVE_GET)
 #else
 #define MISC_API \
     SW_API_DEF(SW_API_PT_UNK_SA_CMD_SET, fal_port_unk_sa_cmd_set), \
@@ -2432,20 +2443,12 @@ extern "C" {
     SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_SET, fal_vport_physical_port_id_set), \
     SW_API_DEF(SW_API_VPORT_PHYSICAL_PORT_GET, fal_vport_physical_port_id_get), \
     SW_API_DEF(SW_API_VPORT_STATE_CHECK_SET, fal_vport_state_check_set), \
-    SW_API_DEF(SW_API_VPORT_STATE_CHECK_GET, fal_vport_state_check_get), \
-    SW_API_DEF(SW_API_VPORT_CNT_CFG_SET, fal_vport_cnt_cfg_set), \
-    SW_API_DEF(SW_API_VPORT_CNT_CFG_GET, fal_vport_cnt_cfg_get), \
-    SW_API_DEF(SW_API_VPORT_CNT_GET, fal_vport_cnt_get), \
-    SW_API_DEF(SW_API_VPORT_CNT_FLUSH, fal_vport_cnt_flush),
+    SW_API_DEF(SW_API_VPORT_STATE_CHECK_GET, fal_vport_state_check_get),
 #define VPORT_API_PARAM \
     SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_SET) \
     SW_API_DESC(SW_API_VPORT_PHYSICAL_PORT_GET) \
     SW_API_DESC(SW_API_VPORT_STATE_CHECK_SET) \
-    SW_API_DESC(SW_API_VPORT_STATE_CHECK_GET) \
-    SW_API_DESC(SW_API_VPORT_CNT_CFG_SET) \
-    SW_API_DESC(SW_API_VPORT_CNT_CFG_GET) \
-    SW_API_DESC(SW_API_VPORT_CNT_GET) \
-    SW_API_DESC(SW_API_VPORT_CNT_FLUSH)
+    SW_API_DESC(SW_API_VPORT_STATE_CHECK_GET)
 #else
 #define VPORT_API
 #define VPORT_API_PARAM

@@ -83,6 +83,14 @@ adpt_cppe_lpbk_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 adpt_cppe_lpbk_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 	a_uint32_t max_frame);
+
+sw_error_t
+adpt_cppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_cnt_cfg_t *cnt_cfg);
+sw_error_t
+adpt_cppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_cnt_cfg_t *cnt_cfg);
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

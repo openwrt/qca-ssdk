@@ -813,36 +813,6 @@ _fal_frame_crc_reserve_get(a_uint32_t dev_id, a_bool_t * enable)
     return rv;
 }
 
-sw_error_t
-_fal_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id, fal_counter_en_t * cnt_en)
-{
-    sw_error_t rv;
-    adpt_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
-
-    if (NULL == p_api->adpt_debug_port_counter_enable)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->adpt_debug_port_counter_enable(dev_id, port_id, cnt_en);
-    return rv;
-}
-
-sw_error_t
-_fal_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id, fal_counter_en_t * cnt_en)
-{
-    sw_error_t rv;
-    adpt_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
-
-    if (NULL == p_api->adpt_debug_port_counter_status_get)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->adpt_debug_port_counter_status_get(dev_id, port_id, cnt_en);
-    return rv;
-}
-
 /**
  * @brief Set arp packets hardware acknowledgement status on a particular device.
  * @param[in] dev_id device id
@@ -1740,31 +1710,7 @@ fal_frame_crc_reserve_get(a_uint32_t dev_id, a_bool_t * enable)
     FAL_API_UNLOCK;
     return rv;
 }
-
-sw_error_t
-fal_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id, fal_counter_en_t * cnt_en)
-{
-    sw_error_t rv = SW_OK;
-
-    FAL_API_LOCK;
-    rv = _fal_debug_port_counter_enable(dev_id, port_id, cnt_en);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-sw_error_t
-fal_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id, fal_counter_en_t * cnt_en)
-{
-    sw_error_t rv = SW_OK;
-
-    FAL_API_LOCK;
-    rv = _fal_debug_port_counter_status_get(dev_id, port_id, cnt_en);
-    FAL_API_UNLOCK;
-    return rv;
-}
 #endif
-
-
 
 /**
  * @}

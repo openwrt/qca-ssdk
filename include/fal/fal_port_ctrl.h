@@ -382,6 +382,10 @@ enum
 	FUNC_ADPT_PORT_PROMISC_MODE_GET,
 	FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_SET,
 	FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET,
+	FUNC_ADPT_PORT_CNT_CFG_SET,
+	FUNC_ADPT_PORT_CNT_CFG_GET,
+	FUNC_ADPT_PORT_CNT_GET,
+	FUNC_ADPT_PORT_CNT_FLUSH,
 };
 
 typedef enum {
@@ -422,6 +426,34 @@ typedef struct {
 typedef struct {
 	a_bool_t loopback_enable;
 } fal_port_8023ah_ctrl_t;
+
+typedef enum {
+	FAL_PORT_CNT_MODE_IP_PKT, /* the outer IP header + innder packet counted */
+	FAL_PORT_CNT_MODE_FULL_PKT, /* for RX, inner packet length,
+				      * for TX vport, the full packet(outer header + inner packet)
+				      * lenght counter */
+	FAL_PORT_CNT_MODE_BUTT,
+} fal_port_cnt_mode_t;
+
+typedef struct {
+	a_bool_t rx_cnt_en; /* Enable/disable port rx counter */
+	a_bool_t tl_rx_cnt_en; /* Enable/disable tunnel source port rx counter */
+	a_bool_t uc_tx_cnt_en; /* Enable/disable port unicast tx and l3_if tx counter */
+	a_bool_t mc_tx_cnt_en; /* Enable/disable physical port multicast tx counter */
+	fal_port_cnt_mode_t rx_cnt_mode; /* as described as fal_port_cnt_mode_t */
+	fal_port_cnt_mode_t tx_cnt_mode; /* as described as fal_port_cnt_mode_t */
+} fal_port_cnt_cfg_t;
+
+typedef struct {
+	a_uint32_t rx_pkt_cnt; /* rx packet counter */
+	a_uint64_t rx_byte_cnt; /* rx byte counter */
+	a_uint32_t rx_drop_pkt_cnt; /* rx drop packet counter */
+	a_uint64_t rx_drop_byte_cnt; /* rx drop byte counter */
+	a_uint32_t tx_pkt_cnt; /* tx packet counter */
+	a_uint64_t tx_byte_cnt; /* tx byte counter */
+	a_uint32_t tx_drop_pkt_cnt; /* tx drop packet counter */
+	a_uint64_t tx_drop_byte_cnt; /* tx drop byte counter */
+} fal_port_cnt_t;
 
 sw_error_t
 fal_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -813,6 +845,19 @@ sw_error_t
 fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
 #endif
+
+sw_error_t
+fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+
+sw_error_t
+fal_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+
+sw_error_t
+fal_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt);
+
+sw_error_t
+fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id);
+
 /*qca808x_start*/
 #ifdef __cplusplus
 }

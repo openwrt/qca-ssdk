@@ -26,6 +26,10 @@
 #include "hppe_uniphy.h"
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
+#include "hppe_policer_reg.h"
+#include "hppe_policer.h"
+#include "hppe_portvlan_reg.h"
+#include "hppe_portvlan.h"
 #include "hppe_global_reg.h"
 #include "hppe_global.h"
 #include "adpt.h"
@@ -48,6 +52,8 @@
 #if defined(APPE)
 #include "adpt_appe_portctrl.h"
 #include "appe_l2_vp.h"
+#include "appe_tunnel_reg.h"
+#include "appe_tunnel.h"
 #endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
 #include <soc/qcom/socinfo.h>
@@ -5611,6 +5617,354 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 	return 0;
 }
 
+static sw_error_t
+_adpt_hppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
+	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
+	union port_eg_vlan_u port_eg_vlan;
+#if defined(APPE)
+	union tl_port_vp_tbl_u tl_port_vp_tbl;
+#endif
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	aos_mem_zero(&mru_mtu_ctrl_tbl, sizeof(union mru_mtu_ctrl_tbl_u));
+	aos_mem_zero(&mc_mtu_ctrl_tbl, sizeof(union mc_mtu_ctrl_tbl_u));
+	aos_mem_zero(&port_eg_vlan, sizeof(union port_eg_vlan_u));
+
+	if (ADPT_IS_PPORT(port_id)) {
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_mc_mtu_ctrl_tbl_get(dev_id, port_value, &mc_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_port_eg_vlan_get(dev_id, port_value, &port_eg_vlan);
+		SW_RTN_ON_ERROR(rv);
+
+		mru_mtu_ctrl_tbl.bf.rx_cnt_en = cnt_cfg->rx_cnt_en;
+		mru_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_cfg->uc_tx_cnt_en;
+		mc_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_cfg->mc_tx_cnt_en;
+		port_eg_vlan.bf.tx_counting_en = cnt_cfg->uc_tx_cnt_en;
+
+		rv = hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_mc_mtu_ctrl_tbl_set(dev_id, port_value, &mc_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_port_eg_vlan_set(dev_id, port_value, &port_eg_vlan);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		mru_mtu_ctrl_tbl.bf.rx_cnt_en = cnt_cfg->rx_cnt_en;
+		mru_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_cfg->uc_tx_cnt_en;
+
+		rv = hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
+		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		tl_port_vp_tbl.bf.rx_cnt_en = cnt_cfg->tl_rx_cnt_en;
+
+		rv = appe_tl_port_vp_tbl_set(dev_id, port_value, &tl_port_vp_tbl);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	return SW_OK;
+}
+
+static sw_error_t
+_adpt_hppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
+	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
+	union port_eg_vlan_u port_eg_vlan;
+#if defined(APPE)
+	union tl_port_vp_tbl_u tl_port_vp_tbl;
+#endif
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	aos_mem_zero(&mru_mtu_ctrl_tbl, sizeof(union mru_mtu_ctrl_tbl_u));
+	aos_mem_zero(&mc_mtu_ctrl_tbl, sizeof(union mc_mtu_ctrl_tbl_u));
+	aos_mem_zero(&port_eg_vlan, sizeof(union port_eg_vlan_u));
+
+	if (ADPT_IS_PPORT(port_id)) {
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_mc_mtu_ctrl_tbl_get(dev_id, port_value, &mc_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_port_eg_vlan_get(dev_id, port_value, &port_eg_vlan);
+		SW_RTN_ON_ERROR(rv);
+
+		cnt_cfg->rx_cnt_en = mru_mtu_ctrl_tbl.bf.rx_cnt_en;
+		cnt_cfg->mc_tx_cnt_en = mc_mtu_ctrl_tbl.bf.tx_cnt_en;
+
+		/*when it's physical port,mru_mtu_ctrl.tx_cnt_en enabled with port_eg_vlan.tx_counting_en in the same time*/
+		cnt_cfg->uc_tx_cnt_en = port_eg_vlan.bf.tx_counting_en;
+	}
+	else
+	{
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		cnt_cfg->rx_cnt_en = mru_mtu_ctrl_tbl.bf.rx_cnt_en;
+		cnt_cfg->uc_tx_cnt_en = mru_mtu_ctrl_tbl.bf.tx_cnt_en;
+	}
+
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
+		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		cnt_cfg->tl_rx_cnt_en = tl_port_vp_tbl.bf.rx_cnt_en;
+	}
+#endif
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	/* set counter enable configs */
+#if defined(CPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+	{
+		rv = adpt_cppe_port_cnt_enable_set(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+#endif
+	{
+		rv = _adpt_hppe_port_cnt_enable_set(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	/* set counter mode configs */
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_cnt_mode_set(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	/* get counter enable configs */
+#if defined(CPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+	{
+		rv = adpt_cppe_port_cnt_enable_get(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+#endif
+	{
+		rv = _adpt_hppe_port_cnt_enable_get(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	/* get counter mode configs */
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_cnt_mode_get(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	return rv;
+}
+
+sw_error_t
+_adpt_hppe_port_tx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
+{
+	sw_error_t rv = SW_OK;
+	union port_tx_counter_tbl_reg_u phy_port_tx_cnt_tbl;
+	union port_tx_drop_cnt_tbl_u phy_port_tx_drop_cnt;
+	union vp_tx_counter_tbl_reg_u vport_tx_cnt_tbl;
+	union vp_tx_drop_cnt_tbl_u vport_tx_drop_cnt;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_cnt);
+
+	aos_mem_zero(&phy_port_tx_cnt_tbl, sizeof(union port_tx_counter_tbl_reg_u));
+	aos_mem_zero(&phy_port_tx_drop_cnt, sizeof(union port_tx_drop_cnt_tbl_u));
+	aos_mem_zero(&vport_tx_cnt_tbl, sizeof(union vp_tx_counter_tbl_reg_u));
+	aos_mem_zero(&vport_tx_drop_cnt, sizeof(union vp_tx_drop_cnt_tbl_u));
+
+	if(ADPT_IS_PPORT(port_id))
+	{
+		rv = hppe_port_tx_counter_tbl_reg_get(dev_id, port_value, &phy_port_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_pkt_cnt = phy_port_tx_cnt_tbl.bf.tx_packets;
+		port_cnt->tx_byte_cnt = ((a_uint64_t)phy_port_tx_cnt_tbl.bf.tx_bytes_1 <<
+			SW_FIELD_OFFSET_IN_WORD(PORT_TX_COUNTER_TBL_REG_TX_BYTES_OFFSET)) |
+			phy_port_tx_cnt_tbl.bf.tx_bytes_0;
+
+		rv = hppe_port_tx_drop_cnt_tbl_get(dev_id, port_value, &phy_port_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_drop_pkt_cnt = phy_port_tx_drop_cnt.bf.tx_drop_pkt_cnt;
+		port_cnt->tx_drop_byte_cnt = ((a_uint64_t)phy_port_tx_drop_cnt.bf.tx_drop_byte_cnt_1 <<
+			SW_FIELD_OFFSET_IN_WORD(PORT_TX_DROP_CNT_TBL_TX_DROP_BYTE_CNT_OFFSET)) |
+			phy_port_tx_drop_cnt.bf.tx_drop_byte_cnt_0;
+	}
+	else
+	{
+		rv = hppe_vp_tx_counter_tbl_reg_get(dev_id, port_value, &vport_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_pkt_cnt = vport_tx_cnt_tbl.bf.tx_packets;
+		port_cnt->tx_byte_cnt = ((a_uint64_t)vport_tx_cnt_tbl.bf.tx_bytes_1 <<
+			SW_FIELD_OFFSET_IN_WORD(VP_TX_COUNTER_TBL_REG_TX_BYTES_OFFSET)) |
+			vport_tx_cnt_tbl.bf.tx_bytes_0;
+
+		rv = hppe_vp_tx_drop_cnt_tbl_get(dev_id, port_value, &vport_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_drop_pkt_cnt = vport_tx_drop_cnt.bf.tx_drop_pkt_cnt;
+		port_cnt->tx_drop_byte_cnt = ((a_uint64_t)vport_tx_drop_cnt.bf.tx_drop_byte_cnt_1 <<
+			SW_FIELD_OFFSET_IN_WORD(VP_TX_DROP_CNT_TBL_TX_DROP_BYTE_CNT_OFFSET)) |
+			vport_tx_drop_cnt.bf.tx_drop_byte_cnt_0;
+	}
+
+	return rv;
+}
+
+sw_error_t
+_adpt_hppe_port_tx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	union port_tx_counter_tbl_reg_u phy_port_tx_cnt_tbl;
+	union port_tx_drop_cnt_tbl_u phy_port_tx_drop_cnt;
+	union vp_tx_counter_tbl_reg_u vport_tx_cnt_tbl;
+	union vp_tx_drop_cnt_tbl_u vport_tx_drop_cnt;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	aos_mem_zero(&phy_port_tx_cnt_tbl, sizeof(union port_tx_counter_tbl_reg_u));
+	aos_mem_zero(&phy_port_tx_drop_cnt, sizeof(union port_tx_drop_cnt_tbl_u));
+	aos_mem_zero(&vport_tx_cnt_tbl, sizeof(union vp_tx_counter_tbl_reg_u));
+	aos_mem_zero(&vport_tx_drop_cnt, sizeof(union vp_tx_drop_cnt_tbl_u));
+
+	if(ADPT_IS_PPORT(port_id))
+	{
+		rv = hppe_port_tx_counter_tbl_reg_set(dev_id, port_value, &phy_port_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = hppe_port_tx_drop_cnt_tbl_set(dev_id, port_value, &phy_port_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = hppe_vp_tx_counter_tbl_reg_set(dev_id, port_value, &vport_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = hppe_vp_tx_drop_cnt_tbl_set(dev_id, port_value, &vport_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_cnt);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_rx_cnt_get(dev_id, port_id, port_cnt);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	rv = _adpt_hppe_port_tx_cnt_get(dev_id, port_id, port_cnt);
+	SW_RTN_ON_ERROR(rv);
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_rx_cnt_flush(dev_id, port_id);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	rv = _adpt_hppe_port_tx_cnt_flush(dev_id, port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	return rv;
+}
+
 void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -5695,7 +6049,11 @@ void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 		(1 << (FUNC_ADPT_PORT_PROMISC_MODE_SET% 32))|
 		(1 << (FUNC_ADPT_PORT_PROMISC_MODE_GET% 32))|
 		(1 << (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_SET% 32))|
-		(1 << (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET% 32)));
+		(1 << (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_CFG_SET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_CFG_GET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_GET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_FLUSH% 32)));
 
 	return;
 
@@ -5777,6 +6135,10 @@ static void adpt_hppe_port_ctrl_func_unregister(a_uint32_t dev_id, adpt_api_t *p
 	p_adpt_api->adpt_port_promisc_mode_get = NULL;
 	p_adpt_api->adpt_port_flowctrl_forcemode_set = NULL;
 	p_adpt_api->adpt_port_flowctrl_forcemode_get = NULL;
+	p_adpt_api->adpt_port_cnt_cfg_set = NULL;
+	p_adpt_api->adpt_port_cnt_cfg_get = NULL;
+	p_adpt_api->adpt_port_cnt_flush = NULL;
+	p_adpt_api->adpt_port_cnt_get = NULL;
 
 	return;
 
@@ -6168,6 +6530,15 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 #endif
 	}
 #endif
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_CFG_SET % 32)))
+		p_adpt_api->adpt_port_cnt_cfg_set = adpt_ppe_port_cnt_cfg_set;
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_CFG_GET % 32)))
+		p_adpt_api->adpt_port_cnt_cfg_get = adpt_ppe_port_cnt_cfg_get;
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_GET % 32)))
+		p_adpt_api->adpt_port_cnt_get = adpt_ppe_port_cnt_get;
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_FLUSH % 32)))
+		p_adpt_api->adpt_port_cnt_flush = adpt_ppe_port_cnt_flush;
+
 	return SW_OK;
 }
 

@@ -74,6 +74,8 @@ sw_error_t
 cmd_data_check_switch_port_loopback_config(char *cmd_str, void * val,
 	a_uint32_t size);
 #endif
+sw_error_t
+cmd_data_check_port_cnt_cfg(char *cmd_str, fal_port_cnt_cfg_t *arg_val, a_uint32_t size);
 #endif
 #ifdef IN_PORTVLAN
 sw_error_t cmd_data_check_1qmode(char *cmd_str, a_uint32_t * arg_val,
@@ -577,8 +579,6 @@ cmd_data_check_mapt_decap_entry(char *info, void *val, a_uint32_t size);
 #if defined(IN_MAPT)
 sw_error_t
 cmd_data_check_vport_state(char *cmd_str, fal_vport_state_t *arg_val, a_uint32_t size);
-sw_error_t
-cmd_data_check_vport_cnt_cfg(char *cmd_str, fal_vport_cnt_cfg_t *arg_val, a_uint32_t size);
 #endif
 
 #ifdef IN_VXLAN

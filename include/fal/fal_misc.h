@@ -36,20 +36,6 @@ extern "C" {
         FAL_LOOP_CHECK_500MS,
     } fal_loop_check_time_t;
 
-	typedef struct
-	{
-		a_bool_t rx_counter_en; /* Enable/disable virtual port rx counter */
-		a_bool_t vp_uni_tx_counter_en; /* Enable/disable virtual port unicast tx counter */
-		a_bool_t port_mc_tx_counter_en; /* Enable/disable physical port multicast tx counter */
-		a_bool_t port_tx_counter_en; /* Enable/disable physical port tx counter */
-	} fal_counter_en_t;
-
-	sw_error_t
-	fal_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id, fal_counter_en_t * cnt_en);
-
-	sw_error_t
-	fal_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id, fal_counter_en_t * cnt_en);
-
     /* define switch interrupt type bitmap */
 #define FAL_SWITCH_INTR_LINK_STATUS      0x1  /* up/down/speed/duplex status */
 #ifndef IN_MISC_MINI

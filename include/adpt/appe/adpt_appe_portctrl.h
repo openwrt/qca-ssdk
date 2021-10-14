@@ -29,6 +29,19 @@ extern "C" {
 sw_error_t
 _adpt_appe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
 	a_uint32_t port_type);
+
+sw_error_t
+adpt_appe_port_cnt_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+
+sw_error_t
+adpt_appe_port_cnt_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+
+sw_error_t
+adpt_appe_port_rx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt);
+
+sw_error_t
+adpt_appe_port_rx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id);
+
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_appe_port_8023ah_set(a_uint32_t dev_id, fal_port_t port_id,

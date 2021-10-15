@@ -356,7 +356,6 @@ hppe_mru_mtu_ctrl_tbl_set(
 				sizeof(union mru_mtu_ctrl_tbl_u)/sizeof(a_uint32_t));
 }
 
-#if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))
 sw_error_t
 hppe_mc_mtu_ctrl_tbl_get(
 		a_uint32_t dev_id,
@@ -384,7 +383,6 @@ hppe_mc_mtu_ctrl_tbl_set(
 				index * MC_MTU_CTRL_TBL_INC,
 				value->val);
 }
-#endif
 
 sw_error_t
 hppe_tdm_ctrl_get(
@@ -2844,7 +2842,6 @@ hppe_drop_stat_pkts_set(
 }
 #endif
 
-#if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))
 sw_error_t
 hppe_port_tx_counter_tbl_reg_get(
 		a_uint32_t dev_id,
@@ -2901,6 +2898,7 @@ hppe_vp_tx_counter_tbl_reg_set(
 				3);
 }
 
+#if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))
 sw_error_t
 hppe_epe_dbg_in_cnt_reg_get(
 		a_uint32_t dev_id,

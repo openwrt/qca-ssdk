@@ -2762,6 +2762,7 @@ parse_port8023ah(struct switch_val *val)
 #endif
 #endif
 
+#if defined(HPPE)
 static const char *port_cntcfg[] = {
 	"port_id",
 	"rx_cnt_enable",
@@ -2773,6 +2774,7 @@ static const char *port_cntcfg[] = {
 	"tx_cnt_mode",
 #endif
 };
+#endif
 
 #endif
 
@@ -11923,10 +11925,13 @@ parse_port(const char *command_name, struct switch_val *val)
 #endif
 	}
 #endif
+
+#if defined(HPPE)
 	else if (!strcmp(command_name, "Cntcfg")) {
 		rv = parse_uci_option(val, port_cntcfg,
 				sizeof(port_cntcfg)/sizeof(char *));
 	}
+#endif
 
 	return rv;
 }

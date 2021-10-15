@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -196,6 +199,25 @@ qca_hppe_port_mac_type_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t por
 	hppe_port_type[port_id - 1] = port_type;
 
 	return 0;
+}
+
+a_uint32_t
+ssdk_ifname_to_port(a_uint32_t dev_id, const char *ifname)
+{
+	struct net_device *eth_dev = NULL;
+	a_uint32_t phy_addr = 0;
+	eth_dev = dev_get_by_name(&init_net, ifname);
+	if (!eth_dev || !eth_dev->phydev)
+	{
+		return 0;
+	}
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
+	phy_addr = eth_dev->phydev->mdio.addr;
+#else
+	phy_addr = eth_dev->phydev->addr;
+#endif
+	dev_put(eth_dev);
+	return qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
 }
 
 #ifndef BOARD_AR71XX

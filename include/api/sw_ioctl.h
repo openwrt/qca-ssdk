@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -339,6 +339,8 @@ extern "C" {
 #define SW_API_ACL_UDF_PROFILE_CFG_GET		(25  + SW_API_ACL_OFFSET)
 #define SW_API_ACL_VPGROUP_SET			(26  + SW_API_ACL_OFFSET)
 #define SW_API_ACL_VPGROUP_GET			(27  + SW_API_ACL_OFFSET)
+#define SW_API_ACL_MAC_ENTRY_SET		(28  + SW_API_ACL_OFFSET)
+#define SW_API_ACL_MAC_ENTRY_DUMP		(29  + SW_API_ACL_OFFSET)
 
     /*qos*/
 #define SW_API_QOS_OFFSET             500

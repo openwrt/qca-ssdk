@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -833,7 +833,9 @@ extern "C" {
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_SET, fal_acl_udf_profile_cfg_set),\
     SW_API_DEF(SW_API_ACL_UDF_PROFILE_CFG_GET, fal_acl_udf_profile_cfg_get),\
     SW_API_DEF(SW_API_ACL_VPGROUP_SET, fal_acl_vpgroup_set),\
-    SW_API_DEF(SW_API_ACL_VPGROUP_GET, fal_acl_vpgroup_get),
+    SW_API_DEF(SW_API_ACL_VPGROUP_GET, fal_acl_vpgroup_get), \
+    SW_API_DEF(SW_API_ACL_MAC_ENTRY_SET, ref_acl_mac_entry_set), \
+    SW_API_DEF(SW_API_ACL_MAC_ENTRY_DUMP, ref_acl_mac_entry_dump),
 
 #define ACL_API_PARAM \
     SW_API_DESC(SW_API_ACL_LIST_CREAT) \
@@ -862,7 +864,9 @@ extern "C" {
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_SET) \
     SW_API_DESC(SW_API_ACL_UDF_PROFILE_CFG_GET) \
     SW_API_DESC(SW_API_ACL_VPGROUP_SET) \
-    SW_API_DESC(SW_API_ACL_VPGROUP_GET)
+    SW_API_DESC(SW_API_ACL_VPGROUP_GET) \
+    SW_API_DESC(SW_API_ACL_MAC_ENTRY_SET) \
+    SW_API_DESC(SW_API_ACL_MAC_ENTRY_DUMP)
 #else
 #define ACL_API
 #define ACL_API_PARAM

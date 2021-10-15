@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1675,6 +1675,14 @@ extern "C" {
 		    sizeof(fal_vport_type_t), SW_PARAM_IN, "vport_type "),\
     SW_PARAM_DEF(SW_API_ACL_VPGROUP_GET, SW_UINT32, \
 		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "vpgroup_id"),
+
+#define SW_API_ACL_MAC_ENTRY_SET_DESC \
+    SW_PARAM_DEF(SW_API_ACL_MAC_ENTRY_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_ACL_MAC_ENTRY_SET, SW_ACL_MAC_ENTRY, \
+        sizeof(fal_acl_mac_entry_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "entry"),
+
+#define SW_API_ACL_MAC_ENTRY_DUMP_DESC \
+    SW_PARAM_DEF(SW_API_ACL_MAC_ENTRY_DUMP, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),
 
 #define SW_API_QOS_SCH_MODE_SET_DESC \
     SW_PARAM_DEF(SW_API_QOS_SCH_MODE_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),\

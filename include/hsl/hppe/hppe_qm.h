@@ -76,6 +76,7 @@
 #define MUL_P7_DROP_CNT_TBL_MAX_ENTRY	12
 #define UQ_AGG_PROFILE_MAP_MAX_ENTRY	256
 #define QUEUE_TX_COUNTER_TBL_MAX_ENTRY	300
+#define PPE_CAPACITY_QUEUES_NUM	300
 
 sw_error_t
 hppe_queue_tx_counter_tbl_get(

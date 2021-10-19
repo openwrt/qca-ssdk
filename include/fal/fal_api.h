@@ -2719,6 +2719,7 @@ extern "C" {
     SW_API_DEF(SW_API_SSDK_CFG, fal_ssdk_cfg), \
     SW_API_DEF(SW_API_MODULE_FUNC_CTRL_SET, fal_module_func_ctrl_set), \
     SW_API_DEF(SW_API_MODULE_FUNC_CTRL_GET, fal_module_func_ctrl_get), \
+    SW_API_DEF(SW_API_PPE_CAPACITY_GET, fal_ppe_capacity_get), \
 /*qca808x_start*/\
     PORTCONTROL_API \
 /*qca808x_end*/\
@@ -2781,6 +2782,9 @@ extern "C" {
     SW_PARAM_DEF(SW_API_MODULE_FUNC_CTRL_GET, SW_MODULE, 4, SW_PARAM_IN, "Module"), \
     SW_PARAM_DEF(SW_API_MODULE_FUNC_CTRL_GET, SW_FUNC_CTRL, sizeof(fal_func_ctrl_t), \
 		    SW_PARAM_PTR|SW_PARAM_OUT, "Function bitmap"), \
+    SW_PARAM_DEF(SW_API_PPE_CAPACITY_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PPE_CAPACITY_GET, SW_PPE_CAPACITY, sizeof(fal_ppe_tbl_caps_t), \
+		    SW_PARAM_PTR|SW_PARAM_OUT, "PPE capacity"), \
     MIB_API_PARAM \
     LEAKY_API_PARAM \
     MISC_API_PARAM \

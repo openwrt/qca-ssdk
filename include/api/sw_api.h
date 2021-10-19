@@ -298,6 +298,7 @@ typedef enum
 	SW_TUNNEL_TYPE,
 	SW_TUNNEL_KEY,
 	SW_TUNNEL_DECAP_ACTION,
+	SW_PPE_CAPACITY,
 /* auto_insert_flag */
 } sw_data_type_e;
 

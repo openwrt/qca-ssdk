@@ -623,66 +623,6 @@ appe_pre_ipo_rule_ext_4_ext8_set(
 		a_uint32_t value);
 
 sw_error_t
-appe_pre_ipo_dbg_addr_ipo_dbg_addr_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value);
-
-sw_error_t
-appe_pre_ipo_dbg_addr_ipo_dbg_addr_set(
-		a_uint32_t dev_id,
-		a_uint32_t value);
-
-sw_error_t
-appe_pre_ipo_dbg_data_ipo_dbg_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value);
-
-sw_error_t
-appe_pre_ipo_dbg_data_ipo_dbg_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value);
-
-sw_error_t
-appe_pre_ipo_spare_reg_spare_reg_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value);
-
-sw_error_t
-appe_pre_ipo_spare_reg_spare_reg_set(
-		a_uint32_t dev_id,
-		a_uint32_t value);
-
-sw_error_t
-appe_pre_ipo_glb_hit_counter_hit_count_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value);
-
-sw_error_t
-appe_pre_ipo_glb_hit_counter_hit_count_set(
-		a_uint32_t dev_id,
-		a_uint32_t value);
-
-sw_error_t
-appe_pre_ipo_glb_miss_counter_miss_count_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value);
-
-sw_error_t
-appe_pre_ipo_glb_miss_counter_miss_count_set(
-		a_uint32_t dev_id,
-		a_uint32_t value);
-
-sw_error_t
-appe_pre_ipo_glb_bypass_counter_bypass_count_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value);
-
-sw_error_t
-appe_pre_ipo_glb_bypass_counter_bypass_count_set(
-		a_uint32_t dev_id,
-		a_uint32_t value);
-
-sw_error_t
 appe_pre_ipo_cnt_tbl_hit_byte_cnt_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

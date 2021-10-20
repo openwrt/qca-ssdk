@@ -155,33 +155,47 @@ appe_tunnel_decap_entry_op(a_uint32_t dev_id,
 		case FAL_TUNNEL_OP_TYPE_DEL:
 			if (op_type == FAL_TUNNEL_OP_TYPE_ADD ||
 					FAL_TUNNEL_OP_MODE_HASH == op_mode) {
-				rv = appe_tl_tbl_op_data0_data_set(dev_id, tl_tbl->val[0]);
+				rv = appe_tl_tbl_op_data0_set(dev_id,
+						(union tl_tbl_op_data0_u *)(&tl_tbl->val[0]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data1_data_set(dev_id, tl_tbl->val[1]);
+				rv = appe_tl_tbl_op_data1_set(dev_id,
+						(union tl_tbl_op_data1_u *)(&tl_tbl->val[1]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data2_data_set(dev_id, tl_tbl->val[2]);
+				rv = appe_tl_tbl_op_data2_set(dev_id,
+						(union tl_tbl_op_data2_u *)(&tl_tbl->val[2]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data3_data_set(dev_id, tl_tbl->val[3]);
+				rv = appe_tl_tbl_op_data3_set(dev_id,
+						(union tl_tbl_op_data3_u *)(&tl_tbl->val[3]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data4_data_set(dev_id, tl_tbl->val[4]);
+				rv = appe_tl_tbl_op_data4_set(dev_id,
+						(union tl_tbl_op_data4_u *)(&tl_tbl->val[4]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data5_data_set(dev_id, tl_tbl->val[5]);
+				rv = appe_tl_tbl_op_data5_set(dev_id,
+						(union tl_tbl_op_data5_u *)(&tl_tbl->val[5]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data6_data_set(dev_id, tl_tbl->val[6]);
+				rv = appe_tl_tbl_op_data6_set(dev_id,
+						(union tl_tbl_op_data6_u *)(&tl_tbl->val[6]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data7_data_set(dev_id, tl_tbl->val[7]);
+				rv = appe_tl_tbl_op_data7_set(dev_id,
+						(union tl_tbl_op_data7_u *)(&tl_tbl->val[7]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data8_data_set(dev_id, tl_tbl->val[8]);
+				rv = appe_tl_tbl_op_data8_set(dev_id,
+						(union tl_tbl_op_data8_u *)(&tl_tbl->val[8]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data9_data_set(dev_id, tl_tbl->val[9]);
+				rv = appe_tl_tbl_op_data9_set(dev_id,
+						(union tl_tbl_op_data9_u *)(&tl_tbl->val[9]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data10_data_set(dev_id, tl_tbl->val[10]);
+				rv = appe_tl_tbl_op_data10_set(dev_id,
+						(union tl_tbl_op_data10_u *)(&tl_tbl->val[10]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data11_data_set(dev_id, tl_tbl->val[11]);
+				rv = appe_tl_tbl_op_data11_set(dev_id,
+						(union tl_tbl_op_data11_u *)(&tl_tbl->val[11]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data12_data_set(dev_id, tl_tbl->val[12]);
+				rv = appe_tl_tbl_op_data12_set(dev_id,
+						(union tl_tbl_op_data12_u *)(&tl_tbl->val[12]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_op_data13_data_set(dev_id, tl_tbl->val[13]);
+				rv = appe_tl_tbl_op_data13_set(dev_id,
+						(union tl_tbl_op_data13_u *)(&tl_tbl->val[13]));
 				SW_RTN_ON_ERROR(rv);
 			}
 
@@ -195,66 +209,94 @@ appe_tunnel_decap_entry_op(a_uint32_t dev_id,
 			break;
 		case FAL_TUNNEL_OP_TYPE_GET:
 			if (FAL_TUNNEL_OP_MODE_HASH == op_mode) {
-				rv = appe_tl_tbl_rd_op_data0_data_set(dev_id, tl_tbl->val[0]);
+				rv = appe_tl_tbl_rd_op_data0_set(dev_id,
+						(union tl_tbl_rd_op_data0_u *)(&tl_tbl->val[0]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data1_data_set(dev_id, tl_tbl->val[1]);
+				rv = appe_tl_tbl_rd_op_data1_set(dev_id,
+						(union tl_tbl_rd_op_data1_u *)(&tl_tbl->val[1]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data2_data_set(dev_id, tl_tbl->val[2]);
+				rv = appe_tl_tbl_rd_op_data2_set(dev_id,
+						(union tl_tbl_rd_op_data2_u *)(&tl_tbl->val[2]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data3_data_set(dev_id, tl_tbl->val[3]);
+				rv = appe_tl_tbl_rd_op_data3_set(dev_id,
+						(union tl_tbl_rd_op_data3_u *)(&tl_tbl->val[3]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data4_data_set(dev_id, tl_tbl->val[4]);
+				rv = appe_tl_tbl_rd_op_data4_set(dev_id,
+						(union tl_tbl_rd_op_data4_u *)(&tl_tbl->val[4]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data5_data_set(dev_id, tl_tbl->val[5]);
+				rv = appe_tl_tbl_rd_op_data5_set(dev_id,
+						(union tl_tbl_rd_op_data5_u *)(&tl_tbl->val[5]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data6_data_set(dev_id, tl_tbl->val[6]);
+				rv = appe_tl_tbl_rd_op_data6_set(dev_id,
+						(union tl_tbl_rd_op_data6_u *)(&tl_tbl->val[6]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data7_data_set(dev_id, tl_tbl->val[7]);
+				rv = appe_tl_tbl_rd_op_data7_set(dev_id,
+						(union tl_tbl_rd_op_data7_u *)(&tl_tbl->val[7]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data8_data_set(dev_id, tl_tbl->val[8]);
+				rv = appe_tl_tbl_rd_op_data8_set(dev_id,
+						(union tl_tbl_rd_op_data8_u *)(&tl_tbl->val[8]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data9_data_set(dev_id, tl_tbl->val[9]);
+				rv = appe_tl_tbl_rd_op_data9_set(dev_id,
+						(union tl_tbl_rd_op_data9_u *)(&tl_tbl->val[9]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data10_data_set(dev_id, tl_tbl->val[10]);
+				rv = appe_tl_tbl_rd_op_data10_set(dev_id,
+						(union tl_tbl_rd_op_data10_u *)(&tl_tbl->val[10]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data11_data_set(dev_id, tl_tbl->val[11]);
+				rv = appe_tl_tbl_rd_op_data11_set(dev_id,
+						(union tl_tbl_rd_op_data11_u *)(&tl_tbl->val[11]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data12_data_set(dev_id, tl_tbl->val[12]);
+				rv = appe_tl_tbl_rd_op_data12_set(dev_id,
+						(union tl_tbl_rd_op_data12_u *)(&tl_tbl->val[12]));
 				SW_RTN_ON_ERROR(rv);
-				rv = appe_tl_tbl_rd_op_data13_data_set(dev_id, tl_tbl->val[13]);
+				rv = appe_tl_tbl_rd_op_data13_set(dev_id,
+						(union tl_tbl_rd_op_data13_u *)(&tl_tbl->val[13]));
 				SW_RTN_ON_ERROR(rv);
 			}
 
 			rv = appe_tunnel_rd_op_common(dev_id, op_type, op_mode, index);
 			SW_RTN_ON_ERROR(rv);
 
-			rv = appe_tl_tbl_rd_rslt_data0_data_get(dev_id, &tl_tbl->val[0]);
+			rv = appe_tl_tbl_rd_rslt_data0_get(dev_id,
+					(union tl_tbl_rd_rslt_data0_u *)(&tl_tbl->val[0]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data1_data_get(dev_id, &tl_tbl->val[1]);
+			rv = appe_tl_tbl_rd_rslt_data1_get(dev_id,
+					(union tl_tbl_rd_rslt_data1_u *)(&tl_tbl->val[1]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data2_data_get(dev_id, &tl_tbl->val[2]);
+			rv = appe_tl_tbl_rd_rslt_data2_get(dev_id,
+					(union tl_tbl_rd_rslt_data2_u *)(&tl_tbl->val[2]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data3_data_get(dev_id, &tl_tbl->val[3]);
+			rv = appe_tl_tbl_rd_rslt_data3_get(dev_id,
+					(union tl_tbl_rd_rslt_data3_u *)(&tl_tbl->val[3]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data4_data_get(dev_id, &tl_tbl->val[4]);
+			rv = appe_tl_tbl_rd_rslt_data4_get(dev_id,
+					(union tl_tbl_rd_rslt_data4_u *)(&tl_tbl->val[4]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data5_data_get(dev_id, &tl_tbl->val[5]);
+			rv = appe_tl_tbl_rd_rslt_data5_get(dev_id,
+					(union tl_tbl_rd_rslt_data5_u *)(&tl_tbl->val[5]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data6_data_get(dev_id, &tl_tbl->val[6]);
+			rv = appe_tl_tbl_rd_rslt_data6_get(dev_id,
+					(union tl_tbl_rd_rslt_data6_u *)(&tl_tbl->val[6]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data7_data_get(dev_id, &tl_tbl->val[7]);
+			rv = appe_tl_tbl_rd_rslt_data7_get(dev_id,
+					(union tl_tbl_rd_rslt_data7_u *)(&tl_tbl->val[7]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data8_data_get(dev_id, &tl_tbl->val[8]);
+			rv = appe_tl_tbl_rd_rslt_data8_get(dev_id,
+					(union tl_tbl_rd_rslt_data8_u *)(&tl_tbl->val[8]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data9_data_get(dev_id, &tl_tbl->val[9]);
+			rv = appe_tl_tbl_rd_rslt_data9_get(dev_id,
+					(union tl_tbl_rd_rslt_data9_u *)(&tl_tbl->val[9]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data10_data_get(dev_id, &tl_tbl->val[10]);
+			rv = appe_tl_tbl_rd_rslt_data10_get(dev_id,
+					(union tl_tbl_rd_rslt_data10_u *)(&tl_tbl->val[10]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data11_data_get(dev_id, &tl_tbl->val[11]);
+			rv = appe_tl_tbl_rd_rslt_data11_get(dev_id,
+					(union tl_tbl_rd_rslt_data11_u *)(&tl_tbl->val[11]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data12_data_get(dev_id, &tl_tbl->val[12]);
+			rv = appe_tl_tbl_rd_rslt_data12_get(dev_id,
+					(union tl_tbl_rd_rslt_data12_u *)(&tl_tbl->val[12]));
 			SW_RTN_ON_ERROR(rv);
-			rv = appe_tl_tbl_rd_rslt_data13_data_get(dev_id, &tl_tbl->val[13]);
+			rv = appe_tl_tbl_rd_rslt_data13_get(dev_id,
+					(union tl_tbl_rd_rslt_data13_u *)(&tl_tbl->val[13]));
 			SW_RTN_ON_ERROR(rv);
 
 			break;

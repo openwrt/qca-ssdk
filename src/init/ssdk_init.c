@@ -1,15 +1,19 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ *
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*qca808x_start*/
@@ -379,10 +383,11 @@ qca_switch_init(a_uint32_t dev_id)
 #if (defined(DESS) || defined(ISISC) || defined(ISIS)) && defined(IN_QOS)
 	a_uint32_t nr = 0;
 #endif
-	int i = 0;
-	a_uint32_t port_bmp = 0;
+	int i = 0, j = 0;
+	a_uint32_t port_bmp = 0, cpu_bmp = 0;
 	hsl_reg_mode reg_mode = HSL_REG_MDIO;
 	a_bool_t flag = A_FALSE;
+	a_uint32_t port_hol_ctrl[2] = {0}, queue_hol_ctrl[6] = {0};
 
 	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
@@ -483,10 +488,10 @@ qca_switch_init(a_uint32_t dev_id)
 #endif
 #endif
 					break;
+
 				case CHIP_ISISC:
 				case CHIP_ISIS:
-				case CHIP_MHT:
-#if defined(ISISC) || defined(ISIS) || defined(MHT)
+#if defined(ISISC) || defined(ISIS)
 #ifdef IN_INTERFACECONTROL
 					fal_port_3az_status_set(dev_id, i, A_FALSE);
 #endif
@@ -507,12 +512,12 @@ qca_switch_init(a_uint32_t dev_id)
 						nr = 48; /*6*8*/
 						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
 						fal_qos_port_red_en_set(dev_id, i, A_TRUE);
-						if (chip_type == CHIP_ISISC ||
-								chip_type == CHIP_MHT) {
+						if (chip_type == CHIP_ISISC) {
 							nr = 64; /*8*8*/
 						} else if (chip_type == CHIP_ISIS) {
 							nr = 60;
 						}
+
 						fal_qos_queue_tx_buf_nr_set(dev_id, i, 5, &nr);
 						nr = 48; /*6*8*/
 						fal_qos_queue_tx_buf_nr_set(dev_id, i, 4, &nr);
@@ -532,8 +537,7 @@ qca_switch_init(a_uint32_t dev_id)
 						nr = 48; /*6*8*/
 						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
 						fal_qos_port_red_en_set(dev_id, i, A_TRUE);
-						if (chip_type == CHIP_ISISC ||
-								chip_type == CHIP_MHT) {
+						if (chip_type == CHIP_ISISC) {
 							nr = 64; /*8*8*/
 						} else if (chip_type == CHIP_ISIS) {
 							nr = 60;
@@ -547,6 +551,66 @@ qca_switch_init(a_uint32_t dev_id)
 						fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
 #endif
 					}
+#endif
+					break;
+				case CHIP_MHT:
+					aos_mem_zero(&port_hol_ctrl, sizeof(port_hol_ctrl));
+					aos_mem_zero(&queue_hol_ctrl, sizeof(queue_hol_ctrl));
+					cpu_bmp = ssdk_cpu_bmp_get(dev_id);
+					if (cpu_bmp & BIT(i)) {
+#if defined(IN_PORTCONTROL)
+						fal_port_flowctrl_set(dev_id, i, A_FALSE);
+						fal_port_flowctrl_forcemode_set(dev_id, i,
+								A_TRUE);
+#endif
+						/* port tx buf number */
+						port_hol_ctrl[0] = 600;
+						/* port rx buf number */
+						port_hol_ctrl[1] = 48;
+						/* queue0 tx buf number */
+						queue_hol_ctrl[0] = 24;
+						/* queue1 tx buf number */
+						queue_hol_ctrl[1] = 32;
+						/* queue2 tx buf number */
+						queue_hol_ctrl[2] = 32;
+						/* queue3 tx buf number */
+						queue_hol_ctrl[3] = 32;
+						/* queue4 tx buf number */
+						queue_hol_ctrl[4] = 48;
+						/* queue5 tx buf number */
+						queue_hol_ctrl[5] = 64;
+					} else {
+#if defined(IN_PORTCONTROL)
+						fal_port_flowctrl_set(dev_id, i, A_TRUE);
+						fal_port_flowctrl_forcemode_set(dev_id, i,
+								A_FALSE);
+#endif
+						/* port tx buf number */
+						port_hol_ctrl[0] = 500;
+						/* port rx buf number */
+						port_hol_ctrl[1] = 48;
+						/* queue0 tx buf number */
+						queue_hol_ctrl[0] = 24;
+						/* queue1 tx buf number */
+						queue_hol_ctrl[1] = 32;
+						/* queue2 tx buf number */
+						queue_hol_ctrl[2] = 48;
+						/* queue3 tx buf number */
+						queue_hol_ctrl[3] = 64;
+					}
+
+#if defined(IN_INTERFACECONTROL)
+					fal_port_3az_status_set(dev_id, i, A_FALSE);
+#endif
+#if defined(IN_QOS)
+					fal_qos_port_red_en_set(dev_id, i, A_TRUE);
+					fal_qos_port_tx_buf_nr_set(dev_id, i, &port_hol_ctrl[0]);
+					fal_qos_port_rx_buf_nr_set(dev_id, i, &port_hol_ctrl[1]);
+
+					for (j = 0; j < ARRAY_SIZE(queue_hol_ctrl)
+							&& queue_hol_ctrl[j] != 0; j++)
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, j,
+								&port_hol_ctrl[j]);
 #endif
 					break;
 				default:
@@ -3672,6 +3736,7 @@ static int __init regi_init(void)
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				rv = qca_mht_hw_init(qca_phy_priv_global[dev_id]);
+				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				SSDK_INFO("Initializing MHT Done!!\n");
 #endif
 				break;

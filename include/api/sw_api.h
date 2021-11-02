@@ -289,6 +289,7 @@ typedef enum
 	SW_VPORT_TYPE,
 	SW_PORT_CNT_CFG,
 	SW_PORT_CNT,
+	SW_INTF_MAC_ENTRY,
 /* auto_insert_flag */
 } sw_data_type_e;
 

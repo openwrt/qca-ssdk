@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -22,8 +22,132 @@
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
 #include "adpt.h"
+#include <linux/etherdevice.h>
+
+struct ppe_ip_intf_mac {
+	a_uint32_t refcount;
+	fal_macaddr_entry_t mac;
+};
+
+struct ppe_ip_mac {
+	spinlock_t lock;
+	struct ppe_ip_intf_mac intf_mac_entry[MY_MAC_TBL_NUM];
+};
+
+static struct ppe_ip_mac ppe_l3_mac_g[SW_MAX_NR_DEV] = {0};
 
 #ifndef IN_IP_MINI
+a_uint8_t adpt_ppe_l3_mac_bitmap_alloc(a_uint32_t dev_id, fal_mac_addr_t mac_addr)
+{
+	a_uint32_t i;
+	struct ppe_ip_intf_mac *mac_ints = NULL;
+	a_uint8_t mac_index = MY_MAC_TBL_NUM;
+	struct ppe_ip_mac *ip_mac_p = &ppe_l3_mac_g[dev_id];
+
+	spin_lock_bh(&ip_mac_p->lock);
+	for (i = 0; i < MY_MAC_TBL_NUM; i++) {
+		mac_ints = &ip_mac_p->intf_mac_entry[i];
+		if (ether_addr_equal(mac_ints->mac.mac_addr.uc, mac_addr.uc)) {
+			mac_ints->refcount++;
+			spin_unlock_bh(&ip_mac_p->lock);
+			return i;
+		}
+
+		if (mac_ints->mac.valid == A_FALSE && mac_index == MY_MAC_TBL_NUM)
+			mac_index = i;
+	}
+
+	if (mac_index < MY_MAC_TBL_NUM) {
+		mac_ints = &ip_mac_p->intf_mac_entry[mac_index];
+		mac_ints->mac.valid = A_TRUE;
+		mac_ints->refcount = 1;
+		ether_addr_copy(mac_ints->mac.mac_addr.uc, mac_addr.uc);
+	}
+	spin_unlock_bh(&ip_mac_p->lock);
+
+	return mac_index;
+}
+
+a_uint8_t adpt_ppe_l3_mac_bitmap_free(a_uint32_t dev_id,
+		a_uint8_t mac_bitmap, fal_mac_addr_t mac_addr)
+{
+	a_uint8_t mac_index = 0, bitmap_del = 0;
+	struct ppe_ip_intf_mac *mac_ints = NULL;
+	a_bool_t free_all_mac = A_FALSE;
+	struct ppe_ip_mac *ip_mac_p = &ppe_l3_mac_g[dev_id];
+
+	/* the parameter mac_addr is 0, release all mac address for the mac_bitmap */
+	if (is_zero_ether_addr(mac_addr.uc))
+		free_all_mac = A_TRUE;
+
+	spin_lock_bh(&ip_mac_p->lock);
+	while (mac_bitmap) {
+		if (mac_bitmap & 1) {
+			mac_ints = &ip_mac_p->intf_mac_entry[mac_index];
+			if (free_all_mac == A_TRUE ||
+					ether_addr_equal(mac_ints->mac.mac_addr.uc, mac_addr.uc)) {
+				mac_ints->refcount--;
+				if (mac_ints->refcount == 0) {
+					eth_zero_addr(mac_ints->mac.mac_addr.uc);
+					mac_ints->mac.valid = A_FALSE;
+					bitmap_del |= BIT(mac_index);
+				}
+
+				/* only release the identified mac address */
+				if (free_all_mac == A_FALSE)
+					break;
+			}
+		}
+		mac_bitmap >>= 1;
+		mac_index++;
+	}
+	spin_unlock_bh(&ip_mac_p->lock);
+
+	/* return the bit map of the released mac address */
+	return bitmap_del;
+}
+
+void adpt_ppe_l3_mac_addr_get(a_uint32_t dev_id, a_uint8_t mac_bitmap, fal_mac_addr_t *mac_addr)
+{
+	a_uint8_t mac_index = 0;
+	struct ppe_ip_intf_mac *mac_ints = NULL;
+	a_bool_t get_next = A_FALSE;
+	struct ppe_ip_mac *ip_mac_p = &ppe_l3_mac_g[dev_id];
+
+	if (!mac_bitmap) {
+		eth_zero_addr(mac_addr->uc);
+		return;
+	}
+
+	/* the parameter mac_addr is not 0, for get next mac from the input mac_addr */
+	if (!is_zero_ether_addr(mac_addr->uc))
+		get_next = A_TRUE;
+
+	spin_lock_bh(&ip_mac_p->lock);
+	while (mac_bitmap) {
+		mac_ints = &ip_mac_p->intf_mac_entry[mac_index];
+		if ((mac_bitmap & 1) && mac_ints->mac.valid == A_TRUE) {
+			if (get_next == A_FALSE) {
+				ether_addr_copy(mac_addr->uc, mac_ints->mac.mac_addr.uc);
+				spin_unlock_bh(&ip_mac_p->lock);
+				return;
+			}
+
+			if (ether_addr_equal(mac_addr->uc, mac_ints->mac.mac_addr.uc) &&
+					get_next == A_TRUE)
+				get_next = A_FALSE;
+		}
+		mac_bitmap >>= 1;
+		mac_index++;
+	}
+	spin_unlock_bh(&ip_mac_p->lock);
+
+	/* mac_bitmap is not found */
+	eth_zero_addr(mac_addr->uc);
+
+	return;
+}
+
 sw_error_t
 adpt_hppe_ip_network_route_get(a_uint32_t dev_id,
 			a_uint32_t index, a_uint8_t type,
@@ -1272,7 +1396,335 @@ adpt_hppe_ip_nexthop_set(a_uint32_t dev_id,
 
 	return hppe_in_nexthop_tbl_set(dev_id, index, &in_nexthop_tbl);
 }
+
+sw_error_t
+adpt_hppe_ip_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if,
+		a_uint32_t mtu, a_uint32_t mru)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	in_l3_if_tbl.bf.mru = mru;
+	in_l3_if_tbl.bf.mtu = mtu;
+
+	rv = hppe_in_l3_if_tbl_set(dev_id, l3_if, &in_l3_if_tbl);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if,
+		a_uint32_t *mtu, a_uint32_t *mru)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(mtu);
+	ADPT_NULL_POINT_CHECK(mru);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	*mru = in_l3_if_tbl.bf.mru;
+	*mtu = in_l3_if_tbl.bf.mtu;
+
+	return rv;
+}
+
+#if defined(APPE)
+sw_error_t
+adpt_hppe_ip6_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if,
+		a_uint32_t mtu, a_uint32_t mru)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	in_l3_if_tbl.bf.mru_ipv6 = mru;
+	in_l3_if_tbl.bf.mtu_ipv6 = mtu;
+
+	rv = hppe_in_l3_if_tbl_set(dev_id, l3_if, &in_l3_if_tbl);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip6_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if,
+		a_uint32_t *mtu, a_uint32_t *mru)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(mtu);
+	ADPT_NULL_POINT_CHECK(mru);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	*mru = in_l3_if_tbl.bf.mru_ipv6;
+	*mtu = in_l3_if_tbl.bf.mtu_ipv6;
+
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip_intf_dmac_check_set(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	in_l3_if_tbl.bf.dmac_check_dis = !enable;
+
+	rv = hppe_in_l3_if_tbl_set(dev_id, l3_if, &in_l3_if_tbl);
+
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip_intf_dmac_check_get(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(enable);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	*enable = !in_l3_if_tbl.bf.dmac_check_dis;
+
+	return rv;
+}
 #endif
+
+sw_error_t adpt_ip_macaddr_convert(fal_mac_addr_t *mac_addr,
+		a_uint32_t *mac_0, a_uint16_t *mac_1, a_bool_t to_hsl)
+{
+	sw_error_t rv = SW_OK;
+
+	if (to_hsl) {
+		*mac_0 = mac_addr->uc[5] | \
+			 mac_addr->uc[4] << 8 | \
+			 mac_addr->uc[3] << 16 | \
+			 mac_addr->uc[2] << 24;
+		*mac_1 = mac_addr->uc[1] | \
+			 mac_addr->uc[0] << 8;
+	} else {
+		mac_addr->uc[5] = *mac_0;
+		mac_addr->uc[4] = *mac_0 >> 8;
+		mac_addr->uc[3] = *mac_0 >> 16;
+		mac_addr->uc[2] = *mac_0 >> 24;
+		mac_addr->uc[1] = *mac_1;
+		mac_addr->uc[0] = *mac_1 >> 8;
+	}
+
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac_entry)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	union eg_l3_if_tbl_u eg_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+	a_uint32_t mac_0;
+	a_uint16_t mac_1;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(mac_entry);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	memset(&eg_l3_if_tbl, 0, sizeof(eg_l3_if_tbl));
+
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_eg_l3_if_tbl_get(dev_id, l3_if, &eg_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	adpt_ip_macaddr_convert(&mac_entry->mac_addr, &mac_0, &mac_1, A_TRUE);
+
+	if (mac_entry->direction == FAL_IP_INGRESS || mac_entry->direction == FAL_IP_BOTH) {
+		a_uint8_t mac_index = adpt_ppe_l3_mac_bitmap_alloc(dev_id, mac_entry->mac_addr);
+
+		if (mac_index < MY_MAC_TBL_NUM) {
+			/* update the my_mac_tbl for the valid mac_index */
+			union my_mac_tbl_u mymac;
+			mymac.bf.valid = 1;
+			mymac.bf.mac_da_0 = mac_0;
+			mymac.bf.mac_da_1 = mac_1;
+			hppe_my_mac_tbl_set(dev_id, mac_index, &mymac);
+		} else {
+			return SW_FULL;
+		}
+
+		/* update the mac_bitmap of L3 intf */
+		in_l3_if_tbl.bf.mac_bitmap |= BIT(mac_index);
+	}
+
+	if (mac_entry->direction == FAL_IP_EGRESS || mac_entry->direction == FAL_IP_BOTH) {
+		eg_l3_if_tbl.bf.mac_addr_0 = mac_0;
+		eg_l3_if_tbl.bf.mac_addr_1 = mac_1;
+	}
+
+	rv = hppe_in_l3_if_tbl_set(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_eg_l3_if_tbl_set(dev_id, l3_if, &eg_l3_if_tbl);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac_entry)
+{
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	union eg_l3_if_tbl_u eg_l3_if_tbl;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(mac_entry);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+	memset(&eg_l3_if_tbl, 0, sizeof(eg_l3_if_tbl));
+
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_eg_l3_if_tbl_get(dev_id, l3_if, &eg_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	if (mac_entry->direction == FAL_IP_INGRESS || mac_entry->direction == FAL_IP_BOTH) {
+		a_uint8_t mac_bitmap_del = 0;
+		mac_bitmap_del = adpt_ppe_l3_mac_bitmap_free(dev_id,
+				in_l3_if_tbl.bf.mac_bitmap, mac_entry->mac_addr);
+
+		/* only delete the valid mac bit map */
+		mac_bitmap_del &= in_l3_if_tbl.bf.mac_bitmap;
+		if (mac_bitmap_del) {
+			union my_mac_tbl_u mymac;
+			a_uint8_t mac_index;
+
+			/* update the mac bit map of L3 intf table */
+			in_l3_if_tbl.bf.mac_bitmap &= ~mac_bitmap_del;
+
+			mymac.bf.valid = 0;
+			mymac.bf.mac_da_0 = 0;
+			mymac.bf.mac_da_1 = 0;
+
+			mac_index = 0;
+			while (mac_bitmap_del) {
+				if (mac_bitmap_del & 1)
+					hppe_my_mac_tbl_set(dev_id, mac_index, &mymac);
+
+				mac_bitmap_del >>= 1;
+				mac_index++;
+			}
+		}
+	}
+
+	if (mac_entry->direction == FAL_IP_EGRESS || mac_entry->direction == FAL_IP_BOTH) {
+		fal_mac_addr_t hsl_mac_addr;
+		fal_mac_addr_t input_mac_addr;
+		a_uint32_t mac_0;
+		a_uint16_t mac_1;
+
+		ether_addr_copy(input_mac_addr.uc, mac_entry->mac_addr.uc);
+
+		mac_0 = eg_l3_if_tbl.bf.mac_addr_0;
+		mac_1 = eg_l3_if_tbl.bf.mac_addr_1;
+		adpt_ip_macaddr_convert(&hsl_mac_addr, &mac_0, &mac_1, A_FALSE);
+
+		if (is_zero_ether_addr(input_mac_addr.uc) ||
+				ether_addr_equal(input_mac_addr.uc, hsl_mac_addr.uc)) {
+			eg_l3_if_tbl.bf.mac_addr_0 = 0;
+			eg_l3_if_tbl.bf.mac_addr_1 = 0;
+		}
+	}
+
+	rv = hppe_in_l3_if_tbl_set(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_eg_l3_if_tbl_set(dev_id, l3_if, &eg_l3_if_tbl);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_ip_intf_macaddr_get(a_uint32_t dev_id, a_uint32_t l3_if,
+		fal_intf_macaddr_t *mac_entry)
+{
+
+	union in_l3_if_tbl_u in_l3_if_tbl;
+	a_uint8_t my_mac_bitmap = 0;
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(mac_entry);
+
+	if (l3_if >= IN_L3_IF_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	memset(&in_l3_if_tbl, 0, sizeof(in_l3_if_tbl));
+
+	rv = hppe_in_l3_if_tbl_get(dev_id, l3_if, &in_l3_if_tbl);
+	SW_RTN_ON_ERROR(rv);
+
+	my_mac_bitmap = in_l3_if_tbl.bf.mac_bitmap;
+	adpt_ppe_l3_mac_addr_get(dev_id, my_mac_bitmap, &mac_entry->mac_addr);
+
+	/* intf_mac get function is always for ingress */
+	mac_entry->direction = FAL_IP_INGRESS;
+
+	return rv;
+}
+#endif
+
 void adpt_hppe_ip_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -1325,6 +1777,16 @@ static void adpt_hppe_ip_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_a
 	p_adpt_api->adpt_ip_nexthop_set = NULL;
 	p_adpt_api->adpt_ip_global_ctrl_get = NULL;
 	p_adpt_api->adpt_ip_global_ctrl_set = NULL;
+	p_adpt_api->adpt_ip_intf_mtu_mru_set = NULL;
+	p_adpt_api->adpt_ip_intf_mtu_mru_get = NULL;
+	p_adpt_api->adpt_ip6_intf_mtu_mru_set = NULL;
+	p_adpt_api->adpt_ip6_intf_mtu_mru_get = NULL;
+	p_adpt_api->adpt_ip_intf_macaddr_add = NULL;
+	p_adpt_api->adpt_ip_intf_macaddr_del = NULL;
+	p_adpt_api->adpt_ip_intf_macaddr_get_first = NULL;
+	p_adpt_api->adpt_ip_intf_macaddr_get_next = NULL;
+	p_adpt_api->adpt_ip_intf_dmac_check_set = NULL;
+	p_adpt_api->adpt_ip_intf_dmac_check_get = NULL;
 
 	return;
 }
@@ -1405,7 +1867,32 @@ sw_error_t adpt_hppe_ip_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_ip_global_ctrl_get = adpt_hppe_ip_global_ctrl_get;
 	if (p_adpt_api->adpt_ip_func_bitmap[1] & (1 << (FUNC_IP_GLOBAL_CTRL_SET % 32)))
 		p_adpt_api->adpt_ip_global_ctrl_set = adpt_hppe_ip_global_ctrl_set;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_MTU_MRU_SET % 32))
+		p_adpt_api->adpt_ip_intf_mtu_mru_set = adpt_hppe_ip_intf_mtu_mru_set;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_MTU_MRU_GET % 32))
+		p_adpt_api->adpt_ip_intf_mtu_mru_get = adpt_hppe_ip_intf_mtu_mru_get;
+#if defined(APPE)
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP6_INTF_MTU_MRU_SET % 32))
+		p_adpt_api->adpt_ip6_intf_mtu_mru_set = adpt_hppe_ip6_intf_mtu_mru_set;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP6_INTF_MTU_MRU_GET % 32))
+		p_adpt_api->adpt_ip6_intf_mtu_mru_get = adpt_hppe_ip6_intf_mtu_mru_get;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_DMAC_CHECK_SET % 32))
+		p_adpt_api->adpt_ip_intf_dmac_check_set = adpt_hppe_ip_intf_dmac_check_set;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_DMAC_CHECK_GET % 32))
+		p_adpt_api->adpt_ip_intf_dmac_check_get = adpt_hppe_ip_intf_dmac_check_get;
 #endif
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_MACADDR_ADD % 32))
+		p_adpt_api->adpt_ip_intf_macaddr_add = adpt_hppe_ip_intf_macaddr_add;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_MACADDR_DEL % 32))
+		p_adpt_api->adpt_ip_intf_macaddr_del = adpt_hppe_ip_intf_macaddr_del;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_MACADDR_GET_FIRST % 32))
+		p_adpt_api->adpt_ip_intf_macaddr_get_first = adpt_hppe_ip_intf_macaddr_get;
+	if (p_adpt_api->adpt_ip_func_bitmap[1] & BIT(FUNC_IP_INTF_MACADDR_GET_NEXT % 32))
+		p_adpt_api->adpt_ip_intf_macaddr_get_next = adpt_hppe_ip_intf_macaddr_get;
+#endif
+
+	spin_lock_init(&ppe_l3_mac_g[dev_id].lock);
+
 	return SW_OK;
 }
 /**

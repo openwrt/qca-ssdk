@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2015, 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012, 2015, 2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -26,6 +26,166 @@
 #include <linux/module.h>
 
 #ifndef IN_IP_MINI
+sw_error_t
+_fal_ip_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_mtu_mru_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_mtu_mru_set(dev_id, l3_if, mtu, mru);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_mtu_mru_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_mtu_mru_get(dev_id, l3_if, mtu, mru);
+	return rv;
+}
+
+sw_error_t
+_fal_ip6_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip6_intf_mtu_mru_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip6_intf_mtu_mru_set(dev_id, l3_if, mtu, mru);
+	return rv;
+}
+
+sw_error_t
+_fal_ip6_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip6_intf_mtu_mru_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip6_intf_mtu_mru_get(dev_id, l3_if, mtu, mru);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_macaddr_add)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_macaddr_add(dev_id, l3_if, mac);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_macaddr_del)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_macaddr_del(dev_id, l3_if, mac);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_macaddr_get_first(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_macaddr_get_first)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_macaddr_get_first(dev_id, l3_if, mac);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_macaddr_get_next(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_macaddr_get_next)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_macaddr_get_next(dev_id, l3_if, mac);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_dmac_check_set(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_dmac_check_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_dmac_check_set(dev_id, l3_if, enable);
+	return rv;
+}
+
+sw_error_t
+_fal_ip_intf_dmac_check_get(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ip_intf_dmac_check_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ip_intf_dmac_check_get(dev_id, l3_if, enable);
+	return rv;
+}
+
 static sw_error_t
 _fal_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry)
 {
@@ -2362,7 +2522,173 @@ fal_ip_global_ctrl_get(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg)
 	FAL_API_UNLOCK;
 	return rv;
 }
+
+sw_error_t
+fal_ip_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_mtu_mru_set(dev_id, l3_if, mtu, mru);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_mtu_mru_get(dev_id, l3_if, mtu, mru);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip6_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip6_intf_mtu_mru_set(dev_id, l3_if, mtu, mru);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip6_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip6_intf_mtu_mru_get(dev_id, l3_if, mtu, mru);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_macaddr_add(dev_id, l3_if, mac);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_macaddr_del(dev_id, l3_if, mac);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_macaddr_get_first(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_macaddr_get_first(dev_id, l3_if, mac);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_macaddr_get_next(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_macaddr_get_next(dev_id, l3_if, mac);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_dmac_check_set(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_dmac_check_set(dev_id, l3_if, enable);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+sw_error_t
+fal_ip_intf_dmac_check_get(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ip_intf_dmac_check_get(dev_id, l3_if, enable);
+	FAL_API_UNLOCK;
+
+	return rv;
+}
+
+EXPORT_SYMBOL(fal_ip_network_route_get);
+EXPORT_SYMBOL(fal_ip_host_add);
+EXPORT_SYMBOL(fal_ip_vsi_sg_cfg_get);
+EXPORT_SYMBOL(fal_ip_pub_addr_set);
+EXPORT_SYMBOL(fal_ip_port_sg_cfg_set);
+EXPORT_SYMBOL(fal_ip_port_intf_get);
+EXPORT_SYMBOL(fal_ip_vsi_arp_sg_cfg_set);
+EXPORT_SYMBOL(fal_ip_pub_addr_get);
+EXPORT_SYMBOL(fal_ip_port_intf_set);
+EXPORT_SYMBOL(fal_ip_vsi_sg_cfg_set);
+EXPORT_SYMBOL(fal_ip_host_next);
+EXPORT_SYMBOL(fal_ip_port_macaddr_set);
+EXPORT_SYMBOL(fal_ip_vsi_intf_get);
+EXPORT_SYMBOL(fal_ip_network_route_add);
+EXPORT_SYMBOL(fal_ip_port_sg_cfg_get);
+EXPORT_SYMBOL(fal_ip_intf_get);
+EXPORT_SYMBOL(fal_ip_network_route_del);
+EXPORT_SYMBOL(fal_ip_host_del);
+EXPORT_SYMBOL(fal_ip_route_mismatch_action_get);
+EXPORT_SYMBOL(fal_ip_vsi_arp_sg_cfg_get);
+EXPORT_SYMBOL(fal_ip_port_arp_sg_cfg_set);
+EXPORT_SYMBOL(fal_ip_vsi_mc_mode_set);
+EXPORT_SYMBOL(fal_ip_vsi_intf_set);
+EXPORT_SYMBOL(fal_ip_nexthop_get);
+EXPORT_SYMBOL(fal_ip_route_mismatch_action_set);
+EXPORT_SYMBOL(fal_ip_host_get);
+EXPORT_SYMBOL(fal_ip_intf_set);
+EXPORT_SYMBOL(fal_ip_vsi_mc_mode_get);
+EXPORT_SYMBOL(fal_ip_port_macaddr_get);
+EXPORT_SYMBOL(fal_ip_port_arp_sg_cfg_get);
+EXPORT_SYMBOL(fal_ip_nexthop_set);
+EXPORT_SYMBOL(fal_ip_global_ctrl_get);
+EXPORT_SYMBOL(fal_ip_global_ctrl_set);
+/* the following APIs added for host data path */
+EXPORT_SYMBOL(fal_ip_intf_dmac_check_set);
+EXPORT_SYMBOL(fal_ip_intf_dmac_check_get);
+EXPORT_SYMBOL(fal_ip_intf_mtu_mru_set);
+EXPORT_SYMBOL(fal_ip_intf_mtu_mru_get);
+EXPORT_SYMBOL(fal_ip6_intf_mtu_mru_set);
+EXPORT_SYMBOL(fal_ip6_intf_mtu_mru_get);
+EXPORT_SYMBOL(fal_ip_intf_macaddr_add);
+EXPORT_SYMBOL(fal_ip_intf_macaddr_del);
+EXPORT_SYMBOL(fal_ip_intf_macaddr_get_first);
+EXPORT_SYMBOL(fal_ip_intf_macaddr_get_next);
 #endif
+
 /*insert flag for outter fal, don't remove it*/
 
 /**

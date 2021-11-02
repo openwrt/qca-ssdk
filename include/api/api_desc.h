@@ -3599,6 +3599,94 @@ extern "C" {
     SW_PARAM_DEF(SW_API_GLOBAL_CTRL_GET, SW_IP_GLOBAL, \
 		    sizeof(fal_ip_global_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "global"),
 
+#define SW_API_IP_INTF_MTU_MRU_SET_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "mtu"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "mru"),
+
+#define SW_API_IP_INTF_MTU_MRU_GET_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "mtu"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "mru"),
+
+#define SW_API_IP6_INTF_MTU_MRU_SET_DESC \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "mtu"), \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "mru"),
+
+#define SW_API_IP6_INTF_MTU_MRU_GET_DESC \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "mtu"), \
+    SW_PARAM_DEF(SW_API_IP6_INTF_MTU_MRU_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_PTR|SW_PARAM_OUT, "mru"),
+
+#define SW_API_IP_INTF_MACADDR_ADD_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_ADD, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_ADD, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_ADD, SW_INTF_MAC_ENTRY, \
+		    sizeof(fal_intf_macaddr_t), SW_PARAM_PTR|SW_PARAM_IN, "mac entry"),
+
+#define SW_API_IP_INTF_MACADDR_DEL_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_DEL, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_DEL, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_DEL, SW_INTF_MAC_ENTRY, \
+		    sizeof(fal_intf_macaddr_t), SW_PARAM_PTR|SW_PARAM_IN, "mac entry"),
+
+#define SW_API_IP_INTF_MACADDR_GET_FIRST_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_GET_FIRST, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_GET_FIRST, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_GET_FIRST, SW_INTF_MAC_ENTRY, \
+		    sizeof(fal_intf_macaddr_t), SW_PARAM_PTR|SW_PARAM_OUT, "mac entry"),
+
+#define SW_API_IP_INTF_MACADDR_GET_NEXT_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_GET_NEXT, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_GET_NEXT, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_MACADDR_GET_NEXT, SW_INTF_MAC_ENTRY, \
+		    sizeof(fal_intf_macaddr_t), \
+		    SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "mac entry"),
+
+#define SW_API_IP_INTF_DMAC_CHECK_SET_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_DMAC_CHECK_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_DMAC_CHECK_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_DMAC_CHECK_SET, SW_ENABLE, \
+		    sizeof(a_bool_t), SW_PARAM_IN, "enable DMAC check"),
+
+#define SW_API_IP_INTF_DMAC_CHECK_GET_DESC \
+    SW_PARAM_DEF(SW_API_IP_INTF_DMAC_CHECK_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_IP_INTF_DMAC_CHECK_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "L3 intf id"), \
+    SW_PARAM_DEF(SW_API_IP_INTF_DMAC_CHECK_GET, SW_ENABLE, \
+		    sizeof(a_bool_t), SW_PARAM_PTR|SW_PARAM_OUT, "enable DMAC check"),
 
 #define SW_API_FLOW_STATUS_SET_DESC \
     SW_PARAM_DEF(SW_API_FLOW_STATUS_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),  \

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -287,26 +287,6 @@ hppe_fdb_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union fdb_tbl_u *value);
-
-sw_error_t
-hppe_l2_dbg_addr_l2_dbg_addr_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_l2_dbg_addr_l2_dbg_addr_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_l2_dbg_data_l2_dbg_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_l2_dbg_data_l2_dbg_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
 
 sw_error_t
 hppe_fdb_tbl_op_op_mode_get(
@@ -627,116 +607,6 @@ hppe_l2_dbgcnt_cmd_addr_get(
 
 sw_error_t
 hppe_l2_dbgcnt_cmd_addr_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_l2_dbgcnt_rdata_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_l2_dbgcnt_rdata_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_l2_dbgcnt_wdata_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_l2_dbgcnt_wdata_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data0_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data0_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data1_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data1_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data2_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data2_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_op_data0_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_op_data0_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_op_data1_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_op_data1_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_op_data2_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_op_data2_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_data0_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_data0_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_data1_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_data1_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_data2_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_fdb_tbl_rd_op_data2_data_set(
 		a_uint32_t dev_id,
 		unsigned int value);
 

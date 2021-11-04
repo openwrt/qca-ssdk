@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -758,66 +758,6 @@ hppe_rule_ext_4_reg_ext8_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
-sw_error_t
-hppe_ipo_dbg_addr_reg_ipo_dbg_addr_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_ipo_dbg_addr_reg_ipo_dbg_addr_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_ipo_dbg_data_reg_ipo_dbg_data_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_ipo_dbg_data_reg_ipo_dbg_data_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_ipo_spare_reg_reg_spare_reg_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_ipo_spare_reg_reg_spare_reg_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_ipo_glb_hit_counter_reg_hit_count_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_ipo_glb_hit_counter_reg_hit_count_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_ipo_glb_miss_counter_reg_miss_count_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_ipo_glb_miss_counter_reg_miss_count_set(
-		a_uint32_t dev_id,
-		unsigned int value);
-
-sw_error_t
-hppe_ipo_glb_bypass_counter_reg_bypass_count_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-hppe_ipo_glb_bypass_counter_reg_bypass_count_set(
-		a_uint32_t dev_id,
-		unsigned int value);
 
 sw_error_t
 hppe_ipo_action_get(

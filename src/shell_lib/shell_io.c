@@ -751,6 +751,9 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_SRC_FILTER_CONFIG, cmd_data_check_src_filter_config, NULL),
     SW_TYPE_DEF(SW_MTU_ENTRY, (param_check_t)cmd_data_check_mtu_entry, NULL),
     SW_TYPE_DEF(SW_MRU_ENTRY, (param_check_t)cmd_data_check_mru_entry, NULL),
+#ifdef APPE
+    SW_TYPE_DEF(SW_MTU_CFG, (param_check_t)cmd_data_check_mtu_cfg, NULL),
+#endif
 #endif
 #endif
 #ifdef IN_INTERFACECONTROL
@@ -1644,7 +1647,17 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
-#if defined (APPE)
+    *(fal_mtu_ctrl_t *)val = entry;
+    return SW_OK;
+}
+#ifdef APPE
+sw_error_t
+cmd_data_check_mtu_cfg(char *cmd_str, void * val, a_uint32_t size)
+{
+    char *cmd;
+    fal_mtu_cfg_t entry;
+
+    aos_mem_zero(&entry, sizeof (fal_mtu_cfg_t));
     cmd_data_check_element("mtu_enable", "enable",
                         "usage: usage: enable/disable\n",
                         cmd_data_check_enable, (cmd,
@@ -1666,11 +1679,12 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
                         cmd_data_check_uint32, (cmd,
                         &(entry.eg_vlan_tag_flag),
                         sizeof(entry.eg_vlan_tag_flag)));
-#endif
-    *(fal_mtu_ctrl_t *)val = entry;
+
+    *(fal_mtu_cfg_t *)val = entry;
+
     return SW_OK;
 }
-
+#endif
 sw_error_t
 cmd_data_check_mru_entry(char *cmd_str, void * val, a_uint32_t size)
 {

@@ -665,6 +665,7 @@ struct sub_cmd_des_t g_port_des[] =
 	{"switchportloopback", "set", SW_API_PT_SWITCH_PORT_LOOPBACK_SET, NULL},
 #if defined (APPE)
 	{"port8023ah", "set", SW_API_PT_8023AH_SET, NULL},
+	{"mtucfg", "set", SW_API_PT_MTU_CFG_SET, NULL},
 #endif
 	#endif
 	{"Cntcfg", "set", SW_API_PT_CNT_CFG_SET, NULL},

@@ -115,4 +115,18 @@
 #define MHT_UNIPHY_MMD_TX_IPG_CHECK_DISABLE                              0x1
 
 sw_error_t
+mht_uniphy_xpcs_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id);
+
+sw_error_t
+mht_uniphy_xpcs_speed_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_speed_t speed);
+
+sw_error_t
+mht_uniphy_uqxgmii_function_reset(a_uint32_t dev_id, a_uint32_t port_id);
+
+sw_error_t
 mht_interface_uqxgmii_mode_set(a_uint32_t dev_id);
+
+sw_error_t
+mht_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_speed_t speed);

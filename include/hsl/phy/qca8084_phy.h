@@ -44,8 +44,11 @@
 #define QCA8084_PHY_MMD7_NUM                                             0x7
 #define QCA8084_PHY_MMD7_ADDR_8023AZ_EEE_2500M_CTRL                      0x3e
 #define QCA8084_PHY_MMD7_ADDR_8023AZ_EEE_2500M_PARTNER                   0x3f
+#define QCA8084_PHY_MMD7_IPG_10_11_ENABLE                                0x901d
 /*MMD7 register field*/
 #define QCA8084_PHY_8023AZ_EEE_2500BT                                    0x1
+#define QCA8084_PHY_MMD7_IPG_10_EN                                       0
+#define QCA8084_PHY_MMD7_IPG_11_EN                                       0x1
 
 void
 qca8084_phy_api_ops_init(hsl_phy_ops_t * hsl_phy_ops);
@@ -81,4 +84,12 @@ qca8084_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	a_uint32_t *status);
 
 sw_error_t
+qca8084_phy_ipg_config(a_uint32_t dev_id, a_uint32_t phy_id,
+	fal_port_speed_t speed);
+
+sw_error_t
 qca8084_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_id);
+
+sw_error_t
+qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
+	struct port_phy_status *phy_status);

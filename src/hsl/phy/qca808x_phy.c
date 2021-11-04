@@ -357,18 +357,31 @@ qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	}
 	else {
 		phy_status->link_status = A_FALSE;
-		if (qca808x_phy_2500caps(dev_id, phy_id) == A_TRUE) {
-			SW_RTN_ON_ERROR(
-				qca808x_phy_ms_random_seed_set (dev_id, phy_id));
-			/*protect logic, if MASTER_SLAVE_CONFIG_FAULT is 1,
-				then disable this logic*/
-			phy_data = qca808x_phy_reg_read(dev_id, phy_id,
-				QCA808X_1000BASET_STATUS);
-			if ((phy_data & QCA808X_MASTER_SLAVE_CONFIG_FAULT) >> 15)
-			{
+/*qca808x_end*/
+#if defined(MHT)
+		if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+		{
+			qca8084_phy_speed_fixup(dev_id, phy_id, phy_status);
+		}
+		else
+#endif
+/*qca808x_start*/
+		{
+
+			if (qca808x_phy_2500caps(dev_id, phy_id) == A_TRUE) {
 				SW_RTN_ON_ERROR(
-					qca808x_phy_ms_seed_enable (dev_id, phy_id, A_FALSE));
-				SSDK_INFO("master_slave_config_fault was set\n");
+					qca808x_phy_ms_random_seed_set (dev_id, phy_id));
+				/*protect logic, if MASTER_SLAVE_CONFIG_FAULT is 1,
+					then disable this logic*/
+				phy_data = qca808x_phy_reg_read(dev_id, phy_id,
+					QCA808X_1000BASET_STATUS);
+				if ((phy_data & QCA808X_MASTER_SLAVE_CONFIG_FAULT) >> 15)
+				{
+					SW_RTN_ON_ERROR(
+						qca808x_phy_ms_seed_enable (dev_id,phy_id,
+							A_FALSE));
+					SSDK_INFO("master_slave_config_fault was set\n");
+				}
 			}
 		}
 
@@ -412,7 +425,14 @@ qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	} else {
 		phy_status->tx_flowctrl = A_FALSE;
 	}
-
+/*qca808x_end*/
+#if defined(MHT)
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+	{
+		qca8084_phy_speed_fixup(dev_id, phy_id, phy_status);
+	}
+#endif
+/*qca808x_start*/
 	return SW_OK;
 }
 

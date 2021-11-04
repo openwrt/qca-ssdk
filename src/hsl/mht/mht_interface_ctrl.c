@@ -76,12 +76,10 @@ mht_uniphy_xpcs_modify_mmd(a_uint32_t dev_id, a_uint32_t mmd_num, a_uint32_t mmd
 	return rv;
 }
 
-static sw_error_t
-mht_uniphy_xpcs_modify_port_mmd(a_uint32_t dev_id, a_uint32_t mht_port_id,
-	a_uint32_t mmd_reg, a_uint32_t mask, a_uint32_t value)
+static a_uint32_t
+mht_uniphy_xpcs_port_to_mmd(a_uint32_t dev_id, a_uint32_t mht_port_id)
 {
 	a_uint32_t mmd_id = 0;
-	sw_error_t rv = SW_OK;
 
 	switch(mht_port_id)
 	{
@@ -101,7 +99,49 @@ mht_uniphy_xpcs_modify_port_mmd(a_uint32_t dev_id, a_uint32_t mht_port_id,
 			return SW_NOT_SUPPORTED;
 	}
 
+	return mmd_id;
+}
+
+static sw_error_t
+mht_uniphy_xpcs_modify_port_mmd(a_uint32_t dev_id, a_uint32_t mht_port_id,
+	a_uint32_t mmd_reg, a_uint32_t mask, a_uint32_t value)
+{
+	a_uint32_t mmd_id = 0;
+	sw_error_t rv = SW_OK;
+
+	mmd_id = mht_uniphy_xpcs_port_to_mmd(dev_id, mht_port_id);
+
 	rv = mht_uniphy_xpcs_modify_mmd(dev_id, mmd_id, mmd_reg, mask, value);
+
+	return rv;
+}
+
+sw_error_t
+mht_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t mht_port_id,
+	fal_port_speed_t speed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t clk_rate = 0;
+
+	switch(speed)
+	{
+		case FAL_SPEED_2500:
+			clk_rate = UQXGMII_SPEED_2500M_CLK;
+			break;
+		case FAL_SPEED_1000:
+			clk_rate = UQXGMII_SPEED_1000M_CLK;
+			break;
+		case FAL_SPEED_100:
+			clk_rate = UQXGMII_SPEED_100M_CLK;
+			break;
+		case FAL_SPEED_10:
+			clk_rate = UQXGMII_SPEED_10M_CLK;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+
+	rv = ssdk_mht_port_clk_rate_set(dev_id, mht_port_id, clk_rate);
 
 	return rv;
 }
@@ -218,6 +258,102 @@ mht_uniphy_xpcs_soft_reset(a_uint32_t dev_id)
 	}
 
 	return rv;
+}
+
+sw_error_t
+mht_uniphy_xpcs_speed_set(a_uint32_t dev_id, a_uint32_t mht_port_id,
+	fal_port_speed_t speed)
+{
+	a_uint32_t xpcs_speed = 0;
+	sw_error_t rv = SW_OK;
+
+	switch(speed)
+	{
+		case FAL_SPEED_2500:
+			xpcs_speed = MHT_UNIPHY_MMD_XPC_SPEED_2500;
+			break;
+		case FAL_SPEED_1000:
+			xpcs_speed = MHT_UNIPHY_MMD_XPC_SPEED_1000;
+			break;
+		case FAL_SPEED_100:
+			xpcs_speed = MHT_UNIPHY_MMD_XPC_SPEED_100;
+			break;
+		case FAL_SPEED_10:
+			xpcs_speed = MHT_UNIPHY_MMD_XPC_SPEED_10;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+	rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
+		MHT_UNIPHY_MMD_MII_CTRL, MHT_UNIPHY_MMD_XPC_SPEED_MASK,
+		xpcs_speed);
+
+	return rv;
+}
+
+sw_error_t
+mht_uniphy_uqxgmii_function_reset(a_uint32_t dev_id, a_uint32_t mht_port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t uniphy_addr = 0;
+
+	rv = qca_mht_serdes_addr_get(dev_id, MHT_UNIPHY_SGMII_1, &uniphy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_QP_USXG_RESET, BIT(mht_port_id-1), 0);
+	SW_RTN_ON_ERROR (rv);
+	mdelay(1);
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_QP_USXG_RESET, BIT(mht_port_id-1),
+		BIT(mht_port_id-1));
+	SW_RTN_ON_ERROR (rv);
+	if(mht_port_id == SSDK_PHYSICAL_PORT1)
+	{
+		rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
+			MHT_UNIPHY_MMD_MII_DIG_CTRL,
+			0x7ff, MHT_UNIPHY_MMD3_USXG_FIFO_INIT);
+		SW_RTN_ON_ERROR (rv);
+	}
+	else
+	{
+		rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
+			MHT_UNIPHY_MMD_MII_DIG_CTRL,
+			0x3f, MHT_UNIPHY_MMD_USXG_FIFO_INIT);
+		SW_RTN_ON_ERROR (rv);
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+mht_uniphy_xpcs_autoneg_restart(a_uint32_t dev_id, a_uint32_t mht_port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t retries = 500, uniphy_data = 0, mmd_id = 0;
+
+	mmd_id = mht_uniphy_xpcs_port_to_mmd(dev_id, mht_port_id);
+	rv = mht_uniphy_xpcs_modify_mmd(dev_id, mmd_id, MHT_UNIPHY_MMD_MII_CTRL,
+		MHT_UNIPHY_MMD_MII_AN_RESTART, MHT_UNIPHY_MMD_MII_AN_RESTART);
+	SW_RTN_ON_ERROR (rv);
+	mdelay(1);
+	uniphy_data = mht_uniphy_xpcs_mmd_read(dev_id,mmd_id,
+		MHT_UNIPHY_MMD_MII_ERR_SEL);
+	PHY_RTN_ON_READ_ERROR(uniphy_data);
+	while(!(uniphy_data & MHT_UNIPHY_MMD_MII_AN_COMPLETE_INT))
+	{
+		mdelay(1);
+		if (retries-- == 0)
+		{
+			SSDK_ERROR ("xpcs uniphy autoneg restart timeout\n");
+			return SW_TIMEOUT;
+		}
+		uniphy_data = mht_uniphy_xpcs_mmd_read(dev_id, mmd_id,
+			MHT_UNIPHY_MMD_MII_ERR_SEL);
+		PHY_RTN_ON_READ_ERROR(uniphy_data);
+	}
+
+	return SW_OK;
 }
 
 static sw_error_t

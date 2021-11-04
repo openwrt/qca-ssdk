@@ -21,6 +21,28 @@
 #include "qca8084_phy.h"
 #include "mht_sec_ctrl.h"
 #include "mht_interface_ctrl.h"
+#include "ssdk_mht_clk.h"
+
+sw_error_t
+qca8084_phy_ipg_config(a_uint32_t dev_id, a_uint32_t phy_id,
+	fal_port_speed_t speed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint16_t phy_data = 0;
+
+	phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+		QCA8084_PHY_MMD7_IPG_10_11_ENABLE);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	phy_data &= ~QCA8084_PHY_MMD7_IPG_11_EN;
+	if(speed == FAL_SPEED_1000)
+		phy_data |= QCA8084_PHY_MMD7_IPG_11_EN;
+
+	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+		QCA8084_PHY_MMD7_IPG_10_11_ENABLE, phy_data);
+
+	return rv;
+}
 
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
@@ -238,6 +260,77 @@ qca8084_phy_function_reset(a_uint32_t dev_id, a_uint32_t phy_id,
 	SW_RTN_ON_ERROR(rv);
 
 	return rv;
+}
+
+static sw_error_t
+_qca8084_phy_speed_fixup (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t link, fal_port_speed_t new_speed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mht_port_id = 0;
+	a_bool_t port_clock_en = A_FALSE;
+
+	rv = qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	/*Restart the auto-neg of uniphy*/
+	SSDK_INFO("Restart the auto-neg of uniphy\n");
+	rv = mht_uniphy_xpcs_autoneg_restart(dev_id, mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+	/*set gmii+ clock to uniphy1 and ethphy*/
+	SSDK_INFO("set gmii,xgmii clock to uniphy and gmii to ethphy\n");
+	rv = mht_port_speed_clock_set(dev_id, mht_port_id, new_speed);
+	SW_RTN_ON_ERROR(rv);
+	/*set xpcs speed*/
+	SSDK_INFO("set xpcs speed\n");
+	rv = mht_uniphy_xpcs_speed_set(dev_id, mht_port_id, new_speed);
+	SW_RTN_ON_ERROR(rv);
+
+	/*GMII/XGMII clock and ETHPHY GMII clock enable/disable*/
+	SSDK_INFO("GMII/XGMII clock and ETHPHY GMII clock enable/disable\n");
+	if(link)
+		port_clock_en = A_TRUE;
+	rv = ssdk_mht_port_clk_en_set(dev_id, mht_port_id,
+		MHT_CLK_TYPE_UNIPHY|MHT_CLK_TYPE_EPHY, port_clock_en);
+	SW_RTN_ON_ERROR(rv);
+	/*GMII/XGMII interface and ETHPHY GMII interface reset and release*/
+	SSDK_INFO("UNIPHY GMII/XGMII interface and ETHPHY GMII interface reset and release\n");
+	rv = ssdk_mht_port_clk_reset(dev_id, mht_port_id, MHT_CLK_TYPE_UNIPHY|MHT_CLK_TYPE_EPHY);
+	SW_RTN_ON_ERROR(rv);
+	/*ipg_tune and xgmii2gmii reset for uniphy and ETHPHY, function reset*/
+	SSDK_INFO("ipg_tune and xgmii2gmii reset for uniphy and ETHPHY, function reset\n");
+	rv = mht_uniphy_uqxgmii_function_reset(dev_id, mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+	/*do ethphy function reset*/
+	SSDK_INFO("do ethphy function reset\n");
+	rv = qca8084_phy_function_reset(dev_id, phy_addr, PHY_FIFO_RESET);
+	SW_RTN_ON_ERROR(rv);
+	/*change IPG from 10 to 11 for 1G speed*/
+	rv = qca8084_phy_ipg_config(dev_id, phy_addr, new_speed);
+
+	return rv;
+}
+
+sw_error_t
+qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
+	struct port_phy_status *phy_status)
+{
+	a_uint32_t port_id = 0;
+	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
+
+	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+	if(phy_info->port_link_status[port_id-1] != phy_status->link_status)
+	{
+		SSDK_INFO("link status is from %s to %s, speed is:%d\n",
+			phy_info->port_link_status[port_id-1] ? "link up" :"link down",
+			phy_status->link_status ? "link up" : "link down",
+			phy_status->speed);
+		_qca8084_phy_speed_fixup(dev_id, phy_addr, phy_status->link_status,
+			phy_status->speed);
+		phy_info->port_link_status[port_id-1] = phy_status->link_status;
+	}
+
+	return SW_OK;
 }
 
 void

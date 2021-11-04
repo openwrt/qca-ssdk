@@ -150,6 +150,11 @@ sw_error_t phy_api_ops_init(phy_type_t phy_type)
 	return SW_OK;
 }
 /*qca808x_end*/
+phy_info_t *hsl_phy_info_get(a_uint32_t dev_id)
+{
+	return phy_info[dev_id];
+}
+
 a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	a_bool_t sfp_port = 0;
@@ -400,6 +405,7 @@ int qca_ssdk_phy_info_init(a_uint32_t dev_id)
 	for (j = SSDK_PHYSICAL_PORT0; j < SW_MAX_NR_PORT; j ++)
 	{
 		phy_info[dev_id]->phy_type[j] = MAX_PHY_CHIP;
+		phy_info[dev_id]->port_link_status[j] = PORT_LINK_DOWN;
 		if(j == SSDK_PHYSICAL_PORT0)
 		{
 			phy_info[dev_id]->phy_address[j] = INVALID_PHY_ADDR;

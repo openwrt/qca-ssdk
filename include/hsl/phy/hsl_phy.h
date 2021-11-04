@@ -555,6 +555,7 @@ typedef struct {
 	a_bool_t phy_combo[SW_MAX_NR_PORT];
 	a_uint32_t phy_reset_gpio[SW_MAX_NR_PORT];
 	phy_dac_t phy_dac[SW_MAX_NR_PORT];
+	a_bool_t port_link_status[SW_MAX_NR_PORT];
 } phy_info_t;
 /*qca808x_end*/
 #define MALIBU5PORT_PHY         0x004DD0B1
@@ -733,6 +734,8 @@ hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
+
+phy_info_t *hsl_phy_info_get(a_uint32_t dev_id);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

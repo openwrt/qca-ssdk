@@ -2686,6 +2686,12 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 	sw_error_t rv = SW_OK;
 	a_uint32_t mode_tmp;
 
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_EXCL_CPU))
+	{
+		SSDK_WARN ("port %d need not to configure mux and mac type\n",
+			port_id);
+		return SW_OK;
+	}
 	/*init the port interface mode before set it according to three mac modes*/
 	rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id, PORT_INTERFACE_MODE_MAX);
 	SW_RTN_ON_ERROR(rv);

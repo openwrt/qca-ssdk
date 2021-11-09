@@ -5537,7 +5537,7 @@ _adpt_hppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
 	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
 	union port_eg_vlan_u port_eg_vlan;
-#if defined(APPE)
+#if defined(APPE) && defined(IN_TUNNEL)
 	union tl_port_vp_tbl_u tl_port_vp_tbl;
 #endif
 	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
@@ -5581,7 +5581,7 @@ _adpt_hppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 		SW_RTN_ON_ERROR(rv);
 	}
 
-#if defined(APPE)
+#if defined(APPE) && defined(IN_TUNNEL)
 	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
@@ -5605,7 +5605,7 @@ _adpt_hppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
 	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
 	union port_eg_vlan_u port_eg_vlan;
-#if defined(APPE)
+#if defined(APPE) && defined(IN_TUNNEL)
 	union tl_port_vp_tbl_u tl_port_vp_tbl;
 #endif
 	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
@@ -5640,7 +5640,7 @@ _adpt_hppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 		cnt_cfg->uc_tx_cnt_en = mru_mtu_ctrl_tbl.bf.tx_cnt_en;
 	}
 
-#if defined(APPE)
+#if defined(APPE) && defined(IN_TUNNEL)
 	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));

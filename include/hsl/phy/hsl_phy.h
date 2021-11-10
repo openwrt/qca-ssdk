@@ -678,7 +678,8 @@ sw_error_t
 hsl_port_phy_serdes_reset(a_uint32_t dev_id);
 
 sw_error_t
-hsl_port_phy_mode_set(a_uint32_t dev_id, fal_port_interface_mode_t mode);
+hsl_port_phy_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t mode);
 phy_type_t hsl_phy_type_get(a_uint32_t dev_id, a_uint32_t port_id);
 
 a_uint32_t

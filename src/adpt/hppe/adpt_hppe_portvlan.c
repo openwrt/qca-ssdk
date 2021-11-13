@@ -762,12 +762,6 @@ adpt_hppe_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid)
 	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
 	SW_RTN_ON_ERROR(rtn);
 
-	rtn = hppe_edma_vlan_tpid_reg_get(dev_id, &edma_tpid);
-	SW_RTN_ON_ERROR(rtn);
-
-	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
-	SW_RTN_ON_ERROR(rtn);
-
 	if (FAL_FLG_TST(tpid->mask, FAL_TPID_CTAG_EN)) {
 		edma_tpid.bf.ctag_tpid = tpid->ctpid;
 		ppe_tpid.bf.ctag_tpid = tpid->ctpid;

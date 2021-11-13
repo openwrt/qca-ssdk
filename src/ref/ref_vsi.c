@@ -260,10 +260,18 @@ static sw_error_t _ppe_port_vsi_mapping_update(a_uint32_t dev_id,
 	port_value = FAL_PORT_ID_VALUE(port_id);
 	vport_value = port_value - SSDK_MIN_VIRTUAL_PORT_ID;
 
-	if(ref_vsi_mapping[dev_id][vsi_id].valid == 0)
+	if(vsi_id != FAL_VSI_INVALID)
 	{
-		SSDK_ERROR("port 0x%x vsi %d entry not found\n", port_id, vsi_id);
-		return SW_NOT_FOUND;
+		if(vsi_id > PPE_VSI_MAX)
+		{
+			SSDK_ERROR("VSI %d is not supported\n", vsi_id);
+			return SW_OUT_OF_RANGE;
+		}
+		if(ref_vsi_mapping[dev_id][vsi_id].valid == 0)
+		{
+			SSDK_ERROR("port 0x%x vsi %d entry not found\n", port_id, vsi_id);
+			return SW_NOT_FOUND;
+		}
 	}
 
 	/*check port previous vsi*/
@@ -301,18 +309,22 @@ static sw_error_t _ppe_port_vsi_mapping_update(a_uint32_t dev_id,
 	}
 	SSDK_DEBUG("port 0x%x, vsi %d set\n", port_id, vsi_id);
 	/*port based vsi update*/
-	rv = _ppe_vsi_member_update(dev_id, vsi_id, port_id, PPE_VSI_ADD);
-	if( rv != SW_OK )
-		return rv;
-	if(FAL_IS_VPORT(port_id))
+	if(vsi_id <= FAL_VSI_MAX)
 	{
-		ref_vsi_mapping[dev_id][vsi_id].vport_bitmap[vport_value/32] |=
-			1 << (vport_value%32);
+		rv = _ppe_vsi_member_update(dev_id, vsi_id, port_id, PPE_VSI_ADD);
+		if( rv != SW_OK )
+			return rv;
+		if(FAL_IS_VPORT(port_id))
+		{
+			ref_vsi_mapping[dev_id][vsi_id].vport_bitmap[vport_value/32] |=
+				1 << (vport_value%32);
+		}
+		else
+		{
+			ref_vsi_mapping[dev_id][vsi_id].pport_bitmap |= 1 << port_value;
+		}
 	}
-	else
-	{
-		ref_vsi_mapping[dev_id][vsi_id].pport_bitmap |= 1 << port_value;
-	}
+
 	return SW_OK;
 }
 
@@ -416,7 +428,7 @@ ppe_port_vsi_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vsi_id)
 	if(!(FAL_IS_PPORT(port_id)) && !(FAL_IS_VPORT(port_id)))
 		return SW_BAD_VALUE;
 
-	if(vsi_id > PPE_VSI_MAX){
+	if(vsi_id > PPE_VSI_MAX && vsi_id != FAL_VSI_INVALID){
 		SSDK_ERROR("invalid VSI port %d, vsi %d\n", port_id, vsi_id);
 		return SW_BAD_VALUE;
 	}

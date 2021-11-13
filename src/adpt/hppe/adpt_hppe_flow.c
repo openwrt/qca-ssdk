@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2019, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -240,7 +240,7 @@ adpt_hppe_flow_entry_host_op_add(
 	type = flow_entry->entry_type;
 	if ((type & FAL_FLOW_IP4_5TUPLE_ADDR) == FAL_FLOW_IP4_5TUPLE_ADDR) {
 		union in_flow_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV4;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -287,7 +287,7 @@ adpt_hppe_flow_entry_host_op_add(
 		rv = hppe_flow_entry_host_op_ipv4_5tuple_add(dev_id, (a_uint32_t)add_mode, &flow_entry->entry_id, &entry);
 	} else if ((type & FAL_FLOW_IP6_5TUPLE_ADDR) == FAL_FLOW_IP6_5TUPLE_ADDR) {
 		union in_flow_ipv6_5tuple_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV6;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -338,7 +338,7 @@ adpt_hppe_flow_entry_host_op_add(
 		rv = hppe_flow_entry_host_op_ipv6_5tuple_add(dev_id, (a_uint32_t)add_mode, &flow_entry->entry_id, &entry);
 	} else if ((type & FAL_FLOW_IP4_3TUPLE_ADDR) == FAL_FLOW_IP4_3TUPLE_ADDR) {
 		union in_flow_3tuple_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV4;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -381,7 +381,7 @@ adpt_hppe_flow_entry_host_op_add(
 		rv = hppe_flow_entry_host_op_ipv4_3tuple_add(dev_id, (a_uint32_t)add_mode, &flow_entry->entry_id, &entry);
 	} else if ((type & FAL_FLOW_IP6_3TUPLE_ADDR) == FAL_FLOW_IP6_3TUPLE_ADDR) {
 		union in_flow_ipv6_3tuple_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV6;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -460,7 +460,6 @@ adpt_hppe_flow_entry_host_op_get(
 	type = flow_entry->entry_type;
 	if ((type & FAL_FLOW_IP4_5TUPLE_ADDR) == FAL_FLOW_IP4_5TUPLE_ADDR) {
 		union in_flow_tbl_u entry;
-		entry.bf0.valid= 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV4;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -479,6 +478,7 @@ adpt_hppe_flow_entry_host_op_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf0.next_hop1;
 			flow_entry->snat_srcport = entry.bf0.l4_port1;
@@ -515,7 +515,6 @@ adpt_hppe_flow_entry_host_op_get(
 #endif
 	} else if ((type & FAL_FLOW_IP6_5TUPLE_ADDR) == FAL_FLOW_IP6_5TUPLE_ADDR) {
 		union in_flow_ipv6_5tuple_tbl_u entry;
-		entry.bf0.valid= 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV6;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -540,6 +539,7 @@ adpt_hppe_flow_entry_host_op_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf0.next_hop1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_DNAT) {
@@ -580,7 +580,6 @@ adpt_hppe_flow_entry_host_op_get(
 #endif
 	} else if ((type & FAL_FLOW_IP4_3TUPLE_ADDR) == FAL_FLOW_IP4_3TUPLE_ADDR) {
 		union in_flow_3tuple_tbl_u entry;
-		entry.bf0.valid= 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV4;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -597,6 +596,7 @@ adpt_hppe_flow_entry_host_op_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf0.next_hop1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_DNAT) {
@@ -629,7 +629,6 @@ adpt_hppe_flow_entry_host_op_get(
 #endif
 	} else if ((type & FAL_FLOW_IP6_3TUPLE_ADDR) == FAL_FLOW_IP6_3TUPLE_ADDR) {
 		union in_flow_ipv6_3tuple_tbl_u entry;
-		entry.bf0.valid= 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV6;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -652,6 +651,7 @@ adpt_hppe_flow_entry_host_op_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf1.next_hop1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_DNAT) {
@@ -1015,6 +1015,7 @@ adpt_hppe_flow_entry_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf0.next_hop1;
 			flow_entry->snat_srcport = entry.bf0.l4_port1;
@@ -1082,6 +1083,7 @@ adpt_hppe_flow_entry_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf0.next_hop1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_DNAT) {
@@ -1146,6 +1148,7 @@ adpt_hppe_flow_entry_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf0.next_hop1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_DNAT) {
@@ -1207,6 +1210,7 @@ adpt_hppe_flow_entry_get(
 		flow_entry->src_intf_valid = entry.bf0.src_l3_if_valid;
 		flow_entry->src_intf_index = entry.bf0.src_l3_if;
 		flow_entry->fwd_type = entry.bf0.fwd_type;
+		flow_entry->invalid = !entry.bf0.valid;
 		if (flow_entry->fwd_type == FAL_FLOW_SNAT) {
 			flow_entry->snat_nexthop = entry.bf1.next_hop1;
 		} else if (flow_entry->fwd_type == FAL_FLOW_DNAT) {
@@ -1715,7 +1719,7 @@ adpt_hppe_flow_entry_add(
 	type = flow_entry->entry_type;
 	if ((type & FAL_FLOW_IP4_5TUPLE_ADDR) == FAL_FLOW_IP4_5TUPLE_ADDR) {
 		union in_flow_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV4;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -1762,7 +1766,7 @@ adpt_hppe_flow_entry_add(
 		rv = hppe_flow_ipv4_5tuple_add(dev_id, (a_uint32_t)add_mode, &flow_entry->entry_id, &entry);
 	} else if ((type & FAL_FLOW_IP6_5TUPLE_ADDR) == FAL_FLOW_IP6_5TUPLE_ADDR) {
 		union in_flow_ipv6_5tuple_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV6;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -1813,7 +1817,7 @@ adpt_hppe_flow_entry_add(
 		rv = hppe_flow_ipv6_5tuple_add(dev_id, (a_uint32_t)add_mode, &flow_entry->entry_id, &entry);
 	} else if ((type & FAL_FLOW_IP4_3TUPLE_ADDR) == FAL_FLOW_IP4_3TUPLE_ADDR) {
 		union in_flow_3tuple_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV4;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -1856,7 +1860,7 @@ adpt_hppe_flow_entry_add(
 		rv = hppe_flow_ipv4_3tuple_add(dev_id, (a_uint32_t)add_mode, &flow_entry->entry_id, &entry);
 	} else if ((type & FAL_FLOW_IP6_3TUPLE_ADDR) == FAL_FLOW_IP6_3TUPLE_ADDR) {
 		union in_flow_ipv6_3tuple_tbl_u entry;
-		entry.bf0.valid= 1;
+		entry.bf0.valid= flow_entry->invalid ? 0 : 1;
 		entry.bf0.entry_type = FLOW_ENTRY_TYPE_IPV6;
 		entry.bf0.host_addr_index_type = flow_entry->host_addr_type;
 		entry.bf0.host_addr_index = flow_entry->host_addr_index;
@@ -1917,6 +1921,127 @@ adpt_hppe_flow_entry_add(
 #endif
 		rv = hppe_eg_flow_tree_map_tbl_set(dev_id, flow_entry->entry_id, &eg_treemap);
 	}
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_flow_counter_get(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_entry_counter_t *flow_counter)
+{
+	sw_error_t rv = SW_OK;
+	union in_flow_cnt_tbl_u flow_cnt;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(flow_counter);
+
+	if (flow_index >= IN_FLOW_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	aos_mem_zero(&flow_cnt, sizeof(flow_cnt));
+
+	rv = hppe_in_flow_cnt_tbl_get(dev_id, flow_index, &flow_cnt);
+	SW_RTN_ON_ERROR(rv);
+
+	flow_counter->matched_pkts = flow_cnt.bf.hit_pkt_counter;
+	flow_counter->matched_bytes = flow_cnt.bf.hit_byte_counter_0 |
+		(a_uint64_t)flow_cnt.bf.hit_byte_counter_1 << SW_FIELD_OFFSET_IN_WORD(
+				IN_FLOW_CNT_TBL_HIT_BYTE_COUNTER_OFFSET);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_flow_entry_en_set(a_uint32_t dev_id, a_uint32_t flow_index, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	union in_flow_tbl_u entry;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (flow_index >= IN_FLOW_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	aos_mem_zero(&entry, sizeof(entry));
+
+	rv = hppe_in_flow_tbl_get(dev_id, flow_index, &entry);
+	SW_RTN_ON_ERROR(rv);
+
+	entry.bf0.valid = enable;
+
+	rv = hppe_in_flow_tbl_set(dev_id, flow_index, &entry);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_flow_entry_en_get(a_uint32_t dev_id, a_uint32_t flow_index, a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+	union in_flow_tbl_u entry;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(enable);
+
+	if (flow_index >= IN_FLOW_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	aos_mem_zero(&entry, sizeof(entry));
+
+	rv = hppe_in_flow_tbl_get(dev_id, flow_index, &entry);
+	SW_RTN_ON_ERROR(rv);
+
+	*enable = entry.bf0.valid;
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_flow_qos_set(a_uint32_t dev_id, a_uint32_t flow_index, fal_flow_qos_t *flow_qos)
+{
+	sw_error_t rv = SW_OK;
+	union eg_flow_tree_map_tbl_u eg_treemap;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(flow_qos);
+
+	if (flow_index >= EG_FLOW_TREE_MAP_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	aos_mem_zero(&eg_treemap, sizeof(eg_treemap));
+
+	rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_index, &eg_treemap);
+	SW_RTN_ON_ERROR(rv);
+
+	eg_treemap.bf.tree_id = flow_qos->tree_id;
+#if defined(APPE)
+	eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
+	eg_treemap.bf.wifi_qos = flow_qos->wifi_qos;
+#endif
+
+	rv = hppe_eg_flow_tree_map_tbl_set(dev_id, flow_index, &eg_treemap);
+	return rv;
+}
+
+sw_error_t
+adpt_hppe_flow_qos_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_flow_qos_t *flow_qos)
+{
+	sw_error_t rv = SW_OK;
+	union eg_flow_tree_map_tbl_u eg_treemap;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(flow_qos);
+
+	if (flow_index >= EG_FLOW_TREE_MAP_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	aos_mem_zero(&eg_treemap, sizeof(eg_treemap));
+
+	rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_index, &eg_treemap);
+	SW_RTN_ON_ERROR(rv);
+
+	flow_qos->tree_id = eg_treemap.bf.tree_id;
+#if defined(APPE)
+	flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
+	flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
+#endif
+
 	return rv;
 }
 
@@ -2088,6 +2213,11 @@ static void adpt_hppe_flow_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt
 	p_adpt_api->adpt_flow_global_cfg_get = NULL;
 	p_adpt_api->adpt_flow_global_cfg_set = NULL;
 	p_adpt_api->adpt_flow_entry_next = NULL;
+	p_adpt_api->adpt_flow_counter_get = NULL;
+	p_adpt_api->adpt_flow_entry_en_set = NULL;
+	p_adpt_api->adpt_flow_entry_en_get = NULL;
+	p_adpt_api->adpt_flow_qos_set = NULL;
+	p_adpt_api->adpt_flow_qos_get = NULL;
 
 	return;
 }
@@ -2130,6 +2260,16 @@ sw_error_t adpt_hppe_flow_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_flow_global_cfg_set = adpt_hppe_flow_global_cfg_set;
 	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_NEXT))
 		p_adpt_api->adpt_flow_entry_next = adpt_hppe_flow_entry_next;
+	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_COUNTER_GET))
+		p_adpt_api->adpt_flow_counter_get = adpt_hppe_flow_counter_get;
+	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_EN_SET))
+		p_adpt_api->adpt_flow_entry_en_set = adpt_hppe_flow_entry_en_set;
+	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_EN_GET))
+		p_adpt_api->adpt_flow_entry_en_get = adpt_hppe_flow_entry_en_get;
+	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_QOS_SET))
+		p_adpt_api->adpt_flow_qos_set = adpt_hppe_flow_qos_set;
+	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_QOS_GET))
+		p_adpt_api->adpt_flow_qos_get = adpt_hppe_flow_qos_get;
 #endif
 	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_CTRL_GET))
 		p_adpt_api->adpt_flow_ctrl_get = adpt_hppe_flow_ctrl_get;

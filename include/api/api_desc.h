@@ -3788,6 +3788,46 @@ extern "C" {
     SW_PARAM_DEF(SW_API_FLOWENTRY_NEXT, SW_FLOW_ENTRY, \
 		    sizeof(fal_flow_entry_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Flowentry"),
 
+#define SW_API_FLOW_COUNTER_GET_DESC \
+    SW_PARAM_DEF(SW_API_FLOW_COUNTER_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_FLOW_COUNTER_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "flow index"),  \
+    SW_PARAM_DEF(SW_API_FLOW_COUNTER_GET, SW_ENTRY_COUNTER, \
+		    sizeof(fal_entry_counter_t), SW_PARAM_PTR|SW_PARAM_OUT, "Flow entry counter"),
+
+#define SW_API_FLOW_ENTRY_EN_SET_DESC \
+    SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "flow index"),  \
+    SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_SET, SW_ENABLE, \
+		    sizeof(a_bool_t), SW_PARAM_IN, "Flow entry enable"),
+
+#define SW_API_FLOW_ENTRY_EN_GET_DESC \
+    SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "flow index"),  \
+    SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_GET, SW_ENABLE, \
+		    sizeof(a_bool_t), SW_PARAM_PTR|SW_PARAM_OUT, "Flow entry enable"),
+
+#define SW_API_FLOW_QOS_SET_DESC \
+    SW_PARAM_DEF(SW_API_FLOW_QOS_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_FLOW_QOS_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "flow index"),  \
+    SW_PARAM_DEF(SW_API_FLOW_QOS_SET, SW_FLOW_QOS, \
+		    sizeof(fal_flow_qos_t), SW_PARAM_PTR|SW_PARAM_IN, "Flow qos"),
+
+#define SW_API_FLOW_QOS_GET_DESC \
+    SW_PARAM_DEF(SW_API_FLOW_QOS_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_FLOW_QOS_GET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "flow index"),  \
+    SW_PARAM_DEF(SW_API_FLOW_QOS_GET, SW_FLOW_QOS, \
+		    sizeof(fal_flow_qos_t), SW_PARAM_PTR|SW_PARAM_OUT, "Flow qos"),
+
 #define SW_API_NAT_ADD_DESC \
     SW_PARAM_DEF(SW_API_NAT_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),   \
     SW_PARAM_DEF(SW_API_NAT_ADD, SW_NATENTRY, \

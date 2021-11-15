@@ -321,6 +321,7 @@ ifneq (, $(filter APPE HPPE CPPE ALL_CHIP, $(CHIP_TYPE)))
 	IN_SHAPER=TRUE
 	IN_POLICER=TRUE
 	IN_UNIPHY=TRUE
+	IN_NETLINK=TRUE
 endif
 
 ifneq (, $(filter MP, $(CHIP_TYPE)))

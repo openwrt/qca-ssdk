@@ -383,6 +383,8 @@ a_uint32_t
 qca_hppe_port_mac_type_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t port_type);
 a_uint32_t
 ssdk_ifname_to_port(a_uint32_t dev_id, const char *ifname);
+char *
+ssdk_port_to_ifname(a_uint32_t dev_id, a_uint32_t port_id);
 
 void ssdk_portvlan_init(a_uint32_t dev_id);
 sw_error_t ssdk_dess_trunk_init(a_uint32_t dev_id, a_uint32_t wan_bitmap);
@@ -398,6 +400,8 @@ sw_error_t qca_switch_init(a_uint32_t dev_id);
 void qca_mac_sw_sync_work_stop(struct qca_phy_priv *priv);
 void qca_mac_sw_sync_work_resume(struct qca_phy_priv *priv);
 int qca_mac_sw_sync_work_start(struct qca_phy_priv *priv);
+int qca_fdb_sw_sync_work_start(struct qca_phy_priv *priv, fal_pbmp_t port_map);
+void qca_fdb_sw_sync_work_stop(struct qca_phy_priv *priv, fal_pbmp_t port_map);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

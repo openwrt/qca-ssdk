@@ -714,7 +714,11 @@ union l0_flow_status_tbl_u {
 /*[table] RING_Q_MAP_TBL*/
 #define RING_Q_MAP_TBL
 #define RING_Q_MAP_TBL_ADDRESS 0x2a000
+#if defined(APPE)
+#define RING_Q_MAP_TBL_NUM     24
+#else
 #define RING_Q_MAP_TBL_NUM     16
+#endif
 #define RING_Q_MAP_TBL_INC     0x40
 #define RING_Q_MAP_TBL_TYPE    REG_TYPE_RW
 #define RING_Q_MAP_TBL_DEFAULT 0x0

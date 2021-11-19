@@ -1,16 +1,20 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /*qca808x_start*/
 #include "sw.h"
 #include "ssdk_init.h"
@@ -222,6 +226,22 @@ qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	mdiobus_write(bus, 0x10 | r2, r1, lo);
 	mdiobus_write(bus, 0x10 | r2, r1 + 2, hi);
 	mutex_unlock(&switch_mdio_lock);
+}
+
+void
+qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val)
+{
+	a_uint32_t new_val = 0, org_val = 0;
+
+	org_val = qca_mht_mii_read(dev_id, reg);
+
+	new_val = org_val & ~mask;
+	new_val |= val & mask;
+
+	if (new_val != org_val)
+		qca_mht_mii_write(dev_id, reg, new_val);
+
+	return;
 }
 
 static inline void

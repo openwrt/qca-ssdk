@@ -34,7 +34,7 @@ ifneq (,$(filter APPE, $(SUPPORT_CHIP)))
 endif
 
 ifneq (,$(filter MHT, $(SUPPORT_CHIP)))
-	SRC_LIST += ssdk_mht.c
+	SRC_LIST += ssdk_mht.c ssdk_mht_clk.c
 endif
 
 ifeq (TRUE, $(SWCONFIG))

@@ -44,6 +44,42 @@ qca8084_phy_ipg_config(a_uint32_t dev_id, a_uint32_t phy_id,
 	return rv;
 }
 
+static sw_error_t
+qca8084_phy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_interface_mode_t interface_mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr_tmp = 0;
+	fal_mac_config_t config = {0};
+
+	if(interface_mode == PHY_SGMII_BASET)
+		config.mac_mode = FAL_MAC_MODE_SGMII;
+	else if(interface_mode == PORT_SGMII_PLUS)
+		config.mac_mode = FAL_MAC_MODE_SGMII_PLUS;
+	else
+		return SW_NOT_SUPPORTED;
+	config.config.sgmii.clock_mode = FAL_INTERFACE_CLOCK_PHY_MODE;
+	config.config.sgmii.auto_neg = A_TRUE;
+
+	rv = qca_mht_ephy_addr_get(dev_id, SSDK_PHYSICAL_PORT4, &phy_addr_tmp);
+	SW_RTN_ON_ERROR (rv);
+	if(phy_addr_tmp != phy_addr)
+	{
+		SSDK_ERROR("phy_addr:0x%x is not matched with port4 phy addr:0x%x\n",
+			phy_addr, phy_addr_tmp);
+		return SW_NOT_SUPPORTED;
+	}
+
+	rv = mht_interface_sgmii_mode_set(dev_id, MHT_UNIPHY_SGMII_0,
+		SSDK_PHYSICAL_PORT4, &config);
+	SW_RTN_ON_ERROR (rv);
+	/*port4 software reset*/
+	SSDK_INFO("port 4 software reset\n");
+	rv = qca808x_phy_reset(dev_id, phy_addr);
+
+	return rv;
+}
+
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 		fal_port_interface_mode_t interface_mode)
@@ -57,8 +93,15 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 			rv = mht_interface_uqxgmii_mode_set(dev_id);
 			SW_RTN_ON_ERROR (rv);
 			break;
-		case PORT_UQXGMII_3CHANNELS:
+		case PHY_SGMII_BASET:
+		case PORT_SGMII_PLUS:
+			SSDK_INFO("configure manhattan work mode:PHY_SGMII_USXGMII_MODE,"
+			"interface_mode:%d\n", interface_mode);
+			/*need to configure work mode as MHT_PHY_SGMII_USXGMII_MODE*/
 			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);
+			SW_RTN_ON_ERROR (rv);
+			rv = qca8084_phy_sgmii_mode_set(dev_id, phy_id, interface_mode);
+			SW_RTN_ON_ERROR (rv);
 			break;
 		default:
 			rv = SW_NOT_SUPPORTED;

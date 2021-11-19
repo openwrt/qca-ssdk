@@ -24,6 +24,7 @@
 #include "qca808x_phy.h"
 #include "qca8084_phy.h"
 #include "ssdk_mht_clk.h"
+#include "ssdk_clk.h"
 
 static a_uint16_t
 mht_uniphy_xpcs_mmd_read(a_uint32_t dev_id, a_uint16_t mmd_num,
@@ -301,11 +302,11 @@ mht_uniphy_uqxgmii_function_reset(a_uint32_t dev_id, a_uint32_t mht_port_id)
 	SW_RTN_ON_ERROR (rv);
 
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
-		MHT_UNIPHY_MMD1_QP_USXG_RESET, BIT(mht_port_id-1), 0);
+		MHT_UNIPHY_MMD1_USXGMII_RESET, BIT(mht_port_id-1), 0);
 	SW_RTN_ON_ERROR (rv);
 	mdelay(1);
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
-		MHT_UNIPHY_MMD1_QP_USXG_RESET, BIT(mht_port_id-1),
+		MHT_UNIPHY_MMD1_USXGMII_RESET, BIT(mht_port_id-1),
 		BIT(mht_port_id-1));
 	SW_RTN_ON_ERROR (rv);
 	if(mht_port_id == SSDK_PHYSICAL_PORT1)
@@ -371,10 +372,11 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
 		MHT_UNIPHY_MMD1_MODE_CTRL, 0x1f00, MHT_UNIPHY_MMD1_XPCS_MODE);
 	SW_RTN_ON_ERROR (rv);
-	/*config QP_USXG_OPTION1*/
-	SSDK_INFO("config QP_USXG_OPTION1\n");
+	/*config dapa pass as usxgmii*/
+	SSDK_INFO("config dapa pass as usxgmii\n");
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
-		MHT_UNIPHY_MMD1_QP_USXG_OPTION1, 0x1, MHT_UNIPHY_MMD1_QP_USXGMII_GMII);
+		MHT_UNIPHY_MMD1_GMII_DATAPASS_SEL, MHT_UNIPHY_MMD1_DATAPASS_MASK,
+		MHT_UNIPHY_MMD1_DATAPASS_USXGMII);
 	SW_RTN_ON_ERROR (rv);
 	/*reset and release uniphy GMII/XGMII and ethphy GMII*/
 	SSDK_INFO("reset and release uniphy GMII/XGMII and ethphy GMII\n");
@@ -508,6 +510,146 @@ mht_interface_uqxgmii_mode_set(a_uint32_t dev_id)
 	/*enable EEE for xpcs*/
 	SSDK_INFO("enable EEE for xpcs\n");
 	rv = mht_uniphy_xpcs_8023az_enable(dev_id);
+
+	return rv;
+}
+
+sw_error_t
+mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
+	a_uint32_t mht_port_id, fal_mac_config_t *config)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t uniphy_addr = 0, mode_ctrl = 0, speed_mode = 0;
+	a_uint32_t uniphy_port_id = 0, ethphy_clk_mask = 0;
+	a_uint64_t raw_clk = 0;
+
+	/*get the uniphy address*/
+	rv = qca_mht_serdes_addr_get(dev_id, uniphy_index, &uniphy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	if(config->mac_mode == FAL_MAC_MODE_SGMII)
+	{
+		mode_ctrl = MHT_UNIPHY_MMD1_SGMII_MODE;
+		raw_clk = UNIPHY_CLK_RATE_125M;
+	}
+	else
+	{
+		mode_ctrl = MHT_UNIPHY_MMD1_SGMII_PLUS_MODE;
+		raw_clk = UNIPHY_CLK_RATE_312M;
+	}
+
+	if(config->config.sgmii.clock_mode == FAL_INTERFACE_CLOCK_MAC_MODE)
+		mode_ctrl |= MHT_UNIPHY_MMD1_SGMII_MAC_MODE;
+	else
+	{
+		mode_ctrl |= MHT_UNIPHY_MMD1_SGMII_PHY_MODE;
+		/*eththy clock should be accessed for phy mode*/
+		ethphy_clk_mask = MHT_CLK_TYPE_EPHY;
+	}
+
+	SSDK_INFO("uniphy:%d,mode:%s,autoneg_en:%d,force_speed:%d,clk_mask:0x%x\n",
+		uniphy_index, (config->mac_mode == FAL_MAC_MODE_SGMII)?"sgmii":"sgmii plus",
+		config->config.sgmii.auto_neg, config->config.sgmii.force_speed,
+		ethphy_clk_mask);
+
+	/*GMII interface clock disable*/
+	SSDK_INFO("GMII interface clock disable\n");
+	rv = ssdk_mht_port_clk_en_set(dev_id, mht_port_id, ethphy_clk_mask,
+		A_FALSE);
+	SW_RTN_ON_ERROR (rv);
+	/*when access uniphy0 clock, port5 should be used, but for phy mode,
+		the port 4 connect to uniphy0, so need to change the port id*/
+	if(uniphy_index == MHT_UNIPHY_SGMII_0)
+		uniphy_port_id = SSDK_PHYSICAL_PORT5;
+	else
+		uniphy_port_id = mht_port_id;
+	rv = ssdk_mht_port_clk_en_set(dev_id, uniphy_port_id, MHT_CLK_TYPE_UNIPHY,
+		A_FALSE);
+	SW_RTN_ON_ERROR (rv);
+	/*uniphy1 xpcs reset, and configure raw clk*/
+	if(uniphy_index == MHT_UNIPHY_SGMII_1)
+	{
+		SSDK_INFO("uniphy1 xpcs reset, confiugre raw clock as:%lld\n",
+			raw_clk);
+		rv = ssdk_mht_clk_assert(dev_id, MHT_UNIPHY_XPCS_RST);
+		SW_RTN_ON_ERROR (rv);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY1_RX, raw_clk);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY1_TX, raw_clk);
+	}
+	else
+	{
+		SSDK_INFO("uniphy0 configure raw clock as %lld\n",
+			raw_clk);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_RX, raw_clk);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_TX, raw_clk);
+	}
+	/*configure SGMII mode or SGMII+ mode*/
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_MODE_CTRL, MHT_UNIPHY_MMD1_SGMII_MODE_CTRL_MASK,
+		mode_ctrl);
+	SW_RTN_ON_ERROR (rv);
+	/*GMII datapass selection, 0 is for SGMII, 1 is for USXGMII*/
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_GMII_DATAPASS_SEL, MHT_UNIPHY_MMD1_DATAPASS_MASK,
+		MHT_UNIPHY_MMD1_DATAPASS_SGMII);
+	SW_RTN_ON_ERROR (rv);
+	/*configue force or autoneg*/
+	if(!config->config.sgmii.auto_neg)
+	{
+		rv = mht_port_speed_clock_set(dev_id, mht_port_id,
+			config->config.sgmii.force_speed);
+		SW_RTN_ON_ERROR(rv);
+		switch (config->config.sgmii.force_speed)
+		{
+			case FAL_SPEED_10:
+				speed_mode = MHT_UNIPHY_MMD1_CH0_FORCE_ENABLE |
+					MHT_UNIPHY_MMD1_CH0_FORCE_SPEED_10M;
+				break;
+			case FAL_SPEED_100:
+				speed_mode = MHT_UNIPHY_MMD1_CH0_FORCE_ENABLE |
+					MHT_UNIPHY_MMD1_CH0_FORCE_SPEED_100M;
+				break;
+			case FAL_SPEED_1000:
+			case FAL_SPEED_2500:
+				speed_mode = MHT_UNIPHY_MMD1_CH0_FORCE_ENABLE |
+					MHT_UNIPHY_MMD1_CH0_FORCE_SPEED_1G;
+				break;
+			default:
+				break;
+		}
+	}
+	else
+	{
+		speed_mode = MHT_UNIPHY_MMD1_CH0_AUTONEG_ENABLE;
+	}
+	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
+		MHT_UNIPHY_MMD1_CHANNEL0_CFG, MHT_UNIPHY_MMD1_CH0_FORCE_SPEED_MASK,
+		speed_mode);
+	SW_RTN_ON_ERROR (rv);
+	/*GMII interface clock reset and release\n*/
+	SSDK_INFO("GMII interface clock reset and release\n");
+	rv = ssdk_mht_port_clk_reset(dev_id, mht_port_id, ethphy_clk_mask);
+	SW_RTN_ON_ERROR (rv);
+	rv = ssdk_mht_port_clk_reset(dev_id, uniphy_port_id, MHT_CLK_TYPE_UNIPHY);
+	SW_RTN_ON_ERROR (rv);
+	/*analog software reset and release*/
+	SSDK_INFO("analog software reset and release\n");
+	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr,
+		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RESET);
+	SW_RTN_ON_ERROR (rv);
+	mdelay(1);
+	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr,
+		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RELEASE);
+	SW_RTN_ON_ERROR (rv);
+	/*wait uniphy calibration done*/
+	SSDK_INFO("wait uniphy calibration done\n");
+	mht_uniphy_calibration(dev_id, uniphy_addr);
+	/*GMII interface clock enable*/
+	SSDK_INFO("GMII interface clock enable\n");
+	rv = ssdk_mht_port_clk_en_set(dev_id, mht_port_id, ethphy_clk_mask, A_TRUE);
+	SW_RTN_ON_ERROR (rv);
+	rv = ssdk_mht_port_clk_en_set(dev_id, uniphy_port_id, MHT_CLK_TYPE_UNIPHY,
+		A_TRUE);
 
 	return rv;
 }

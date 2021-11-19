@@ -34,6 +34,7 @@ extern "c" {
         FAL_MAC_MODE_SGMII,
         FAL_MAC_MODE_FIBER,
         FAL_MAC_MODE_RMII,
+        FAL_MAC_MODE_SGMII_PLUS,
         FAL_MAC_MODE_DEFAULT
     }
     fal_interface_mac_mode_t;
@@ -78,7 +79,7 @@ extern "c" {
     {
         fal_interface_clock_mode_t  clock_mode;
         a_bool_t                    auto_neg;
-        a_bool_t                    force_speed;
+        a_uint32_t                  force_speed;
         a_bool_t                    prbs_enable;
         a_bool_t                    rem_phy_lpbk;
     } fal_mac_sgmii_config_t;

@@ -139,7 +139,6 @@ hppe_network_route_action_set(
 		a_uint32_t index,
 		union network_route_action_u *value);
 #endif
-#if ((!defined IN_IP_MINI) || (!defined IN_FLOW_MINI))
 sw_error_t
 hppe_l3_route_ctrl_get(
 		a_uint32_t dev_id,
@@ -150,6 +149,7 @@ hppe_l3_route_ctrl_set(
 		a_uint32_t dev_id,
 		union l3_route_ctrl_u *value);
 
+#if ((!defined IN_IP_MINI) || (!defined IN_FLOW_MINI))
 sw_error_t
 hppe_l3_route_ctrl_ext_get(
 		a_uint32_t dev_id,

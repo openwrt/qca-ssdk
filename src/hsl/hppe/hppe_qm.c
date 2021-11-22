@@ -752,6 +752,19 @@ hppe_ucast_queue_map_tbl_set(
 				value->val);
 }
 
+sw_error_t
+hppe_ucast_hash_map_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union ucast_hash_map_tbl_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				QUEUE_MANAGER_BASE_ADDR + UCAST_HASH_MAP_TBL_ADDRESS + \
+				index * UCAST_HASH_MAP_TBL_INC,
+				value->val);
+}
+
 #ifndef IN_QM_MINI
 sw_error_t
 hppe_ucast_hash_map_tbl_get(
@@ -766,19 +779,6 @@ hppe_ucast_hash_map_tbl_get(
 				QUEUE_MANAGER_BASE_ADDR + UCAST_HASH_MAP_TBL_ADDRESS + \
 				index * UCAST_HASH_MAP_TBL_INC,
 				&value->val);
-}
-
-sw_error_t
-hppe_ucast_hash_map_tbl_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union ucast_hash_map_tbl_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				QUEUE_MANAGER_BASE_ADDR + UCAST_HASH_MAP_TBL_ADDRESS + \
-				index * UCAST_HASH_MAP_TBL_INC,
-				value->val);
 }
 
 sw_error_t

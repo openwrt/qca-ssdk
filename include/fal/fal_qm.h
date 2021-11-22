@@ -269,6 +269,13 @@ fal_ucast_priority_class_set(
 		a_uint8_t priority,
 		a_uint8_t class);
 
+sw_error_t
+fal_ucast_hash_map_set(
+		a_uint32_t dev_id,
+		a_uint8_t profile,
+		a_uint8_t rss_hash,
+		a_int8_t queue_hash);
+
 #ifndef IN_QM_MINI
 sw_error_t
 fal_ucast_priority_class_get(
@@ -276,13 +283,6 @@ fal_ucast_priority_class_get(
 		a_uint8_t profile,
 		a_uint8_t priority,
 		a_uint8_t *class);
-
-sw_error_t
-fal_ucast_hash_map_set(
-		a_uint32_t dev_id,
-		a_uint8_t profile,
-		a_uint8_t rss_hash,
-		a_int8_t queue_hash);
 
 sw_error_t
 fal_ucast_hash_map_get(

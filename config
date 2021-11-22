@@ -348,10 +348,8 @@ ifeq ($(MINI_SSDK), enable)
 	IN_IP_MINI=TRUE
 	IN_SFP=FALSE
 
-	#disable modules for MINI HPPE/CPPE
+	#disable modules for MINI HPPE/CPPE/APPE
 	ifneq (, $(filter APPE HPPE CPPE, $(CHIP_TYPE)))
-		IN_SERVCODE=FALSE
-		IN_PPPOE=FALSE
 		IN_NAT=FALSE
 		IN_COSMAP=FALSE
 		IN_RATE=FALSE
@@ -413,14 +411,12 @@ ifeq (MP, $(CHIP_TYPE))
 endif
 
 ifneq (, $(filter APPE , $(CHIP_TYPE)))
-ifneq ($(MINI_SSDK), enable)
 	IN_VPORT=TRUE
 	IN_TUNNEL=TRUE
 	IN_VXLAN=TRUE
 	IN_GENEVE=TRUE
 	IN_TUNNEL_PROGRAM=TRUE
 	IN_MAPT=TRUE
-endif
 endif
 
 #auto_insert_flag

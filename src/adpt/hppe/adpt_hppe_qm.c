@@ -53,7 +53,6 @@
 #define MCAST_QUEUE_ITEMS	3
 #define DROP_INC	0x10
 
-#ifndef IN_QM_MINI
 sw_error_t
 adpt_hppe_ucast_hash_map_set(
 		a_uint32_t dev_id,
@@ -73,6 +72,7 @@ adpt_hppe_ucast_hash_map_set(
 	return hppe_ucast_hash_map_tbl_set(dev_id, index, &ucast_hash_map_tbl);
 }
 
+#ifndef IN_QM_MINI
 sw_error_t
 adpt_hppe_ac_dynamic_threshold_get(
 		a_uint32_t dev_id,
@@ -1315,9 +1315,9 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_queue_flush = adpt_hppe_queue_flush;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_ENQUEUE_CTRL_SET))
 		p_adpt_api->adpt_qm_enqueue_ctrl_set = adpt_hppe_qm_enqueue_ctrl_set;
-#ifndef IN_QM_MINI
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_HASH_MAP_SET))
 		p_adpt_api->adpt_ucast_hash_map_set = adpt_hppe_ucast_hash_map_set;
+#ifndef IN_QM_MINI
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_AC_DYNAMIC_THRESHOLD_GET))
 		p_adpt_api->adpt_ac_dynamic_threshold_get = adpt_hppe_ac_dynamic_threshold_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_QUEUE_BASE_PROFILE_GET))

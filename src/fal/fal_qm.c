@@ -22,7 +22,6 @@
 #include "hsl_api.h"
 #include "adpt.h"
 
-#ifndef IN_QM_MINI
 sw_error_t
 _fal_ucast_hash_map_set(
 		a_uint32_t dev_id,
@@ -41,6 +40,8 @@ _fal_ucast_hash_map_set(
 	rv = p_api->adpt_ucast_hash_map_set(dev_id, profile, rss_hash, queue_hash);
 	return rv;
 }
+
+#ifndef IN_QM_MINI
 sw_error_t
 _fal_ac_dynamic_threshold_get(
 		a_uint32_t dev_id,
@@ -626,20 +627,6 @@ _fal_qm_port_source_profile_get(a_uint32_t dev_id, fal_port_t port, a_uint32_t *
 /*insert flag for inner fal, don't remove it*/
 
 sw_error_t
-fal_ucast_hash_map_set(
-		a_uint32_t dev_id,
-		a_uint8_t profile,
-		a_uint8_t rss_hash,
-		a_int8_t queue_hash)
-{
-	sw_error_t rv = SW_OK;
-
-	FAL_API_LOCK;
-	rv = _fal_ucast_hash_map_set(dev_id, profile, rss_hash, queue_hash);
-	FAL_API_UNLOCK;
-	return rv;
-}
-sw_error_t
 fal_ac_dynamic_threshold_get(
 		a_uint32_t dev_id,
 		a_uint32_t queue_id,
@@ -680,6 +667,22 @@ fal_port_mcast_priority_class_get(
 	return rv;
 }
 #endif
+
+sw_error_t
+fal_ucast_hash_map_set(
+		a_uint32_t dev_id,
+		a_uint8_t profile,
+		a_uint8_t rss_hash,
+		a_int8_t queue_hash)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ucast_hash_map_set(dev_id, profile, rss_hash, queue_hash);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
 sw_error_t
 fal_ac_dynamic_threshold_set(
 		a_uint32_t dev_id,
@@ -1112,6 +1115,8 @@ EXPORT_SYMBOL(fal_queue_counter_ctrl_set);
 
 EXPORT_SYMBOL(fal_ucast_priority_class_set);
 
+EXPORT_SYMBOL(fal_ucast_hash_map_set);
+
 #ifndef IN_QM_MINI
 EXPORT_SYMBOL(fal_qm_port_source_profile_set);
 
@@ -1134,8 +1139,6 @@ EXPORT_SYMBOL(fal_ac_group_buffer_get);
 EXPORT_SYMBOL(fal_ucast_queue_base_profile_get);
 
 EXPORT_SYMBOL(fal_ucast_priority_class_get);
-
-EXPORT_SYMBOL(fal_ucast_hash_map_set);
 
 EXPORT_SYMBOL(fal_ucast_hash_map_get);
 

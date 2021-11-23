@@ -32,6 +32,10 @@
 #include "ssdk_plat.h"
 #include "hsl_phy.h"
 
+#if defined(MHT)
+#include "mht_sec_ctrl.h"
+#endif
+
 static ssdk_dt_global_t ssdk_dt_global = {0};
 #ifdef HPPE
 #ifdef IN_QOS
@@ -792,6 +796,80 @@ static void ssdk_dt_parse_mdio(a_uint32_t dev_id, struct device_node *switch_nod
 	return;
 }
 
+#if defined(MHT)
+void ssdk_clk_mode_set(a_uint32_t dev_id, mht_work_mode_t clk_mode)
+{
+	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
+
+	cfg->clk_mode = clk_mode;
+}
+
+mht_work_mode_t ssdk_clk_mode_get(a_uint32_t dev_id)
+{
+	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
+
+	return cfg->clk_mode;
+}
+
+static void
+ssdk_switch_clk_mode_parse(a_uint32_t dev_id, mht_work_mode_t *clk_mode)
+{
+	a_uint32_t mac_mode0, mac_mode1;
+
+	mac_mode0 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
+	mac_mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
+
+	switch (mac_mode0) {
+		case PORT_WRAPPER_SGMII_PLUS:
+		case PORT_WRAPPER_SGMII_CHANNEL0:
+			break;
+		default:
+			SSDK_ERROR("Unsupported mac_mode0 %d\n", mac_mode0);
+			return;
+	}
+
+	switch (mac_mode1) {
+		case PORT_WRAPPER_SGMII_PLUS:
+		case PORT_WRAPPER_SGMII_CHANNEL0:
+			*clk_mode = MHT_SWITCH_MODE;
+			break;
+		case PORT_WRAPPER_MAX:
+			*clk_mode = MHT_PHY_SGMII_UQXGMII_MODE;
+			break;
+		default:
+			SSDK_ERROR("Unsupported mac_mode1 %d\n", mac_mode1);
+			return;
+	}
+}
+
+static void ssdk_dt_parse_clk(a_uint32_t dev_id, struct device_node *switch_node)
+{
+	const char *clk_mode;
+	mht_work_mode_t clk_val = MHT_WORK_MODE_MAX;
+
+	clk_mode = of_get_property(switch_node, "qca8084_clk", NULL);
+	if (!clk_mode) {
+		if (of_device_is_compatible(switch_node, "qcom,ess-switch-qca8386"))
+			ssdk_switch_clk_mode_parse(dev_id, &clk_val);
+
+		ssdk_clk_mode_set(dev_id, clk_val);
+		return;
+	}
+
+	if (!strncmp(clk_mode, "phy0_mode", strlen(clk_mode)))
+		clk_val = MHT_PHY_UQXGMII_MODE;
+	else if (!strncmp(clk_mode, "phy1_mode", strlen(clk_mode)))
+		clk_val = MHT_PHY_SGMII_UQXGMII_MODE;
+	else if (!strncmp(clk_mode, "switch_bypass_mode", strlen(clk_mode)))
+		clk_val = MHT_SWITCH_BYPASS_PORT5_MODE;
+	else
+		SSDK_ERROR("Unsupported qca8084_clk: %s\n", clk_mode);
+
+	ssdk_clk_mode_set(dev_id, clk_val);
+	return;
+}
+#endif
+
 static void ssdk_dt_parse_port_bmp(a_uint32_t dev_id,
 		struct device_node *switch_node, ssdk_init_cfg *cfg)
 {
@@ -1058,6 +1136,9 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 	ssdk_dt_parse_mac_mode(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_mdio(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_port_bmp(*dev_id, switch_node, cfg);
+#if defined(MHT)
+	ssdk_dt_parse_clk(*dev_id, switch_node);
+#endif
 
 	if (of_device_is_compatible(switch_node, "qcom,ess-switch")) {
 		/* DESS chip */

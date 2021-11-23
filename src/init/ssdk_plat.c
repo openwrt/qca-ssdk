@@ -110,6 +110,10 @@
 #endif
 #endif
 
+#if defined(MHT)
+#include "ssdk_mht_clk.h"
+#endif
+
 #include "adpt.h"
 /*qca808x_start*/
 
@@ -1452,8 +1456,12 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	#ifdef BOARD_AR71XX
 	int rv = 0;
 	#endif
+#if defined(MHT)
+	a_uint32_t clk_bmp = 0;
+	mht_work_mode_t clk_mode = ssdk_clk_mode_get(dev_id);
+#endif
 /*qca808x_start*/
-	printk("ssdk_plat_init start\n");
+	SSDK_INFO("ssdk_plat_init start\n");
 /*qca808x_end*/
 	mutex_init(&switch_mdio_lock);
 
@@ -1480,7 +1488,7 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	}
 #endif
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
-	if(reg_mode == HSL_REG_LOCAL_BUS) {
+	if (reg_mode == HSL_REG_LOCAL_BUS) {
 		ssdk_switch_reg_map_info_get(dev_id, &map);
 		qca_phy_priv_global[dev_id]->hw_addr = ioremap_nocache(map.base_addr,
 								map.size);
@@ -1500,11 +1508,26 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 				ssdk_gcc_clock_init();
 			}
 #endif
-			return 0;
 		}
 
 		cfg->reg_mode = HSL_HEADER;
+	} else if (reg_mode == HSL_REG_MDIO) {
+		cfg->reg_mode = HSL_MDIO;
+#if defined(MHT)
+		/* For phy mode(device 0), the clk_bmp is 0 bacause the port id is meaningless;
+		 * For switch mode(device 1), the clk_bmp is acquired from dts.
+		 */
+		clk_bmp = ssdk_cpu_bmp_get(dev_id) |
+			ssdk_wan_bmp_get(dev_id) |
+			ssdk_lan_bmp_get(dev_id);
+#endif
 	}
+
+#if defined(MHT)
+	if (clk_mode != MHT_WORK_MODE_MAX)
+		ssdk_mht_gcc_clock_init(dev_id, clk_mode, clk_bmp);
+#endif
+
 #ifdef DESS
 	reg_mode = ssdk_psgmii_reg_access_mode_get(dev_id);
 	if(reg_mode == HSL_REG_LOCAL_BUS) {
@@ -1528,11 +1551,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 		cfg->reg_func.psgmii_reg_get = qca_psgmii_reg_read;
 	}
 #endif
-	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
-	if(reg_mode == HSL_REG_MDIO) {
-		cfg->reg_mode = HSL_MDIO;
-	} else
-		return 0;
 /*qca808x_start*/
 
 	return 0;
@@ -1547,7 +1565,7 @@ ssdk_plat_exit(a_uint32_t dev_id)
 	ssdk_reg_map_info map;
 #endif
 /*qca808x_start*/
-	printk("ssdk_plat_exit\n");
+	SSDK_INFO("ssdk_plat_exit\n");
 /*qca808x_end*/
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
 	if (reg_mode == HSL_REG_LOCAL_BUS) {

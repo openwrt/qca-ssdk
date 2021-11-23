@@ -21,6 +21,7 @@
 #include "ssdk_plat.h"
 #include "ssdk_mht_clk.h"
 #include "ssdk_clk.h"
+#include "mht_sec_ctrl.h"
 
 #define MHT_PORT_CLK_CBC_MAX		8
 /* 2 uniphy with rx and tx */
@@ -656,7 +657,7 @@ sw_error_t ssdk_mht_clk_rate_set(a_uint32_t dev_id,
 			return SW_BAD_VALUE;
 		}
 		div = RCGR_DIV_BYPASS;
-		cdiv_val = UQXGMII_SPEED_2500M_CLK / UQXGMII_XPCS_SPEED_2500M_CLK;
+		cdiv_val = (UQXGMII_SPEED_2500M_CLK / UQXGMII_XPCS_SPEED_2500M_CLK) - 1;
 	} else {
 
 		/* calculate the RCGR divider prate/rate = (rcg_divider + 1)/2 */
@@ -938,4 +939,218 @@ sw_error_t ssdk_mht_port_clk_en_set(a_uint32_t dev_id,
 	}
 
 	return SW_OK;
+}
+
+void ssdk_mht_gcc_common_clk_parent_enable(a_uint32_t dev_id)
+{
+	/* Switch core */
+	ssdk_mht_clk_parent_set(dev_id, MHT_SWITCH_CORE_CLK, MHT_P_UNIPHY1_TX312P5M);
+	ssdk_mht_clk_rate_set(dev_id, MHT_SWITCH_CORE_CLK, UQXGMII_SPEED_2500M_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_SWITCH_CORE_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_APB_BRIDGE_CLK);
+
+	/* AHB bridge */
+	ssdk_mht_clk_parent_set(dev_id, MHT_AHB_CLK, MHT_P_UNIPHY1_TX312P5M);
+	ssdk_mht_clk_rate_set(dev_id, MHT_AHB_CLK, MHT_AHB_CLK_RATE_104P17M);
+	ssdk_mht_clk_enable(dev_id, MHT_AHB_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_SEC_CTRL_AHB_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_TLMM_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_TLMM_AHB_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_CNOC_AHB_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_MDIO_AHB_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_MDIO_MASTER_AHB_CLK);
+
+	/* System */
+	ssdk_mht_clk_parent_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_P_XO);
+	ssdk_mht_clk_rate_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_SYS_CLK_RATE_25M);
+	ssdk_mht_clk_enable(dev_id, MHT_SRDS0_SYS_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_SRDS1_SYS_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_GEPHY0_SYS_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_GEPHY1_SYS_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_GEPHY2_SYS_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_GEPHY3_SYS_CLK);
+
+	/* Sec control */
+	ssdk_mht_clk_parent_set(dev_id, MHT_SEC_CTRL_CLK, MHT_P_XO);
+	ssdk_mht_clk_rate_set(dev_id, MHT_SEC_CTRL_CLK, MHT_SYS_CLK_RATE_25M);
+	ssdk_mht_clk_enable(dev_id, MHT_SEC_CTRL_CLK);
+	ssdk_mht_clk_enable(dev_id, MHT_SEC_CTRL_SENSE_CLK);
+}
+
+void ssdk_mht_gcc_port_clk_parent_set(a_uint32_t dev_id,
+		mht_work_mode_t clk_mode, a_uint32_t mht_port_id)
+{
+	mht_clk_parent_t port_tx_parent, port_rx_parent;
+	char *tx_clk_id, *rx_clk_id;
+
+	/* Initialize the clock parent with port 1, 2, 3, clock parent is same for these ports;
+	 * the clock parent will be updated for port 0, 4, 5.
+	 */
+	switch(clk_mode) {
+		case MHT_SWITCH_MODE:
+		case MHT_SWITCH_BYPASS_PORT5_MODE:
+			port_tx_parent = MHT_P_UNIPHY1_TX312P5M;
+			break;
+		case MHT_PHY_UQXGMII_MODE:
+		case MHT_PHY_SGMII_UQXGMII_MODE:
+			port_tx_parent = MHT_P_UNIPHY1_RX312P5M;
+			break;
+		default:
+			SSDK_ERROR("Unsupported clock mode %d\n", clk_mode);
+			return;
+	}
+	port_rx_parent = MHT_P_UNIPHY1_TX312P5M;
+
+	switch (mht_port_id) {
+		case SSDK_PHYSICAL_PORT0:
+			port_tx_parent = MHT_P_UNIPHY1_TX;
+			port_rx_parent = MHT_P_UNIPHY1_RX;
+			tx_clk_id = MHT_MAC0_TX_CLK;
+			rx_clk_id = MHT_MAC0_RX_CLK;
+			break;
+		case SSDK_PHYSICAL_PORT1:
+			tx_clk_id = MHT_MAC1_TX_CLK;
+			rx_clk_id = MHT_MAC1_RX_CLK;
+			break;
+		case SSDK_PHYSICAL_PORT2:
+			tx_clk_id = MHT_MAC2_TX_CLK;
+			rx_clk_id = MHT_MAC2_RX_CLK;
+			break;
+		case SSDK_PHYSICAL_PORT3:
+			tx_clk_id = MHT_MAC3_TX_CLK;
+			rx_clk_id = MHT_MAC3_RX_CLK;
+			break;
+		case SSDK_PHYSICAL_PORT4:
+			switch(clk_mode) {
+				case MHT_SWITCH_BYPASS_PORT5_MODE:
+				case MHT_PHY_SGMII_UQXGMII_MODE:
+					port_tx_parent = MHT_P_UNIPHY0_RX;
+					port_rx_parent = MHT_P_UNIPHY0_TX;
+					break;
+				case MHT_SWITCH_MODE:
+					port_tx_parent = MHT_P_UNIPHY1_TX312P5M;
+					port_rx_parent = MHT_P_UNIPHY1_TX312P5M;
+					break;
+				case MHT_PHY_UQXGMII_MODE:
+					port_tx_parent = MHT_P_UNIPHY1_RX312P5M;
+					port_rx_parent = MHT_P_UNIPHY1_TX312P5M;
+					break;
+				default:
+					SSDK_ERROR("Unsupported clock mode %d\n", clk_mode);
+					return;
+			}
+			tx_clk_id = MHT_MAC4_TX_CLK;
+			rx_clk_id = MHT_MAC4_RX_CLK;
+			break;
+		case SSDK_PHYSICAL_PORT5:
+			port_tx_parent = MHT_P_UNIPHY0_TX;
+			port_rx_parent = MHT_P_UNIPHY0_RX;
+			tx_clk_id = MHT_MAC5_TX_CLK;
+			rx_clk_id = MHT_MAC5_RX_CLK;
+			switch (clk_mode) {
+				case MHT_SWITCH_BYPASS_PORT5_MODE:
+				case MHT_PHY_SGMII_UQXGMII_MODE:
+					ssdk_mht_port5_uniphy0_clk_src_set(dev_id, A_TRUE);
+					break;
+				case MHT_SWITCH_MODE:
+				case MHT_PHY_UQXGMII_MODE:
+					ssdk_mht_port5_uniphy0_clk_src_set(dev_id, A_FALSE);
+					break;
+				default:
+					SSDK_ERROR("Unsupported clock mode %d\n", clk_mode);
+					return;
+			}
+			break;
+		default:
+			SSDK_ERROR("Unsupported mht_port_id %d\n", mht_port_id);
+			return;
+	}
+
+	ssdk_mht_clk_parent_set(dev_id, tx_clk_id, port_tx_parent);
+	ssdk_mht_clk_parent_set(dev_id, rx_clk_id, port_rx_parent);
+}
+
+/* The input parameter pbmp will be 0 when the clock mode from device 0 is the following mode:
+ * MHT_SWITCH_BYPASS_PORT5_MODE(for phy port 4),
+ * MHT_PHY_UQXGMII_MODE and MHT_PHY_SGMII_UQXGMII_MODE.
+ *
+ * The clock mode MHT_SWITCH_MODE adn MHT_SWITCH_BYPASS_PORT5_MODE(for switch device 1) where
+ * the pbmp will be acquired from dts.
+ */
+void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint32_t pbmp)
+{
+	a_uint32_t mht_port_id = 0;
+	/* clock type mask value for 6 manhattan ports */
+	a_uint8_t clk_mask[SSDK_PHYSICAL_PORT5 + 1] = {0};
+	static a_bool_t gcc_common_clk_init = A_FALSE;
+
+	switch (clk_mode) {
+		case MHT_SWITCH_MODE:
+		case MHT_SWITCH_BYPASS_PORT5_MODE:
+			if (!pbmp && clk_mode == MHT_SWITCH_BYPASS_PORT5_MODE) {
+				/* For phy port 4 in switch bypass mode */
+				clk_mask[SSDK_PHYSICAL_PORT4] = MHT_CLK_TYPE_EPHY;
+				clk_mask[SSDK_PHYSICAL_PORT5] = MHT_CLK_TYPE_UNIPHY;
+			}
+
+			while (pbmp) {
+				if (pbmp & 1) {
+					if (mht_port_id == SSDK_PHYSICAL_PORT0 ||
+							mht_port_id == SSDK_PHYSICAL_PORT5) {
+						clk_mask[mht_port_id] = MHT_CLK_TYPE_MAC |
+							MHT_CLK_TYPE_UNIPHY;
+					} else {
+						clk_mask[mht_port_id] = MHT_CLK_TYPE_MAC |
+							MHT_CLK_TYPE_EPHY;
+					}
+				}
+				pbmp >>= 1;
+				mht_port_id++;
+			}
+			break;
+		case MHT_PHY_UQXGMII_MODE:
+		case MHT_PHY_SGMII_UQXGMII_MODE:
+			clk_mask[SSDK_PHYSICAL_PORT1] = MHT_CLK_TYPE_UNIPHY | MHT_CLK_TYPE_EPHY;
+			clk_mask[SSDK_PHYSICAL_PORT2] = MHT_CLK_TYPE_UNIPHY | MHT_CLK_TYPE_EPHY;
+			clk_mask[SSDK_PHYSICAL_PORT3] = MHT_CLK_TYPE_UNIPHY | MHT_CLK_TYPE_EPHY;
+			clk_mask[SSDK_PHYSICAL_PORT4] = MHT_CLK_TYPE_UNIPHY | MHT_CLK_TYPE_EPHY;
+			if (clk_mode == MHT_PHY_SGMII_UQXGMII_MODE) {
+				/* For phy port4 in PHY bypass mode */
+				clk_mask[SSDK_PHYSICAL_PORT4] = MHT_CLK_TYPE_EPHY;
+				clk_mask[SSDK_PHYSICAL_PORT5] = MHT_CLK_TYPE_UNIPHY;
+			}
+			break;
+		default:
+			SSDK_ERROR("Unsupported clock mode %d\n", clk_mode);
+			return;
+	}
+
+	if (!gcc_common_clk_init) {
+		ssdk_mht_gcc_common_clk_parent_enable(dev_id);
+		gcc_common_clk_init = A_TRUE;
+
+		/* Initialize the uniphy raw clock, if the port4 is in bypass mode, the uniphy0
+		 * raw clock need to be dynamically updated between UQXGMII_SPEED_2500M_CLK and
+		 * UQXGMII_SPEED_1000M_CLK according to the realtime link speed.
+		 */
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_RX, UQXGMII_SPEED_2500M_CLK);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_TX, UQXGMII_SPEED_2500M_CLK);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY1_RX, UQXGMII_SPEED_2500M_CLK);
+		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY1_TX, UQXGMII_SPEED_2500M_CLK);
+	}
+
+	mht_port_id = 0;
+	pbmp = 0;
+	while (mht_port_id < ARRAY_SIZE(clk_mask)) {
+		if (clk_mask[mht_port_id] != 0) {
+			ssdk_mht_gcc_port_clk_parent_set(dev_id, clk_mode, mht_port_id);
+			ssdk_mht_port_clk_en_set(dev_id,
+					mht_port_id, clk_mask[mht_port_id], A_TRUE);
+			pbmp |= BIT(mht_port_id);
+		}
+		mht_port_id++;
+	}
+
+	SSDK_INFO("MHT GCC CLK initialization with clock mode %d on port bmp 0x%x\n",
+			clk_mode, pbmp);
 }

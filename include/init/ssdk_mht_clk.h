@@ -20,6 +20,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif                          /* __cplusplus */
+#include "mht_sec_ctrl.h"
 
 #define MHT_SWITCH_CORE_CLK			"mht_gcc_switch_core_clk"
 #define MHT_APB_BRIDGE_CLK			"mht_gcc_apb_bridge_clk"
@@ -194,6 +195,7 @@ sw_error_t ssdk_mht_port_clk_en_set(a_uint32_t dev_id,
 a_uint64_t ssdk_mht_uniphy_raw_clock_get(a_uint32_t dev_id, mht_clk_parent_t uniphy_clk);
 void ssdk_mht_uniphy_raw_clock_set(a_uint32_t dev_id,
 		mht_clk_parent_t uniphy_clk, a_uint64_t rate);
+void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint32_t pbmp);
 
 #ifdef __cplusplus
 }

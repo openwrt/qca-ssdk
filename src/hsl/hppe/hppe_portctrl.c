@@ -2160,7 +2160,7 @@ hppe_mac_jumbo_size_mac_jumbo_size_set(
 	ret = hppe_mac_jumbo_size_set(dev_id, index, &reg_val);
 	return ret;
 }
-#ifndef IN_PORTCONTROL_MINI
+
 sw_error_t
 hppe_mru_mtu_ctrl_tbl_mtu_cmd_get(
 		a_uint32_t dev_id,
@@ -2409,7 +2409,6 @@ ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_set(
 	return ret;
 }
 #endif
-#endif
 
 sw_error_t
 hppe_mru_mtu_ctrl_tbl_src_profile_get(
@@ -2442,7 +2441,6 @@ hppe_mru_mtu_ctrl_tbl_src_profile_set(
 	return ret;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_mc_mtu_ctrl_tbl_mtu_cmd_get(
 		a_uint32_t dev_id,
@@ -2536,6 +2534,7 @@ hppe_mc_mtu_ctrl_tbl_mtu_set(
 	return ret;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_tdm_ctrl_tdm_en_get(
 		a_uint32_t dev_id,

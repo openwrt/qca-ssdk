@@ -50,6 +50,7 @@ adpt_appe_port_8023ah_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 adpt_appe_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
+#endif
 
 sw_error_t
 adpt_appe_port_mtu_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -58,7 +59,6 @@ adpt_appe_port_mtu_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 adpt_appe_port_mtu_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_mtu_cfg_t *mtu_cfg);
-#endif
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

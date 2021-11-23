@@ -390,6 +390,8 @@ enum
 	FUNC_ADPT_PORT_8023AH_GET,
 	FUNC_ADPT_PORT_MTU_CFG_SET,
 	FUNC_ADPT_PORT_MTU_CFG_GET,
+	FUNC_ADPT_PORT_MRU_MTU_SET,
+	FUNC_ADPT_PORT_MRU_MTU_GET,
 };
 
 typedef enum {
@@ -470,7 +472,6 @@ sw_error_t
 fal_port_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t *max_frame);
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl);
@@ -494,8 +495,13 @@ fal_port_mtu_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_port_mtu_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_cfg_t *mtu_cfg);
-#endif
+sw_error_t
+fal_port_mru_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t mru_size, a_uint32_t mtu_size);
 
+sw_error_t
+fal_port_mru_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t *mru_size, a_uint32_t *mtu_size);
 /*qca808x_start*/
 sw_error_t
 fal_port_duplex_set(a_uint32_t dev_id, fal_port_t port_id,

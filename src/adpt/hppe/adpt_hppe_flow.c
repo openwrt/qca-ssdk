@@ -2189,7 +2189,27 @@ void adpt_hppe_flow_func_bitmap_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return;
 
-	p_adpt_api->adpt_flow_func_bitmap = 0;
+	p_adpt_api->adpt_flow_func_bitmap = BIT(FUNC_FLOW_HOST_ADD) |
+		BIT(FUNC_FLOW_ENTRY_GET) |
+		BIT(FUNC_FLOW_ENTRY_DEL) |
+		BIT(FUNC_FLOW_STATUS_GET) |
+		BIT(FUNC_FLOW_CTRL_SET) |
+		BIT(FUNC_FLOW_AGE_TIMER_GET) |
+		BIT(FUNC_FLOW_STATUS_SET) |
+		BIT(FUNC_FLOW_HOST_GET) |
+		BIT(FUNC_FLOW_HOST_DEL) |
+		BIT(FUNC_FLOW_CTRL_GET) |
+		BIT(FUNC_FLOW_AGE_TIMER_SET) |
+		BIT(FUNC_FLOW_ENTRY_ADD) |
+		BIT(FUNC_FLOW_GLOBAL_CFG_GET) |
+		BIT(FUNC_FLOW_GLOBAL_CFG_SET) |
+		BIT(FUNC_FLOW_ENTRY_NEXT) |
+		BIT(FUNC_FLOW_COUNTER_GET) |
+		BIT(FUNC_FLOW_ENTRY_EN_SET) |
+		BIT(FUNC_FLOW_ENTRY_EN_GET) |
+		BIT(FUNC_FLOW_QOS_SET) |
+		BIT(FUNC_FLOW_QOS_GET);
+
 	return;
 }
 

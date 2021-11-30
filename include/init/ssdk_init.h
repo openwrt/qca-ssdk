@@ -206,6 +206,7 @@ enum {
 	QCA_PHY_F_INIT_BIT,
 	QCA_PHY_F_FORCE_BIT,
 	QCA_PHY_F_SFP_BIT,
+	QCA_PHY_F_SFP_SGMII_BIT,
 	QCA_PHY_FEATURE_MAX
 };
 /*qca808x_start*/
@@ -221,6 +222,7 @@ enum {
 #define PHY_F_INIT         _PHY_F(INIT)
 #define PHY_F_FORCE        _PHY_F(FORCE)
 #define PHY_F_SFP          _PHY_F(SFP)
+#define PHY_F_SFP_SGMII    _PHY_F(SFP_SGMII)
 
 typedef struct
 {

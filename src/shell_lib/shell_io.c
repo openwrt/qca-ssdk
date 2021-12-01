@@ -23,7 +23,7 @@
     do { if ((rtn) == NULL) return SW_BAD_PARAM; } while(0);
 
 #define DEFAULT_FLAG "default"
-#define MAX_ARRT_NUM 32
+#define MAX_ARRT_NUM 16
 #define INVALID_ARRT_VALUE 0xFFFFFFFF
 static char **full_cmdstrp;
 static int talk_mode = 1;
@@ -149,6 +149,7 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
+#if defined(IN_ACL) || defined(IN_TUNNEL)
 	{
 		"tunnel_type",
 		{
@@ -170,6 +171,7 @@ struct attr_des_t g_attr_des[] =
 			{NULL, INVALID_ARRT_VALUE}
 		}
 	},
+#endif
 	{
 		"vport_type",
 		{
@@ -334,27 +336,6 @@ struct attr_des_t g_attr_des[] =
 			{"proto_map0", FAL_TUNNEL_RULE_SRC3_PROTO_MAP0},
 			{"proto_map1", FAL_TUNNEL_RULE_SRC3_PROTO_MAP1},
 			{NULL, FAL_TUNNEL_RULE_SRC3_DATA_INVALID}
-		}
-	},
-	{
-		"tunnel_type",
-		{
-			{"gre_tap_ipv4", FAL_TUNNEL_TYPE_GRE_TAP_OVER_IPV4},
-			{"gre_tap_ipv6", FAL_TUNNEL_TYPE_GRE_TAP_OVER_IPV6},
-			{"vxlan_ipv4", FAL_TUNNEL_TYPE_VXLAN_OVER_IPV4},
-			{"vxlan_ipv6", FAL_TUNNEL_TYPE_VXLAN_OVER_IPV6},
-			{"vxlan_gpe_ipv4", FAL_TUNNEL_TYPE_VXLAN_GPE_OVER_IPV4},
-			{"vxlan_gpe_ipv6", FAL_TUNNEL_TYPE_VXLAN_GPE_OVER_IPV6},
-			{"ipv4_ipv6", FAL_TUNNEL_TYPE_IPV4_OVER_IPV6},
-			{"program0", FAL_TUNNEL_TYPE_PROGRAM0},
-			{"program1", FAL_TUNNEL_TYPE_PROGRAM1},
-			{"program2", FAL_TUNNEL_TYPE_PROGRAM2},
-			{"program3", FAL_TUNNEL_TYPE_PROGRAM3},
-			{"program4", FAL_TUNNEL_TYPE_PROGRAM4},
-			{"program5", FAL_TUNNEL_TYPE_PROGRAM5},
-			{"geneve_ipv4", FAL_TUNNEL_TYPE_GENEVE_OVER_IPV4},
-			{"geneve_ipv6", FAL_TUNNEL_TYPE_GENEVE_OVER_IPV6},
-			{NULL, FAL_TUNNEL_TYPE_INVALID_TUNNEL}
 		}
 	},
 	{

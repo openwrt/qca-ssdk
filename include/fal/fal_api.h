@@ -293,6 +293,12 @@ extern "C" {
     SW_API_DEF(SW_API_PT_MTU_CFG_GET, fal_port_mtu_cfg_get), \
     SW_API_DEF(SW_API_PT_MRU_MTU_SET, fal_port_mru_mtu_set), \
     SW_API_DEF(SW_API_PT_MRU_MTU_GET, fal_port_mru_mtu_get), \
+    SW_API_DEF(SW_API_PT_SOURCE_FILTER_GET, fal_port_source_filter_status_get), \
+    SW_API_DEF(SW_API_PT_SOURCE_FILTER_SET, fal_port_source_filter_enable), \
+    SW_API_DEF(SW_API_PT_SOURCE_FILTER_CONFIG_GET, fal_port_source_filter_config_get), \
+    SW_API_DEF(SW_API_PT_SOURCE_FILTER_CONFIG_SET, fal_port_source_filter_config_set), \
+    SW_API_DEF(SW_API_PT_PROMISC_MODE_SET, fal_port_promisc_mode_set), \
+    SW_API_DEF(SW_API_PT_PROMISC_MODE_GET, fal_port_promisc_mode_get), \
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
     SW_API_DESC(SW_API_PT_DUPLEX_SET) \
@@ -323,7 +329,13 @@ extern "C" {
     SW_API_DESC(SW_API_PT_MTU_CFG_SET) \
     SW_API_DESC(SW_API_PT_MTU_CFG_GET) \
     SW_API_DESC(SW_API_PT_MRU_MTU_SET) \
-    SW_API_DESC(SW_API_PT_MRU_MTU_GET)
+    SW_API_DESC(SW_API_PT_MRU_MTU_GET) \
+    SW_API_DESC(SW_API_PT_SOURCE_FILTER_GET) \
+    SW_API_DESC(SW_API_PT_SOURCE_FILTER_SET) \
+    SW_API_DESC(SW_API_PT_SOURCE_FILTER_CONFIG_GET) \
+    SW_API_DESC(SW_API_PT_SOURCE_FILTER_CONFIG_SET) \
+    SW_API_DESC(SW_API_PT_PROMISC_MODE_SET) \
+    SW_API_DESC(SW_API_PT_PROMISC_MODE_GET)
 /*end of PORTCONTROL_API_PARAM*/
 #endif
 
@@ -737,16 +749,56 @@ extern "C" {
     SW_API_DESC(SW_API_FDB_DEL_BY_FID)
 #else
 #define FDB_API \
-    SW_API_DEF(SW_API_FDB_PT_LEARN_SET,   fal_fdb_port_learn_set), \
-    SW_API_DEF(SW_API_FDB_FIND,           fal_fdb_entry_search), \
-    SW_API_DEF(SW_API_FDB_EXTEND_FIRST,   fal_fdb_entry_extend_getfirst), \
-    SW_API_DEF(SW_API_FDB_EXTEND_NEXT,    fal_fdb_entry_extend_getnext),
+    SW_API_DEF(SW_API_FDB_FIND,                    fal_fdb_entry_search), \
+    SW_API_DEF(SW_API_FDB_EXTEND_FIRST,            fal_fdb_entry_extend_getfirst), \
+    SW_API_DEF(SW_API_FDB_EXTEND_NEXT,             fal_fdb_entry_extend_getnext), \
+    SW_API_DEF(SW_API_FDB_DELALL,                  fal_fdb_entry_flush), \
+    SW_API_DEF(SW_API_FDB_DELPORT,                 fal_fdb_entry_del_byport), \
+    SW_API_DEF(SW_API_FDB_DELMAC,                  fal_fdb_entry_del_bymac), \
+    SW_API_DEF(SW_API_FDB_FIRST,                   fal_fdb_entry_getfirst), \
+    SW_API_DEF(SW_API_FDB_PT_LEARN_SET,            fal_fdb_port_learn_set), \
+    SW_API_DEF(SW_API_FDB_PT_NEWADDR_LEARN_SET,    fal_fdb_port_learning_ctrl_set), \
+    SW_API_DEF(SW_API_FDB_PT_NEWADDR_LEARN_GET,    fal_fdb_port_learning_ctrl_get), \
+    SW_API_DEF(SW_API_FDB_PT_STAMOVE_SET,          fal_fdb_port_stamove_ctrl_set), \
+    SW_API_DEF(SW_API_FDB_PT_STAMOVE_GET,          fal_fdb_port_stamove_ctrl_get), \
+    SW_API_DEF(SW_API_FDB_AGE_CTRL_SET,            fal_fdb_aging_ctrl_set), \
+    SW_API_DEF(SW_API_FDB_LEARN_CTRL_SET,          fal_fdb_learning_ctrl_set), \
+    SW_API_DEF(SW_API_FDB_ITERATE,                 fal_fdb_entry_getnext_byindex), \
+    SW_API_DEF(SW_API_FDB_EXTEND_NEXT,             fal_fdb_entry_extend_getnext), \
+    SW_API_DEF(SW_API_FDB_EXTEND_FIRST,            fal_fdb_entry_extend_getfirst), \
+    SW_API_DEF(SW_API_PT_FDB_LEARN_LIMIT_SET,      fal_port_fdb_learn_limit_set), \
+    SW_API_DEF(SW_API_PT_FDB_LEARN_LIMIT_GET,      fal_port_fdb_learn_limit_get), \
+    SW_API_DEF(SW_API_PT_FDB_LEARN_EXCEED_CMD_SET, fal_port_fdb_learn_exceed_cmd_set), \
+    SW_API_DEF(SW_API_PT_FDB_LEARN_EXCEED_CMD_GET, fal_port_fdb_learn_exceed_cmd_get), \
+    SW_API_DEF(SW_API_FDB_PT_MACLIMIT_CTRL_SET,    fal_fdb_port_maclimit_ctrl_set), \
+    SW_API_DEF(SW_API_FDB_PT_MACLIMIT_CTRL_GET,    fal_fdb_port_maclimit_ctrl_get), \
+    SW_API_DEF(SW_API_FDB_DEL_BY_FID,              fal_fdb_entry_del_byfid),
 
 #define FDB_API_PARAM \
-    SW_API_DESC(SW_API_FDB_PT_LEARN_SET) \
     SW_API_DESC(SW_API_FDB_FIND) \
     SW_API_DESC(SW_API_FDB_EXTEND_FIRST) \
-    SW_API_DESC(SW_API_FDB_EXTEND_NEXT)
+    SW_API_DESC(SW_API_FDB_EXTEND_NEXT) \
+    SW_API_DESC(SW_API_FDB_DELALL) \
+    SW_API_DESC(SW_API_FDB_DELPORT) \
+    SW_API_DESC(SW_API_FDB_DELMAC) \
+    SW_API_DESC(SW_API_FDB_FIRST) \
+    SW_API_DESC(SW_API_FDB_PT_LEARN_SET) \
+    SW_API_DESC(SW_API_FDB_PT_NEWADDR_LEARN_SET) \
+    SW_API_DESC(SW_API_FDB_PT_NEWADDR_LEARN_GET) \
+    SW_API_DESC(SW_API_FDB_PT_STAMOVE_SET) \
+    SW_API_DESC(SW_API_FDB_PT_STAMOVE_GET) \
+    SW_API_DESC(SW_API_FDB_AGE_CTRL_SET) \
+    SW_API_DESC(SW_API_FDB_LEARN_CTRL_SET) \
+    SW_API_DESC(SW_API_FDB_ITERATE) \
+    SW_API_DESC(SW_API_FDB_EXTEND_NEXT) \
+    SW_API_DESC(SW_API_FDB_EXTEND_FIRST) \
+    SW_API_DESC(SW_API_PT_FDB_LEARN_LIMIT_SET) \
+    SW_API_DESC(SW_API_PT_FDB_LEARN_LIMIT_GET) \
+    SW_API_DESC(SW_API_PT_FDB_LEARN_EXCEED_CMD_SET) \
+    SW_API_DESC(SW_API_PT_FDB_LEARN_EXCEED_CMD_GET) \
+    SW_API_DESC(SW_API_FDB_PT_MACLIMIT_CTRL_SET) \
+    SW_API_DESC(SW_API_FDB_PT_MACLIMIT_CTRL_GET) \
+    SW_API_DESC(SW_API_FDB_DEL_BY_FID)
 #endif
 #else
 #define FDB_API

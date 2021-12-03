@@ -759,13 +759,6 @@ struct sub_cmd_des_t g_fdb_des[] =
 {
 #ifndef IN_FDB_MINI
 	{"entry", "set",   SW_API_FDB_ADD, NULL},
-	{"entry", "add",   SW_API_FDB_ADD, NULL},
-	{"entry", "del",   SW_API_FDB_DELMAC, NULL},
-	{"entry", "flush",   SW_API_FDB_DELALL, NULL},
-	{"entry", "transfer",   SW_API_FDB_TRANSFER, NULL},
-	{"portEntry", "flush",   SW_API_FDB_DELPORT, NULL},
-	{"firstEntry", "find",   SW_API_FDB_FIRST, NULL},
-	{"nextEntry", "find",   SW_API_FDB_NEXT, NULL},
 #endif
 	{"portLearn", "set",   SW_API_FDB_PT_LEARN_SET, NULL},
 #ifndef IN_FDB_MINI
@@ -777,16 +770,11 @@ struct sub_cmd_des_t g_fdb_des[] =
 	{"learnlimit", "set",   SW_API_FDB_LEARN_LIMIT_SET, NULL},
 	{"learnexceedcmd", "set",   SW_API_FDB_LEARN_EXCEED_CMD_SET, NULL},
 	{"resventry", "set",   SW_API_FDB_RESV_ADD, NULL},
-	{"resventry", "add",   SW_API_FDB_RESV_ADD, NULL},
-	{"resventry", "del",   SW_API_FDB_RESV_DEL, NULL},
 	{"ptLearnstatic", "set",   SW_API_FDB_PT_LEARN_STATIC_SET, NULL},
-	{"port", "add",   SW_API_FDB_PORT_ADD, NULL},
-	{"port", "del",   SW_API_FDB_PORT_DEL, NULL},
 	{"LearnCtrl", "set", SW_API_FDB_LEARN_CTRL_SET, NULL},
 	{"PtLearnCtrl", "set", SW_API_FDB_PT_NEWADDR_LEARN_SET, NULL},
 	{"PtStationMove", "set", SW_API_FDB_PT_STAMOVE_SET, NULL},
 	{"PtMacLimitCtrl", "set", SW_API_FDB_PT_MACLIMIT_CTRL_SET, NULL},
-        {"fidEntry", "flush", SW_API_FDB_DEL_BY_FID, NULL},
 #endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };

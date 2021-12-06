@@ -460,6 +460,13 @@ extern "C"
 	  (*hsl_ring_union_get) (a_uint32_t dev_id, a_bool_t *en);
 
   typedef sw_error_t
+	  (*hsl_ring_flow_ctrl_get) (a_uint32_t dev_id, a_uint32_t ring_id,
+			  a_bool_t *status);
+  typedef sw_error_t
+	  (*hsl_ring_flow_ctrl_set) (a_uint32_t dev_id, a_uint32_t ring_id,
+			  a_bool_t status);
+
+  typedef sw_error_t
     (*hsl_port_8023az_set) (a_uint32_t dev_id, fal_port_t port_id,
 			    a_bool_t enable);
 
@@ -2156,6 +2163,8 @@ typedef sw_error_t
     hsl_ring_flow_ctrl_status_get ring_flow_ctrl_status_get;
     hsl_ring_union_set ring_union_set;
     hsl_ring_union_get ring_union_get;
+    hsl_ring_flow_ctrl_set ring_flow_ctrl_set;
+    hsl_ring_flow_ctrl_get ring_flow_ctrl_get;
 /*qca808x_start*/
     hsl_port_8023az_set port_8023az_set;
     hsl_port_8023az_get port_8023az_get;

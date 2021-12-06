@@ -2802,6 +2802,8 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
 	p_api->ring_flow_ctrl_status_get = mht_ring_flow_ctrl_status_get;
 	p_api->ring_union_set = mht_ring_union_set;
 	p_api->ring_union_get = mht_ring_union_get;
+	p_api->ring_flow_ctrl_set = mht_ring_flow_ctrl_config_set;
+	p_api->ring_flow_ctrl_get = mht_ring_flow_ctrl_config_get;
 #endif
 
     }

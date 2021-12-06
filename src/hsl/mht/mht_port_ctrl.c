@@ -292,6 +292,49 @@ _mht_port_flowctrl_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
+static sw_error_t
+_mht_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status)
+{
+
+	sw_error_t rv = SW_OK;
+	a_uint32_t val = 0;
+
+	HSL_DEV_ID_CHECK (dev_id);
+	if (ring_id >= PORT5_MAX_VIRT_RING) {
+		return SW_BAD_PARAM;
+	}
+
+	HSL_REG_ENTRY_GET(rv, dev_id, SWITCH_CORE_SWITCH_RING_FC, 0,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	val &= ~BIT(ring_id);
+	val |= status << ring_id;
+
+	HSL_REG_ENTRY_SET(rv, dev_id, SWITCH_CORE_SWITCH_RING_FC, 0,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+	return rv;
+}
+
+static sw_error_t
+_mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+
+	sw_error_t rv = SW_OK;
+	a_uint32_t val = 0;
+
+	HSL_DEV_ID_CHECK (dev_id);
+	if (ring_id >= PORT5_MAX_VIRT_RING) {
+		return SW_BAD_PARAM;
+	}
+
+	HSL_REG_ENTRY_GET(rv, dev_id, SWITCH_CORE_SWITCH_RING_FC, 0,
+			(a_uint8_t *)(&val), sizeof(a_uint32_t));
+
+	*status = (val & BIT(ring_id)) ? A_TRUE : A_FALSE;
+
+	return rv;
+}
+
 /**
  * @brief Set flow congestion drop on a particular port queue.
  * @param[in] dev_id device id
@@ -456,6 +499,40 @@ mht_port_flowctrl_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	HSL_API_LOCK;
 	rv = _mht_port_flowctrl_thresh_set(dev_id, port_id, on, off);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get port 0 & port5 ring flow control status.
+ * @param[in] dev_id device id
+ * @param[in] ring_id ring id
+ * @param[in] status enable or not
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status)
+{
+	sw_error_t rv;
+	HSL_API_LOCK;
+	rv = _mht_ring_flow_ctrl_config_set(dev_id, ring_id, status);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set port 0 & port5 ring flow control status.
+ * @param[in] dev_id device id
+ * @param[in] ring_id ring id
+ * @param[out] status enable or not
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+	sw_error_t rv;
+	HSL_API_LOCK;
+	rv = _mht_ring_flow_ctrl_config_get(dev_id, ring_id, status);
 	HSL_API_UNLOCK;
 	return rv;
 }

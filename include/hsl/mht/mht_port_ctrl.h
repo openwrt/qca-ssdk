@@ -48,6 +48,10 @@ sw_error_t
 mht_ring_union_set(a_uint32_t dev_id, a_bool_t en);
 sw_error_t
 mht_ring_union_get(a_uint32_t dev_id, a_bool_t *en);
+sw_error_t
+mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
+sw_error_t
+mht_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

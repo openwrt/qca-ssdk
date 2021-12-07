@@ -592,7 +592,7 @@ static sw_data_type_t sw_data_type[] =
 #endif
     SW_TYPE_DEF(SW_MACCMD, cmd_data_check_maccmd, NULL),
 #ifdef IN_IP
-#ifndef IN_IP_MINI
+#if !defined(IN_IP_MINI)
     SW_TYPE_DEF(SW_FLOWCMD, cmd_data_check_flowcmd, NULL),
     SW_TYPE_DEF(SW_FLOWTYPE, cmd_data_check_flowtype, NULL),
 #endif
@@ -653,6 +653,7 @@ static sw_data_type_t sw_data_type[] =
 #endif
 #if defined(IN_IP) || defined(IN_NAT)
     SW_TYPE_DEF(SW_IP_HOSTENTRY, (param_check_t)cmd_data_check_host_entry, NULL),
+#if !defined(IN_IP_MINI)
     SW_TYPE_DEF(SW_ARP_LEARNMODE, cmd_data_check_arp_learn_mode, NULL),
     SW_TYPE_DEF(SW_IP_GUARDMODE, cmd_data_check_ip_guard_mode, NULL),
     SW_TYPE_DEF(SW_NATENTRY, (param_check_t)cmd_data_check_nat_entry, NULL),
@@ -661,10 +662,11 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_FLOWCOOKIE, (param_check_t)cmd_data_check_flow_cookie, NULL),
     SW_TYPE_DEF(SW_FLOWRFS, (param_check_t)cmd_data_check_flow_rfs, NULL),
     SW_TYPE_DEF(SW_NAPTMODE, cmd_data_check_napt_mode, NULL),
-    SW_TYPE_DEF(SW_IP4ADDR, (param_check_t)cmd_data_check_ip4addr, NULL),
-    SW_TYPE_DEF(SW_IP6ADDR, (param_check_t)cmd_data_check_ip6addr, NULL),
     SW_TYPE_DEF(SW_INTFMACENTRY, (param_check_t)cmd_data_check_intf_mac_entry, NULL),
     SW_TYPE_DEF(SW_PUBADDRENTRY, (param_check_t)cmd_data_check_pub_addr_entry, NULL),
+#endif
+    SW_TYPE_DEF(SW_IP4ADDR, (param_check_t)cmd_data_check_ip4addr, NULL),
+    SW_TYPE_DEF(SW_IP6ADDR, (param_check_t)cmd_data_check_ip6addr, NULL),
 #endif
 #ifdef IN_RATE
     SW_TYPE_DEF(SW_INGPOLICER, (param_check_t)cmd_data_check_port_policer, NULL),
@@ -706,13 +708,14 @@ static sw_data_type_t sw_data_type[] =
 #endif
 #endif
 #ifdef IN_IP
-#ifndef IN_IP_MINI
+#if !defined(IN_IP_MINI)
     SW_TYPE_DEF(SW_DEFAULT_ROUTE_ENTRY, (param_check_t)cmd_data_check_default_route_entry, NULL),
-    SW_TYPE_DEF(SW_HOST_ROUTE_ENTRY, (param_check_t)cmd_data_check_host_route_entry, NULL),
     SW_TYPE_DEF(SW_IP_RFS_IP4, (param_check_t)cmd_data_check_ip4_rfs_entry, NULL),
     SW_TYPE_DEF(SW_IP_RFS_IP6, (param_check_t)cmd_data_check_ip6_rfs_entry, NULL),
-    SW_TYPE_DEF(SW_ARP_SG_CFG, (param_check_t)cmd_data_check_arp_sg, NULL),
+    SW_TYPE_DEF(SW_HOST_ROUTE_ENTRY, (param_check_t)cmd_data_check_host_route_entry, NULL),
     SW_TYPE_DEF(SW_IP_NETWORK_ROUTE, (param_check_t)cmd_data_check_network_route, NULL),
+#endif
+    SW_TYPE_DEF(SW_ARP_SG_CFG, (param_check_t)cmd_data_check_arp_sg, NULL),
     SW_TYPE_DEF(SW_IP_INTF, (param_check_t)cmd_data_check_intf, NULL),
     SW_TYPE_DEF(SW_IP_VSI_INTF, (param_check_t)cmd_data_check_vsi_intf, NULL),
     SW_TYPE_DEF(SW_IP_NEXTHOP, (param_check_t)cmd_data_check_nexthop, NULL),
@@ -721,7 +724,6 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_IP_PORTMAC, (param_check_t)cmd_data_check_ip_portmac, NULL),
     SW_TYPE_DEF(SW_IP_MCMODE, (param_check_t)cmd_data_check_ip_mcmode, NULL),
     SW_TYPE_DEF(SW_IP_GLOBAL, (param_check_t)cmd_data_check_ip_global, NULL),
-#endif
 #endif
 #ifdef IN_PORTCONTROL
 #ifndef IN_PORTCONTROL_MINI
@@ -3158,7 +3160,7 @@ cmd_data_check_maccmd(char *cmdstr, fal_fwd_cmd_t * val, a_uint32_t size)
 
 /*flow*/
 #ifdef IN_IP
-#ifndef IN_IP_MINI
+#if !defined(IN_IP_MINI)
 sw_error_t
 cmd_data_check_flowcmd(char *cmdstr, fal_default_flow_cmd_t * val, a_uint32_t size)
 {
@@ -6827,7 +6829,7 @@ cmd_data_check_host_entry(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 }
 
-
+#if !defined(IN_IP_MINI)
 sw_error_t
 cmd_data_check_arp_learn_mode(char *cmd_str, fal_arp_learn_mode_t * arg_val,
                               a_uint32_t size)
@@ -7302,7 +7304,6 @@ cmd_data_check_flow_entry(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 }
 
-
 sw_error_t
 cmd_data_check_napt_mode(char *cmd_str, fal_napt_mode_t * arg_val,
                          a_uint32_t size)
@@ -7335,7 +7336,6 @@ cmd_data_check_napt_mode(char *cmd_str, fal_napt_mode_t * arg_val,
 
     return SW_OK;
 }
-
 
 sw_error_t
 cmd_data_check_intf_mac_entry(char *cmd_str, void * val, a_uint32_t size)
@@ -7399,7 +7399,6 @@ cmd_data_check_intf_mac_entry(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 }
 
-
 sw_error_t
 cmd_data_check_pub_addr_entry(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -7425,6 +7424,7 @@ cmd_data_check_pub_addr_entry(char *cmd_str, void * val, a_uint32_t size)
     *(fal_nat_pub_addr_t *)val = entry;
     return SW_OK;
 }
+#endif
 #endif
 
 #ifdef IN_RATE
@@ -9054,7 +9054,7 @@ cmd_data_check_remark_entry(char *info, void *val, a_uint32_t size)
 #endif
 #endif
 #ifdef IN_IP
-#ifndef IN_IP_MINI
+#if !defined(IN_IP_MINI)
 sw_error_t
 cmd_data_check_default_route_entry(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -9370,6 +9370,7 @@ cmd_data_check_fdb_rfs(char *cmd_str, void * val, a_uint32_t size)
 }
 #endif
 #if defined(IN_IP) || defined(IN_NAT)
+#if !defined(IN_IP_MINI)
 sw_error_t
 cmd_data_check_flow_cookie(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -9483,8 +9484,8 @@ cmd_data_check_flow_rfs(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 }
 #endif
+#endif
 #ifdef IN_IP
-#ifndef IN_IP_MINI
 sw_error_t
 cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -10762,6 +10763,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 }
 
+#if !defined(IN_IP_MINI)
 sw_error_t
 cmd_data_check_network_route(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -10903,8 +10905,7 @@ cmd_data_check_network_route(char *cmd_str, void * val, a_uint32_t size)
     *(fal_network_route_entry_t *)val = entry;
     return SW_OK;
 }
-
-
+#endif
 
 sw_error_t
 cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
@@ -11166,6 +11167,8 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
     *(fal_arp_sg_cfg_t *)val = entry;
     return SW_OK;
 }
+
+#if !defined(IN_IP_MINI)
 sw_error_t
 cmd_data_check_ip6_rfs_entry(char *cmd_str, void * val, a_uint32_t size)
 {

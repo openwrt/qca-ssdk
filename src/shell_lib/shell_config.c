@@ -1067,11 +1067,11 @@ struct sub_cmd_des_t g_misc_des[] =
 #ifdef IN_IP
 struct sub_cmd_des_t g_ip_des[] =
 {
-#ifndef IN_IP_MINI
 	{"hostentry", "set", SW_API_IP_HOST_ADD, NULL},
 	{"hostentry", "add", SW_API_IP_HOST_ADD, NULL},
 	{"hostentry", "del", SW_API_IP_HOST_DEL, NULL},
 	{"hostentry", "next", SW_API_IP_HOST_NEXT, NULL},
+#if !defined(IN_IP_MINI)
 	{"hostentry", "bindcnt", SW_API_IP_HOST_COUNTER_BIND, NULL},
 	{"hostentry", "bindpppoe", SW_API_IP_HOST_PPPOE_BIND, NULL},
 	{"ptarplearn", "set", SW_API_IP_PT_ARP_LEARN_SET, NULL},
@@ -1095,9 +1095,10 @@ struct sub_cmd_des_t g_ip_des[] =
 	{"rfsip6", "set", SW_API_IP_RFS_IP6_SET, NULL},
 	{"defaultflowcmd", "set", SW_API_IP_DEFAULT_FLOW_CMD_SET, NULL},
 	{"defaultrtflowcmd", "set", SW_API_IP_DEFAULT_RT_FLOW_CMD_SET, NULL},
-	{"vsiarpsg", "set",  SW_API_IP_VIS_ARP_SG_CFG_SET, NULL},
 	{"networkroute", "set",  SW_API_IP_NETWORK_ROUTE_ADD, NULL},
 	{"networkroute", "add",  SW_API_IP_NETWORK_ROUTE_ADD, NULL},
+#endif
+	{"vsiarpsg", "set",  SW_API_IP_VIS_ARP_SG_CFG_SET, NULL},
 	{"intf", "set",  SW_API_IP_INTF_SET, NULL},
 	{"vsiintf", "set",  SW_API_IP_VSI_INTF_SET, NULL},
 	{"portintf", "set",  SW_API_IP_PORT_INTF_SET, NULL},
@@ -1110,7 +1111,6 @@ struct sub_cmd_des_t g_ip_des[] =
 	{"portarpsg", "set",  SW_API_IP_PORT_ARP_SG_SET, NULL},
 	{"mcmode", "set",  SW_API_IP_VSI_MC_MODE_SET, NULL},
 	{"globalctrl", "set",  SW_API_GLOBAL_CTRL_SET, NULL},
-#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif

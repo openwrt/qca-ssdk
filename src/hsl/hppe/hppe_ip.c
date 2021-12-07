@@ -23,7 +23,6 @@
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
 
-#ifndef IN_IP_MINI
 static a_uint32_t host_cmd_id = 0;
 sw_error_t
 hppe_rt_interface_cnt_tbl_get(
@@ -138,20 +137,6 @@ hppe_l3_vsi_ext_set(
 }
 
 sw_error_t
-hppe_network_route_ip_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union network_route_ip_u *value)
-{
-	return hppe_reg_tbl_get(
-				dev_id,
-				IPE_L3_BASE_ADDR + NETWORK_ROUTE_IP_ADDRESS + \
-				index * NETWORK_ROUTE_IP_INC,
-				value->val,
-				2);
-}
-
-sw_error_t
 hppe_in_pub_ip_addr_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -178,6 +163,21 @@ hppe_in_pub_ip_addr_tbl_get(
 				IPE_L3_BASE_ADDR + IN_PUB_IP_ADDR_TBL_ADDRESS + \
 				index * IN_PUB_IP_ADDR_TBL_INC,
 				&value->val);
+}
+
+#if !defined(IN_IP_MINI)
+sw_error_t
+hppe_network_route_ip_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union network_route_ip_u *value)
+{
+	return hppe_reg_tbl_get(
+				dev_id,
+				IPE_L3_BASE_ADDR + NETWORK_ROUTE_IP_ADDRESS + \
+				index * NETWORK_ROUTE_IP_INC,
+				value->val,
+				2);
 }
 
 sw_error_t
@@ -250,6 +250,7 @@ hppe_network_route_action_set(
 				value->val);
 }
 #endif
+
 sw_error_t
 hppe_l3_route_ctrl_get(
 		a_uint32_t dev_id,
@@ -272,7 +273,6 @@ hppe_l3_route_ctrl_set(
 				value->val);
 }
 
-#if ((!defined IN_IP_MINI) || (!defined IN_FLOW_MINI))
 sw_error_t
 hppe_l3_route_ctrl_ext_get(
 		a_uint32_t dev_id,
@@ -294,8 +294,7 @@ hppe_l3_route_ctrl_ext_set(
 				IPE_L3_BASE_ADDR + L3_ROUTE_CTRL_EXT_ADDRESS,
 				value->val);
 }
-#endif
-#ifndef IN_IP_MINI
+
 sw_error_t
 hppe_host_tbl_op_get(
 		a_uint32_t dev_id,
@@ -317,8 +316,7 @@ hppe_host_tbl_op_set(
 				IPE_L3_BASE_ADDR + HOST_TBL_OP_ADDRESS,
 				value->val);
 }
-#endif
-#if ((!defined IN_IP_MINI) || (!defined IN_FLOW_MINI))
+
 sw_error_t
 hppe_host_tbl_op_data0_get(
 		a_uint32_t dev_id,
@@ -428,8 +426,7 @@ hppe_host_tbl_op_data4_set(
 				IPE_L3_BASE_ADDR + HOST_TBL_OP_DATA4_ADDRESS,
 				value->val);
 }
-#endif
-#ifndef IN_IP_MINI
+
 sw_error_t
 hppe_host_tbl_op_data5_get(
 		a_uint32_t dev_id,
@@ -580,8 +577,7 @@ hppe_host_tbl_rd_op_set(
 				IPE_L3_BASE_ADDR + HOST_TBL_RD_OP_ADDRESS,
 				value->val);
 }
-#endif
-#if ((!defined IN_IP_MINI) || (!defined IN_FLOW_MINI))
+
 sw_error_t
 hppe_host_tbl_rd_op_data0_get(
 		a_uint32_t dev_id,
@@ -691,8 +687,7 @@ hppe_host_tbl_rd_op_data4_set(
 				IPE_L3_BASE_ADDR + HOST_TBL_RD_OP_DATA4_ADDRESS,
 				value->val);
 }
-#endif
-#ifndef IN_IP_MINI
+
 sw_error_t
 hppe_host_tbl_rd_op_data5_get(
 		a_uint32_t dev_id,
@@ -1074,7 +1069,7 @@ hppe_l3_dbg_rd_data_set(
 {
 	return SW_NOT_SUPPORTED;
 }
-#endif
+
 sw_error_t
 hppe_l3_vp_port_tbl_get(
 		a_uint32_t dev_id,
@@ -1102,7 +1097,7 @@ hppe_l3_vp_port_tbl_set(
 				value->val,
 				sizeof(union l3_vp_port_tbl_u)/sizeof(a_uint32_t));
 }
-#if ((!defined IN_IP_MINI) || (defined IN_PPPOE))
+
 sw_error_t
 hppe_in_l3_if_tbl_get(
 		a_uint32_t dev_id,
@@ -1130,8 +1125,7 @@ hppe_in_l3_if_tbl_set(
 				value->val,
 				sizeof(union in_l3_if_tbl_u)/sizeof(a_uint32_t));
 }
-#endif
-#ifndef IN_IP_MINI
+
 sw_error_t
 hppe_host_ipv6_mcast_tbl_get(
 		a_uint32_t dev_id,
@@ -1271,7 +1265,6 @@ hppe_in_nexthop_tbl_set(
 				value->val,
 				4);
 }
-#endif
 
 sw_error_t
 hppe_eg_l3_if_tbl_get(
@@ -1301,7 +1294,7 @@ hppe_eg_l3_if_tbl_set(
 				3);
 }
 
-#ifndef IN_IP_MINI
+#if 0
 sw_error_t
 hppe_my_mac_tbl_mac_da_get(
 		a_uint32_t dev_id,
@@ -2296,6 +2289,7 @@ hppe_l3_vsi_ext_ipv6_sg_cvlan_en_set(
 	return ret;
 }
 
+#if !defined(IN_IP_MINI)
 sw_error_t
 hppe_network_route_ip_ip_addr_mask_get(
 		a_uint32_t dev_id,
@@ -2512,6 +2506,7 @@ hppe_network_route_action_dst_info_set(
 	ret = hppe_network_route_action_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_l3_route_ctrl_flow_src_if_check_de_acce_get(
@@ -4851,42 +4846,7 @@ hppe_l3_vp_port_tbl_ipv6_sg_cvlan_en_set(
 	ret = hppe_l3_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-#endif
 
-#if defined(APPE)
-sw_error_t
-appe_l3_vp_port_tbl_ipo_vp_profile_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		a_uint32_t value)
-{
-	union l3_vp_port_tbl_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l3_vp_port_tbl_get(dev_id, index, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.ipo_vp_profile= value;
-	ret = hppe_l3_vp_port_tbl_set(dev_id, index, &reg_val);
-	return ret;
-}
-
-sw_error_t
-appe_l3_vp_port_tbl_ipo_vp_profile_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		a_uint32_t *value)
-{
-	union l3_vp_port_tbl_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l3_vp_port_tbl_get(dev_id, index, &reg_val);
-	*value = reg_val.bf.ipo_vp_profile;
-	return ret;
-}
-#endif
-
-#ifndef IN_IP_MINI
 sw_error_t
 hppe_in_l3_if_tbl_ttl_dec_bypass_get(
 		a_uint32_t dev_id,
@@ -5826,7 +5786,7 @@ hppe_rt_interface_cnt_tbl_drop_pkt_cnt_set(
 	ret = hppe_rt_interface_cnt_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 
 sw_error_t
 hppe_host_op_common(
@@ -6133,5 +6093,37 @@ hppe_host_flush_common(a_uint32_t dev_id)
 		return SW_FAIL;
 	
 	
+}
+
+#if defined(APPE)
+sw_error_t
+appe_l3_vp_port_tbl_ipo_vp_profile_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union l3_vp_port_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_l3_vp_port_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ipo_vp_profile= value;
+	ret = hppe_l3_vp_port_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+appe_l3_vp_port_tbl_ipo_vp_profile_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union l3_vp_port_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_l3_vp_port_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ipo_vp_profile;
+	return ret;
 }
 #endif

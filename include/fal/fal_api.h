@@ -1496,7 +1496,7 @@ extern "C" {
 #endif
 
 #ifdef IN_IP
-#ifndef IN_IP_MINI
+#if !defined(IN_IP_MINI)
 #define IP_API \
     SW_API_DEF(SW_API_IP_HOST_ADD, fal_ip_host_add), \
     SW_API_DEF(SW_API_IP_HOST_DEL, fal_ip_host_del), \
@@ -1669,8 +1669,89 @@ extern "C" {
     SW_API_DESC(SW_API_IP_INTF_DMAC_CHECK_SET) \
     SW_API_DESC(SW_API_IP_INTF_DMAC_CHECK_GET)
 #else
-#define IP_API
-#define IP_API_PARAM
+#define IP_API \
+    SW_API_DEF(SW_API_IP_HOST_ADD, fal_ip_host_add), \
+    SW_API_DEF(SW_API_IP_HOST_DEL, fal_ip_host_del), \
+    SW_API_DEF(SW_API_IP_HOST_GET, fal_ip_host_get), \
+    SW_API_DEF(SW_API_IP_HOST_NEXT, fal_ip_host_next), \
+    SW_API_DEF(SW_API_IP_VIS_ARP_SG_CFG_GET, fal_ip_vsi_arp_sg_cfg_get), \
+    SW_API_DEF(SW_API_IP_VIS_ARP_SG_CFG_SET, fal_ip_vsi_arp_sg_cfg_set), \
+    SW_API_DEF(SW_API_IP_INTF_GET, fal_ip_intf_get), \
+    SW_API_DEF(SW_API_IP_INTF_SET, fal_ip_intf_set), \
+    SW_API_DEF(SW_API_IP_VSI_INTF_GET, fal_ip_vsi_intf_get), \
+    SW_API_DEF(SW_API_IP_VSI_INTF_SET, fal_ip_vsi_intf_set), \
+    SW_API_DEF(SW_API_IP_NEXTHOP_GET, fal_ip_nexthop_get), \
+    SW_API_DEF(SW_API_IP_NEXTHOP_SET, fal_ip_nexthop_set), \
+    SW_API_DEF(SW_API_IP_VSI_SG_SET, fal_ip_vsi_sg_cfg_set), \
+    SW_API_DEF(SW_API_IP_VSI_SG_GET, fal_ip_vsi_sg_cfg_get), \
+    SW_API_DEF(SW_API_IP_PORT_SG_SET, fal_ip_port_sg_cfg_set), \
+    SW_API_DEF(SW_API_IP_PORT_SG_GET, fal_ip_port_sg_cfg_get), \
+    SW_API_DEF(SW_API_IP_PUB_IP_SET, fal_ip_pub_addr_set), \
+    SW_API_DEF(SW_API_IP_PUB_IP_GET, fal_ip_pub_addr_get), \
+    SW_API_DEF(SW_API_IP_PORT_INTF_GET, fal_ip_port_intf_get), \
+    SW_API_DEF(SW_API_IP_PORT_INTF_SET, fal_ip_port_intf_set), \
+    SW_API_DEF(SW_API_IP_PORT_MAC_GET, fal_ip_port_macaddr_get), \
+    SW_API_DEF(SW_API_IP_PORT_MAC_SET, fal_ip_port_macaddr_set), \
+    SW_API_DEF(SW_API_IP_ROUTE_MISS_GET, fal_ip_route_mismatch_action_get), \
+    SW_API_DEF(SW_API_IP_ROUTE_MISS_SET, fal_ip_route_mismatch_action_set), \
+    SW_API_DEF(SW_API_IP_PORT_ARP_SG_SET, fal_ip_port_arp_sg_cfg_set), \
+    SW_API_DEF(SW_API_IP_PORT_ARP_SG_GET, fal_ip_port_arp_sg_cfg_get), \
+    SW_API_DEF(SW_API_IP_VSI_MC_MODE_SET, fal_ip_vsi_mc_mode_set), \
+    SW_API_DEF(SW_API_IP_VSI_MC_MODE_GET, fal_ip_vsi_mc_mode_get), \
+    SW_API_DEF(SW_API_GLOBAL_CTRL_GET, fal_ip_global_ctrl_get), \
+    SW_API_DEF(SW_API_GLOBAL_CTRL_SET, fal_ip_global_ctrl_set), \
+    SW_API_DEF(SW_API_IP_INTF_MTU_MRU_SET, fal_ip_intf_mtu_mru_set), \
+    SW_API_DEF(SW_API_IP_INTF_MTU_MRU_GET, fal_ip_intf_mtu_mru_get), \
+    SW_API_DEF(SW_API_IP6_INTF_MTU_MRU_SET, fal_ip6_intf_mtu_mru_set), \
+    SW_API_DEF(SW_API_IP6_INTF_MTU_MRU_GET, fal_ip6_intf_mtu_mru_get), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_ADD, fal_ip_intf_macaddr_add), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_DEL, fal_ip_intf_macaddr_del), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_GET_FIRST, fal_ip_intf_macaddr_get_first), \
+    SW_API_DEF(SW_API_IP_INTF_MACADDR_GET_NEXT, fal_ip_intf_macaddr_get_next), \
+    SW_API_DEF(SW_API_IP_INTF_DMAC_CHECK_SET, fal_ip_intf_dmac_check_set), \
+    SW_API_DEF(SW_API_IP_INTF_DMAC_CHECK_GET, fal_ip_intf_dmac_check_get),
+
+#define IP_API_PARAM \
+    SW_API_DESC(SW_API_IP_HOST_ADD) \
+    SW_API_DESC(SW_API_IP_HOST_DEL) \
+    SW_API_DESC(SW_API_IP_HOST_GET) \
+    SW_API_DESC(SW_API_IP_HOST_NEXT) \
+    SW_API_DESC(SW_API_IP_VIS_ARP_SG_CFG_GET) \
+    SW_API_DESC(SW_API_IP_VIS_ARP_SG_CFG_SET) \
+    SW_API_DESC(SW_API_IP_INTF_GET) \
+    SW_API_DESC(SW_API_IP_INTF_SET) \
+    SW_API_DESC(SW_API_IP_VSI_INTF_GET) \
+    SW_API_DESC(SW_API_IP_VSI_INTF_SET) \
+    SW_API_DESC(SW_API_IP_NEXTHOP_GET) \
+    SW_API_DESC(SW_API_IP_NEXTHOP_SET) \
+    SW_API_DESC(SW_API_IP_VSI_SG_SET) \
+    SW_API_DESC(SW_API_IP_VSI_SG_GET) \
+    SW_API_DESC(SW_API_IP_PORT_SG_SET) \
+    SW_API_DESC(SW_API_IP_PORT_SG_GET) \
+    SW_API_DESC(SW_API_IP_PUB_IP_SET) \
+    SW_API_DESC(SW_API_IP_PUB_IP_GET) \
+    SW_API_DESC(SW_API_IP_PORT_INTF_GET) \
+    SW_API_DESC(SW_API_IP_PORT_INTF_SET) \
+    SW_API_DESC(SW_API_IP_PORT_MAC_GET) \
+    SW_API_DESC(SW_API_IP_PORT_MAC_SET) \
+    SW_API_DESC(SW_API_IP_ROUTE_MISS_GET) \
+    SW_API_DESC(SW_API_IP_ROUTE_MISS_SET) \
+    SW_API_DESC(SW_API_IP_PORT_ARP_SG_SET) \
+    SW_API_DESC(SW_API_IP_PORT_ARP_SG_GET) \
+    SW_API_DESC(SW_API_IP_VSI_MC_MODE_SET) \
+    SW_API_DESC(SW_API_IP_VSI_MC_MODE_GET) \
+    SW_API_DESC(SW_API_GLOBAL_CTRL_GET) \
+    SW_API_DESC(SW_API_GLOBAL_CTRL_SET) \
+    SW_API_DESC(SW_API_IP_INTF_MTU_MRU_SET) \
+    SW_API_DESC(SW_API_IP_INTF_MTU_MRU_GET) \
+    SW_API_DESC(SW_API_IP6_INTF_MTU_MRU_SET) \
+    SW_API_DESC(SW_API_IP6_INTF_MTU_MRU_GET) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_ADD) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_DEL) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_GET_FIRST) \
+    SW_API_DESC(SW_API_IP_INTF_MACADDR_GET_NEXT) \
+    SW_API_DESC(SW_API_IP_INTF_DMAC_CHECK_SET) \
+    SW_API_DESC(SW_API_IP_INTF_DMAC_CHECK_GET)
 #endif
 #else
 #define IP_API

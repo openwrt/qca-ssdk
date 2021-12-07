@@ -273,6 +273,7 @@ union l3_vsi_ext_u {
 	struct l3_vsi_ext bf;
 };
 
+#if !defined(IN_IP_MINI)
 /*[register] NETWORK_ROUTE_IP*/
 #define NETWORK_ROUTE_IP
 #if defined (APPE)
@@ -376,6 +377,7 @@ union network_route_action_u {
 	a_uint32_t val;
 	struct network_route_action bf;
 };
+#endif
 
 /*[register] L3_ROUTE_CTRL*/
 #define L3_ROUTE_CTRL

@@ -773,6 +773,7 @@ hppe_eg_flow_tree_map_tbl_set(
 		a_uint32_t index,
 		union eg_flow_tree_map_tbl_u *value);
 
+#if 0
 sw_error_t
 hppe_flow_ctrl0_flow_hash_mode_0_get(
 		a_uint32_t dev_id,
@@ -1274,11 +1275,6 @@ hppe_in_flow_tbl_op_rslt_cmd_id_set(
 		unsigned int value);
 
 sw_error_t
-hppe_flow_host_tbl_op_rslt_host_entry_index_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
 hppe_flow_host_tbl_op_rslt_host_entry_index_set(
 		a_uint32_t dev_id,
 		unsigned int value);
@@ -1434,11 +1430,6 @@ hppe_in_flow_tbl_rd_op_rslt_cmd_id_set(
 		unsigned int value);
 
 sw_error_t
-hppe_flow_host_tbl_rd_op_rslt_host_entry_index_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
 hppe_flow_host_tbl_rd_op_rslt_host_entry_index_set(
 		a_uint32_t dev_id,
 		unsigned int value);
@@ -1478,6 +1469,17 @@ hppe_in_flow_cnt_tbl_hit_pkt_counter_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
+
+sw_error_t
+hppe_flow_host_tbl_op_rslt_host_entry_index_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+hppe_flow_host_tbl_rd_op_rslt_host_entry_index_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
 
 sw_error_t
 hppe_flow_ipv4_5tuple_add(

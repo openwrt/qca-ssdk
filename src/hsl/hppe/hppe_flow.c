@@ -25,7 +25,6 @@
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
 
-#ifndef IN_FLOW_MINI
 static a_uint32_t flow_cmd_id = 0;
 static a_uint32_t flow_host_cmd_id = 0;
 
@@ -78,7 +77,6 @@ hppe_flow_ctrl0_set(
 				IPE_L3_BASE_ADDR + FLOW_CTRL0_ADDRESS,
 				value->val);
 }
-#endif
 
 sw_error_t
 hppe_flow_ctrl1_get(
@@ -108,7 +106,6 @@ hppe_flow_ctrl1_set(
 				value->val);
 }
 
-#ifndef IN_FLOW_MINI
 sw_error_t
 hppe_in_flow_tbl_op_get(
 		a_uint32_t dev_id,
@@ -1668,6 +1665,7 @@ hppe_eg_flow_tree_map_tbl_set(
 }
 #endif
 
+#if 0
 sw_error_t
 hppe_flow_ctrl0_flow_hash_mode_0_get(
 		a_uint32_t dev_id,
@@ -2992,19 +2990,6 @@ hppe_in_flow_tbl_op_rslt_cmd_id_set(
 }
 
 sw_error_t
-hppe_flow_host_tbl_op_rslt_host_entry_index_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union flow_host_tbl_op_rslt_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_flow_host_tbl_op_rslt_get(dev_id, &reg_val);
-	*value = reg_val.bf.host_entry_index;
-	return ret;
-}
-
-sw_error_t
 hppe_flow_host_tbl_op_rslt_host_entry_index_set(
 		a_uint32_t dev_id,
 		a_uint32_t value)
@@ -3416,19 +3401,6 @@ hppe_in_flow_tbl_rd_op_rslt_cmd_id_set(
 }
 
 sw_error_t
-hppe_flow_host_tbl_rd_op_rslt_host_entry_index_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union flow_host_tbl_rd_op_rslt_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_flow_host_tbl_rd_op_rslt_get(dev_id, &reg_val);
-	*value = reg_val.bf.host_entry_index;
-	return ret;
-}
-
-sw_error_t
 hppe_flow_host_tbl_rd_op_rslt_host_entry_index_set(
 		a_uint32_t dev_id,
 		a_uint32_t value)
@@ -3530,7 +3502,33 @@ hppe_in_flow_cnt_tbl_hit_pkt_counter_set(
 	ret = hppe_in_flow_cnt_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
+sw_error_t
+hppe_flow_host_tbl_op_rslt_host_entry_index_get(
+		a_uint32_t dev_id,
+		a_uint32_t *value)
+{
+	union flow_host_tbl_op_rslt_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_flow_host_tbl_op_rslt_get(dev_id, &reg_val);
+	*value = reg_val.bf.host_entry_index;
+	return ret;
+}
+
+sw_error_t
+hppe_flow_host_tbl_rd_op_rslt_host_entry_index_get(
+		a_uint32_t dev_id,
+		a_uint32_t *value)
+{
+	union flow_host_tbl_rd_op_rslt_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_flow_host_tbl_rd_op_rslt_get(dev_id, &reg_val);
+	*value = reg_val.bf.host_entry_index;
+	return ret;
+}
 
 sw_error_t
 hppe_flow_get_common(
@@ -4392,4 +4390,3 @@ hppe_flow_ipv6_3tuple_get(
 	return hppe_flow_get_common(dev_id, op_mode, index, (a_uint32_t *)entry,
 			sizeof(union in_flow_ipv6_3tuple_tbl_u)/sizeof(a_uint32_t));
 }
-#endif

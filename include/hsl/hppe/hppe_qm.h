@@ -170,6 +170,7 @@ hppe_qm_dbg_data_set(
 		a_uint32_t dev_id,
 		union qm_dbg_data_u *value);
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 hppe_mcast_priority_map0_get(
 		a_uint32_t dev_id,
@@ -265,6 +266,7 @@ hppe_mcast_priority_map7_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mcast_priority_map7_u *value);
+#endif
 
 sw_error_t
 hppe_agg_profile_cnt_en_get(
@@ -420,6 +422,7 @@ hppe_ucast_priority_map_tbl_set(
 		a_uint32_t index,
 		union ucast_priority_map_tbl_u *value);
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 hppe_mcast_queue_map_tbl_get(
 		a_uint32_t dev_id,
@@ -431,6 +434,7 @@ hppe_mcast_queue_map_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mcast_queue_map_tbl_u *value);
+#endif
 
 sw_error_t
 hppe_ac_mseq_tbl_get(
@@ -840,6 +844,7 @@ hppe_uq_agg_profile_map_set(
 		a_uint32_t index,
 		union uq_agg_profile_map_u *value);
 
+#if 0
 sw_error_t
 hppe_flush_cfg_flush_busy_get(
 		a_uint32_t dev_id,
@@ -3808,5 +3813,6 @@ hppe_queue_tx_counter_tbl_tx_packets_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#endif
 #endif
 

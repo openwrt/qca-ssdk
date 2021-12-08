@@ -3845,6 +3845,12 @@ extern "C" {
     SW_PARAM_DEF(SW_API_FLOW_COUNTER_GET, SW_ENTRY_COUNTER, \
 		    sizeof(fal_entry_counter_t), SW_PARAM_PTR|SW_PARAM_OUT, "Flow entry counter"),
 
+#define SW_API_FLOW_COUNTER_CLEANUP_DESC \
+    SW_PARAM_DEF(SW_API_FLOW_COUNTER_CLEANUP, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \
+    SW_PARAM_DEF(SW_API_FLOW_COUNTER_CLEANUP, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "flow index"),
+
 #define SW_API_FLOW_ENTRY_EN_SET_DESC \
     SW_PARAM_DEF(SW_API_FLOW_ENTRY_EN_SET, SW_UINT32, \
 		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"),  \

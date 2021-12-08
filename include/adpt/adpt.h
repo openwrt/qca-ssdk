@@ -555,6 +555,9 @@ typedef sw_error_t (*adpt_flow_entry_add_func)(
 typedef sw_error_t (*adpt_flow_counter_get_func)(a_uint32_t dev_id,
 		a_uint32_t flow_index, fal_entry_counter_t *flow_counter);
 
+typedef sw_error_t (*adpt_flow_counter_cleanup_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index);
+
 typedef sw_error_t (*adpt_flow_entry_en_set_func)(a_uint32_t dev_id,
 		a_uint32_t flow_index, a_bool_t enable);
 
@@ -1672,6 +1675,7 @@ typedef struct
 	adpt_flow_global_cfg_get_func adpt_flow_global_cfg_get;
 	adpt_flow_global_cfg_set_func adpt_flow_global_cfg_set;
 	adpt_flow_counter_get_func adpt_flow_counter_get;
+	adpt_flow_counter_cleanup_func adpt_flow_counter_cleanup;
 	adpt_flow_entry_en_set_func adpt_flow_entry_en_set;
 	adpt_flow_entry_en_get_func adpt_flow_entry_en_get;
 	adpt_flow_qos_set_func adpt_flow_qos_set;

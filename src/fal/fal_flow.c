@@ -289,6 +289,21 @@ _fal_flow_counter_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_entry_counte
 }
 
 sw_error_t
+_fal_flow_counter_cleanup(a_uint32_t dev_id, a_uint32_t flow_index)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_flow_counter_cleanup)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_flow_counter_cleanup(dev_id, flow_index);
+	return rv;
+}
+
+sw_error_t
 _fal_flow_entry_en_set(a_uint32_t dev_id, a_uint32_t flow_index, a_bool_t enable)
 {
 	adpt_api_t *p_api;
@@ -553,6 +568,17 @@ fal_flow_counter_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_entry_counter
 }
 
 sw_error_t
+fal_flow_counter_cleanup(a_uint32_t dev_id, a_uint32_t flow_index)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_flow_counter_cleanup(dev_id, flow_index);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
+sw_error_t
 fal_flow_entry_en_set(a_uint32_t dev_id, a_uint32_t flow_index, a_bool_t enable)
 {
 	sw_error_t rv = SW_OK;
@@ -617,6 +643,7 @@ EXPORT_SYMBOL(fal_flow_entry_en_get);
 EXPORT_SYMBOL(fal_flow_qos_set);
 EXPORT_SYMBOL(fal_flow_qos_get);
 EXPORT_SYMBOL(fal_flow_counter_get);
+EXPORT_SYMBOL(fal_flow_counter_cleanup);
 EXPORT_SYMBOL(fal_flow_mgmt_get);
 EXPORT_SYMBOL(fal_flow_mgmt_set);
 

@@ -1950,6 +1950,24 @@ adpt_hppe_flow_counter_get(a_uint32_t dev_id,
 }
 
 sw_error_t
+adpt_hppe_flow_counter_cleanup(a_uint32_t dev_id, a_uint32_t flow_index)
+{
+	sw_error_t rv = SW_OK;
+	union in_flow_cnt_tbl_u flow_cnt;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (flow_index >= IN_FLOW_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
+
+	aos_mem_zero(&flow_cnt, sizeof(flow_cnt));
+
+	rv = hppe_in_flow_cnt_tbl_set(dev_id, flow_index, &flow_cnt);
+
+	return rv;
+}
+
+sw_error_t
 adpt_hppe_flow_entry_en_set(a_uint32_t dev_id, a_uint32_t flow_index, a_bool_t enable)
 {
 	sw_error_t rv = SW_OK;
@@ -2233,6 +2251,7 @@ static void adpt_hppe_flow_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt
 	p_adpt_api->adpt_flow_global_cfg_set = NULL;
 	p_adpt_api->adpt_flow_entry_next = NULL;
 	p_adpt_api->adpt_flow_counter_get = NULL;
+	p_adpt_api->adpt_flow_counter_cleanup = NULL;
 	p_adpt_api->adpt_flow_entry_en_set = NULL;
 	p_adpt_api->adpt_flow_entry_en_get = NULL;
 	p_adpt_api->adpt_flow_qos_set = NULL;
@@ -2282,6 +2301,8 @@ sw_error_t adpt_hppe_flow_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_flow_entry_next = adpt_hppe_flow_entry_next;
 	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_COUNTER_GET))
 		p_adpt_api->adpt_flow_counter_get = adpt_hppe_flow_counter_get;
+	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_COUNTER_CLEANUP))
+		p_adpt_api->adpt_flow_counter_cleanup = adpt_hppe_flow_counter_cleanup;
 	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_EN_SET))
 		p_adpt_api->adpt_flow_entry_en_set = adpt_hppe_flow_entry_en_set;
 	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_EN_GET))

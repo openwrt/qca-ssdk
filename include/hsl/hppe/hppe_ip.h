@@ -42,6 +42,16 @@
 #define IN_PUB_IP_ADDR_TBL_MAX_ENTRY	16
 #define RT_INTERFACE_CNT_TBL_MAX_ENTRY	512
 
+#define HASH_MODE	0
+#define INDEX_MODE	1
+
+enum {
+	OP_ADD = 0,
+	OP_DEL,
+	OP_GET,
+	OP_FLUSH,
+};
+
 sw_error_t
 hppe_rt_interface_cnt_tbl_get(
 		a_uint32_t dev_id,
@@ -168,103 +178,16 @@ hppe_host_tbl_op_set(
 		a_uint32_t dev_id,
 		union host_tbl_op_u *value);
 sw_error_t
-hppe_host_tbl_op_data0_get(
+hppe_host_tbl_op_data_get(
 		a_uint32_t dev_id,
-		union host_tbl_op_data0_u *value);
+		a_uint32_t i,
+		a_uint32_t *value);
 
 sw_error_t
-hppe_host_tbl_op_data0_set(
+hppe_host_tbl_op_data_set(
 		a_uint32_t dev_id,
-		union host_tbl_op_data0_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data1_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data1_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data1_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data1_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data2_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data2_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data2_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data2_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data3_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data3_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data3_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data3_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data4_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data4_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data4_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data4_u *value);
-sw_error_t
-hppe_host_tbl_op_data5_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data5_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data5_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data5_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data6_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data6_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data6_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data6_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data7_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data7_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data7_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data7_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data8_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data8_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data8_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data8_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data9_get(
-		a_uint32_t dev_id,
-		union host_tbl_op_data9_u *value);
-
-sw_error_t
-hppe_host_tbl_op_data9_set(
-		a_uint32_t dev_id,
-		union host_tbl_op_data9_u *value);
+		a_uint32_t i,
+		a_uint32_t value);
 
 sw_error_t
 hppe_host_tbl_op_rslt_get(
@@ -285,104 +208,18 @@ sw_error_t
 hppe_host_tbl_rd_op_set(
 		a_uint32_t dev_id,
 		union host_tbl_rd_op_u *value);
-sw_error_t
-hppe_host_tbl_rd_op_data0_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data0_u *value);
 
 sw_error_t
-hppe_host_tbl_rd_op_data0_set(
+hppe_host_tbl_rd_op_data_set(
 		a_uint32_t dev_id,
-		union host_tbl_rd_op_data0_u *value);
+		a_uint32_t i,
+		a_uint32_t value);
 
 sw_error_t
-hppe_host_tbl_rd_op_data1_get(
+hppe_host_tbl_rd_op_data_get(
 		a_uint32_t dev_id,
-		union host_tbl_rd_op_data1_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data1_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data1_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data2_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data2_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data2_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data2_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data3_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data3_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data3_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data3_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data4_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data4_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data4_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data4_u *value);
-sw_error_t
-hppe_host_tbl_rd_op_data5_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data5_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data5_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data5_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data6_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data6_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data6_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data6_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data7_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data7_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data7_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data7_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data8_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data8_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data8_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data8_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data9_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data9_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_op_data9_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_op_data9_u *value);
+		a_uint32_t i,
+		a_uint32_t *value);
 
 sw_error_t
 hppe_host_tbl_rd_op_rslt_get(
@@ -393,106 +230,6 @@ sw_error_t
 hppe_host_tbl_rd_op_rslt_set(
 		a_uint32_t dev_id,
 		union host_tbl_rd_op_rslt_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data0_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data0_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data0_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data0_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data1_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data1_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data1_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data1_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data2_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data2_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data2_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data2_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data3_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data3_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data3_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data3_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data4_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data4_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data4_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data4_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data5_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data5_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data5_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data5_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data6_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data6_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data6_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data6_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data7_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data7_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data7_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data7_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data8_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data8_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data8_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data8_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data9_get(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data9_u *value);
-
-sw_error_t
-hppe_host_tbl_rd_rslt_data9_set(
-		a_uint32_t dev_id,
-		union host_tbl_rd_rslt_data9_u *value);
 
 sw_error_t
 hppe_l3_dbg_cmd_get(

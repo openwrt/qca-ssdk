@@ -928,6 +928,7 @@ adpt_hppe_flow_host_add(
 
 	rv = adpt_hppe_ip_flow_host_data_add(dev_id, host_entry);
 	SW_RTN_ON_ERROR(rv);
+
 	rv = adpt_hppe_flow_entry_host_op_add(dev_id, add_mode, flow_entry);
 	SW_RTN_ON_ERROR(rv);
 

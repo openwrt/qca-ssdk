@@ -390,6 +390,10 @@ qca_switch_init(a_uint32_t dev_id)
 	fal_mib_status_set(dev_id, A_TRUE);
 	fal_mib_cpukeep_set(dev_id, A_FALSE);
 #endif
+	/*set mirror analysis port as 0xf in default*/
+#ifdef IN_MIRROR
+	fal_mirr_analysis_port_set(dev_id, 0xf);
+#endif
 #ifdef IN_IGMP
 	fal_igmp_mld_rp_set(dev_id, 0);
 #endif

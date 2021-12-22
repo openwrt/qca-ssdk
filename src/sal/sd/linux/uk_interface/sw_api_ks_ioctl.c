@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012, 2017-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -61,6 +62,11 @@ static long
 switch_ioctl(struct inode *inode, struct file * file, unsigned int cmd, unsigned long arg);
 #endif
 
+#ifdef CONFIG_COMPAT
+static long
+switch_compat_ioctl(struct file * file, unsigned int cmd, unsigned long arg);
+#endif
+
 static unsigned long *cmd_buf = NULL;
 
 static struct mutex api_ioctl_lock;
@@ -71,7 +77,10 @@ static struct file_operations switch_device_fops =
     .read    = NULL,
     .write   = NULL,
     .poll    = NULL,
-    .unlocked_ioctl= switch_ioctl,
+    .unlocked_ioctl = switch_ioctl,
+#ifdef CONFIG_COMPAT
+    .compat_ioctl = switch_compat_ioctl,
+#endif
     .open    = switch_open,
     .release = switch_close
 };
@@ -81,17 +90,29 @@ static struct file_operations switch_device_fops =
 #endif
 static struct miscdevice switch_device =
 {
-    MISC_DYNAMIC_MINOR,
-    SHELL_DEV,
-    &switch_device_fops
+    .minor	= MISC_DYNAMIC_MINOR,
+    .name	= SHELL_DEV,
+    .fops	= &switch_device_fops,
 };
 
+#ifndef CONFIG_COMPAT
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0))
+static inline void __user *compat_ptr(compat_uptr_t uptr)
+{
+	return (void __user *)(unsigned long)uptr;
+}
+#endif
+#endif
+
 static sw_error_t
-input_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
+input_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args, compat_ulong_t *compat_args)
 {
     a_uint32_t i = 0, buf_head = nr_param;
     a_uint32_t offset = sizeof(unsigned long);
     a_uint32_t credit = sizeof(unsigned long) - 1;
+
+	if(!args && !compat_args)
+		return SW_BAD_PARAM;
 
     for (i = 0; i < nr_param; i++)
     {
@@ -108,7 +129,8 @@ input_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
 
             if (p->param_type & SW_PARAM_IN)
             {
-                if (copy_from_user((a_uint8_t*)(cmd_buf[i]), (void __USER *)args[i + 2],
+                if (copy_from_user((a_uint8_t*)(cmd_buf[i]),
+				args? (void __USER *)args[i + 2] : (void __USER *)compat_ptr(compat_args[i + 2]),
 				((p->data_size + credit) / offset) * offset))
                 {
                     SSDK_ERROR("copy_from_user fail\n");
@@ -121,7 +143,7 @@ input_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
         }
         else
         {
-            cmd_buf[i] = args[i + 2];
+            cmd_buf[i] = args? args[i + 2]:compat_args[i + 2];
             SSDK_DEBUG("Input parameter %d: %ld\n", i, cmd_buf[i]);
         }
         p++;
@@ -130,11 +152,14 @@ input_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
 }
 
 static sw_error_t
-output_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
+output_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args, compat_ulong_t *compat_args)
 {
     a_uint32_t i =0;
-    a_uint32_t offset = sizeof(unsigned long);
-    a_uint32_t credit = sizeof(unsigned long) - 1;
+    a_uint32_t offset = args ? sizeof(unsigned long):sizeof(a_uint32_t);
+    a_uint32_t credit = args ? (sizeof(unsigned long) - 1):(sizeof(a_uint32_t) - 1);
+
+	if(!args && !compat_args)
+		return SW_BAD_PARAM;
 
     for (i = 0; i < nr_param; i++)
     {
@@ -143,7 +168,9 @@ output_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
             SSDK_DEBUG("Output parameter %d: ", i);
             SSDK_DUMP_BUF(DEBUG, (unsigned long *)cmd_buf[i],
 				((p->data_size + credit) / offset));
-            if (copy_to_user((void __USER *) args[i + 2], (unsigned long *) cmd_buf[i],
+            if (copy_to_user(
+			 args ? (void __USER *) args[i + 2]:(void __USER *) compat_ptr(compat_args[i + 2]),
+			 (unsigned long *) cmd_buf[i],
 				((p->data_size + credit) / offset) * offset))
             {
                 SSDK_ERROR("copy_to_user fail\n");
@@ -157,14 +184,19 @@ output_parser(sw_api_param_t *p, a_uint32_t nr_param, unsigned long *args)
 }
 
 static sw_error_t
-sw_api_cmd(unsigned long * args)
+sw_api_cmd(unsigned long * args, compat_ulong_t * compat_args)
 {
-    unsigned long *p = cmd_buf, api_id = args[0], nr_param = 0;
+    unsigned long *p = cmd_buf, api_id, nr_param = 0;
     sw_error_t(*func) (unsigned long, ...);
     sw_api_param_t *pp;
     sw_api_func_t *fp;
     sw_error_t rv;
     sw_api_t sw_api;
+
+	if(!args && !compat_args)
+		return SW_BAD_PARAM;
+
+	api_id = args? args[0]:compat_args[0];
 
     SSDK_DEBUG("api_id is %ld\n", api_id);
     sw_api.api_id = api_id;
@@ -177,7 +209,7 @@ sw_api_cmd(unsigned long * args)
 
 	/* Clean up cmd_buf */
 	aos_mem_set(cmd_buf, 0, SW_MAX_API_BUF);
-    rv = input_parser(pp, nr_param, args);
+    rv = input_parser(pp, nr_param, args, compat_args);
     SW_OUT_ON_ERROR(rv);
     func = fp->func;
 
@@ -219,7 +251,7 @@ sw_api_cmd(unsigned long * args)
     }
 
     SW_OUT_ON_ERROR(rv);
-    rv = output_parser(pp, nr_param, args);
+    rv = output_parser(pp, nr_param, args, compat_args);
 
 out:
     return rv;
@@ -249,7 +281,7 @@ switch_ioctl(struct inode *inode, struct file * file, unsigned int cmd, unsigned
     sw_error_t rv = SW_NO_RESOURCE;
     void __user *argp = (void __user *)arg;
 
-    SSDK_DEBUG("Recieved IOCTL call\n");
+    SSDK_DEBUG("Received IOCTL call\n");
     if (copy_from_user(args, argp, sizeof (args)))
     {
         SSDK_ERROR("copy_from_user fail\n");
@@ -257,7 +289,7 @@ switch_ioctl(struct inode *inode, struct file * file, unsigned int cmd, unsigned
     }
 
     mutex_lock(&api_ioctl_lock);
-    rv = sw_api_cmd(args);
+    rv = sw_api_cmd(args, NULL);
     mutex_unlock(&api_ioctl_lock);
 
     /* return API result to user */
@@ -271,6 +303,37 @@ switch_ioctl(struct inode *inode, struct file * file, unsigned int cmd, unsigned
 
     return SW_OK;
 }
+
+#ifdef CONFIG_COMPAT
+static long
+switch_compat_ioctl(struct file * file, unsigned int cmd, unsigned long arg)
+{
+	a_uint32_t args[SW_MAX_API_PARAM], rtn;
+	sw_error_t rv = SW_NO_RESOURCE;
+
+	SSDK_DEBUG("Recieved IOCTL call\n");
+	if (copy_from_user(args,  compat_ptr(arg), sizeof (args)))
+	{
+		SSDK_ERROR("copy_from_user fail\n");
+		return SW_NO_RESOURCE;
+	}
+
+	mutex_lock(&api_ioctl_lock);
+	rv = sw_api_cmd(NULL, args);
+	mutex_unlock(&api_ioctl_lock);
+
+	/* return API result to user */
+	rtn = (unsigned long) rv;
+	if (copy_to_user
+			((void __USER *) compat_ptr(args[1]),  &rtn, sizeof (rtn))) //sizeof (unsigned long)))
+	{
+		SSDK_ERROR("copy_to_user fail\n");
+		rv = SW_NO_RESOURCE;
+	}
+
+	return SW_OK;
+}
+#endif
 
 sw_error_t
 sw_uk_init(a_uint32_t nl_prot)

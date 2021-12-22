@@ -308,9 +308,18 @@ hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg)
         SSDK_ERROR("the dev%d wasn't initialized\n", dev_id);
         return SW_BAD_VALUE;
     }
+#ifdef IOCTL_COMPAT
+	aos_mem_set(&(ssdk_cfg->init_cfg), 0,  sizeof(ssdk_init_cfg_us));
+	ssdk_cfg->init_cfg.cpu_mode = dev_ssdk_cfg[dev_id]->cpu_mode;
+	ssdk_cfg->init_cfg.reg_mode = dev_ssdk_cfg[dev_id]->reg_mode;
+	ssdk_cfg->init_cfg.chip_type = dev_ssdk_cfg[dev_id]->chip_type;
+	ssdk_cfg->init_cfg.chip_revision = dev_ssdk_cfg[dev_id]->chip_revision;
+	ssdk_cfg->init_cfg.nl_prot = dev_ssdk_cfg[dev_id]->nl_prot;
+#else
     aos_mem_set(&(ssdk_cfg->init_cfg), 0,  sizeof(ssdk_init_cfg));
 
     aos_mem_copy(&(ssdk_cfg->init_cfg), dev_ssdk_cfg[dev_id], sizeof(ssdk_init_cfg));
+#endif
 
 #ifdef VERSION
     aos_mem_copy(ssdk_cfg->build_ver, VERSION, sizeof(VERSION));

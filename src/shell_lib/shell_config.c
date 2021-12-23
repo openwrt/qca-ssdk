@@ -1374,6 +1374,7 @@ struct sub_cmd_des_t g_tunnel_des[] =
     {"Encapecn", "set", SW_API_TUNNEL_ENCAP_ECN_MODE_SET, NULL},
     {"Decapecn", "set", SW_API_TUNNEL_DECAP_ECN_MODE_SET, NULL},
     {"Decapexpfmtctrl", "set", SW_API_TUNNEL_EXP_DECAP_SET, NULL},
+    {"Decapkey", "set", SW_API_TUNNEL_DECAP_KEY_SET, NULL},
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif

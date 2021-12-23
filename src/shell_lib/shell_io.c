@@ -858,6 +858,10 @@ static sw_data_type_t sw_data_type[] =
 		    (param_check_t)cmd_data_check_encap_ecn_rule, NULL),
     SW_TYPE_DEF(SW_TUNNEL_ECN_VAL,
 		    (param_check_t)cmd_data_check_ecn_val, NULL),
+    SW_TYPE_DEF(SW_TUNNEL_TYPE,
+		    cmd_data_check_tunnel_type, NULL),
+    SW_TYPE_DEF(SW_TUNNEL_KEY,
+		    (param_check_t)cmd_data_check_tunnel_key, NULL),
 #endif
 #ifdef IN_MAPT
     SW_TYPE_DEF(SW_MAPT_DECAP_CTRL,
@@ -18317,6 +18321,146 @@ cmd_data_check_decap_ecn_action(char *cmd_str,
 	SW_RTN_ON_ERROR(rv);
 
 	*(fal_tunnel_decap_ecn_action_t *)arg_val = entry;
+
+	return SW_OK;
+}
+
+sw_error_t
+cmd_data_check_tunnel_type(char *cmd_str, fal_tunnel_type_t *arg_val, a_uint32_t size)
+{
+
+	return cmd_data_check_attr("tunnel_type", cmd_str,
+			arg_val, sizeof(*arg_val));
+}
+
+sw_error_t
+cmd_data_check_tunnel_key(char *cmd_str, fal_tunnel_decap_key_t *arg_val, a_uint32_t size)
+{
+	char *cmd;
+	fal_tunnel_decap_key_t entry;
+	a_uint32_t tmp = 0;
+	a_bool_t enable = A_FALSE;
+	sw_error_t rv = SW_OK;
+
+	aos_mem_zero(&entry, sizeof(fal_tunnel_decap_key_t));
+
+        rv = __cmd_data_check_boolean("key_sip_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_SIP_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_SIP_EN);
+
+        rv = __cmd_data_check_boolean("key_dip_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_DIP_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_DIP_EN);
+
+        rv = __cmd_data_check_boolean("key_l4proto_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_L4PROTO_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_L4PROTO_EN);
+
+        rv = __cmd_data_check_boolean("key_sport_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_SPORT_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_SPORT_EN);
+
+        rv = __cmd_data_check_boolean("key_dport_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_DPORT_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_DPORT_EN);
+
+        rv = __cmd_data_check_boolean("key_tlinfo_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_TLINFO_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_TLINFO_EN);
+
+	cmd_data_check_element("tunnel_info_mask", "0",
+			"usage: tunnel info\n",
+			cmd_data_check_uint32, (cmd, &tmp, sizeof(a_uint32_t)));
+
+	entry.tunnel_info_mask = tmp;
+
+        rv = __cmd_data_check_boolean("key_udf0_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_UDF0_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_UDF0_EN);
+
+	cmd_data_check_element("udf0_idx", "0",
+			"usage: udf0 id to select\n",
+			cmd_data_check_uint8, (cmd, &tmp, sizeof(a_uint8_t)));
+
+	entry.udf0_idx = tmp;
+
+	cmd_data_check_element("udf0_mask", "0",
+			"usage: udf0 mask value\n",
+			cmd_data_check_uint16, (cmd, &tmp, sizeof(a_uint16_t)));
+
+	entry.udf0_mask = tmp;
+
+        rv = __cmd_data_check_boolean("key_udf1_en", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &enable,
+			sizeof(a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (enable == A_TRUE)
+		entry.key_bmp |= BIT(FAL_TUNNEL_KEY_UDF1_EN);
+	else
+		entry.key_bmp &= ~BIT(FAL_TUNNEL_KEY_UDF1_EN);
+
+	cmd_data_check_element("udf1_idx", "0",
+			"usage: udf1 id to select\n",
+			cmd_data_check_uint8, (cmd, &tmp, sizeof(a_uint8_t)));
+	entry.udf1_idx = tmp;
+
+	cmd_data_check_element("udf1_mask", "0",
+			"usage: udf1 mask value\n",
+			cmd_data_check_uint16, (cmd, &tmp, sizeof(a_uint16_t)));
+	entry.udf1_mask = tmp;
+
+	*arg_val = entry;
 
 	return SW_OK;
 }

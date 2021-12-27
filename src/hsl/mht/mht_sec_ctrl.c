@@ -33,7 +33,7 @@ qca_mht_work_mode_set(a_uint32_t dev_id, mht_work_mode_t work_mode)
 	HSL_DEV_ID_CHECK(dev_id);
 
 	data = qca_mht_mii_read(dev_id, WORK_MODE_OFFSET);
-	data = ~MHT_WORK_MODE_MASK;
+	data &= ~MHT_WORK_MODE_MASK;
 	data |= work_mode;
 
 	qca_mht_mii_write(dev_id, WORK_MODE_OFFSET, data);

@@ -1414,7 +1414,13 @@ qm_err_check_work_task_polling(struct work_struct *work)
 
 	mutex_lock(&priv->qm_lock);
 
-	qca_ar8327_sw_mac_polling_task(priv);
+	if(priv->version == QCA_VER_MHT) {
+#if defined(MHT)
+		qca_mht_sw_mac_polling_task(priv);
+#endif
+	} else {
+		qca_ar8327_sw_mac_polling_task(priv);
+	}
 
 	mutex_unlock(&priv->qm_lock);
 
@@ -1501,7 +1507,8 @@ qm_err_check_work_start(struct qca_phy_priv *priv)
 	/*Only valid for S17c chip*/
 	if (priv->version != QCA_VER_AR8337 &&
 		priv->version != QCA_VER_AR8327 &&
-		priv->version != QCA_VER_DESS)
+		priv->version != QCA_VER_DESS &&
+		priv->version != QCA_VER_MHT)
 	{
 		return 0;
 	}

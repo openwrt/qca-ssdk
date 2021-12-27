@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,6 +24,14 @@ extern "C"
 #endif				/* __cplusplus */
 
 #include "fal_port_ctrl.h"
+
+#define MHT_PORT_SPEED_10M          0
+#define MHT_PORT_SPEED_100M         1
+#define MHT_PORT_SPEED_1000M        2
+#define MHT_PORT_SPEED_2500M        MHT_PORT_SPEED_1000M
+#define MHT_PORT_HALF_DUPLEX        0
+#define MHT_PORT_FULL_DUPLEX        1
+
 sw_error_t
 mht_port_congestion_drop_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t queue_id, a_bool_t enable);
@@ -52,6 +60,40 @@ sw_error_t
 mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
 sw_error_t
 mht_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status);
+sw_error_t
+mht_port_flowctrl_forcemode_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+sw_error_t
+mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t *enable);
+sw_error_t
+mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+mht_port_txfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
+sw_error_t
+mht_port_rxfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
+sw_error_t
+mht_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+mht_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
+sw_error_t
+mht_port_duplex_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t duplex);
+sw_error_t
+mht_port_duplex_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t *duplex);
+sw_error_t
+mht_port_speed_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t speed);
+sw_error_t
+mht_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t *pspeed);
+sw_error_t
+mht_port_link_update(struct qca_phy_priv *priv, a_uint32_t port_id,
+	struct port_phy_status phy_status);
+
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

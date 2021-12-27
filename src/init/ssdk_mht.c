@@ -20,6 +20,7 @@
  * @{
  */
 #include "sw.h"
+#include "hsl_phy.h"
 #include "ssdk_init.h"
 #include "ssdk_plat.h"
 #include "ssdk_mht_pinctrl.h"
@@ -28,6 +29,8 @@
 #include "fal_interface_ctrl.h"
 #include "fal_port_ctrl.h"
 #include "ssdk_mht_clk.h"
+#include "mht_port_ctrl.h"
+#include "ref_port_ctrl.h"
 
 static sw_error_t
 qca_mht_work_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0, a_uint32_t mac_mode1)
@@ -177,6 +180,68 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	ret = ssdk_mht_pinctrl_init(dev_id);
 
 	return ret;
+}
+
+sw_error_t
+qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
+{
+	sw_error_t rv = 0, port_id;
+	a_uint32_t portbmp = 0;
+	struct port_phy_status phy_status = {0};
+
+	portbmp = qca_ssdk_port_bmp_get(priv->device_id);
+	for (port_id = 1; port_id < SW_MAX_NR_PORT; port_id++) {
+		if(!(portbmp & (0x1 << port_id)))
+			continue;
+		rv = hsl_port_phy_status_get(priv->device_id, port_id, &phy_status);
+		if (rv != SW_OK) {
+			SSDK_DEBUG("mht failed to get port %d status return value is %d\n",
+					port_id, rv);
+			continue;
+		}
+		SSDK_DEBUG("mth port_id %d phy link status is %d and speed is %d\n",
+				port_id, phy_status.link_status, phy_status.speed);
+		/* Up --> Down */
+		if ((priv->port_old_link[port_id] == PORT_LINK_UP) &&
+			(phy_status.link_status == PORT_LINK_DOWN)) {
+			/* disable mac rx function */
+			rv = fal_port_rxmac_status_set(priv->device_id, port_id, A_FALSE);
+			SW_RTN_ON_ERROR (rv);
+			/* update gcc, mac speed, mac duplex and phy stauts */
+			rv = mht_port_link_update(priv, port_id, phy_status);
+			SW_RTN_ON_ERROR (rv);
+			priv->port_old_link[port_id] = phy_status.link_status;
+			ssdk_port_link_notify(port_id, 0, 0, 0);
+#ifdef IN_FDB
+			/* flush all dynamic fdb of this port */
+			fal_fdb_del_by_port(priv->device_id, port_id, 0);
+#endif
+		}
+		/* Down --> Up */
+		if ((priv->port_old_link[port_id] == PORT_LINK_DOWN) &&
+			(phy_status.link_status == PORT_LINK_UP)) {
+			/* disable mac tx function */
+			rv = fal_port_txmac_status_set(priv->device_id, port_id, A_FALSE);
+			SW_RTN_ON_ERROR (rv);
+			/* update gcc, mac speed, mac duplex and phy stauts */
+			rv = mht_port_link_update(priv, port_id, phy_status);
+			SW_RTN_ON_ERROR (rv);
+			/* enable mac tx function */
+			rv = fal_port_txmac_status_set(priv->device_id, port_id, A_TRUE);
+			SW_RTN_ON_ERROR (rv);
+			/* enable mac rx function */
+			rv = fal_port_rxmac_status_set(priv->device_id, port_id, A_TRUE);
+			SW_RTN_ON_ERROR (rv);
+			/* save the current link status */
+			priv->port_old_link[port_id] = phy_status.link_status;
+			ssdk_port_link_notify(port_id, phy_status.link_status,
+					phy_status.speed, phy_status.duplex);
+		}
+		SSDK_DEBUG("mht port %d old link status is %d\n",
+				port_id, priv->port_old_link[port_id]);
+	}
+
+	return rv;
 }
 
 /**

@@ -964,6 +964,43 @@ hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
 	return rv;
 }
 
+sw_error_t
+hsl_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	struct port_phy_status *phy_status)
+{
+	sw_error_t rv = 0;
+	a_uint32_t phy_id;
+	hsl_phy_ops_t *phy_drv;
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_get_status)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	SW_RTN_ON_ERROR (rv);
+	rv = phy_drv->phy_get_status(dev_id, phy_id, phy_status);
+	SW_RTN_ON_ERROR (rv);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_function_reset(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	sw_error_t rv = 0;
+	a_uint32_t phy_addr;
+	hsl_phy_ops_t *phy_drv;
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_function_reset)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+	rv = phy_drv->phy_function_reset(dev_id, phy_addr, PHY_FIFO_RESET);
+	SW_RTN_ON_ERROR(rv);
+
+	return rv;
+}
+
 /*qca808x_start*/
 sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)
 {

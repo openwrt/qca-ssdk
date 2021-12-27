@@ -735,7 +735,6 @@ hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
-
 phy_info_t *hsl_phy_info_get(a_uint32_t dev_id);
 
 sw_error_t
@@ -744,6 +743,12 @@ hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
 a_uint32_t
 hsl_phy_speed_duplex_to_auto_adv(a_uint32_t dev_id, fal_port_speed_t speed,
 	fal_port_duplex_t duplex);
+sw_error_t
+hsl_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	struct port_phy_status *phy_status);
+sw_error_t
+hsl_port_phy_function_reset(a_uint32_t dev_id, a_uint32_t port_id);
+
 /*qca808x_start*/
 #ifdef __cplusplus
 }

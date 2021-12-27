@@ -31,7 +31,7 @@
 #include "mht_port_ctrl.h"
 #endif
 
-static a_bool_t
+a_bool_t
 _isisc_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
 {
 	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
@@ -2128,8 +2128,6 @@ isisc_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable
     return rv;
 }
 
-
-
 /**
  * @brief Get flow control force mode on a particular port.
  * @param[in] dev_id device id
@@ -2877,29 +2875,57 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
 #ifndef HSL_STANDALONG
     {
         hsl_api_t *p_api;
+        ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
 
+        chip_type = hsl_get_current_chip_type(dev_id);
         SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
 
-        p_api->port_duplex_set = isisc_port_duplex_set;
-        p_api->port_speed_set = isisc_port_speed_set;
-        p_api->port_flowctrl_set = isisc_port_flowctrl_set;
-        p_api->port_flowctrl_forcemode_set = isisc_port_flowctrl_forcemode_set;
-        p_api->port_duplex_get = isisc_port_duplex_get;
-        p_api->port_speed_get = isisc_port_speed_get;
+        if (chip_type == CHIP_ISISC) {
+            p_api->port_flowctrl_set = isisc_port_flowctrl_set;
+            p_api->port_flowctrl_forcemode_set = isisc_port_flowctrl_forcemode_set;
+            p_api->port_txfc_status_get = isisc_port_txfc_status_get;
+            p_api->port_txfc_status_set = isisc_port_txfc_status_set;
+            p_api->port_rxfc_status_set = isisc_port_rxfc_status_set;
+            p_api->port_rxfc_status_get = isisc_port_rxfc_status_get;
+            p_api->port_duplex_get = isisc_port_duplex_get;
+            p_api->port_speed_get = isisc_port_speed_get;
+            p_api->port_duplex_set = isisc_port_duplex_set;
+            p_api->port_speed_set = isisc_port_speed_set;
+#ifndef IN_PORTCONTROL_MINI
+            p_api->port_flowctrl_get = isisc_port_flowctrl_get;
+            p_api->port_flowctrl_forcemode_get = isisc_port_flowctrl_forcemode_get;
+#endif
+        }
+#if defined(MHT)
+        else if (chip_type == CHIP_MHT) {
+            p_api->port_flowctrl_set = mht_port_flowctrl_set;
+            p_api->port_flowctrl_forcemode_set = mht_port_flowctrl_forcemode_set;
+            p_api->port_txfc_status_get = mht_port_txfc_status_get;
+            p_api->port_txfc_status_set = mht_port_txfc_status_set;
+            p_api->port_rxfc_status_set = mht_port_rxfc_status_set;
+            p_api->port_rxfc_status_get = mht_port_rxfc_status_get;
+            p_api->port_duplex_get = mht_port_duplex_get;
+            p_api->port_speed_get = mht_port_speed_get;
+            p_api->port_duplex_set = mht_port_duplex_set;
+            p_api->port_speed_set = mht_port_speed_set;
+#ifndef IN_PORTCONTROL_MINI
+            p_api->port_flowctrl_get = mht_port_flowctrl_get;
+            p_api->port_flowctrl_forcemode_get = mht_port_flowctrl_forcemode_get;
+#endif
+        }
+#endif
         p_api->port_autoneg_enable = isisc_port_autoneg_enable;
         p_api->port_autoneg_restart = isisc_port_autoneg_restart;
         p_api->port_autoneg_adv_set = isisc_port_autoneg_adv_set;
         p_api->port_autoneg_status_get = isisc_port_autoneg_status_get;
         p_api->port_autoneg_adv_get = isisc_port_autoneg_adv_get;
 #ifndef IN_PORTCONTROL_MINI
-        p_api->port_flowctrl_get = isisc_port_flowctrl_get;
-        p_api->port_flowctrl_forcemode_get = isisc_port_flowctrl_forcemode_get;
         p_api->port_powersave_set = isisc_port_powersave_set;
         p_api->port_powersave_get = isisc_port_powersave_get;
         p_api->port_hibernate_set = isisc_port_hibernate_set;
         p_api->port_hibernate_get = isisc_port_hibernate_get;
         p_api->port_cdt = isisc_port_cdt;
-	p_api->port_phy_id_get = isisc_port_phy_id_get;
+        p_api->port_phy_id_get = isisc_port_phy_id_get;
         p_api->port_rxhdr_mode_get = isisc_port_rxhdr_mode_get;
         p_api->port_txhdr_mode_get = isisc_port_txhdr_mode_get;
         p_api->header_type_get = isisc_header_type_get;
@@ -2913,16 +2939,12 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
         p_api->port_remote_loopback_get = isisc_port_remote_loopback_get;
 
 #endif
-        p_api->port_txfc_status_get = isisc_port_txfc_status_get;
         p_api->port_rxhdr_mode_set = isisc_port_rxhdr_mode_set;
         p_api->port_txhdr_mode_set = isisc_port_txhdr_mode_set;
         p_api->header_type_set = isisc_header_type_set;
         p_api->port_txmac_status_set = isisc_port_txmac_status_set;
         p_api->port_rxmac_status_set = isisc_port_rxmac_status_set;
-        p_api->port_txfc_status_set = isisc_port_txfc_status_set;
-        p_api->port_rxfc_status_set = isisc_port_rxfc_status_set;
         p_api->port_link_status_get = isisc_port_link_status_get;
-        p_api->port_rxfc_status_get = isisc_port_rxfc_status_get;
         p_api->port_power_off = isisc_port_power_off;
         p_api->port_power_on = isisc_port_power_on;
         p_api->port_link_forcemode_set = isisc_port_link_forcemode_set;

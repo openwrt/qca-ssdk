@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,6 +25,12 @@
 #include "mht_port_ctrl.h"
 #include "mht_reg.h"
 #include "isisc_reg.h"
+#include "isisc_port_ctrl.h"
+#include "hsl_phy.h"
+#include "ssdk_plat.h"
+#include "ssdk_mht_clk.h"
+#include "mht_port_ctrl.h"
+#include "mht_interface_ctrl.h"
 
 #define PORT0_MAX_VIRT_RING	8
 #define PORT5_MAX_VIRT_RING	16
@@ -335,6 +341,476 @@ _mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *
 	return rv;
 }
 
+static sw_error_t
+_mht_port_flowctrl_forcemode_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	HSL_DEV_ID_CHECK(dev_id);
+	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+	if (!priv)
+		return SW_FAIL;
+
+	priv->port_tx_flowctrl_forcemode[port_id] = enable;
+	priv->port_rx_flowctrl_forcemode[port_id] = enable;
+
+    return rv;
+}
+
+static sw_error_t
+_mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv;
+	a_uint32_t val, reg = 0, tmp;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	if (A_TRUE == enable)
+	{
+	    val = 1;
+	}
+	else if (A_FALSE == enable)
+	{
+	    val = 0;
+	}
+	else
+	{
+	    return SW_BAD_PARAM;
+	}
+
+	HSL_REG_ENTRY_GET(rv, dev_id, PORT_STATUS, port_id,
+				(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+	tmp = reg;
+
+	SW_SET_REG_BY_FIELD(PORT_STATUS, TX_FLOW_EN, val, reg);
+	SW_SET_REG_BY_FIELD(PORT_STATUS, TX_HALF_FLOW_EN, val, reg);
+
+	if (tmp == reg)
+		return SW_OK;
+	HSL_REG_ENTRY_SET(rv, dev_id, PORT_STATUS, port_id,
+				(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+
+	priv->port_old_tx_flowctrl[port_id] = enable;
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_txfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv;
+	a_uint32_t val;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	HSL_REG_FIELD_GET(rv, dev_id, PORT_STATUS, port_id, TX_FLOW_EN,
+				(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (val)
+	{
+	    *enable = A_TRUE;
+	}
+	else
+	{
+	    *enable = A_FALSE;
+	}
+
+	return SW_OK;
+}
+
+static sw_error_t
+_mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv;
+	a_uint32_t val = 0, reg, tmp;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	if (A_TRUE == enable)
+	{
+	    val = 1;
+	}
+	else if (A_FALSE == enable)
+	{
+	    val = 0;
+	}
+	else
+	{
+	    return SW_BAD_PARAM;
+	}
+
+	HSL_REG_ENTRY_GET(rv, dev_id, PORT_STATUS, port_id,
+				(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+	tmp = reg;
+
+	SW_SET_REG_BY_FIELD(PORT_STATUS, RX_FLOW_EN, val, reg);
+
+	if ( tmp == reg)
+		return SW_OK;
+	HSL_REG_ENTRY_SET(rv, dev_id, PORT_STATUS, port_id,
+				(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+
+	priv->port_old_rx_flowctrl[port_id] = enable;
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_rxfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv;
+	a_uint32_t val;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	HSL_REG_FIELD_GET(rv, dev_id, PORT_STATUS, port_id, RX_FLOW_EN,
+				(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if (val)
+	{
+	    *enable = A_TRUE;
+	}
+	else
+	{
+	    *enable = A_FALSE;
+	}
+
+	return SW_OK;
+}
+
+static sw_error_t
+_mht_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = 0;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+	    return SW_BAD_PARAM;
+	}
+
+	rv = _mht_port_txfc_status_set(dev_id, port_id, enable);
+	SW_RTN_ON_ERROR(rv);
+	rv = _mht_port_rxfc_status_set(dev_id, port_id, enable);
+	SW_RTN_ON_ERROR(rv);
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_mac_speed_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t speed)
+{
+	sw_error_t rv = 0;
+	a_uint32_t reg_val = 0, tmp;
+	a_uint32_t speed_val;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	HSL_REG_ENTRY_GET(rv, dev_id, PORT_STATUS, port_id,
+			(a_uint8_t *) (&reg_val), sizeof (a_uint32_t));
+	tmp = reg_val;
+
+	if (FAL_SPEED_10 == speed) {
+		speed_val = MHT_PORT_SPEED_10M;
+	} else if (FAL_SPEED_100 == speed) {
+		speed_val = MHT_PORT_SPEED_100M;
+	} else if (FAL_SPEED_1000 == speed) {
+		speed_val = MHT_PORT_SPEED_1000M;
+	} else if (FAL_SPEED_2500 == speed) {
+		speed_val = MHT_PORT_SPEED_2500M;
+	} else {
+		SSDK_ERROR("mht port %d invalid speed\n", port_id);
+		return SW_BAD_PARAM;
+	}
+	SW_SET_REG_BY_FIELD(PORT_STATUS, SPEED_MODE, speed_val, reg_val);
+
+	if (tmp == reg_val)
+		return SW_OK;
+
+	HSL_REG_ENTRY_SET(rv, dev_id, PORT_STATUS, port_id,
+			(a_uint8_t *) (&reg_val), sizeof (a_uint32_t));
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_mac_dupex_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t duplex)
+{
+	sw_error_t rv = 0;
+	a_uint32_t reg_val = 0, tmp;
+	a_uint32_t duplex_val;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	HSL_REG_ENTRY_GET(rv, dev_id, PORT_STATUS, port_id,
+			(a_uint8_t *) (&reg_val), sizeof (a_uint32_t));
+	tmp = reg_val;
+
+	if (FAL_HALF_DUPLEX == duplex) {
+		duplex_val = MHT_PORT_HALF_DUPLEX;
+	} else {
+		duplex_val = MHT_PORT_FULL_DUPLEX;
+	}
+	SW_SET_REG_BY_FIELD(PORT_STATUS, DUPLEX_MODE, duplex_val, reg_val);
+
+	if (tmp == reg_val)
+		return SW_OK;
+
+	HSL_REG_ENTRY_SET(rv, dev_id, PORT_STATUS, port_id,
+			(a_uint8_t *) (&reg_val), sizeof (a_uint32_t));
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_duplex_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t duplex)
+{
+	sw_error_t rv;
+	a_uint32_t phy_id;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	/* for those ports without PHY device we set MAC register */
+	if (A_FALSE == hsl_port_phy_connected(dev_id, port_id))
+	{
+		rv = _mht_port_mac_dupex_set(dev_id, port_id, duplex);
+		SW_RTN_ON_ERROR (rv);
+	}
+	else
+	{
+		SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+		if (NULL == phy_drv->phy_duplex_set)
+			return SW_NOT_SUPPORTED;
+		if (FAL_DUPLEX_BUTT <= duplex)
+		{
+			return SW_BAD_PARAM;
+		}
+		rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+		SW_RTN_ON_ERROR (rv);
+		rv = phy_drv->phy_duplex_set(dev_id, phy_id, duplex);
+		SW_RTN_ON_ERROR (rv);
+	}
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_duplex_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t * pduplex)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_id;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK (dev_id);
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+	if (A_FALSE == hsl_port_phy_connected(dev_id, port_id))
+	{
+		a_uint32_t reg_val = 0, field;
+
+		HSL_REG_ENTRY_GET(rv, dev_id, PORT_STATUS, port_id,
+			(a_uint8_t *) (&reg_val), sizeof (a_uint32_t));
+		SW_GET_FIELD_BY_REG(PORT_STATUS, DUPLEX_MODE, field, reg_val);
+		if (field)
+		{
+			*pduplex = FAL_FULL_DUPLEX;
+		}
+		else
+		{
+			*pduplex = FAL_HALF_DUPLEX;
+		}
+	}
+	else
+	{
+		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+		if (NULL == phy_drv->phy_duplex_get)
+			return SW_NOT_SUPPORTED;
+		rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+		SW_RTN_ON_ERROR (rv);
+		rv = phy_drv->phy_duplex_get(dev_id, phy_id, pduplex);
+		SW_RTN_ON_ERROR (rv);
+	}
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_speed_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t speed)
+{
+	sw_error_t rv;
+	a_uint32_t phy_id;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK (dev_id);
+
+	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+	/* for those ports without PHY device we set MAC register */
+	if (A_FALSE == hsl_port_phy_connected(dev_id, port_id))
+	{
+		rv = _mht_port_mac_speed_set(dev_id, port_id, speed);
+		SW_RTN_ON_ERROR (rv);
+	}
+	else
+	{
+		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+		if (NULL == phy_drv->phy_speed_set)
+			return SW_NOT_SUPPORTED;
+		if (FAL_SPEED_2500 < speed)
+		{
+			return SW_BAD_PARAM;
+		}
+		rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+		SW_RTN_ON_ERROR (rv);
+		rv = phy_drv->phy_speed_set(dev_id, phy_id, speed);
+		SW_RTN_ON_ERROR (rv);
+	}
+	return rv;
+}
+
+static sw_error_t
+_mht_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t * pspeed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_id;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+	if (A_FALSE == hsl_port_phy_connected(dev_id, port_id))
+	{
+		a_uint32_t reg_val = 0, field;
+
+		HSL_REG_ENTRY_GET(rv, dev_id, PORT_STATUS, port_id,
+			(a_uint8_t *) (&reg_val), sizeof (a_uint32_t));
+		SW_GET_FIELD_BY_REG(PORT_STATUS, SPEED_MODE, field, reg_val);
+		if (0 == field)
+		{
+			*pspeed = FAL_SPEED_10;
+		}
+		else if (1 == field)
+		{
+			*pspeed = FAL_SPEED_100;
+		}
+		else if (2 == field)
+		{
+			*pspeed = FAL_SPEED_1000;
+		}
+	}
+	else
+	{
+		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+		if (NULL == phy_drv->phy_speed_get)
+			return SW_NOT_SUPPORTED;
+		rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+		SW_RTN_ON_ERROR (rv);
+		rv = phy_drv->phy_speed_get(dev_id, phy_id, pspeed);
+		SW_RTN_ON_ERROR (rv);
+	}
+	return rv;
+}
+
+#ifndef IN_PORTCONTROL_MINI
+static sw_error_t
+_mht_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+	sw_error_t rv = 0;
+	a_bool_t txfc_enable, rxfc_enable;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+	    return SW_BAD_PARAM;
+	}
+
+	rv = _mht_port_txfc_status_get(dev_id, port_id, &txfc_enable);
+	SW_RTN_ON_ERROR(rv);
+	rv = _mht_port_rxfc_status_get(dev_id, port_id, &rxfc_enable);
+	SW_RTN_ON_ERROR(rv);
+
+	*enable = txfc_enable & rxfc_enable;
+
+	return rv;
+}
+
+static sw_error_t
+_mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	HSL_DEV_ID_CHECK(dev_id);
+	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+	if (!priv)
+		return SW_FAIL;
+
+	*enable = (priv->port_tx_flowctrl_forcemode[port_id] &
+		priv->port_rx_flowctrl_forcemode[port_id]);
+
+	return rv;
+}
+#endif
+
 /**
  * @brief Set flow congestion drop on a particular port queue.
  * @param[in] dev_id device id
@@ -534,6 +1010,286 @@ mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *s
 	HSL_API_LOCK;
 	rv = _mht_ring_flow_ctrl_config_get(dev_id, ring_id, status);
 	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set status of tx flow control on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_txfc_status_set(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get status of tx flow control on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_txfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_txfc_status_get(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set status of rx flow control on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_rxfc_status_set(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set status of rx flow control on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_rxfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_rxfc_status_get(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set flow control(rx/tx/bp) status on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_flowctrl_set(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set flow control force mode on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_flowctrl_forcemode_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_flowctrl_forcemode_set(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set duplex mode on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] duplex duplex mode
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_duplex_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t duplex)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_duplex_set(dev_id, port_id, duplex);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Set speed on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] speed port speed
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_speed_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t speed)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_speed_set(dev_id, port_id, speed);
+	HSL_API_UNLOCK;
+	return rv;
+}
+/**
+ * @brief Get duplex mode on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] duplex duplex mode
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_duplex_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t * pduplex)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_duplex_get(dev_id, port_id, pduplex);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get speed on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] speed port speed
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t * pspeed)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_speed_get(dev_id, port_id, pspeed);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+#ifndef IN_PORTCONTROL_MINI
+/**
+ * @brief Get flow control status on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_flowctrl_get(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+
+/**
+ * @brief Get flow control force mode on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable)
+{
+	sw_error_t rv;
+
+	HSL_API_LOCK;
+	rv = _mht_port_flowctrl_forcemode_get(dev_id, port_id, enable);
+	HSL_API_UNLOCK;
+	return rv;
+}
+#endif
+
+sw_error_t
+mht_port_link_update(struct qca_phy_priv *priv, a_uint32_t port_id,
+	struct port_phy_status phy_status)
+{
+	sw_error_t rv = 0;
+
+	/* configure gcc uniphy and mac speed frequency*/
+	rv = mht_port_speed_clock_set(priv->device_id, port_id, phy_status.speed);
+	SW_RTN_ON_ERROR (rv);
+	/* configure mac speed and duplex */
+	rv = _mht_port_mac_speed_set(priv->device_id, port_id, phy_status.speed);
+	SW_RTN_ON_ERROR (rv);
+	rv = _mht_port_mac_dupex_set(priv->device_id, port_id, phy_status.duplex);
+	SW_RTN_ON_ERROR (rv);
+	SSDK_DEBUG("mht port %d link %d update speed %d duplex %d\n",
+			port_id, phy_status.speed,
+			phy_status.speed, phy_status.duplex);
+	if (phy_status.link_status == PORT_LINK_UP)
+	{
+		/* sync mac flowctrl */
+		if (priv->port_tx_flowctrl_forcemode[port_id] != A_TRUE) {
+			rv = mht_port_txfc_status_set(priv->device_id,
+				port_id, phy_status.tx_flowctrl);
+			SW_RTN_ON_ERROR (rv);
+			SSDK_DEBUG("mht port %d link up update txfc %d\n",
+			port_id, phy_status.tx_flowctrl);
+		}
+		if (priv->port_tx_flowctrl_forcemode[port_id] != A_TRUE) {
+			rv = mht_port_rxfc_status_set(priv->device_id,
+				port_id, phy_status.rx_flowctrl);
+			SW_RTN_ON_ERROR (rv);
+			SSDK_DEBUG("mht port %d link up update rxfc %d\n",
+			port_id, phy_status.rx_flowctrl);
+		}
+		if (port_id != SSDK_PHYSICAL_PORT5) {
+			/* enable eth phy clock */
+			rv = ssdk_mht_port_clk_en_set(priv->device_id, port_id,
+				MHT_CLK_TYPE_EPHY, A_TRUE);
+			SW_RTN_ON_ERROR (rv);
+		}
+	}
+	if (phy_status.link_status == PORT_LINK_DOWN) {
+		/* disable eth phy clock */
+		rv = ssdk_mht_port_clk_en_set(priv->device_id, port_id,
+			MHT_CLK_TYPE_EPHY, A_FALSE);
+		SW_RTN_ON_ERROR (rv);
+	}
+	/* reset eth phy clock */
+	rv = ssdk_mht_port_clk_reset(priv->device_id, port_id, MHT_CLK_TYPE_EPHY);
+	SW_RTN_ON_ERROR (rv);
+	/* reset eth phy fifo */
+	rv = hsl_port_phy_function_reset(priv->device_id, port_id);
+	SW_RTN_ON_ERROR (rv);
+
 	return rv;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -116,6 +116,13 @@ typedef enum {
 	MHT_P_MAX,
 } mht_clk_parent_t;
 
+struct mht_clk_data {
+	unsigned long rate;
+	unsigned int rcg_val;
+	unsigned int cdiv_val;
+	unsigned int cbc_val;
+};
+
 struct mht_parent_data {
 	unsigned long prate;		/* RCG input clock rate */
 	mht_clk_parent_t parent;	/* RCG parent clock id */
@@ -157,7 +164,7 @@ struct clk_lookup {
 #define UQXGMII_SPEED_100M_CLK			25000000
 #define UQXGMII_SPEED_10M_CLK			2500000
 #define UQXGMII_XPCS_SPEED_2500M_CLK		78125000
-#define MHT_AHB_CLK_RATE_104P17M		104170000
+#define MHT_AHB_CLK_RATE_104P17M		104160000
 #define MHT_SYS_CLK_RATE_25M			25000000
 #define MHT_XO_CLK_RATE_50M			50000000
 
@@ -167,6 +174,7 @@ struct clk_lookup {
 #define MHT_UNIPHY0_SEL_MAC5			0x3
 #define MHT_UNIPHY0_SEL_MAC4			0
 
+#define RCGR_CMD_ROOT_OFF			BIT(31)
 #define RCGR_CMD_UPDATE				BIT(0)
 #define RCGR_SRC_SEL				BITS(8, 3)
 #define RCGR_SRC_SEL_SHIFT			8
@@ -175,6 +183,9 @@ struct clk_lookup {
 #define RCGR_DIV_BYPASS				0
 #define RCGR_DIV_MAX				0x1f
 #define CDIVR_DIVIDER_10			9	/* CDIVR divided by N + 1 */
+#define CDIVR_DIVIDER				BITS(0, 4)
+#define CDIVR_DIVIDER_SHIFT			0
+#define CBCR_CLK_OFF				BIT(31)
 #define CBCR_CLK_RESET				BIT(2)
 #define CBCR_CLK_ENABLE				BIT(0)
 
@@ -196,6 +207,10 @@ a_uint64_t ssdk_mht_uniphy_raw_clock_get(a_uint32_t dev_id, mht_clk_parent_t uni
 void ssdk_mht_uniphy_raw_clock_set(a_uint32_t dev_id,
 		mht_clk_parent_t uniphy_clk, a_uint64_t rate);
 void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint32_t pbmp);
+sw_error_t ssdk_mht_clk_rate_get(a_uint32_t dev_id,
+		const char *clock_id, struct mht_clk_data *clk_data);
+a_uint32_t ssdk_mht_clk_dump(a_uint32_t dev_id, char *buf);
+a_bool_t ssdk_mht_clk_is_enabled(a_uint32_t dev_id, const char *clock_id);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1316,6 +1316,110 @@ static ssize_t ssdk_ptp_counter_set(struct device *dev,
 }
 #endif
 
+#if defined(MHT)
+static ssize_t ssdk_clk_show(struct device *dev,
+		struct device_attribute *attr,
+		char *buf)
+{
+	return ssdk_mht_clk_dump(ssdk_dev_id, buf);
+}
+
+static ssize_t ssdk_clk_store(struct device *dev,
+		struct device_attribute *attr,
+		const char *buf, size_t count)
+{
+	char *clk_str, *clk_id, *op_str, *val_str = NULL;
+	a_uint32_t op_val;
+
+	clk_str = kstrndup(buf, count, GFP_KERNEL);
+	if (!clk_str)
+		return -ENOMEM;
+
+	if (clk_str[count - 1] == '\n')
+		clk_str[count - 1] = '\0';
+
+	clk_id = strsep(&clk_str, " ");
+	if (!clk_id)
+		goto parse_fail;
+
+	op_str = strsep(&clk_str, " ");
+	if (!op_str)
+		goto parse_fail;
+
+	/* the op_val is optinal */
+	val_str = strsep(&clk_str, " ");
+	if (val_str) {
+		if (kstrtou32(val_str, 0, &op_val) < 0)
+			goto parse_fail;
+	}
+
+	SSDK_DEBUG("clk_id: %s, option: %s %s\n", clk_id, op_str, val_str ? val_str : "");
+
+	if (strncasecmp(op_str, "parent", 6) == 0) {
+		if (val_str != NULL)
+			ssdk_mht_clk_parent_set(ssdk_dev_id, clk_id, op_val);
+		else {
+			SSDK_ERROR("parent value needed\n");
+			goto parse_fail;
+		}
+	}
+
+	if (strncasecmp(op_str, "rate", 4) == 0) {
+		if (val_str != NULL)
+			ssdk_mht_clk_rate_set(ssdk_dev_id, clk_id, op_val);
+		else {
+			SSDK_ERROR("rate value needed\n");
+			goto parse_fail;
+		}
+	}
+
+	if (strncasecmp(op_str, "reset", 5) == 0) {
+		ssdk_mht_clk_reset(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "deassert", 8) == 0) {
+		ssdk_mht_clk_deassert(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "assert", 6) == 0) {
+		ssdk_mht_clk_assert(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "enable", 6) == 0) {
+		ssdk_mht_clk_enable(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "disable", 7) == 0) {
+		ssdk_mht_clk_disable(ssdk_dev_id, clk_id);
+	}
+
+	kfree(clk_str);
+	return count;
+
+parse_fail:
+	if (clk_str)
+		kfree(clk_str);
+
+	SSDK_INFO("clk_cfg supported options:\n"
+			"clock_id parent parent_value[0-6]\n"
+			"Example: echo mht_gcc_mac1_tx_clk parent 6 > /sys/ssdk/clk_cfg\n"
+			"clock_id rate rate_value\n"
+			"Example: echo mht_gcc_mac1_tx_clk rate 312500000 > /sys/ssdk/clk_cfg\n"
+			"clock_id reset\n"
+			"Example: echo mht_gcc_mac1_tx_clk reset > /sys/ssdk/clk_cfg\n"
+			"clock_id deassert\n"
+			"Example: echo mht_gcc_mac1_tx_clk deassert > /sys/ssdk/clk_cfg\n"
+			"clock_id assert\n"
+			"Example: echo mht_gcc_mac1_tx_clk assert > /sys/ssdk/clk_cfg\n"
+			"clock_id enable\n"
+			"Example: echo mht_gcc_mac1_tx_clk enable > /sys/ssdk/clk_cfg\n"
+			"clock_id disable\n"
+			"Example: echo mht_gcc_mac1_tx_clk disable > /sys/ssdk/clk_cfg\n");
+
+	return -EINVAL;
+}
+#endif
+
 static const struct device_attribute ssdk_dev_id_attr =
 	__ATTR(dev_id, 0660, ssdk_dev_id_get, ssdk_dev_id_set);
 static const struct device_attribute ssdk_log_level_attr =
@@ -1334,6 +1438,11 @@ static const struct device_attribute ssdk_phy_read_reg_attr =
 static const struct device_attribute ssdk_ptp_counter_attr =
 	__ATTR(ptp_packet_counter, 0660, ssdk_ptp_counter_get, ssdk_ptp_counter_set);
 #endif
+#if defined(MHT)
+static const struct device_attribute ssdk_clk_cfg_attr =
+	__ATTR(clk_cfg, 0660, ssdk_clk_show, ssdk_clk_store);
+#endif
+
 struct kobject *ssdk_sys = NULL;
 
 int ssdk_sysfs_init (void)
@@ -1405,7 +1514,23 @@ int ssdk_sysfs_init (void)
 	}
 #endif
 
+#if defined(MHT)
+	/* create /sys/ssdk/dts_clk file */
+	ret = sysfs_create_file(ssdk_sys, &ssdk_clk_cfg_attr.attr);
+	if (ret) {
+		printk("Failed to register SSDK clk_cfg file\n");
+		goto CLEANUP_9;
+	}
+#endif
+
 	return 0;
+
+#if defined(MHT)
+CLEANUP_9:
+#if defined(IN_LINUX_STD_PTP)
+	sysfs_remove_file(ssdk_sys, &ssdk_ptp_counter_attr.attr);
+#endif
+#endif
 
 #ifdef IN_LINUX_STD_PTP
 CLEANUP_8:
@@ -1431,6 +1556,10 @@ CLEANUP_1:
 
 void ssdk_sysfs_exit (void)
 {
+#if defined(MHT)
+	sysfs_remove_file(ssdk_sys, &ssdk_clk_cfg_attr.attr);
+#endif
+
 #ifdef IN_LINUX_STD_PTP
 	sysfs_remove_file(ssdk_sys, &ssdk_ptp_counter_attr.attr);
 #endif

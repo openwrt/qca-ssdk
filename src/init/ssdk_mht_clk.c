@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -469,10 +469,25 @@ sw_error_t ssdk_mht_clk_reset(a_uint32_t dev_id, const char *clock_id)
 	return rv;
 }
 
+a_bool_t ssdk_mht_clk_is_enabled(a_uint32_t dev_id, const char *clock_id)
+{
+	struct clk_lookup *clk;
+	a_uint32_t reg_val = 0;
+
+	clk = ssdk_mht_clk_find(clock_id);
+	if (!clk) {
+		SSDK_ERROR("CLK %s is not found!\n", clock_id);
+		return A_FALSE;
+	}
+
+	reg_val = qca_mht_mii_read(dev_id, MHT_CLK_BASE_REG + clk->rcg - 4);
+	return (reg_val & RCGR_CMD_ROOT_OFF) == 0;
+}
+
 sw_error_t ssdk_mht_clk_enable(a_uint32_t dev_id, const char *clock_id)
 {
 	struct clk_lookup *clk;
-	a_uint32_t cbc_reg = 0;
+	a_uint32_t cbc_reg = 0, reg_val = 0;
 
 	clk = ssdk_mht_clk_find(clock_id);
 	if (!clk) {
@@ -481,8 +496,15 @@ sw_error_t ssdk_mht_clk_enable(a_uint32_t dev_id, const char *clock_id)
 	}
 
 	cbc_reg = MHT_CLK_BASE_REG + clk->cbc;
-
 	qca_mht_mii_update(dev_id, cbc_reg, CBCR_CLK_ENABLE, CBCR_CLK_ENABLE);
+
+	udelay(1);
+	reg_val = qca_mht_mii_read(dev_id, cbc_reg);
+	if (reg_val & CBCR_CLK_OFF) {
+		SSDK_ERROR("CLK %s is not enabled!\n", clock_id);
+		return SW_FAIL;
+	}
+
 	return SW_OK;
 }
 
@@ -681,13 +703,14 @@ sw_error_t ssdk_mht_clk_rate_set(a_uint32_t dev_id,
 	}
 
 	/* update CDIV Reg to be divided by N(N-1 for reg value) */
-	if (cdiv_val > 0) {
-		if (cdiv_reg == 0) {
-			SSDK_ERROR("CLK %s needs CDIVR to generate rate %d from prate %lld\n",
-					clock_id, rate, prate);
-			return SW_BAD_VALUE;
-		}
-		qca_mht_mii_write(dev_id, cdiv_reg, cdiv_val);
+	if (cdiv_reg != 0)
+		qca_mht_mii_update(dev_id, cdiv_reg,
+				CDIVR_DIVIDER, cdiv_val << CDIVR_DIVIDER_SHIFT);
+
+	if (cdiv_reg == 0 && cdiv_val > 0) {
+		SSDK_ERROR("CLK %s needs CDIVR to generate rate %d from prate %lld\n",
+				clock_id, rate, prate);
+		return SW_BAD_VALUE;
 	}
 
 	/* update RCGR */
@@ -697,6 +720,122 @@ sw_error_t ssdk_mht_clk_rate_set(a_uint32_t dev_id,
 
 	/* update RCG to the new programmed configuration */
 	return ssdk_mht_clk_update(dev_id, cmd_reg);
+}
+
+sw_error_t ssdk_mht_clk_rate_get(a_uint32_t dev_id,
+		const char *clock_id, struct mht_clk_data *clk_data)
+{
+	struct clk_lookup *clk;
+	a_uint64_t div, prate = 0;
+	a_uint32_t i, reg_val, parent_index = 0;
+	const struct mht_parent_data *pdata = NULL;
+	char clk_id[64] = {0};
+	a_bool_t bypass_en = A_FALSE;
+
+	strlcpy(clk_id, clock_id, sizeof(clk_id));
+
+	ssdk_mht_port5_uniphy0_clk_src_get(dev_id, &bypass_en);
+	if (bypass_en == A_TRUE) {
+		if (strncasecmp(clock_id, MHT_MAC5_TX_UNIPHY0_CLK,
+					strlen(MHT_MAC5_TX_UNIPHY0_CLK)) == 0)
+			strlcpy(clk_id, MHT_MAC4_RX_CLK, sizeof(clk_id));
+		else if (strncasecmp(clock_id, MHT_MAC5_RX_UNIPHY0_CLK,
+					strlen(MHT_MAC5_RX_UNIPHY0_CLK)) == 0)
+			strlcpy(clk_id, MHT_MAC4_TX_CLK, sizeof(clk_id));
+	}
+
+	clk = ssdk_mht_clk_find(clk_id);
+	if (!clk) {
+		SSDK_ERROR("CLK %s is not found!\n", clk_id);
+		return SW_NOT_FOUND;
+	}
+
+	reg_val = qca_mht_mii_read(dev_id, MHT_CLK_BASE_REG + clk->rcg);
+
+	/* get the parent rate of clock */
+	parent_index = (reg_val & RCGR_SRC_SEL) >> RCGR_SRC_SEL_SHIFT;
+	for (i = 0; i < clk->num_parent; i++) {
+		pdata = &(clk->pdata[i]);
+		if (pdata->cfg == parent_index) {
+			/* uniphy0 rx, tx and unphy1 rx, tx clock can be 125M or 312.5M, which
+			 * depends on the current link speed, the clock rate needs to be acquired
+			 * dynamically.
+			 */
+			switch (pdata->parent) {
+				case MHT_P_UNIPHY0_RX:
+				case MHT_P_UNIPHY0_TX:
+				case MHT_P_UNIPHY1_RX:
+				case MHT_P_UNIPHY1_TX:
+					prate = ssdk_mht_uniphy_raw_clock_get(dev_id,
+							pdata->parent);
+					break;
+				default:
+					/* XO 50M or 315P5M fix clock rate */
+					prate = pdata->prate;
+					break;
+			}
+			/* find the parent clock rate */
+			break;
+		}
+	}
+
+	if (i == clk->num_parent || prate == 0) {
+		SSDK_ERROR("CLK %s is configured as unsupported parent value %d\n",
+				clk_id, parent_index);
+		return SW_BAD_VALUE;
+	}
+
+	/* calculate the current clock rate */
+	div = (reg_val >> RCGR_HDIV_SHIFT) & RCGR_HDIV;
+	if (div != 0) {
+		/* RCG divider is bypassed if the div value is 0 */
+		prate *= 2;
+		do_div(prate, div + 1);
+	}
+
+	clk_data->rcg_val = reg_val;
+
+	reg_val = qca_mht_mii_read(dev_id, MHT_CLK_BASE_REG + clk->cbc);
+	clk_data->cbc_val = reg_val;
+
+	if (clk->cdiv != 0) {
+		reg_val = qca_mht_mii_read(dev_id, MHT_CLK_BASE_REG + clk->cdiv);
+		clk_data->cdiv_val = reg_val;
+		do_div(prate, ((reg_val >> CDIVR_DIVIDER_SHIFT) & CDIVR_DIVIDER) + 1);
+	}
+
+	clk_data->rate = prate;
+
+	return SW_OK;
+}
+
+a_uint32_t ssdk_mht_clk_dump(a_uint32_t dev_id, char *buf)
+{
+	a_uint32_t i, len = 0;
+	struct clk_lookup *clk;
+	struct mht_clk_data clk_data;
+	sw_error_t rv = SW_OK;
+
+	len += snprintf(buf + len, (ssize_t)(PAGE_SIZE - len),
+			"%-31s Frequency RCG_VAL CDIV_VAL CBC_VAL\n",
+			"Clock Name");
+
+	for (i = 0; i < ARRAY_SIZE(mht_clk_lookup_table); i++) {
+		clk = &mht_clk_lookup_table[i];
+		if (clk->rcg != 0) {
+			rv = ssdk_mht_clk_rate_get(dev_id, clk->clk_name, &clk_data);
+			if (rv != SW_OK)
+				continue;
+			len += snprintf(buf + len, (ssize_t)(PAGE_SIZE - len),
+					"%-31s %-9ld 0x%-5x 0x%-6x 0x%-5x\n",
+					clk->clk_name + 4, clk_data.rate,
+					clk_data.rcg_val, clk_data.cdiv_val, clk_data.cbc_val);
+			if (len >= PAGE_SIZE)
+				break;
+		}
+	}
+
+	return len;
 }
 
 sw_error_t ssdk_mht_port5_uniphy0_clk_src_set(a_uint32_t dev_id, a_bool_t bypass_en)
@@ -725,7 +864,7 @@ sw_error_t ssdk_mht_port5_uniphy0_clk_src_get(a_uint32_t dev_id, a_bool_t *bypas
 	 * In bypass mode, uniphy0 rx clock is from mac4 tx, uniphy0 tx clock is from mac4 rx;
 	 */
 	reg_val = qca_mht_mii_read(dev_id, MHT_CLK_BASE_REG + MHT_CLK_MUX_SEL);
-	*bypass_en = (reg_val & MHT_UNIPHY0_MUX_SEL_MASK) ? A_FALSE : A_TRUE;
+	*bypass_en = (reg_val & MHT_UNIPHY0_SEL_MAC5) ? A_FALSE : A_TRUE;
 
 	return SW_OK;
 }

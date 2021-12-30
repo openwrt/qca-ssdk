@@ -22,6 +22,7 @@
 #include "sw.h"
 #include "ssdk_init.h"
 #include "ssdk_plat.h"
+#include "ssdk_mht_pinctrl.h"
 #include "mht_sec_ctrl.h"
 #include "ssdk_dts.h"
 #include "fal_interface_ctrl.h"
@@ -116,6 +117,9 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	ssdk_portvlan_init(dev_id);
 #endif
 	ret = qca_mht_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = ssdk_mht_pinctrl_init(dev_id);
 
 	return ret;
 }

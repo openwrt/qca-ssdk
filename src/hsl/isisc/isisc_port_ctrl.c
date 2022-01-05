@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -34,14 +34,19 @@
 static a_bool_t
 _isisc_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
 {
-    if ((0 == port_id) || (6 == port_id))
-    {
-        return A_FALSE;
-    }
-    else
-    {
-        return A_TRUE;
-    }
+	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
+	a_uint32_t cpu_bmp = BIT(6) | BIT(0);
+
+	chip_type = hsl_get_current_chip_type(dev_id);
+#if defined(MHT)
+	if (chip_type == CHIP_MHT)
+		return hsl_port_phy_connected(dev_id, port_id);
+#endif
+
+	if (cpu_bmp & BIT(port_id))
+		return A_FALSE;
+	else
+		return A_TRUE;
 }
 
 static sw_error_t

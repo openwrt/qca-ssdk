@@ -1,18 +1,19 @@
 /*
  * Copyright (c) 2012, 2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
-
 
 #include "sw_config.h"
 #include "aos_head.h"
@@ -23,6 +24,7 @@
 #include "hsl_dev.h"
 #include "hsl_port_prop.h"
 #include "hsl_phy.h"
+#include "ssdk_dts.h"
 
 
 typedef struct
@@ -96,6 +98,20 @@ hsl_mports_validity_check(a_uint32_t dev_id, fal_pbmp_t port_bitmap)
     pbitmap = p_port_info[dev_id]->dev_portmap;
 
     return (SW_IS_PBMP_INCLUDE(pbitmap, port_bitmap));
+}
+
+a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
+{
+	a_uint32_t cpu_bmp = ssdk_cpu_bmp_get(dev_id);
+	a_bool_t is_fport = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+
+	if (A_FALSE == hsl_port_validity_check(dev_id, port_id))
+		return A_FALSE;
+
+	if (cpu_bmp & port_id || is_fport == A_TRUE)
+		return A_FALSE;
+
+	return A_TRUE;
 }
 
 sw_error_t

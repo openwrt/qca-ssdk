@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -146,6 +146,7 @@
 
 #if defined(MHT)
 #include "ssdk_mht.h"
+#include "ssdk_mht_clk.h"
 #endif
 
 #ifdef IN_RFS
@@ -425,7 +426,7 @@ qca_switch_init(a_uint32_t dev_id)
 	} else {
 		port_bmp = qca_ssdk_port_bmp_get(dev_id);
 		/* Including CPU port */
-		port_bmp |= AR8327_PORT_CPU;
+		port_bmp |= ssdk_cpu_bmp_get(dev_id);
 	}
 
 	i = 0;
@@ -557,11 +558,20 @@ qca_switch_init(a_uint32_t dev_id)
 					aos_mem_zero(&port_hol_ctrl, sizeof(port_hol_ctrl));
 					aos_mem_zero(&queue_hol_ctrl, sizeof(queue_hol_ctrl));
 					cpu_bmp = ssdk_cpu_bmp_get(dev_id);
+#if defined(IN_PORTCONTROL)
+					fal_port_txmac_status_set(dev_id, i, A_FALSE);
+					fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+#endif
 					if (cpu_bmp & BIT(i)) {
 #if defined(IN_PORTCONTROL)
 						fal_port_flowctrl_set(dev_id, i, A_FALSE);
-						fal_port_flowctrl_forcemode_set(dev_id, i,
-								A_TRUE);
+						fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
+						fal_header_type_set(dev_id,
+								A_TRUE, MHT_HEADER_TYPE_VAL);
+						fal_port_rxhdr_mode_set(dev_id,
+								i, FAL_ONLY_MANAGE_FRAME_EN);
+						fal_port_txhdr_mode_set(dev_id,
+								i, FAL_NO_HEADER_EN);
 #endif
 						/* port tx buf number */
 						port_hol_ctrl[0] = 600;
@@ -3732,10 +3742,10 @@ static int __init regi_init(void)
 			case CHIP_MHT:
 #if defined(MHT)
 				SSDK_INFO("Initializing MHT!!\n");
-				qca_ar8327_gpio_reset(qca_phy_priv_global[dev_id]);
-				rv = ssdk_switch_register(dev_id, cfg.chip_type);
-				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
+				ssdk_mht_clk_reset(dev_id, MHT_SWITCH_CORE_CLK);
 				rv = qca_mht_hw_init(&cfg, dev_id);
+				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
+				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				SSDK_INFO("Initializing MHT Done!!\n");
 #endif

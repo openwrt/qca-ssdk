@@ -48,8 +48,16 @@ _qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t force_speed = FAL_SPEED_BUTT;
 
 	force_en = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
-	if (force_en == A_TRUE)
+	if (force_en == A_TRUE) {
 		force_speed = ssdk_port_force_speed_get(dev_id, port_id);
+
+		rv = fal_port_speed_set(dev_id, port_id, force_speed);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = fal_port_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
+		SW_RTN_ON_ERROR(rv);
+	}
+
 
 	if(mac_mode == PORT_WRAPPER_SGMII_PLUS)
 		mac_config.mac_mode = FAL_MAC_MODE_SGMII_PLUS;
@@ -70,10 +78,28 @@ static sw_error_t
 qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0,
 	a_uint32_t mac_mode1)
 {
-	_qca_mht_interface_mode_init(dev_id, SSDK_PHYSICAL_PORT0, mac_mode0);
-	_qca_mht_interface_mode_init(dev_id, SSDK_PHYSICAL_PORT5, mac_mode1);
+	sw_error_t rv = SW_OK;
 
-	return SW_OK;
+	rv = _qca_mht_interface_mode_init(dev_id, SSDK_PHYSICAL_PORT0, mac_mode0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = _qca_mht_interface_mode_init(dev_id, SSDK_PHYSICAL_PORT5, mac_mode1);
+	SW_RTN_ON_ERROR(rv);
+
+	if (A_TRUE == ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT0, PHY_F_FORCE)) {
+		rv = fal_port_txmac_status_set(dev_id, SSDK_PHYSICAL_PORT0, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+		rv = fal_port_rxmac_status_set(dev_id, SSDK_PHYSICAL_PORT0, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	if (A_TRUE == ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT5, PHY_F_FORCE)) {
+		rv = fal_port_txmac_status_set(dev_id, SSDK_PHYSICAL_PORT5, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+		rv = fal_port_rxmac_status_set(dev_id, SSDK_PHYSICAL_PORT5, A_TRUE);
+	}
+
+	return rv;
 }
 
 int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)

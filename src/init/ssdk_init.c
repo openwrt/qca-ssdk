@@ -3735,7 +3735,7 @@ static int __init regi_init(void)
 				qca_ar8327_gpio_reset(qca_phy_priv_global[dev_id]);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
-				rv = qca_mht_hw_init(qca_phy_priv_global[dev_id]);
+				rv = qca_mht_hw_init(&cfg, dev_id);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				SSDK_INFO("Initializing MHT Done!!\n");
 #endif

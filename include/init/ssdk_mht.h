@@ -23,7 +23,7 @@ extern "C" {
 
 #include "ssdk_init.h"
 
-int qca_mht_hw_init(struct qca_phy_priv *priv);
+int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 
 #ifdef __cplusplus
 }

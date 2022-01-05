@@ -1667,9 +1667,18 @@ qca808x_phy_interface_get_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 */
 sw_error_t
 qca808x_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
-		fal_port_interface_mode_t *interface_mode_status)
+	fal_port_interface_mode_t *interface_mode_status)
 {
 	a_uint16_t phy_data;
+/*qca808x_end*/
+#if defined(MHT)
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+	{
+		return qca8084_phy_interface_get_mode_status(dev_id, phy_id,
+			interface_mode_status);
+	}
+#endif
+/*qca808x_start*/
 	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CHIP_CONFIG);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 

@@ -406,6 +406,7 @@ int qca_ssdk_phy_info_init(a_uint32_t dev_id)
 	{
 		phy_info[dev_id]->phy_type[j] = MAX_PHY_CHIP;
 		phy_info[dev_id]->port_link_status[j] = PORT_LINK_DOWN;
+		phy_info[dev_id]->port_mode[j] = PORT_INTERFACE_MODE_MAX;
 		if(j == SSDK_PHYSICAL_PORT0)
 		{
 			phy_info[dev_id]->phy_address[j] = INVALID_PHY_ADDR;

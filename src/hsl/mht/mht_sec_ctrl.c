@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -131,6 +131,40 @@ qca_mht_port_id_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	}
 
 	return SW_NOT_FOUND;
+}
+
+sw_error_t
+qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t intr_bmp)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mht_port_id = 0;
+	a_uint32_t data0 = 0, data1 = 0;
+
+	rv = qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
+	SW_RTN_ON_ERROR (rv);
+	if(mht_port_id > SSDK_PHYSICAL_PORT4 || mht_port_id < SSDK_PHYSICAL_PORT1)
+		return SW_NOT_SUPPORTED;
+	data0 = qca_mht_mii_read(dev_id, GLOBAL_INTR_ENABLE_OFFSET);
+	data1 = qca_mht_mii_read(dev_id, WOL_INTR_ENABLE_OFFSET);
+	if(!intr_bmp)
+	{
+		data0 &= ~(BIT(GLOBAL_INTR_ENABLE_PHY0_BOFFSET+1-mht_port_id));
+		data1 &= ~(BIT(mht_port_id-1));
+	}
+	else
+	{
+		data0 |= BIT(GLOBAL_INTR_ENABLE_PHY0_BOFFSET+1-mht_port_id);
+		if(intr_bmp & FAL_PHY_INTR_WOL_STATUS)
+			data1 |= BIT(mht_port_id-1);
+		else
+			data1 &= BIT(mht_port_id-1);
+	}
+
+	qca_mht_mii_write(dev_id, GLOBAL_INTR_ENABLE_OFFSET, data0);
+	qca_mht_mii_write(dev_id, WOL_INTR_ENABLE_OFFSET, data1);
+
+	return SW_OK;
 }
 /**
  * @}

@@ -698,7 +698,11 @@ extern "C" {
 #define GBL_INT_STATUS1_NR_E           1
 
 #define LINK_CHG_INT_S
+#if defined(MHT)
+#define GBL_INT_STATUS1_LINK_CHG_INT_S_BOFFSET 0
+#else
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_BOFFSET 1
+#endif
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_BLEN        7
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_FLAG    HSL_RW
 
@@ -719,7 +723,11 @@ extern "C" {
 #define GBL_INT_MASK1_NR_E           1
 
 #define LINK_CHG_INT_M
+#if defined(MHT)
+#define GBL_INT_MASK1_LINK_CHG_INT_M_BOFFSET 0
+#else
 #define GBL_INT_MASK1_LINK_CHG_INT_M_BOFFSET 1
+#endif
 #define GBL_INT_MASK1_LINK_CHG_INT_M_BLEN        7
 #define GBL_INT_MASK1_LINK_CHG_INT_M_FLAG    HSL_RW
 

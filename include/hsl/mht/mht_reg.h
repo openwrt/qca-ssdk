@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -31,6 +31,69 @@ extern "C" {
 /*
  * Manhattan GCC Gloabl Control Register
  */
+/*global intr enable*/
+#define GLOBAL_INTR_ENABLE
+#define GLOBAL_INTR_ENABLE_ID                           0
+#define GLOBAL_INTR_ENABLE_OFFSET                       0xC90F008
+#define GLOBAL_INTR_ENABLE_E_LENGTH                     4
+#define GLOBAL_INTR_ENABLE_E_OFFSET                     0
+#define GLOBAL_INTR_ENABLE_NR_E                         1
+
+/*phy0 intr enable*/
+#define GLOBAL_INTR_ENABLE_PHY0
+#define GLOBAL_INTR_ENABLE_PHY0_BOFFSET                 7
+#define GLOBAL_INTR_ENABLE_PHY0_BLEN                    1
+#define GLOBAL_INTR_ENABLE_PHY0_FLAG                    HSL_RW
+
+/*phy1 intr enable*/
+#define GLOBAL_INTR_ENABLE_PHY1
+#define GLOBAL_INTR_ENABLE_PHY1_BOFFSET                 6
+#define GLOBAL_INTR_ENABLE_PHY1_BLEN                    1
+#define GLOBAL_INTR_ENABLE_PHY1_FLAG                    HSL_RW
+
+/*phy2 intr enable*/
+#define GLOBAL_INTR_ENABLE_PHY2
+#define GLOBAL_INTR_ENABLE_PHY2_BOFFSET                 5
+#define GLOBAL_INTR_ENABLE_PHY2_BLEN                    1
+#define GLOBAL_INTR_ENABLE_PHY2_FLAG                    HSL_RW
+
+/*phy3 intr enable*/
+#define GLOBAL_INTR_ENABLE_PHY3
+#define GLOBAL_INTR_ENABLE_PHY3_BOFFSET                 4
+#define GLOBAL_INTR_ENABLE_PHY3_BLEN                    1
+#define GLOBAL_INTR_ENABLE_PHY3_FLAG                    HSL_RW
+
+/*WOL intr enable*/
+#define WOLL_INTR_ENABLE
+#define WOL_INTR_ENABLE_ID                              0
+#define WOL_INTR_ENABLE_OFFSET                          0xC90F010
+#define WOL_INTR_ENABLE_E_LENGTH                        4
+#define WOL_INTR_ENABLE_E_OFFSET                        0
+#define WOL_INTR_ENABLE_NR_E                            1
+
+/*phy0 WOL intr enable*/
+#define WOL_INTR_ENABLE_PHY0
+#define WOL_INTR_ENABLE_PHY0_BOFFSET                    0
+#define WOL_INTR_ENABLE_PHY0_BLEN                       1
+#define WOL_INTR_ENABLE_PHY0_FLAG                       HSL_RW
+
+/*phy1 WOL intr enable*/
+#define WOL_INTR_ENABLE_PHY1
+#define WOL_INTR_ENABLE_PHY1_BOFFSET                    1
+#define WOL_INTR_ENABLE_PHY1_BLEN                       1
+#define WOL_INTR_ENABLE_PHY1_FLAG                       HSL_RW
+
+/*phy2 WOL intr enable*/
+#define WOL_INTR_ENABLE_PHY2
+#define WOL_INTR_ENABLE_PHY2_BOFFSET                    2
+#define WOL_INTR_ENABLE_PHY2_BLEN                       1
+#define WOL_INTR_ENABLE_PHY2_FLAG                       HSL_RW
+
+/*phy3 WOL intr enable*/
+#define WOL_INTR_ENABLE_PHY3
+#define WOL_INTR_ENABLE_PHY3_BOFFSET                    3
+#define WOL_INTR_ENABLE_PHY3_BLEN                       1
+#define WOL_INTR_ENABLE_PHY3_FLAG                       HSL_RW
 
 /* work mode */
 #define WORK_MODE
@@ -539,34 +602,6 @@ extern "C" {
 #define SWITCH_CORE_SWITCH_RING_FC_EN_BOFFSET	0
 #define SWITCH_CORE_SWITCH_RING_FC_EN_BLEN	1
 #define SWITCH_CORE_SWITCH_RING_FC_EN_FLAG	HSL_RW
-
-/* Global Interrupt Register0 */
-#define GLOBAL_INT0
-#define GLOBAL_INT0_OFFSET    0x0020
-#define GLOBAL_INT0_E_LENGTH  4
-#define GLOBAL_INT0_E_OFFSET  0
-#define GLOBAL_INT0_NR_E      1
-
-/* Global Interrupt Register1 */
-#define GLOBAL_INT1
-#define GLOBAL_INT1_OFFSET    0x0024
-#define GLOBAL_INT1_E_LENGTH  4
-#define GLOBAL_INT1_E_OFFSET  0
-#define GLOBAL_INT1_NR_E      1
-
-/* Global Interrupt Mask Register0  */
-#define GLOBAL_INT0_MASK
-#define GLOBAL_INT0_MASK_OFFSET    0x0028
-#define GLOBAL_INT0_MASK_E_LENGTH  4
-#define GLOBAL_INT0_MASK_E_OFFSET  0
-#define GLOBAL_INT0_MASK_NR_E      1
-
-/* Global Interrupt Mask Register1  */
-#define GLOBAL_INT1_MASK
-#define GLOBAL_INT1_MASK_OFFSET    0x002c
-#define GLOBAL_INT1_MASK_E_LENGTH  4
-#define GLOBAL_INT1_MASK_E_OFFSET  0
-#define GLOBAL_INT1_MASK_NR_E      1
 
 /* QM Debug Address Register */
 #define SWITCH_QM_DEBUG_ADDR

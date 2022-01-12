@@ -245,7 +245,7 @@ phy_addr_validation_check(a_uint32_t phy_addr)
 		return A_TRUE;
 }
 
-static struct mii_bus *
+struct mii_bus *
 ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	struct mii_bus *bus = NULL;

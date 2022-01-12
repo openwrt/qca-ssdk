@@ -729,30 +729,30 @@ sw_error_t
 hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct phy_device **phydev)
 {
-	struct qca_phy_priv *priv;
 	a_uint32_t pdev_addr;
 	const char *pdev_name;
+	struct mii_bus *miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
 
-	priv = ssdk_phy_priv_data_get(dev_id);
-	SW_RTN_ON_NULL(priv);
 	SW_RTN_ON_NULL(phydev);
-
 #if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
-	*phydev = priv->miibus->phy_map[phy_addr];
-	SW_RTN_ON_NULL(*phydev);
-	pdev_addr = (*phydev)->addr;
-	pdev_name = dev_name(&((*phydev)->dev));
-#else
-	*phydev = mdiobus_get_phy(priv->miibus, phy_addr);
-	SW_RTN_ON_NULL(*phydev);
-	pdev_addr = (*phydev)->mdio.addr;
-	pdev_name = phydev_name(*phydev);
-#endif
+	*phydev = miibus->phy_map[phy_addr];
 	if(*phydev == NULL)
 	{
 		SSDK_ERROR("phy_addr %d phydev is NULL\n", phy_addr);
 		return SW_NOT_INITIALIZED;
 	}
+	pdev_addr = (*phydev)->addr;
+	pdev_name = dev_name(&((*phydev)->dev));
+#else
+	*phydev = mdiobus_get_phy(miibus, phy_addr);
+	if(*phydev == NULL)
+	{
+		SSDK_ERROR("phy_addr %d phydev is NULL\n", phy_addr);
+		return SW_NOT_INITIALIZED;
+	}
+	pdev_addr = (*phydev)->mdio.addr;
+	pdev_name = phydev_name(*phydev);
+#endif
 	SSDK_DEBUG("phy[%d]: device %s, driver %s\n",
 		pdev_addr, pdev_name,
 		(*phydev)->drv ? (*phydev)->drv->name : "unknown");
@@ -785,7 +785,6 @@ hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
 	return SW_OK;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
 static sw_error_t
 hsl_phy_adv_to_linkmode_adv(a_uint32_t autoadv, a_ulong_t *advertising)
 {
@@ -823,32 +822,71 @@ hsl_phy_adv_to_linkmode_adv(a_uint32_t autoadv, a_ulong_t *advertising)
 }
 
 sw_error_t
-hsl_port_phydev_adv_update(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t autoadv)
-{
-	sw_error_t rv = SW_OK;
-	struct phy_device *phydev;
-
-	rv = hsl_port_phydev_get(dev_id, port_id, &phydev);
-	SW_RTN_ON_ERROR(rv);
-	rv = hsl_phy_adv_to_linkmode_adv(autoadv, phydev->advertising);
-
-	return rv;
-}
-#endif
-
-sw_error_t
 hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
-	a_bool_t enable)
+	a_bool_t autoneg_en, a_uint32_t autoadv)
 {
 	sw_error_t rv = SW_OK;
 	struct phy_device *phydev;
 
+#if defined(IN_PHY_I2C_MODE)
+	/*if phy is accessed by I2C, so the phydev address is mdio fake address*/
+	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS)
+		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
+#endif
 	rv = hsl_phy_phydev_get(dev_id, phy_addr, &phydev);
 	SW_RTN_ON_ERROR(rv);
-	phydev->autoneg = enable;
+	if(autoneg_en)
+	{
+		if(autoadv != 0)
+		{
+			rv = hsl_phy_adv_to_linkmode_adv(autoadv, phydev->advertising);
+			SW_RTN_ON_ERROR(rv);
+		}
+	}
+
+	phydev->autoneg = autoneg_en;
 
 	return SW_OK;
+}
+
+a_uint32_t
+hsl_phy_speed_duplex_to_auto_adv(a_uint32_t dev_id,fal_port_speed_t speed,
+	fal_port_duplex_t duplex)
+{
+	a_uint32_t auto_adv = 0;
+
+	switch(speed)
+	{
+		case FAL_SPEED_10:
+			if(duplex == FAL_FULL_DUPLEX)
+				auto_adv = FAL_PHY_ADV_10T_FD;
+			else
+				auto_adv = FAL_PHY_ADV_10T_HD;
+			break;
+		case FAL_SPEED_100:
+			if(duplex == FAL_FULL_DUPLEX)
+				auto_adv =FAL_PHY_ADV_100TX_FD;
+			else
+				auto_adv =FAL_PHY_ADV_100TX_HD;
+			break;
+		case FAL_SPEED_1000:
+			auto_adv = FAL_PHY_ADV_1000T_FD;
+			break;
+		case FAL_SPEED_2500:
+			auto_adv = FAL_PHY_ADV_2500T_FD;
+			break;
+		case FAL_SPEED_5000:
+			auto_adv = FAL_PHY_ADV_5000T_FD;
+			break;
+		case FAL_SPEED_10000:
+			auto_adv = FAL_PHY_ADV_10000T_FD;
+			break;
+		default:
+			break;
+	}
+
+	return auto_adv;
 }
 
 sw_error_t

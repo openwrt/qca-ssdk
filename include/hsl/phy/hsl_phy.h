@@ -721,12 +721,6 @@ hsl_port_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_id);
 sw_error_t
 hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
 	struct phy_device **phydev);
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
-sw_error_t
-hsl_port_phydev_adv_update(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t autoadv);
-#endif
 sw_error_t
 hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
 	led_ctrl_pattern_t * pattern);
@@ -738,7 +732,10 @@ hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
 sw_error_t
 hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
-	a_bool_t enable);
+	a_bool_t autoneg_en, a_uint32_t autoadv);
+a_uint32_t
+hsl_phy_speed_duplex_to_auto_adv(a_uint32_t dev_id, fal_port_speed_t speed,
+	fal_port_duplex_t duplex);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

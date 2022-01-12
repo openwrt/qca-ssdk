@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -171,27 +173,22 @@ mpge_phy_get_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
 * specified device.
 */
 static sw_error_t
-mpge_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
+mpge_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 		     fal_port_speed_t speed)
 {
 	a_uint16_t phy_data = 0;
-	a_uint32_t autoneg = 0;
 	fal_port_duplex_t old_duplex = MPGE_CTRL_FULL_DUPLEX;
 	sw_error_t rv = SW_OK;
 
-	phy_data = mpge_phy_reg_read(dev_id, phy_id, MPGE_PHY_CONTROL);
+	phy_data = mpge_phy_reg_read(dev_id, phy_addr, MPGE_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	switch(speed)
 	{
 		case FAL_SPEED_1000:
-			rv = mpge_phy_get_autoneg_adv(dev_id, phy_id, &autoneg);
+			rv = mpge_phy_set_autoneg_adv(dev_id, phy_addr,
+				FAL_PHY_ADV_1000T_FD);
 			PHY_RTN_ON_ERROR(rv);
-			if (!(autoneg & FAL_PHY_ADV_1000T_FD)) {
-				rv = mpge_phy_set_autoneg_adv(dev_id, phy_id,
-						autoneg | FAL_PHY_ADV_1000T_FD);
-				PHY_RTN_ON_ERROR(rv);
-			}
 			phy_data |= MPGE_CTRL_FULL_DUPLEX;
 			phy_data |= MPGE_CTRL_AUTONEGOTIATION_ENABLE;
 			phy_data |= MPGE_CTRL_RESTART_AUTONEGOTIATION;
@@ -204,7 +201,7 @@ mpge_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 			} else {
 				phy_data |= MPGE_CONTROL_10M;
 			}
-			rv = mpge_phy_get_duplex(dev_id, phy_id, &old_duplex);
+			rv = mpge_phy_get_duplex(dev_id, phy_addr, &old_duplex);
 			PHY_RTN_ON_ERROR(rv);
 
 			if (old_duplex == FAL_FULL_DUPLEX) {
@@ -218,7 +215,12 @@ mpge_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		default:
 			return SW_BAD_PARAM;
 	}
-	rv = mpge_phy_reg_write(dev_id, phy_id, MPGE_PHY_CONTROL, phy_data);
+
+	if(speed < FAL_SPEED_1000) {
+		rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	rv = mpge_phy_reg_write(dev_id, phy_addr, MPGE_PHY_CONTROL, phy_data);
 
 	return rv;
 }
@@ -229,19 +231,18 @@ mpge_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 * specified device.
 */
 static sw_error_t
-mpge_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
+mpge_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 		      fal_port_duplex_t duplex)
 {
 
 	a_uint16_t phy_data = 0;
-	a_uint32_t autoneg = 0;
 	fal_port_speed_t old_speed;
 	sw_error_t rv = SW_OK;
 
-	phy_data = mpge_phy_reg_read(dev_id, phy_id, MPGE_PHY_CONTROL);
+	phy_data = mpge_phy_reg_read(dev_id, phy_addr, MPGE_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
-	rv = mpge_phy_get_speed(dev_id, phy_id, &old_speed);
+	rv = mpge_phy_get_speed(dev_id, phy_addr, &old_speed);
 	PHY_RTN_ON_ERROR(rv);
 
 	switch(old_speed)
@@ -252,14 +253,11 @@ mpge_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
 			} else {
 				return SW_NOT_SUPPORTED;
 			}
-			phy_data |= MPGE_CTRL_AUTONEGOTIATION_ENABLE;
-			rv = mpge_phy_get_autoneg_adv(dev_id, phy_id, &autoneg);
+			rv = mpge_phy_set_autoneg_adv(dev_id, phy_addr,
+				FAL_PHY_ADV_1000T_FD);
 			PHY_RTN_ON_ERROR(rv);
-			if (!(autoneg & FAL_PHY_ADV_1000T_FD)) {
-				rv = mpge_phy_set_autoneg_adv(dev_id, phy_id,
-						autoneg | FAL_PHY_ADV_1000T_FD);
-				PHY_RTN_ON_ERROR(rv);
-			}
+			phy_data |= MPGE_CTRL_AUTONEGOTIATION_ENABLE;
+			phy_data |= MPGE_CTRL_RESTART_AUTONEGOTIATION;
 			break;
 		case FAL_SPEED_100:
 		case FAL_SPEED_10:
@@ -279,7 +277,12 @@ mpge_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
 		default:
 			return SW_FAIL;
 	}
-	rv = mpge_phy_reg_write(dev_id, phy_id, MPGE_PHY_CONTROL, phy_data);
+
+	if(old_speed < FAL_SPEED_1000) {
+		rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	rv = mpge_phy_reg_write(dev_id, phy_addr, MPGE_PHY_CONTROL, phy_data);
 
 	return rv;
 }

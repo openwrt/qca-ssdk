@@ -2605,6 +2605,8 @@ typedef sw_error_t
 /*qca808x_end*/
     hsl_reg_get reg_get;
     hsl_reg_set reg_set;
+    hsl_reg_get mii_reg_get;	/* mht in phy mode */
+    hsl_reg_set mii_reg_set;	/* mht in phy mode */
     hsl_reg_field_get reg_field_get;
     hsl_reg_field_set reg_field_set;
     hsl_reg_entries_get reg_entries_get;

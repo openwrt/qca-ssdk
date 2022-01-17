@@ -219,6 +219,8 @@ sw_error_t hppe_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 		p_api->dev_clean   = hppe_cleanup;
 		p_api->reg_get = sd_reg_hdr_get;
 		p_api->reg_set = sd_reg_hdr_set;
+		p_api->mii_reg_get = sd_reg_mii_get;
+		p_api->mii_reg_set = sd_reg_mii_set;
 		p_api->phy_get = sd_reg_mdio_get;
 		p_api->phy_set = sd_reg_mdio_set;
 		p_api->phy_i2c_get = sd_reg_i2c_get;

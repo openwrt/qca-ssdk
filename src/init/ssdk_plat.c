@@ -1640,6 +1640,15 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 		}
 
 		cfg->reg_mode = HSL_HEADER;
+#if defined(MHT)
+		/* when manhattan works in PHY mode, the clock mode will be defined in dts,
+		 * the registers of manhattan need to be accessed, mii_reg_set/mii_reg_get
+		 * can be leveraged for this purpose. */
+		if (clk_mode != MHT_WORK_MODE_MAX) {
+			cfg->reg_func.mii_reg_set = qca_mht_mii_write;
+			cfg->reg_func.mii_reg_get = qca_mht_mii_read;
+		}
+#endif
 	} else if (reg_mode == HSL_REG_MDIO) {
 		cfg->reg_mode = HSL_MDIO;
 #if defined(MHT)

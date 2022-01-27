@@ -278,6 +278,7 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 	a_uint32_t i = 0;
 	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
 	a_bool_t force_port;
+	fal_port_cnt_cfg_t init_cnt_cfg;
 
 	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
 		force_port = ssdk_port_feature_get(dev_id, i,
@@ -296,6 +297,16 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 		}
 		fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
 	}
+
+	aos_mem_zero(&init_cnt_cfg, sizeof(init_cnt_cfg));
+	init_cnt_cfg.uc_tx_cnt_en = FAL_ENABLE;
+	init_cnt_cfg.mc_tx_cnt_en = FAL_ENABLE;
+	init_cnt_cfg.tl_rx_cnt_en = FAL_ENABLE;
+	init_cnt_cfg.rx_cnt_en    = FAL_ENABLE;
+	for(i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT6; i++) {
+		fal_port_cnt_cfg_set(dev_id, FAL_PORT_ID(FAL_PORT_TYPE_PPORT, i), &init_cnt_cfg);
+	}
+
 	SSDK_INFO("appe portctrl initialization\n");
 
 	return SW_OK;

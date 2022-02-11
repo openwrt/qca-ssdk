@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018, 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -433,6 +434,9 @@ extern "C"
 #define QCA808X_PHY_ADC_THRESHOLD_100MV         0xf0
 #define QCA808X_PHY_ADC_THRESHOLD_200MV         0x0f
 #define QCA808X_PHY_ADC_THRESHOLD_300MV         0xff
+
+#define QCA808X_PHY_MMD7_CHIP_TYPE              0x901d
+#define QCA808X_PHY_1G_CHIP_TYPE                0x1
 
 a_uint16_t
 qca808x_phy_reg_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_id);

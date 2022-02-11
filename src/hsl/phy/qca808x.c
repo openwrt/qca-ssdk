@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018-2019, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -154,18 +155,19 @@ static sw_error_t qca808x_phy_config_init(struct phy_device *phydev)
 #endif
 		}
 	}
-
-	phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+	if(qca808x_phy_2500caps(dev_id, phy_id))
+	{
+		phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
 			QCA808X_MMD1_PMA_CAP_REG);
 
-	if (phy_data & QCA808X_STATUS_2500T_FD_CAPS) {
+		if (phy_data & QCA808X_STATUS_2500T_FD_CAPS) {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
-		features |= SUPPORTED_2500baseX_Full;
+			features |= SUPPORTED_2500baseX_Full;
 #else
-		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, mask);
+			linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, mask);
 #endif
+		}
 	}
-
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 	phydev->supported = features;
 	phydev->advertising = features;
@@ -367,6 +369,10 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 	} else {
 		/* autoneg enabled */
 		advertise = qca808x_negtiation_cap_get(phydev);
+		/*link would be down if there is no speed adv except for pause*/
+		if(!(advertise & ~(FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE))) {
+			return SW_BAD_VALUE;
+		}
 		err |= qca808x_phy_set_autoneg_adv(dev_id, phy_id, advertise);
 		err |= qca808x_phy_restart_autoneg(dev_id, phy_id);
 	}

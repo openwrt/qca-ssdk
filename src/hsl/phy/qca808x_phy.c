@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018, 2020-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -270,7 +271,10 @@ qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id)
 							QCA808X_MMD1_PMA_CAP_REG);
 
 	if (phy_data & QCA808X_STATUS_2500T_FD_CAPS) {
-		return A_TRUE;
+		phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+			QCA808X_PHY_MMD7_CHIP_TYPE);
+		if(!(phy_data & QCA808X_PHY_1G_CHIP_TYPE))
+			return A_TRUE;
 	}
 
 	return A_FALSE;
@@ -409,6 +413,8 @@ qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 	switch(speed)
 	{
 		case FAL_SPEED_2500:
+			if(!qca808x_phy_2500caps(dev_id, phy_id))
+				return SW_NOT_SUPPORTED;
 			phy_data1 |= QCA808X_PMA_CONTROL_2500M;
 			phy_data2 |= QCA808X_PMA_TYPE_2500M;
 			break;
@@ -482,6 +488,8 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		case FAL_SPEED_2500:
 		case FAL_SPEED_1000:
 			if (speed == FAL_SPEED_2500) {
+				if(!qca808x_phy_2500caps(dev_id, phy_id))
+					return SW_NOT_SUPPORTED;
 				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id,
 						FAL_PHY_ADV_2500T_FD);
 				PHY_RTN_ON_ERROR(rv);
@@ -1081,9 +1089,15 @@ qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	if (qca808x_phy_2500caps(dev_id, phy_id) == A_TRUE) {
 		rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id, autoneg);
+		PHY_RTN_ON_ERROR(rv);
+	} else {
+		if(autoneg & FAL_PHY_ADV_2500T_FD) {
+			SSDK_ERROR("2.5G auto adv is not supported\n");
+			return SW_NOT_SUPPORTED;
+		}
 	}
 
-	return rv;
+	return SW_OK;
 }
 
 sw_error_t
@@ -2152,15 +2166,18 @@ qca808x_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_bmp)
 			rv = qca808x_phy_mmd_write(dev_id, phy_addr, QCA808X_PHY_MMD3_NUM,
 				QCA808X_PHY_MMD3_AZ_TRAINING_CTRL, phy_data);
 			SW_RTN_ON_ERROR(rv);
-			/*config the fast retrain*/
-			rv = qca808x_phy_fast_retrain_cfg(dev_id, phy_addr);
-			SW_RTN_ON_ERROR(rv);
-			/*enable seed and configure ramdom seed in order that napa can be
-				as slave easier*/
-			rv = qca808x_phy_ms_seed_enable(dev_id, phy_addr, A_TRUE);
-			SW_RTN_ON_ERROR(rv);
-			rv = qca808x_phy_ms_random_seed_set(dev_id, phy_addr);
-			SW_RTN_ON_ERROR(rv);
+			if(qca808x_phy_2500caps(dev_id, phy_addr) == A_TRUE)
+			{
+				/*config the fast retrain*/
+				rv = qca808x_phy_fast_retrain_cfg(dev_id, phy_addr);
+				SW_RTN_ON_ERROR(rv);
+				/*enable seed and configure ramdom seed in order that napa can be
+					as slave easier*/
+				rv = qca808x_phy_ms_seed_enable(dev_id, phy_addr, A_TRUE);
+				SW_RTN_ON_ERROR(rv);
+				rv = qca808x_phy_ms_random_seed_set(dev_id, phy_addr);
+				SW_RTN_ON_ERROR(rv);
+			}
 			/*set adc threshold as 100mv for 10M*/
 			rv = qca808x_phy_adc_threshold_set(dev_id, phy_addr,
 				QCA808X_PHY_ADC_THRESHOLD_100MV);

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all copies.
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -30,6 +30,7 @@ extern "C" {
 #define SW_API_SSDK_CFG            (2  + SW_API_INIT_OFFSET)
 #define SW_API_MODULE_FUNC_CTRL_SET   (3  + SW_API_INIT_OFFSET)
 #define SW_API_MODULE_FUNC_CTRL_GET   (4  + SW_API_INIT_OFFSET)
+#define SW_API_PPE_CAPACITY_GET       (5  + SW_API_INIT_OFFSET)
 
     /*port ctrl*/
 #define SW_API_PORT_OFFSET          30
@@ -136,6 +137,10 @@ extern "C" {
 #define SW_API_PT_FLOW_CTRL_THRES_GET	(89 + SW_API_PORT_OFFSET)
 #define SW_API_PT_RING_FLOW_CTRL_SET	(90 + SW_API_PORT_OFFSET)
 #define SW_API_PT_RING_FLOW_CTRL_GET	(91 + SW_API_PORT_OFFSET)
+#define SW_API_PT_CNT_CFG_SET		(92 + SW_API_PORT_OFFSET)
+#define SW_API_PT_CNT_CFG_GET		(93 + SW_API_PORT_OFFSET)
+#define SW_API_PT_CNT_GET		(94 + SW_API_PORT_OFFSET)
+#define SW_API_PT_CNT_FLUSH		(95 + SW_API_PORT_OFFSET)
 
     /*vlan*/
 #define SW_API_VLAN_OFFSET         130
@@ -167,7 +172,10 @@ extern "C" {
 #define SW_API_PT_FRAME_MAX_SIZE_SET (7 + SW_API_PORT_EXT_OFFSET)
 #define SW_API_PT_SOURCE_FILTER_CONFIG_GET (8 + SW_API_PORT_EXT_OFFSET)
 #define SW_API_PT_SOURCE_FILTER_CONFIG_SET (9 + SW_API_PORT_EXT_OFFSET)
-
+#define SW_API_PT_MTU_CFG_SET  (10 + SW_API_PORT_EXT_OFFSET)
+#define SW_API_PT_MTU_CFG_GET  (11 + SW_API_PORT_EXT_OFFSET)
+#define SW_API_PT_MRU_MTU_SET  (12 + SW_API_PORT_EXT_OFFSET)
+#define SW_API_PT_MRU_MTU_GET  (13 + SW_API_PORT_EXT_OFFSET)
 
     /*portvlan*/
 #define SW_API_PORTVLAN_OFFSET       200
@@ -337,6 +345,8 @@ extern "C" {
 #define SW_API_ACL_UDF_PROFILE_CFG_GET		(25  + SW_API_ACL_OFFSET)
 #define SW_API_ACL_VPGROUP_SET			(26  + SW_API_ACL_OFFSET)
 #define SW_API_ACL_VPGROUP_GET			(27  + SW_API_ACL_OFFSET)
+#define SW_API_ACL_MAC_ENTRY_SET		(28  + SW_API_ACL_OFFSET)
+#define SW_API_ACL_MAC_ENTRY_DUMP		(29  + SW_API_ACL_OFFSET)
 
     /*qos*/
 #define SW_API_QOS_OFFSET             500
@@ -557,8 +567,10 @@ extern "C" {
 #define SW_API_FRAME_CRC_RESERVE_GET          (62  + SW_API_MISC_OFFSET)
 #define SW_API_PPPOE_EN_SET			(63  + SW_API_MISC_OFFSET)
 #define SW_API_PPPOE_EN_GET			(64  + SW_API_MISC_OFFSET)
-#define SW_API_DEBUG_PORT_COUNTER_ENABLE 	(65  + SW_API_MISC_OFFSET)
-#define SW_API_DEBUG_PORT_COUNTER_STATUS_GET	(66  + SW_API_MISC_OFFSET)
+#define SW_API_PPPOE_L3_INTF_SET		(65  + SW_API_MISC_OFFSET)
+#define SW_API_PPPOE_L3_INTF_GET		(66  + SW_API_MISC_OFFSET)
+#define SW_API_PPPOE_GLOBAL_CTRL_SET		(67  + SW_API_MISC_OFFSET)
+#define SW_API_PPPOE_GLOBAL_CTRL_GET		(68  + SW_API_MISC_OFFSET)
 
     /*led*/
 #define SW_API_LED_OFFSET             1300
@@ -709,6 +721,16 @@ extern "C" {
 #define SW_API_IP_VSI_MC_MODE_SET    (71  + SW_API_IP_OFFSET)
 #define SW_API_GLOBAL_CTRL_GET    (72  + SW_API_IP_OFFSET)
 #define SW_API_GLOBAL_CTRL_SET    (73  + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_MTU_MRU_SET	(74 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_MTU_MRU_GET	(75 + SW_API_IP_OFFSET)
+#define SW_API_IP6_INTF_MTU_MRU_SET	(76 + SW_API_IP_OFFSET)
+#define SW_API_IP6_INTF_MTU_MRU_GET	(77 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_MACADDR_ADD	(78 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_MACADDR_DEL	(79 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_MACADDR_GET_FIRST	(80 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_MACADDR_GET_NEXT		(81 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_DMAC_CHECK_SET		(82 + SW_API_IP_OFFSET)
+#define SW_API_IP_INTF_DMAC_CHECK_GET		(83 + SW_API_IP_OFFSET)
 
     /* nat */
 #define SW_API_NAT_OFFSET            1700
@@ -854,6 +876,12 @@ extern "C" {
 #define SW_API_FLOW_HOST_ADD         (20  + SW_API_FLOW_OFFSET)
 #define SW_API_FLOW_HOST_DEL         (21  + SW_API_FLOW_OFFSET)
 #define SW_API_FLOW_HOST_GET         (22  + SW_API_FLOW_OFFSET)
+#define SW_API_FLOW_COUNTER_GET		(23  + SW_API_FLOW_OFFSET)
+#define SW_API_FLOW_COUNTER_CLEANUP	(24  + SW_API_FLOW_OFFSET)
+#define SW_API_FLOW_ENTRY_EN_SET	(25  + SW_API_FLOW_OFFSET)
+#define SW_API_FLOW_ENTRY_EN_GET	(26  + SW_API_FLOW_OFFSET)
+#define SW_API_FLOW_QOS_SET		(27  + SW_API_FLOW_OFFSET)
+#define SW_API_FLOW_QOS_GET		(28  + SW_API_FLOW_OFFSET)
 
 /* rss hash */
 #define SW_API_RSS_HASH_OFFSET		2400
@@ -1017,10 +1045,6 @@ extern "C" {
 #define SW_API_VPORT_PHYSICAL_PORT_GET		(1  + SW_API_VPORT_OFFSET)
 #define SW_API_VPORT_STATE_CHECK_SET		(2  + SW_API_VPORT_OFFSET)
 #define SW_API_VPORT_STATE_CHECK_GET		(3  + SW_API_VPORT_OFFSET)
-#define SW_API_VPORT_CNT_CFG_SET		(4  + SW_API_VPORT_OFFSET)
-#define SW_API_VPORT_CNT_CFG_GET		(5  + SW_API_VPORT_OFFSET)
-#define SW_API_VPORT_CNT_GET			(6  + SW_API_VPORT_OFFSET)
-#define SW_API_VPORT_CNT_FLUSH			(7  + SW_API_VPORT_OFFSET)
 
 /* tunnel */
 #define SW_API_TUNNEL_OFFSET			3400
@@ -1064,6 +1088,12 @@ extern "C" {
 #define SW_API_TUNNEL_UDF_PROFILE_CFG_GET		(37  + SW_API_TUNNEL_OFFSET)
 #define SW_API_TUNNEL_EXP_DECAP_SET	(38 + SW_API_TUNNEL_OFFSET)
 #define SW_API_TUNNEL_EXP_DECAP_GET	(39 + SW_API_TUNNEL_OFFSET)
+#define SW_API_TUNNEL_DECAP_KEY_SET	(40 + SW_API_TUNNEL_OFFSET)
+#define SW_API_TUNNEL_DECAP_KEY_GET	(41 + SW_API_TUNNEL_OFFSET)
+#define SW_API_TUNNEL_DECAP_EN_SET	(42 + SW_API_TUNNEL_OFFSET)
+#define SW_API_TUNNEL_DECAP_EN_GET	(43 + SW_API_TUNNEL_OFFSET)
+#define SW_API_TUNNEL_DECAP_ACTION_UPDATE	(44 + SW_API_TUNNEL_OFFSET)
+#define SW_API_TUNNEL_DECAP_COUNTER_GET		(45 + SW_API_TUNNEL_OFFSET)
 
 /* VXLAN */
 #define SW_API_VXLAN_OFFSET                       3500

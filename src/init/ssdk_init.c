@@ -143,6 +143,9 @@
 #ifdef SCOMPHY
 #include "ssdk_scomphy.h"
 #endif
+#ifdef IN_NETLINK
+#include "ssdk_netlink.h"
+#endif
 
 #if defined(MHT)
 #include "ssdk_mht.h"
@@ -171,6 +174,7 @@ extern void qca_ar8327_sw_mib_task(struct qca_phy_priv *priv);
 #define QCA_QM_ITEM_NUMBER 41
 #define QCA_RGMII_WORK_DELAY	1000
 #define QCA_MAC_SW_SYNC_WORK_DELAY	1000
+#define QCA_FDB_SW_SYNC_WORK_DELAY	1000
 #ifdef DESS
 static bool qca_dess_rfs_registered = false;
 #endif
@@ -204,6 +208,41 @@ qca_hppe_port_mac_type_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t por
 	hppe_port_type[port_id - 1] = port_type;
 
 	return 0;
+}
+
+a_uint32_t
+ssdk_ifname_to_port(a_uint32_t dev_id, const char *ifname)
+{
+	struct net_device *eth_dev = NULL;
+	a_uint32_t phy_addr = 0;
+	eth_dev = dev_get_by_name(&init_net, ifname);
+	if (!eth_dev || !eth_dev->phydev)
+	{
+		return 0;
+	}
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
+	phy_addr = eth_dev->phydev->mdio.addr;
+#else
+	phy_addr = eth_dev->phydev->addr;
+#endif
+	dev_put(eth_dev);
+	return qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+}
+
+char *
+ssdk_port_to_ifname(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	struct phy_device *phydev = NULL;
+
+	hsl_port_phydev_get(dev_id, port_id, &phydev);
+	if (phydev && phydev->attached_dev)
+	{
+		return phydev->attached_dev->name;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 #ifndef BOARD_AR71XX
@@ -384,11 +423,14 @@ qca_switch_init(a_uint32_t dev_id)
 #if (defined(DESS) || defined(ISISC) || defined(ISIS)) && defined(IN_QOS)
 	a_uint32_t nr = 0;
 #endif
-	int i = 0, j = 0;
-	a_uint32_t port_bmp = 0, cpu_bmp = 0;
+#if defined(MHT)
+	a_uint32_t port_hol_ctrl[2] = {0}, queue_hol_ctrl[6] = {0};
+	a_uint32_t j = 0, cpu_bmp = 0;
+#endif
+	int i = 0;
+	a_uint32_t port_bmp = 0;
 	hsl_reg_mode reg_mode = HSL_REG_MDIO;
 	a_bool_t flag = A_FALSE;
-	a_uint32_t port_hol_ctrl[2] = {0}, queue_hol_ctrl[6] = {0};
 
 	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
@@ -403,6 +445,10 @@ qca_switch_init(a_uint32_t dev_id)
 	/* Enable MIB counters */
 	fal_mib_status_set(dev_id, A_TRUE);
 	fal_mib_cpukeep_set(dev_id, A_FALSE);
+#endif
+	/*set mirror analysis port as 0xf in default*/
+#ifdef IN_MIRROR
+	fal_mirr_analysis_port_set(dev_id, 0xf);
 #endif
 #ifdef IN_IGMP
 	fal_igmp_mld_rp_set(dev_id, 0);
@@ -555,6 +601,7 @@ qca_switch_init(a_uint32_t dev_id)
 #endif
 					break;
 				case CHIP_MHT:
+#if defined(MHT)
 					aos_mem_zero(&port_hol_ctrl, sizeof(port_hol_ctrl));
 					aos_mem_zero(&queue_hol_ctrl, sizeof(queue_hol_ctrl));
 					cpu_bmp = ssdk_cpu_bmp_get(dev_id);
@@ -621,6 +668,7 @@ qca_switch_init(a_uint32_t dev_id)
 							&& queue_hol_ctrl[j] != 0; j++)
 						fal_qos_queue_tx_buf_nr_set(dev_id, i, j,
 								&port_hol_ctrl[j]);
+#endif
 #endif
 					break;
 				default:
@@ -1608,6 +1656,95 @@ qca_mac_sw_sync_work_resume(struct qca_phy_priv *priv)
 					msecs_to_jiffies(QCA_MAC_SW_SYNC_WORK_DELAY));
 }
 
+void
+qca_fdb_sw_sync_work_task(struct work_struct *work)
+{
+	struct qca_phy_priv *priv = container_of(work, struct qca_phy_priv,
+					fdb_sw_sync_dwork.work);
+
+	mutex_lock(&priv->fdb_sw_sync_lock);
+#ifdef IN_FDB
+	ref_fdb_sw_sync_task(priv->device_id, priv->fdb_sw_sync_port_map);
+#endif
+	mutex_unlock(&priv->fdb_sw_sync_lock);
+
+	schedule_delayed_work(&priv->fdb_sw_sync_dwork,
+					msecs_to_jiffies(QCA_FDB_SW_SYNC_WORK_DELAY));
+}
+
+int
+qca_fdb_sw_sync_work_init(struct qca_phy_priv *priv)
+{
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE))
+	{
+		return 0;
+	}
+
+	mutex_init(&priv->fdb_sw_sync_lock);
+
+	return 0;
+}
+
+/**
+ * add fdb polling on port_map
+ */
+int
+qca_fdb_sw_sync_work_start(struct qca_phy_priv *priv, fal_pbmp_t port_map)
+{
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE))
+	{
+		return 0;
+	}
+	if (port_map == 0)
+	{
+		return 0;
+	}
+
+	mutex_lock(&priv->fdb_sw_sync_lock);
+	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
+	if (priv->fdb_sw_sync_port_map == 0)
+	{
+		INIT_DELAYED_WORK(&priv->fdb_sw_sync_dwork,
+						qca_fdb_sw_sync_work_task);
+		schedule_delayed_work(&priv->fdb_sw_sync_dwork,
+						msecs_to_jiffies(QCA_FDB_SW_SYNC_WORK_DELAY));
+	}
+	SW_PBMP_OR(priv->fdb_sw_sync_port_map, port_map);
+	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
+	mutex_unlock(&priv->fdb_sw_sync_lock);
+
+	return 0;
+}
+
+/**
+ * stop fdb polling on port_map
+ */
+void
+qca_fdb_sw_sync_work_stop(struct qca_phy_priv *priv, fal_pbmp_t port_map)
+{
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE))
+	{
+		return;
+	}
+	if (port_map == 0)
+	{
+		return;
+	}
+
+	mutex_lock(&priv->fdb_sw_sync_lock);
+	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
+	SW_PBMP_AND(priv->fdb_sw_sync_port_map, ~port_map);
+	if (priv->fdb_sw_sync_port_map == 0)
+	{
+		cancel_delayed_work_sync(&priv->fdb_sw_sync_dwork);
+	}
+#ifdef IN_FDB
+	ref_fdb_sw_sync_reset(priv->device_id, port_map);
+#endif
+	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
+	mutex_unlock(&priv->fdb_sw_sync_lock);
+}
+
 int
 qca_phy_id_chip(struct qca_phy_priv *priv)
 {
@@ -1909,6 +2046,12 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 			ret = qca_mac_sw_sync_work_start(priv);
 			if (ret != 0) {
 				SSDK_ERROR("qca_mac_sw_sync_work_start failed for chip 0x%02x%02x\n",
+						priv->version, priv->revision);
+				return ret;
+			}
+			ret = qca_fdb_sw_sync_work_init(priv);
+			if (ret != 0) {
+				SSDK_ERROR("qca_fdb_sw_sync_work_init failed for chip 0x%02x%02x\n",
 						priv->version, priv->revision);
 				return ret;
 			}
@@ -3814,6 +3957,9 @@ static int __init regi_init(void)
 /*qca808x_end*/
 
 	ssdk_sysfs_init();
+#ifdef IN_NETLINK
+	ssdk_genl_init();
+#endif
 
 	if (rv == 0){
 		/* register the notifier later should be ok */
@@ -3877,6 +4023,9 @@ regi_exit(void)
 	for (dev_id = 0; dev_id < dev_num; dev_id++) {
 		ssdk_plat_exit(dev_id);
 	}
+#ifdef IN_NETLINK
+	ssdk_genl_deinit();
+#endif
 
 /*qca808x_start*/
 	ssdk_free_priv();

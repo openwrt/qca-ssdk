@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -469,7 +469,7 @@ hppe_port_bridge_ctrl_set(
 				index * PORT_BRIDGE_CTRL_INC,
 				value->val);
 }
-#ifndef IN_FDB_MINI
+
 sw_error_t
 hppe_port_lrn_limit_ctrl_get(
 		a_uint32_t dev_id,
@@ -498,6 +498,7 @@ hppe_port_lrn_limit_ctrl_set(
 				value->val);
 }
 
+#ifndef IN_FDB_MINI
 sw_error_t
 hppe_port_lrn_limit_counter_get(
 		a_uint32_t dev_id,
@@ -576,56 +577,6 @@ hppe_fdb_tbl_set(
 				index * FDB_TBL_INC,
 				value->val,
 				3);
-}
-
-sw_error_t
-hppe_l2_dbg_addr_l2_dbg_addr_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union l2_dbg_addr_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l2_dbg_addr_get(dev_id, &reg_val);
-	*value = reg_val.bf.l2_dbg_addr;
-	return ret;
-}
-
-sw_error_t
-hppe_l2_dbg_addr_l2_dbg_addr_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union l2_dbg_addr_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l2_dbg_addr_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.l2_dbg_addr = value;
-	ret = hppe_l2_dbg_addr_set(dev_id, &reg_val);
-	return ret;
-}
-
-sw_error_t
-hppe_l2_dbg_data_l2_dbg_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union l2_dbg_data_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l2_dbg_data_get(dev_id, &reg_val);
-	*value = reg_val.bf.l2_dbg_data;
-	return ret;
-}
-
-sw_error_t
-hppe_l2_dbg_data_l2_dbg_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	return SW_NOT_SUPPORTED;
 }
 
 sw_error_t
@@ -1493,293 +1444,6 @@ hppe_l2_dbgcnt_cmd_addr_set(
 }
 
 sw_error_t
-hppe_l2_dbgcnt_rdata_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union l2_dbgcnt_rdata_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l2_dbgcnt_rdata_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-
-sw_error_t
-hppe_l2_dbgcnt_rdata_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	return SW_NOT_SUPPORTED;
-}
-
-sw_error_t
-hppe_l2_dbgcnt_wdata_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union l2_dbgcnt_wdata_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l2_dbgcnt_wdata_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-
-sw_error_t
-hppe_l2_dbgcnt_wdata_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union l2_dbgcnt_wdata_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_l2_dbgcnt_wdata_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_l2_dbgcnt_wdata_set(dev_id, &reg_val);
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data0_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_rd_op_rslt_data0_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_rslt_data0_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data0_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	return SW_NOT_SUPPORTED;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data1_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_rd_op_rslt_data1_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_rslt_data1_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data1_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	return SW_NOT_SUPPORTED;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data2_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_rd_op_rslt_data2_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_rslt_data2_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_rd_op_rslt_data2_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	return SW_NOT_SUPPORTED;
-}
-
-sw_error_t
-hppe_fdb_tbl_op_data0_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_op_data0_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_op_data0_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_op_data0_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union fdb_tbl_op_data0_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_op_data0_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_fdb_tbl_op_data0_set(dev_id, &reg_val);
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_op_data1_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_op_data1_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_op_data1_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_op_data1_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union fdb_tbl_op_data1_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_op_data1_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_fdb_tbl_op_data1_set(dev_id, &reg_val);
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_op_data2_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_op_data2_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_op_data2_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_op_data2_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union fdb_tbl_op_data2_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_op_data2_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_fdb_tbl_op_data2_set(dev_id, &reg_val);
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_rd_op_data0_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_rd_op_data0_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_data0_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_rd_op_data0_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union fdb_tbl_rd_op_data0_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_data0_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_fdb_tbl_rd_op_data0_set(dev_id, &reg_val);
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_rd_op_data1_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_rd_op_data1_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_data1_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_rd_op_data1_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union fdb_tbl_rd_op_data1_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_data1_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_fdb_tbl_rd_op_data1_set(dev_id, &reg_val);
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
-hppe_fdb_tbl_rd_op_data2_data_get(
-		a_uint32_t dev_id,
-		a_uint32_t *value)
-{
-	union fdb_tbl_rd_op_data2_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_data2_get(dev_id, &reg_val);
-	*value = reg_val.bf.data;
-	return ret;
-}
-#endif
-sw_error_t
-hppe_fdb_tbl_rd_op_data2_data_set(
-		a_uint32_t dev_id,
-		a_uint32_t value)
-{
-	union fdb_tbl_rd_op_data2_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_fdb_tbl_rd_op_data2_get(dev_id, &reg_val);
-	if (SW_OK != ret)
-		return ret;
-	reg_val.bf.data = value;
-	ret = hppe_fdb_tbl_rd_op_data2_set(dev_id, &reg_val);
-	return ret;
-}
-#ifndef IN_FDB_MINI
-sw_error_t
 hppe_port_bridge_ctrl_txmac_en_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -1840,7 +1504,7 @@ hppe_port_bridge_ctrl_port_isolation_bitmap_set(
 	ret = hppe_port_bridge_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 hppe_port_bridge_ctrl_station_move_lrn_en_get(
 		a_uint32_t dev_id,
@@ -2026,7 +1690,7 @@ hppe_port_lrn_limit_ctrl_lrn_lmt_en_set(
 	ret = hppe_port_lrn_limit_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#ifndef IN_FDB_MINI
 sw_error_t
 hppe_port_lrn_limit_ctrl_lrn_lmt_cnt_get(
 		a_uint32_t dev_id,
@@ -2057,7 +1721,7 @@ hppe_port_lrn_limit_ctrl_lrn_lmt_cnt_set(
 	ret = hppe_port_lrn_limit_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 hppe_port_lrn_limit_ctrl_lrn_lmt_exceed_fwd_get(
 		a_uint32_t dev_id,
@@ -2088,7 +1752,7 @@ hppe_port_lrn_limit_ctrl_lrn_lmt_exceed_fwd_set(
 	ret = hppe_port_lrn_limit_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#ifndef IN_FDB_MINI
 sw_error_t
 hppe_port_lrn_limit_counter_lrn_cnt_get(
 		a_uint32_t dev_id,

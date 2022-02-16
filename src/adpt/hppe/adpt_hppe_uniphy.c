@@ -29,6 +29,7 @@
 #include "hsl_phy.h"
 #include "hsl_port_prop.h"
 #include "adpt_hppe.h"
+#include "adpt_hppe_uniphy.h"
 #if defined(CPPE)
 #include "adpt_cppe_uniphy.h"
 #include "adpt_cppe_portctrl.h"
@@ -335,6 +336,60 @@ __adpt_ppe_gcc_uniphy_software_reset(a_uint32_t dev_id,
 }
 
 static sw_error_t
+__adpt_hppe_uniphy_uqxgmii_eee_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
+{
+	sw_error_t rv = SW_OK;
+
+	union vr_xs_pcs_eee_ctrl0_u vr_xs_pcs_eee_ctrl0;
+	union vr_xs_pcs_eee_txtimer_u vr_xs_pcs_eee_txtimer;
+	union vr_xs_pcs_eee_rxtimer_u vr_xs_pcs_eee_rxtimer;
+	union vr_xs_pcs_eee_ctrl1_u vr_xs_pcs_eee_ctrl1;
+
+	memset(&vr_xs_pcs_eee_ctrl0, 0, sizeof(vr_xs_pcs_eee_ctrl0));
+	memset(&vr_xs_pcs_eee_txtimer, 0, sizeof(vr_xs_pcs_eee_txtimer));
+	memset(&vr_xs_pcs_eee_rxtimer, 0, sizeof(vr_xs_pcs_eee_rxtimer));
+	memset(&vr_xs_pcs_eee_ctrl1, 0, sizeof(vr_xs_pcs_eee_ctrl1));
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	/* configure eee related timer value */
+	rv = hppe_vr_xs_pcs_eee_ctrl0_get(dev_id, uniphy_index, &vr_xs_pcs_eee_ctrl0);
+	SW_RTN_ON_ERROR (rv);
+	vr_xs_pcs_eee_ctrl0.bf.sign_bit = 1;
+	vr_xs_pcs_eee_ctrl0.bf.mult_fact_100ns = 1;
+	rv = hppe_vr_xs_pcs_eee_ctrl0_set(dev_id, uniphy_index, &vr_xs_pcs_eee_ctrl0);
+	SW_RTN_ON_ERROR (rv);
+	rv = hppe_vr_xs_pcs_eee_txtimer_get(dev_id, uniphy_index, &vr_xs_pcs_eee_txtimer);
+	SW_RTN_ON_ERROR (rv);
+	vr_xs_pcs_eee_txtimer.bf.tsl_res = UNIPHY_XPCS_TSL_TIMER;
+	vr_xs_pcs_eee_txtimer.bf.t1u_res = UNIPHY_XPCS_TLU_TIMER;
+	vr_xs_pcs_eee_txtimer.bf.twl_res = UNIPHY_XPCS_TWL_TIMER;
+	rv = hppe_vr_xs_pcs_eee_txtimer_set(dev_id, uniphy_index, &vr_xs_pcs_eee_txtimer);
+	SW_RTN_ON_ERROR (rv);
+	rv = hppe_vr_xs_pcs_eee_rxtimer_get(dev_id, uniphy_index, &vr_xs_pcs_eee_rxtimer);
+	SW_RTN_ON_ERROR (rv);
+	vr_xs_pcs_eee_rxtimer.bf.res_100u = UNIPHY_XPCS_100US_TIMER;
+	vr_xs_pcs_eee_rxtimer.bf.twr_res = UNIPHY_XPCS_TWR_TIMER;
+	rv = hppe_vr_xs_pcs_eee_rxtimer_set(dev_id, uniphy_index, &vr_xs_pcs_eee_rxtimer);
+	SW_RTN_ON_ERROR (rv);
+
+	/* Transparent LPI mode and LPI pattern eanble */
+	rv = hppe_vr_xs_pcs_eee_ctrl1_get(dev_id, uniphy_index, &vr_xs_pcs_eee_ctrl1);
+	SW_RTN_ON_ERROR (rv);
+	vr_xs_pcs_eee_ctrl1.bf.trn_lpi = 1;
+	vr_xs_pcs_eee_ctrl1.bf.trn_rxlpi = 1;
+	rv = hppe_vr_xs_pcs_eee_ctrl1_set(dev_id, uniphy_index, &vr_xs_pcs_eee_ctrl1);
+	SW_RTN_ON_ERROR (rv);
+	rv = hppe_vr_xs_pcs_eee_ctrl0_get(dev_id, uniphy_index, &vr_xs_pcs_eee_ctrl0);
+	SW_RTN_ON_ERROR (rv);
+	vr_xs_pcs_eee_ctrl0.bf.lrx_en = 1;
+	vr_xs_pcs_eee_ctrl0.bf.ltx_en = 1;
+	rv = hppe_vr_xs_pcs_eee_ctrl0_set(dev_id, uniphy_index, &vr_xs_pcs_eee_ctrl0);
+	SW_RTN_ON_ERROR (rv);
+
+	return rv;
+}
+
+static sw_error_t
 __adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
 	sw_error_t rv = SW_OK;
@@ -465,8 +520,10 @@ __adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	hppe_sr_mii_ctrl_channel2_set(0, uniphy_index, &sr_mii_ctrl);
 	hppe_sr_mii_ctrl_channel3_set(0, uniphy_index, &sr_mii_ctrl);
 
-	rv = hsl_port_phy_mode_set(dev_id, SSDK_PHYSICAL_PORT1, PORT_UQXGMII);
+	/* enable uniphy eee transparent mode*/
+	__adpt_hppe_uniphy_uqxgmii_eee_set(dev_id, uniphy_index);
 
+	rv = hsl_port_phy_mode_set(dev_id, SSDK_PHYSICAL_PORT1, PORT_UQXGMII);
 	return rv;
 }
 
@@ -767,9 +824,15 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
 
 	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,channel);
-	if (A_TRUE == hsl_port_is_sfp(dev_id, ssdk_port)) {
-		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m = 0;
+	if ((A_TRUE == hsl_port_is_sfp(dev_id, ssdk_port)) &&
+		(A_TRUE != ssdk_port_feature_get(dev_id, ssdk_port, PHY_F_SFP_SGMII))) {
+		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
+			UNIPHY_1000BASE_X_MODE;
 		SSDK_DEBUG("port_id %d is a fiber port!\n", ssdk_port);
+	} else {
+		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
+			UNIPHY_SGMII_MAC_MODE;
+		SSDK_DEBUG("port_id %d is a sfp sgmii or phy port!\n", ssdk_port);
 	}
 
 	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_autoneg_mode =

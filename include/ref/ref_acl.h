@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,42 +14,30 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef _REF_ACL_H_
+#define _REF_ACL_H_
 
-/**
- * @defgroup
- * @{
- */
-#include <linux/switch.h>
+#ifdef __cplusplus
+extern "C" {
+#endif                          /* __cplusplus */
+
 #include "sw.h"
-#include "ref_uci.h"
+#include "fal/fal_type.h"
+#include "fal/fal_acl.h"
 
-static const char *vport_phyport[] = {
-	"port_id",
-	"physical_port",
-};
-
-static const char *vport_statecheck[] = {
-	"check_en",
-	"vport_type",
-	"vport_active",
-	"tunnel_active",
-};
-
-int parse_vport(const char *command_name, struct switch_val *val)
+typedef struct
 {
-	int rv = -1;
+	fal_mac_addr_t src_mac; /*src mac address*/
+	fal_pbmp_t port_map; /*port bitmap*/
+	a_uint8_t acl_policy; /*0 deny, 1 accept*/
+} ref_acl_mac_entry_t;
 
-	if (!strcmp(command_name, "Phyport")) {
-		rv = parse_uci_option(val, vport_phyport,
-				sizeof(vport_phyport)/sizeof(char *));
-	} else if (!strcmp(command_name, "Statecheck")) {
-		rv = parse_uci_option(val, vport_statecheck,
-				sizeof(vport_statecheck)/sizeof(char *));
-	}
+sw_error_t
+ref_acl_mac_entry_set(a_uint32_t dev_id, fal_acl_mac_entry_t * entry);
+sw_error_t
+ref_acl_mac_entry_dump(a_uint32_t dev_id);
 
-	return rv;
+#ifdef __cplusplus
 }
-
-/**
- * @}
- */
+#endif                          /* __cplusplus */
+#endif                          /* _REF_TUNNEL_H_ */

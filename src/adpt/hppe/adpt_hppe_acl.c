@@ -3610,6 +3610,11 @@ _adpt_hppe_acl_hw_list_resort(a_uint32_t dev_id, a_uint32_t hw_list_index, a_boo
 		end += ADPT_PRE_ACL_HW_LIST_NUM;
 	}
 #endif
+	if(hw_list_index >= end)
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
 	if(move_up)
 	{
 		temp.hw_list_id = g_acl_hw_list[dev_id][hw_list_index].hw_list_id;

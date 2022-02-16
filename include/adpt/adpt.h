@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -334,10 +336,27 @@ typedef sw_error_t (*adpt_port_8023ah_set_func)(a_uint32_t dev_id,
 			fal_port_t port_id, fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
 typedef sw_error_t (*adpt_port_8023ah_get_func)(a_uint32_t dev_id,
 			fal_port_t port_id, fal_port_8023ah_ctrl_t *port_8023ah_ctrl);
+typedef sw_error_t (*adpt_port_mtu_cfg_set_func)(a_uint32_t dev_id,
+			fal_port_t port_id, fal_mtu_cfg_t *mtu_cfg);
+typedef sw_error_t (*adpt_port_mtu_cfg_get_func)(a_uint32_t dev_id,
+			fal_port_t port_id, fal_mtu_cfg_t *mtu_cfg);
+typedef sw_error_t (*adpt_port_mru_mtu_set_func)(a_uint32_t dev_id,
+			fal_port_t port_id, a_uint32_t mru_size, a_uint32_t mtu_size);
+typedef sw_error_t (*adpt_port_mru_mtu_get_func)(a_uint32_t dev_id,
+			fal_port_t port_id, a_uint32_t *mru_size, a_uint32_t *mtu_size);
 typedef sw_error_t (*adpt_port_netdev_notify_func)(struct qca_phy_priv *priv,
 			a_uint32_t port_id);
 typedef sw_error_t (*adpt_port_phy_status_get_func)(a_uint32_t dev_id,
 			fal_port_t port_id, struct port_phy_status *phy_status);
+typedef sw_error_t (*adpt_port_cnt_cfg_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_port_cnt_cfg_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
+typedef sw_error_t (*adpt_port_cnt_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_port_cnt_t *port_cnt);
+typedef sw_error_t (*adpt_port_cnt_flush_func)(a_uint32_t dev_id,
+		fal_port_t port_id);
+
 // mirror
 typedef sw_error_t (*adpt_mirr_port_in_set_func)(a_uint32_t dev_id, fal_port_t port_id,
                          a_bool_t enable);
@@ -459,6 +478,27 @@ typedef sw_error_t (*adpt_ip_global_ctrl_get_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_ip_global_ctrl_set_func)(a_uint32_t dev_id,
 			fal_ip_global_cfg_t *cfg);
 
+typedef sw_error_t (*adpt_ip_intf_mtu_mru_set_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+typedef sw_error_t (*adpt_ip_intf_mtu_mru_get_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+typedef sw_error_t (*adpt_ip6_intf_mtu_mru_set_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+typedef sw_error_t (*adpt_ip6_intf_mtu_mru_get_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+typedef sw_error_t (*adpt_ip_intf_macaddr_add_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_macaddr_del_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_macaddr_get_first_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_macaddr_get_next_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+typedef sw_error_t (*adpt_ip_intf_dmac_check_set_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable);
+typedef sw_error_t (*adpt_ip_intf_dmac_check_get_func)
+	(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable);
+
 typedef sw_error_t (*adpt_flow_global_cfg_get_func)(
 		a_uint32_t dev_id,
 		fal_flow_global_cfg_t *cfg);
@@ -511,6 +551,25 @@ typedef sw_error_t (*adpt_flow_entry_add_func)(
 		a_uint32_t dev_id,
 		a_uint32_t add_mode, /*index or hash*/
 		fal_flow_entry_t *flow_entry);
+
+typedef sw_error_t (*adpt_flow_counter_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_entry_counter_t *flow_counter);
+
+typedef sw_error_t (*adpt_flow_counter_cleanup_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index);
+
+typedef sw_error_t (*adpt_flow_entry_en_set_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, a_bool_t enable);
+
+typedef sw_error_t (*adpt_flow_entry_en_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, a_bool_t *enable);
+
+typedef sw_error_t (*adpt_flow_qos_set_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_flow_qos_t *flow_qos);
+
+typedef sw_error_t (*adpt_flow_qos_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_flow_qos_t *flow_qos);
+
 typedef sw_error_t (*adpt_ucast_hash_map_set_func)(
 		a_uint32_t dev_id,
 		a_uint8_t profile,
@@ -755,6 +814,15 @@ typedef sw_error_t (*adpt_pppoe_en_get_func)(
 		a_uint32_t l3_if,
 		a_uint32_t *enable);
 
+typedef sw_error_t (*adpt_pppoe_l3_intf_set_func)(a_uint32_t dev_id,
+		a_uint32_t pppoe_index, fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+typedef sw_error_t (*adpt_pppoe_l3_intf_get_func)(a_uint32_t dev_id,
+		a_uint32_t pppoe_index, fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+typedef sw_error_t (*adpt_pppoe_global_ctrl_set_func) (a_uint32_t dev_id,
+		fal_pppoe_global_cfg_t *cfg);
+typedef sw_error_t (*adpt_pppoe_global_ctrl_get_func) (a_uint32_t dev_id,
+		fal_pppoe_global_cfg_t *cfg);
+
 /*sec module*/
 typedef sw_error_t (*adpt_sec_l3_excep_parser_ctrl_set_func)(
 		a_uint32_t dev_id,
@@ -988,10 +1056,6 @@ typedef sw_error_t (*adpt_policer_ctrl_set_func)(a_uint32_t dev_id, fal_policer_
 typedef sw_error_t (*adpt_policer_ctrl_get_func)(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 /* misc */
-typedef sw_error_t (*adpt_debug_port_counter_enable_func)(a_uint32_t dev_id,
-			fal_port_t port_id, fal_counter_en_t * cnt_en);
-typedef sw_error_t (*adpt_debug_port_counter_status_get_func)(a_uint32_t dev_id,
-			fal_port_t port_id, fal_counter_en_t * cnt_en);
 typedef sw_error_t (*adpt_debug_counter_get_func)(a_bool_t show_type);
 typedef sw_error_t (*adpt_debug_counter_set_func)(void);
 typedef sw_error_t (*adpt_intr_port_link_mask_set_func) (a_uint32_t dev_id,
@@ -1150,14 +1214,6 @@ typedef sw_error_t (*adpt_vport_state_check_set_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
 typedef sw_error_t (*adpt_vport_state_check_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_vport_state_t *vp_state);
-typedef sw_error_t (*adpt_vport_cnt_cfg_set_func)(a_uint32_t dev_id,
-		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
-typedef sw_error_t (*adpt_vport_cnt_cfg_get_func)(a_uint32_t dev_id,
-		fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg);
-typedef sw_error_t (*adpt_vport_cnt_flush_func)(a_uint32_t dev_id,
-		fal_port_t port_id);
-typedef sw_error_t (*adpt_vport_cnt_get_func)(a_uint32_t dev_id,
-		fal_port_t port_id, fal_vport_cnt_t *vp_cnt);
 
 /*vxlan*/
 typedef sw_error_t (*adpt_vxlan_entry_add_func)(a_uint32_t dev_id,
@@ -1294,6 +1350,24 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_tunnel_exp_decap_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, a_bool_t *enable);
+typedef sw_error_t
+(*adpt_tunnel_decap_key_set_func)(a_uint32_t dev_id,
+		fal_tunnel_type_t tunnel_type, fal_tunnel_decap_key_t *key_gen);
+typedef sw_error_t
+(*adpt_tunnel_decap_key_get_func)(a_uint32_t dev_id,
+		fal_tunnel_type_t tunnel_type, fal_tunnel_decap_key_t *key_gen);
+typedef sw_error_t
+(*adpt_tunnel_decap_en_set_func)(a_uint32_t dev_id,
+		a_uint32_t tunnel_index, a_bool_t en);
+typedef sw_error_t
+(*adpt_tunnel_decap_en_get_func)(a_uint32_t dev_id,
+		a_uint32_t tunnel_index, a_bool_t *en);
+typedef sw_error_t
+(*adpt_tunnel_decap_action_update_func)(a_uint32_t dev_id,
+		a_uint32_t tunnel_index, fal_tunnel_action_t *update_action);
+typedef sw_error_t
+(*adpt_tunnel_decap_counter_get_func)(a_uint32_t dev_id,
+		a_uint32_t tunnel_index, fal_entry_counter_t *decap_counter);
 
 /*tunnel program*/
 typedef sw_error_t (*adpt_tunnel_program_entry_add_func)(a_uint32_t dev_id,
@@ -1506,6 +1580,14 @@ typedef struct
 	adpt_port_phy_status_get_func adpt_port_phy_status_get;
 	adpt_port_8023ah_set_func adpt_port_8023ah_set;
 	adpt_port_8023ah_get_func adpt_port_8023ah_get;
+	adpt_port_cnt_cfg_set_func adpt_port_cnt_cfg_set;
+	adpt_port_cnt_cfg_get_func adpt_port_cnt_cfg_get;
+	adpt_port_cnt_get_func adpt_port_cnt_get;
+	adpt_port_cnt_flush_func adpt_port_cnt_flush;
+	adpt_port_mtu_cfg_set_func adpt_port_mtu_cfg_set;
+	adpt_port_mtu_cfg_get_func adpt_port_mtu_cfg_get;
+	adpt_port_mru_mtu_set_func adpt_port_mru_mtu_set;
+	adpt_port_mru_mtu_get_func adpt_port_mru_mtu_get;
 // mirror
 	a_uint32_t adpt_mirror_func_bitmap;
 	adpt_mirr_port_in_set_func adpt_mirr_port_in_set;
@@ -1564,6 +1646,17 @@ typedef struct
 	adpt_ip_nexthop_set_func adpt_ip_nexthop_set;
 	adpt_ip_global_ctrl_get_func adpt_ip_global_ctrl_get;
 	adpt_ip_global_ctrl_set_func adpt_ip_global_ctrl_set;
+	adpt_ip_intf_mtu_mru_set_func adpt_ip_intf_mtu_mru_set;
+	adpt_ip_intf_mtu_mru_get_func adpt_ip_intf_mtu_mru_get;
+	adpt_ip6_intf_mtu_mru_set_func adpt_ip6_intf_mtu_mru_set;
+	adpt_ip6_intf_mtu_mru_get_func adpt_ip6_intf_mtu_mru_get;
+	adpt_ip_intf_macaddr_add_func adpt_ip_intf_macaddr_add;
+	adpt_ip_intf_macaddr_del_func adpt_ip_intf_macaddr_del;
+	adpt_ip_intf_macaddr_get_first_func adpt_ip_intf_macaddr_get_first;
+	adpt_ip_intf_macaddr_get_next_func adpt_ip_intf_macaddr_get_next;
+	adpt_ip_intf_dmac_check_set_func adpt_ip_intf_dmac_check_set;
+	adpt_ip_intf_dmac_check_get_func adpt_ip_intf_dmac_check_get;
+
 	/* flow */
 	a_uint32_t adpt_flow_func_bitmap;
 	adpt_flow_host_add_func adpt_flow_host_add;
@@ -1581,6 +1674,12 @@ typedef struct
 	adpt_flow_entry_add_func adpt_flow_entry_add;
 	adpt_flow_global_cfg_get_func adpt_flow_global_cfg_get;
 	adpt_flow_global_cfg_set_func adpt_flow_global_cfg_set;
+	adpt_flow_counter_get_func adpt_flow_counter_get;
+	adpt_flow_counter_cleanup_func adpt_flow_counter_cleanup;
+	adpt_flow_entry_en_set_func adpt_flow_entry_en_set;
+	adpt_flow_entry_en_get_func adpt_flow_entry_en_get;
+	adpt_flow_qos_set_func adpt_flow_qos_set;
+	adpt_flow_qos_get_func adpt_flow_qos_get;
 
 	/* qm */
 	a_uint32_t adpt_qm_func_bitmap[2];
@@ -1705,6 +1804,10 @@ typedef struct
 	adpt_pppoe_session_table_get_func adpt_pppoe_session_table_get;
 	adpt_pppoe_en_set_func adpt_pppoe_en_set;
 	adpt_pppoe_en_get_func adpt_pppoe_en_get;
+	adpt_pppoe_l3_intf_set_func adpt_pppoe_l3_intf_set;
+	adpt_pppoe_l3_intf_get_func adpt_pppoe_l3_intf_get;
+	adpt_pppoe_global_ctrl_set_func adpt_pppoe_global_ctrl_set;
+	adpt_pppoe_global_ctrl_get_func adpt_pppoe_global_ctrl_get;
 
 	/*sec */
 	a_uint32_t adpt_sec_func_bitmap;
@@ -1843,8 +1946,6 @@ typedef struct
 	adpt_policer_ctrl_get_func adpt_policer_ctrl_get;
 
 	/* misc */
-	adpt_debug_port_counter_enable_func adpt_debug_port_counter_enable;
-	adpt_debug_port_counter_status_get_func adpt_debug_port_counter_status_get;
 	adpt_debug_counter_set_func adpt_debug_counter_set;
 	adpt_debug_counter_get_func adpt_debug_counter_get;
 	adpt_intr_port_link_mask_set_func adpt_intr_port_link_mask_set;
@@ -1931,10 +2032,6 @@ typedef struct
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 	adpt_vport_state_check_set_func adpt_vport_state_check_set;
 	adpt_vport_state_check_get_func adpt_vport_state_check_get;
-	adpt_vport_cnt_cfg_set_func adpt_vport_cnt_cfg_set;
-	adpt_vport_cnt_cfg_get_func adpt_vport_cnt_cfg_get;
-	adpt_vport_cnt_flush_func adpt_vport_cnt_flush;
-	adpt_vport_cnt_get_func adpt_vport_cnt_get;
 
 	/* tunnel */
 	a_uint32_t adpt_tunnel_func_bitmap[2];
@@ -1978,6 +2075,12 @@ typedef struct
 	adpt_tunnel_udf_profile_cfg_get_func adpt_tunnel_udf_profile_cfg_get;
 	adpt_tunnel_exp_decap_set_func adpt_tunnel_exp_decap_set;
 	adpt_tunnel_exp_decap_get_func adpt_tunnel_exp_decap_get;
+	adpt_tunnel_decap_key_set_func adpt_tunnel_decap_key_set;
+	adpt_tunnel_decap_key_get_func adpt_tunnel_decap_key_get;
+	adpt_tunnel_decap_en_set_func adpt_tunnel_decap_en_set;
+	adpt_tunnel_decap_en_get_func adpt_tunnel_decap_en_get;
+	adpt_tunnel_decap_action_update_func adpt_tunnel_decap_action_update;
+	adpt_tunnel_decap_counter_get_func adpt_tunnel_decap_counter_get;
 
 	/*vxlan*/
 	a_uint32_t adpt_vxlan_func_bitmap;
@@ -2155,6 +2258,7 @@ sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
 		a_uint32_t module, fal_func_ctrl_t *func_ctrl);
 sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
 a_uint32_t adpt_chip_type_get(a_uint32_t dev_id);
+sw_error_t adpt_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capacity);
 #ifdef SCOMPHY
 a_uint32_t adapt_scomphy_revision_get(a_uint32_t dev_id);
 #endif

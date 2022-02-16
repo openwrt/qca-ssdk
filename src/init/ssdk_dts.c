@@ -554,7 +554,7 @@ static void ssdk_dt_parse_scheduler_cfg(a_uint32_t dev_id, struct device_node *s
 {
 	struct device_node *scheduler_node;
 	struct device_node *child;
-	a_uint32_t port_id;
+	a_uint32_t port_id = SSDK_MAX_PORT_NUM;
 
 	scheduler_node = of_find_node_by_name(switch_node, "port_scheduler_resource");
 	if (!scheduler_node) {
@@ -712,6 +712,10 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 				if (!strncmp("sfp", media_type, strlen(media_type))) {
 					port_phyinfo->phy_features |= PHY_F_SFP;
 					SSDK_INFO("[PORT %d] media type is %s\n", port_id, media_type);
+				} else if (!strncmp("sfp_sgmii", media_type, strlen(media_type))) {
+					port_phyinfo->phy_features |= PHY_F_SFP;
+					port_phyinfo->phy_features |= PHY_F_SFP_SGMII;
+					SSDK_INFO("[PORT %d] media type sfp support sfp_sgmii\n", port_id);
 				}
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2018, 2021, The Linux Foundation. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -35,6 +35,8 @@ extern "C" {
 #define FAL_RSS_HASH_API_UNLOCK
 #endif
 
+#define FAL_RSS_HASH_IP_MIX_MAX_NUM 4
+#define FAL_RSS_HASH_FIN_MAX_NUM 5
 typedef enum
 {
 	FAL_RSS_HASH_IPV4V6 = 0,
@@ -47,13 +49,13 @@ typedef struct
 	a_uint32_t 	hash_mask; /* final hash value bits */
 	a_bool_t	hash_fragment_mode; /* enable fragment mode or not */
 	a_uint32_t	hash_seed; /* rss hash seed value */
-	a_uint32_t	hash_sip_mix; /* source ip hash mix */
-	a_uint32_t	hash_dip_mix; /* dest ip hash mix */
+	a_uint8_t	hash_sip_mix[FAL_RSS_HASH_IP_MIX_MAX_NUM]; /* source ip hash mix */
+	a_uint8_t	hash_dip_mix[FAL_RSS_HASH_IP_MIX_MAX_NUM]; /* dest ip hash mix */
 	a_uint8_t	hash_protocol_mix; /* L4 protocol hash mix */
 	a_uint8_t	hash_sport_mix; /* L4 source port hash mix */
 	a_uint8_t	hash_dport_mix; /* L4 dest port hash mix */
-	a_uint32_t	hash_fin_inner; /* hash fin inner mix */
-	a_uint32_t	hash_fin_outer; /* hash fin outer mix */
+	a_uint8_t	hash_fin_inner[FAL_RSS_HASH_FIN_MAX_NUM]; /* hash fin inner mix */
+	a_uint8_t	hash_fin_outer[FAL_RSS_HASH_FIN_MAX_NUM]; /* hash fin outer mix */
 } fal_rss_hash_config_t;
 
 enum {

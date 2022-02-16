@@ -20,8 +20,6 @@
 #include "sw.h"
 #include "hppe_portctrl_reg.h"
 #include "hppe_portctrl.h"
-#include "hppe_portvlan_reg.h"
-#include "hppe_portvlan.h"
 #include "hppe_vsi_reg.h"
 #include "hppe_vsi.h"
 #include "hppe_policer_reg.h"
@@ -30,15 +28,12 @@
 #include "hppe_qm.h"
 #include "adpt_hppe.h"
 #include "adpt.h"
-#if defined(CPPE)
-#include "adpt_cppe_misc.h"
-#endif
 #ifdef APPE
 #include "appe_counter.h"
 #endif
 
 #ifndef IN_MISC_MINI
-char cpucode[][85] = {
+char *cpucode[] = {
 "Forwarding to CPU",
 "Unkown L2 protocol exception redirect/copy to CPU",
 "PPPoE wrong version or wrong type exception redirect/copy to CPU",
@@ -241,7 +236,7 @@ char cpucode[][85] = {
 #endif
 };
 
-char dropcode[][75] = {
+char *dropcode[] = {
 #ifdef APPE
 "None",
 "Unkown L2 protocol exception drop",
@@ -502,107 +497,6 @@ char dropcode[][75] = {
 "Policing drop"
 #endif
 };
-
-static sw_error_t
-adpt_hppe_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id,
-		fal_counter_en_t *cnt_en)
-{
-	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
-	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
-	union port_eg_vlan_u port_eg_vlan;
-	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(cnt_en);
-
-	if (ADPT_IS_PPORT(port_id)) {
-		SW_RTN_ON_ERROR(hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl));
-		SW_RTN_ON_ERROR(hppe_mc_mtu_ctrl_tbl_get(dev_id, port_value, &mc_mtu_ctrl_tbl));
-		SW_RTN_ON_ERROR(hppe_port_eg_vlan_get(dev_id, port_value, &port_eg_vlan));
-		mru_mtu_ctrl_tbl.bf.rx_cnt_en = cnt_en->rx_counter_en;
-		mru_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_en->vp_uni_tx_counter_en;
-		mc_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_en->port_mc_tx_counter_en;
-		port_eg_vlan.bf.tx_counting_en = cnt_en->port_tx_counter_en;
-		SW_RTN_ON_ERROR(hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl));
-		SW_RTN_ON_ERROR(hppe_mc_mtu_ctrl_tbl_set(dev_id, port_value, &mc_mtu_ctrl_tbl));
-		SW_RTN_ON_ERROR(hppe_port_eg_vlan_set(dev_id, port_value, &port_eg_vlan));
-	}
-	else if (ADPT_IS_VPORT(port_id)) {
-		SW_RTN_ON_ERROR(hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl));
-		mru_mtu_ctrl_tbl.bf.rx_cnt_en = cnt_en->rx_counter_en;
-		mru_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_en->vp_uni_tx_counter_en;
-		SW_RTN_ON_ERROR(hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl));
-	} else {
-		return SW_OUT_OF_RANGE;
-	}
-
-	return SW_OK;
-}
-
-static sw_error_t
-adpt_ppe_debug_port_counter_enable(a_uint32_t dev_id, fal_port_t port_id,
-		fal_counter_en_t *cnt_en)
-{
-	a_uint32_t chip_ver = 0;
-
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-#if defined(CPPE)
-	if (chip_ver == CPPE_REVISION) {
-		return adpt_cppe_debug_port_counter_enable(dev_id, port_id, cnt_en);
-	} else
-#endif
-	{
-		return adpt_hppe_debug_port_counter_enable(dev_id, port_id, cnt_en);
-	}
-}
-
-static sw_error_t
-adpt_hppe_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_counter_en_t *cnt_en)
-{
-	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
-	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
-	union port_eg_vlan_u port_eg_vlan;
-	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(cnt_en);
-
-	if (ADPT_IS_PPORT(port_id)) {
-		SW_RTN_ON_ERROR(hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl));
-		SW_RTN_ON_ERROR(hppe_mc_mtu_ctrl_tbl_get(dev_id, port_value, &mc_mtu_ctrl_tbl));
-		SW_RTN_ON_ERROR(hppe_port_eg_vlan_get(dev_id, port_value, &port_eg_vlan));
-		cnt_en->rx_counter_en = mru_mtu_ctrl_tbl.bf.rx_cnt_en;
-		cnt_en->vp_uni_tx_counter_en = mru_mtu_ctrl_tbl.bf.tx_cnt_en;
-		cnt_en->port_mc_tx_counter_en = mc_mtu_ctrl_tbl.bf.tx_cnt_en;
-		cnt_en->port_tx_counter_en = port_eg_vlan.bf.tx_counting_en;
-	} else if (ADPT_IS_VPORT(port_id)) {
-		SW_RTN_ON_ERROR(hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl));
-		cnt_en->rx_counter_en = mru_mtu_ctrl_tbl.bf.rx_cnt_en;
-		cnt_en->vp_uni_tx_counter_en = mru_mtu_ctrl_tbl.bf.tx_cnt_en;
-	} else {
-		return SW_OUT_OF_RANGE;
-	}
-
-	return SW_OK;
-}
-
-static sw_error_t
-adpt_ppe_debug_port_counter_status_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_counter_en_t *cnt_en)
-{
-	a_uint32_t chip_ver = 0;
-
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-#if defined(CPPE)
-	if (chip_ver == CPPE_REVISION) {
-		return adpt_cppe_debug_port_counter_status_get(dev_id, port_id, cnt_en);
-	} else
-#endif
-	{
-		return adpt_hppe_debug_port_counter_status_get(dev_id, port_id, cnt_en);
-	}
-}
 
 static sw_error_t
 adpt_hppe_debug_counter_set(void)
@@ -1332,9 +1226,6 @@ sw_error_t adpt_hppe_misc_init(a_uint32_t dev_id)
 	}
 
 #ifndef IN_MISC_MINI
-	p_adpt_api->adpt_debug_port_counter_enable = adpt_ppe_debug_port_counter_enable;
-	p_adpt_api->adpt_debug_port_counter_status_get = adpt_ppe_debug_port_counter_status_get;
-
 	p_adpt_api->adpt_debug_counter_set = adpt_hppe_debug_counter_set;
 	p_adpt_api->adpt_debug_counter_get = adpt_hppe_debug_counter_get;
 #endif

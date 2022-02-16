@@ -326,7 +326,7 @@ hppe_mac_rx_tx_status_set(
 	return SW_NOT_SUPPORTED;
 
 }
-
+#endif
 sw_error_t
 hppe_mac_lpi_control_status_get(
 		a_uint32_t dev_id,
@@ -439,6 +439,7 @@ hppe_mac_1us_tic_counter_set(
 				value->val);
 }
 
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_mac_address0_high_get(
 		a_uint32_t dev_id,

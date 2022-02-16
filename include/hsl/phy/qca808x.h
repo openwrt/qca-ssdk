@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -20,41 +23,17 @@
 #include "hsl.h"
 #include "ssdk_plat.h"
 #include "hsl_phy.h"
+#include "hsl_ptp.h"
 #include "qca808x_phy.h"
 
 #if defined(IN_LINUX_STD_PTP)
 #include <linux/ptp_clock_kernel.h>
-enum {
-	PTP_PKT_SEQID_UNMATCHED,
-	PTP_PKT_SEQID_MATCHED,
-	PTP_PKT_SEQID_MATCH_MAX
-};
-
-enum {
-	QCA808X_PTP_MSG_SYNC,
-	QCA808X_PTP_MSG_DREQ,
-	QCA808X_PTP_MSG_PREQ,
-	QCA808X_PTP_MSG_PRESP,
-	QCA808X_PTP_MSG_MAX
-};
-
 typedef struct {
 	/* ptp filter class */
 	a_int32_t ptp_type;
 	/* ptp frame type */
 	a_int32_t pkt_type;
 } qca808x_ptp_cb;
-
-/* statistics for the event packet*/
-typedef struct {
-	/* the counter saves the packet with sequence id
-	 * matched and unmatched */
-	a_uint64_t sync_cnt[PTP_PKT_SEQID_MATCH_MAX];
-	a_uint64_t delay_req_cnt[PTP_PKT_SEQID_MATCH_MAX];
-	a_uint64_t pdelay_req_cnt[PTP_PKT_SEQID_MATCH_MAX];
-	a_uint64_t pdelay_resp_cnt[PTP_PKT_SEQID_MATCH_MAX];
-	a_uint64_t event_pkt_cnt;
-} ptp_packet_stat;
 
 typedef struct {
 	a_uint8_t reserved0;
@@ -94,9 +73,6 @@ struct qca808x_phy_info {
 	/* work for gps sencond sync */
 	struct delayed_work ts_schedule_work;
 	a_bool_t gps_seconds_sync_en;
-	/*the statistics array records the counter of
-	 * rx and tx ptp event packet */
-	ptp_packet_stat pkt_stat[2];
 #endif
 };
 
@@ -105,6 +81,9 @@ typedef struct {
 	struct qca808x_phy_info *phy_info;
 #if defined(IN_LINUX_STD_PTP)
 	struct qca808x_ptp_info ptp_info;
+	/*the statistics array records the counter of
+	 * rx and tx ptp event packet */
+	hsl_ptp_event_pkt_stat_t ptp_event_stat[FAL_TX_DIRECTION + 1];
 #endif
 } qca808x_priv;
 

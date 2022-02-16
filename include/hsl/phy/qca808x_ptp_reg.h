@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +13,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -345,142 +346,54 @@ union ptp_rx_ts0_0_reg_u {
 	struct ptp_rx_ts0_0_reg bf;
 };
 
-/*[register] PTP_RX_TS0_1_REG*/
-#define PTP_RX_TS0_1_REG
-#define PTP_RX_TS0_1_REG_ADDRESS 0x801a
-#define PTP_RX_TS0_1_REG_NUM     1
-#define PTP_RX_TS0_1_REG_INC     0x1
-#define PTP_RX_TS0_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS0_1_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS0_1_REG_RX_TS_SEC
-	#define PTP_RX_TS0_1_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS0_1_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS0_1_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts0_1_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts0_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts0_1_reg bf;
-};
-
-/*[register] PTP_RX_TS0_2_REG*/
-#define PTP_RX_TS0_2_REG
-#define PTP_RX_TS0_2_REG_ADDRESS 0x801b
-#define PTP_RX_TS0_2_REG_NUM     1
-#define PTP_RX_TS0_2_REG_INC     0x1
-#define PTP_RX_TS0_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS0_2_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS0_2_REG_RX_TS_SEC
-	#define PTP_RX_TS0_2_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS0_2_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS0_2_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts0_2_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts0_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts0_2_reg bf;
-};
-
-/*[register] PTP_RX_TS0_3_REG*/
-#define PTP_RX_TS0_3_REG
-#define PTP_RX_TS0_3_REG_ADDRESS 0x801c
-#define PTP_RX_TS0_3_REG_NUM     1
-#define PTP_RX_TS0_3_REG_INC     0x1
-#define PTP_RX_TS0_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS0_3_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS0_3_REG_RX_TS_NSEC
-	#define PTP_RX_TS0_3_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS0_3_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS0_3_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts0_3_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts0_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts0_3_reg bf;
-};
-
-/*[register] PTP_RX_TS0_4_REG*/
-#define PTP_RX_TS0_4_REG
-#define PTP_RX_TS0_4_REG_ADDRESS 0x801d
-#define PTP_RX_TS0_4_REG_NUM     1
-#define PTP_RX_TS0_4_REG_INC     0x1
-#define PTP_RX_TS0_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS0_4_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS0_4_REG_RX_TS_NSEC
-	#define PTP_RX_TS0_4_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS0_4_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS0_4_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts0_4_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts0_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts0_4_reg bf;
-};
-
-/*[register] PTP_RX_TS0_5_REG*/
-#define PTP_RX_TS0_5_REG
-#define PTP_RX_TS0_5_REG_ADDRESS 0x801e
-#define PTP_RX_TS0_5_REG_NUM     1
-#define PTP_RX_TS0_5_REG_INC     0x1
-#define PTP_RX_TS0_5_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS0_5_REG_DEFAULT 0x0
+/*[register] PTP_TS5_REG*/
+#define PTP_TS5_REG
+#define PTP_TS5_REG_ADDRESS 0x801e
+#define PTP_TS5_REG_NUM     1
+#define PTP_TS5_REG_INC     0x1
+#define PTP_TS5_REG_TYPE    REG_TYPE_RW
+#define PTP_TS5_REG_DEFAULT 0x0
 	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS0_5_REG_RX_TS_NFSEC
-	#define PTP_RX_TS0_5_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS0_5_REG_RX_TS_NFSEC_LEN     12
-	#define PTP_RX_TS0_5_REG_RX_TS_NFSEC_DEFAULT 0x0
+	#define PTP_TS5_REG_TS_NFSEC
+	#define PTP_TS5_REG_TS_NFSEC_OFFSET  0
+	#define PTP_TS5_REG_TS_NFSEC_LEN     12
+	#define PTP_TS5_REG_TS_NFSEC_DEFAULT 0x0
 	/*[field] RX_MSG_TYPE*/
-	#define PTP_RX_TS0_5_REG_RX_MSG_TYPE
-	#define PTP_RX_TS0_5_REG_RX_MSG_TYPE_OFFSET  12
-	#define PTP_RX_TS0_5_REG_RX_MSG_TYPE_LEN     4
-	#define PTP_RX_TS0_5_REG_RX_MSG_TYPE_DEFAULT 0x0
+	#define PTP_TS5_REG_MSG_TYPE
+	#define PTP_TS5_REG_MSG_TYPE_OFFSET  12
+	#define PTP_TS5_REG_MSG_TYPE_LEN     4
+	#define PTP_TS5_REG_MSG_TYPE_DEFAULT 0x0
 
-struct ptp_rx_ts0_5_reg {
+struct ptp_ts5_reg {
 	a_uint16_t  rx_ts_nfsec:12;
 	a_uint16_t  rx_msg_type:4;
 };
 
-union ptp_rx_ts0_5_reg_u {
+union ptp_ts5_reg_u {
 	a_uint32_t val;
-	struct ptp_rx_ts0_5_reg bf;
+	struct ptp_ts5_reg bf;
 };
 
-/*[register] PTP_RX_TS0_6_REG*/
-#define PTP_RX_TS0_6_REG
-#define PTP_RX_TS0_6_REG_ADDRESS 0x801f
-#define PTP_RX_TS0_6_REG_NUM     1
-#define PTP_RX_TS0_6_REG_INC     0x1
-#define PTP_RX_TS0_6_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS0_6_REG_DEFAULT 0x0
+/*[register] PTP_TS6_REG*/
+#define PTP_TS6_REG
+#define PTP_TS6_REG_ADDRESS 0x801f
+#define PTP_TS6_REG_NUM     1
+#define PTP_TS6_REG_INC     0x1
+#define PTP_TS6_REG_TYPE    REG_TYPE_RW
+#define PTP_TS6_REG_DEFAULT 0x0
 	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS0_6_REG_RX_TS_NFSEC
-	#define PTP_RX_TS0_6_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS0_6_REG_RX_TS_NFSEC_LEN     8
-	#define PTP_RX_TS0_6_REG_RX_TS_NFSEC_DEFAULT 0x0
+	#define PTP_TS6_REG_TS_NFSEC
+	#define PTP_TS6_REG_TS_NFSEC_OFFSET  0
+	#define PTP_TS6_REG_TS_NFSEC_LEN     8
+	#define PTP_TS6_REG_TS_NFSEC_DEFAULT 0x0
 
-struct ptp_rx_ts0_6_reg {
+struct ptp_ts6_reg {
 	a_uint16_t  rx_ts_nfsec:8;
 };
 
-union ptp_rx_ts0_6_reg_u {
+union ptp_ts6_reg_u {
 	a_uint32_t val;
-	struct ptp_rx_ts0_6_reg bf;
+	struct ptp_ts6_reg bf;
 };
 
 /*[register] PTP_TX_SEQID_REG*/
@@ -527,94 +440,6 @@ union ptp_tx_portid0_reg_u {
 	struct ptp_tx_portid0_reg bf;
 };
 
-/*[register] PTP_TX_PORTID1_REG*/
-#define PTP_TX_PORTID1_REG
-#define PTP_TX_PORTID1_REG_ADDRESS 0x8022
-#define PTP_TX_PORTID1_REG_NUM     1
-#define PTP_TX_PORTID1_REG_INC     0x1
-#define PTP_TX_PORTID1_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_PORTID1_REG_DEFAULT 0x0
-	/*[field] TX_PORTID*/
-	#define PTP_TX_PORTID1_REG_TX_PORTID
-	#define PTP_TX_PORTID1_REG_TX_PORTID_OFFSET  0
-	#define PTP_TX_PORTID1_REG_TX_PORTID_LEN     16
-	#define PTP_TX_PORTID1_REG_TX_PORTID_DEFAULT 0x0
-
-struct ptp_tx_portid1_reg {
-	a_uint16_t  tx_portid:16;
-};
-
-union ptp_tx_portid1_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_portid1_reg bf;
-};
-
-/*[register] PTP_TX_PORTID2_REG*/
-#define PTP_TX_PORTID2_REG
-#define PTP_TX_PORTID2_REG_ADDRESS 0x8023
-#define PTP_TX_PORTID2_REG_NUM     1
-#define PTP_TX_PORTID2_REG_INC     0x1
-#define PTP_TX_PORTID2_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_PORTID2_REG_DEFAULT 0x0
-	/*[field] TX_PORTID*/
-	#define PTP_TX_PORTID2_REG_TX_PORTID
-	#define PTP_TX_PORTID2_REG_TX_PORTID_OFFSET  0
-	#define PTP_TX_PORTID2_REG_TX_PORTID_LEN     16
-	#define PTP_TX_PORTID2_REG_TX_PORTID_DEFAULT 0x0
-
-struct ptp_tx_portid2_reg {
-	a_uint16_t  tx_portid:16;
-};
-
-union ptp_tx_portid2_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_portid2_reg bf;
-};
-
-/*[register] PTP_TX_PORTID3_REG*/
-#define PTP_TX_PORTID3_REG
-#define PTP_TX_PORTID3_REG_ADDRESS 0x8024
-#define PTP_TX_PORTID3_REG_NUM     1
-#define PTP_TX_PORTID3_REG_INC     0x1
-#define PTP_TX_PORTID3_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_PORTID3_REG_DEFAULT 0x0
-	/*[field] TX_PORTID*/
-	#define PTP_TX_PORTID3_REG_TX_PORTID
-	#define PTP_TX_PORTID3_REG_TX_PORTID_OFFSET  0
-	#define PTP_TX_PORTID3_REG_TX_PORTID_LEN     16
-	#define PTP_TX_PORTID3_REG_TX_PORTID_DEFAULT 0x0
-
-struct ptp_tx_portid3_reg {
-	a_uint16_t  tx_portid:16;
-};
-
-union ptp_tx_portid3_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_portid3_reg bf;
-};
-
-/*[register] PTP_TX_PORTID4_REG*/
-#define PTP_TX_PORTID4_REG
-#define PTP_TX_PORTID4_REG_ADDRESS 0x8025
-#define PTP_TX_PORTID4_REG_NUM     1
-#define PTP_TX_PORTID4_REG_INC     0x1
-#define PTP_TX_PORTID4_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_PORTID4_REG_DEFAULT 0x0
-	/*[field] TX_PORTID*/
-	#define PTP_TX_PORTID4_REG_TX_PORTID
-	#define PTP_TX_PORTID4_REG_TX_PORTID_OFFSET  0
-	#define PTP_TX_PORTID4_REG_TX_PORTID_LEN     16
-	#define PTP_TX_PORTID4_REG_TX_PORTID_DEFAULT 0x0
-
-struct ptp_tx_portid4_reg {
-	a_uint16_t  tx_portid:16;
-};
-
-union ptp_tx_portid4_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_portid4_reg bf;
-};
-
 /*[register] PTP_TX_TS0_REG*/
 #define PTP_TX_TS0_REG
 #define PTP_TX_TS0_REG_ADDRESS 0x8026
@@ -635,144 +460,6 @@ struct ptp_tx_ts0_reg {
 union ptp_tx_ts0_reg_u {
 	a_uint32_t val;
 	struct ptp_tx_ts0_reg bf;
-};
-
-/*[register] PTP_TX_TS1_REG*/
-#define PTP_TX_TS1_REG
-#define PTP_TX_TS1_REG_ADDRESS 0x8027
-#define PTP_TX_TS1_REG_NUM     1
-#define PTP_TX_TS1_REG_INC     0x1
-#define PTP_TX_TS1_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_TS1_REG_DEFAULT 0x0
-	/*[field] TX_TS_SEC*/
-	#define PTP_TX_TS1_REG_TX_TS_SEC
-	#define PTP_TX_TS1_REG_TX_TS_SEC_OFFSET  0
-	#define PTP_TX_TS1_REG_TX_TS_SEC_LEN     16
-	#define PTP_TX_TS1_REG_TX_TS_SEC_DEFAULT 0x0
-
-struct ptp_tx_ts1_reg {
-	a_uint16_t  tx_ts_sec:16;
-};
-
-union ptp_tx_ts1_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_ts1_reg bf;
-};
-
-/*[register] PTP_TX_TS2_REG*/
-#define PTP_TX_TS2_REG
-#define PTP_TX_TS2_REG_ADDRESS 0x8028
-#define PTP_TX_TS2_REG_NUM     1
-#define PTP_TX_TS2_REG_INC     0x1
-#define PTP_TX_TS2_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_TS2_REG_DEFAULT 0x0
-	/*[field] TX_TS_SEC*/
-	#define PTP_TX_TS2_REG_TX_TS_SEC
-	#define PTP_TX_TS2_REG_TX_TS_SEC_OFFSET  0
-	#define PTP_TX_TS2_REG_TX_TS_SEC_LEN     16
-	#define PTP_TX_TS2_REG_TX_TS_SEC_DEFAULT 0x0
-
-struct ptp_tx_ts2_reg {
-	a_uint16_t  tx_ts_sec:16;
-};
-
-union ptp_tx_ts2_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_ts2_reg bf;
-};
-
-/*[register] PTP_TX_TS3_REG*/
-#define PTP_TX_TS3_REG
-#define PTP_TX_TS3_REG_ADDRESS 0x8029
-#define PTP_TX_TS3_REG_NUM     1
-#define PTP_TX_TS3_REG_INC     0x1
-#define PTP_TX_TS3_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_TS3_REG_DEFAULT 0x0
-	/*[field] TX_TS_NSEC*/
-	#define PTP_TX_TS3_REG_TX_TS_NSEC
-	#define PTP_TX_TS3_REG_TX_TS_NSEC_OFFSET  0
-	#define PTP_TX_TS3_REG_TX_TS_NSEC_LEN     16
-	#define PTP_TX_TS3_REG_TX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_tx_ts3_reg {
-	a_uint16_t  tx_ts_nsec:16;
-};
-
-union ptp_tx_ts3_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_ts3_reg bf;
-};
-
-/*[register] PTP_TX_TS4_REG*/
-#define PTP_TX_TS4_REG
-#define PTP_TX_TS4_REG_ADDRESS 0x802a
-#define PTP_TX_TS4_REG_NUM     1
-#define PTP_TX_TS4_REG_INC     0x1
-#define PTP_TX_TS4_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_TS4_REG_DEFAULT 0x0
-	/*[field] TX_TS_NSEC*/
-	#define PTP_TX_TS4_REG_TX_TS_NSEC
-	#define PTP_TX_TS4_REG_TX_TS_NSEC_OFFSET  0
-	#define PTP_TX_TS4_REG_TX_TS_NSEC_LEN     16
-	#define PTP_TX_TS4_REG_TX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_tx_ts4_reg {
-	a_uint16_t  tx_ts_nsec:16;
-};
-
-union ptp_tx_ts4_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_ts4_reg bf;
-};
-
-/*[register] PTP_TX_TS5_REG*/
-#define PTP_TX_TS5_REG
-#define PTP_TX_TS5_REG_ADDRESS 0x802b
-#define PTP_TX_TS5_REG_NUM     1
-#define PTP_TX_TS5_REG_INC     0x1
-#define PTP_TX_TS5_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_TS5_REG_DEFAULT 0x0
-	/*[field] TX_TS_NFSEC*/
-	#define PTP_TX_TS5_REG_TX_TS_NFSEC
-	#define PTP_TX_TS5_REG_TX_TS_NFSEC_OFFSET  0
-	#define PTP_TX_TS5_REG_TX_TS_NFSEC_LEN     12
-	#define PTP_TX_TS5_REG_TX_TS_NFSEC_DEFAULT 0x0
-	/*[field] TX_MSG_TYPE*/
-	#define PTP_TX_TS5_REG_TX_MSG_TYPE
-	#define PTP_TX_TS5_REG_TX_MSG_TYPE_OFFSET  12
-	#define PTP_TX_TS5_REG_TX_MSG_TYPE_LEN     4
-	#define PTP_TX_TS5_REG_TX_MSG_TYPE_DEFAULT 0x0
-
-struct ptp_tx_ts5_reg {
-	a_uint16_t  tx_ts_nfsec:12;
-	a_uint16_t  tx_msg_type:4;
-};
-
-union ptp_tx_ts5_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_ts5_reg bf;
-};
-
-/*[register] PTP_TX_TS6_REG*/
-#define PTP_TX_TS6_REG
-#define PTP_TX_TS6_REG_ADDRESS 0x802c
-#define PTP_TX_TS6_REG_NUM     1
-#define PTP_TX_TS6_REG_INC     0x1
-#define PTP_TX_TS6_REG_TYPE    REG_TYPE_RW
-#define PTP_TX_TS6_REG_DEFAULT 0x0
-	/*[field] TX_TS_NFSEC*/
-	#define PTP_TX_TS6_REG_TX_TS_NFSEC
-	#define PTP_TX_TS6_REG_TX_TS_NFSEC_OFFSET  0
-	#define PTP_TX_TS6_REG_TX_TS_NFSEC_LEN     8
-	#define PTP_TX_TS6_REG_TX_TS_NFSEC_DEFAULT 0x0
-
-struct ptp_tx_ts6_reg {
-	a_uint16_t  tx_ts_nfsec:8;
-};
-
-union ptp_tx_ts6_reg_u {
-	a_uint32_t val;
-	struct ptp_tx_ts6_reg bf;
 };
 
 /*[register] PTP_ORIG_CORR0_REG*/
@@ -2710,94 +2397,6 @@ union ptp_rx_portid1_0_reg_u {
 	struct ptp_rx_portid1_0_reg bf;
 };
 
-/*[register] PTP_RX_PORTID1_1_REG*/
-#define PTP_RX_PORTID1_1_REG
-#define PTP_RX_PORTID1_1_REG_ADDRESS 0x8502
-#define PTP_RX_PORTID1_1_REG_NUM     1
-#define PTP_RX_PORTID1_1_REG_INC     0x1
-#define PTP_RX_PORTID1_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID1_1_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID1_1_REG_RX_PORTID
-	#define PTP_RX_PORTID1_1_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID1_1_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID1_1_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid1_1_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid1_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid1_1_reg bf;
-};
-
-/*[register] PTP_RX_PORTID1_2_REG*/
-#define PTP_RX_PORTID1_2_REG
-#define PTP_RX_PORTID1_2_REG_ADDRESS 0x8503
-#define PTP_RX_PORTID1_2_REG_NUM     1
-#define PTP_RX_PORTID1_2_REG_INC     0x1
-#define PTP_RX_PORTID1_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID1_2_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID1_2_REG_RX_PORTID
-	#define PTP_RX_PORTID1_2_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID1_2_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID1_2_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid1_2_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid1_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid1_2_reg bf;
-};
-
-/*[register] PTP_RX_PORTID1_3_REG*/
-#define PTP_RX_PORTID1_3_REG
-#define PTP_RX_PORTID1_3_REG_ADDRESS 0x8504
-#define PTP_RX_PORTID1_3_REG_NUM     1
-#define PTP_RX_PORTID1_3_REG_INC     0x1
-#define PTP_RX_PORTID1_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID1_3_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID1_3_REG_RX_PORTID
-	#define PTP_RX_PORTID1_3_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID1_3_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID1_3_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid1_3_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid1_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid1_3_reg bf;
-};
-
-/*[register] PTP_RX_PORTID1_4_REG*/
-#define PTP_RX_PORTID1_4_REG
-#define PTP_RX_PORTID1_4_REG_ADDRESS 0x8505
-#define PTP_RX_PORTID1_4_REG_NUM     1
-#define PTP_RX_PORTID1_4_REG_INC     0x1
-#define PTP_RX_PORTID1_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID1_4_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID1_4_REG_RX_PORTID
-	#define PTP_RX_PORTID1_4_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID1_4_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID1_4_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid1_4_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid1_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid1_4_reg bf;
-};
-
 /*[register] PTP_RX_TS1_0_REG*/
 #define PTP_RX_TS1_0_REG
 #define PTP_RX_TS1_0_REG_ADDRESS 0x8506
@@ -2818,144 +2417,6 @@ struct ptp_rx_ts1_0_reg {
 union ptp_rx_ts1_0_reg_u {
 	a_uint32_t val;
 	struct ptp_rx_ts1_0_reg bf;
-};
-
-/*[register] PTP_RX_TS1_1_REG*/
-#define PTP_RX_TS1_1_REG
-#define PTP_RX_TS1_1_REG_ADDRESS 0x8507
-#define PTP_RX_TS1_1_REG_NUM     1
-#define PTP_RX_TS1_1_REG_INC     0x1
-#define PTP_RX_TS1_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS1_1_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS1_1_REG_RX_TS_SEC
-	#define PTP_RX_TS1_1_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS1_1_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS1_1_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts1_1_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts1_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts1_1_reg bf;
-};
-
-/*[register] PTP_RX_TS1_2_REG*/
-#define PTP_RX_TS1_2_REG
-#define PTP_RX_TS1_2_REG_ADDRESS 0x8508
-#define PTP_RX_TS1_2_REG_NUM     1
-#define PTP_RX_TS1_2_REG_INC     0x1
-#define PTP_RX_TS1_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS1_2_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS1_2_REG_RX_TS_SEC
-	#define PTP_RX_TS1_2_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS1_2_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS1_2_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts1_2_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts1_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts1_2_reg bf;
-};
-
-/*[register] PTP_RX_TS1_3_REG*/
-#define PTP_RX_TS1_3_REG
-#define PTP_RX_TS1_3_REG_ADDRESS 0x8509
-#define PTP_RX_TS1_3_REG_NUM     1
-#define PTP_RX_TS1_3_REG_INC     0x1
-#define PTP_RX_TS1_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS1_3_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS1_3_REG_RX_TS_NSEC
-	#define PTP_RX_TS1_3_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS1_3_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS1_3_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts1_3_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts1_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts1_3_reg bf;
-};
-
-/*[register] PTP_RX_TS1_4_REG*/
-#define PTP_RX_TS1_4_REG
-#define PTP_RX_TS1_4_REG_ADDRESS 0x850a
-#define PTP_RX_TS1_4_REG_NUM     1
-#define PTP_RX_TS1_4_REG_INC     0x1
-#define PTP_RX_TS1_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS1_4_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS1_4_REG_RX_TS_NSEC
-	#define PTP_RX_TS1_4_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS1_4_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS1_4_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts1_4_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts1_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts1_4_reg bf;
-};
-
-/*[register] PTP_RX_TS1_5_REG*/
-#define PTP_RX_TS1_5_REG
-#define PTP_RX_TS1_5_REG_ADDRESS 0x850b
-#define PTP_RX_TS1_5_REG_NUM     1
-#define PTP_RX_TS1_5_REG_INC     0x1
-#define PTP_RX_TS1_5_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS1_5_REG_DEFAULT 0x0
-	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS1_5_REG_RX_TS_NFSEC
-	#define PTP_RX_TS1_5_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS1_5_REG_RX_TS_NFSEC_LEN     12
-	#define PTP_RX_TS1_5_REG_RX_TS_NFSEC_DEFAULT 0x0
-	/*[field] RX_MSG_TYPE*/
-	#define PTP_RX_TS1_5_REG_RX_MSG_TYPE
-	#define PTP_RX_TS1_5_REG_RX_MSG_TYPE_OFFSET  12
-	#define PTP_RX_TS1_5_REG_RX_MSG_TYPE_LEN     4
-	#define PTP_RX_TS1_5_REG_RX_MSG_TYPE_DEFAULT 0x0
-
-struct ptp_rx_ts1_5_reg {
-	a_uint16_t  rx_ts_nfsec:12;
-	a_uint16_t  rx_msg_type:4;
-};
-
-union ptp_rx_ts1_5_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts1_5_reg bf;
-};
-
-/*[register] PTP_RX_TS1_6_REG*/
-#define PTP_RX_TS1_6_REG
-#define PTP_RX_TS1_6_REG_ADDRESS 0x850c
-#define PTP_RX_TS1_6_REG_NUM     1
-#define PTP_RX_TS1_6_REG_INC     0x1
-#define PTP_RX_TS1_6_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS1_6_REG_DEFAULT 0x0
-	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS1_6_REG_RX_TS_NFSEC
-	#define PTP_RX_TS1_6_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS1_6_REG_RX_TS_NFSEC_LEN     8
-	#define PTP_RX_TS1_6_REG_RX_TS_NFSEC_DEFAULT 0x0
-
-struct ptp_rx_ts1_6_reg {
-	a_uint16_t  rx_ts_nfsec:8;
-};
-
-union ptp_rx_ts1_6_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts1_6_reg bf;
 };
 
 /*[register] PTP_RX_SEQID2_REG*/
@@ -3002,94 +2463,6 @@ union ptp_rx_portid2_0_reg_u {
 	struct ptp_rx_portid2_0_reg bf;
 };
 
-/*[register] PTP_RX_PORTID2_1_REG*/
-#define PTP_RX_PORTID2_1_REG
-#define PTP_RX_PORTID2_1_REG_ADDRESS 0x851c
-#define PTP_RX_PORTID2_1_REG_NUM     1
-#define PTP_RX_PORTID2_1_REG_INC     0x1
-#define PTP_RX_PORTID2_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID2_1_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID2_1_REG_RX_PORTID
-	#define PTP_RX_PORTID2_1_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID2_1_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID2_1_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid2_1_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid2_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid2_1_reg bf;
-};
-
-/*[register] PTP_RX_PORTID2_2_REG*/
-#define PTP_RX_PORTID2_2_REG
-#define PTP_RX_PORTID2_2_REG_ADDRESS 0x851d
-#define PTP_RX_PORTID2_2_REG_NUM     1
-#define PTP_RX_PORTID2_2_REG_INC     0x1
-#define PTP_RX_PORTID2_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID2_2_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID2_2_REG_RX_PORTID
-	#define PTP_RX_PORTID2_2_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID2_2_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID2_2_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid2_2_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid2_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid2_2_reg bf;
-};
-
-/*[register] PTP_RX_PORTID2_3_REG*/
-#define PTP_RX_PORTID2_3_REG
-#define PTP_RX_PORTID2_3_REG_ADDRESS 0x851e
-#define PTP_RX_PORTID2_3_REG_NUM     1
-#define PTP_RX_PORTID2_3_REG_INC     0x1
-#define PTP_RX_PORTID2_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID2_3_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID2_3_REG_RX_PORTID
-	#define PTP_RX_PORTID2_3_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID2_3_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID2_3_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid2_3_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid2_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid2_3_reg bf;
-};
-
-/*[register] PTP_RX_PORTID2_4_REG*/
-#define PTP_RX_PORTID2_4_REG
-#define PTP_RX_PORTID2_4_REG_ADDRESS 0x851f
-#define PTP_RX_PORTID2_4_REG_NUM     1
-#define PTP_RX_PORTID2_4_REG_INC     0x1
-#define PTP_RX_PORTID2_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID2_4_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID2_4_REG_RX_PORTID
-	#define PTP_RX_PORTID2_4_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID2_4_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID2_4_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid2_4_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid2_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid2_4_reg bf;
-};
-
 /*[register] PTP_RX_TS2_0_REG*/
 #define PTP_RX_TS2_0_REG
 #define PTP_RX_TS2_0_REG_ADDRESS 0x8520
@@ -3110,144 +2483,6 @@ struct ptp_rx_ts2_0_reg {
 union ptp_rx_ts2_0_reg_u {
 	a_uint32_t val;
 	struct ptp_rx_ts2_0_reg bf;
-};
-
-/*[register] PTP_RX_TS2_1_REG*/
-#define PTP_RX_TS2_1_REG
-#define PTP_RX_TS2_1_REG_ADDRESS 0x8521
-#define PTP_RX_TS2_1_REG_NUM     1
-#define PTP_RX_TS2_1_REG_INC     0x1
-#define PTP_RX_TS2_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS2_1_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS2_1_REG_RX_TS_SEC
-	#define PTP_RX_TS2_1_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS2_1_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS2_1_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts2_1_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts2_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts2_1_reg bf;
-};
-
-/*[register] PTP_RX_TS2_2_REG*/
-#define PTP_RX_TS2_2_REG
-#define PTP_RX_TS2_2_REG_ADDRESS 0x8522
-#define PTP_RX_TS2_2_REG_NUM     1
-#define PTP_RX_TS2_2_REG_INC     0x1
-#define PTP_RX_TS2_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS2_2_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS2_2_REG_RX_TS_SEC
-	#define PTP_RX_TS2_2_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS2_2_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS2_2_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts2_2_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts2_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts2_2_reg bf;
-};
-
-/*[register] PTP_RX_TS2_3_REG*/
-#define PTP_RX_TS2_3_REG
-#define PTP_RX_TS2_3_REG_ADDRESS 0x8523
-#define PTP_RX_TS2_3_REG_NUM     1
-#define PTP_RX_TS2_3_REG_INC     0x1
-#define PTP_RX_TS2_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS2_3_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS2_3_REG_RX_TS_NSEC
-	#define PTP_RX_TS2_3_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS2_3_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS2_3_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts2_3_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts2_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts2_3_reg bf;
-};
-
-/*[register] PTP_RX_TS2_4_REG*/
-#define PTP_RX_TS2_4_REG
-#define PTP_RX_TS2_4_REG_ADDRESS 0x8524
-#define PTP_RX_TS2_4_REG_NUM     1
-#define PTP_RX_TS2_4_REG_INC     0x1
-#define PTP_RX_TS2_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS2_4_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS2_4_REG_RX_TS_NSEC
-	#define PTP_RX_TS2_4_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS2_4_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS2_4_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts2_4_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts2_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts2_4_reg bf;
-};
-
-/*[register] PTP_RX_TS2_5_REG*/
-#define PTP_RX_TS2_5_REG
-#define PTP_RX_TS2_5_REG_ADDRESS 0x8525
-#define PTP_RX_TS2_5_REG_NUM     1
-#define PTP_RX_TS2_5_REG_INC     0x1
-#define PTP_RX_TS2_5_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS2_5_REG_DEFAULT 0x0
-	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS2_5_REG_RX_TS_NFSEC
-	#define PTP_RX_TS2_5_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS2_5_REG_RX_TS_NFSEC_LEN     12
-	#define PTP_RX_TS2_5_REG_RX_TS_NFSEC_DEFAULT 0x0
-	/*[field] RX_MSG_TYPE*/
-	#define PTP_RX_TS2_5_REG_RX_MSG_TYPE
-	#define PTP_RX_TS2_5_REG_RX_MSG_TYPE_OFFSET  12
-	#define PTP_RX_TS2_5_REG_RX_MSG_TYPE_LEN     4
-	#define PTP_RX_TS2_5_REG_RX_MSG_TYPE_DEFAULT 0x0
-
-struct ptp_rx_ts2_5_reg {
-	a_uint16_t  rx_ts_nfsec:12;
-	a_uint16_t  rx_msg_type:4;
-};
-
-union ptp_rx_ts2_5_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts2_5_reg bf;
-};
-
-/*[register] PTP_RX_TS2_6_REG*/
-#define PTP_RX_TS2_6_REG
-#define PTP_RX_TS2_6_REG_ADDRESS 0x8526
-#define PTP_RX_TS2_6_REG_NUM     1
-#define PTP_RX_TS2_6_REG_INC     0x1
-#define PTP_RX_TS2_6_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS2_6_REG_DEFAULT 0x0
-	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS2_6_REG_RX_TS_NFSEC
-	#define PTP_RX_TS2_6_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS2_6_REG_RX_TS_NFSEC_LEN     8
-	#define PTP_RX_TS2_6_REG_RX_TS_NFSEC_DEFAULT 0x0
-
-struct ptp_rx_ts2_6_reg {
-	a_uint16_t  rx_ts_nfsec:8;
-};
-
-union ptp_rx_ts2_6_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts2_6_reg bf;
 };
 
 /*[register] PTP_RX_SEQID3_REG*/
@@ -3294,94 +2529,6 @@ union ptp_rx_portid3_0_reg_u {
 	struct ptp_rx_portid3_0_reg bf;
 };
 
-/*[register] PTP_RX_PORTID3_1_REG*/
-#define PTP_RX_PORTID3_1_REG
-#define PTP_RX_PORTID3_1_REG_ADDRESS 0x8536
-#define PTP_RX_PORTID3_1_REG_NUM     1
-#define PTP_RX_PORTID3_1_REG_INC     0x1
-#define PTP_RX_PORTID3_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID3_1_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID3_1_REG_RX_PORTID
-	#define PTP_RX_PORTID3_1_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID3_1_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID3_1_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid3_1_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid3_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid3_1_reg bf;
-};
-
-/*[register] PTP_RX_PORTID3_2_REG*/
-#define PTP_RX_PORTID3_2_REG
-#define PTP_RX_PORTID3_2_REG_ADDRESS 0x8537
-#define PTP_RX_PORTID3_2_REG_NUM     1
-#define PTP_RX_PORTID3_2_REG_INC     0x1
-#define PTP_RX_PORTID3_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID3_2_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID3_2_REG_RX_PORTID
-	#define PTP_RX_PORTID3_2_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID3_2_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID3_2_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid3_2_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid3_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid3_2_reg bf;
-};
-
-/*[register] PTP_RX_PORTID3_3_REG*/
-#define PTP_RX_PORTID3_3_REG
-#define PTP_RX_PORTID3_3_REG_ADDRESS 0x8538
-#define PTP_RX_PORTID3_3_REG_NUM     1
-#define PTP_RX_PORTID3_3_REG_INC     0x1
-#define PTP_RX_PORTID3_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID3_3_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID3_3_REG_RX_PORTID
-	#define PTP_RX_PORTID3_3_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID3_3_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID3_3_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid3_3_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid3_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid3_3_reg bf;
-};
-
-/*[register] PTP_RX_PORTID3_4_REG*/
-#define PTP_RX_PORTID3_4_REG
-#define PTP_RX_PORTID3_4_REG_ADDRESS 0x8539
-#define PTP_RX_PORTID3_4_REG_NUM     1
-#define PTP_RX_PORTID3_4_REG_INC     0x1
-#define PTP_RX_PORTID3_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_PORTID3_4_REG_DEFAULT 0x0
-	/*[field] RX_PORTID*/
-	#define PTP_RX_PORTID3_4_REG_RX_PORTID
-	#define PTP_RX_PORTID3_4_REG_RX_PORTID_OFFSET  0
-	#define PTP_RX_PORTID3_4_REG_RX_PORTID_LEN     16
-	#define PTP_RX_PORTID3_4_REG_RX_PORTID_DEFAULT 0x0
-
-struct ptp_rx_portid3_4_reg {
-	a_uint16_t  rx_portid:16;
-};
-
-union ptp_rx_portid3_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_portid3_4_reg bf;
-};
-
 /*[register] PTP_RX_TS3_0_REG*/
 #define PTP_RX_TS3_0_REG
 #define PTP_RX_TS3_0_REG_ADDRESS 0x853a
@@ -3402,144 +2549,6 @@ struct ptp_rx_ts3_0_reg {
 union ptp_rx_ts3_0_reg_u {
 	a_uint32_t val;
 	struct ptp_rx_ts3_0_reg bf;
-};
-
-/*[register] PTP_RX_TS3_1_REG*/
-#define PTP_RX_TS3_1_REG
-#define PTP_RX_TS3_1_REG_ADDRESS 0x853b
-#define PTP_RX_TS3_1_REG_NUM     1
-#define PTP_RX_TS3_1_REG_INC     0x1
-#define PTP_RX_TS3_1_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS3_1_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS3_1_REG_RX_TS_SEC
-	#define PTP_RX_TS3_1_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS3_1_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS3_1_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts3_1_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts3_1_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts3_1_reg bf;
-};
-
-/*[register] PTP_RX_TS3_2_REG*/
-#define PTP_RX_TS3_2_REG
-#define PTP_RX_TS3_2_REG_ADDRESS 0x853c
-#define PTP_RX_TS3_2_REG_NUM     1
-#define PTP_RX_TS3_2_REG_INC     0x1
-#define PTP_RX_TS3_2_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS3_2_REG_DEFAULT 0x0
-	/*[field] RX_TS_SEC*/
-	#define PTP_RX_TS3_2_REG_RX_TS_SEC
-	#define PTP_RX_TS3_2_REG_RX_TS_SEC_OFFSET  0
-	#define PTP_RX_TS3_2_REG_RX_TS_SEC_LEN     16
-	#define PTP_RX_TS3_2_REG_RX_TS_SEC_DEFAULT 0x0
-
-struct ptp_rx_ts3_2_reg {
-	a_uint16_t  rx_ts_sec:16;
-};
-
-union ptp_rx_ts3_2_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts3_2_reg bf;
-};
-
-/*[register] PTP_RX_TS3_3_REG*/
-#define PTP_RX_TS3_3_REG
-#define PTP_RX_TS3_3_REG_ADDRESS 0x853d
-#define PTP_RX_TS3_3_REG_NUM     1
-#define PTP_RX_TS3_3_REG_INC     0x1
-#define PTP_RX_TS3_3_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS3_3_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS3_3_REG_RX_TS_NSEC
-	#define PTP_RX_TS3_3_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS3_3_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS3_3_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts3_3_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts3_3_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts3_3_reg bf;
-};
-
-/*[register] PTP_RX_TS3_4_REG*/
-#define PTP_RX_TS3_4_REG
-#define PTP_RX_TS3_4_REG_ADDRESS 0x853e
-#define PTP_RX_TS3_4_REG_NUM     1
-#define PTP_RX_TS3_4_REG_INC     0x1
-#define PTP_RX_TS3_4_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS3_4_REG_DEFAULT 0x0
-	/*[field] RX_TS_NSEC*/
-	#define PTP_RX_TS3_4_REG_RX_TS_NSEC
-	#define PTP_RX_TS3_4_REG_RX_TS_NSEC_OFFSET  0
-	#define PTP_RX_TS3_4_REG_RX_TS_NSEC_LEN     16
-	#define PTP_RX_TS3_4_REG_RX_TS_NSEC_DEFAULT 0x0
-
-struct ptp_rx_ts3_4_reg {
-	a_uint16_t  rx_ts_nsec:16;
-};
-
-union ptp_rx_ts3_4_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts3_4_reg bf;
-};
-
-/*[register] PTP_RX_TS3_5_REG*/
-#define PTP_RX_TS3_5_REG
-#define PTP_RX_TS3_5_REG_ADDRESS 0x853f
-#define PTP_RX_TS3_5_REG_NUM     1
-#define PTP_RX_TS3_5_REG_INC     0x1
-#define PTP_RX_TS3_5_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS3_5_REG_DEFAULT 0x0
-	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS3_5_REG_RX_TS_NFSEC
-	#define PTP_RX_TS3_5_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS3_5_REG_RX_TS_NFSEC_LEN     12
-	#define PTP_RX_TS3_5_REG_RX_TS_NFSEC_DEFAULT 0x0
-	/*[field] RX_MSG_TYPE*/
-	#define PTP_RX_TS3_5_REG_RX_MSG_TYPE
-	#define PTP_RX_TS3_5_REG_RX_MSG_TYPE_OFFSET  12
-	#define PTP_RX_TS3_5_REG_RX_MSG_TYPE_LEN     4
-	#define PTP_RX_TS3_5_REG_RX_MSG_TYPE_DEFAULT 0x0
-
-struct ptp_rx_ts3_5_reg {
-	a_uint16_t  rx_ts_nfsec:12;
-	a_uint16_t  rx_msg_type:4;
-};
-
-union ptp_rx_ts3_5_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts3_5_reg bf;
-};
-
-/*[register] PTP_RX_TS3_6_REG*/
-#define PTP_RX_TS3_6_REG
-#define PTP_RX_TS3_6_REG_ADDRESS 0x8540
-#define PTP_RX_TS3_6_REG_NUM     1
-#define PTP_RX_TS3_6_REG_INC     0x1
-#define PTP_RX_TS3_6_REG_TYPE    REG_TYPE_RW
-#define PTP_RX_TS3_6_REG_DEFAULT 0x0
-	/*[field] RX_TS_NFSEC*/
-	#define PTP_RX_TS3_6_REG_RX_TS_NFSEC
-	#define PTP_RX_TS3_6_REG_RX_TS_NFSEC_OFFSET  0
-	#define PTP_RX_TS3_6_REG_RX_TS_NFSEC_LEN     8
-	#define PTP_RX_TS3_6_REG_RX_TS_NFSEC_DEFAULT 0x0
-
-struct ptp_rx_ts3_6_reg {
-	a_uint16_t  rx_ts_nfsec:8;
-};
-
-union ptp_rx_ts3_6_reg_u {
-	a_uint32_t val;
-	struct ptp_rx_ts3_6_reg bf;
 };
 
 /*[register] PTP_PHASE_ADJUST_0*/

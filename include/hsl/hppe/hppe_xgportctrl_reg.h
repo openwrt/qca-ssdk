@@ -879,8 +879,9 @@ union mac_lpi_timers_control_u {
 	#define MAC_LPI_AUTO_ENTRY_TIMER_LPIET_DEFAULT 0x0
 
 struct mac_lpi_auto_entry_timer {
+	a_uint32_t  _reserved0:3;
 	a_uint32_t  lpiet:17;
-	a_uint32_t  _reserved0:12;
+	a_uint32_t  _reserved1:12;
 };
 
 union mac_lpi_auto_entry_timer_u {

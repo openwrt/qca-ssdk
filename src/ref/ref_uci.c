@@ -104,8 +104,8 @@ static char *vrf_dflt_str = "0";
 static char *lb_dflt_str = "0";
 static char *cookie_dflt_str = "0";
 static char *priority_dflt_str = "no";
-static char *param_dflt_str = " ";
 #endif
+static char *param_dflt_str = " ";
 
 #if defined(HPPE)
 int parse_uci_option(struct switch_val *val, const char *option_names[], const int length)
@@ -2601,7 +2601,7 @@ parse_port_framemaxsize(struct switch_val *val)
 
 	return rv;
 }
-
+#endif
 static int
 parse_port_mtu(struct switch_val *val)
 {
@@ -2620,16 +2620,6 @@ parse_port_mtu(struct switch_val *val)
 			val_ptr[1] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "mtuaction")) {
 			val_ptr[2] = (char*)ext_value_p->option_value;
-#if defined (APPE)
-		} else if(!strcmp(ext_value_p->option_name, "mtu_enable")) {
-			val_ptr[3] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "mtu_type")) {
-			val_ptr[4] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "extra_header_len")) {
-			val_ptr[5] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "eg_vlan_tag_flag")) {
-			val_ptr[6] = (char*)ext_value_p->option_value;
-#endif
 		} else {
 			rv = -1;
 			break;
@@ -2671,7 +2661,7 @@ parse_port_mru(struct switch_val *val)
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static int
 parse_port_srcfilter(struct switch_val *val)
 {
@@ -2731,7 +2721,9 @@ parse_switch_port_loopback(struct switch_val *val)
 
 	return rv;
 }
+#endif
 #if defined (APPE)
+#ifndef IN_PORTCONTROL_MINI
 static int
 parse_port8023ah(struct switch_val *val)
 {
@@ -2760,7 +2752,84 @@ parse_port8023ah(struct switch_val *val)
 	return rv;
 }
 #endif
+static int
+parse_port_mtu_cfg(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mtu_enable")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mtu_type")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "extra_header_len")) {
+			val_ptr[3] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "eg_vlan_tag_flag")) {
+			val_ptr[4] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
 #endif
+
+#if defined(HPPE)
+static const char *port_cntcfg[] = {
+	"port_id",
+	"rx_cnt_enable",
+	"uc_tx_cnt_enable",
+	"mc_tx_cnt_enable",
+#if defined(APPE)
+	"tl_rx_cnt_enable",
+	"rx_cnt_mode",
+	"tx_cnt_mode",
+#endif
+};
+#endif
+
+static int
+parse_port_mru_mtu(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mru_size")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "mtu_size")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
 #endif
 
 #ifdef IN_PORTVLAN
@@ -6004,7 +6073,6 @@ parse_misc_pppoeen(struct switch_val *val)
 #endif
 
 #ifdef IN_IP
-#ifndef IN_IP_MINI
 static int
 parse_ip_hostentry(struct switch_val *val)
 {
@@ -6090,6 +6158,7 @@ parse_ip_hostentry(struct switch_val *val)
 	return rv;
 }
 
+#if !defined(IN_IP_MINI)
 static int
 parse_ip_intfentry(struct switch_val *val)
 {
@@ -6621,6 +6690,7 @@ parse_ip_rfsip6(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_ip_vsiarpsg(struct switch_val *val)
@@ -6855,6 +6925,7 @@ parse_ip_pubip(struct switch_val *val)
 	return rv;
 }
 
+#if !defined(IN_IP_MINI)
 static int
 parse_ip_networkroute(struct switch_val *val)
 {
@@ -6893,6 +6964,7 @@ parse_ip_networkroute(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_ip_intf(struct switch_val *val)
@@ -7213,7 +7285,6 @@ parse_ip_globalctrl(struct switch_val *val)
 
 	return rv;
 }
-#endif
 #endif
 
 #ifdef IN_NAT
@@ -11823,7 +11894,7 @@ parse_port(const char *command_name, struct switch_val *val)
 	} else if(!strcmp(command_name, "HdrType")) {
 		rv = parse_port_hdrtype(val);
 	}
-	#ifndef IN_PORTCONTROL_MINI
+#ifndef IN_PORTCONTROL_MINI
 	else if(!strcmp(command_name, "Duplex")) {
 		rv = parse_port_duplex(val);
 	} else if(!strcmp(command_name, "Speed")) {
@@ -11888,11 +11959,17 @@ parse_port(const char *command_name, struct switch_val *val)
 		rv = parse_port_reset(val);
 	} else if(!strcmp(command_name, "FrameMaxSize")) {
 		rv = parse_port_framemaxsize(val);
-	} else if(!strcmp(command_name, "Mtu")) {
+	}
+#endif
+	else if(!strcmp(command_name, "Mtu")) {
 		rv = parse_port_mtu(val);
 	} else if(!strcmp(command_name, "Mru")) {
 		rv = parse_port_mru(val);
-	} else if(!strcmp(command_name, "Srcfilter")) {
+	} else if(!strcmp(command_name, "Mrumtu")) {
+		rv = parse_port_mru_mtu(val);
+	}
+#ifndef IN_PORTCONTROL_MINI
+	else if(!strcmp(command_name, "Srcfilter")) {
 		rv = parse_port_srcfilter(val);
 	} else if(!strcmp(command_name, "Interface3az")) {
 		rv = parse_port_interface8023az(val);
@@ -11904,12 +11981,26 @@ parse_port(const char *command_name, struct switch_val *val)
 		rv = parse_port_srcfiltercfg(val);
 	} else if(!strcmp(command_name, "SwitchPortLoopback")) {
 		rv = parse_switch_port_loopback(val);
-#if defined (APPE)
-	} else if(!strcmp(command_name, "Port8023ah")) {
-		rv = parse_port8023ah(val);
-#endif
 	}
 #endif
+#if defined (APPE)
+#ifndef IN_PORTCONTROL_MINI
+	else if(!strcmp(command_name, "Port8023ah")) {
+		rv = parse_port8023ah(val);
+	}
+#endif
+	else if(!strcmp(command_name, "Mtucfg")) {
+		rv = parse_port_mtu_cfg(val);
+	}
+#endif
+
+#if defined(HPPE)
+	else if (!strcmp(command_name, "Cntcfg")) {
+		rv = parse_uci_option(val, port_cntcfg,
+				sizeof(port_cntcfg)/sizeof(char *));
+	}
+#endif
+
 	return rv;
 }
 #endif
@@ -12227,10 +12318,11 @@ static int
 parse_ip(const char *command_name, struct switch_val *val)
 {
 	int rv = -1;
-#ifndef IN_IP_MINI
 	if(!strcmp(command_name, "Hostentry")) {
 		rv = parse_ip_hostentry(val);
-	} else if(!strcmp(command_name, "Intfentry")) {
+	}
+#if !defined(IN_IP_MINI)
+	else if(!strcmp(command_name, "Intfentry")) {
 		rv = parse_ip_intfentry(val);
 	} else if(!strcmp(command_name, "Ptarplearn")) {
 		rv = parse_ip_ptarplearn(val);
@@ -12266,7 +12358,9 @@ parse_ip(const char *command_name, struct switch_val *val)
 		rv = parse_ip_rfsip4(val);
 	} else if(!strcmp(command_name, "Rfsip6")) {
 		rv = parse_ip_rfsip6(val);
-	} else if (!strcmp(command_name, "Vsiarpsg")) {
+	}
+#endif
+	else if (!strcmp(command_name, "Vsiarpsg")) {
 		rv = parse_ip_vsiarpsg(val);
 	} else if (!strcmp(command_name, "Vsisg")) {
 		rv = parse_ip_vsisg(val);
@@ -12276,9 +12370,13 @@ parse_ip(const char *command_name, struct switch_val *val)
 		rv = parse_ip_portsg(val);
 	} else if (!strcmp(command_name, "Pubip")) {
 		rv = parse_ip_pubip(val);
-	} else if (!strcmp(command_name, "Networkroute")) {
+	}
+#if !defined(IN_IP_MINI)
+	else if (!strcmp(command_name, "Networkroute")) {
 		rv = parse_ip_networkroute(val);
-	} else if (!strcmp(command_name, "Intf")) {
+	}
+#endif
+	else if (!strcmp(command_name, "Intf")) {
 		rv = parse_ip_intf(val);
 	} else if (!strcmp(command_name, "Vsiintf")) {
 		rv = parse_ip_vsiintf(val);
@@ -12297,7 +12395,6 @@ parse_ip(const char *command_name, struct switch_val *val)
 	} else if (!strcmp(command_name, "Hostentry")) {
 		rv = parse_ip_hostentry(val);
 	}
-#endif
 	return rv;
 }
 #endif

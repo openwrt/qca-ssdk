@@ -356,7 +356,6 @@ hppe_mru_mtu_ctrl_tbl_set(
 				sizeof(union mru_mtu_ctrl_tbl_u)/sizeof(a_uint32_t));
 }
 
-#if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))
 sw_error_t
 hppe_mc_mtu_ctrl_tbl_get(
 		a_uint32_t dev_id,
@@ -384,7 +383,6 @@ hppe_mc_mtu_ctrl_tbl_set(
 				index * MC_MTU_CTRL_TBL_INC,
 				value->val);
 }
-#endif
 
 sw_error_t
 hppe_tdm_ctrl_get(
@@ -2162,7 +2160,7 @@ hppe_mac_jumbo_size_mac_jumbo_size_set(
 	ret = hppe_mac_jumbo_size_set(dev_id, index, &reg_val);
 	return ret;
 }
-#ifndef IN_PORTCONTROL_MINI
+
 sw_error_t
 hppe_mru_mtu_ctrl_tbl_mtu_cmd_get(
 		a_uint32_t dev_id,
@@ -2190,6 +2188,37 @@ hppe_mru_mtu_ctrl_tbl_mtu_cmd_set(
 	if (SW_OK != ret)
 		return ret;
 	reg_val.bf.mtu_cmd = value;
+	ret = hppe_mru_mtu_ctrl_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+hppe_mru_mtu_ctrl_tbl_mtu_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.mtu;
+	return ret;
+}
+
+sw_error_t
+hppe_mru_mtu_ctrl_tbl_mtu_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union mru_mtu_ctrl_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mru_mtu_ctrl_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.mtu = value;
 	ret = hppe_mru_mtu_ctrl_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
@@ -2380,7 +2409,6 @@ ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_set(
 	return ret;
 }
 #endif
-#endif
 
 sw_error_t
 hppe_mru_mtu_ctrl_tbl_src_profile_get(
@@ -2413,7 +2441,6 @@ hppe_mru_mtu_ctrl_tbl_src_profile_set(
 	return ret;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_mc_mtu_ctrl_tbl_mtu_cmd_get(
 		a_uint32_t dev_id,
@@ -2507,6 +2534,7 @@ hppe_mc_mtu_ctrl_tbl_mtu_set(
 	return ret;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_tdm_ctrl_tdm_en_get(
 		a_uint32_t dev_id,
@@ -2844,7 +2872,6 @@ hppe_drop_stat_pkts_set(
 }
 #endif
 
-#if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))
 sw_error_t
 hppe_port_tx_counter_tbl_reg_get(
 		a_uint32_t dev_id,
@@ -2901,6 +2928,7 @@ hppe_vp_tx_counter_tbl_reg_set(
 				3);
 }
 
+#if ((!defined(IN_PORTCONTROL_MINI)) || (!defined(IN_MISC_MINI)))
 sw_error_t
 hppe_epe_dbg_in_cnt_reg_get(
 		a_uint32_t dev_id,

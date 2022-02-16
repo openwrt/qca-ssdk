@@ -762,12 +762,6 @@ adpt_hppe_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid)
 	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
 	SW_RTN_ON_ERROR(rtn);
 
-	rtn = hppe_edma_vlan_tpid_reg_get(dev_id, &edma_tpid);
-	SW_RTN_ON_ERROR(rtn);
-
-	rtn = hppe_vlan_tpid_reg_get(dev_id, &ppe_tpid);
-	SW_RTN_ON_ERROR(rtn);
-
 	if (FAL_FLG_TST(tpid->mask, FAL_TPID_CTAG_EN)) {
 		edma_tpid.bf.ctag_tpid = tpid->ctpid;
 		ppe_tpid.bf.ctag_tpid = tpid->ctpid;
@@ -2253,6 +2247,7 @@ adpt_hppe_port_vlan_trans_adv_add(a_uint32_t dev_id,
 	}
 
 	entry_sign = A_FALSE;
+	insert_entry_ready = A_FALSE;
 	for (idx = XLT_RULE_TBL_NUM - 1; idx >= 0; idx--) {
 		aos_mem_zero(&temp_rule, sizeof (fal_vlan_trans_adv_rule_t));
 		aos_mem_zero(&temp_action, sizeof (fal_vlan_trans_adv_action_t));

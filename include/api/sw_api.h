@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -85,6 +88,7 @@ typedef enum
 	SW_PPPOE_LESS,
 	SW_ACL_UDF_TYPE,
 	SW_ACL_UDF_PROFILE_ENTRY,
+	SW_ACL_MAC_ENTRY,
 	SW_IP_HOSTENTRY,
 	SW_ARP_LEARNMODE,
 	SW_IP_GUARDMODE,
@@ -141,6 +145,7 @@ typedef enum
 	SW_MRU_INFO,
 	SW_MTU_ENTRY,
 	SW_MRU_ENTRY,
+	SW_MTU_CFG,
 	SW_FRAME_MAX_SIZE,
 	SW_SOURCE_FILTER,
 	SW_ARP_SG_CFG,
@@ -176,7 +181,6 @@ typedef enum
 	SW_PT_VLAN_TRANS_ADV_RULE,
 	SW_PT_VLAN_TRANS_ADV_ACTION,
 	SW_PT_VLAN_COUNTER,
-	SW_DEBUG_COUNTER_EN,
 	SW_TAG_PROPAGATION,
 	SW_EGRESS_DEFAULT_VID,
 	SW_EGRESS_MODE,
@@ -288,8 +292,17 @@ typedef enum
 	SW_ISOL_CTRL,
 	SW_EGRESS_FILTER,
 	SW_VPORT_TYPE,
-	SW_VPORT_CNT_CFG,
-	SW_VPORT_CNT,
+	SW_PORT_CNT_CFG,
+	SW_PORT_CNT,
+	SW_INTF_MAC_ENTRY,
+	SW_ENTRY_COUNTER,
+	SW_FLOW_QOS,
+	SW_INTF_TYPE,
+	SW_PPPOE_CTRL,
+	SW_TUNNEL_TYPE,
+	SW_TUNNEL_KEY,
+	SW_TUNNEL_DECAP_ACTION,
+	SW_PPE_CAPACITY,
 /* auto_insert_flag */
 } sw_data_type_e;
 

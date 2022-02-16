@@ -146,7 +146,10 @@ void adpt_hppe_servcode_func_bitmap_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return;
 
-	p_adpt_api->adpt_servcode_func_bitmap = 0x0;
+	p_adpt_api->adpt_servcode_func_bitmap = ((1<<FUNC_SERVCODE_CONFIG_SET) |
+						(1<<FUNC_SERVCODE_CONFIG_GET) |
+						(1<<FUNC_SERVCODE_LOOPCHECK_EN) |
+						(1<<FUNC_SERVCODE_LOOPCHECK_STATUS_GET));
 
 	return;
 }

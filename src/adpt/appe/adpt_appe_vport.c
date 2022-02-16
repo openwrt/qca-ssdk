@@ -26,10 +26,6 @@
 #endif
 #include "appe_l2_vp_reg.h"
 #include "appe_l2_vp.h"
-#include "appe_counter_reg.h"
-#include "appe_counter.h"
-#include "appe_portvlan_reg.h"
-#include "appe_portvlan.h"
 #include "hppe_portctrl_reg.h"
 #include "hppe_portctrl.h"
 
@@ -148,146 +144,6 @@ adpt_appe_vport_state_check_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport
 	return rv;
 }
 
-sw_error_t
-adpt_appe_vport_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg)
-{
-	sw_error_t rv = SW_OK;
-	union port_vp_rx_cnt_mode_tbl_u port_vp_rx_cnt_mode_tbl;
-	union eg_vp_tbl_u eg_vp_tbl;
-	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(cnt_cfg);
-
-	aos_mem_zero(&port_vp_rx_cnt_mode_tbl, sizeof(union port_vp_rx_cnt_mode_tbl_u));
-	aos_mem_zero(&eg_vp_tbl, sizeof(union eg_vp_tbl_u));
-
-	/* set RX counter configs */
-	rv = appe_port_vp_rx_cnt_mode_tbl_get(dev_id, port_value/32, &port_vp_rx_cnt_mode_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	switch (cnt_cfg->rx_cnt_mode) {
-		case FAL_VPORT_CNT_MODE_IP_PKT:
-			port_vp_rx_cnt_mode_tbl.bf.cnt_mode &= ~BIT(port_value%32);
-			break;
-		case FAL_VPORT_CNT_MODE_FULL_PKT:
-			port_vp_rx_cnt_mode_tbl.bf.cnt_mode |= BIT(port_value%32);
-			break;
-		default:
-			SSDK_ERROR("Unsupported rx_cnt_mode: %d\n", cnt_cfg->rx_cnt_mode);
-			return SW_BAD_PARAM;
-	}
-
-	rv = appe_port_vp_rx_cnt_mode_tbl_set(dev_id, port_value/32, &port_vp_rx_cnt_mode_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	/* set TX counter configs */
-	rv = appe_egress_vp_tbl_get(dev_id, port_value, &eg_vp_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	eg_vp_tbl.bf.cnt_mode = cnt_cfg->tx_cnt_mode;
-
-	rv = appe_egress_vp_tbl_set(dev_id, port_value, &eg_vp_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	return rv;
-}
-
-sw_error_t
-adpt_appe_vport_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_vport_cnt_cfg_t *cnt_cfg)
-{
-	sw_error_t rv = SW_OK;
-	union port_vp_rx_cnt_mode_tbl_u port_vp_rx_cnt_mode_tbl;
-	union eg_vp_tbl_u eg_vp_tbl;
-	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(cnt_cfg);
-
-	aos_mem_zero(&port_vp_rx_cnt_mode_tbl, sizeof(union port_vp_rx_cnt_mode_tbl_u));
-	aos_mem_zero(&eg_vp_tbl, sizeof(union eg_vp_tbl_u));
-
-	/* get RX counter configs */
-	rv = appe_port_vp_rx_cnt_mode_tbl_get(dev_id, port_value/32, &port_vp_rx_cnt_mode_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	if (port_vp_rx_cnt_mode_tbl.bf.cnt_mode & BIT(port_value%32))
-		cnt_cfg->rx_cnt_mode = FAL_VPORT_CNT_MODE_FULL_PKT;
-	else
-		cnt_cfg->rx_cnt_mode = FAL_VPORT_CNT_MODE_IP_PKT;
-
-	/* get TX counter configs */
-	rv = appe_egress_vp_tbl_get(dev_id, port_value, &eg_vp_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	cnt_cfg->tx_cnt_mode = eg_vp_tbl.bf.cnt_mode;
-
-	return rv;
-}
-
-sw_error_t
-adpt_appe_vport_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_vport_cnt_t *vp_cnt)
-{
-	sw_error_t rv = SW_OK;
-	union port_rx_cnt_tbl_u port_rx_cnt_tbl;
-	union vp_tx_counter_tbl_reg_u port_tx_cnt_tbl;
-	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(vp_cnt);
-
-	aos_mem_zero(&port_rx_cnt_tbl, sizeof(union port_rx_cnt_tbl_u));
-	aos_mem_zero(&port_tx_cnt_tbl, sizeof(union vp_tx_counter_tbl_reg_u));
-
-	rv = appe_port_rx_cnt_tbl_get(dev_id, port_value, &port_rx_cnt_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = hppe_vp_tx_counter_tbl_reg_get(dev_id, port_value, &port_tx_cnt_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	vp_cnt->rx_pkt_cnt = port_rx_cnt_tbl.bf.rx_pkt_cnt;
-
-	vp_cnt->rx_byte_cnt = ((a_uint64_t)port_rx_cnt_tbl.bf.rx_byte_cnt_1 <<
-			SW_FIELD_OFFSET_IN_WORD(PORT_RX_CNT_TBL_RX_BYTE_CNT_OFFSET)) |
-		port_rx_cnt_tbl.bf.rx_byte_cnt_0;
-
-	vp_cnt->rx_drop_pkt_cnt = ((a_uint32_t)port_rx_cnt_tbl.bf.rx_drop_pkt_cnt_1 <<
-		SW_FIELD_OFFSET_IN_WORD(PORT_RX_CNT_TBL_RX_DROP_PKT_CNT_OFFSET)) |
-		port_rx_cnt_tbl.bf.rx_drop_pkt_cnt_0;
-
-	vp_cnt->rx_drop_byte_cnt = ((a_uint64_t)port_rx_cnt_tbl.bf.rx_drop_byte_cnt_1 <<
-		SW_FIELD_OFFSET_IN_WORD(PORT_RX_CNT_TBL_RX_DROP_BYTE_CNT_OFFSET)) |
-		port_rx_cnt_tbl.bf.rx_drop_byte_cnt_0;
-
-	vp_cnt->tx_pkt_cnt = port_tx_cnt_tbl.bf.tx_packets;
-	vp_cnt->tx_byte_cnt = ((a_uint64_t)port_tx_cnt_tbl.bf.tx_bytes_1 <<
-		SW_FIELD_OFFSET_IN_WORD(VP_TX_COUNTER_TBL_REG_TX_BYTES_OFFSET)) |
-		port_tx_cnt_tbl.bf.tx_bytes_0;
-
-	return rv;
-}
-
-sw_error_t
-adpt_appe_vport_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
-{
-	sw_error_t rv = SW_OK;
-	union port_rx_cnt_tbl_u port_rx_cnt_tbl;
-	union vp_tx_counter_tbl_reg_u port_tx_cnt_tbl;
-	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
-
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	aos_mem_zero(&port_rx_cnt_tbl, sizeof(union port_rx_cnt_tbl_u));
-	aos_mem_zero(&port_tx_cnt_tbl, sizeof(union vp_tx_counter_tbl_reg_u));
-
-	rv = appe_port_rx_cnt_tbl_set(dev_id, port_value, &port_rx_cnt_tbl);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = hppe_vp_tx_counter_tbl_reg_set(dev_id, port_value, &port_tx_cnt_tbl);
-
-	return rv;
-}
-
 void adpt_appe_vport_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -297,7 +153,10 @@ void adpt_appe_vport_func_bitmap_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return;
 
-	p_adpt_api->adpt_vport_func_bitmap = 0;
+	p_adpt_api->adpt_vport_func_bitmap = BIT(FUNC_VPORT_PHYSICAL_PORT_SET) |
+		BIT(FUNC_VPORT_PHYSICAL_PORT_GET) |
+		BIT(FUNC_VPORT_STATE_CHECK_SET) |
+		BIT(FUNC_VPORT_STATE_CHECK_GET);
 
 	return;
 }
@@ -311,10 +170,6 @@ static void adpt_appe_vport_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adp
 	p_adpt_api->adpt_vport_physical_port_id_get = NULL;
 	p_adpt_api->adpt_vport_state_check_set = NULL;
 	p_adpt_api->adpt_vport_state_check_get = NULL;
-	p_adpt_api->adpt_vport_cnt_cfg_set = NULL;
-	p_adpt_api->adpt_vport_cnt_cfg_get = NULL;
-	p_adpt_api->adpt_vport_cnt_flush = NULL;
-	p_adpt_api->adpt_vport_cnt_get = NULL;
 
 	return;
 }
@@ -342,14 +197,6 @@ adpt_appe_vport_init(a_uint32_t dev_id)
 	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_STATE_CHECK_GET))
 		p_adpt_api->adpt_vport_state_check_get =
 			adpt_appe_vport_state_check_get;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_CNT_CFG_SET))
-		p_adpt_api->adpt_vport_cnt_cfg_set = adpt_appe_vport_cnt_cfg_set;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_CNT_CFG_GET))
-		p_adpt_api->adpt_vport_cnt_cfg_get = adpt_appe_vport_cnt_cfg_get;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_CNT_FLUSH))
-		p_adpt_api->adpt_vport_cnt_flush = adpt_appe_vport_cnt_flush;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_CNT_GET))
-		p_adpt_api->adpt_vport_cnt_get = adpt_appe_vport_cnt_get;
 
 	return SW_OK;
 }

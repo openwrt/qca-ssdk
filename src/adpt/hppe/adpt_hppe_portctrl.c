@@ -26,6 +26,10 @@
 #include "hppe_uniphy.h"
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
+#include "hppe_policer_reg.h"
+#include "hppe_policer.h"
+#include "hppe_portvlan_reg.h"
+#include "hppe_portvlan.h"
 #include "hppe_global_reg.h"
 #include "hppe_global.h"
 #include "adpt.h"
@@ -48,6 +52,8 @@
 #if defined(APPE)
 #include "adpt_appe_portctrl.h"
 #include "appe_l2_vp.h"
+#include "appe_tunnel_reg.h"
+#include "appe_tunnel.h"
 #endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
 #include <soc/qcom/socinfo.h>
@@ -88,9 +94,11 @@
 #define CARRIER_SENSE_SIGNAL_FROM_MAC        0x0
 
 #define PHY_PORT_TO_BM_PORT(port)	(port + 7)
-#define GMAC_IPG_CHECK 0xc
+#define GMAC_IPG_CHECK          0xc
 #define LPI_EEE_TIMER_FREQUENCY 300  /* 300MHZ*/
-#define LPI_EEE_TIMER_UNIT 256
+#define LPI_EEE_TIMER_UNIT      256
+#define XGMAC_TIC_1US_CNTR      0x15f
+#define XGMAC_LPI_ENTRY_TIMER   0x2c
 
 /* This register is used to adjust the write timing for reserving
  * some bandwidth of the memory to read operation.
@@ -1076,7 +1084,6 @@ adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
 	return SW_OK;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
@@ -1095,19 +1102,20 @@ adpt_ppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
 {
 	sw_error_t rv = 0;
-	a_uint32_t chip_ver = 0;
+	a_uint32_t chip_ver = 0, port_value = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	port_value = FAL_PORT_ID_VALUE(port_id);
 	if (chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
-		rv = adpt_cppe_port_mru_set(dev_id, port_id, ctrl);
+		rv = adpt_cppe_port_mru_set(dev_id, port_value, ctrl);
 #endif
 	} else {
-		rv = adpt_hppe_port_mru_set(dev_id, port_id, ctrl);
+		rv = adpt_hppe_port_mru_set(dev_id, port_value, ctrl);
 	}
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_TRUE));
 
@@ -1118,73 +1126,18 @@ sw_error_t
 adpt_hppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
 {
-	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
-	a_uint32_t port_type = 0, port_value = 0;
-
-	memset(&mru_mtu_ctrl_tbl, 0, sizeof(mru_mtu_ctrl_tbl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
-	port_type = FAL_PORT_ID_TYPE(port_id);
-	port_value = FAL_PORT_ID_VALUE(port_id);
+	hppe_mru_mtu_ctrl_tbl_mtu_set(dev_id, port_id, ctrl->mtu_size);
+	hppe_mru_mtu_ctrl_tbl_mtu_cmd_set(dev_id, port_id, (a_uint32_t)ctrl->action);
 
-	hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
-	mru_mtu_ctrl_tbl.bf.mtu = ctrl->mtu_size;
-	mru_mtu_ctrl_tbl.bf.mtu_cmd = (a_uint32_t)ctrl->action;
-	hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl);
-
-	if ((port_value >= SSDK_PHYSICAL_PORT0) && (port_value <= SSDK_PHYSICAL_PORT7))
+	if ((port_id >= SSDK_PHYSICAL_PORT0) && (port_id <= SSDK_PHYSICAL_PORT7))
 	{
-		hppe_mc_mtu_ctrl_tbl_mtu_set(dev_id, port_value, ctrl->mtu_size);
-		hppe_mc_mtu_ctrl_tbl_mtu_cmd_set(dev_id, port_value, (a_uint32_t)ctrl->action);
+		hppe_mc_mtu_ctrl_tbl_mtu_set(dev_id, port_id, ctrl->mtu_size);
+		hppe_mc_mtu_ctrl_tbl_mtu_cmd_set(dev_id, port_id, (a_uint32_t)ctrl->action);
 	}
-#ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
-	{
-		union l2_vp_port_tbl_u l2_vp_port_tbl = {0};
 
-		SW_RTN_ON_ERROR(appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl));
-		l2_vp_port_tbl.bf.mtu_check_type = ctrl->mtu_type;
-		if(port_type == FAL_PORT_TYPE_VPORT)
-		{
-			if(!ctrl->mtu_enable)
-			{
-				l2_vp_port_tbl.bf.physical_port_mtu_check_en = A_TRUE;
-			}
-			else
-			{
-				l2_vp_port_tbl.bf.physical_port_mtu_check_en = A_FALSE;
-			}
-		}
-		else
-		{
-			if(!ctrl->mtu_enable)
-			{
-				SSDK_ERROR("physical port %d does not support mtu disable\n",
-					port_id);
-				return SW_NOT_SUPPORTED;
-			}
-		}
-		l2_vp_port_tbl.bf.extra_header_len = ctrl->extra_header_len;
-		l2_vp_port_tbl.bf.eg_vlan_fmt_valid = A_FALSE;
-		if(ctrl->eg_vlan_tag_flag != 0)
-		{
-			l2_vp_port_tbl.bf.eg_vlan_fmt_valid = A_TRUE;
-		}
-		l2_vp_port_tbl.bf.eg_ctag_fmt = A_FALSE;
-		if(ctrl->eg_vlan_tag_flag & BIT(0))
-		{
-			l2_vp_port_tbl.bf.eg_ctag_fmt = A_TRUE;
-		}
-		l2_vp_port_tbl.bf.eg_stag_fmt = A_FALSE;
-		if(ctrl->eg_vlan_tag_flag & BIT(1))
-		{
-			l2_vp_port_tbl.bf.eg_stag_fmt = A_TRUE;
-		}
-
-		SW_RTN_ON_ERROR(appe_l2_vp_port_tbl_set (dev_id, port_value, &l2_vp_port_tbl));
-	}
-#endif
 	return SW_OK;
 }
 
@@ -1193,25 +1146,25 @@ adpt_ppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
 {
 	sw_error_t rv = 0;
-	a_uint32_t chip_ver = 0;
+	a_uint32_t chip_ver = 0, port_value = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	port_value = FAL_PORT_ID_VALUE(port_id);
 	if (chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
-		rv = adpt_cppe_port_mtu_set(dev_id, port_id, ctrl);
+		rv = adpt_cppe_port_mtu_set(dev_id, port_value, ctrl);
 #endif
 	} else {
-		rv = adpt_hppe_port_mtu_set(dev_id, port_id, ctrl);
+		rv = adpt_hppe_port_mtu_set(dev_id, port_value, ctrl);
 	}
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_TRUE));
 
 	return rv;
 }
-#endif
 
 sw_error_t
 adpt_hppe_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -1589,6 +1542,8 @@ adpt_hppe_port_phy_id_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
+
 sw_error_t
 adpt_hppe_port_mru_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
@@ -1615,23 +1570,23 @@ sw_error_t
 adpt_ppe_port_mru_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
 {
-	a_uint32_t chip_ver = 0;
+	a_uint32_t chip_ver = 0, port_value = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	port_value = FAL_PORT_ID_VALUE(port_id);
 	if (chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
-		return adpt_cppe_port_mru_get(dev_id, port_id, ctrl);
+		return adpt_cppe_port_mru_get(dev_id, port_value, ctrl);
 #endif
 	} else {
-		return adpt_hppe_port_mru_get(dev_id, port_id, ctrl);
+		return adpt_hppe_port_mru_get(dev_id, port_value, ctrl);
 	}
 
 	return SW_NOT_SUPPORTED;
 }
-#endif
 
 sw_error_t
 adpt_hppe_port_power_on(a_uint32_t dev_id, fal_port_t port_id)
@@ -2730,6 +2685,12 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 	sw_error_t rv = SW_OK;
 	a_uint32_t mode_tmp;
 
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_EXCL_CPU))
+	{
+		SSDK_WARN ("port %d need not to configure mux and mac type\n",
+			port_id);
+		return SW_OK;
+	}
 	/*init the port interface mode before set it according to three mac modes*/
 	rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id, PORT_INTERFACE_MODE_MAX);
 	SW_RTN_ON_ERROR(rv);
@@ -3649,63 +3610,28 @@ adpt_hppe_port_counter_show(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
+
 sw_error_t
 adpt_hppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
 {
 	sw_error_t rv = SW_OK;
 	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
-	a_uint32_t port_type, port_value;
 
 	memset(&mru_mtu_ctrl_tbl, 0, sizeof(mru_mtu_ctrl_tbl));
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
-	port_type = FAL_PORT_ID_TYPE(port_id);
-	port_value = FAL_PORT_ID_VALUE(port_id);
-
-	rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
-
+	rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_id, &mru_mtu_ctrl_tbl);
 	if( rv != SW_OK )
 		return rv;
-
 	ctrl->mtu_size = mru_mtu_ctrl_tbl.bf.mtu;
 	ctrl->action = (fal_fwd_cmd_t)mru_mtu_ctrl_tbl.bf.mtu_cmd;
 
-#ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
-	{
-		union l2_vp_port_tbl_u l2_vp_port_tbl = {0};
-
-		SW_RTN_ON_ERROR(appe_l2_vp_port_tbl_get(dev_id, port_value, &l2_vp_port_tbl));
-		ctrl->mtu_type = l2_vp_port_tbl.bf.mtu_check_type;
-		ctrl->mtu_enable = A_TRUE;
-		if(port_type == FAL_PORT_TYPE_VPORT)
-		{
-			if(l2_vp_port_tbl.bf.physical_port_mtu_check_en)
-			{
-				ctrl->mtu_enable = A_FALSE;
-			}
-		}
-		ctrl->extra_header_len = l2_vp_port_tbl.bf.extra_header_len;
-		ctrl->eg_vlan_tag_flag = 0;
-		if(l2_vp_port_tbl.bf.eg_vlan_fmt_valid == A_TRUE)
-		{
-			if(l2_vp_port_tbl.bf.eg_ctag_fmt)
-			{
-				ctrl->eg_vlan_tag_flag |= BIT(0);
-			}
-			if(l2_vp_port_tbl.bf.eg_stag_fmt)
-			{
-				ctrl->eg_vlan_tag_flag |= BIT(1);
-			}
-		}
-	}
-#endif
 	return SW_OK;
 }
 
-#endif
 sw_error_t
 adpt_hppe_port_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id)
 {
@@ -3735,28 +3661,68 @@ adpt_hppe_port_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id)
 
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_ppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl)
 {
-	a_uint32_t chip_ver = 0;
+	a_uint32_t chip_ver = 0, port_value = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
 
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	port_value = FAL_PORT_ID_VALUE(port_id);
 	if (chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
-		return adpt_cppe_port_mtu_get(dev_id, port_id, ctrl);
+		return adpt_cppe_port_mtu_get(dev_id, port_value, ctrl);
 #endif
 	} else {
-		return adpt_hppe_port_mtu_get(dev_id, port_id, ctrl);
+		return adpt_hppe_port_mtu_get(dev_id, port_value, ctrl);
 	}
 
 	return SW_NOT_SUPPORTED;
 }
-#endif
+
+sw_error_t
+adpt_ppe_port_mru_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_uint32_t mru_size, a_uint32_t mtu_size)
+{
+	sw_error_t rv = SW_OK;
+	fal_mru_ctrl_t mru = {0};
+	fal_mtu_ctrl_t mtu = {0};
+
+	rv = adpt_ppe_port_mru_get (dev_id, port_id,  &mru);
+	SW_RTN_ON_ERROR (rv);
+	mru.mru_size = mru_size;
+	rv = adpt_ppe_port_mru_set (dev_id, port_id,  &mru);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = adpt_ppe_port_mtu_get (dev_id, port_id,  &mtu);
+	SW_RTN_ON_ERROR (rv);
+	mtu.mtu_size = mtu_size;
+	rv = adpt_ppe_port_mtu_set (dev_id, port_id,  &mtu);
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_mru_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_uint32_t *mru_size, a_uint32_t *mtu_size)
+{
+	sw_error_t rv = SW_OK;
+	fal_mru_ctrl_t mru = {0};
+	fal_mtu_ctrl_t mtu = {0};
+
+	rv = adpt_ppe_port_mru_get (dev_id, port_id,  &mru);
+	SW_RTN_ON_ERROR (rv);
+	*mru_size = mru.mru_size;
+
+	rv = adpt_ppe_port_mtu_get (dev_id, port_id,  &mtu);
+	SW_RTN_ON_ERROR (rv);
+	*mtu_size = mtu.mtu_size;
+
+	return rv;
+}
 
 sw_error_t
 adpt_hppe_port_interface_mode_status_get(a_uint32_t dev_id, fal_port_t port_id,
@@ -3958,6 +3924,8 @@ adpt_hppe_port_wol_status_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
+
 #if (defined(CPPE) || defined(APPE))
 static sw_error_t
 _adpt_ppe_port_source_filter_config_get(a_uint32_t dev_id,
@@ -4053,6 +4021,7 @@ _adpt_ppe_port_source_filter_set(a_uint32_t dev_id,
 	return rv;
 }
 #endif
+
 sw_error_t
 adpt_hppe_port_source_filter_get(a_uint32_t dev_id,
 				fal_port_t port_id, a_bool_t * enable)
@@ -4149,7 +4118,7 @@ adpt_ppe_port_source_filter_config_set(a_uint32_t dev_id,
 #endif
 	return SW_NOT_SUPPORTED;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 adpt_hppe_port_interface_3az_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
@@ -4230,6 +4199,7 @@ adpt_hppe_port_interface_3az_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t
 
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 adpt_hppe_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
@@ -4259,7 +4229,6 @@ adpt_hppe_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t 
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_hppe_port_promisc_mode_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
@@ -4427,7 +4396,7 @@ static a_uint32_t port_lpi_wakeup_timer[SW_MAX_NR_DEV][SSDK_PHYSICAL_PORT6] = {
 	{27, 27, 27, 27, 27, 27},
 }; /* unit is us*/
 static sw_error_t
-adpt_hppe_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+_adpt_hppe_gmac_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
 {
 	sw_error_t rv = 0;
@@ -4447,13 +4416,6 @@ adpt_hppe_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	} else {
 		adv = 0;
 	}
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY)) {
-		return SW_BAD_PARAM;
-	}
-	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id)) {
-		return SW_NOT_SUPPORTED;
-	}
-
 	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
 	if (NULL == phy_drv->phy_eee_adv_set) {
 		return SW_NOT_SUPPORTED;
@@ -4483,8 +4445,9 @@ adpt_hppe_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
+
 static sw_error_t
-adpt_hppe_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+_adpt_hppe_gmac_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
 {
 	sw_error_t rv = 0;
@@ -4493,21 +4456,13 @@ adpt_hppe_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 	hsl_phy_ops_t *phy_drv;
 	a_uint32_t adv, lp_adv, cap, status;
 
-	if ((port_id < SSDK_PHYSICAL_PORT1) || (port_id > SSDK_PHYSICAL_PORT6)) {
-		return SW_BAD_PARAM;
-	}
-
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(port_eee_cfg);
 	memset(port_eee_cfg, 0, sizeof(*port_eee_cfg));
 
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY)) {
+	if ((port_id < SSDK_PHYSICAL_PORT1) || (port_id > SSDK_PHYSICAL_PORT6)) {
 		return SW_BAD_PARAM;
 	}
-	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id)) {
-		return SW_NOT_SUPPORTED;
-	}
-
 	SW_RTN_ON_NULL (phy_drv =hsl_phy_api_ops_get (dev_id, port_id));
 	if ((NULL == phy_drv->phy_eee_adv_get) || (NULL == phy_drv->phy_eee_partner_adv_get) ||
 		(NULL == phy_drv->phy_eee_cap_get) || (NULL == phy_drv->phy_eee_status_get)) {
@@ -4547,6 +4502,181 @@ adpt_hppe_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 	port_eee_cfg->lpi_sleep_timer = port_lpi_sleep_timer[dev_id][port_id - 1];
 
 	return rv;
+}
+
+#if defined(APPE)
+static sw_error_t
+_adpt_hppe_xgmac_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+	sw_error_t rv = 0;
+	a_uint32_t phy_addr = 0, adv, xgmac_id = 0;
+	hsl_phy_ops_t *phy_drv;
+	union mac_lpi_control_status_u mac_lpi_control_status;
+	union mac_1us_tic_counter_u mac_1us_tic_counter;
+	union mac_lpi_auto_entry_timer_u mac_lpi_auto_entry_timer;
+	union mac_lpi_timers_control_u mac_lpi_timers_control;
+
+	memset(&mac_lpi_control_status, 0, sizeof(mac_lpi_control_status));
+	memset(&mac_1us_tic_counter, 0, sizeof(mac_1us_tic_counter));
+	memset(&mac_lpi_auto_entry_timer, 0, sizeof(mac_lpi_auto_entry_timer));
+	memset(&mac_lpi_timers_control, 0, sizeof(mac_lpi_timers_control));
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_eee_cfg);
+
+	if (port_eee_cfg->enable) {
+		adv = port_eee_cfg->advertisement;
+	} else {
+		adv = 0;
+	}
+	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_eee_adv_set) {
+		return SW_NOT_SUPPORTED;
+	}
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = phy_drv->phy_eee_adv_set(dev_id, phy_addr, adv);
+	SW_RTN_ON_ERROR (rv);
+
+	xgmac_id = HPPE_TO_XGMAC_PORT_ID(port_id);
+	rv = hppe_mac_lpi_control_status_get(dev_id, xgmac_id, &mac_lpi_control_status);
+	SW_RTN_ON_ERROR (rv);
+	mac_lpi_control_status.bf.lpitxen = port_eee_cfg->lpi_tx_enable;;
+	mac_lpi_control_status.bf.pls = 0x1;
+	mac_lpi_control_status.bf.lpitxa = 0x1;
+	mac_lpi_control_status.bf.lpite = 0x1;
+	rv = hppe_mac_lpi_control_status_set(dev_id, xgmac_id, &mac_lpi_control_status);
+	SW_RTN_ON_ERROR (rv);
+	rv = hppe_mac_1us_tic_counter_get(dev_id, xgmac_id, &mac_1us_tic_counter);
+	SW_RTN_ON_ERROR (rv);
+	mac_1us_tic_counter.bf.tic_1us_cntr = XGMAC_TIC_1US_CNTR;
+	rv = hppe_mac_1us_tic_counter_set(dev_id, xgmac_id, &mac_1us_tic_counter);
+	SW_RTN_ON_ERROR (rv);
+	rv = hppe_mac_lpi_auto_entry_timer_get(dev_id, xgmac_id, &mac_lpi_auto_entry_timer);
+	SW_RTN_ON_ERROR (rv);
+	mac_lpi_auto_entry_timer.bf.lpiet = XGMAC_LPI_ENTRY_TIMER;
+	rv = hppe_mac_lpi_auto_entry_timer_set(dev_id, xgmac_id, &mac_lpi_auto_entry_timer);
+	SW_RTN_ON_ERROR (rv);
+	rv = hppe_mac_lpi_timers_control_get(dev_id, xgmac_id, &mac_lpi_timers_control);
+	SW_RTN_ON_ERROR (rv);
+	/*sleep timer as 100us*/
+	mac_lpi_timers_control.bf.lst = port_eee_cfg->lpi_sleep_timer;
+	/*wake up timer, 2.5G:40us, 1G:22us, 100M:28us*/
+	mac_lpi_timers_control.bf.twt = port_eee_cfg->lpi_wakeup_timer;
+	rv = hppe_mac_lpi_timers_control_set(dev_id, xgmac_id, &mac_lpi_timers_control);
+	SW_RTN_ON_ERROR (rv);
+
+	return rv;
+}
+
+static sw_error_t
+_adpt_hppe_xgmac_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+	sw_error_t rv = 0;
+	union mac_lpi_control_status_u mac_lpi_control_status;
+	union mac_lpi_timers_control_u mac_lpi_timers_control;
+	a_uint32_t phy_addr = 0, xgmac_id = 0;
+	hsl_phy_ops_t *phy_drv;
+	a_uint32_t adv, lp_adv, cap, status;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_eee_cfg);
+	memset(&mac_lpi_control_status, 0, sizeof(mac_lpi_control_status));
+	memset(&mac_lpi_timers_control, 0, sizeof(mac_lpi_timers_control));
+
+	SW_RTN_ON_NULL (phy_drv =hsl_phy_api_ops_get (dev_id, port_id));
+	if ((NULL == phy_drv->phy_eee_adv_get) || (NULL == phy_drv->phy_eee_partner_adv_get) ||
+		(NULL == phy_drv->phy_eee_cap_get) || (NULL == phy_drv->phy_eee_status_get)) {
+		return SW_NOT_SUPPORTED;
+	}
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = phy_drv->phy_eee_adv_get(dev_id, phy_addr, &adv);
+	SW_RTN_ON_ERROR (rv);
+	port_eee_cfg->advertisement = adv;
+	rv = phy_drv->phy_eee_partner_adv_get(dev_id, phy_addr, &lp_adv);
+	SW_RTN_ON_ERROR (rv);
+	port_eee_cfg->link_partner_advertisement = lp_adv;
+	rv = phy_drv->phy_eee_cap_get(dev_id, phy_addr, &cap);
+	SW_RTN_ON_ERROR (rv);
+	port_eee_cfg->capability = cap;
+	rv = phy_drv->phy_eee_status_get(dev_id, phy_addr, &status);
+	SW_RTN_ON_ERROR (rv);
+	port_eee_cfg->eee_status = status;
+
+	if (port_eee_cfg->advertisement) {
+		port_eee_cfg->enable = A_TRUE;
+	} else {
+		port_eee_cfg->enable = A_FALSE;
+	}
+	xgmac_id = HPPE_TO_XGMAC_PORT_ID(port_id);
+	rv = hppe_mac_lpi_control_status_get(dev_id, xgmac_id, &mac_lpi_control_status);
+	SW_RTN_ON_ERROR (rv);
+	port_eee_cfg->lpi_tx_enable = mac_lpi_control_status.bf.lpitxen;
+	rv = hppe_mac_lpi_timers_control_get(dev_id, xgmac_id, &mac_lpi_timers_control);
+	SW_RTN_ON_ERROR (rv);
+	port_eee_cfg->lpi_wakeup_timer =  mac_lpi_timers_control.bf.twt;
+	port_eee_cfg->lpi_sleep_timer = mac_lpi_timers_control.bf.lst;
+
+	return rv;
+}
+#endif
+
+static sw_error_t
+adpt_hppe_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+	a_uint32_t port_mac_type;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (A_FALSE == _adpt_hppe_port_phy_connected(dev_id, port_id)) {
+		return SW_NOT_SUPPORTED;
+	}
+
+	port_mac_type =qca_hppe_port_mac_type_get(dev_id, port_id);
+	if (port_mac_type == PORT_XGMAC_TYPE) {
+#if defined(APPE)
+		_adpt_hppe_xgmac_port_interface_eee_cfg_set( dev_id, port_id, port_eee_cfg);
+#endif
+	} else if (port_mac_type == PORT_GMAC_TYPE) {
+		_adpt_hppe_gmac_port_interface_eee_cfg_set( dev_id, port_id, port_eee_cfg);
+	} else {
+		return SW_BAD_VALUE;
+	}
+
+	return SW_OK;
+}
+
+static sw_error_t
+adpt_hppe_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+	a_uint32_t port_mac_type;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (A_FALSE == _adpt_hppe_port_phy_connected(dev_id, port_id)) {
+		return SW_NOT_SUPPORTED;
+	}
+
+	port_mac_type =qca_hppe_port_mac_type_get(dev_id, port_id);
+	if (port_mac_type == PORT_XGMAC_TYPE) {
+#if defined(APPE)
+		_adpt_hppe_xgmac_port_interface_eee_cfg_get( dev_id, port_id, port_eee_cfg);
+#endif
+	} else if (port_mac_type == PORT_GMAC_TYPE) {
+		_adpt_hppe_gmac_port_interface_eee_cfg_get( dev_id, port_id, port_eee_cfg);
+	} else {
+		return SW_BAD_VALUE;
+	}
+
+	return SW_OK;
 }
 
 static sw_error_t
@@ -5448,6 +5578,354 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 	return 0;
 }
 
+static sw_error_t
+_adpt_hppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
+	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
+	union port_eg_vlan_u port_eg_vlan;
+#if defined(APPE) && defined(IN_TUNNEL)
+	union tl_port_vp_tbl_u tl_port_vp_tbl;
+#endif
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	aos_mem_zero(&mru_mtu_ctrl_tbl, sizeof(union mru_mtu_ctrl_tbl_u));
+	aos_mem_zero(&mc_mtu_ctrl_tbl, sizeof(union mc_mtu_ctrl_tbl_u));
+	aos_mem_zero(&port_eg_vlan, sizeof(union port_eg_vlan_u));
+
+	if (ADPT_IS_PPORT(port_id)) {
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_mc_mtu_ctrl_tbl_get(dev_id, port_value, &mc_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_port_eg_vlan_get(dev_id, port_value, &port_eg_vlan);
+		SW_RTN_ON_ERROR(rv);
+
+		mru_mtu_ctrl_tbl.bf.rx_cnt_en = cnt_cfg->rx_cnt_en;
+		mru_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_cfg->uc_tx_cnt_en;
+		mc_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_cfg->mc_tx_cnt_en;
+		port_eg_vlan.bf.tx_counting_en = cnt_cfg->uc_tx_cnt_en;
+
+		rv = hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_mc_mtu_ctrl_tbl_set(dev_id, port_value, &mc_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_port_eg_vlan_set(dev_id, port_value, &port_eg_vlan);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		mru_mtu_ctrl_tbl.bf.rx_cnt_en = cnt_cfg->rx_cnt_en;
+		mru_mtu_ctrl_tbl.bf.tx_cnt_en = cnt_cfg->uc_tx_cnt_en;
+
+		rv = hppe_mru_mtu_ctrl_tbl_set(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+#if defined(APPE) && defined(IN_TUNNEL)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
+		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		tl_port_vp_tbl.bf.rx_cnt_en = cnt_cfg->tl_rx_cnt_en;
+
+		rv = appe_tl_port_vp_tbl_set(dev_id, port_value, &tl_port_vp_tbl);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	return SW_OK;
+}
+
+static sw_error_t
+_adpt_hppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+	union mru_mtu_ctrl_tbl_u mru_mtu_ctrl_tbl;
+	union mc_mtu_ctrl_tbl_u mc_mtu_ctrl_tbl;
+	union port_eg_vlan_u port_eg_vlan;
+#if defined(APPE) && defined(IN_TUNNEL)
+	union tl_port_vp_tbl_u tl_port_vp_tbl;
+#endif
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	aos_mem_zero(&mru_mtu_ctrl_tbl, sizeof(union mru_mtu_ctrl_tbl_u));
+	aos_mem_zero(&mc_mtu_ctrl_tbl, sizeof(union mc_mtu_ctrl_tbl_u));
+	aos_mem_zero(&port_eg_vlan, sizeof(union port_eg_vlan_u));
+
+	if (ADPT_IS_PPORT(port_id)) {
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_mc_mtu_ctrl_tbl_get(dev_id, port_value, &mc_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+		rv = hppe_port_eg_vlan_get(dev_id, port_value, &port_eg_vlan);
+		SW_RTN_ON_ERROR(rv);
+
+		cnt_cfg->rx_cnt_en = mru_mtu_ctrl_tbl.bf.rx_cnt_en;
+		cnt_cfg->mc_tx_cnt_en = mc_mtu_ctrl_tbl.bf.tx_cnt_en;
+
+		/*when it's physical port,mru_mtu_ctrl.tx_cnt_en enabled with port_eg_vlan.tx_counting_en in the same time*/
+		cnt_cfg->uc_tx_cnt_en = port_eg_vlan.bf.tx_counting_en;
+	}
+	else
+	{
+		rv = hppe_mru_mtu_ctrl_tbl_get(dev_id, port_value, &mru_mtu_ctrl_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		cnt_cfg->rx_cnt_en = mru_mtu_ctrl_tbl.bf.rx_cnt_en;
+		cnt_cfg->uc_tx_cnt_en = mru_mtu_ctrl_tbl.bf.tx_cnt_en;
+	}
+
+#if defined(APPE) && defined(IN_TUNNEL)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
+		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		cnt_cfg->tl_rx_cnt_en = tl_port_vp_tbl.bf.rx_cnt_en;
+	}
+#endif
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	/* set counter enable configs */
+#if defined(CPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+	{
+		rv = adpt_cppe_port_cnt_enable_set(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+#endif
+	{
+		rv = _adpt_hppe_port_cnt_enable_set(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	/* set counter mode configs */
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_cnt_mode_set(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(cnt_cfg);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+	/* get counter enable configs */
+#if defined(CPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+	{
+		rv = adpt_cppe_port_cnt_enable_get(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+#endif
+	{
+		rv = _adpt_hppe_port_cnt_enable_get(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	/* get counter mode configs */
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_cnt_mode_get(dev_id, port_id, cnt_cfg);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	return rv;
+}
+
+sw_error_t
+_adpt_hppe_port_tx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
+{
+	sw_error_t rv = SW_OK;
+	union port_tx_counter_tbl_reg_u phy_port_tx_cnt_tbl;
+	union port_tx_drop_cnt_tbl_u phy_port_tx_drop_cnt;
+	union vp_tx_counter_tbl_reg_u vport_tx_cnt_tbl;
+	union vp_tx_drop_cnt_tbl_u vport_tx_drop_cnt;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_cnt);
+
+	aos_mem_zero(&phy_port_tx_cnt_tbl, sizeof(union port_tx_counter_tbl_reg_u));
+	aos_mem_zero(&phy_port_tx_drop_cnt, sizeof(union port_tx_drop_cnt_tbl_u));
+	aos_mem_zero(&vport_tx_cnt_tbl, sizeof(union vp_tx_counter_tbl_reg_u));
+	aos_mem_zero(&vport_tx_drop_cnt, sizeof(union vp_tx_drop_cnt_tbl_u));
+
+	if(ADPT_IS_PPORT(port_id))
+	{
+		rv = hppe_port_tx_counter_tbl_reg_get(dev_id, port_value, &phy_port_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_pkt_cnt = phy_port_tx_cnt_tbl.bf.tx_packets;
+		port_cnt->tx_byte_cnt = ((a_uint64_t)phy_port_tx_cnt_tbl.bf.tx_bytes_1 <<
+			SW_FIELD_OFFSET_IN_WORD(PORT_TX_COUNTER_TBL_REG_TX_BYTES_OFFSET)) |
+			phy_port_tx_cnt_tbl.bf.tx_bytes_0;
+
+		rv = hppe_port_tx_drop_cnt_tbl_get(dev_id, port_value, &phy_port_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_drop_pkt_cnt = phy_port_tx_drop_cnt.bf.tx_drop_pkt_cnt;
+		port_cnt->tx_drop_byte_cnt = ((a_uint64_t)phy_port_tx_drop_cnt.bf.tx_drop_byte_cnt_1 <<
+			SW_FIELD_OFFSET_IN_WORD(PORT_TX_DROP_CNT_TBL_TX_DROP_BYTE_CNT_OFFSET)) |
+			phy_port_tx_drop_cnt.bf.tx_drop_byte_cnt_0;
+	}
+	else
+	{
+		rv = hppe_vp_tx_counter_tbl_reg_get(dev_id, port_value, &vport_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_pkt_cnt = vport_tx_cnt_tbl.bf.tx_packets;
+		port_cnt->tx_byte_cnt = ((a_uint64_t)vport_tx_cnt_tbl.bf.tx_bytes_1 <<
+			SW_FIELD_OFFSET_IN_WORD(VP_TX_COUNTER_TBL_REG_TX_BYTES_OFFSET)) |
+			vport_tx_cnt_tbl.bf.tx_bytes_0;
+
+		rv = hppe_vp_tx_drop_cnt_tbl_get(dev_id, port_value, &vport_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+		port_cnt->tx_drop_pkt_cnt = vport_tx_drop_cnt.bf.tx_drop_pkt_cnt;
+		port_cnt->tx_drop_byte_cnt = ((a_uint64_t)vport_tx_drop_cnt.bf.tx_drop_byte_cnt_1 <<
+			SW_FIELD_OFFSET_IN_WORD(VP_TX_DROP_CNT_TBL_TX_DROP_BYTE_CNT_OFFSET)) |
+			vport_tx_drop_cnt.bf.tx_drop_byte_cnt_0;
+	}
+
+	return rv;
+}
+
+sw_error_t
+_adpt_hppe_port_tx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	union port_tx_counter_tbl_reg_u phy_port_tx_cnt_tbl;
+	union port_tx_drop_cnt_tbl_u phy_port_tx_drop_cnt;
+	union vp_tx_counter_tbl_reg_u vport_tx_cnt_tbl;
+	union vp_tx_drop_cnt_tbl_u vport_tx_drop_cnt;
+	a_uint32_t port_value = FAL_PORT_ID_VALUE(port_id);
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	aos_mem_zero(&phy_port_tx_cnt_tbl, sizeof(union port_tx_counter_tbl_reg_u));
+	aos_mem_zero(&phy_port_tx_drop_cnt, sizeof(union port_tx_drop_cnt_tbl_u));
+	aos_mem_zero(&vport_tx_cnt_tbl, sizeof(union vp_tx_counter_tbl_reg_u));
+	aos_mem_zero(&vport_tx_drop_cnt, sizeof(union vp_tx_drop_cnt_tbl_u));
+
+	if(ADPT_IS_PPORT(port_id))
+	{
+		rv = hppe_port_tx_counter_tbl_reg_set(dev_id, port_value, &phy_port_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = hppe_port_tx_drop_cnt_tbl_set(dev_id, port_value, &phy_port_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = hppe_vp_tx_counter_tbl_reg_set(dev_id, port_value, &vport_tx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = hppe_vp_tx_drop_cnt_tbl_set(dev_id, port_value, &vport_tx_drop_cnt);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_cnt);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_rx_cnt_get(dev_id, port_id, port_cnt);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	rv = _adpt_hppe_port_tx_cnt_get(dev_id, port_id, port_cnt);
+	SW_RTN_ON_ERROR(rv);
+
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (!ADPT_IS_PPORT(port_id) && !ADPT_IS_VPORT(port_id))
+	{
+		return SW_OUT_OF_RANGE;
+	}
+
+#if defined(APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	{
+		rv = adpt_appe_port_rx_cnt_flush(dev_id, port_id);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+	rv = _adpt_hppe_port_tx_cnt_flush(dev_id, port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	return rv;
+}
+
 void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -5532,7 +6010,17 @@ void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 		(1 << (FUNC_ADPT_PORT_PROMISC_MODE_SET% 32))|
 		(1 << (FUNC_ADPT_PORT_PROMISC_MODE_GET% 32))|
 		(1 << (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_SET% 32))|
-		(1 << (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET% 32)));
+		(1 << (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_CFG_SET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_CFG_GET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_GET% 32))|
+		(1 << (FUNC_ADPT_PORT_CNT_FLUSH% 32))|
+		(1<< (FUNC_ADPT_PORT_8023AH_SET% 32))|
+		(1<< (FUNC_ADPT_PORT_8023AH_GET% 32))|
+		(1<< (FUNC_ADPT_PORT_MTU_CFG_SET% 32))|
+		(1<< (FUNC_ADPT_PORT_MTU_CFG_GET% 32)) |
+		(1<< (FUNC_ADPT_PORT_MRU_MTU_SET% 32)) |
+		(1<< (FUNC_ADPT_PORT_MRU_MTU_GET% 32)));
 
 	return;
 
@@ -5614,6 +6102,16 @@ static void adpt_hppe_port_ctrl_func_unregister(a_uint32_t dev_id, adpt_api_t *p
 	p_adpt_api->adpt_port_promisc_mode_get = NULL;
 	p_adpt_api->adpt_port_flowctrl_forcemode_set = NULL;
 	p_adpt_api->adpt_port_flowctrl_forcemode_get = NULL;
+	p_adpt_api->adpt_port_cnt_cfg_set = NULL;
+	p_adpt_api->adpt_port_cnt_cfg_get = NULL;
+	p_adpt_api->adpt_port_cnt_flush = NULL;
+	p_adpt_api->adpt_port_cnt_get = NULL;
+	p_adpt_api->adpt_port_8023ah_set = NULL;
+	p_adpt_api->adpt_port_8023ah_get = NULL;
+	p_adpt_api->adpt_port_mtu_cfg_set = NULL;
+	p_adpt_api->adpt_port_mtu_cfg_get = NULL;
+	p_adpt_api->adpt_port_mru_mtu_set = NULL;
+	p_adpt_api->adpt_port_mru_mtu_get = NULL;
 
 	return;
 
@@ -5703,12 +6201,10 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_flowctrl_set = adpt_hppe_port_flowctrl_set;
 	}
-#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_MRU_SET))
 	{
 		p_adpt_api->adpt_port_mru_set = adpt_ppe_port_mru_set;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_AUTONEG_STATUS_GET))
 	{
 		p_adpt_api->adpt_port_autoneg_status_get = adpt_hppe_port_autoneg_status_get;
@@ -5734,11 +6230,11 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_phy_id_get = adpt_hppe_port_phy_id_get;
 	}
+#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_MRU_GET))
 	{
 		p_adpt_api->adpt_port_mru_get = adpt_ppe_port_mru_get;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_POWER_ON))
 	{
 		p_adpt_api->adpt_port_power_on = adpt_hppe_port_power_on;
@@ -5764,11 +6260,11 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_mdix_status_get = adpt_hppe_port_mdix_status_get;
 	}
+#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_MTU_SET))
 	{
 		p_adpt_api->adpt_port_mtu_set = adpt_ppe_port_mtu_set;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_LINK_STATUS_GET))
 	{
 		p_adpt_api->adpt_port_link_status_get = adpt_hppe_port_link_status_get;
@@ -5880,12 +6376,10 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_autoneg_enable = adpt_hppe_port_autoneg_enable;
 	}
-#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] & (1 <<  (FUNC_ADPT_PORT_MTU_GET % 32)))
 	{
 		p_adpt_api->adpt_port_mtu_get = adpt_ppe_port_mtu_get;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] &
 		(1 <<  (FUNC_ADPT_PORT_INTERFACE_MODE_STATUS_GET % 32)))
 	{
@@ -5927,7 +6421,6 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_max_frame_size_get = adpt_ppe_port_max_frame_size_get;
 	}
-#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] &
 		(1 <<  (FUNC_ADPT_PORT_SOURCE_FILTER_GET % 32)))
 	{
@@ -5938,6 +6431,7 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_source_filter_set = adpt_ppe_port_source_filter_set;
 	}
+#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
 		(1 <<  (FUNC_ADPT_PORT_INTERFACE_MODE_APPLY% 32)))
 	{
@@ -5959,14 +6453,11 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_promisc_mode_set = adpt_hppe_port_promisc_mode_set;
 	}
-#ifndef IN_PORTCONTROL_MINI
-
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
 		(1 <<  (FUNC_ADPT_PORT_PROMISC_MODE_GET% 32)))
 	{
 		p_adpt_api->adpt_port_promisc_mode_get = adpt_hppe_port_promisc_mode_get;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
 		(1 <<  (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_SET% 32)))
 	{
@@ -5980,9 +6471,9 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_port_flowctrl_forcemode_get =
 			adpt_hppe_port_flowctrl_forcemode_get;
 	}
+#endif
 	p_adpt_api->adpt_port_source_filter_config_get = adpt_ppe_port_source_filter_config_get;
 	p_adpt_api->adpt_port_source_filter_config_set = adpt_ppe_port_source_filter_config_set;
-#endif
 	p_adpt_api->adpt_port_mux_mac_type_set = adpt_hppe_port_mux_mac_type_set;
 	p_adpt_api->adpt_port_mac_speed_set = adpt_hppe_port_mac_speed_set;
 	p_adpt_api->adpt_port_mac_duplex_set = adpt_hppe_port_mac_duplex_set;
@@ -6000,11 +6491,48 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 #if defined(APPE)
 	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 #ifndef IN_PORTCONTROL_MINI
-		p_adpt_api->adpt_port_8023ah_set = adpt_appe_port_8023ah_set;
-		p_adpt_api->adpt_port_8023ah_get = adpt_appe_port_8023ah_get;
+		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_8023AH_SET% 32)))
+		{
+			p_adpt_api->adpt_port_8023ah_set = adpt_appe_port_8023ah_set;
+		}
+		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_8023AH_GET% 32)))
+		{
+			p_adpt_api->adpt_port_8023ah_get = adpt_appe_port_8023ah_get;
+		}
 #endif
+		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_MTU_CFG_SET% 32)))
+		{
+			p_adpt_api->adpt_port_mtu_cfg_set = adpt_appe_port_mtu_cfg_set;
+		}
+		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_MTU_CFG_GET% 32)))
+		{
+			p_adpt_api->adpt_port_mtu_cfg_get = adpt_appe_port_mtu_cfg_get;
+		}
 	}
 #endif
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_CFG_SET % 32)))
+		p_adpt_api->adpt_port_cnt_cfg_set = adpt_ppe_port_cnt_cfg_set;
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_CFG_GET % 32)))
+		p_adpt_api->adpt_port_cnt_cfg_get = adpt_ppe_port_cnt_cfg_get;
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_GET % 32)))
+		p_adpt_api->adpt_port_cnt_get = adpt_ppe_port_cnt_get;
+	if (p_adpt_api->adpt_port_ctrl_func_bitmap[2] & (1 <<  (FUNC_ADPT_PORT_CNT_FLUSH % 32)))
+		p_adpt_api->adpt_port_cnt_flush = adpt_ppe_port_cnt_flush;
+
+	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+		(1 << (FUNC_ADPT_PORT_MRU_MTU_SET% 32)))
+	{
+		p_adpt_api->adpt_port_mru_mtu_set = adpt_ppe_port_mru_mtu_set;
+	}
+	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+		(1 << (FUNC_ADPT_PORT_MRU_MTU_GET% 32)))
+	{
+		p_adpt_api->adpt_port_mru_mtu_get = adpt_ppe_port_mru_mtu_get;
+	}
 	return SW_OK;
 }
 

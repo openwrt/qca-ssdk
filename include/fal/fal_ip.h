@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2015, 2017-2018, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -268,12 +271,6 @@ typedef struct {
 	a_uint16_t vpn_id; /* vpn id, added for ipq95xx */
 } fal_intf_entry_t;
 
-typedef struct
-{
-	a_bool_t l3_if_valid; /*0 for disable and 1 for enable*/
-	a_uint32_t l3_if_index; /*index for interface table*/        	  
-} fal_intf_id_t;
-
 typedef enum
 {
 	FAL_NEXTHOP_L3 = 0,
@@ -374,9 +371,50 @@ enum {
 	FUNC_IP_NEXTHOP_SET,
 	FUNC_IP_GLOBAL_CTRL_GET,
 	FUNC_IP_GLOBAL_CTRL_SET,
+	FUNC_IP_INTF_MTU_MRU_SET,
+	FUNC_IP_INTF_MTU_MRU_GET,
+	FUNC_IP6_INTF_MTU_MRU_SET,
+	FUNC_IP6_INTF_MTU_MRU_GET,
+	FUNC_IP_INTF_MACADDR_ADD,
+	FUNC_IP_INTF_MACADDR_DEL,
+	FUNC_IP_INTF_MACADDR_GET_FIRST,
+	FUNC_IP_INTF_MACADDR_GET_NEXT,
+	FUNC_IP_INTF_DMAC_CHECK_SET,
+	FUNC_IP_INTF_DMAC_CHECK_GET,
 };
 
-#ifndef IN_IP_MINI
+typedef enum {
+	FAL_IP_BOTH = 0,
+	FAL_IP_INGRESS,
+	FAL_IP_EGRESS,
+} fal_ip_direction_t;
+
+typedef struct {
+	fal_ip_direction_t direction;
+	fal_mac_addr_t mac_addr; /* mac address */
+} fal_intf_macaddr_t;
+
+sw_error_t
+fal_ip_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+sw_error_t
+fal_ip_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+sw_error_t
+fal_ip6_intf_mtu_mru_set(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t mtu, a_uint32_t mru);
+sw_error_t
+fal_ip6_intf_mtu_mru_get(a_uint32_t dev_id, a_uint32_t l3_if, a_uint32_t *mtu, a_uint32_t *mru);
+sw_error_t
+fal_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_macaddr_get_first(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_macaddr_get_next(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_macaddr_t *mac);
+sw_error_t
+fal_ip_intf_dmac_check_set(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t enable);
+sw_error_t
+fal_ip_intf_dmac_check_get(a_uint32_t dev_id, a_uint32_t l3_if, a_bool_t *enable);
+
 sw_error_t
 fal_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry);
 
@@ -392,6 +430,7 @@ sw_error_t
 fal_ip_host_next(a_uint32_t dev_id, a_uint32_t next_mode,
                  fal_host_entry_t * host_entry);
 
+#if !defined(IN_IP_MINI)
 sw_error_t
 fal_ip_host_counter_bind(a_uint32_t dev_id, a_uint32_t entry_id,
                          a_uint32_t cnt_id, a_bool_t enable);
@@ -540,6 +579,7 @@ fal_default_rt_flow_cmd_set(a_uint32_t dev_id, a_uint32_t vrf_id,
 sw_error_t
 fal_default_rt_flow_cmd_get(a_uint32_t dev_id, a_uint32_t vrf_id,
 		fal_flow_type_t type, fal_default_flow_cmd_t * cmd);
+#endif
 
 sw_error_t
 fal_ip_vsi_arp_sg_cfg_get(a_uint32_t dev_id, a_uint32_t vsi,
@@ -549,6 +589,7 @@ sw_error_t
 fal_ip_vsi_arp_sg_cfg_set(a_uint32_t dev_id, a_uint32_t vsi,
 			fal_arp_sg_cfg_t *arp_sg_cfg);
 
+#if !defined(IN_IP_MINI)
 sw_error_t
 fal_ip_network_route_add(a_uint32_t dev_id, a_uint32_t index,
 			fal_network_route_entry_t *entry);
@@ -561,6 +602,7 @@ fal_ip_network_route_get(a_uint32_t dev_id,
 sw_error_t
 fal_ip_network_route_del(a_uint32_t dev_id,
 			a_uint32_t index, a_uint8_t type);
+#endif
 
 sw_error_t
 fal_ip_intf_set(a_uint32_t dev_id,
@@ -651,7 +693,6 @@ fal_ip_global_ctrl_get(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg);
 
 sw_error_t
 fal_ip_global_ctrl_set(a_uint32_t dev_id, fal_ip_global_cfg_t *cfg);
-#endif
 
 #ifdef __cplusplus
 }

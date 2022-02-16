@@ -108,7 +108,7 @@ a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
 	if (A_FALSE == hsl_port_validity_check(dev_id, port_id))
 		return A_FALSE;
 
-	if (cpu_bmp & port_id || is_fport == A_TRUE)
+	if ((cpu_bmp & BIT(port_id)) || is_fport == A_TRUE)
 		return A_FALSE;
 
 	return A_TRUE;

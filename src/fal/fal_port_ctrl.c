@@ -1714,7 +1714,6 @@ _fal_port_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 _fal_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
@@ -1774,6 +1773,70 @@ _fal_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
         return SW_NOT_SUPPORTED;
 
     rv = p_api->adpt_port_mtu_get(dev_id, port_id, ctrl);
+    return rv;
+}
+
+sw_error_t
+_fal_port_mtu_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_mtu_cfg_t *mtu_cfg)
+{
+    adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_port_mtu_cfg_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_mtu_cfg_set(dev_id, port_id, mtu_cfg);
+    return rv;
+}
+
+sw_error_t
+_fal_port_mtu_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_mtu_cfg_t *mtu_cfg)
+{
+    adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_port_mtu_cfg_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_mtu_cfg_get(dev_id, port_id, mtu_cfg);
+    return rv;
+}
+
+sw_error_t
+_fal_port_mru_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t mru_size, a_uint32_t mtu_size)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_port_mru_mtu_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_mru_mtu_set(dev_id, port_id, mtu_size, mru_size);
+    return rv;
+}
+
+sw_error_t
+_fal_port_mru_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t *mru_size, a_uint32_t *mtu_size)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_port_mru_mtu_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_port_mru_mtu_get(dev_id, port_id, mru_size, mtu_size);
     return rv;
 }
 
@@ -1842,7 +1905,7 @@ _fal_port_source_filter_config_get(a_uint32_t dev_id,
 			src_filter_config);
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _fal_port_interface_3az_status_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_bool_t enable)
@@ -1877,6 +1940,7 @@ _fal_port_interface_3az_status_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
 
 static sw_error_t
 _fal_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
@@ -1895,7 +1959,6 @@ _fal_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enab
 
 	return rv;
 }
-#endif
 
 static sw_error_t
 _fal_port_promisc_mode_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
@@ -2079,7 +2142,21 @@ _fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
 		return SW_NOT_SUPPORTED;
 
 	rv = p_api->port_flowctrl_thresh_set(dev_id, port_id, on_thres, off_thres);
+	return rv;
+}
 
+sw_error_t
+_fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv;
+	adpt_api_t *p_api;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_port_cnt_cfg_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_port_cnt_cfg_set(dev_id, port_id, cnt_cfg);
 	return rv;
 }
 
@@ -2117,6 +2194,36 @@ _fal_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *
 }
 
 sw_error_t
+_fal_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+	sw_error_t rv;
+	adpt_api_t *p_api;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_port_cnt_cfg_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_port_cnt_cfg_get(dev_id, port_id, cnt_cfg);
+	return rv;
+}
+
+sw_error_t
+_fal_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
+{
+	sw_error_t rv;
+	adpt_api_t *p_api;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_port_cnt_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_port_cnt_get(dev_id, port_id, port_cnt);
+	return rv;
+}
+
+sw_error_t
 _fal_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status)
 {
 	sw_error_t rv;
@@ -2128,6 +2235,21 @@ _fal_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t s
 		return SW_NOT_SUPPORTED;
 
 	rv = p_api->ring_flow_ctrl_set(dev_id, ring_id, status);
+	return rv;
+}
+
+sw_error_t
+_fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv;
+	adpt_api_t *p_api;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_port_cnt_flush)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_port_cnt_flush(dev_id, port_id);
 	return rv;
 }
 
@@ -3589,7 +3711,6 @@ fal_port_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl)
@@ -3631,6 +3752,52 @@ fal_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 
     FAL_API_LOCK;
     rv = _fal_port_mtu_get(dev_id, port_id, ctrl);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_mtu_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_mtu_cfg_t *mtu_cfg)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_mtu_cfg_set(dev_id, port_id, mtu_cfg);
+    FAL_API_UNLOCK;
+    return rv;
+}
+sw_error_t
+fal_port_mtu_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_mtu_cfg_t *mtu_cfg)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_mtu_cfg_get(dev_id, port_id, mtu_cfg);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_mru_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t mru_size, a_uint32_t mtu_size)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_mru_mtu_set(dev_id, port_id, mru_size, mtu_size);
+    FAL_API_UNLOCK;
+    return rv;
+}
+sw_error_t
+fal_port_mru_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t *mru_size, a_uint32_t *mtu_size)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_mru_mtu_get(dev_id, port_id, mru_size, mtu_size);
     FAL_API_UNLOCK;
     return rv;
 }
@@ -3684,7 +3851,7 @@ fal_port_source_filter_config_get(a_uint32_t dev_id,
     FAL_API_UNLOCK;
     return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_interface_3az_status_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_bool_t enable)
@@ -3707,6 +3874,7 @@ fal_port_interface_3az_status_get(a_uint32_t dev_id, fal_port_t port_id,
     FAL_API_UNLOCK;
     return rv;
 }
+#endif
 
 sw_error_t
 fal_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
@@ -3718,7 +3886,6 @@ fal_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enabl
     FAL_API_UNLOCK;
     return rv;
 }
-#endif
 
 sw_error_t
 fal_port_promisc_mode_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
@@ -3883,16 +4050,66 @@ fal_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t st
     return rv;
 }
 
+sw_error_t
+fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_cnt_cfg_set(dev_id, port_id, cnt_cfg);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+sw_error_t
+fal_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_cnt_cfg_get(dev_id, port_id, cnt_cfg);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+sw_error_t
+fal_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_cnt_get(dev_id, port_id, port_cnt);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+sw_error_t
+fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_cnt_flush(dev_id, port_id);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 /**
  * @}
  */
- #ifndef IN_PORTCONTROL_MINI
 EXPORT_SYMBOL(fal_port_mtu_set);
 EXPORT_SYMBOL(fal_port_mtu_get);
 EXPORT_SYMBOL(fal_port_mru_set);
 EXPORT_SYMBOL(fal_port_mru_get);
-#endif
+EXPORT_SYMBOL(fal_port_mtu_cfg_set);
+EXPORT_SYMBOL(fal_port_mtu_cfg_get);
+EXPORT_SYMBOL(fal_port_mru_mtu_set);
+EXPORT_SYMBOL(fal_port_mru_mtu_get);
 EXPORT_SYMBOL(fal_port_duplex_set);
 EXPORT_SYMBOL(fal_port_duplex_get);
 EXPORT_SYMBOL(fal_port_speed_set);
@@ -3959,11 +4176,11 @@ EXPORT_SYMBOL(fal_port_interface_mode_apply);
 
 EXPORT_SYMBOL(fal_port_interface_mode_get );
 EXPORT_SYMBOL(fal_port_interface_mode_status_get );
+#endif
 EXPORT_SYMBOL(fal_port_source_filter_enable);
 EXPORT_SYMBOL(fal_port_source_filter_status_get);
 EXPORT_SYMBOL(fal_port_source_filter_config_get);
 EXPORT_SYMBOL(fal_port_source_filter_config_set);
-#endif
 EXPORT_SYMBOL(fal_port_max_frame_size_set);
 EXPORT_SYMBOL(fal_port_max_frame_size_get);
 #ifndef IN_PORTCONTROL_MINI
@@ -3973,9 +4190,9 @@ EXPORT_SYMBOL(fal_port_interface_3az_status_get);
 EXPORT_SYMBOL(fal_port_flowctrl_forcemode_set);
 #ifndef IN_PORTCONTROL_MINI
 EXPORT_SYMBOL(fal_port_flowctrl_forcemode_get);
+#endif
 EXPORT_SYMBOL(fal_port_promisc_mode_set);
 EXPORT_SYMBOL(fal_port_promisc_mode_get);
-#endif
 EXPORT_SYMBOL(fal_port_interface_eee_cfg_set);
 EXPORT_SYMBOL(fal_port_interface_eee_cfg_get);
 EXPORT_SYMBOL(fal_switch_port_loopback_set);
@@ -3989,3 +4206,7 @@ EXPORT_SYMBOL(fal_ring_union_set);
 EXPORT_SYMBOL(fal_ring_union_get);
 EXPORT_SYMBOL(fal_ring_flow_ctrl_config_get);
 EXPORT_SYMBOL(fal_ring_flow_ctrl_config_set);
+EXPORT_SYMBOL(fal_port_cnt_cfg_set);
+EXPORT_SYMBOL(fal_port_cnt_cfg_get);
+EXPORT_SYMBOL(fal_port_cnt_get);
+EXPORT_SYMBOL(fal_port_cnt_flush);

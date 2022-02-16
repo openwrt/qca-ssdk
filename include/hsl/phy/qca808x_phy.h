@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018, 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -186,6 +187,7 @@ extern "C"
 #define QCA808X_CTRL_SOFTWARE_RESET              0x8000
 
 #define QCA808X_PHY_MMD7_AUTONEGOTIATION_CONTROL 0x20
+#define QCA808X_PHY_MMD7_LP_2500M_ABILITY        0x21
 
 #define QCA808X_CTRL_SPEED_MASK                  0x2040
 #define QCA808X_CTRL_SPEED_1000                  0x0040
@@ -433,6 +435,9 @@ extern "C"
 #define QCA808X_PHY_ADC_THRESHOLD_200MV         0x0f
 #define QCA808X_PHY_ADC_THRESHOLD_300MV         0xff
 
+#define QCA808X_PHY_MMD7_CHIP_TYPE              0x901d
+#define QCA808X_PHY_1G_CHIP_TYPE                0x1
+
 a_uint16_t
 qca808x_phy_reg_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_id);
 
@@ -514,6 +519,10 @@ qca808x_phy_set_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
 sw_error_t
 qca808x_phy_get_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
 			a_uint32_t * autoneg);
+
+sw_error_t
+qca808x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
+	a_uint32_t * ability);
 
 a_bool_t qca808x_phy_autoneg_status (a_uint32_t dev_id, a_uint32_t phy_id);
 #ifndef IN_PORTCONTROL_MINI

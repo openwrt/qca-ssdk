@@ -49,14 +49,12 @@ adpt_cppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 adpt_cppe_port_mru_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl);
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_cppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl);
 sw_error_t
 adpt_cppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mtu_ctrl_t *ctrl);
-#endif
 sw_error_t
 adpt_cppe_port_to_channel_convert(a_uint32_t dev_id,
 		a_uint32_t port_id, a_uint32_t *channel_id);
@@ -83,6 +81,14 @@ adpt_cppe_lpbk_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 adpt_cppe_lpbk_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 	a_uint32_t max_frame);
+
+sw_error_t
+adpt_cppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_cnt_cfg_t *cnt_cfg);
+sw_error_t
+adpt_cppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_cnt_cfg_t *cnt_cfg);
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

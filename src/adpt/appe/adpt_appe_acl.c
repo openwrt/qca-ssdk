@@ -1897,7 +1897,7 @@ adpt_appe_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
 	}
 	else if(vport_type == FAL_VPORT_TYPE_NORMAL)
 	{
-#ifndef IN_IP_MINI
+#ifdef IN_IP
 		return appe_l3_vp_port_tbl_ipo_vp_profile_set(dev_id,
 				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
 #endif
@@ -1919,7 +1919,7 @@ adpt_appe_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
 	}
 	else if(vport_type == FAL_VPORT_TYPE_NORMAL)
 	{
-#ifndef IN_IP_MINI
+#ifdef IN_IP
 		return appe_l3_vp_port_tbl_ipo_vp_profile_get(dev_id,
 				FAL_PORT_ID_VALUE(vport_id), vpgroup_id);
 #endif

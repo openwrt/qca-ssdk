@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -112,91 +115,6 @@ void qca808x_ptp_clock_mode_config(a_uint32_t dev_id,
 	}
 
 	return;
-}
-
-void qca808x_ptp_stat_update(struct qca808x_phy_info *pdata, fal_ptp_direction_t direction,
-		a_int32_t msg_type, a_int32_t seqid_matched)
-{
-	ptp_packet_stat *pkt_stat = NULL;
-
-	if (((direction != FAL_RX_DIRECTION) && (direction != FAL_TX_DIRECTION)) ||
-			(seqid_matched < PTP_PKT_SEQID_UNMATCHED) ||
-			(seqid_matched >= PTP_PKT_SEQID_MATCH_MAX)) {
-		return;
-	}
-
-	pkt_stat = &pdata->pkt_stat[direction];
-	switch (msg_type) {
-		case QCA808X_PTP_MSG_SYNC:
-			pkt_stat->sync_cnt[seqid_matched]++;
-			break;
-		case QCA808X_PTP_MSG_DREQ:
-			pkt_stat->delay_req_cnt[seqid_matched]++;
-			break;
-		case QCA808X_PTP_MSG_PREQ:
-			pkt_stat->pdelay_req_cnt[seqid_matched]++;
-			break;
-		case QCA808X_PTP_MSG_PRESP:
-			pkt_stat->pdelay_resp_cnt[seqid_matched]++;
-			break;
-		case QCA808X_PTP_MSG_MAX:
-			pkt_stat->event_pkt_cnt++;
-			break;
-		default:
-			SSDK_DEBUG("%s: msg %x is not event frame\n",
-					__func__, msg_type);
-	}
-}
-
-void qca808x_ptp_stat_get(void)
-{
-	int i = 0;
-	struct qca808x_phy_info *pdata = NULL;
-	ptp_packet_stat *pkt_stat;
-
-	list_for_each_entry(pdata, &g_qca808x_phy_list, list) {
-		pkt_stat = pdata->pkt_stat;
-		SSDK_INFO("PHY [%#x] PTP event packet statistics:\n", pdata->phy_addr);
-		for (i=0; i <= FAL_TX_DIRECTION; i++)
-		{
-			if (i == FAL_TX_DIRECTION) {
-				SSDK_INFO("----------TX direction----------\n");
-			} else {
-				SSDK_INFO("----------RX direction----------\n");
-			}
-
-			SSDK_INFO("even sum:    %lld\n",
-					pkt_stat[i].event_pkt_cnt);
-			SSDK_INFO("seq id matched stat:\n");
-			SSDK_INFO("sync:        %lld\n",
-					pkt_stat[i].sync_cnt[PTP_PKT_SEQID_MATCHED]);
-			SSDK_INFO("delay_req:   %lld\n",
-					pkt_stat[i].delay_req_cnt[PTP_PKT_SEQID_MATCHED]);
-			SSDK_INFO("pdelay_req:  %lld\n",
-					pkt_stat[i].pdelay_req_cnt[PTP_PKT_SEQID_MATCHED]);
-			SSDK_INFO("pdelay_resp: %lld\n\n",
-					pkt_stat[i].pdelay_resp_cnt[PTP_PKT_SEQID_MATCHED]);
-
-			SSDK_INFO("seq id unmatched stat:\n");
-			SSDK_INFO("sync:        %lld\n",
-					pkt_stat[i].sync_cnt[PTP_PKT_SEQID_UNMATCHED]);
-			SSDK_INFO("delay_req:   %lld\n",
-					pkt_stat[i].delay_req_cnt[PTP_PKT_SEQID_UNMATCHED]);
-			SSDK_INFO("pdelay_req:  %lld\n",
-					pkt_stat[i].pdelay_req_cnt[PTP_PKT_SEQID_UNMATCHED]);
-			SSDK_INFO("pdelay_resp: %lld\n\n",
-					pkt_stat[i].pdelay_resp_cnt[PTP_PKT_SEQID_UNMATCHED]);
-		}
-	}
-}
-
-void qca808x_ptp_stat_set(void)
-{
-	struct qca808x_phy_info *pdata;
-
-	list_for_each_entry(pdata, &g_qca808x_phy_list, list) {
-		memset(pdata->pkt_stat, 0, sizeof(pdata->pkt_stat));
-	}
 }
 
 static sw_error_t qca808x_ptp_clock_synce_clock_enable(a_uint32_t dev_id,
@@ -395,6 +313,8 @@ static void tx_timestamp_work(struct work_struct *work)
 	qca808x_priv *priv =
 		container_of(ptp_data, qca808x_priv, ptp_info);
 
+	hsl_ptp_event_pkt_stat_t *pkt_stat = priv->ptp_event_stat;
+
 	pdata = priv->phy_info;
 
 	if (!pdata) {
@@ -425,14 +345,14 @@ static void tx_timestamp_work(struct work_struct *work)
 				FAL_TX_DIRECTION, &pkt_info, &tx_time);
 
 		if (ret == SW_NOT_FOUND) {
-			qca808x_ptp_stat_update(pdata, FAL_TX_DIRECTION,
+			hsl_ptp_event_stat_update(&pkt_stat[FAL_TX_DIRECTION],
 					pkt_info.msg_type, PTP_PKT_SEQID_UNMATCHED);
 			SSDK_DEBUG("Fail to get tx_ts: sequence_id:%x, clock_identify:%llx,"
 					" port_number:%x, msg_type:%x\n",
 					pkt_info.sequence_id, pkt_info.clock_identify,
 					pkt_info.port_number, pkt_info.msg_type);
 		} else {
-			qca808x_ptp_stat_update(pdata, FAL_TX_DIRECTION,
+			hsl_ptp_event_stat_update(&pkt_stat[FAL_TX_DIRECTION],
 					pkt_info.msg_type, PTP_PKT_SEQID_MATCHED);
 		}
 		ts.tv_sec = tx_time.seconds;
@@ -493,6 +413,8 @@ static void rx_timestamp_work(struct work_struct *work)
 	qca808x_priv *priv =
 		container_of(ptp_data, qca808x_priv, ptp_info);
 
+	hsl_ptp_event_pkt_stat_t *pkt_stat = priv->ptp_event_stat;
+
 	pdata = priv->phy_info;
 
 	if (!pdata) {
@@ -509,14 +431,14 @@ static void rx_timestamp_work(struct work_struct *work)
 		ret = qca808x_phy_ptp_timestamp_get(dev_id, phy_id,
 				FAL_RX_DIRECTION, &pkt_info, &rx_time);
 		if (ret == SW_NOT_FOUND) {
-			qca808x_ptp_stat_update(pdata, FAL_RX_DIRECTION,
+			hsl_ptp_event_stat_update(&pkt_stat[FAL_RX_DIRECTION],
 					pkt_info.msg_type, PTP_PKT_SEQID_UNMATCHED);
 			SSDK_DEBUG("Fail to get rx_ts: sequence_id:%x, clock_identify:%llx, "
 					"port_number:%x, msg_type:%x\n",
 					pkt_info.sequence_id, pkt_info.clock_identify,
 					pkt_info.port_number, pkt_info.msg_type);
 		} else {
-			qca808x_ptp_stat_update(pdata, FAL_RX_DIRECTION,
+			hsl_ptp_event_stat_update(&pkt_stat[FAL_RX_DIRECTION],
 					pkt_info.msg_type, PTP_PKT_SEQID_MATCHED);
 		}
 
@@ -536,7 +458,7 @@ static void rx_timestamp_work(struct work_struct *work)
 			switch (pdata->clock_mode) {
 				case FAL_OC_CLOCK_MODE:
 				case FAL_BC_CLOCK_MODE:
-					if (pkt_info.msg_type == QCA808X_PTP_MSG_PREQ) {
+					if (pkt_info.msg_type == PTP_MSG_PREQ) {
 						ptp_ingress_time_sync(phy_id,
 								ts.tv_nsec, A_FALSE);
 					}
@@ -1107,6 +1029,7 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 	qca808x_priv *priv = phydev->priv;
 	struct qca808x_phy_info *pdata = priv->phy_info;
 	struct qca808x_ptp_info *ptp_info = &priv->ptp_info;
+	hsl_ptp_event_pkt_stat_t *pkt_stat = priv->ptp_event_stat;
 
 	if (ptp_info->hwts_rx_type == PTP_CLASS_NONE || !pdata) {
 		return false;
@@ -1154,8 +1077,8 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 	embed_val = (*reserved0 & 0xf0) >> 4;
 	pkt_type = *ptp_header & 0xf;
 
-	qca808x_ptp_stat_update(pdata, FAL_RX_DIRECTION,
-			QCA808X_PTP_MSG_MAX, PTP_PKT_SEQID_UNMATCHED);
+	hsl_ptp_event_stat_update(&pkt_stat[FAL_RX_DIRECTION],
+			pkt_type, PTP_PKT_SEQID_CHECKED);
 
 	if (embed_val == QCA808X_PTP_EMBEDDED_MODE) {
 		ts.tv_sec = ntohl(*reserved2);
@@ -1173,7 +1096,7 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 					 * recorded and will be copied the corresponding pdealy
 					 * response msg.
 					 */
-					if (pkt_type == QCA808X_PTP_MSG_PREQ) {
+					if (pkt_type == PTP_MSG_PREQ) {
 						ptp_info->embeded_ts.reserved0 = *reserved0;
 						ptp_info->embeded_ts.reserved1 = *reserved1;
 						ptp_info->embeded_ts.reserved2 = *reserved2;
@@ -1197,7 +1120,7 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 		/* restore the original correctionfield value except for
 		 * the TC one-step mode offloading*/
 		if (!(((pdata->clock_mode == FAL_P2PTC_CLOCK_MODE &&
-					pkt_type == QCA808X_PTP_MSG_SYNC) ||
+					pkt_type == PTP_MSG_SYNC) ||
 					pdata->clock_mode == FAL_E2ETC_CLOCK_MODE) &&
 					pdata->step_mode == FAL_ONE_STEP_MODE))
 		{
@@ -1221,7 +1144,7 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 	}
 	ns = timespec64_to_ns(&ts);
 
-	qca808x_ptp_stat_update(pdata, FAL_RX_DIRECTION,
+	hsl_ptp_event_stat_update(&pkt_stat[FAL_RX_DIRECTION],
 			pkt_type, PTP_PKT_SEQID_MATCHED);
 
 	shhwtstamps->hwtstamp = ns_to_ktime(ns);
@@ -1244,6 +1167,7 @@ void qca808x_txtstamp(struct phy_device *phydev,
 	a_int32_t ptp_class;
 	qca808x_priv *priv = phydev->priv;
 	struct qca808x_ptp_info *ptp_info = &priv->ptp_info;
+	hsl_ptp_event_pkt_stat_t *pkt_stat = priv->ptp_event_stat;
 
 	/* The PTP_CLASS_NONE is passed, which indicates that the
 	 * PTP class is not determined, calling ptp_classify_raw to
@@ -1279,7 +1203,7 @@ void qca808x_txtstamp(struct phy_device *phydev,
 	msg_type = *ptp_header & 0xf;
 	switch (ptp_info->hwts_tx_type) {
 		case HWTSTAMP_TX_ONESTEP_SYNC:
-			if (msg_type == QCA808X_PTP_MSG_SYNC) {
+			if (msg_type == PTP_MSG_SYNC) {
 				skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 				kfree_skb(skb);
 				return;
@@ -1287,17 +1211,17 @@ void qca808x_txtstamp(struct phy_device *phydev,
 			break;
 		case HWTSTAMP_TX_ONESTEP_P2P:
 			switch (msg_type) {
-				case QCA808X_PTP_MSG_PRESP:
+				case PTP_MSG_PRESP:
 					if (ptp_info->embeded_ts.seqid == *seqid &&
 							ptp_info->embeded_ts.msg_type ==
-							QCA808X_PTP_MSG_PREQ) {
+							PTP_MSG_PREQ) {
 						*reserved0 = ptp_info->embeded_ts.reserved0;
 						*reserved1 = ptp_info->embeded_ts.reserved1;
 						*reserved2 = ptp_info->embeded_ts.reserved2;
 						*correction = ptp_info->embeded_ts.correction;
 					}
 					/* fall down */
-				case QCA808X_PTP_MSG_SYNC:
+				case PTP_MSG_SYNC:
 					skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 					kfree_skb(skb);
 					return;
@@ -1317,8 +1241,8 @@ void qca808x_txtstamp(struct phy_device *phydev,
 	skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 	skb_queue_tail(&ptp_info->tx_queue, skb);
 	ptp_cb->ptp_type = type;
-	qca808x_ptp_stat_update(priv->phy_info, FAL_TX_DIRECTION,
-			QCA808X_PTP_MSG_MAX, PTP_PKT_SEQID_UNMATCHED);
+	hsl_ptp_event_stat_update(&pkt_stat[FAL_TX_DIRECTION],
+			msg_type, PTP_PKT_SEQID_CHECKED);
 	schedule_delayed_work(&ptp_info->tx_ts_work, 0);
 }
 

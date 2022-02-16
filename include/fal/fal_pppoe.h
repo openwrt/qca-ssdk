@@ -33,6 +33,10 @@ enum {
 	FUNC_PPPOE_SESSION_TABLE_GET,
 	FUNC_PPPOE_EN_SET,
 	FUNC_PPPOE_EN_GET,
+	FUNC_PPPOE_L3_INTF_SET,
+	FUNC_PPPOE_L3_INTF_GET,
+	FUNC_PPPOE_GLOBAL_CTRL_SET,
+	FUNC_PPPOE_GLOBAL_CTRL_GET,
 };
 
 typedef struct
@@ -50,6 +54,25 @@ typedef struct
 	a_uint32_t tl_l3_if_index; /* tunnel pppoe l3_if check, added for ipq95xx */
 	a_bool_t   tl_l3_if_valid; /* tunnel l3 interface index valid or not, added for ipq95xx */
 } fal_pppoe_session_t;
+
+typedef struct {
+	fal_fwd_cmd_t pppoe_multicast_cmd; /* pppoe multicast action with IP routing enable */
+	a_bool_t pppoe_multicast_deacclr_en; /*0 for disable and 1 for enable*/
+} fal_pppoe_global_cfg_t;
+
+sw_error_t
+fal_pppoe_l3_intf_set(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+
+sw_error_t
+fal_pppoe_l3_intf_get(a_uint32_t dev_id, a_uint32_t pppoe_index,
+		fal_intf_type_t l3_type, fal_intf_id_t *pppoe_intf);
+
+sw_error_t
+fal_pppoe_global_ctrl_set(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg);
+
+sw_error_t
+fal_pppoe_global_ctrl_get(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg);
 
 sw_error_t
 fal_pppoe_cmd_set(a_uint32_t dev_id, fal_fwd_cmd_t cmd);

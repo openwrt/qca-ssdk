@@ -318,7 +318,10 @@ qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id)
 							QCA808X_MMD1_PMA_CAP_REG);
 
 	if (phy_data & QCA808X_STATUS_2500T_FD_CAPS) {
-		return A_TRUE;
+		phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+			QCA808X_PHY_MMD7_CHIP_TYPE);
+		if(!(phy_data & QCA808X_PHY_1G_CHIP_TYPE))
+			return A_TRUE;
 	}
 
 	return A_FALSE;
@@ -491,6 +494,8 @@ qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 	switch(speed)
 	{
 		case FAL_SPEED_2500:
+			if(!qca808x_phy_2500caps(dev_id, phy_id))
+				return SW_NOT_SUPPORTED;
 			phy_data1 |= QCA808X_PMA_CONTROL_2500M;
 			phy_data2 |= QCA808X_PMA_TYPE_2500M;
 			break;
@@ -564,6 +569,8 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		case FAL_SPEED_2500:
 		case FAL_SPEED_1000:
 			if (speed == FAL_SPEED_2500) {
+				if(!qca808x_phy_2500caps(dev_id, phy_id))
+					return SW_NOT_SUPPORTED;
 				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id,
 						FAL_PHY_ADV_2500T_FD);
 				PHY_RTN_ON_ERROR(rv);
@@ -1058,6 +1065,53 @@ qca808x_phy_get_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
 
 }
 #endif
+
+sw_error_t
+qca808x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
+	a_uint32_t *ability)
+{
+	a_uint16_t phy_data;
+
+	*ability = 0;
+
+	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_LINK_PARTNER_ABILITY);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if(phy_data & QCA808X_LINK_10BASETX_HALF_DUPLEX)
+		*ability |= FAL_PHY_PART_10T_HD;
+
+	if(phy_data & QCA808X_LINK_10BASETX_FULL_DUPLEX)
+		*ability |= FAL_PHY_PART_10T_FD;
+
+	if(phy_data & QCA808X_LINK_100BASETX_HALF_DUPLEX)
+		*ability |= FAL_PHY_PART_100TX_HD;
+
+	if(phy_data & QCA808X_LINK_100BASETX_FULL_DUPLEX)
+		*ability |= FAL_PHY_PART_100TX_FD;
+
+	if(phy_data & QCA808X_LINK_PAUSE)
+		*ability |= FAL_PHY_PART_PAUSE;
+
+	if(phy_data & QCA808X_LINK_ASYPAUSE)
+		*ability |= FAL_PHY_PART_ASY_PAUSE;
+
+	if(phy_data & QCA808X_LINK_LPACK)
+		*ability |= FAL_PHY_PART_AUTONEG;
+
+	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_1000BASET_STATUS);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(phy_data & QCA808X_LINK_1000BASETX_FULL_DUPLEX)
+		*ability |= FAL_PHY_PART_1000T_FD;
+
+	phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+		QCA808X_PHY_MMD7_LP_2500M_ABILITY);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(phy_data & QCA808X_LINK_2500BASETX_FULL_DUPLEX)
+		*ability |= FAL_PHY_PART_2500T_FD;
+
+	return SW_OK;
+}
+
 /******************************************************************************
 *
 * qca808x_set_autoneg_adv - set the phy autoneg Advertisement
@@ -1120,9 +1174,15 @@ qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	if (qca808x_phy_2500caps(dev_id, phy_id) == A_TRUE) {
 		rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id, autoneg);
+		PHY_RTN_ON_ERROR(rv);
+	} else {
+		if(autoneg & FAL_PHY_ADV_2500T_FD) {
+			SSDK_ERROR("2.5G auto adv is not supported\n");
+			return SW_NOT_SUPPORTED;
+		}
 	}
 
-	return rv;
+	return SW_OK;
 }
 
 sw_error_t

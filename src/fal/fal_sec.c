@@ -515,6 +515,25 @@ fal_sec_tunnel_flags_excep_parser_ctrl_get(a_uint32_t dev_id, a_uint32_t index, 
 
 /*insert flag for outter fal, don't remove it*/
 
+EXPORT_SYMBOL(fal_sec_norm_item_set);
+EXPORT_SYMBOL(fal_sec_norm_item_get);
+EXPORT_SYMBOL(fal_sec_l2_excep_ctrl_set);
+EXPORT_SYMBOL(fal_sec_l2_excep_ctrl_get);
+EXPORT_SYMBOL(fal_sec_l3_excep_ctrl_set);
+EXPORT_SYMBOL(fal_sec_l3_excep_ctrl_get);
+EXPORT_SYMBOL(fal_sec_l3_excep_parser_ctrl_set);
+EXPORT_SYMBOL(fal_sec_l3_excep_parser_ctrl_get);
+EXPORT_SYMBOL(fal_sec_l4_excep_parser_ctrl_set);
+EXPORT_SYMBOL(fal_sec_l4_excep_parser_ctrl_get);
+EXPORT_SYMBOL(fal_sec_tunnel_excep_ctrl_set);
+EXPORT_SYMBOL(fal_sec_tunnel_excep_ctrl_get);
+EXPORT_SYMBOL(fal_sec_tunnel_l3_excep_parser_ctrl_set);
+EXPORT_SYMBOL(fal_sec_tunnel_l3_excep_parser_ctrl_get);
+EXPORT_SYMBOL(fal_sec_tunnel_l4_excep_parser_ctrl_set);
+EXPORT_SYMBOL(fal_sec_tunnel_l4_excep_parser_ctrl_get);
+EXPORT_SYMBOL(fal_sec_tunnel_flags_excep_parser_ctrl_set);
+EXPORT_SYMBOL(fal_sec_tunnel_flags_excep_parser_ctrl_get);
+
 /**
  * @}
  */

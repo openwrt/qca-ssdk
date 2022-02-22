@@ -414,7 +414,8 @@ qca_uniphy_reg_read(a_uint32_t dev_id, a_uint32_t uniphy_index,
 				a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len);
 
 struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id);
-
+struct mii_bus *
+ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
 int ssdk_sysfs_init (void);
 void ssdk_sysfs_exit (void);
 /*qca808x_start*/

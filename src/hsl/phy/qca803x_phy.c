@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2017, 2019, The Linux Foundation. All rights reserved.
+ *
+  * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -180,17 +183,17 @@ qca803x_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 * specified device.
 */
 sw_error_t
-qca803x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
+qca803x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 		     fal_port_speed_t speed)
 {
 	a_uint16_t phy_data = 0;
 	fal_port_duplex_t old_duplex;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca803x_phy_reg_read(dev_id, phy_id, QCA803X_PHY_CONTROL);
+	phy_data = qca803x_phy_reg_read(dev_id, phy_addr, QCA803X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
-	rv = qca803x_phy_get_duplex(dev_id, phy_id, &old_duplex);
+	rv = qca803x_phy_get_duplex(dev_id, phy_addr, &old_duplex);
 	if(rv != SW_OK) {
 		return rv;
 	}
@@ -203,6 +206,7 @@ qca803x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 				phy_data |= QCA803X_CTRL_SPEED_1000;
 				phy_data &= ~QCA803X_CTRL_SPEED_100;
 				phy_data |= QCA803X_CTRL_AUTONEGOTIATION_ENABLE;
+				phy_data |= QCA803X_CTRL_RESTART_AUTONEGOTIATION;
 				break;
 			case FAL_SPEED_100:
 			case FAL_SPEED_10:
@@ -231,19 +235,22 @@ qca803x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 					phy_data &= ~QCA803X_CTRL_SPEED_100;
 				}
 				break;
-			case FAL_SPEED_1000:
-				phy_data |= QCA803X_CTRL_FULL_DUPLEX;
-				phy_data |= QCA803X_CTRL_SPEED_1000;
-				phy_data &= ~QCA803X_CTRL_SPEED_100;
-				phy_data |= QCA803X_CTRL_AUTONEGOTIATION_ENABLE;
-				break;
 			default:
-				return SW_BAD_PARAM;
+				return SW_NOT_SUPPORTED;
 		}
 	} else {
 		return SW_FAIL;
 	}
-	rv = qca803x_phy_reg_write(dev_id, phy_id, QCA803X_PHY_CONTROL, phy_data);
+
+	if(speed == FAL_SPEED_1000) {
+		rv = qca803x_phy_set_autoneg_adv(dev_id, phy_addr,
+			FAL_PHY_ADV_1000T_FD);
+		SW_RTN_ON_ERROR(rv);
+	} else {
+		rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+		SW_RTN_ON_ERROR(rv);
+	}
+	rv = qca803x_phy_reg_write(dev_id, phy_addr, QCA803X_PHY_CONTROL, phy_data);
 
 	return rv;
 }
@@ -254,23 +261,24 @@ qca803x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 * specified device.
 */
 sw_error_t
-qca803x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
+qca803x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 		      fal_port_duplex_t duplex)
 {
 	a_uint16_t phy_data = 0;
 	fal_port_speed_t old_speed;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca803x_phy_reg_read(dev_id, phy_id, QCA803X_PHY_CONTROL);
+	phy_data = qca803x_phy_reg_read(dev_id, phy_addr, QCA803X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
-	qca803x_phy_get_speed(dev_id, phy_id, &old_speed);
+	qca803x_phy_get_speed(dev_id, phy_addr, &old_speed);
 	switch(old_speed)
 	{
 		case FAL_SPEED_1000:
 			phy_data |= QCA803X_CTRL_SPEED_1000;
 			phy_data &= ~QCA803X_CTRL_SPEED_100;
 			phy_data |= QCA803X_CTRL_AUTONEGOTIATION_ENABLE;
+			phy_data |= QCA803X_CTRL_RESTART_AUTONEGOTIATION;
 			if (duplex == FAL_FULL_DUPLEX) {
 				phy_data |= QCA803X_CTRL_FULL_DUPLEX;
 			} else {
@@ -295,7 +303,16 @@ qca803x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
 		default:
 			return SW_FAIL;
 	}
-	rv = qca803x_phy_reg_write(dev_id, phy_id, QCA803X_PHY_CONTROL, phy_data);
+
+	if(old_speed == FAL_SPEED_1000) {
+		rv = qca803x_phy_set_autoneg_adv(dev_id, phy_addr,
+			FAL_PHY_ADV_1000T_FD);
+		SW_RTN_ON_ERROR(rv);
+	} else {
+		rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+		SW_RTN_ON_ERROR(rv);
+	}
+	rv = qca803x_phy_reg_write(dev_id, phy_addr, QCA803X_PHY_CONTROL, phy_data);
 
 	return rv;
 }
@@ -634,12 +651,14 @@ qca803x_phy_get_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
 *
 */
 sw_error_t
-qca803x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
+qca803x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 			   a_uint32_t autoneg)
 {
 	a_uint16_t phy_data = 0;
 
-	phy_data = qca803x_phy_reg_read(dev_id, phy_id,
+	hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, autoneg);
+
+	phy_data = qca803x_phy_reg_read(dev_id, phy_addr,
 			QCA803X_AUTONEG_ADVERT);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
@@ -668,10 +687,10 @@ qca803x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 	} else {
 		phy_data &= ~QCA803X_EXTENDED_NEXT_PAGE_EN;
 	}
-	qca803x_phy_reg_write(dev_id, phy_id, QCA803X_AUTONEG_ADVERT,
+	qca803x_phy_reg_write(dev_id, phy_addr, QCA803X_AUTONEG_ADVERT,
 			phy_data);
 
-	phy_data = qca803x_phy_reg_read(dev_id, phy_id,
+	phy_data = qca803x_phy_reg_read(dev_id, phy_addr,
 				QCA803X_1000BASET_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
@@ -681,7 +700,7 @@ qca803x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 	if (autoneg & FAL_PHY_ADV_1000T_FD) {
 		phy_data |= QCA803X_ADVERTISE_1000FULL;
 	}
-	qca803x_phy_reg_write(dev_id, phy_id, QCA803X_1000BASET_CONTROL,
+	qca803x_phy_reg_write(dev_id, phy_addr, QCA803X_1000BASET_CONTROL,
 			phy_data);
 
 	return SW_OK;
@@ -754,16 +773,18 @@ a_bool_t qca803x_phy_autoneg_status(a_uint32_t dev_id, a_uint32_t phy_id)
 * qca803x_restart_autoneg - restart the phy autoneg
 *
 */
-sw_error_t qca803x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_id)
+sw_error_t qca803x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca803x_phy_reg_read(dev_id, phy_id, QCA803X_PHY_CONTROL);
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
+	SW_RTN_ON_ERROR(rv);
+	phy_data = qca803x_phy_reg_read(dev_id, phy_addr, QCA803X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	phy_data |= QCA803X_CTRL_AUTONEGOTIATION_ENABLE;
-	rv = qca803x_phy_reg_write(dev_id, phy_id, QCA803X_PHY_CONTROL,
+	rv = qca803x_phy_reg_write(dev_id, phy_addr, QCA803X_PHY_CONTROL,
 			     phy_data | QCA803X_CTRL_RESTART_AUTONEGOTIATION);
 
 	return rv;
@@ -773,15 +794,18 @@ sw_error_t qca803x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_id)
 * qca803x_phy_enable_autonego
 *
 */
-sw_error_t qca803x_phy_enable_autoneg(a_uint32_t dev_id, a_uint32_t phy_id)
+sw_error_t qca803x_phy_enable_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca803x_phy_reg_read(dev_id, phy_id, QCA803X_PHY_CONTROL);
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
+	SW_RTN_ON_ERROR(rv);
+
+	phy_data = qca803x_phy_reg_read(dev_id, phy_addr, QCA803X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
-	rv = qca803x_phy_reg_write(dev_id, phy_id, QCA803X_PHY_CONTROL,
+	rv = qca803x_phy_reg_write(dev_id, phy_addr, QCA803X_PHY_CONTROL,
 			     phy_data | QCA803X_CTRL_AUTONEGOTIATION_ENABLE);
 
 	return rv;

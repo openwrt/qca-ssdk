@@ -392,7 +392,7 @@ qca808x_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 * specified device.
 */
 sw_error_t
-qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 		     fal_port_speed_t speed)
 {
 	a_uint16_t phy_data1 = 0;
@@ -400,12 +400,12 @@ qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 	sw_error_t rv = SW_OK;
 
 	/* the speed of qca808x controled by MMD1 PMA/PMD control register */
-	phy_data1 = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+	phy_data1 = qca808x_phy_mmd_read(dev_id, phy_addr, QCA808X_PHY_MMD1_NUM,
 			QCA808X_PHY_MMD1_PMA_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data1);
 	phy_data1 &= ~QCA808X_PMA_CONTROL_SPEED_MASK;
 
-	phy_data2 = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+	phy_data2 = qca808x_phy_mmd_read(dev_id, phy_addr, QCA808X_PHY_MMD1_NUM,
 			QCA808X_PHY_MMD1_PMA_TYPE);
 	PHY_RTN_ON_READ_ERROR(phy_data2);
 	phy_data2 &= ~QCA808X_PMA_TYPE_MASK;
@@ -413,7 +413,7 @@ qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 	switch(speed)
 	{
 		case FAL_SPEED_2500:
-			if(!qca808x_phy_2500caps(dev_id, phy_id))
+			if(!qca808x_phy_2500caps(dev_id, phy_addr))
 				return SW_NOT_SUPPORTED;
 			phy_data1 |= QCA808X_PMA_CONTROL_2500M;
 			phy_data2 |= QCA808X_PMA_TYPE_2500M;
@@ -434,12 +434,16 @@ qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 			return SW_BAD_PARAM;
 	}
 
-	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+	rv = qca808x_phy_mmd_write(dev_id, phy_addr, QCA808X_PHY_MMD1_NUM,
 			QCA808X_PHY_MMD1_PMA_CONTROL, phy_data1);
 	PHY_RTN_ON_ERROR(rv);
 
-	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+	rv = qca808x_phy_mmd_write(dev_id, phy_addr, QCA808X_PHY_MMD1_NUM,
 			QCA808X_PHY_MMD1_PMA_TYPE, phy_data2);
+/*qca808x_end*/
+	PHY_RTN_ON_ERROR(rv);
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+/*qca808x_start*/
 
 	return rv;
 }
@@ -473,14 +477,14 @@ _qca808x_phy_set_autoneg_adv_ext(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_
 * specified device.
 */
 sw_error_t
-qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 		     fal_port_speed_t speed)
 {
 	a_uint16_t phy_data = 0;
 	fal_port_duplex_t old_duplex = QCA808X_CTRL_FULL_DUPLEX;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CONTROL);
+	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	switch(speed)
@@ -488,14 +492,14 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		case FAL_SPEED_2500:
 		case FAL_SPEED_1000:
 			if (speed == FAL_SPEED_2500) {
-				if(!qca808x_phy_2500caps(dev_id, phy_id))
+				if(!qca808x_phy_2500caps(dev_id, phy_addr))
 					return SW_NOT_SUPPORTED;
-				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id,
-						FAL_PHY_ADV_2500T_FD);
+				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_addr,
+					FAL_PHY_ADV_2500T_FD);
 				PHY_RTN_ON_ERROR(rv);
 			} else {
-				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id,
-						~FAL_PHY_ADV_2500T_FD);
+				rv = qca808x_phy_set_autoneg_adv(dev_id, phy_addr,
+						FAL_PHY_ADV_1000T_FD);
 				PHY_RTN_ON_ERROR(rv);
 			}
 			phy_data |= QCA808X_CTRL_FULL_DUPLEX;
@@ -505,9 +509,9 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 		case FAL_SPEED_100:
 		case FAL_SPEED_10:
 			/* set qca808x phy speed by pma control registers */
-			rv = qca808x_phy_set_force_speed(dev_id, phy_id, speed);
+			rv = qca808x_phy_set_force_speed(dev_id, phy_addr, speed);
 			PHY_RTN_ON_ERROR(rv);
-			rv = qca808x_phy_get_duplex(dev_id, phy_id, &old_duplex);
+			rv = qca808x_phy_get_duplex(dev_id, phy_addr, &old_duplex);
 			PHY_RTN_ON_ERROR(rv);
 
 			if (old_duplex == FAL_FULL_DUPLEX) {
@@ -522,7 +526,7 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 			return SW_BAD_PARAM;
 	}
 
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL, phy_data);
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_PHY_CONTROL, phy_data);
 
 	return rv;
 }
@@ -533,17 +537,17 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_id,
 * specified device.
 */
 sw_error_t
-qca808x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 		      fal_port_duplex_t duplex)
 {
 	a_uint16_t phy_data = 0;
 	fal_port_speed_t old_speed;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CONTROL);
+	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
-	rv = qca808x_phy_get_speed(dev_id, phy_id, &old_speed);
+	rv = qca808x_phy_get_speed(dev_id, phy_addr, &old_speed);
 	PHY_RTN_ON_ERROR(rv);
 
 	switch(old_speed)
@@ -556,21 +560,21 @@ qca808x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
 				return SW_NOT_SUPPORTED;
 			}
 			phy_data |= QCA808X_CTRL_AUTONEGOTIATION_ENABLE;
-
+			phy_data |= QCA808X_CTRL_RESTART_AUTONEGOTIATION;
 			if (old_speed == FAL_SPEED_2500) {
-				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id,
+				rv = qca808x_phy_set_autoneg_adv(dev_id, phy_addr,
 						FAL_PHY_ADV_2500T_FD);
 				PHY_RTN_ON_ERROR(rv);
 			} else {
-				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id,
-						~FAL_PHY_ADV_2500T_FD);
+				rv = qca808x_phy_set_autoneg_adv(dev_id, phy_addr,
+						FAL_PHY_ADV_1000T_FD);
 				PHY_RTN_ON_ERROR(rv);
 			}
 			break;
 		case FAL_SPEED_100:
 		case FAL_SPEED_10:
 			/* force the speed */
-			rv = qca808x_phy_set_force_speed(dev_id, phy_id, old_speed);
+			rv = qca808x_phy_set_force_speed(dev_id, phy_addr, old_speed);
 			PHY_RTN_ON_ERROR(rv);
 			phy_data &= ~QCA808X_CTRL_AUTONEGOTIATION_ENABLE;
 			if (duplex == FAL_FULL_DUPLEX) {
@@ -582,7 +586,7 @@ qca808x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_id,
 		default:
 			return SW_FAIL;
 	}
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL, phy_data);
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_PHY_CONTROL, phy_data);
 
 	return rv;
 }
@@ -1033,14 +1037,18 @@ qca808x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
 *
 */
 sw_error_t
-qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 			   a_uint32_t autoneg)
 {
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id,
-			QCA808X_AUTONEG_ADVERT);
+/*qca808x_end*/
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, autoneg);
+	SW_RTN_ON_ERROR(rv);
+/*qca808x_start*/
+
+	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_AUTONEG_ADVERT);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	phy_data &= ~QCA808X_ADVERTISE_MEGA_ALL;
@@ -1068,11 +1076,11 @@ qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 	if (autoneg & FAL_PHY_ADV_ASY_PAUSE) {
 		phy_data |= QCA808X_ADVERTISE_ASYM_PAUSE;
 	}
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_AUTONEG_ADVERT,
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_AUTONEG_ADVERT,
 			phy_data);
 	PHY_RTN_ON_ERROR(rv);
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id,
+	phy_data = qca808x_phy_reg_read(dev_id, phy_addr,
 				QCA808X_1000BASET_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
@@ -1083,12 +1091,12 @@ qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_id,
 		phy_data |= QCA808X_ADVERTISE_1000FULL;
 	}
 
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_1000BASET_CONTROL,
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_1000BASET_CONTROL,
 			phy_data);
 	PHY_RTN_ON_ERROR(rv);
 
-	if (qca808x_phy_2500caps(dev_id, phy_id) == A_TRUE) {
-		rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_id, autoneg);
+	if (qca808x_phy_2500caps(dev_id, phy_addr) == A_TRUE) {
+		rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_addr, autoneg);
 		PHY_RTN_ON_ERROR(rv);
 	} else {
 		if(autoneg & FAL_PHY_ADV_2500T_FD) {
@@ -1193,16 +1201,21 @@ a_bool_t qca808x_phy_autoneg_status(a_uint32_t dev_id, a_uint32_t phy_id)
 * qca808x_restart_autoneg - restart the phy autoneg
 *
 */
-sw_error_t qca808x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_id)
+sw_error_t qca808x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CONTROL);
+/*qca808x_end*/
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
+	SW_RTN_ON_ERROR(rv);
+/*qca808x_start*/
+
+	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	phy_data |= QCA808X_CTRL_AUTONEGOTIATION_ENABLE;
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL,
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_PHY_CONTROL,
 			     phy_data | QCA808X_CTRL_RESTART_AUTONEGOTIATION);
 
 	return rv;
@@ -1213,15 +1226,20 @@ sw_error_t qca808x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_id)
 * qca808x_phy_enable_autonego
 *
 */
-sw_error_t qca808x_phy_enable_autoneg(a_uint32_t dev_id, a_uint32_t phy_id)
+sw_error_t qca808x_phy_enable_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CONTROL);
+/*qca808x_end*/
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
+	SW_RTN_ON_ERROR(rv);
+/*qca808x_start*/
+
+	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL,
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_PHY_CONTROL,
 			     phy_data | QCA808X_CTRL_AUTONEGOTIATION_ENABLE);
 
 	return rv;

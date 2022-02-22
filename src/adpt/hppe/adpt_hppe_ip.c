@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -160,6 +162,8 @@ adpt_hppe_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry)
 
 	if ((type & FAL_IP_IP4_ADDR) == FAL_IP_IP4_ADDR) {
 		union host_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= host_entry->status;
 		entry.bf.key_type = 0;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -170,6 +174,8 @@ adpt_hppe_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry)
 		rv = hppe_host_ipv4_add(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP6_ADDR) == FAL_IP_IP6_ADDR) {
 		union host_ipv6_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= host_entry->status;
 		entry.bf.key_type = 2;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -187,6 +193,8 @@ adpt_hppe_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry)
 		rv = hppe_host_ipv6_add(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP4_ADDR_MCAST) == FAL_IP_IP4_ADDR_MCAST) {
 		union host_ipv4_mcast_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= host_entry->status;
 		entry.bf.key_type = 1;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -203,6 +211,8 @@ adpt_hppe_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * host_entry)
 		rv = hppe_host_ipv4_mcast_add(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP6_ADDR_MCAST) == FAL_IP_IP6_ADDR_MCAST) {
 		union host_ipv6_mcast_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= host_entry->status;
 		entry.bf.key_type = 3;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -690,6 +700,9 @@ adpt_hppe_ip_intf_get(
 
 	if (rv == SW_OK) {
 		union rt_interface_cnt_tbl_u cnt_ingress, cnt_egress;
+		aos_mem_zero(&cnt_ingress, sizeof(cnt_ingress));
+		aos_mem_zero(&cnt_egress, sizeof(cnt_egress));
+
 		hppe_rt_interface_cnt_tbl_get(dev_id, index, &cnt_ingress);
 		hppe_rt_interface_cnt_tbl_get(dev_id, index + 256, &cnt_egress);
 		entry->counter.rx_pkt_counter = cnt_ingress.bf.pkt_cnt;
@@ -744,6 +757,8 @@ adpt_hppe_ip_host_del(a_uint32_t dev_id, a_uint32_t del_mode,
 
 	if ((type & FAL_IP_IP4_ADDR) == FAL_IP_IP4_ADDR) {
 		union host_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= 1;
 		entry.bf.key_type = 0;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -754,6 +769,8 @@ adpt_hppe_ip_host_del(a_uint32_t dev_id, a_uint32_t del_mode,
 		rv = hppe_host_ipv4_del(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP6_ADDR) == FAL_IP_IP6_ADDR) {
 		union host_ipv6_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= 1;
 		entry.bf.key_type = 2;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -771,6 +788,8 @@ adpt_hppe_ip_host_del(a_uint32_t dev_id, a_uint32_t del_mode,
 		rv = hppe_host_ipv6_del(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP4_ADDR_MCAST) == FAL_IP_IP4_ADDR_MCAST) {
 		union host_ipv4_mcast_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= 1;
 		entry.bf.key_type = 1;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -787,6 +806,8 @@ adpt_hppe_ip_host_del(a_uint32_t dev_id, a_uint32_t del_mode,
 		rv = hppe_host_ipv4_mcast_del(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
 	} else if ((type & FAL_IP_IP6_ADDR_MCAST) == FAL_IP_IP6_ADDR_MCAST) {
 		union host_ipv6_mcast_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.valid= 1;
 		entry.bf.key_type = 3;
 		entry.bf.fwd_cmd = host_entry->action;
@@ -992,6 +1013,8 @@ adpt_hppe_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 
 	if ((type & FAL_IP_IP4_ADDR) == FAL_IP_IP4_ADDR) {
 		union host_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.key_type = 0;
 		entry.bf.ip_addr = host_entry->ip4_addr;
 		rv = hppe_host_ipv4_get(dev_id, (a_uint32_t)mode, &host_entry->entry_id, &entry);
@@ -1005,6 +1028,8 @@ adpt_hppe_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 		host_entry->status = entry.bf.valid;
 	} else if ((type & FAL_IP_IP6_ADDR) == FAL_IP_IP6_ADDR) {
 		union host_ipv6_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.key_type = 2;
 		entry.bf.ipv6_addr_0 = host_entry->ip6_addr.ul[3];
 		entry.bf.ipv6_addr_1 = host_entry->ip6_addr.ul[3] >> 10 | \
@@ -1028,6 +1053,8 @@ adpt_hppe_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 		host_entry->status = entry.bf.valid;
 	} else if ((type & FAL_IP_IP4_ADDR_MCAST) == FAL_IP_IP4_ADDR_MCAST) {
 		union host_ipv4_mcast_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.key_type = 1;
 		entry.bf.gip_addr_0 = host_entry->ip4_addr;
 		entry.bf.gip_addr_1 = host_entry->ip4_addr >> 11;
@@ -1050,6 +1077,8 @@ adpt_hppe_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 			SW_FIELD_OFFSET_IN_WORD(HOST_IPV4_MCAST_TBL_SIP_ADDR_OFFSET);
 	} else if ((type & FAL_IP_IP6_ADDR_MCAST) == FAL_IP_IP6_ADDR_MCAST) {
 		union host_ipv6_mcast_tbl_u entry;
+		aos_mem_zero(&entry, sizeof(entry));
+
 		entry.bf.key_type = 3;
 		entry.bf.vsi = host_entry->mcast_info.vsi;
 		entry.bf.gipv6_addr_0 = host_entry->ip6_addr.ul[3];
@@ -1182,6 +1211,8 @@ adpt_hppe_ip_intf_set(
 	for (i = 0; i < 8; i++) {
 		if ((entry->mac_addr_bitmap >> i) & 0x1) {
 			union my_mac_tbl_u mymac;
+			aos_mem_zero(&mymac, sizeof(mymac));
+
 			mymac.bf.valid = 1;
 			mymac.bf.mac_da_0 = eg_l3_if_tbl.bf.mac_addr_0;
 			mymac.bf.mac_da_1 = eg_l3_if_tbl.bf.mac_addr_1;
@@ -1652,6 +1683,7 @@ adpt_hppe_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_maca
 		if (mac_bitmap_del) {
 			union my_mac_tbl_u mymac;
 			a_uint8_t mac_index;
+			aos_mem_zero(&mymac, sizeof(mymac));
 
 			/* update the mac bit map of L3 intf table */
 			in_l3_if_tbl.bf.mac_bitmap &= ~mac_bitmap_del;

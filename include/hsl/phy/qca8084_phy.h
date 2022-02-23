@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -49,6 +49,14 @@
 #define QCA8084_PHY_8023AZ_EEE_2500BT                                    0x1
 #define QCA8084_PHY_MMD7_IPG_10_EN                                       0
 #define QCA8084_PHY_MMD7_IPG_11_EN                                       0x1
+/*DEBUG port analog register*/
+#define QCA8084_PHY_DEBUG_ANA_INTERFACE_CLK_SEL                          0x8b80
+
+typedef enum {
+	ADC_RISING = 0,
+	ADC_FALLING = 0xf0,
+}
+qca8084_adc_edge_t;
 
 void
 qca8084_phy_api_ops_init(hsl_phy_ops_t * hsl_phy_ops);

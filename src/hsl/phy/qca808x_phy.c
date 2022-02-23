@@ -269,6 +269,26 @@ qca808x_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return rv;
 }
 
+sw_error_t
+qca808x_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint32_t mask, a_uint32_t value)
+{
+	sw_error_t rv = SW_OK;
+	a_uint16_t phy_data = 0, new_phy_data = 0;
+
+	phy_data = qca808x_phy_debug_read (dev_id, phy_addr, debug_reg);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	new_phy_data = (phy_data & ~mask) | value;
+	rv = qca808x_phy_debug_write (dev_id, phy_addr, debug_reg,
+		new_phy_data);
+	/*check the debug register value*/
+	phy_data = qca808x_phy_debug_read (dev_id, phy_addr, debug_reg);
+	SSDK_INFO ("phy_addr:0x%x, debug_reg:0x%x, phy_data:0x%x",
+		phy_addr, debug_reg, phy_data);
+
+	return rv;
+}
+
 static sw_error_t
 qca808x_phy_ms_random_seed_set(a_uint32_t dev_id, a_uint32_t phy_id)
 {

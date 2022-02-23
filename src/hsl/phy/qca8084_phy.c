@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -543,6 +543,23 @@ qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return SW_OK;
 }
 
+static sw_error_t
+qca8084_phy_adc_edge_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	qca8084_adc_edge_t adc_edge)
+{
+	sw_error_t rv = SW_OK;
+
+	if(adc_edge != ADC_RISING && adc_edge != ADC_FALLING)
+		return SW_NOT_SUPPORTED;
+
+	rv = qca808x_phy_modify_debug(dev_id, phy_addr,
+		QCA8084_PHY_DEBUG_ANA_INTERFACE_CLK_SEL, BITS(4,4), adc_edge);
+	SW_RTN_ON_ERROR(rv);
+	rv = qca808x_phy_reset(dev_id, phy_addr);
+
+	return rv;
+}
+
 void
 qca8084_phy_api_ops_init(hsl_phy_ops_t * hsl_phy_ops)
 {
@@ -560,7 +577,10 @@ qca8084_phy_hw_init(a_uint32_t dev_id, a_uint32_t phy_addr)
 	sw_error_t rv = SW_OK;
 
 	/*adjust CDT threshold*/
-	qca8084_phy_cdt_thresh_init(dev_id, phy_addr);
+	rv = qca8084_phy_cdt_thresh_init(dev_id, phy_addr);
+	SW_RTN_ON_ERROR(rv);
+	/*invert ADC clock edge as falling edge to fix link issue*/
+	rv = qca8084_phy_adc_edge_set(dev_id, phy_addr, ADC_FALLING);
 
 	return rv;
 }

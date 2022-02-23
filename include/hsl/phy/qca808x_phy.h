@@ -484,6 +484,10 @@ sw_error_t
 qca808x_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
 		a_uint32_t mask, a_uint32_t value);
 
+sw_error_t
+qca808x_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,a_uint32_t debug_reg,
+		a_uint32_t mask, a_uint32_t value);
+
 #define QCA808X_PHY_8023AZ_AFE_CTRL_MASK        0x01f0
 #define QCA808X_PHY_8023AZ_AFE_EN               0x0090
 

@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -4214,7 +4217,7 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	}
 
 	/*record sw info and insert the sw rule entry to the sw list entry*/
-	rule_add_entry = (ADPT_HPPE_ACL_SW_RULE*)aos_mem_alloc(sizeof(ADPT_HPPE_ACL_SW_RULE));
+	rule_add_entry = (ADPT_HPPE_ACL_SW_RULE*)kzalloc(sizeof(ADPT_HPPE_ACL_SW_RULE), GFP_ATOMIC);
 	if(rule_add_entry == NULL)
 	{
 		SSDK_ERROR("%s, %d:malloc fail for rule add entry\n", __FUNCTION__, __LINE__);
@@ -4521,7 +4524,7 @@ adpt_hppe_acl_list_creat(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t list_
 		return SW_ALREADY_EXIST;
 	}
 
-	list_create_entry = (ADPT_HPPE_ACL_SW_LIST*)aos_mem_alloc(sizeof(ADPT_HPPE_ACL_SW_LIST));
+	list_create_entry = (ADPT_HPPE_ACL_SW_LIST*)kzalloc(sizeof(ADPT_HPPE_ACL_SW_LIST), GFP_ATOMIC);
 	if(list_create_entry == NULL)
 	{
 		SSDK_ERROR("%s, %d:malloc fail for list create entry\n", __FUNCTION__, __LINE__);

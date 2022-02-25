@@ -141,7 +141,7 @@ int ssdk_genl_notify_mac_info(char cmd, char *ifname, unsigned char *addr)
 				nla_total_size(ETH_ALEN) +
 				nla_total_size(sizeof(u32));
 
-	skb = genlmsg_new(payload, GFP_KERNEL);
+	skb = genlmsg_new(payload, GFP_ATOMIC);
 	if (!skb)
 	{
 		SSDK_ERROR("genlmsg_new() failed.\n");

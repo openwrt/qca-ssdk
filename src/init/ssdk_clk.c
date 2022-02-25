@@ -1,16 +1,20 @@
 /*
  * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 #include "sw.h"
 #include "ssdk_init.h"
 #include "ssdk_plat.h"
@@ -1044,6 +1048,16 @@ static void ssdk_appe_fixed_clock_init(void)
 	/* cmn ahb and sys clk */
 	ssdk_clock_rate_set_and_enable(clock_node, CMN_AHB_CLK, 0);
 	ssdk_clock_rate_set_and_enable(clock_node, CMN_SYS_CLK, 0);
+
+	/* nssnoc and nssnoc_soc clk */
+	ssdk_clock_rate_set_and_enable(clock_node, NSSCC_CLK,
+					NSS_NSSCC_CLK_RATE);
+	ssdk_clock_rate_set_and_enable(clock_node, NSSNOC_NSSCC_CLK,
+					NSS_NSSNOC_NSSCC_CLK_RATE);
+	ssdk_clock_rate_set_and_enable(clock_node, NSSNOC_SNOC_CLK,
+					NSS_NSSNOC_SNOC_CLK_RATE);
+	ssdk_clock_rate_set_and_enable(clock_node, NSSNOC_SNOC_1_CLK,
+					NSS_NSSNOC_SNOC_1_CLK_RATE);
 
 	/* GCC_UNIPHY_SYS_CFG_RCGR init 24MHz */
 	ssdk_clock_rate_set_and_enable(clock_node, UNIPHY0_SYS_CLK,

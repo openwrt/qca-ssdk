@@ -185,6 +185,8 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 			/*the work mode is PORT_UQXGMII in default*/
 			rv = mht_interface_uqxgmii_mode_set(dev_id);
 			SW_RTN_ON_ERROR (rv);
+			/*init clock for PORT_UQXGMII*/
+			ssdk_mht_gcc_clock_init(dev_id, MHT_PHY_UQXGMII_MODE, 0);
 			break;
 		case PHY_SGMII_BASET:
 		case PORT_SGMII_PLUS:

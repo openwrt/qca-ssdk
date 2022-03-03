@@ -5231,6 +5231,26 @@ extern "C" {
     SW_PARAM_DEF(SW_API_PTP_INTERRUPT_GET, SW_PTP_INTERRUPT, sizeof(SW_PTP_INTERRUPT), \
 		    SW_PARAM_PTR|SW_PARAM_OUT, "Interrupt"),
 
+#define SW_API_PTP_RTC_SYNC_SET_DESC \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_SET, SW_UINT32, sizeof(a_uint32_t), \
+		    SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_SET, SW_UINT32, sizeof(a_uint32_t), \
+		    SW_PARAM_IN, "Port ID"), \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_SET, SW_RTC_SRC_TYPE, sizeof(fal_ptp_rtc_src_type_t), \
+		    SW_PARAM_IN, "RTC SRC type"), \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_SET, SW_UINT32, sizeof(a_uint32_t), \
+		    SW_PARAM_IN, "SRC ID"),
+
+#define SW_API_PTP_RTC_SYNC_GET_DESC \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_GET, SW_UINT32, sizeof(a_uint32_t), \
+		    SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_GET, SW_UINT32, sizeof(a_uint32_t), \
+		    SW_PARAM_IN, "Port ID"), \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_GET, SW_RTC_SRC_TYPE, sizeof(fal_ptp_rtc_src_type_t), \
+		    SW_PARAM_PTR|SW_PARAM_OUT, "RTC SRC type"), \
+    SW_PARAM_DEF(SW_API_PTP_RTC_SYNC_GET, SW_UINT32, sizeof(a_uint32_t), \
+		    SW_PARAM_PTR|SW_PARAM_OUT, "SRC ID"),
+
 #define SW_API_SFP_DATA_GET_DESC \
     SW_PARAM_DEF(SW_API_SFP_DATA_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),\
     SW_PARAM_DEF(SW_API_SFP_DATA_GET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"), \

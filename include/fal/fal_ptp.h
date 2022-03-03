@@ -322,6 +322,13 @@ typedef struct {
 	a_uint32_t intr_status;
 } fal_ptp_interrupt_t;
 
+typedef enum {
+	FAL_PTP_RTC_SRC_PRE_PORT = 0, /* RTC clock source from previous mht port 1->2->3->4->1 */
+	FAL_PTP_RTC_SRC_MHT_PORT,     /* RTC clock source can be specified any mht port id */
+	FAL_PTP_RTC_SRC_EXT,          /* RTC clock source from external port such as NAPA port */
+	FAL_PTP_RTC_SRC_DIS,          /* RTC clock source disabled */
+} fal_ptp_rtc_src_type_t;
+
 sw_error_t
 fal_ptp_config_set(a_uint32_t dev_id, a_uint32_t port_id,
 		fal_ptp_config_t *config);
@@ -497,6 +504,13 @@ sw_error_t
 fal_ptp_interrupt_get(a_uint32_t dev_id, a_uint32_t port_id,
 		fal_ptp_interrupt_t *interrupt);
 
+sw_error_t
+fal_ptp_rtc_sync_set(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id);
+
+sw_error_t
+fal_ptp_rtc_sync_get(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id);
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

@@ -1018,6 +1018,8 @@ extern "C" {
 #define SW_API_PTP_CAPTURE_GET                    (40  + SW_API_PTP_OFFSET)
 #define SW_API_PTP_INTERRUPT_SET                  (41  + SW_API_PTP_OFFSET)
 #define SW_API_PTP_INTERRUPT_GET                  (42  + SW_API_PTP_OFFSET)
+#define SW_API_PTP_RTC_SYNC_SET                   (43  + SW_API_PTP_OFFSET)
+#define SW_API_PTP_RTC_SYNC_GET                   (44  + SW_API_PTP_OFFSET)
 
 /* sfp */
 #define SW_API_SFP_OFFSET                         3200

@@ -153,7 +153,12 @@ extern "C"
 #define QCA808X_ANALOG_PHY_SYNCE_CLOCK_EN  0x20
 
 #define QCA808X_MMD7_CLOCK_CTRL_REG        0x8072
-#define QCA808X_DIGITAL_PHY_SYNCE_CLOCK_EN 0x1
+#define QCA808X_DIGITAL_PHY_SYNCE_CLOCK_EN BIT(0)	/* enable synce clock manually */
+#define QCA808X_SYNCE_CLK_SEL_EN           BIT(1)	/* enable synce clock when link up */
+
+#define QCA808X_MMD1_SYNCE_CTRL            0x2000
+#define QCA808X_SYNCE_CLK_SEL_MASK         BITS(0, 5)
+#define QCA808X_SYNCE_CLK_CH0_SEL          0x20
 
   /* PHY Registers Field */
 #define QCA808X_STATUS_LINK_PASS                 0x0400

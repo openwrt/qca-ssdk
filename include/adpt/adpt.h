@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1159,6 +1159,11 @@ typedef sw_error_t (*adpt_ptp_interrupt_set_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_ptp_interrupt_get_func)(a_uint32_t dev_id,
 		a_uint32_t port_id, fal_ptp_interrupt_t *interrupt);
 
+typedef sw_error_t (*adpt_ptp_rtc_sync_set_func)(a_uint32_t dev_id,
+		a_uint32_t port_id, fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id);
+typedef sw_error_t (*adpt_ptp_rtc_sync_get_func)(a_uint32_t dev_id,
+		a_uint32_t port_id, fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id);
+
 /* sfp */
 typedef sw_error_t (*adpt_sfp_eeprom_data_get_func)(a_uint32_t dev_id,
 		a_uint32_t port_id, fal_sfp_data_t *entry);
@@ -2000,6 +2005,8 @@ typedef struct
 	adpt_ptp_capture_get_func adpt_ptp_capture_get;
 	adpt_ptp_interrupt_set_func adpt_ptp_interrupt_set;
 	adpt_ptp_interrupt_get_func adpt_ptp_interrupt_get;
+	adpt_ptp_rtc_sync_set_func adpt_ptp_rtc_sync_set;
+	adpt_ptp_rtc_sync_get_func adpt_ptp_rtc_sync_get;
 
 	/* sfp */
 	adpt_sfp_eeprom_data_get_func adpt_sfp_eeprom_data_get;

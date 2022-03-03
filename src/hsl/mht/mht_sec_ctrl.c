@@ -24,6 +24,7 @@
 #include "hsl_dev.h"
 #include "mht_sec_ctrl.h"
 #include "mht_interface_ctrl.h"
+#include "ssdk_mht_pinctrl.h"
 
 sw_error_t
 qca_mht_work_mode_set(a_uint32_t dev_id, mht_work_mode_t work_mode)
@@ -166,6 +167,203 @@ qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	return SW_OK;
 }
+
+#if defined(IN_PTP)
+sw_error_t
+qca_mht_ptp_sync_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_bool_t enable)
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	switch (mht_port_id) {
+		case SSDK_PHYSICAL_PORT1:
+		case SSDK_PHYSICAL_PORT2:
+		case SSDK_PHYSICAL_PORT3:
+		case SSDK_PHYSICAL_PORT4:
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	data = qca_mht_mii_read(dev_id, PTP_MUX_OFFSET);
+	if (enable) {
+		data |= BIT(PTP_MUX_SEL_RTC_REF_CLK_EXT_0_BOFFSET+mht_port_id-1);
+		data |= BIT(PTP_MUX_SEL_TOD_IN_EXT_0_BOFFSET+mht_port_id-1);
+		data |= BIT(PTP_MUX_SEL_PPS_IN_EXT_0_BOFFSET+mht_port_id-1);
+	} else {
+		data &= ~BIT(PTP_MUX_SEL_RTC_REF_CLK_EXT_0_BOFFSET+mht_port_id-1);
+		data &= ~BIT(PTP_MUX_SEL_TOD_IN_EXT_0_BOFFSET+mht_port_id-1);
+		data &= ~BIT(PTP_MUX_SEL_PPS_IN_EXT_0_BOFFSET+mht_port_id-1);
+	}
+
+	qca_mht_mii_write(dev_id, PTP_MUX_OFFSET, data);
+
+	return SW_OK;
+}
+
+sw_error_t
+qca_mht_ptp_sync_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_bool_t *enable)
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	switch (mht_port_id) {
+		case SSDK_PHYSICAL_PORT1:
+		case SSDK_PHYSICAL_PORT2:
+		case SSDK_PHYSICAL_PORT3:
+		case SSDK_PHYSICAL_PORT4:
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	data = qca_mht_mii_read(dev_id, PTP_MUX_OFFSET);
+	if ((data & BIT(PTP_MUX_SEL_RTC_REF_CLK_EXT_0_BOFFSET+mht_port_id-1)) &&
+			(data & BIT(PTP_MUX_SEL_TOD_IN_EXT_0_BOFFSET+mht_port_id-1)) &&
+			(data & BIT(PTP_MUX_SEL_PPS_IN_EXT_0_BOFFSET+mht_port_id-1)))
+		*enable = A_TRUE;
+	else
+		*enable = A_FALSE;
+
+	return SW_OK;
+}
+
+sw_error_t
+qca_mht_ptp_async_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t src_id)
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	switch (mht_port_id) {
+		case SSDK_PHYSICAL_PORT1:
+		case SSDK_PHYSICAL_PORT2:
+		case SSDK_PHYSICAL_PORT3:
+		case SSDK_PHYSICAL_PORT4:
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	/* configure tod, refclk, pps from external */
+	qca_mht_ptp_sync_set(dev_id, mht_port_id, A_FALSE);
+
+	/* configure the external source */
+	data = qca_mht_mii_read(dev_id, PTP_MUX_OFFSET);
+	switch (src_id) {
+		case SSDK_PHYSICAL_PORT0:
+			/* PPS_IN from pad */
+			data &= ~BITS(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET, PTP_MUX_EXT_PPS_IN_SEL_BLEN);
+			data |= BIT(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET+1);
+			/* refclk from pad */
+			data &= ~BIT(PTP_MUX_EXT_TOD_SEL_BOFFSET);
+			/* TOD_IN from pad */
+			data &= ~BIT(PTP_MUX_EXT_RTC_REF_CLK_SEL_BOFFSET);
+			break;
+		case SSDK_PHYSICAL_PORT1:
+			/* PPS_IN from port1 pps_out */
+			data &= ~BIT(PTP_MUX_EXT_PPS_P12_SEL_BOFFSET);
+			data &= ~BITS(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET, PTP_MUX_EXT_PPS_IN_SEL_BLEN);
+			/* refclk from port clk125_tdi_out */
+			data |= BIT(PTP_MUX_EXT_TOD_SEL_BOFFSET);
+			/* TOD_IN from port tod_out */
+			data |= BIT(PTP_MUX_EXT_RTC_REF_CLK_SEL_BOFFSET);
+
+			/* select the tod, clk125, pps */
+			mht_gpio_pin_mux_set(dev_id, 9, MHT_PIN_FUNC_P0_PPS_OUT);
+			mht_gpio_pin_mux_set(dev_id, 13, MHT_PIN_FUNC_P0_TOD_OUT);
+			mht_gpio_pin_mux_set(dev_id, 14, MHT_PIN_FUNC_P0_CLK125_TDI);
+			break;
+		case SSDK_PHYSICAL_PORT2:
+			/* PPS_IN from port2 pps_out */
+			data |= BIT(PTP_MUX_EXT_PPS_P12_SEL_BOFFSET);
+			data &= ~BITS(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET, PTP_MUX_EXT_PPS_IN_SEL_BLEN);
+			/* refclk from port clk125_tdi_out */
+			data |= BIT(PTP_MUX_EXT_TOD_SEL_BOFFSET);
+			/* TOD_IN from port tod_out */
+			data |= BIT(PTP_MUX_EXT_RTC_REF_CLK_SEL_BOFFSET);
+
+			/* select the tod, clk125, pps */
+			mht_gpio_pin_mux_set(dev_id, 10, MHT_PIN_FUNC_P1_PPS_OUT);
+			mht_gpio_pin_mux_set(dev_id, 13, MHT_PIN_FUNC_P1_TOD_OUT);
+			mht_gpio_pin_mux_set(dev_id, 14, MHT_PIN_FUNC_P1_CLK125_TDI);
+			break;
+		case SSDK_PHYSICAL_PORT3:
+			/* PPS_IN from port3 pps_out */
+			data &= ~BIT(PTP_MUX_EXT_PPS_P34_SEL_BOFFSET);
+			data &= ~BITS(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET, PTP_MUX_EXT_PPS_IN_SEL_BLEN);
+			data |= BIT(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET);
+			/* refclk from port clk125_tdi_out */
+			data |= BIT(PTP_MUX_EXT_TOD_SEL_BOFFSET);
+			/* TOD_IN from port tod_out */
+			data |= BIT(PTP_MUX_EXT_RTC_REF_CLK_SEL_BOFFSET);
+
+			/* select the tod, clk125, pps */
+			mht_gpio_pin_mux_set(dev_id, 11, MHT_PIN_FUNC_P2_PPS_OUT);
+			mht_gpio_pin_mux_set(dev_id, 13, MHT_PIN_FUNC_P2_TOD_OUT);
+			mht_gpio_pin_mux_set(dev_id, 14, MHT_PIN_FUNC_P2_CLK125_TDI);
+			break;
+		case SSDK_PHYSICAL_PORT4:
+			/* PPS_IN from port4 pps_out */
+			data |= BIT(PTP_MUX_EXT_PPS_P34_SEL_BOFFSET);
+			data &= ~BITS(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET, PTP_MUX_EXT_PPS_IN_SEL_BLEN);
+			data |= BIT(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET);
+			/* refclk from port clk125_tdi_out */
+			data |= BIT(PTP_MUX_EXT_TOD_SEL_BOFFSET);
+			/* TOD_IN from port tod_out */
+			data |= BIT(PTP_MUX_EXT_RTC_REF_CLK_SEL_BOFFSET);
+
+			/* select the tod, clk125, pps */
+			mht_gpio_pin_mux_set(dev_id, 12, MHT_PIN_FUNC_P3_PPS_OUT);
+			mht_gpio_pin_mux_set(dev_id, 13, MHT_PIN_FUNC_P3_TOD_OUT);
+			mht_gpio_pin_mux_set(dev_id, 14, MHT_PIN_FUNC_P3_CLK125_TDI);
+			break;
+		default:
+			SSDK_ERROR("Unsupported source id: %d\n", src_id);
+			return SW_OUT_OF_RANGE;
+	}
+
+	qca_mht_mii_write(dev_id, PTP_MUX_OFFSET, data);
+	return SW_OK;
+}
+
+sw_error_t
+qca_mht_ptp_async_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t *src_id)
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	switch (mht_port_id) {
+		case SSDK_PHYSICAL_PORT1:
+		case SSDK_PHYSICAL_PORT2:
+		case SSDK_PHYSICAL_PORT3:
+		case SSDK_PHYSICAL_PORT4:
+			break;
+		default:
+			return SW_OUT_OF_RANGE;
+	}
+
+	data = qca_mht_mii_read(dev_id, PTP_MUX_OFFSET);
+	if (data & BIT(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET+1)) {
+		*src_id = SSDK_PHYSICAL_PORT0;
+		return SW_OK;
+	}
+
+	if (data & BIT(PTP_MUX_EXT_PPS_IN_SEL_BOFFSET)) {
+		if (data & BIT(PTP_MUX_EXT_PPS_P34_SEL_BOFFSET))
+			*src_id = SSDK_PHYSICAL_PORT4;
+		else
+			*src_id = SSDK_PHYSICAL_PORT3;
+	} else {
+		if (data & BIT(PTP_MUX_EXT_PPS_P12_SEL_BOFFSET))
+			*src_id = SSDK_PHYSICAL_PORT2;
+		else
+			*src_id = SSDK_PHYSICAL_PORT1;
+	}
+
+	return SW_OK;
+}
+#endif
+
 /**
  * @}
  */

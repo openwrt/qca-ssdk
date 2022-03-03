@@ -72,6 +72,21 @@ qca_mht_port_id_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 sw_error_t
 qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t intr_bmp);
+
+#if defined(IN_PTP)
+sw_error_t
+qca_mht_ptp_sync_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_bool_t enable);
+
+sw_error_t
+qca_mht_ptp_sync_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_bool_t *enable);
+
+sw_error_t
+qca_mht_ptp_async_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t src_id);
+
+sw_error_t
+qca_mht_ptp_async_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t *src_id);
+#endif
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

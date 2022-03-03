@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -1314,6 +1317,66 @@ adpt_hppe_ptp_interrupt_get(a_uint32_t dev_id, a_uint32_t port_id,
 	return rv;
 }
 
+#if defined(MHT)
+sw_error_t
+adpt_ppe_ptp_rtc_sync_set(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_id = 0;
+	hsl_phy_ops_t *phy_drv;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY)) {
+		return SW_BAD_PARAM;
+	}
+
+	phy_drv = hsl_phy_api_ops_get(dev_id, port_id);
+	SW_RTN_ON_NULL(phy_drv);
+
+	if (NULL == phy_drv->phy_ptp_ops.phy_ptp_rtc_sync_set) {
+		return SW_NOT_SUPPORTED;
+	}
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = phy_drv->phy_ptp_ops.phy_ptp_rtc_sync_set(dev_id, phy_id, src_type, src_id);
+	return rv;
+}
+
+sw_error_t
+adpt_ppe_ptp_rtc_sync_get(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_id = 0;
+	hsl_phy_ops_t *phy_drv;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(src_type);
+	ADPT_NULL_POINT_CHECK(src_id);
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY)) {
+		return SW_BAD_PARAM;
+	}
+
+	phy_drv = hsl_phy_api_ops_get(dev_id, port_id);
+	SW_RTN_ON_NULL(phy_drv);
+
+	if (NULL == phy_drv->phy_ptp_ops.phy_ptp_rtc_sync_get) {
+		return SW_NOT_SUPPORTED;
+	}
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = phy_drv->phy_ptp_ops.phy_ptp_rtc_sync_get(dev_id, phy_id, src_type, src_id);
+	return rv;
+}
+#endif
+
 sw_error_t adpt_hppe_ptp_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -1373,6 +1436,10 @@ sw_error_t adpt_hppe_ptp_init(a_uint32_t dev_id)
 		adpt_hppe_ptp_enhanced_timestamp_engine_set;
 	p_adpt_api->adpt_ptp_enhanced_timestamp_engine_get =
 		adpt_hppe_ptp_enhanced_timestamp_engine_get;
+#if defined(MHT)
+	p_adpt_api->adpt_ptp_rtc_sync_set = adpt_ppe_ptp_rtc_sync_set;
+	p_adpt_api->adpt_ptp_rtc_sync_get = adpt_ppe_ptp_rtc_sync_get;
+#endif
 
 	return SW_OK;
 }

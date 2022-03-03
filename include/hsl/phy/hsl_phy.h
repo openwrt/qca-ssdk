@@ -390,6 +390,11 @@ extern "C" {
 	typedef sw_error_t(*hsl_phy_ptp_reference_clock_get) (a_uint32_t dev_id,
 				a_uint32_t phy_id, fal_ptp_reference_clock_t *ref_clock);
 
+	typedef sw_error_t(*hsl_phy_ptp_rtc_sync_set) (a_uint32_t dev_id, a_uint32_t phy_id,
+			fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id);
+	typedef sw_error_t(*hsl_phy_ptp_rtc_sync_get) (a_uint32_t dev_id, a_uint32_t phy_id,
+			fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id);
+
 	typedef struct hsl_phy_ptp_ops_s {
 		hsl_phy_ptp_security_set phy_ptp_security_set;
 		hsl_phy_ptp_link_delay_set phy_ptp_link_delay_set;
@@ -436,6 +441,8 @@ extern "C" {
 		hsl_phy_ptp_interrupt_get phy_ptp_interrupt_get;
 		hsl_phy_ptp_rtc_time_snapshot_enable phy_ptp_rtc_time_snapshot_enable;
 		hsl_phy_ptp_reference_clock_get phy_ptp_reference_clock_get;
+		hsl_phy_ptp_rtc_sync_set phy_ptp_rtc_sync_set;
+		hsl_phy_ptp_rtc_sync_get phy_ptp_rtc_sync_get;
 	} hsl_phy_ptp_ops_t;
 
 /*qca808x_start*/

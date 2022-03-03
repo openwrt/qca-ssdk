@@ -303,6 +303,7 @@ typedef enum
 	SW_TUNNEL_KEY,
 	SW_TUNNEL_DECAP_ACTION,
 	SW_PPE_CAPACITY,
+	SW_RTC_SRC_TYPE,
 /* auto_insert_flag */
 } sw_data_type_e;
 

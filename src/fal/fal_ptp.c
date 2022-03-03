@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -679,6 +682,40 @@ _fal_ptp_reference_clock_get(a_uint32_t dev_id, a_uint32_t port_id,
 }
 
 sw_error_t
+_fal_ptp_rtc_sync_set(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ptp_rtc_sync_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ptp_rtc_sync_set(dev_id, port_id, src_type, src_id);
+	return rv;
+}
+
+sw_error_t
+_fal_ptp_rtc_sync_get(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	p_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->adpt_ptp_rtc_sync_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_ptp_rtc_sync_get(dev_id, port_id, src_type, src_id);
+	return rv;
+}
+
+sw_error_t
 fal_ptp_security_set(a_uint32_t dev_id, a_uint32_t port_id,
 		fal_ptp_security_t *sec)
 {
@@ -1159,6 +1196,30 @@ fal_ptp_reference_clock_get(a_uint32_t dev_id, a_uint32_t port_id,
 	return rv;
 }
 
+sw_error_t
+fal_ptp_rtc_sync_set(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ptp_rtc_sync_set(dev_id, port_id, src_type, src_id);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
+sw_error_t
+fal_ptp_rtc_sync_get(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_ptp_rtc_sync_get(dev_id, port_id, src_type, src_id);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
 EXPORT_SYMBOL(fal_ptp_config_set);
 EXPORT_SYMBOL(fal_ptp_config_get);
 EXPORT_SYMBOL(fal_ptp_reference_clock_set);
@@ -1202,6 +1263,8 @@ EXPORT_SYMBOL(fal_ptp_capture_set);
 EXPORT_SYMBOL(fal_ptp_capture_get);
 EXPORT_SYMBOL(fal_ptp_interrupt_set);
 EXPORT_SYMBOL(fal_ptp_interrupt_get);
+EXPORT_SYMBOL(fal_ptp_rtc_sync_set);
+EXPORT_SYMBOL(fal_ptp_rtc_sync_get);
 
 /**
  * @}

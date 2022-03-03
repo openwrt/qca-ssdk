@@ -2659,7 +2659,9 @@ extern "C" {
     SW_API_DEF(SW_API_PTP_CAPTURE_SET, fal_ptp_capture_set), \
     SW_API_DEF(SW_API_PTP_CAPTURE_GET, fal_ptp_capture_get), \
     SW_API_DEF(SW_API_PTP_INTERRUPT_SET, fal_ptp_interrupt_set), \
-    SW_API_DEF(SW_API_PTP_INTERRUPT_GET, fal_ptp_interrupt_get),
+    SW_API_DEF(SW_API_PTP_INTERRUPT_GET, fal_ptp_interrupt_get), \
+    SW_API_DEF(SW_API_PTP_RTC_SYNC_SET, fal_ptp_rtc_sync_set), \
+    SW_API_DEF(SW_API_PTP_RTC_SYNC_GET, fal_ptp_rtc_sync_get),
 
 #define PTP_API_PARAM \
     SW_API_DESC(SW_API_PTP_CONFIG_SET) \
@@ -2704,7 +2706,9 @@ extern "C" {
     SW_API_DESC(SW_API_PTP_CAPTURE_SET) \
     SW_API_DESC(SW_API_PTP_CAPTURE_GET) \
     SW_API_DESC(SW_API_PTP_INTERRUPT_SET) \
-    SW_API_DESC(SW_API_PTP_INTERRUPT_GET)
+    SW_API_DESC(SW_API_PTP_INTERRUPT_GET) \
+    SW_API_DESC(SW_API_PTP_RTC_SYNC_SET) \
+    SW_API_DESC(SW_API_PTP_RTC_SYNC_GET)
 #else
 #define PTP_API
 #define PTP_API_PARAM

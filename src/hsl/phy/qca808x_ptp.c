@@ -19,11 +19,16 @@
 #include "hsl_api.h"
 #include "hsl.h"
 #include "hsl_phy.h"
+#include "hsl_port_prop.h"
 #include "ssdk_plat.h"
 #include "qca808x_phy.h"
 #include "qca808x_ptp_reg.h"
 #include "qca808x_ptp_api.h"
 #include "qca808x_ptp.h"
+
+#if defined(MHT)
+#include "mht_sec_ctrl.h"
+#endif
 
 sw_error_t
 qca808x_phy_ptp_config_set(a_uint32_t dev_id,
@@ -286,6 +291,251 @@ qca808x_phy_ptp_rx_timestamp_mode_get(a_uint32_t dev_id,
 }
 
 #if defined(MHT)
+/*
+ * Select the synce clock source from ADC clock channel0.
+ * Enable the synce clock out enable when the link is up.
+ */
+static sw_error_t
+_qca808x_phy_ptp_synce_clock_set(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint16_t data0 = 0, data1 = 0;
+
+	data0 = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+			QCA808X_MMD7_CLOCK_CTRL_REG);
+
+	data1 = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+			QCA808X_MMD1_SYNCE_CTRL);
+
+	if (enable) {
+		data0 |= QCA808X_SYNCE_CLK_SEL_EN;
+		data1 &= ~QCA808X_SYNCE_CLK_SEL_MASK;
+		data1 |= QCA808X_SYNCE_CLK_CH0_SEL;
+	} else {
+		data0 &= ~QCA808X_SYNCE_CLK_SEL_EN;
+		data1 &= ~QCA808X_SYNCE_CLK_SEL_MASK;
+	}
+
+	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+			QCA808X_MMD7_CLOCK_CTRL_REG, data0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
+			QCA808X_MMD1_SYNCE_CTRL, data1);
+
+	return rv;
+}
+
+static sw_error_t
+_qca808x_phy_ptp_synce_clock_get(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint16_t data = 0;
+
+	data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
+			QCA808X_MMD7_CLOCK_CTRL_REG);
+
+	if (data & QCA808X_SYNCE_CLK_SEL_EN)
+		*enable = A_TRUE;
+	else
+		*enable = A_FALSE;
+
+	return rv;
+}
+
+#define RTC_SRC_INVALID_ID	0xff
+static a_uint32_t g_rtc_src_id[SSDK_PHYSICAL_PORT4] = {0};
+
+static inline sw_error_t _qca808x_phy_mht_port_id_convert(a_uint32_t dev_id,
+		a_uint32_t *port_id, a_uint32_t *mht_port_id, a_bool_t to_mht_port)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+
+	if (!port_id || !mht_port_id)
+		return SW_BAD_PTR;
+
+	if (to_mht_port) {
+		rv = hsl_port_prop_get_phyid(dev_id, *port_id, &phy_addr);
+		SW_RTN_ON_ERROR (rv);
+
+		rv = qca_mht_port_id_get(dev_id, phy_addr, mht_port_id);
+		SW_RTN_ON_ERROR (rv);
+	} else {
+		rv = qca_mht_ephy_addr_get(dev_id, *mht_port_id, &phy_addr);
+		SW_RTN_ON_ERROR (rv);
+
+		*port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+	}
+
+	return rv;
+}
+
+sw_error_t
+qca808x_phy_ptp_rtc_sync_get(a_uint32_t dev_id, a_uint32_t phy_id,
+		fal_ptp_rtc_src_type_t *src_type, a_uint32_t *src_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mht_port_id = 0, mht_port_src_id = 0, src_phy_addr = 0;
+	a_bool_t sync_en = A_FALSE, rtc_en = A_FALSE;
+
+	rv = qca_mht_port_id_get(dev_id, phy_id, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	*src_id = g_rtc_src_id[mht_port_id - 1];
+	if (*src_id == RTC_SRC_INVALID_ID) {
+		*src_type = FAL_PTP_RTC_SRC_DIS;
+		return rv;
+	}
+
+	if (*src_id == SSDK_PHYSICAL_PORT0) {
+		*src_type = FAL_PTP_RTC_SRC_EXT;
+		mht_port_src_id = SSDK_PHYSICAL_PORT0;
+	} else {
+		/*
+		 * Sanity check whether src_id is mht port id 1-4,
+		 * otherwise return error.
+		 */
+		rv = _qca808x_phy_mht_port_id_convert(dev_id, src_id, &mht_port_src_id, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	/* Check RTC source is pre_port or mht_port */
+	rv = qca_mht_ptp_sync_get(dev_id, mht_port_id, &sync_en);
+	SW_RTN_ON_ERROR(rv);
+
+	if (sync_en == A_TRUE) {
+		*src_type = FAL_PTP_RTC_SRC_PRE_PORT;
+	} else {
+		/* Get the RTC source id, which is mht_port or external */
+		qca_mht_ptp_async_get(dev_id, mht_port_id, &mht_port_src_id);
+		*src_type = FAL_PTP_RTC_SRC_MHT_PORT;
+	}
+
+	if (mht_port_src_id == SSDK_PHYSICAL_PORT0) {
+		*src_type = FAL_PTP_RTC_SRC_EXT;
+		*src_id = SSDK_PHYSICAL_PORT0;
+	} else {
+		/* Update src_id according to the current mht_port_src_id */
+		rv = _qca808x_phy_mht_port_id_convert(dev_id, src_id, &mht_port_src_id, A_FALSE);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = qca_mht_ephy_addr_get(dev_id, mht_port_src_id, &src_phy_addr);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = _qca808x_phy_ptp_synce_clock_get(dev_id, src_phy_addr, &rtc_en);
+		SW_RTN_ON_ERROR(rv);
+
+		if (rtc_en == A_FALSE) {
+			*src_type = FAL_PTP_RTC_SRC_DIS;
+			*src_id = RTC_SRC_INVALID_ID;
+		}
+	}
+
+	return rv;
+}
+
+sw_error_t
+qca808x_phy_ptp_rtc_sync_set(a_uint32_t dev_id, a_uint32_t phy_id,
+		fal_ptp_rtc_src_type_t src_type, a_uint32_t src_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mht_port_id = 0, mht_port_src_id = 0, src_phy_addr = 0;
+	a_bool_t rtc_en = A_FALSE;
+
+	rv = qca_mht_port_id_get(dev_id, phy_id, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	switch (src_type) {
+		case FAL_PTP_RTC_SRC_PRE_PORT:
+			/* src_id is the adjacent port */
+			switch (mht_port_id) {
+				case SSDK_PHYSICAL_PORT1:
+					mht_port_src_id = SSDK_PHYSICAL_PORT4;
+					break;
+				case SSDK_PHYSICAL_PORT2:
+				case SSDK_PHYSICAL_PORT3:
+				case SSDK_PHYSICAL_PORT4:
+					mht_port_src_id = mht_port_id - 1;
+					break;
+				default:
+					SSDK_ERROR("Unsupported mht port ID: %d\n", mht_port_id);
+					return SW_OUT_OF_RANGE;
+			}
+
+			rv = _qca808x_phy_mht_port_id_convert(dev_id, &src_id,
+					&mht_port_src_id, A_FALSE);
+			SW_RTN_ON_ERROR(rv);
+
+			rv = qca_mht_ptp_sync_set(dev_id, mht_port_id, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+
+			g_rtc_src_id[mht_port_id - 1] = src_id;
+			rtc_en = A_TRUE;
+			break;
+		case FAL_PTP_RTC_SRC_MHT_PORT:
+			/*
+			 * A valid src_id need to be provided, src_id need to be updated
+			 * as the MHT port id.
+			 */
+			rv = _qca808x_phy_mht_port_id_convert(dev_id, &src_id,
+					&mht_port_src_id, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+
+			rv = qca_mht_ptp_async_set(dev_id, mht_port_id, mht_port_src_id);
+			SW_RTN_ON_ERROR(rv);
+
+			g_rtc_src_id[mht_port_id - 1] = src_id;
+			rtc_en = A_TRUE;
+			break;
+		case FAL_PTP_RTC_SRC_EXT:
+			/* src_id is the external clock source from PAD */
+			src_id = SSDK_PHYSICAL_PORT0;
+			mht_port_src_id = SSDK_PHYSICAL_PORT0;
+
+			rv = qca_mht_ptp_async_set(dev_id, mht_port_id, mht_port_src_id);
+			SW_RTN_ON_ERROR(rv);
+
+			g_rtc_src_id[mht_port_id - 1] = src_id;
+			break;
+		case FAL_PTP_RTC_SRC_DIS:
+			/*
+			 * A valid src_id need to be provided, src_id need to be updated
+			 * as the MHT port id.
+			 */
+			rv = _qca808x_phy_mht_port_id_convert(dev_id, &src_id,
+					&mht_port_src_id, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+
+			rv = qca_mht_ptp_sync_set(dev_id, mht_port_id, A_FALSE);
+			SW_RTN_ON_ERROR(rv);
+
+			g_rtc_src_id[mht_port_id - 1] = RTC_SRC_INVALID_ID;
+			rtc_en = A_FALSE;
+			break;
+		default:
+			SSDK_ERROR("Unsupported RTC source: %d\n", src_type);
+			return SW_OUT_OF_RANGE;
+	}
+
+	switch (mht_port_src_id) {
+		case SSDK_PHYSICAL_PORT1:
+		case SSDK_PHYSICAL_PORT2:
+		case SSDK_PHYSICAL_PORT3:
+		case SSDK_PHYSICAL_PORT4:
+			rv = qca_mht_ephy_addr_get(dev_id, src_id, &src_phy_addr);
+			SW_RTN_ON_ERROR(rv);
+
+			rv = _qca808x_phy_ptp_synce_clock_set(dev_id, src_phy_addr, rtc_en);
+			SW_RTN_ON_ERROR(rv);
+			break;
+		default:
+			break;
+	}
+
+	return rv;
+}
+
 static sw_error_t
 qca808x_phy_ptp_v2p1_pkt_info_get(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t ts_type,
 		fal_ptp_pkt_info_t *pkt_info)
@@ -2509,4 +2759,8 @@ void qca808x_phy_ptp_api_ops_init(hsl_phy_ptp_ops_t *ptp_ops)
 		qca808x_phy_ptp_increment_sync_from_clock_enable;
 	ptp_ops->phy_ptp_increment_sync_from_clock_status_get =
 		qca808x_phy_ptp_increment_sync_from_clock_status_get;
+#if defined(MHT)
+	ptp_ops->phy_ptp_rtc_sync_set = qca808x_phy_ptp_rtc_sync_set;
+	ptp_ops->phy_ptp_rtc_sync_get = qca808x_phy_ptp_rtc_sync_get;
+#endif
 }

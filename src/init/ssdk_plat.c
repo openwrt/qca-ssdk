@@ -672,7 +672,7 @@ static int miibus_get(a_uint32_t dev_id)
 	struct device_node *mdio_node = NULL;
 	struct device_node *switch_node = NULL;
 	struct platform_device *mdio_plat = NULL;
-	struct ipq40xx_mdio_data *mdio_data = NULL;
+	struct qca_mdio_data *mdio_data = NULL;
 	struct qca_phy_priv *priv;
 	hsl_reg_mode reg_mode = HSL_REG_LOCAL_BUS;
 	priv = qca_phy_priv_global[dev_id];
@@ -818,6 +818,27 @@ static int miibus_get(a_uint32_t dev_id)
 struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id)
 {
 	return qca_phy_priv_global[dev_id]->miibus;
+}
+
+sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq)
+{
+	struct mii_bus *bus = NULL;
+	struct qca_mdio_data *mdio_priv = NULL;
+
+	bus = ssdk_miibus_get_by_device(dev_id);
+	if (!bus) {
+		SSDK_ERROR("Can't get MDIO bus of device id %d\n", dev_id);
+		return SW_BAD_PTR;
+	}
+
+	mdio_priv = bus->priv;
+	if (!mdio_priv) {
+		SSDK_ERROR("MDIO bus private data is NULL\n");
+		return SW_BAD_PTR;
+	}
+
+	mdio_priv->clk_div = freq;
+	return SW_OK;
 }
 
 static ssize_t ssdk_dev_id_get(struct device *dev,
@@ -1592,10 +1613,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	#ifdef BOARD_AR71XX
 	int rv = 0;
 	#endif
-#if defined(MHT)
-	a_uint32_t clk_bmp = 0;
-	mht_work_mode_t clk_mode = ssdk_clk_mode_get(dev_id);
-#endif
 /*qca808x_start*/
 	SSDK_INFO("ssdk_plat_init start\n");
 /*qca808x_end*/
@@ -1651,27 +1668,12 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 		/* when manhattan works in PHY mode, the clock mode will be defined in dts,
 		 * the registers of manhattan need to be accessed, mii_reg_set/mii_reg_get
 		 * can be leveraged for this purpose. */
-		if (clk_mode != MHT_WORK_MODE_MAX) {
-			cfg->reg_func.mii_reg_set = qca_mht_mii_write;
-			cfg->reg_func.mii_reg_get = qca_mht_mii_read;
-		}
+		cfg->reg_func.mii_reg_set = qca_mht_mii_write;
+		cfg->reg_func.mii_reg_get = qca_mht_mii_read;
 #endif
 	} else if (reg_mode == HSL_REG_MDIO) {
 		cfg->reg_mode = HSL_MDIO;
-#if defined(MHT)
-		/* For phy mode(device 0), the clk_bmp is 0 bacause the port id is meaningless;
-		 * For switch mode(device 1), the clk_bmp is acquired from dts.
-		 */
-		clk_bmp = ssdk_cpu_bmp_get(dev_id) |
-			ssdk_wan_bmp_get(dev_id) |
-			ssdk_lan_bmp_get(dev_id);
-#endif
 	}
-
-#if defined(MHT)
-	if (clk_mode != MHT_WORK_MODE_MAX)
-		ssdk_mht_gcc_clock_init(dev_id, clk_mode, clk_bmp);
-#endif
 
 #ifdef DESS
 	reg_mode = ssdk_psgmii_reg_access_mode_get(dev_id);

@@ -27,16 +27,35 @@
 #include "ssdk_dts.h"
 #include "fal_interface_ctrl.h"
 #include "fal_port_ctrl.h"
+#include "ssdk_mht_clk.h"
 
 static sw_error_t
-qca_mht_work_mode_init(a_uint32_t dev_id)
+qca_mht_work_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0, a_uint32_t mac_mode1)
 {
-	mht_work_mode_t clk_mode = ssdk_clk_mode_get(dev_id);
+	sw_error_t ret = SW_OK;
 
-	if (clk_mode == MHT_WORK_MODE_MAX)
-		return SW_OUT_OF_RANGE;
+	switch (mac_mode0) {
+		case PORT_WRAPPER_SGMII_PLUS:
+		case PORT_WRAPPER_SGMII_CHANNEL0:
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
 
-	return qca_mht_work_mode_set(dev_id, clk_mode);
+	switch (mac_mode1) {
+		case PORT_WRAPPER_SGMII_PLUS:
+		case PORT_WRAPPER_SGMII_CHANNEL0:
+			ret = qca_mht_work_mode_set(dev_id, MHT_SWITCH_MODE);
+			SW_RTN_ON_ERROR(ret);
+			break;
+		case PORT_WRAPPER_MAX:
+			ret = qca_mht_work_mode_set(dev_id, MHT_SWITCH_BYPASS_PORT5_MODE);
+			SW_RTN_ON_ERROR(ret);
+		default:
+			break;
+	}
+
+	return ret;
 }
 
 static sw_error_t
@@ -106,8 +125,10 @@ qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0,
 int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	int ret = 0;
+	mht_work_mode_t work_mode;
+	a_uint32_t port_bmp = 0;
 
-	ret = qca_mht_work_mode_init(dev_id);
+	ret = qca_mht_work_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
 	SW_RTN_ON_ERROR(ret);
 
 	ret = qca_switch_init(dev_id);
@@ -118,6 +139,10 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 #endif
 	ret = qca_mht_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
 	SW_RTN_ON_ERROR(ret);
+
+	port_bmp = ssdk_cpu_bmp_get(dev_id) | ssdk_wan_bmp_get(dev_id) | ssdk_lan_bmp_get(dev_id);
+	qca_mht_work_mode_get(dev_id, &work_mode);
+	ssdk_mht_gcc_clock_init(dev_id, work_mode, port_bmp);
 
 	ret = ssdk_mht_pinctrl_init(dev_id);
 

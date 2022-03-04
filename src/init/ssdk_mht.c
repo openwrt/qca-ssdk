@@ -99,6 +99,11 @@ _qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t port_id,
 		mac_config.mac_mode = FAL_MAC_MODE_SGMII;
 		phy_info->port_mode[port_id] = PHY_SGMII_BASET;
 	}
+	else if(mac_mode == PORT_WRAPPER_MAX)
+	{
+		mac_config.mac_mode = FAL_MAC_MODE_MAX;
+		phy_info->port_mode[port_id] = PORT_INTERFACE_MODE_MAX;
+	}
 	else
 		return SW_NOT_SUPPORTED;
 	mac_config.config.sgmii.clock_mode = FAL_INTERFACE_CLOCK_MAC_MODE;

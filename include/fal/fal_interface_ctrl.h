@@ -37,7 +37,8 @@ extern "c" {
         FAL_MAC_MODE_FIBER,
         FAL_MAC_MODE_RMII,
         FAL_MAC_MODE_SGMII_PLUS,
-        FAL_MAC_MODE_DEFAULT
+        FAL_MAC_MODE_DEFAULT,
+        FAL_MAC_MODE_MAX = 0xff,
     } fal_interface_mac_mode_t;
 
     typedef enum

@@ -1222,16 +1222,11 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 	/* clock type mask value for 6 manhattan ports */
 	a_uint8_t clk_mask[SSDK_PHYSICAL_PORT5 + 1] = {0};
 	static a_bool_t gcc_common_clk_init = A_FALSE;
+	a_bool_t switch_flag = A_FALSE;
 
 	switch (clk_mode) {
 		case MHT_SWITCH_MODE:
 		case MHT_SWITCH_BYPASS_PORT5_MODE:
-			if (!pbmp && clk_mode == MHT_SWITCH_BYPASS_PORT5_MODE) {
-				/* For phy port 4 in switch bypass mode */
-				clk_mask[SSDK_PHYSICAL_PORT4] = MHT_CLK_TYPE_EPHY;
-				clk_mask[SSDK_PHYSICAL_PORT5] = MHT_CLK_TYPE_UNIPHY;
-			}
-
 			while (pbmp) {
 				if (pbmp & 1) {
 					if (mht_port_id == SSDK_PHYSICAL_PORT0 ||
@@ -1246,6 +1241,14 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 				pbmp >>= 1;
 				mht_port_id++;
 			}
+
+			if (clk_mode == MHT_SWITCH_BYPASS_PORT5_MODE) {
+				/* For phy port 4 in switch bypass mode */
+				clk_mask[SSDK_PHYSICAL_PORT4] = MHT_CLK_TYPE_EPHY;
+				clk_mask[SSDK_PHYSICAL_PORT5] = MHT_CLK_TYPE_UNIPHY;
+			}
+
+			switch_flag = A_TRUE;
 			break;
 		case MHT_PHY_UQXGMII_MODE:
 		case MHT_PHY_SGMII_UQXGMII_MODE:
@@ -1283,12 +1286,19 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 	while (mht_port_id < ARRAY_SIZE(clk_mask)) {
 		if (clk_mask[mht_port_id] != 0) {
 			ssdk_mht_gcc_port_clk_parent_set(dev_id, clk_mode, mht_port_id);
-			ssdk_mht_port_clk_en_set(dev_id,
-					mht_port_id, clk_mask[mht_port_id], A_TRUE);
+			if (clk_mask[mht_port_id] & MHT_CLK_TYPE_MAC)
+				ssdk_mht_port_clk_en_set(dev_id,
+						mht_port_id, MHT_CLK_TYPE_MAC, A_TRUE);
+			if (clk_mask[mht_port_id] & MHT_CLK_TYPE_UNIPHY && switch_flag == A_TRUE)
+				ssdk_mht_port_clk_en_set(dev_id,
+						mht_port_id, MHT_CLK_TYPE_UNIPHY, A_TRUE);
 			pbmp |= BIT(mht_port_id);
 		}
 		mht_port_id++;
 	}
+
+	/* recovery MDIO to work on normal frequency after switched to clock src serdes1 TX */
+	ssdk_miibus_freq_set(dev_id, 0xf);
 
 	SSDK_INFO("MHT GCC CLK initialization with clock mode %d on port bmp 0x%x\n",
 			clk_mode, pbmp);

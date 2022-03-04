@@ -350,10 +350,12 @@ struct qca_phy_priv {
 /*qca808x_start*/
 };
 
-struct ipq40xx_mdio_data {
-        struct mii_bus          *mii_bus;
-        void __iomem            *membase;
-        int phy_irq[PHY_MAX_ADDR];
+struct qca_mdio_data {
+	struct mii_bus *mii_bus;
+	struct clk *mdio_clk;
+	void __iomem *membase;
+	int phy_irq[PHY_MAX_ADDR];
+	int clk_div;
 };
 
 #if defined(IN_SWCONFIG)
@@ -426,6 +428,7 @@ qca_uniphy_reg_read(a_uint32_t dev_id, a_uint32_t uniphy_index,
 				a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len);
 
 struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id);
+sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq);
 
 int ssdk_sysfs_init (void);
 void ssdk_sysfs_exit (void);

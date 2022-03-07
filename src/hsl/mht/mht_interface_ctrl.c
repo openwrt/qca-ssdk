@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -193,7 +193,7 @@ mht_uniphy_xpcs_8023az_enable(a_uint32_t dev_id)
 	SW_RTN_ON_ERROR (rv);
 
 	rv = mht_uniphy_xpcs_modify_mmd(dev_id, MHT_UNIPHY_MMD3,
-		MHT_UNIPHY_MMD3_EEE_RX_TIMER, 0x1fff, MHT_UNIPHY_MMD3_EEE_RWR_REG_REGS|
+		MHT_UNIPHY_MMD3_EEE_RX_TIMER, 0x1fff, MHT_UNIPHY_MMD3_EEE_100US_REG_REGS|
 		MHT_UNIPHY_MMD3_EEE_RWR_REG_REGS);
 	SW_RTN_ON_ERROR (rv);
 

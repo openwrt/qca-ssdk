@@ -337,6 +337,13 @@ qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id)
 	phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
 							QCA808X_MMD1_PMA_CAP_REG);
 
+/*qca808x_end*/
+	/*the bit0 of mmd7 reg0x901d is used for ipq runing and 1G napa flag,
+	and qca8084 support 2.5G always*/
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+		return A_TRUE;
+/*qca808x_start*/
+
 	if (phy_data & QCA808X_STATUS_2500T_FD_CAPS) {
 		phy_data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
 			QCA808X_PHY_MMD7_CHIP_TYPE);
@@ -387,6 +394,8 @@ qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
 #if defined(MHT)
 		if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
 		{
+			/*when link down, phy speed is set as 10M*/
+			phy_status->speed = FAL_SPEED_10;
 			qca8084_phy_speed_fixup(dev_id, phy_id, phy_status);
 		}
 		else

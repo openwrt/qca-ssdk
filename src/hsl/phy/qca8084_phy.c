@@ -35,6 +35,8 @@ qca8084_phy_ipg_config(a_uint32_t dev_id, a_uint32_t phy_id,
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	phy_data &= ~QCA8084_PHY_MMD7_IPG_11_EN;
+	/*If speed is 1G, enable 11 ipg tuning*/
+	SSDK_INFO("if speed is 1G, enable 11 ipg tuning\n");
 	if(speed == FAL_SPEED_1000)
 		phy_data |= QCA8084_PHY_MMD7_IPG_11_EN;
 
@@ -106,13 +108,12 @@ _qca8084_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	else
 	{
 		/*if uniphy0 is mac mode, then there are two case: 1. uniphy0 is not
-			used(uniphy0 is not sgmii or sgmii+), and if uniphy1 is uqxgmii,
+			used(sgmii and mac mode in default), and if uniphy1 is uqxgmii,
 			then port4 interface mode is PORT_UQXGMII, 2. uniphy0 is used as
 			sgmii or sgmii+, means uniphy0 is used for switch mode, the the
 			port4 interface mode is PORT_INTERFACE_MODE_MAX*/
-		if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_MAC) &&
-			(!mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_SGMII |
-			MHT_UNIPHY_SGMII_PLUS)) && mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_1,
+		if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_MAC)
+			&& mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_1,
 			MHT_UNIPHY_UQXGMII))
 		{
 			*interface_mode_status = PORT_UQXGMII;
@@ -178,6 +179,7 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 {
 	sw_error_t rv = SW_OK;
 	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
+	a_uint32_t port_id  = 0;
 
 	switch (interface_mode) {
 		case PORT_UQXGMII:
@@ -187,6 +189,12 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 			SW_RTN_ON_ERROR (rv);
 			/*init clock for PORT_UQXGMII*/
 			ssdk_mht_gcc_clock_init(dev_id, MHT_PHY_UQXGMII_MODE, 0);
+			/*init port mode*/
+			for(port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT4;
+				port_id++)
+			{
+				phy_info->port_mode[port_id] = PORT_UQXGMII;
+			}
 			break;
 		case PHY_SGMII_BASET:
 		case PORT_SGMII_PLUS:

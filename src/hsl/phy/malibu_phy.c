@@ -24,6 +24,8 @@
 #include "ssdk_plat.h"
 
 static a_uint32_t first_phy_addr = MAX_PHY_ADDR;
+static a_uint32_t combo_phy_addr = MAX_PHY_ADDR;
+#define COMBO_PHY_ID combo_phy_addr
 
 static a_uint16_t
 _phy_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t reg)
@@ -1003,7 +1005,7 @@ malibu_phy_cdt_get(a_uint32_t dev_id, a_uint32_t phy_id,
 	a_uint16_t cable_delta_time = 0;
 	int i;
 
-	if ((!port_cdt) || (phy_id > 4)) {
+	if (!port_cdt) {
 		return SW_FAIL;
 	}
 
@@ -1078,7 +1080,7 @@ malibu_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 		__phy_reg_pages_sel(dev_id, phy_id, MALIBU_PHY_COPPER_PAGES);
 	}
 
-	if ((mdi_pair >= 4) || (phy_id > 4)) {
+	if (mdi_pair >= 4) {
 		//There are only 4 mdi pairs in 1000BASE-T
 		return SW_BAD_PARAM;
 	}
@@ -2736,6 +2738,10 @@ malibu_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 	mode = ssdk_dt_global_get_mac_mode(dev_id, 0);
 	if (mode == PORT_WRAPPER_PSGMII_FIBER)
 		malibu_phy_interface_set_mode(dev_id, first_phy_addr, PHY_PSGMII_FIBER);
+
+	/*init combo phy address*/
+	combo_phy_addr = first_phy_addr+4;
+
 	return SW_OK;
 }
 

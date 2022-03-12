@@ -881,21 +881,14 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	}
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
 
-	if (uniphy_index != SSDK_UNIPHY_INSTANCE0) {
-		if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
-			ssdk_port = SSDK_PHYSICAL_PORT5;
-		} else {
-			ssdk_port = SSDK_PHYSICAL_PORT6;
-		}
-		force_port = ssdk_port_feature_get(dev_id,
-			ssdk_port, PHY_F_FORCE);
-		if (force_port == A_TRUE) {
-			rv = hppe_uniphy_channel0_force_speed_mode_set(dev_id,
-				uniphy_index, UNIPHY_FORCE_SPEED_MODE_ENABLE);
-			SW_RTN_ON_ERROR (rv);
-			SSDK_INFO("ssdk uniphy %d connects force port\n",
-					uniphy_index);
-		}
+	force_port = ssdk_port_feature_get(dev_id,
+		ssdk_port, PHY_F_FORCE);
+	if (force_port == A_TRUE) {
+		rv = hppe_uniphy_channel0_force_speed_mode_set(dev_id,
+			uniphy_index, UNIPHY_FORCE_SPEED_MODE_ENABLE);
+		SW_RTN_ON_ERROR (rv);
+		SSDK_INFO("ssdk uniphy %d connects force port\n",
+				uniphy_index);
 	}
 	/* configure uniphy gcc software reset */
 	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);

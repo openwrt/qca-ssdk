@@ -26,7 +26,7 @@
 #define MHT_PORT_CLK_CBC_MAX		8
 /* 2 uniphy with rx and tx */
 #define MHT_UNIPHY_INSTANCE		2
-static a_uint64_t mht_uniphy_raw_clock[MHT_UNIPHY_INSTANCE * 2];
+static a_uint64_t mht_uniphy_raw_clock[MHT_UNIPHY_INSTANCE * 2] = {0};
 
 static const unsigned long mht_switch_core_support_rates[] = {
 	UQXGMII_SPEED_2500M_CLK,
@@ -1223,6 +1223,7 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 	a_uint8_t clk_mask[SSDK_PHYSICAL_PORT5 + 1] = {0};
 	static a_bool_t gcc_common_clk_init = A_FALSE;
 	a_bool_t switch_flag = A_FALSE;
+	mht_clk_parent_t uniphy_index = MHT_P_UNIPHY0_RX;
 
 	switch (clk_mode) {
 		case MHT_SWITCH_MODE:
@@ -1275,10 +1276,14 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 		 * raw clock need to be dynamically updated between UQXGMII_SPEED_2500M_CLK and
 		 * UQXGMII_SPEED_1000M_CLK according to the realtime link speed.
 		 */
-		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_RX, UQXGMII_SPEED_2500M_CLK);
-		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_TX, UQXGMII_SPEED_2500M_CLK);
-		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY1_RX, UQXGMII_SPEED_2500M_CLK);
-		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY1_TX, UQXGMII_SPEED_2500M_CLK);
+		uniphy_index = MHT_P_UNIPHY0_RX;
+		while (uniphy_index <= MHT_P_UNIPHY1_TX) {
+			/* the uniphy raw clock may be already initialized. */
+			if (0 == ssdk_mht_uniphy_raw_clock_get(dev_id, uniphy_index))
+				ssdk_mht_uniphy_raw_clock_set(dev_id, uniphy_index,
+						UQXGMII_SPEED_2500M_CLK);
+			uniphy_index++;
+		}
 	}
 
 	mht_port_id = 0;

@@ -211,6 +211,8 @@ sw_error_t ssdk_mht_clk_rate_get(a_uint32_t dev_id,
 		const char *clock_id, struct mht_clk_data *clk_data);
 a_uint32_t ssdk_mht_clk_dump(a_uint32_t dev_id, char *buf);
 a_bool_t ssdk_mht_clk_is_enabled(a_uint32_t dev_id, const char *clock_id);
+void ssdk_mht_gcc_port_clk_parent_set(a_uint32_t dev_id,
+		mht_work_mode_t clk_mode, a_uint32_t mht_port_id);
 
 #ifdef __cplusplus
 }

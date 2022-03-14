@@ -66,6 +66,7 @@ _qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_mac_config_t mac_config = {0};
 	a_bool_t force_en = A_FALSE;
 	a_uint32_t force_speed = FAL_SPEED_BUTT;
+	mht_work_mode_t work_mode = MHT_SWITCH_MODE;
 
 	force_en = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
 	if (force_en == A_TRUE) {
@@ -76,6 +77,11 @@ _qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t port_id,
 
 		rv = fal_port_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
 		SW_RTN_ON_ERROR(rv);
+
+		/* The clock parent need to be configured before initializing
+		 * the interface mode. */
+		qca_mht_work_mode_get(dev_id, &work_mode);
+		ssdk_mht_gcc_port_clk_parent_set(dev_id, work_mode, port_id);
 	}
 
 

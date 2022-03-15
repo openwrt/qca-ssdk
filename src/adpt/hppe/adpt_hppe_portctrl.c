@@ -2812,10 +2812,11 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 		case PORT_WRAPPER_SGMII0_RGMII4:
 		case PORT_WRAPPER_SGMII_CHANNEL0:
 		case PORT_WRAPPER_SGMII_FIBER:
-#ifdef CPPE
 		case PORT_WRAPPER_SGMII_PLUS:
-			if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION
-				&& port_id == SSDK_PHYSICAL_PORT4)
+#ifdef CPPE
+			if(adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+				adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION &&
+				port_id == SSDK_PHYSICAL_PORT4)
 			{
 				qca_hppe_port_mac_type_set(dev_id, port_id,
 					PORT_GMAC_TYPE);
@@ -2857,6 +2858,11 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 				{
 					_adpt_hppe_port_interface_mode_set(dev_id,
 							SSDK_PHYSICAL_PORT1, PORT_SGMII_FIBER);
+				}
+				else if(mode0 == PORT_WRAPPER_SGMII_PLUS)
+				{
+					_adpt_hppe_port_interface_mode_set(dev_id,
+						SSDK_PHYSICAL_PORT1, PORT_SGMII_PLUS);
 				}
 				else
 				{
@@ -3052,15 +3058,24 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 				 port_interface_mode[dev_id][port_id] ==PORT_USXGMII ||
 				 port_interface_mode[dev_id][port_id] == PORT_10GBASE_R))
 		{
-#ifdef CPPE
-			if(port_interface_mode[dev_id][port_id] == PORT_SGMII_PLUS
-				&& adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION
-				&& port_id == SSDK_PHYSICAL_PORT4)
+			if(port_interface_mode[dev_id][port_id] == PORT_SGMII_PLUS)
 			{
-				*mode0 = PORT_WRAPPER_SGMII_PLUS;
-				continue;
-			}
+#ifdef CPPE
+				if(adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+					adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION &&
+					port_id == SSDK_PHYSICAL_PORT4)
+				{
+					*mode0 = PORT_WRAPPER_SGMII_PLUS;
+					continue;
+				}
+#else
+				if(port_id == SSDK_PHYSICAL_PORT1)
+				{
+					*mode0 = PORT_WRAPPER_SGMII_PLUS;
+					continue;
+				}
 #endif
+			}
 			SSDK_ERROR("port %d doesn't support port_interface_mode %d\n",
 				port_id, port_interface_mode[dev_id][port_id]);
 			return SW_NOT_SUPPORTED;
@@ -3364,9 +3379,10 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 			case PORT_WRAPPER_SGMII0_RGMII4:
 			case PORT_WRAPPER_SGMII_CHANNEL0:
 			case PORT_WRAPPER_SGMII_FIBER:
-#ifdef CPPE
 			case PORT_WRAPPER_SGMII_PLUS:
-				if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+#ifdef CPPE
+				if(adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+					adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
 				{
 					a_uint32_t mode_tmp = 0;
 					mode_tmp = mode[SSDK_UNIPHY_INSTANCE0];
@@ -5235,6 +5251,8 @@ adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
 #if defined(APPE)
 			adpt_hppe_usxgmii_speed_clock_set(dev_id,port_id, phy_speed);
 #endif
+		} else if (mode == PORT_WRAPPER_SGMII_PLUS) {
+			adpt_hppe_sgmiiplus_speed_clock_set(dev_id, port_id, phy_speed);
 		} else {
 			adpt_hppe_pqsgmii_speed_clock_set(dev_id, port_id, phy_speed);
 		}

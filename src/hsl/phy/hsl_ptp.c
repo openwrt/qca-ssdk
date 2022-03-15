@@ -121,6 +121,7 @@ static int hsl_ptp_event_stat_operation_callback(struct device *dev, void *data)
 
 	switch (phy_id) {
 		case QCA8081_PHY_V1_1:
+		case QCA8084_PHY:
 			pkt_stat = ((qca808x_priv *)priv)->ptp_event_stat;
 			break;
 		default:

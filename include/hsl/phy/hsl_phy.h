@@ -755,6 +755,13 @@ hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 /*qca808x_end*/
 
 /*qca808x_start*/
+sw_error_t
+hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);
+sw_error_t
+hsl_port_phy_counter_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
+sw_error_t
+hsl_port_phy_counter_show(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_counter_info_t *counter_info);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

@@ -22,6 +22,7 @@
  */
 #include "sw.h"
 #include "fal_port_ctrl.h"
+#include "hsl_phy.h"
 #include "hsl_api.h"
 /*qca808x_end*/
 #include "adpt.h"
@@ -1613,24 +1614,7 @@ _fal_port_interface_mode_status_get (a_uint32_t dev_id, fal_port_t port_id, fal_
 static sw_error_t
 _fal_port_counter_set (a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
-  sw_error_t rv;
-  hsl_api_t *p_api;
-/*qca808x_end*/
-    adpt_api_t *p_adpt_api;
-
-    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
-        p_adpt_api->adpt_port_counter_set != NULL) {
-        rv = p_adpt_api->adpt_port_counter_set(dev_id, port_id, enable);
-        return rv;
-    }
-/*qca808x_start*/
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_counter_set)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_counter_set (dev_id, port_id, enable);
-  return rv;
+  return hsl_port_phy_counter_set(dev_id, port_id, enable);
 }
 
 
@@ -1638,47 +1622,13 @@ static sw_error_t
 _fal_port_counter_get (a_uint32_t dev_id, fal_port_t port_id,
 		      a_bool_t * enable)
 {
-  sw_error_t rv;
-  hsl_api_t *p_api;
-/*qca808x_end*/
-    adpt_api_t *p_adpt_api;
-
-    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
-        p_adpt_api->adpt_port_counter_get != NULL) {
-        rv = p_adpt_api->adpt_port_counter_get(dev_id, port_id, enable);
-        return rv;
-    }
-/*qca808x_start*/
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_counter_get)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_counter_get (dev_id, port_id, enable);
-  return rv;
+  return hsl_port_phy_counter_get(dev_id, port_id, enable);
 }
 
 static sw_error_t
 _fal_port_counter_show (a_uint32_t dev_id, fal_port_t port_id, fal_port_counter_info_t * counter_info)
 {
-  sw_error_t rv;
-  hsl_api_t *p_api;
-/*qca808x_end*/
-    adpt_api_t *p_adpt_api;
-
-    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
-        p_adpt_api->adpt_port_counter_show != NULL) {
-        rv = p_adpt_api->adpt_port_counter_show(dev_id, port_id, counter_info);
-        return rv;
-    }
-/*qca808x_start*/
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_counter_show)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_counter_show (dev_id, port_id, counter_info);
-  return rv;
+  return hsl_port_phy_counter_show(dev_id, port_id, counter_info);
 }
 /*qca808x_end*/
 #endif

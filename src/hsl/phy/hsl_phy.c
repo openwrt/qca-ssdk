@@ -19,6 +19,7 @@
 #include "sw.h"
 #include "hsl_phy.h"
 #include "hsl.h"
+#include "hsl_dev.h"
 /*qca808x_end*/
 #include "ssdk_dts.h"
 #if defined(ISIS) ||defined(ISISC) ||defined(GARUDA)
@@ -1017,7 +1018,85 @@ hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	SW_RTN_ON_ERROR (rv);
 	rv = phy_drv->phy_interface_mode_status_get(dev_id, phy_addr,
 		interface_mode_status);
-	SW_RTN_ON_ERROR(rv);;
+	SW_RTN_ON_ERROR(rv);
+
+	return SW_OK;
+}
+
+sw_error_t
+hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
+{
+	sw_error_t rv;
+	a_uint32_t phy_id = 0;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if(NULL == phy_drv->phy_counter_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = phy_drv->phy_counter_set(dev_id, phy_id, enable);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_counter_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
+{
+	sw_error_t rv;
+	a_uint32_t phy_id = 0;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if(NULL == phy_drv->phy_counter_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = phy_drv->phy_counter_get(dev_id, phy_id, enable);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_counter_show(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_counter_info_t *counter_info)
+{
+	sw_error_t rv;
+	a_uint32_t phy_id = 0;
+	hsl_phy_ops_t *phy_drv;
+
+	HSL_DEV_ID_CHECK (dev_id);
+
+	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_counter_show)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = phy_drv->phy_counter_show(dev_id, phy_id, counter_info);
 
 	return rv;
 }

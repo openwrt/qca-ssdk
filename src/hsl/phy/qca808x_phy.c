@@ -281,6 +281,20 @@ qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id)
 
 }
 
+a_bool_t
+qca808x_phy_id_check(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t phy_id)
+{
+	a_uint32_t phy_id_tmp = 0;
+
+	qca808x_phy_get_phy_id (dev_id, phy_addr, &phy_id_tmp);
+
+	if(phy_id_tmp == phy_id)
+		return A_TRUE;
+
+	return A_FALSE;
+}
+
 /******************************************************************************
 *
 * qca808x_phy_get status
@@ -632,10 +646,14 @@ sw_error_t qca808x_phy_reset(a_uint32_t dev_id, a_uint32_t phy_id)
 	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL,
 			     phy_data | QCA808X_CTRL_SOFTWARE_RESET);
 	SW_RTN_ON_ERROR(rv);
-	/*the configure will lost when reset.*/
-	rv = qca808x_phy_ms_seed_enable(dev_id, phy_id, A_TRUE);
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8081_PHY_V1_1) &&
+		qca808x_phy_2500caps(dev_id, phy_id))
+	{
+		/*the configure will lost when reset for 2.5G napa*/
+		rv = qca808x_phy_ms_seed_enable(dev_id, phy_id, A_TRUE);
+	}
 
-	return rv;
+	return SW_OK;
 }
 /******************************************************************************
 *

@@ -374,6 +374,25 @@ void
 qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
 void
 qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
+sw_error_t
+qca_mht_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                    a_uint32_t bit_offset, a_uint32_t field_len,
+                    a_uint8_t value[], a_uint32_t value_len);
+sw_error_t
+qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint32_t bit_offset, a_uint32_t field_len,
+                   const a_uint8_t value[], a_uint32_t value_len);
+
+#define MHT_REG_FIELD_GET(rv, dev, reg, index, field, value, val_len) \
+	rv = qca_mht_mii_field_get(dev, reg##_OFFSET + ((a_uint32_t)index) * reg##_E_OFFSET,\
+	reg##_##field##_BOFFSET, \
+	reg##_##field##_BLEN, value, val_len);
+
+#define MHT_REG_FIELD_SET(rv, dev, reg, index, field, value, val_len) \
+		rv = qca_mht_mii_field_set(dev, reg##_OFFSET + ((a_uint32_t)index) * reg##_E_OFFSET,\
+		reg##_##field##_BOFFSET, \
+		reg##_##field##_BLEN, value, val_len);
+
 a_uint32_t
 qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
 void

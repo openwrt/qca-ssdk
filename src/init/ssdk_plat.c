@@ -248,6 +248,57 @@ qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_
 	return;
 }
 
+sw_error_t
+qca_mht_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                    a_uint32_t bit_offset, a_uint32_t field_len,
+                    a_uint8_t value[], a_uint32_t value_len)
+{
+    a_uint32_t reg_val = 0;
+
+    if ((bit_offset >= 32 || (field_len > 32)) || (field_len == 0))
+        return SW_OUT_OF_RANGE;
+
+    if (value_len != sizeof (a_uint32_t))
+        return SW_BAD_LEN;
+
+    reg_val = qca_mht_mii_read(dev_id, reg_addr);
+
+    if(32 == field_len) {
+        *((a_uint32_t *) value) = reg_val;
+    } else  {
+        *((a_uint32_t *) value) = SW_REG_2_FIELD(reg_val, bit_offset, field_len);
+    }
+
+    return SW_OK;
+}
+
+sw_error_t
+qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint32_t bit_offset, a_uint32_t field_len,
+                   const a_uint8_t value[], a_uint32_t value_len)
+{
+	a_uint32_t reg_val = 0;
+	a_uint32_t field_val = *((a_uint32_t *) value);
+
+	if ((bit_offset >= 32 || (field_len > 32)) || (field_len == 0))
+		return SW_OUT_OF_RANGE;
+
+	if (value_len != sizeof (a_uint32_t))
+		return SW_BAD_LEN;
+
+	reg_val = qca_mht_mii_read(dev_id, reg_addr);
+
+	if(32 == field_len) {
+		reg_val = field_val;
+	} else {
+		SW_REG_SET_BY_FIELD_U32(reg_val, field_val, bit_offset, field_len);
+	}
+
+	qca_mht_mii_write(dev_id, reg_addr, reg_val);
+
+	return SW_OK;
+}
+
 static inline void
 split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page)
 {

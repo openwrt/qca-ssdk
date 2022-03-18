@@ -17,6 +17,7 @@
 #include "sw.h"
 #include "hsl_phy.h"
 #include "ssdk_plat.h"
+#include "ssdk_mht_pinctrl.h"
 #include "qca808x_phy.h"
 #include "qca8084_phy.h"
 #include "mht_sec_ctrl.h"
@@ -189,6 +190,10 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 			SW_RTN_ON_ERROR (rv);
 			/*init clock for PORT_UQXGMII*/
 			ssdk_mht_gcc_clock_init(dev_id, MHT_PHY_UQXGMII_MODE, 0);
+
+			/*init pinctrl for phy mode*/
+			rv = ssdk_mht_pinctrl_init(dev_id);
+
 			/*init port mode*/
 			for(port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT4;
 				port_id++)

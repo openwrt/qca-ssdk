@@ -90,7 +90,7 @@ sw_error_t mht_gpio_set_bit(a_uint32_t dev_id, a_uint32_t pin, a_uint32_t value)
 {
     sw_error_t rv = SW_OK;
 
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_IN_OUTN, pin, GPIO_OUT,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_IN_OUTN, pin, GPIO_OUT,
                       (a_uint8_t *) (&value), sizeof(a_uint32_t));
     SSDK_DEBUG("[%s] select pin:%d value:%d\n", __func__, pin, value);
 
@@ -101,7 +101,7 @@ sw_error_t mht_gpio_get_bit(a_uint32_t dev_id, a_uint32_t pin, a_uint32_t *data)
 {
     sw_error_t rv = SW_OK;
 
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_IN_OUTN, pin, GPIO_IN,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_IN_OUTN, pin, GPIO_IN,
                       (a_uint8_t *) (data), sizeof(a_uint32_t));
     SSDK_DEBUG("[%s] select pin:%d value:%d\n", __func__, pin, *data);
 
@@ -113,7 +113,7 @@ sw_error_t mht_gpio_pin_mux_set(a_uint32_t dev_id, a_uint32_t pin, a_uint32_t fu
     sw_error_t rv = SW_OK;
 
     SSDK_DEBUG("[%s] select pin:%d func:%d\n", __func__, pin, func);
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, FUNC_SEL,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, FUNC_SEL,
                       (a_uint8_t *) (&func), sizeof(a_uint32_t));
 
     return rv;
@@ -143,7 +143,7 @@ sw_error_t mht_gpio_pin_cfg_set_bias(a_uint32_t dev_id, a_uint32_t pin, enum pin
             return -1;
     }
 
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_PULL,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_PULL,
                       (a_uint8_t *) (&data), sizeof(a_uint32_t));
     SSDK_DEBUG("[%s]pin:%d bias:%d", __func__, pin, bias);
 
@@ -155,7 +155,7 @@ sw_error_t mht_gpio_pin_cfg_get_bias(a_uint32_t dev_id, a_uint32_t pin, enum pin
     sw_error_t rv = SW_OK;
     a_uint32_t data = 0;
 
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_PULL,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_PULL,
                       (a_uint8_t *) (&data), sizeof (a_uint32_t));
     switch (data)
     {
@@ -190,7 +190,7 @@ sw_error_t mht_gpio_pin_cfg_set_drvs(a_uint32_t dev_id, a_uint32_t pin, a_uint32
         return SW_BAD_PARAM;
     }
 
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, DRV_STRENGTH,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, DRV_STRENGTH,
                       (a_uint8_t *) (&drvs), sizeof(a_uint32_t));
     SSDK_DEBUG("[%s]%d", __func__, pin);
 
@@ -201,7 +201,7 @@ sw_error_t mht_gpio_pin_cfg_get_drvs(a_uint32_t dev_id, a_uint32_t pin, a_uint32
 {
     sw_error_t rv = SW_OK;
 
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, DRV_STRENGTH,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, DRV_STRENGTH,
                       (a_uint8_t *) (drvs), sizeof(a_uint32_t));
     SSDK_DEBUG("[%s]%d", __func__, pin);
 
@@ -214,7 +214,7 @@ sw_error_t mht_gpio_pin_cfg_set_oe(a_uint32_t dev_id, a_uint32_t pin, a_bool_t o
 
     SSDK_DEBUG("[%s]%d oe:%d", __func__, pin, oe);
 
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_OE,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_OE,
                       (a_uint8_t *) (&oe), sizeof(a_uint32_t));
 
     return rv;
@@ -225,7 +225,7 @@ sw_error_t mht_gpio_pin_cfg_get_oe(a_uint32_t dev_id, a_uint32_t pin, a_bool_t *
     sw_error_t rv = SW_OK;
     a_uint32_t data = 0;
 
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_OE,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_OE,
                       (a_uint8_t *) (&data), sizeof (a_uint32_t));
     *oe = data ? A_TRUE : A_FALSE;
 
@@ -289,11 +289,11 @@ sw_error_t mht_pinctrl_clk_gate_set(a_uint32_t dev_id, a_bool_t gate_en)
 {
     sw_error_t rv = SW_OK;
 
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_CLK_GATE_EN, 0, AHB_HCLK_EN,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_CLK_GATE_EN, 0, AHB_HCLK_EN,
                       (a_uint8_t *) (&gate_en), sizeof (a_bool_t));
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_CLK_GATE_EN, 0, SUMMARY_INTR_EN,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_CLK_GATE_EN, 0, SUMMARY_INTR_EN,
                       (a_uint8_t *) (&gate_en), sizeof (a_bool_t));
-    HSL_REG_FIELD_SET(rv, dev_id, TLMM_CLK_GATE_EN, 0, CRIF_READ_EN,
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_CLK_GATE_EN, 0, CRIF_READ_EN,
                       (a_uint8_t *) (&gate_en), sizeof (a_bool_t));
 
     SSDK_INFO("[%s] gate_en:%d", __func__, gate_en);
@@ -306,20 +306,20 @@ static sw_error_t mht_pinctrl_rev_check(a_uint32_t dev_id)
     sw_error_t rv = SW_OK;
     a_uint32_t version_id = 0, mfg_id = 0, start_bit = 0;
 
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_HW_REVISION_NUMBER, 0, VERSION_ID,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_HW_REVISION_NUMBER, 0, VERSION_ID,
                       (a_uint8_t *) (&version_id), sizeof (a_uint32_t));
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_HW_REVISION_NUMBER, 0, MFG_ID,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_HW_REVISION_NUMBER, 0, MFG_ID,
                       (a_uint8_t *) (&mfg_id), sizeof (a_uint32_t));
-    HSL_REG_FIELD_GET(rv, dev_id, TLMM_HW_REVISION_NUMBER, 0, START_BIT,
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_HW_REVISION_NUMBER, 0, START_BIT,
                       (a_uint8_t *) (&start_bit), sizeof (a_uint32_t));
 
     SSDK_INFO("[%s] version_id:0x%x mfg_id:0x%x start_bit:0x%x",
                                 __func__, version_id, mfg_id, start_bit);
 
     if((version_id == 0x0) && (mfg_id == 0x70) && (start_bit == 0x1)) {
-        SSDK_INFO(" Check Result is Pass\n");
+        SSDK_INFO(" Pinctrl Version Check Pass\n");
     } else {
-        SSDK_INFO(" Check Result is Fail\n");
+        SSDK_INFO(" Pinctrl Version Check Fail\n");
         rv = SW_FAIL;
     }
 

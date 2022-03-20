@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -162,12 +164,12 @@ adpt_mp_uniphy_reset(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	rv = hppe_uniphy_pll_reset_ctrl_set(dev_id, uniphy_index,
 		&pll_software_reset);
 	SW_RTN_ON_ERROR (rv);
-	msleep(500);
+	msleep(100);
 	pll_software_reset.bf.software_reset_analog_reset = 1;
 	rv = hppe_uniphy_pll_reset_ctrl_set(dev_id, uniphy_index,
 		&pll_software_reset);
 	SW_RTN_ON_ERROR (rv);
-	msleep(500);
+	msleep(100);
 
 	return SW_OK;
 }

@@ -500,7 +500,8 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(SYS_PATH)/include/generated/uapi \
               -I$(SYS_PATH)/include/uapi \
               -I$(SYS_PATH)/arch/arm/include/uapi \
-              -I$(SYS_PATH)/source/arch/arm/include/asm/mach
+              -I$(SYS_PATH)/source/arch/arm/include/asm/mach \
+              -I$(TOOL_PATH)/../../lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/9.3.0/include/
 
 	      ifneq ($(wildcard $(SYS_PATH)/include/linux/kconfig.h),)
 	          MODULE_INC += -include $(SYS_PATH)/include/linux/kconfig.h

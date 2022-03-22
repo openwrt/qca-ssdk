@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -122,11 +122,35 @@ qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0,
 	return rv;
 }
 
+static inline void qca_mht_switch_reset(a_uint32_t dev_id)
+{
+	/* Reset switch core */
+	ssdk_mht_clk_reset(dev_id, MHT_SWITCH_CORE_CLK);
+
+	/* Reset MAC ports */
+	ssdk_mht_clk_reset(dev_id, MHT_MAC0_TX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC0_RX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC1_TX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC1_RX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC2_TX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC2_RX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC3_TX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC3_RX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC4_TX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC4_RX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC5_TX_CLK);
+	ssdk_mht_clk_reset(dev_id, MHT_MAC5_RX_CLK);
+
+	return;
+}
+
 int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	int ret = 0;
 	mht_work_mode_t work_mode;
 	a_uint32_t port_bmp = 0;
+
+	qca_mht_switch_reset(dev_id);
 
 	ret = qca_mht_work_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
 	SW_RTN_ON_ERROR(ret);

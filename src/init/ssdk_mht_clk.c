@@ -1297,9 +1297,6 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 		mht_port_id++;
 	}
 
-	/* recovery MDIO to work on normal frequency after switched to clock src serdes1 TX */
-	ssdk_miibus_freq_set(dev_id, 0xf);
-
 	SSDK_INFO("MHT GCC CLK initialization with clock mode %d on port bmp 0x%x\n",
 			clk_mode, pbmp);
 }

@@ -120,7 +120,6 @@
 
 extern struct qca_phy_priv **qca_phy_priv_global;
 /*qca808x_end*/
-struct mutex switch_mdio_lock;
 
 #ifdef BOARD_IPQ806X
 #define PLATFORM_MDIO_BUS_NAME		"mdio-gpio"
@@ -203,12 +202,12 @@ qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg)
 	bus = qca_phy_priv_global[dev_id]->miibus;
 
 	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
-	mutex_lock(&switch_mdio_lock);
-	mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
 	udelay(100);
-	lo = mdiobus_read(bus, 0x10 | r2, r1);
-	hi = mdiobus_read(bus, 0x10 | r2, r1 + 2);
-	mutex_unlock(&switch_mdio_lock);
+	lo = __mdiobus_read(bus, 0x10 | r2, r1);
+	hi = __mdiobus_read(bus, 0x10 | r2, r1 + 2);
+	mutex_unlock(&bus->mdio_lock);
 	return (hi << 16) | lo;
 }
 
@@ -225,12 +224,12 @@ qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	lo = val & 0xffff;
 	hi = (a_uint16_t) (val >> 16);
 
-	mutex_lock(&switch_mdio_lock);
-	mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
 	udelay(100);
-	mdiobus_write(bus, 0x10 | r2, r1, lo);
-	mdiobus_write(bus, 0x10 | r2, r1 + 2, hi);
-	mutex_unlock(&switch_mdio_lock);
+	__mdiobus_write(bus, 0x10 | r2, r1, lo);
+	__mdiobus_write(bus, 0x10 | r2, r1 + 2, hi);
+	mutex_unlock(&bus->mdio_lock);
 }
 
 void
@@ -272,13 +271,13 @@ qca_ar8216_mii_read(a_uint32_t dev_id, a_uint32_t reg)
 	bus = qca_phy_priv_global[dev_id]->miibus;
 
 	split_addr((uint32_t) reg, &r1, &r2, &page);
-	mutex_lock(&switch_mdio_lock);
-	mdiobus_write(bus, switch_chip_id, switch_chip_reg, page);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, page);
 	udelay(100);
-	lo = mdiobus_read(bus, 0x10 | r2, r1);
-	hi = mdiobus_read(bus, 0x10 | r2, r1 + 1);
-	mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
-	mutex_unlock(&switch_mdio_lock);
+	lo = __mdiobus_read(bus, 0x10 | r2, r1);
+	hi = __mdiobus_read(bus, 0x10 | r2, r1 + 1);
+	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
+	mutex_unlock(&bus->mdio_lock);
 	return (hi << 16) | lo;
 }
 
@@ -296,18 +295,18 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	lo = val & 0xffff;
 	hi = (a_uint16_t) (val >> 16);
 
-	mutex_lock(&switch_mdio_lock);
-	mdiobus_write(bus, switch_chip_id, switch_chip_reg, r3);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, r3);
 	udelay(100);
 	if(chip_type != CHIP_SHIVA) {
-		mdiobus_write(bus, 0x10 | r2, r1, lo);
-		mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
+		__mdiobus_write(bus, 0x10 | r2, r1, lo);
+		__mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
 	} else {
-		mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
-		mdiobus_write(bus, 0x10 | r2, r1, lo);
+		__mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
+		__mdiobus_write(bus, 0x10 | r2, r1, lo);
 	}
-	mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
-	mutex_unlock(&switch_mdio_lock);
+	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
+	mutex_unlock(&bus->mdio_lock);
 }
 
 a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg)
@@ -383,7 +382,10 @@ qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (!bus)
 		return SW_NOT_SUPPORTED;
 
-	*data = mdiobus_read(bus, phy_addr, reg);
+	mutex_lock(&bus->mdio_lock);
+	*data = __mdiobus_read(bus, phy_addr, reg);
+	mutex_unlock(&bus->mdio_lock);
+
 	return 0;
 }
 
@@ -402,7 +404,10 @@ qca_ar8327_phy_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (!bus)
 		return SW_NOT_SUPPORTED;
 
-	mdiobus_write(bus, phy_addr, reg, data);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, phy_addr, reg, data);
+	mutex_unlock(&bus->mdio_lock);
+
 	return 0;
 }
 
@@ -421,8 +426,10 @@ qca_ar8327_phy_dbg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (!bus)
 		return;
 
-	mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
-	mdiobus_write(bus, phy_addr, QCA_MII_DBG_DATA, dbg_data);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
+	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_DATA, dbg_data);
+	mutex_unlock(&bus->mdio_lock);
 }
 
 void
@@ -440,8 +447,10 @@ qca_ar8327_phy_dbg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (!bus)
 		return;
 
-	mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
-	*dbg_data = mdiobus_read(bus, phy_addr, QCA_MII_DBG_DATA);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
+	*dbg_data = __mdiobus_read(bus, phy_addr, QCA_MII_DBG_DATA);
+	mutex_unlock(&bus->mdio_lock);
 }
 
 
@@ -460,8 +469,10 @@ qca_ar8327_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (!bus)
 		return;
 
-	mdiobus_write(bus, phy_addr, QCA_MII_MMD_ADDR, addr);
-	mdiobus_write(bus, phy_addr, QCA_MII_MMD_DATA, data);
+	mutex_lock(&bus->mdio_lock);
+	__mdiobus_write(bus, phy_addr, QCA_MII_MMD_ADDR, addr);
+	__mdiobus_write(bus, phy_addr, QCA_MII_MMD_DATA, data);
+	mutex_unlock(&bus->mdio_lock);
 }
 
 void qca_phy_mmd_write(u32 dev_id, u32 phy_id,
@@ -1616,7 +1627,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 /*qca808x_start*/
 	SSDK_INFO("ssdk_plat_init start\n");
 /*qca808x_end*/
-	mutex_init(&switch_mdio_lock);
 
 	if(!ssdk_is_emulation(dev_id)){
 /*qca808x_start*/

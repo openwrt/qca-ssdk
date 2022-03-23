@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2015-2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup isisc_port_ctrl ISISC_PORT_CONTROL
@@ -25,17 +27,26 @@
 #include "isisc_reg.h"
 #include "hsl_phy.h"
 
+#if defined(MHT)
+#include "mht_port_ctrl.h"
+#endif
+
 static a_bool_t
 _isisc_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
 {
-    if ((0 == port_id) || (6 == port_id))
-    {
-        return A_FALSE;
-    }
-    else
-    {
-        return A_TRUE;
-    }
+	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
+	a_uint32_t cpu_bmp = BIT(6) | BIT(0);
+
+	chip_type = hsl_get_current_chip_type(dev_id);
+#if defined(MHT)
+	if (chip_type == CHIP_MHT)
+		return hsl_port_phy_connected(dev_id, port_id);
+#endif
+
+	if (cpu_bmp & BIT(port_id))
+		return A_FALSE;
+	else
+		return A_TRUE;
 }
 
 static sw_error_t
@@ -2926,6 +2937,21 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
         p_api->port_mdix_get = isisc_port_mdix_get;
         p_api->port_mdix_status_get = isisc_port_mdix_status_get;
 #endif
+
+#if defined(MHT)
+	p_api->port_congestion_drop_set = mht_port_congestion_drop_set;
+	p_api->port_congestion_drop_get = mht_port_congestion_drop_get;
+	p_api->port_flowctrl_thresh_set = mht_port_flowctrl_thresh_set;
+	p_api->port_flowctrl_thresh_get = mht_port_flowctrl_thresh_get;
+	p_api->ring_flow_ctrl_thres_set = mht_ring_flow_ctrl_thres_set;
+	p_api->ring_flow_ctrl_thres_get = mht_ring_flow_ctrl_thres_get;
+	p_api->ring_flow_ctrl_status_get = mht_ring_flow_ctrl_status_get;
+	p_api->ring_union_set = mht_ring_union_set;
+	p_api->ring_union_get = mht_ring_union_get;
+	p_api->ring_flow_ctrl_set = mht_ring_flow_ctrl_config_set;
+	p_api->ring_flow_ctrl_get = mht_ring_flow_ctrl_config_get;
+#endif
+
     }
 #endif
 

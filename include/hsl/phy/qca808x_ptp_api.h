@@ -4554,5 +4554,19 @@ qca808x_ptp_backup_reg_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		union ptp_backup_reg_u *value);
 
+#if defined(MHT)
+sw_error_t
+qca808x_ptp_version_reg_get(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_version_reg_u *value);
+sw_error_t
+qca808x_ptp_msg_type_spec0_reg(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_msg_type_spec0_reg_u *value);
+sw_error_t
+qca808x_ptp_msg_type_spec1_reg(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_msg_type_spec1_reg_u *value);
+sw_error_t
+qca808x_ptp_domain_number_reg(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_domain_number_reg_u *value);
+#endif
 #endif
 

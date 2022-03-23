@@ -1,18 +1,19 @@
 /*
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
-
 
 #ifndef _ISISC_REG_H_
 #define _ISISC_REG_H_
@@ -21,6 +22,7 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
+#define MHT_DEVICE_ID  0x17
 #define S16E_DEVICE_ID  0x11
 #define S17C_DEVICE_ID   0x13 /* TBD */
 #define S17_REVISION_A  0x01
@@ -696,7 +698,11 @@ extern "C" {
 #define GBL_INT_STATUS1_NR_E           1
 
 #define LINK_CHG_INT_S
+#if defined(MHT)
+#define GBL_INT_STATUS1_LINK_CHG_INT_S_BOFFSET 0
+#else
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_BOFFSET 1
+#endif
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_BLEN        7
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_FLAG    HSL_RW
 
@@ -717,7 +723,11 @@ extern "C" {
 #define GBL_INT_MASK1_NR_E           1
 
 #define LINK_CHG_INT_M
+#if defined(MHT)
+#define GBL_INT_MASK1_LINK_CHG_INT_M_BOFFSET 0
+#else
 #define GBL_INT_MASK1_LINK_CHG_INT_M_BOFFSET 1
+#endif
 #define GBL_INT_MASK1_LINK_CHG_INT_M_BLEN        7
 #define GBL_INT_MASK1_LINK_CHG_INT_M_FLAG    HSL_RW
 
@@ -873,7 +883,12 @@ extern "C" {
 #define MAX_SIZE_MAX_FRAME_SIZE_BLEN        14
 #define MAX_SIZE_MAX_FRAME_SIZE_FLAG        HSL_RW
 
-
+#if defined(MHT)
+#define CRC_RESERVE
+#define MAX_SIZE_CRC_RESERVE_BOFFSET     16
+#define MAX_SIZE_CRC_RESERVE_BLEN        1
+#define MAX_SIZE_CRC_RESERVE_FLAG        HSL_RW
+#endif
 
 
     /* Flow Control Register */
@@ -1156,6 +1171,13 @@ extern "C" {
 #define FRAME_ACK_CTL1_E_OFFSET  0
 #define FRAME_ACK_CTL1_NR_E      1
 
+#if defined(MHT)
+#define LLDP_EN
+#define FRAME_ACK_CTL1_LLDP_EN_BOFFSET               26
+#define FRAME_ACK_CTL1_LLDP_EN_BLEN                  1
+#define FRAME_ACK_CTL1_LLDP_EN_FLAG                  HSL_RW
+#endif
+
 #define PPPOE_EN
 #define FRAME_ACK_CTL1_PPPOE_EN_BOFFSET               25
 #define FRAME_ACK_CTL1_PPPOE_EN_BLEN                  1
@@ -1246,6 +1268,17 @@ extern "C" {
 #define TRUNK_HASH_MODE_E_OFFSET             0x4
 #define TRUNK_HASH_MODE_NR_E                 1
 
+#if defined(MHT)
+#define DIP_EN
+#define TRUNK_HASH_MODE_DIP_EN_BOFFSET       3
+#define TRUNK_HASH_MODE_DIP_EN_BLEN          1
+#define TRUNK_HASH_MODE_DIP_EN_FLAG          HSL_RW
+
+#define SIP_EN
+#define TRUNK_HASH_MODE_SIP_EN_BOFFSET       2
+#define TRUNK_HASH_MODE_SIP_EN_BLEN          1
+#define TRUNK_HASH_MODE_SIP_EN_FLAG          HSL_RW
+#else
 #define SIP_EN
 #define TRUNK_HASH_MODE_SIP_EN_BOFFSET       3
 #define TRUNK_HASH_MODE_SIP_EN_BLEN          1
@@ -1255,6 +1288,7 @@ extern "C" {
 #define TRUNK_HASH_MODE_DIP_EN_BOFFSET       2
 #define TRUNK_HASH_MODE_DIP_EN_BLEN          1
 #define TRUNK_HASH_MODE_DIP_EN_FLAG          HSL_RW
+#endif
 
 #define SA_EN
 #define TRUNK_HASH_MODE_SA_EN_BOFFSET        1
@@ -1427,6 +1461,18 @@ extern "C" {
 #define ADDR_TABLE_FUNC2_E_LENGTH  4
 #define ADDR_TABLE_FUNC2_E_OFFSET  0
 #define ADDR_TABLE_FUNC2_NR_E      1
+
+#if defined(MHT)
+#define LOAD_BALANCE_EN
+#define ADDR_TABLE_FUNC2_LOAD_BALANCE_EN_BOFFSET         23
+#define ADDR_TABLE_FUNC2_LOAD_BALANCE_EN_BLEN            1
+#define ADDR_TABLE_FUNC2_LOAD_BALANCE_EN_FLAG            HSL_RW
+
+#define LOAD_BALANCE
+#define ADDR_TABLE_FUNC2_LOAD_BALANCE_BOFFSET         21
+#define ADDR_TABLE_FUNC2_LOAD_BALANCE_BLEN            2
+#define ADDR_TABLE_FUNC2_LOAD_BALANCE_FLAG            HSL_RW
+#endif
 
 #define WL_EN
 #define ADDR_TABLE_FUNC2_WL_EN_BOFFSET         20
@@ -1843,7 +1889,6 @@ extern "C" {
 
 
 
-
     /* Port Lookup control Register */
 #define PORT_LOOKUP_CTL
 #define PORT_LOOKUP_CTL_OFFSET     0x0660
@@ -1921,6 +1966,13 @@ extern "C" {
 #define PRI_CTL_EG_MAC_BASE_VLAN_EN_BLEN        1
 #define PRI_CTL_EG_MAC_BASE_VLAN_EN_FLAG        HSL_RW
 
+#if defined(MHT)
+#define FLOW_PRI_EN
+#define PRI_CTL_FLOW_PRI_EN_BOFFSET             19
+#define PRI_CTL_FLOW_PRI_EN_BLEN                1
+#define PRI_CTL_FLOW_PRI_EN_FLAG                HSL_RW
+#endif
+
 #define DA_PRI_EN
 #define PRI_CTL_DA_PRI_EN_BOFFSET               18
 #define PRI_CTL_DA_PRI_EN_BLEN                  1
@@ -1935,6 +1987,13 @@ extern "C" {
 #define PRI_CTL_IP_PRI_EN_BOFFSET               16
 #define PRI_CTL_IP_PRI_EN_BLEN                  1
 #define PRI_CTL_IP_PRI_EN_FLAG                  HSL_RW
+
+#if defined(MHT)
+#define FLOW_PRI_SEL
+#define PRI_CTL_FLOW_PRI_SEL_BOFFSET            8
+#define PRI_CTL_FLOW_PRI_SEL_BLEN               2
+#define PRI_CTL_FLOW_PRI_SEL_FLAG               HSL_RW
+#endif
 
 #define DA_PRI_SEL
 #define PRI_CTL_DA_PRI_SEL_BOFFSET              6
@@ -2082,6 +2141,13 @@ extern "C" {
 #define PORT_VLAN1_E_LENGTH   4
 #define PORT_VLAN1_E_OFFSET   0x0008
 #define PORT_VLAN1_NR_E       7
+
+#if defined(MHT)
+#define VRF_ID
+#define PORT_VLAN1_VRF_ID_BOFFSET   15
+#define PORT_VLAN1_VRF_ID_BLEN      3
+#define PORT_VLAN1_VRF_ID_FLAG      HSL_RW
+#endif
 
 #define EG_VLAN_MODE
 #define PORT_VLAN1_EG_VLAN_MODE_BOFFSET   12
@@ -2274,7 +2340,6 @@ extern "C" {
 
 
 
-
     /* LED control Register */
 #define LED_CTRL               "ledctrl"
 #define LED_CTRL_ID            25
@@ -2462,6 +2527,34 @@ extern "C" {
 #define PORT_HOL_CTL0_E_OFFSET       0x0008
 #define PORT_HOL_CTL0_NR_E           7
 
+#if defined(MHT)
+#define PORT_DESC_NR
+#define PORT_HOL_CTL0_PORT_DESC_NR_BOFFSET           24
+#define PORT_HOL_CTL0_PORT_DESC_NR_BLEN              8
+#define PORT_HOL_CTL0_PORT_DESC_NR_FLAG              HSL_RW
+
+#define QUEUE3_DESC_NR
+#define PORT_HOL_CTL0_QUEUE3_DESC_NR_BOFFSET         18
+#define PORT_HOL_CTL0_QUEUE3_DESC_NR_BLEN            6
+#define PORT_HOL_CTL0_QUEUE3_DESC_NR_FLAG            HSL_RW
+
+#define QUEUE2_DESC_NR
+#define PORT_HOL_CTL0_QUEUE2_DESC_NR_BOFFSET         12
+#define PORT_HOL_CTL0_QUEUE2_DESC_NR_BLEN            6
+#define PORT_HOL_CTL0_QUEUE2_DESC_NR_FLAG            HSL_RW
+
+#define QUEUE1_DESC_NR
+#define PORT_HOL_CTL0_QUEUE1_DESC_NR_BOFFSET         6
+#define PORT_HOL_CTL0_QUEUE1_DESC_NR_BLEN            6
+#define PORT_HOL_CTL0_QUEUE1_DESC_NR_FLAG            HSL_RW
+
+#define QUEUE0_DESC_NR
+#define PORT_HOL_CTL0_QUEUE0_DESC_NR_BOFFSET         0
+#define PORT_HOL_CTL0_QUEUE0_DESC_NR_BLEN            6
+#define PORT_HOL_CTL0_QUEUE0_DESC_NR_FLAG            HSL_RW
+
+#else
+
 #define PORT_DESC_NR
 #define PORT_HOL_CTL0_PORT_DESC_NR_BOFFSET           24
 #define PORT_HOL_CTL0_PORT_DESC_NR_BLEN              6
@@ -2497,12 +2590,26 @@ extern "C" {
 #define PORT_HOL_CTL0_QUEUE0_DESC_NR_BLEN            4
 #define PORT_HOL_CTL0_QUEUE0_DESC_NR_FLAG            HSL_RW
 
+#endif
+
     /* Port HOL CTL1 Register */
 #define PORT_HOL_CTL1
 #define PORT_HOL_CTL1_OFFSET         0x0974
 #define PORT_HOL_CTL1_E_LENGTH       4
 #define PORT_HOL_CTL1_E_OFFSET       0x0008
 #define PORT_HOL_CTL1_NR_E           7
+
+#if defined(MHT)
+#define QUEUE5_DESC_NR
+#define PORT_HOL_CTL1_QUEUE5_DESC_NR_BOFFSET         26
+#define PORT_HOL_CTL1_QUEUE5_DESC_NR_BLEN            6
+#define PORT_HOL_CTL1_QUEUE5_DESC_NR_FLAG            HSL_RW
+
+#define QUEUE4_DESC_NR
+#define PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET         20
+#define PORT_HOL_CTL1_QUEUE4_DESC_NR_BLEN            6
+#define PORT_HOL_CTL1_QUEUE4_DESC_NR_FLAG            HSL_RW
+#endif
 
 #define EG_MIRROR_EN
 #define PORT_HOL_CTL1_EG_MIRROR_EN_BOFFSET           16
@@ -2526,7 +2633,11 @@ extern "C" {
 
 #define PORT_IN_DESC_EN
 #define PORT_HOL_CTL1_PORT_IN_DESC_EN_BOFFSET        0
+#if defined(MHT)
+#define PORT_HOL_CTL1_PORT_IN_DESC_EN_BLEN           6
+#else
 #define PORT_HOL_CTL1_PORT_IN_DESC_EN_BLEN           4
+#endif
 #define PORT_HOL_CTL1_PORT_IN_DESC_EN_FLAG           HSL_RW
 
     /* PORT FLOW CTRL THRESHOLD REGISTER  */
@@ -2538,12 +2649,20 @@ extern "C" {
 
 #define XON_THRES
 #define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_BOFFSET	16
+#if defined(MHT)
+#define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_BLEN		10
+#else
 #define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_BLEN		8
+#endif
 #define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_FLAG		HSL_RW
 
 #define XOFF_THRES
 #define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_BOFFSET	0
+#if defined(MHT)
+#define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_BLEN	10
+#else
 #define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_BLEN	8
+#endif
 #define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_FLAG	HSL_RW
 
     /* FX100 CTRL  Register */
@@ -4282,6 +4401,13 @@ extern "C" {
 #define PPPOE_SESSION_E_OFFSET                     0x4
 #define PPPOE_SESSION_NR_E                         16
 
+#if defined(MHT)
+#define VRF_ID
+#define PPPOE_SESSION_VRF_ID_BOFFSET           18
+#define PPPOE_SESSION_VRF_ID_BLEN              3
+#define PPPOE_SESSION_VRF_ID_FLAG              HSL_RW
+#endif
+
 #define ENTRY_VALID
 #define PPPOE_SESSION_ENTRY_VALID_BOFFSET          16
 #define PPPOE_SESSION_ENTRY_VALID_BLEN             2
@@ -4405,6 +4531,18 @@ extern "C" {
 #define HOST_ENTRY6_E_OFFSET                     0x0
 #define HOST_ENTRY6_NR_E                         1
 
+#if defined(MHT)
+#define LB_BIT
+#define HOST_ENTRY6_LB_BIT_BOFFSET               19
+#define HOST_ENTRY6_LB_BIT_BLEN                  3
+#define HOST_ENTRY6_LB_BIT_FLAG                  HSL_RW
+
+#define VRF_ID
+#define HOST_ENTRY6_VRF_ID_BOFFSET               16
+#define HOST_ENTRY6_VRF_ID_BLEN                  3
+#define HOST_ENTRY6_VRF_ID_FLAG                  HSL_RW
+#endif
+
 #define IP_VER
 #define HOST_ENTRY6_IP_VER_BOFFSET               15
 #define HOST_ENTRY6_IP_VER_BLEN                  1
@@ -4451,6 +4589,13 @@ extern "C" {
 #define HOST_ENTRY7_TBL_BUSY_BOFFSET             31
 #define HOST_ENTRY7_TBL_BUSY_BLEN                1
 #define HOST_ENTRY7_TBL_BUSY_FLAG                HSL_RW
+
+#if defined(MHT)
+#define SPEC_SYNC
+#define HOST_ENTRY7_SPEC_SYNC_BOFFSET            23
+#define HOST_ENTRY7_SPEC_SYNC_BLEN               1
+#define HOST_ENTRY7_SPEC_SYNC_FLAG               HSL_RW
+#endif
 
 #define SPEC_SP
 #define HOST_ENTRY7_SPEC_SP_BOFFSET              22
@@ -4572,6 +4717,13 @@ extern "C" {
 #define NAT_ENTRY3_E_OFFSET                     0x0
 #define NAT_ENTRY3_NR_E                         1
 
+#if defined(MHT)
+#define VRF_ID
+#define NAT_ENTRY3_VRF_ID_BOFFSET               4
+#define NAT_ENTRY3_VRF_ID_BLEN                  3
+#define NAT_ENTRY3_VRF_ID_FLAG                  HSL_RW
+#endif
+
 #define ENTRY_VALID
 #define NAT_ENTRY3_ENTRY_VALID_BOFFSET          3
 #define NAT_ENTRY3_ENTRY_VALID_BLEN             1
@@ -4645,6 +4797,18 @@ extern "C" {
 #define NAPT_ENTRY3_E_OFFSET                     0x0
 #define NAPT_ENTRY3_NR_E                         1
 
+#if defined(MHT)
+#define PRIORITY_EN
+#define NAPT_ENTRY3_PRIORITY_EN_BOFFSET          31
+#define NAPT_ENTRY3_PRIORITY_EN_BLEN             1
+#define NAPT_ENTRY3_PRIORITY_EN_FLAG             HSL_RW
+
+#define PRIORITY_VAL
+#define NAPT_ENTRY3_PRIORITY_VAL_BOFFSET         28
+#define NAPT_ENTRY3_PRIORITY_VAL_BLEN            3
+#define NAPT_ENTRY3_PRIORITY_VAL_FLAG            HSL_RW
+#endif
+
 #define CNT_EN
 #define NAPT_ENTRY3_CNT_EN_BOFFSET               27
 #define NAPT_ENTRY3_CNT_EN_BLEN                  1
@@ -4676,6 +4840,28 @@ extern "C" {
 #define NAPT_ENTRY4_E_LENGTH                     4
 #define NAPT_ENTRY4_E_OFFSET                     0x0
 #define NAPT_ENTRY4_NR_E                         1
+
+#if defined(MHT)
+#define LOAD_BALANCE
+#define NAPT_ENTRY4_LOAD_BALANCE_BOFFSET         19
+#define NAPT_ENTRY4_LOAD_BALANCE_BLEN            3
+#define NAPT_ENTRY4_LOAD_BALANCE_FLAG            HSL_RW
+
+#define FLOW_COOKIE
+#define NAPT_ENTRY4_FLOW_COOKIE_BOFFSET          8
+#define NAPT_ENTRY4_FLOW_COOKIE_BLEN             11
+#define NAPT_ENTRY4_FLOW_COOKIE_FLAG             HSL_RW
+
+#define VRF_ID
+#define NAPT_ENTRY4_VRF_ID_BOFFSET               5
+#define NAPT_ENTRY4_VRF_ID_BLEN                  3
+#define NAPT_ENTRY4_VRF_ID_FLAG                  HSL_RW
+
+#define AGE_SYNC
+#define NAPT_ENTRY4_AGE_SYNC_BOFFSET             4
+#define NAPT_ENTRY4_AGE_SYNC_BLEN                1
+#define NAPT_ENTRY4_AGE_SYNC_FLAG                HSL_RO
+#endif
 
 #define AGE_FLAG
 #define NAPT_ENTRY4_AGE_FLAG_BOFFSET             0
@@ -4784,6 +4970,18 @@ extern "C" {
 #define NAT_CTRL_E_OFFSET                     0x0
 #define NAT_CTRL_NR_E                         1
 
+#if defined(MHT)
+#define FLOW_HASH_CTRL
+#define NAT_CTRL_FLOW_HASH_CTRL_BOFFSET        24
+#define NAT_CTRL_FLOW_HASH_CTRL_BLEN           1
+#define NAT_CTRL_FLOW_HASH_CTRL_FLAG           HSL_RW
+
+#define NAPT_SYNC
+#define NAT_CTRL_NAPT_SYNC_BOFFSET		23
+#define NAT_CTRL_NAPT_SYNC_BLEN			1
+#define NAT_CTRL_NAPT_SYNC_FLAG			HSL_RW
+#endif
+
 #define NAT_HASH_MODE
 #define NAT_CTRL_NAT_HASH_MODE_BOFFSET        5
 #define NAT_CTRL_NAT_HASH_MODE_BLEN           2
@@ -4808,7 +5006,6 @@ extern "C" {
 #define NAT_CTRL_NAPT_EN_BOFFSET              0
 #define NAT_CTRL_NAPT_EN_BLEN                 1
 #define NAT_CTRL_NAPT_EN_FLAG                 HSL_RW
-
 
 
 
@@ -4938,6 +5135,13 @@ extern "C" {
 #define INTF_ADDR_ENTRY2_E_OFFSET                   0x0
 #define INTF_ADDR_ENTRY2_NR_E                       8
 
+#if defined(MHT)
+#define VRF_ID
+#define INTF_ADDR_ENTRY2_VRF_ID_BOFFSET          10
+#define INTF_ADDR_ENTRY2_VRF_ID_BLEN             3
+#define INTF_ADDR_ENTRY2_VRF_ID_FLAG             HSL_RW
+#endif
+
 #define IP6_ROUTE
 #define INTF_ADDR_ENTRY2_IP6_ROUTE_BOFFSET          9
 #define INTF_ADDR_ENTRY2_IP6_ROUTE_BLEN             1
@@ -4952,7 +5156,6 @@ extern "C" {
 #define INTF_ADDR_ENTRY2_VID_HIGH1_BOFFSET          0
 #define INTF_ADDR_ENTRY2_VID_HIGH1_BLEN             8
 #define INTF_ADDR_ENTRY2_VID_HIGH1_FLAG             HSL_RW
-
 
 
 
@@ -5466,9 +5669,6 @@ extern "C" {
 #define WRR_CTRL_Q0_W_BOFFSET                   0
 #define WRR_CTRL_Q0_W_BLEN                      5
 #define WRR_CTRL_Q0_W_FLAG                      HSL_RW
-
-
-
 
 
 #ifdef __cplusplus

@@ -78,6 +78,11 @@ typedef struct{
 	a_uint64_t clock_identify;	/* packet field: ClockIdentify */
 	a_uint32_t port_number;		/* packet field: SourcePortID */
 	a_uint32_t msg_type;		/* packet field: message type */
+	a_uint8_t domain_number;	/* packet field: domain number */
+	a_uint8_t minor_ver;		/* packet field: minor version ptp */
+	a_uint8_t major_sdoid;		/* packet field: marjor sdoid */
+	a_uint8_t minor_sdoid;		/* packet field: minor sdoid */
+	a_uint32_t msgtype_spec;	/* packet field: message type specific */
 } fal_ptp_pkt_info_t;
 
 typedef enum {

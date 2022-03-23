@@ -24,6 +24,9 @@
 #include "isisc_interface_ctrl.h"
 #include "isisc_reg.h"
 #include "hsl_phy.h"
+#if defined(MHT)
+#include "mht_interface_ctrl.h"
+#endif
 
 #define ISISC_MAC_0     0
 #define ISISC_MAC_5     5
@@ -102,9 +105,12 @@ _isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enabl
     SW_RTN_ON_ERROR(rv);
 
     SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    if (S17C_DEVICE_ID != device_id)
-    {
-        return SW_NOT_SUPPORTED;
+    switch (device_id) {
+	    case S17C_DEVICE_ID:
+	    case MHT_DEVICE_ID:
+		    break;
+	    default:
+		    return SW_NOT_SUPPORTED;
     }
 
     SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
@@ -173,9 +179,12 @@ _isisc_port_3az_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * ena
     SW_RTN_ON_ERROR(rv);
 
     SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    if (S17C_DEVICE_ID != device_id)
-    {
-        return SW_NOT_SUPPORTED;
+    switch (device_id) {
+	    case S17C_DEVICE_ID:
+	    case MHT_DEVICE_ID:
+		    break;
+	    default:
+		    return SW_NOT_SUPPORTED;
     }
 
     SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
@@ -2289,7 +2298,10 @@ isisc_interface_mac_sgmii_set(a_uint32_t dev_id, a_uint32_t value)
 sw_error_t
 isisc_interface_ctrl_init(a_uint32_t dev_id)
 {
+    ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
+
     HSL_DEV_ID_CHECK(dev_id);
+    chip_type = hsl_get_current_chip_type(dev_id);
 
 #ifndef HSL_STANDALONG
     {
@@ -2299,19 +2311,28 @@ isisc_interface_ctrl_init(a_uint32_t dev_id)
 
         p_api->port_3az_status_set = isisc_port_3az_status_set;
         p_api->port_3az_status_get = isisc_port_3az_status_get;
-        p_api->interface_mac_mode_set = isisc_interface_mac_mode_set;
-        p_api->interface_mac_mode_get = isisc_interface_mac_mode_get;
-        p_api->interface_phy_mode_set = isisc_interface_phy_mode_set;
-        p_api->interface_phy_mode_get = isisc_interface_phy_mode_get;
-        p_api->interface_fx100_ctrl_set = isisc_interface_fx100_ctrl_set;
-        p_api->interface_fx100_ctrl_get = isisc_interface_fx100_ctrl_get;
-        p_api->interface_fx100_status_get = isisc_interface_fx100_status_get;
-        p_api->interface_mac06_exch_set = isisc_interface_mac06_exch_set;
-        p_api->interface_mac06_exch_get = isisc_interface_mac06_exch_get;
-	p_api->interface_mac_pad_get = isisc_interface_mac_pad_get;
-	p_api->interface_mac_pad_set = isisc_interface_mac_pad_set;
-	p_api->interface_mac_sgmii_get = isisc_interface_mac_sgmii_get;
-	p_api->interface_mac_sgmii_set = isisc_interface_mac_sgmii_set;
+#if defined(MHT)
+        if(chip_type == CHIP_MHT)
+        {
+             p_api->interface_mac_mode_set = mht_interface_mac_mode_set;
+        }
+        else
+#endif
+        {
+            p_api->interface_mac_mode_set = isisc_interface_mac_mode_set;
+            p_api->interface_mac_mode_get = isisc_interface_mac_mode_get;
+            p_api->interface_phy_mode_set = isisc_interface_phy_mode_set;
+            p_api->interface_phy_mode_get = isisc_interface_phy_mode_get;
+            p_api->interface_fx100_ctrl_set = isisc_interface_fx100_ctrl_set;
+            p_api->interface_fx100_ctrl_get = isisc_interface_fx100_ctrl_get;
+            p_api->interface_fx100_status_get = isisc_interface_fx100_status_get;
+            p_api->interface_mac06_exch_set = isisc_interface_mac06_exch_set;
+            p_api->interface_mac06_exch_get = isisc_interface_mac06_exch_get;
+            p_api->interface_mac_pad_get = isisc_interface_mac_pad_get;
+            p_api->interface_mac_pad_set = isisc_interface_mac_pad_set;
+            p_api->interface_mac_sgmii_get = isisc_interface_mac_sgmii_get;
+            p_api->interface_mac_sgmii_set = isisc_interface_mac_sgmii_set;
+        }
     }
 #endif
 

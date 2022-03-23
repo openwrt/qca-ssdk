@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2015, 2017-2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -303,9 +306,13 @@ extern "C"
   typedef sw_error_t
     (*hsl_port_flowctrl_get) (a_uint32_t dev_id, fal_port_t port_id,
 			      a_bool_t * enable);
-typedef sw_error_t
+  typedef sw_error_t
     (*hsl_port_flowctrl_thresh_set) (a_uint32_t dev_id, fal_port_t port_id,
-			      a_uint8_t  on, a_uint8_t  off);
+			      a_uint16_t on, a_uint16_t off);
+
+  typedef sw_error_t
+    (*hsl_port_flowctrl_thresh_get) (a_uint32_t dev_id, fal_port_t port_id,
+			      a_uint16_t *on, a_uint16_t *off);
 
   typedef sw_error_t
     (*hsl_port_flowctrl_forcemode_set) (a_uint32_t dev_id, fal_port_t port_id,
@@ -437,12 +444,27 @@ typedef sw_error_t
 
   typedef sw_error_t
     (*hsl_ring_flow_ctrl_thres_set) (a_uint32_t dev_id, a_uint32_t ring_id,
-				     a_uint8_t on_thres, a_uint8_t off_thres);
+				     a_uint16_t on_thres, a_uint16_t off_thres);
 
   typedef sw_error_t
     (*hsl_ring_flow_ctrl_thres_get) (a_uint32_t dev_id, a_uint32_t ring_id,
-				     a_uint8_t * on_thres,
-				     a_uint8_t * off_thres);
+				     a_uint16_t * on_thres,
+				     a_uint16_t * off_thres);
+  typedef sw_error_t
+	  (*hsl_ring_flow_ctrl_status_get) (a_uint32_t dev_id, a_uint32_t ring_id,
+			  a_bool_t *status);
+  typedef sw_error_t
+	  (*hsl_ring_union_set) (a_uint32_t dev_id, a_bool_t en);
+
+  typedef sw_error_t
+	  (*hsl_ring_union_get) (a_uint32_t dev_id, a_bool_t *en);
+
+  typedef sw_error_t
+	  (*hsl_ring_flow_ctrl_get) (a_uint32_t dev_id, a_uint32_t ring_id,
+			  a_bool_t *status);
+  typedef sw_error_t
+	  (*hsl_ring_flow_ctrl_set) (a_uint32_t dev_id, a_uint32_t ring_id,
+			  a_bool_t status);
 
   typedef sw_error_t
     (*hsl_port_8023az_set) (a_uint32_t dev_id, fal_port_t port_id,
@@ -2099,7 +2121,8 @@ typedef sw_error_t
     hsl_port_flowctrl_set port_flowctrl_set;
     hsl_port_flowctrl_get port_flowctrl_get;
 /*qca808x_end*/
-	hsl_port_flowctrl_thresh_set port_flowctrl_thresh_set;
+    hsl_port_flowctrl_thresh_set port_flowctrl_thresh_set;
+    hsl_port_flowctrl_thresh_get port_flowctrl_thresh_get;
     hsl_port_flowctrl_forcemode_set port_flowctrl_forcemode_set;
     hsl_port_flowctrl_forcemode_get port_flowctrl_forcemode_get;
 /*qca808x_start*/
@@ -2137,6 +2160,11 @@ typedef sw_error_t
     hsl_port_congestion_drop_get port_congestion_drop_get;
     hsl_ring_flow_ctrl_thres_set ring_flow_ctrl_thres_set;
     hsl_ring_flow_ctrl_thres_get ring_flow_ctrl_thres_get;
+    hsl_ring_flow_ctrl_status_get ring_flow_ctrl_status_get;
+    hsl_ring_union_set ring_union_set;
+    hsl_ring_union_get ring_union_get;
+    hsl_ring_flow_ctrl_set ring_flow_ctrl_set;
+    hsl_ring_flow_ctrl_get ring_flow_ctrl_get;
 /*qca808x_start*/
     hsl_port_8023az_set port_8023az_set;
     hsl_port_8023az_get port_8023az_get;
@@ -2577,6 +2605,8 @@ typedef sw_error_t
 /*qca808x_end*/
     hsl_reg_get reg_get;
     hsl_reg_set reg_set;
+    hsl_reg_get mii_reg_get;	/* mht in phy mode */
+    hsl_reg_set mii_reg_set;	/* mht in phy mode */
     hsl_reg_field_get reg_field_get;
     hsl_reg_field_set reg_field_set;
     hsl_reg_entries_get reg_entries_get;

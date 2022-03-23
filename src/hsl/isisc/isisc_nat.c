@@ -28,6 +28,10 @@
 #include "isisc_nat_helper.h"
 #endif
 
+#if defined(MHT)
+#include "mht_nat.h"
+#endif
+
 #define ISISC_HOST_ENTRY_DATA0_ADDR              0x0e80
 #define ISISC_HOST_ENTRY_DATA1_ADDR              0x0e84
 #define ISISC_HOST_ENTRY_DATA2_ADDR              0x0e88
@@ -70,21 +74,20 @@ extern a_uint32_t isisc_nat_global_status;
 static sw_error_t
 _isisc_nat_feature_check(a_uint32_t dev_id)
 {
-    sw_error_t rv;
-    a_uint32_t entry = 0;
+	sw_error_t rv;
+	a_uint32_t entry = 0;
 
-    HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
-                      (a_uint8_t *) (&entry), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
+			(a_uint8_t *) (&entry), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    if (S17C_DEVICE_ID == entry)
-    {
-        return SW_OK;
-    }
-    else
-    {
-        return SW_NOT_SUPPORTED;
-    }
+	switch (entry) {
+		case S17C_DEVICE_ID:
+		case MHT_DEVICE_ID:
+			return SW_OK;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
 }
 
 static sw_error_t
@@ -2457,6 +2460,16 @@ isisc_nat_init(a_uint32_t dev_id)
         p_api->nat_prv_base_mask_set = isisc_nat_prv_base_mask_set;
         p_api->nat_prv_base_mask_get = isisc_nat_prv_base_mask_get;
         p_api->nat_global_set = isisc_nat_global_set;
+#if defined(MHT)
+	p_api->flow_cookie_set = mht_flow_cookie_set;
+	p_api->flow_rfs_set = mht_flow_rfs_set;
+	p_api->flow_add = mht_flow_add;
+	p_api->flow_del = mht_flow_del;
+	p_api->flow_get = mht_flow_get;
+	p_api->flow_next = mht_flow_next;
+	p_api->flow_counter_bind = mht_flow_counter_bind;
+	aos_lock_init(&mht_nat_lock);
+#endif
     }
 #endif
 

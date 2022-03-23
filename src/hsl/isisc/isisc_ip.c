@@ -25,6 +25,10 @@
 #include "isisc_ip.h"
 #include "isisc_reg.h"
 
+#if defined(MHT)
+#include "mht_ip.h"
+#endif
+
 #define ISISC_HOST_ENTRY_DATA0_ADDR              0x0e80
 #define ISISC_HOST_ENTRY_DATA1_ADDR              0x0e84
 #define ISISC_HOST_ENTRY_DATA2_ADDR              0x0e88
@@ -106,21 +110,20 @@ _isisc_ip_pt_learn_restore(a_uint32_t dev_id, a_uint32_t status)
 static sw_error_t
 _isisc_ip_feature_check(a_uint32_t dev_id)
 {
-    sw_error_t rv;
-    a_uint32_t entry = 0;
+	sw_error_t rv;
+	a_uint32_t entry = 0;
 
-    HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
-                      (a_uint8_t *) (&entry), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
+			(a_uint8_t *) (&entry), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    if (S17C_DEVICE_ID == entry)
-    {
-        return SW_OK;
-    }
-    else
-    {
-        return SW_NOT_SUPPORTED;
-    }
+	switch (entry) {
+		case S17C_DEVICE_ID:
+		case MHT_DEVICE_ID:
+			return SW_OK;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
 }
 
 static sw_error_t
@@ -2543,6 +2546,28 @@ isisc_ip_init(a_uint32_t dev_id)
         p_api->ip_age_time_get = isisc_ip_age_time_get;
         p_api->ip_wcmp_hash_mode_set = isisc_ip_wcmp_hash_mode_set;
         p_api->ip_wcmp_hash_mode_get = isisc_ip_wcmp_hash_mode_get;
+
+#if defined(MHT)
+	p_api->ip_vrf_base_addr_set = mht_ip_vrf_base_addr_set;
+	p_api->ip_vrf_base_addr_get = mht_ip_vrf_base_addr_get;
+	p_api->ip_vrf_base_mask_set = mht_ip_vrf_base_mask_set;
+	p_api->ip_vrf_base_mask_get = mht_ip_vrf_base_mask_get;
+	p_api->ip_default_route_set = mht_ip_default_route_set;
+	p_api->ip_default_route_get = mht_ip_default_route_get;
+	p_api->ip_host_route_set = mht_ip_host_route_set;
+	p_api->ip_host_route_get = mht_ip_host_route_get;
+	p_api->ip_wcmp_entry_set = mht_ip_wcmp_entry_set;
+	p_api->ip_wcmp_entry_get = mht_ip_wcmp_entry_get;
+	p_api->ip_rfs_ip4_set = mht_ip_rfs_ip4_set;
+	p_api->ip_rfs_ip6_set = mht_ip_rfs_ip6_set;
+	p_api->ip_rfs_ip4_del = mht_ip_rfs_ip4_del;
+	p_api->ip_rfs_ip6_del = mht_ip_rfs_ip6_del;
+	p_api->ip_default_flow_cmd_set = mht_default_flow_cmd_set;
+	p_api->ip_default_flow_cmd_get = mht_default_flow_cmd_get;
+	p_api->ip_default_rt_flow_cmd_set = mht_default_rt_flow_cmd_set;
+	p_api->ip_default_rt_flow_cmd_get = mht_default_rt_flow_cmd_get;
+	p_api->ip_glb_lock_time_set = mht_ip_glb_lock_time_set;
+#endif
     }
 #endif
 

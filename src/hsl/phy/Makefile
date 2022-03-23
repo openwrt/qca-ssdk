@@ -63,6 +63,9 @@ endif
 ifeq (TRUE, $(IN_QCA808X_PHY))
     SRC_LIST += qca808x_phy.c
     SRC_LIST += qca808x.c
+ifneq (,$(filter MHT, $(SUPPORT_CHIP)))
+    SRC_LIST += qca8084_phy.c
+endif
 ifeq (TRUE, $(IN_LED))
     SRC_LIST += qca808x_led.c
 endif

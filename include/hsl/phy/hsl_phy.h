@@ -559,6 +559,8 @@ typedef struct {
 	a_bool_t phy_combo[SW_MAX_NR_PORT];
 	a_uint32_t phy_reset_gpio[SW_MAX_NR_PORT];
 	phy_dac_t phy_dac[SW_MAX_NR_PORT];
+	a_bool_t port_link_status[SW_MAX_NR_PORT];
+	a_uint32_t port_mode[SW_MAX_NR_PORT];
 } phy_info_t;
 /*qca808x_end*/
 #define MALIBU5PORT_PHY         0x004DD0B1
@@ -569,8 +571,8 @@ typedef struct {
 /*qca808x_start*/
 #define QCA8081_PHY_V1_1        0x004DD101
 #define INVALID_PHY_ID          0xFFFFFFFF
-
 /*qca808x_end*/
+#define QCA8084_PHY             0x004DD180
 #define F1V1_PHY                0x004DD033
 #define F1V2_PHY                0x004DD034
 #define F1V3_PHY                0x004DD035
@@ -682,7 +684,8 @@ sw_error_t
 hsl_port_phy_serdes_reset(a_uint32_t dev_id);
 
 sw_error_t
-hsl_port_phy_mode_set(a_uint32_t dev_id, fal_port_interface_mode_t mode);
+hsl_port_phy_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t mode);
 phy_type_t hsl_phy_type_get(a_uint32_t dev_id, a_uint32_t port_id);
 
 a_uint32_t
@@ -704,6 +707,8 @@ hsl_port_phy_dac_set(a_uint32_t dev_id, a_uint32_t port_id,
 	phy_dac_t phy_dac);
 
 a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id);
+
+a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id);
 /*qca808x_start*/
 sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id);
 /*qca808x_end*/
@@ -730,6 +735,9 @@ hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
+
+phy_info_t *hsl_phy_info_get(a_uint32_t dev_id);
+
 sw_error_t
 hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t autoneg_en, a_uint32_t autoadv);

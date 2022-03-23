@@ -4859,4 +4859,122 @@ union ptp_backup_reg_u {
 	struct ptp_backup_reg bf;
 };
 
+#if defined(MHT)
+/*[register] PTP_RX_VERSION0_REG*/
+#define PTP_VERSION_REG
+#define PTP_RX0_VERSION_REG_ADDRESS 0x8420
+#define PTP_RX1_VERSION_REG_ADDRESS 0x850d
+#define PTP_RX2_VERSION_REG_ADDRESS 0x8527
+#define PTP_RX3_VERSION_REG_ADDRESS 0x8541
+#define PTP_TX0_VERSION_REG_ADDRESS 0x8424
+#define PTP_VERSION_REG_NUM     1
+#define PTP_VERSION_REG_INC     0x1
+#define PTP_VERSION_REG_TYPE    REG_TYPE_RW
+#define PTP_VERSION_REG_DEFAULT 0x0
+	/*[field] MINOR_SDOID*/
+	#define PTP_VERSION_REG_MINOR_SDOID
+	#define PTP_VERSION_REG_MINOR_SDOID_OFFSET  0
+	#define PTP_VERSION_REG_MINOR_SDOID_LEN     8
+	#define PTP_VERSION_REG_MINOR_SDOID_DEFAULT 0x0
+	/*[field] MAJOR_SDOID*/
+	#define PTP_VERSION_REG_MAJOR_SDOID
+	#define PTP_VERSION_REG_MAJOR_SDOID_OFFSET  8
+	#define PTP_VERSION_REG_MAJOR_SDOID_LEN     4
+	#define PTP_VERSION_REG_MAJOR_SDOID_DEFAULT 0x0
+	/*[field] MINOR_VERSION_PTP*/
+	#define PTP_VERSION_REG_MINOR_VERSION_PTP
+	#define PTP_VERSION_REG_MINOR_VERSION_PTP_OFFSET  12
+	#define PTP_VERSION_REG_MINOR_VERSION_PTP_LEN     4
+	#define PTP_VERSION_REG_MINOR_VERSION_PTP_DEFAULT 0x0
+
+struct ptp_version_reg {
+	a_uint16_t  minor_sdoid:8;
+	a_uint16_t  major_sdoid:4;
+	a_uint16_t  minor_version_ptp:4;
+};
+
+union ptp_version_reg_u {
+	a_uint32_t val;
+	struct ptp_version_reg bf;
+};
+
+/*[register] PTP_MSG_TYPE_SPEC0 */
+#define PTP_MSG_TYPE_SPEC0_REG
+#define PTP_RX0_MSG_TYPE_SPEC0_REG_ADDRESS 0x8421
+#define PTP_RX1_MSG_TYPE_SPEC0_REG_ADDRESS 0x850e
+#define PTP_RX2_MSG_TYPE_SPEC0_REG_ADDRESS 0x8528
+#define PTP_RX3_MSG_TYPE_SPEC0_REG_ADDRESS 0x8542
+#define PTP_TX0_MSG_TYPE_SPEC0_REG_ADDRESS 0x8425
+#define PTP_MSG_TYPE_SPEC0_REG_NUM     1
+#define PTP_MSG_TYPE_SPEC0_REG_INC     0x1
+#define PTP_MSG_TYPE_SPEC0_REG_TYPE    REG_TYPE_RW
+#define PTP_MSG_TYPE_SPEC0_REG_DEFAULT 0x0
+	/*[field] BIT31_16*/
+	#define PTP_MSG_TYPE_SPEC0_REG_BIT31_16
+	#define PTP_MSG_TYPE_SPEC0_REG_BIT31_16_OFFSET  0
+	#define PTP_MSG_TYPE_SPEC0_REG_BIT31_16_LEN     16
+	#define PTP_MSG_TYPE_SPEC0_REG_BIT31_16_DEFAULT 0x0
+
+struct ptp_msg_type_spec0_reg {
+	a_uint16_t  bit31_16:16;
+};
+
+union ptp_msg_type_spec0_reg_u {
+	a_uint32_t val;
+	struct ptp_msg_type_spec0_reg bf;
+};
+
+/*[register] PTP_MSG_TYPE_SPEC1 */
+#define PTP_MSG_TYPE_SPEC1_REG
+#define PTP_RX0_MSG_TYPE_SPEC1_REG_ADDRESS 0x8422
+#define PTP_RX1_MSG_TYPE_SPEC1_REG_ADDRESS 0x850f
+#define PTP_RX2_MSG_TYPE_SPEC1_REG_ADDRESS 0x8529
+#define PTP_RX3_MSG_TYPE_SPEC1_REG_ADDRESS 0x8543
+#define PTP_TX0_MSG_TYPE_SPEC1_REG_ADDRESS 0x8426
+#define PTP_MSG_TYPE_SPEC1_REG_NUM     1
+#define PTP_MSG_TYPE_SPEC1_REG_INC     0x1
+#define PTP_MSG_TYPE_SPEC1_REG_TYPE    REG_TYPE_RW
+#define PTP_MSG_TYPE_SPEC1_REG_DEFAULT 0x0
+	/*[field] BIT15_0*/
+	#define PTP_MSG_TYPE_SPEC1_REG_BIT15_0
+	#define PTP_MSG_TYPE_SPEC1_REG_BIT15_0_OFFSET  0
+	#define PTP_MSG_TYPE_SPEC1_REG_BIT15_0_LEN     16
+	#define PTP_MSG_TYPE_SPEC1_REG_BIT15_0_DEFAULT 0x0
+
+struct ptp_msg_type_spec1_reg {
+	a_uint16_t  bit15_0:16;
+};
+
+union ptp_msg_type_spec1_reg_u {
+	a_uint32_t val;
+	struct ptp_msg_type_spec1_reg bf;
+};
+
+/*[register] PTP_DOMAIN_NUMBER */
+#define PTP_DOMAIN_NUMBER_REG
+#define PTP_RX0_DOMAIN_NUMBER_REG_ADDRESS 0x8423
+#define PTP_RX1_DOMAIN_NUMBER_REG_ADDRESS 0x8510
+#define PTP_RX2_DOMAIN_NUMBER_REG_ADDRESS 0x852a
+#define PTP_RX3_DOMAIN_NUMBER_REG_ADDRESS 0x8544
+#define PTP_TX0_DOMAIN_NUMBER_REG_ADDRESS 0x8427
+#define PTP_DOMAIN_NUMBER_REG_NUM     1
+#define PTP_DOMAIN_NUMBER_REG_INC     0x1
+#define PTP_DOMAIN_NUMBER_REG_TYPE    REG_TYPE_RW
+#define PTP_DOMAIN_NUMBER_REG_DEFAULT 0x0
+	/*[field] ID*/
+	#define PTP_DOMAIN_NUMBER_REG_ID
+	#define PTP_DOMAIN_NUMBER_REG_ID_OFFSET  0
+	#define PTP_DOMAIN_NUMBER_REG_ID_LEN     8
+	#define PTP_DOMAIN_NUMBER_REG_ID_DEFAULT 0x0
+
+struct ptp_domain_number_reg {
+	a_uint16_t  id:8;
+};
+
+union ptp_domain_number_reg_u {
+	a_uint32_t val;
+	struct ptp_domain_number_reg bf;
+};
+#endif
+
 #endif

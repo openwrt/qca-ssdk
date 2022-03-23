@@ -44,6 +44,9 @@
 #if defined HPPE
 #include "hppe_init.h"
 #endif
+#if defined MHT
+#include "mht_init.h"
+#endif
 #if defined SCOMPHY
 /*qca808x_start*/
 #include "scomphy_init.h"
@@ -66,45 +69,61 @@
 /*qca808x_start*/
 static hsl_dev_t dev_table[SW_MAX_NR_DEV];
 static ssdk_init_cfg *dev_ssdk_cfg[SW_MAX_NR_DEV] = { 0 };
-ssdk_chip_type SSDK_CURRENT_CHIP_TYPE = CHIP_UNSPECIFIED;
+ssdk_chip_type SSDK_CURRENT_CHIP_TYPE[SW_MAX_NR_DEV] = {CHIP_UNSPECIFIED};
 
-static sw_error_t hsl_set_current_chip_type(ssdk_chip_type chip_type)
+ssdk_chip_type hsl_get_current_chip_type(a_uint32_t dev_id)
 {
-    sw_error_t rv = SW_OK;
+	ssdk_chip_type chip_type;
 
-    SSDK_CURRENT_CHIP_TYPE = chip_type;
+	if (dev_id >= SW_MAX_NR_DEV)
+		chip_type = CHIP_UNSPECIFIED;
+	else
+		chip_type = SSDK_CURRENT_CHIP_TYPE[dev_id];
 
-    if (SSDK_CURRENT_CHIP_TYPE == CHIP_UNSPECIFIED)
-    {
-/*qca808x_end*/
-#if defined ATHENA
-        SSDK_CURRENT_CHIP_TYPE = CHIP_ATHENA;
-#elif defined GARUDA
-        SSDK_CURRENT_CHIP_TYPE = CHIP_GARUDA;
-#elif defined SHIVA
-        SSDK_CURRENT_CHIP_TYPE = CHIP_SHIVA;
-#elif defined HORUS
-        SSDK_CURRENT_CHIP_TYPE = CHIP_HORUS;
-#elif defined ISIS
-        SSDK_CURRENT_CHIP_TYPE = CHIP_ISIS;
-#elif defined ISISC
-        SSDK_CURRENT_CHIP_TYPE = CHIP_ISISC;
-#elif defined DESS
-        SSDK_CURRENT_CHIP_TYPE = CHIP_DESS;
-#elif defined APPE
-        SSDK_CURRENT_CHIP_TYPE = CHIP_APPE;
-#elif defined HPPE
-        SSDK_CURRENT_CHIP_TYPE = CHIP_HPPE;
-#elif defined SCOMPHY
-/*qca808x_start*/
-        SSDK_CURRENT_CHIP_TYPE = CHIP_SCOMPHY;
-/*qca808x_end*/
+	return chip_type;
+}
+
+static inline sw_error_t hsl_set_current_chip_type(a_uint32_t dev_id, ssdk_chip_type chip_type)
+{
+	sw_error_t rv = SW_OK;
+
+	if (dev_id >= SW_MAX_NR_DEV)
+		return SW_OUT_OF_RANGE;
+
+	SSDK_CURRENT_CHIP_TYPE[dev_id] = chip_type;
+	if (SSDK_CURRENT_CHIP_TYPE[dev_id] == CHIP_UNSPECIFIED)
+	{
+		/*qca808x_end*/
+#if defined(ATHENA)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_ATHENA;
+#elif defined(GARUDA)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_GARUDA;
+#elif defined(SHIVA)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_SHIVA;
+#elif defined(HORUS)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_HORUS;
+#elif defined(ISIS)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_ISIS;
+#elif defined(ISISC)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_ISISC;
+#elif defined(MHT)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_MHT;
+#elif defined(DESS)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_DESS;
+#elif defined(APPE)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_APPE;
+#elif defined(HPPE)
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_HPPE;
+#elif defined(SCOMPHY)
+		/*qca808x_start*/
+		SSDK_CURRENT_CHIP_TYPE[dev_id] = CHIP_SCOMPHY;
+		/*qca808x_end*/
 #else
-        rv = SW_FAIL;
+		rv = SW_FAIL;
 #endif
-/*qca808x_start*/
-    }
-    return rv;
+		/*qca808x_start*/
+	}
+	return rv;
 }
 
 hsl_dev_t *
@@ -167,7 +186,7 @@ hsl_dev_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 #endif
         dev_init = 1;
     }
-    rv = hsl_set_current_chip_type(cfg->chip_type);
+    rv = hsl_set_current_chip_type(dev_id, cfg->chip_type);
     SW_RTN_ON_ERROR(rv);
 
     if (NULL == dev_ssdk_cfg[dev_id])
@@ -221,6 +240,11 @@ hsl_dev_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
         case CHIP_ISISC:
 #if defined ISISC
             rv = isisc_init(dev_id, cfg);
+#endif
+            break;
+        case CHIP_MHT:
+#if defined MHT
+            rv = mht_init(dev_id, cfg);
 #endif
             break;
         case CHIP_DESS:
@@ -324,6 +348,10 @@ hsl_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg)
 
         case CHIP_APPE:
             aos_mem_copy(ssdk_cfg->chip_type, "appe", sizeof("appe"));
+            break;
+
+        case CHIP_MHT:
+            aos_mem_copy(ssdk_cfg->chip_type, "mht", sizeof("mht"));
             break;
 
         case CHIP_SCOMPHY:

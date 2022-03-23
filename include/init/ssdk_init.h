@@ -30,6 +30,8 @@ extern "C" {
 #include "fal/fal_led.h"
 /*qca808x_start*/
 #define SSDK_MAX_PORT_NUM               8
+#define PORT_LINK_UP                    1
+#define PORT_LINK_DOWN                  0
 /*qca808x_end*/
 #define SSDK_MIN_VIRTUAL_PORT_ID	64
 #define SSDK_MAX_VIRTUAL_PORT_ID	255
@@ -48,8 +50,6 @@ extern "C" {
 
 #define PORT_GMAC_TYPE                  1
 #define PORT_XGMAC_TYPE                 2
-#define PORT_LINK_UP                    1
-#define PORT_LINK_DOWN                  0
 
 /*qca808x_start*/
     typedef enum {
@@ -134,6 +134,7 @@ enum ssdk_port_wrapper_cfg {
 	PORT_WRAPPER_PSGMII_FIBER,
 	PORT_WRAPPER_SGMII_FIBER,
 	PORT_WRAPPER_UQXGMII, /* for four channels manhattan phy mode*/
+	PORT_WRAPPER_UQXGMII_3CHANNELS, /* for three channels manhattan phy mode*/
 	PORT_WRAPPER_MAX = 0xFF
 };
 
@@ -182,6 +183,7 @@ enum ssdk_port_wrapper_cfg {
         CHIP_HPPE,
 	CHIP_SCOMPHY,
         CHIP_APPE,
+	CHIP_MHT,
     } ssdk_chip_type;
 /*qca808x_end*/
 	typedef struct

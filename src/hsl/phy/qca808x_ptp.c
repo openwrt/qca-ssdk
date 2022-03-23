@@ -285,6 +285,39 @@ qca808x_phy_ptp_rx_timestamp_mode_get(a_uint32_t dev_id,
 	return SW_OK;
 }
 
+#if defined(MHT)
+static sw_error_t
+qca808x_phy_ptp_v2p1_pkt_info_get(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t ts_type,
+		fal_ptp_pkt_info_t *pkt_info)
+{
+	sw_error_t rv = SW_OK;
+	union ptp_version_reg_u ptp_ver = {0};
+	union ptp_msg_type_spec0_reg_u msg_spec0 = {0};
+	union ptp_msg_type_spec1_reg_u msg_spec1 = {0};
+	union ptp_domain_number_reg_u domain = {0};
+
+	rv = qca808x_ptp_version_reg_get(dev_id, phy_id, ts_type, &ptp_ver);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_ptp_msg_type_spec0_reg(dev_id, phy_id, ts_type, &msg_spec0);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_ptp_msg_type_spec1_reg(dev_id, phy_id, ts_type, &msg_spec1);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = qca808x_ptp_domain_number_reg(dev_id, phy_id, ts_type, &domain);
+	SW_RTN_ON_ERROR(rv);
+
+	pkt_info->domain_number = domain.bf.id;
+	pkt_info->minor_ver = ptp_ver.bf.minor_version_ptp;
+	pkt_info->major_sdoid = ptp_ver.bf.major_sdoid;
+	pkt_info->minor_sdoid = ptp_ver.bf.minor_sdoid;
+	pkt_info->msgtype_spec = msg_spec0.bf.bit31_16 << 16 | msg_spec1.bf.bit15_0;
+
+	return SW_OK;
+}
+#endif
+
 sw_error_t
 qca808x_phy_ptp_ts_get(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t ts_type,
 		fal_ptp_pkt_info_t *pkt_info, fal_ptp_time_t *time)
@@ -318,8 +351,10 @@ qca808x_phy_ptp_ts_get(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t ts_ty
 		pkt_info->clock_identify = clock_id;
 		pkt_info->port_number = port_num;
 		pkt_info->msg_type = msgtype;
-
-		return SW_OK;
+#if defined(MHT)
+		rv = qca808x_phy_ptp_v2p1_pkt_info_get(dev_id, phy_id, ts_type, pkt_info);
+#endif
+		return rv;
 	}
 
 	return SW_NOT_FOUND;

@@ -1,4 +1,3 @@
-
 include $(PRJ_PATH)/config
 -include $(SYS_PATH)/include/config/auto.conf
 
@@ -80,7 +79,7 @@ else
      ifneq (TRUE, $(FAL))
          $(error FAL must be TRUE when CHIP_TYPE is defined as ALL_CHIP!)
      endif
-     SUPPORT_CHIP = ISIS ISISC SHIVA DESS HPPE CPPE SCOMPHY MP
+     SUPPORT_CHIP = ISIS ISISC SHIVA DESS HPPE CPPE SCOMPHY MP MHT
   endif
 
   ifeq (NONHK_CHIP, $(CHIP_TYPE))
@@ -93,6 +92,16 @@ else
   ifndef SUPPORT_CHIP
     $(error defined CHIP_TYPE isn't supported!)
   endif
+
+  ifeq ($(MHT_ENABLE), enable)
+      SUPPORT_CHIP += MHT
+  endif
+
+#manhattan depends on isisc
+ifneq (, $(filter MHT, $(SUPPORT_CHIP)))
+	SUPPORT_CHIP += ISISC
+endif
+
 endif
 
 #define compile tool prefix

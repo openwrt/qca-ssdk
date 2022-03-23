@@ -523,6 +523,7 @@ __adpt_hppe_uniphy_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	/* enable uniphy eee transparent mode*/
 	__adpt_hppe_uniphy_uqxgmii_eee_set(dev_id, uniphy_index);
 
+	rv = hsl_port_phy_mode_set(dev_id, SSDK_PHYSICAL_PORT1, PORT_UQXGMII);
 	return rv;
 }
 
@@ -926,7 +927,7 @@ __adpt_hppe_uniphy_qsgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	ADPT_DEV_ID_CHECK(dev_id);
 
 	/* configure malibu phy to qsgmii mode*/
-	rv = hsl_port_phy_mode_set(dev_id, PORT_QSGMII);
+	rv = hsl_port_phy_mode_set(dev_id, SSDK_PHYSICAL_PORT1, PORT_QSGMII);
 	SW_RTN_ON_ERROR (rv);
 
 	/* keep xpcs to reset status */
@@ -1122,6 +1123,7 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 			clock = UNIPHY_CLK_RATE_312M;
 			break;
 		case PORT_WRAPPER_UQXGMII:
+		case PORT_WRAPPER_UQXGMII_3CHANNELS:
 			rv = __adpt_hppe_uniphy_uqxgmii_mode_set(dev_id, index);
 			clock = UNIPHY_CLK_RATE_312M;
 			break;

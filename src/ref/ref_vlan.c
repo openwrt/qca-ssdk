@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2014, 2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "sw.h"
@@ -50,9 +53,6 @@
 #include "ssdk_uci.h"
 #endif
 
-
-extern ssdk_chip_type SSDK_CURRENT_CHIP_TYPE;
-
 #if !defined(IN_VLAN_MINI)
 sw_error_t
 qca_lan_wan_cfg_set(a_uint32_t dev_id, qca_lan_wan_cfg_t *lan_wan_cfg)
@@ -60,13 +60,15 @@ qca_lan_wan_cfg_set(a_uint32_t dev_id, qca_lan_wan_cfg_t *lan_wan_cfg)
 	a_uint32_t i = 0, lan_bmp = 0, wan_bmp = 0;
 	sw_error_t rv = SW_OK;
 	fal_vlan_t vlan_entry;
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	SW_RTN_ON_NULL(lan_wan_cfg);
 
-	switch (SSDK_CURRENT_CHIP_TYPE) {
+	switch (chip_type) {
 		case CHIP_ISIS:
 		case CHIP_ISISC:
 		case CHIP_DESS:
+		case CHIP_MHT:
 			break;
 		default:
 			return SW_NOT_SUPPORTED;
@@ -155,7 +157,7 @@ qca_lan_wan_cfg_set(a_uint32_t dev_id, qca_lan_wan_cfg_t *lan_wan_cfg)
 	ssdk_wan_bmp_set(dev_id, wan_bmp);
 	qca_ssdk_port_bmp_set(dev_id, lan_bmp|wan_bmp);
 #if defined(DESS) && defined(IN_TRUNK)
-	if(SSDK_CURRENT_CHIP_TYPE == CHIP_DESS) {
+	if(chip_type == CHIP_DESS) {
 		ssdk_dess_trunk_init(dev_id, wan_bmp);
 	}
 #endif
@@ -172,13 +174,15 @@ qca_lan_wan_cfg_get(a_uint32_t dev_id, qca_lan_wan_cfg_t *lan_wan_cfg)
 	fal_vlan_t vlan_entry;
 	fal_pbmp_t member_pmap, lan_bmp, wan_bmp;
 	a_uint32_t port_id, entry_id, vlan_id;
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	SW_RTN_ON_NULL(lan_wan_cfg);
 
-	switch (SSDK_CURRENT_CHIP_TYPE) {
+	switch (chip_type) {
 		case CHIP_ISIS:
 		case CHIP_ISISC:
 		case CHIP_DESS:
+		case CHIP_MHT:
 			break;
 		default:
 			return SW_NOT_SUPPORTED;
@@ -316,7 +320,7 @@ qca_ar8327_sw_set_vlan(struct switch_dev *dev,
     priv->vlan = !!val->value.i;
 
     #ifdef BOARD_AR71XX
-    if(SSDK_CURRENT_CHIP_TYPE == CHIP_SHIVA) {
+    if(priv->version == CHIP_SHIVA) {
 		ssdk_uci_sw_set_vlan(attr, val);
     }
     #endif
@@ -346,7 +350,7 @@ qca_ar8327_sw_set_vid(struct switch_dev *dev,
     priv->vlan_id[val->port_vlan] = val->value.i;
 
 #ifdef BOARD_AR71XX
-    if(SSDK_CURRENT_CHIP_TYPE == CHIP_SHIVA) {
+    if(priv->version == CHIP_SHIVA) {
 		ssdk_uci_sw_set_vid(attr, val);
     }
 #endif
@@ -388,7 +392,7 @@ qca_ar8327_sw_set_pvid(struct switch_dev *dev, int port, int vlan)
     priv->pvid[port] = vlan;
 
 #ifdef BOARD_AR71XX
-		if(SSDK_CURRENT_CHIP_TYPE == CHIP_SHIVA) {
+		if(priv->version == CHIP_SHIVA) {
 			ssdk_uci_sw_set_pvid(port, vlan);
 		}
 #endif
@@ -433,7 +437,7 @@ qca_ar8327_sw_set_ports(struct switch_dev *dev, struct switch_val *val)
     int i;
 
 #ifdef BOARD_AR71XX
-	if(SSDK_CURRENT_CHIP_TYPE == CHIP_SHIVA) {
+	if(priv->version == CHIP_SHIVA) {
 		ssdk_uci_sw_set_ports(val);
 	}
 #endif
@@ -480,13 +484,12 @@ qca_ar8327_sw_hw_apply(struct switch_dev *dev)
 
     portmask = aos_mem_alloc(sizeof(fal_pbmp_t) * dev->ports);
     if (portmask == NULL) {
-        SSDK_ERROR("%s: portmask malloc failed. \n", __func__);
-        return -1;
+	    SSDK_ERROR("%s: portmask malloc failed. \n", __func__);
+	    return -1;
     }
     memset(portmask, 0, sizeof(fal_pbmp_t) * dev->ports);
 
     mutex_lock(&priv->reg_mutex);
-
     if (!priv->init) {
         /*Handle VLAN 0 entry*/
         if (priv->vlan_id[0] == 0 && priv->vlan_table[0] == 0) {
@@ -513,8 +516,8 @@ qca_ar8327_sw_hw_apply(struct switch_dev *dev)
                     portmask[i] |= vp & ~mask;
                 }
             }
-	    	if (SSDK_CURRENT_CHIP_TYPE == CHIP_SHIVA)
-				fal_vlan_member_update(priv->device_id,priv->vlan_id[j],vp,0);
+	    if (priv->version == CHIP_SHIVA)
+		    fal_vlan_member_update(priv->device_id,priv->vlan_id[j],vp,0);
         }
 
         /*Hanlde VLAN 0 entry*/

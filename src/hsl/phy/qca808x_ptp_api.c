@@ -12274,3 +12274,132 @@ qca808x_ptp_backup_reg_set(
 			value->val);
 }
 
+#if defined(MHT)
+sw_error_t
+qca808x_ptp_version_reg_get(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_version_reg_u *value)
+{
+	a_uint32_t reg = 0;
+
+	switch (type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX0_VERSION_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX1_VERSION_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX2_VERSION_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX3_VERSION_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX0_VERSION_REG_ADDRESS;
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+
+	return qca808x_phy_ptp_mmd_read(
+			dev_id,
+			phy_id, QCA808X_PHY_MMD3_NUM, reg,
+			&value->val);
+}
+
+sw_error_t
+qca808x_ptp_msg_type_spec0_reg(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_msg_type_spec0_reg_u *value)
+{
+	a_uint32_t reg = 0;
+
+	switch (type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX0_MSG_TYPE_SPEC0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX1_MSG_TYPE_SPEC0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX2_MSG_TYPE_SPEC0_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX3_MSG_TYPE_SPEC0_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX0_MSG_TYPE_SPEC0_REG_ADDRESS;
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+
+	return qca808x_phy_ptp_mmd_read(
+			dev_id,
+			phy_id, QCA808X_PHY_MMD3_NUM, reg,
+			&value->val);
+}
+
+sw_error_t
+qca808x_ptp_msg_type_spec1_reg(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_msg_type_spec1_reg_u *value)
+{
+	a_uint32_t reg = 0;
+
+	switch (type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX0_MSG_TYPE_SPEC1_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX1_MSG_TYPE_SPEC1_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX2_MSG_TYPE_SPEC1_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX3_MSG_TYPE_SPEC1_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX0_MSG_TYPE_SPEC1_REG_ADDRESS;
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+
+	return qca808x_phy_ptp_mmd_read(
+			dev_id,
+			phy_id, QCA808X_PHY_MMD3_NUM, reg,
+			&value->val);
+}
+
+sw_error_t
+qca808x_ptp_domain_number_reg(a_uint32_t dev_id, a_uint32_t phy_id, ptp_ts_type_t type,
+		union ptp_domain_number_reg_u *value)
+{
+	a_uint32_t reg = 0;
+
+	switch (type) {
+		case PTP_TS_RX0:
+			reg = PTP_RX0_DOMAIN_NUMBER_REG_ADDRESS;
+			break;
+		case PTP_TS_RX1:
+			reg = PTP_RX1_DOMAIN_NUMBER_REG_ADDRESS;
+			break;
+		case PTP_TS_RX2:
+			reg = PTP_RX2_DOMAIN_NUMBER_REG_ADDRESS;
+			break;
+		case PTP_TS_RX3:
+			reg = PTP_RX3_DOMAIN_NUMBER_REG_ADDRESS;
+			break;
+		case PTP_TS_TX0:
+			reg = PTP_TX0_DOMAIN_NUMBER_REG_ADDRESS;
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+
+	return qca808x_phy_ptp_mmd_read(
+			dev_id,
+			phy_id, QCA808X_PHY_MMD3_NUM, reg,
+			&value->val);
+}
+#endif

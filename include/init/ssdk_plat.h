@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2014-2015, 2017-2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -11,9 +11,10 @@
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /*qca808x_start*/
 #ifndef __SSDK_PLAT_H
 #define __SSDK_PLAT_H
@@ -187,6 +188,7 @@ enum {
 	QCA_VER_AR8337 = 0x13,
 	QCA_VER_DESS = 0x14,
 	QCA_VER_HPPE = 0x15,
+	QCA_VER_MHT = 0x17,
 	QCA_VER_APPE = 0x20,
 	QCA_VER_SCOMPHY = 0xEE
 };
@@ -348,10 +350,12 @@ struct qca_phy_priv {
 /*qca808x_start*/
 };
 
-struct ipq40xx_mdio_data {
-        struct mii_bus          *mii_bus;
-        void __iomem            *membase;
-        int phy_irq[PHY_MAX_ADDR];
+struct qca_mdio_data {
+	struct mii_bus *mii_bus;
+	struct clk *mdio_clk;
+	void __iomem *membase;
+	int phy_irq[PHY_MAX_ADDR];
+	int clk_div;
 };
 
 #if defined(IN_SWCONFIG)
@@ -364,6 +368,16 @@ a_uint32_t
 qca_ar8216_mii_read(a_uint32_t dev_id, a_uint32_t reg);
 void
 qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+a_uint32_t
+qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg);
+void
+qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+void
+qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
+a_uint32_t
+qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
+void
+qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
 /*qca808x_start*/
 sw_error_t
 qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
@@ -416,6 +430,9 @@ qca_uniphy_reg_read(a_uint32_t dev_id, a_uint32_t uniphy_index,
 struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id);
 struct mii_bus *
 ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
+
+sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq);
+
 int ssdk_sysfs_init (void);
 void ssdk_sysfs_exit (void);
 /*qca808x_start*/

@@ -377,6 +377,11 @@ ifneq (,$(findstring SCOMPHY, $(SUPPORT_CHIP)))
   MODULE_CFLAG += -DSCOMPHY
 endif
 
+ifneq (,$(findstring MHT, $(SUPPORT_CHIP)))
+  MODULE_INC   += -I$(PRJ_PATH)/include/hsl/mht
+  MODULE_CFLAG += -DMHT
+endif
+
 ifeq (TRUE, $(IN_SFP))
   MODULE_INC   += -I$(PRJ_PATH)/include/hsl/sfp
   MODULE_INC   += -I$(PRJ_PATH)/include/adpt/sfp

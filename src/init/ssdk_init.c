@@ -1,18 +1,19 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*qca808x_start*/
@@ -146,6 +147,11 @@
 #include "ssdk_netlink.h"
 #endif
 
+#if defined(MHT)
+#include "ssdk_mht.h"
+#include "ssdk_mht_clk.h"
+#endif
+
 #ifdef IN_RFS
 struct rfs_device rfs_dev;
 struct notifier_block ssdk_inet_notifier;
@@ -157,7 +163,6 @@ struct notifier_block ssdk_dev_notifier;
 //#endif
 
 
-extern ssdk_chip_type SSDK_CURRENT_CHIP_TYPE;
 extern a_uint32_t hsl_dev_wan_port_get(a_uint32_t dev_id);
 extern void dess_rgmii_sw_mac_polling_task(struct qca_phy_priv *priv);
 extern void qca_ar8327_sw_mac_polling_task(struct qca_phy_priv *priv);
@@ -418,7 +423,16 @@ qca_switch_init(a_uint32_t dev_id)
 #if (defined(DESS) || defined(ISISC) || defined(ISIS)) && defined(IN_QOS)
 	a_uint32_t nr = 0;
 #endif
+#if defined(MHT)
+	a_uint32_t port_hol_ctrl[2] = {0}, queue_hol_ctrl[6] = {0};
+	a_uint32_t j = 0, cpu_bmp = 0;
+#endif
 	int i = 0;
+	a_uint32_t port_bmp = 0;
+	hsl_reg_mode reg_mode = HSL_REG_MDIO;
+	a_bool_t flag = A_FALSE;
+
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	/*fal_reset(dev_id);*/
 	/*enable cpu and disable mirror*/
@@ -441,7 +455,7 @@ qca_switch_init(a_uint32_t dev_id)
 #endif
 
 	/*enable pppoe for dakota to support RSS*/
-	if (SSDK_CURRENT_CHIP_TYPE == CHIP_DESS) {
+	if (chip_type == CHIP_DESS) {
 #ifdef DESS
 #ifdef IN_PPPOE
 		fal_pppoe_status_set(dev_id, A_TRUE);
@@ -449,124 +463,220 @@ qca_switch_init(a_uint32_t dev_id)
 #endif
 	}
 
-	for (i = 0; i < AR8327_NUM_PORTS; i++) {
-		/* forward multicast and broadcast frames to CPU */
+	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
+	flag = ssdk_ess_switch_flag_get(dev_id);
+
+	if (reg_mode == HSL_REG_MDIO && flag == A_FALSE) {
+		/* For legacy S17C without defining port bmp in dts */
+		port_bmp = 0x7f;
+	} else {
+		port_bmp = qca_ssdk_port_bmp_get(dev_id);
+		/* Including CPU port */
+		port_bmp |= ssdk_cpu_bmp_get(dev_id);
+	}
+
+	i = 0;
+	while (port_bmp) {
+		if (port_bmp & 1) {
+			/* forward multicast and broadcast frames to CPU */
 #ifdef IN_MISC
-		fal_port_unk_uc_filter_set(dev_id, i, A_FALSE);
-		fal_port_unk_mc_filter_set(dev_id, i, A_FALSE);
-		fal_port_bc_filter_set(dev_id, i, A_FALSE);
+			fal_port_unk_uc_filter_set(dev_id, i, A_FALSE);
+			fal_port_unk_mc_filter_set(dev_id, i, A_FALSE);
+			fal_port_bc_filter_set(dev_id, i, A_FALSE);
 #endif
 #ifdef IN_PORTVLAN
-		fal_port_default_svid_set(dev_id, i, 0);
-		fal_port_default_cvid_set(dev_id, i, 0);
-		fal_port_1qmode_set(dev_id, i, FAL_1Q_DISABLE);
-		fal_port_egvlanmode_set(dev_id, i, FAL_EG_UNMODIFIED);
+			fal_port_default_svid_set(dev_id, i, 0);
+			fal_port_default_cvid_set(dev_id, i, 0);
+			fal_port_1qmode_set(dev_id, i, FAL_1Q_DISABLE);
+			fal_port_egvlanmode_set(dev_id, i, FAL_EG_UNMODIFIED);
 #endif
 
 #ifdef IN_FDB
-		fal_fdb_port_learn_set(dev_id, i, A_TRUE);
+			fal_fdb_port_learn_set(dev_id, i, A_TRUE);
 #endif
 #ifdef IN_STP
-		fal_stp_port_state_set(dev_id, 0, i, FAL_STP_FARWARDING);
+			fal_stp_port_state_set(dev_id, 0, i, FAL_STP_FARWARDING);
 #endif
 #ifdef IN_PORTVLAN
-		fal_port_vlan_propagation_set(dev_id, i, FAL_VLAN_PROPAGATION_REPLACE);
+			fal_port_vlan_propagation_set(dev_id, i, FAL_VLAN_PROPAGATION_REPLACE);
 #endif
 #ifdef IN_IGMP
-		fal_port_igmps_status_set(dev_id, i, A_FALSE);
-		fal_port_igmp_mld_join_set(dev_id, i, A_FALSE);
-		fal_port_igmp_mld_leave_set(dev_id, i, A_FALSE);
-		fal_igmp_mld_entry_creat_set(dev_id, A_FALSE);
-		fal_igmp_mld_entry_v3_set(dev_id, A_FALSE);
+			fal_port_igmps_status_set(dev_id, i, A_FALSE);
+			fal_port_igmp_mld_join_set(dev_id, i, A_FALSE);
+			fal_port_igmp_mld_leave_set(dev_id, i, A_FALSE);
+			fal_igmp_mld_entry_creat_set(dev_id, A_FALSE);
+			fal_igmp_mld_entry_v3_set(dev_id, A_FALSE);
 #endif
-		if (SSDK_CURRENT_CHIP_TYPE == CHIP_SHIVA) {
-			return SW_OK;
-		} else if (SSDK_CURRENT_CHIP_TYPE == CHIP_DESS) {
+			switch (chip_type) {
+				case CHIP_SHIVA:
+					return SW_OK;
+				case CHIP_DESS:
 #ifdef DESS
 #ifdef IN_PORTCONTROL
-			fal_port_flowctrl_forcemode_set(dev_id, i, A_FALSE);
-			fal_port_link_forcemode_set(dev_id, i, A_TRUE);
+					fal_port_flowctrl_forcemode_set(dev_id, i, A_FALSE);
+					fal_port_link_forcemode_set(dev_id, i, A_TRUE);
 #endif
 #ifdef IN_QOS
-			nr = 240; /*30*8*/
-			fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
-			nr = 48; /*6*8*/
-			fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
-			fal_qos_port_red_en_set(dev_id, i, A_TRUE);
-			nr = 32;
-			fal_qos_queue_tx_buf_nr_set(dev_id, i, 5, &nr);
-			fal_qos_queue_tx_buf_nr_set(dev_id, i, 4, &nr);
-			fal_qos_queue_tx_buf_nr_set(dev_id, i, 3, &nr);
-			fal_qos_queue_tx_buf_nr_set(dev_id, i, 2, &nr);
-			fal_qos_queue_tx_buf_nr_set(dev_id, i, 1, &nr);
-			fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
-			if (i != SSDK_PHYSICAL_PORT0)
-				fal_qos_port_mode_set(dev_id, i,
-					FAL_QOS_DSCP_MODE, A_TRUE);
+					nr = 240; /*30*8*/
+					fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
+					nr = 48; /*6*8*/
+					fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
+					fal_qos_port_red_en_set(dev_id, i, A_TRUE);
+					nr = 32;
+					fal_qos_queue_tx_buf_nr_set(dev_id, i, 5, &nr);
+					fal_qos_queue_tx_buf_nr_set(dev_id, i, 4, &nr);
+					fal_qos_queue_tx_buf_nr_set(dev_id, i, 3, &nr);
+					fal_qos_queue_tx_buf_nr_set(dev_id, i, 2, &nr);
+					fal_qos_queue_tx_buf_nr_set(dev_id, i, 1, &nr);
+					fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
+					if (i != SSDK_PHYSICAL_PORT0)
+						fal_qos_port_mode_set(dev_id, i,
+								FAL_QOS_DSCP_MODE, A_TRUE);
 #endif
 #endif
-		} else if (SSDK_CURRENT_CHIP_TYPE == CHIP_ISISC ||
-			SSDK_CURRENT_CHIP_TYPE == CHIP_ISIS) {
+					break;
+
+				case CHIP_ISISC:
+				case CHIP_ISIS:
 #if defined(ISISC) || defined(ISIS)
 #ifdef IN_INTERFACECONTROL
-			fal_port_3az_status_set(dev_id, i, A_FALSE);
+					fal_port_3az_status_set(dev_id, i, A_FALSE);
 #endif
 #ifdef IN_PORTCONTROL
-			fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
-			fal_port_flowctrl_set(dev_id, i, A_FALSE);
+					fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
+					fal_port_flowctrl_set(dev_id, i, A_FALSE);
 
-			if (i != 0 && i != 6) {
-				fal_port_flowctrl_set(dev_id, i, A_TRUE);
-				fal_port_flowctrl_forcemode_set(dev_id, i, A_FALSE);
-			}
+					if (i != 0 && i != 6) {
+						fal_port_flowctrl_set(dev_id, i, A_TRUE);
+						fal_port_flowctrl_forcemode_set(dev_id, i,
+								A_FALSE);
+					}
 #endif
-			if (i == 0 || i == 5 || i == 6) {
+					if (i == 0 || i == 5 || i == 6) {
 #ifdef IN_QOS
-				nr = 240; /*30*8*/
-				fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
-				nr = 48; /*6*8*/
-				fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
-				fal_qos_port_red_en_set(dev_id, i, A_TRUE);
-				if (SSDK_CURRENT_CHIP_TYPE == CHIP_ISISC) {
-					nr = 64; /*8*8*/
-				} else if (SSDK_CURRENT_CHIP_TYPE == CHIP_ISIS) {
-					nr = 60;
-				}
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 5, &nr);
-				nr = 48; /*6*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 4, &nr);
-				nr = 32; /*4*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 3, &nr);
-				nr = 32; /*4*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 2, &nr);
-				nr = 32; /*4*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 1, &nr);
-				nr = 24; /*3*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
+						nr = 240; /*30*8*/
+						fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
+						nr = 48; /*6*8*/
+						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
+						fal_qos_port_red_en_set(dev_id, i, A_TRUE);
+						if (chip_type == CHIP_ISISC) {
+							nr = 64; /*8*8*/
+						} else if (chip_type == CHIP_ISIS) {
+							nr = 60;
+						}
+
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 5, &nr);
+						nr = 48; /*6*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 4, &nr);
+						nr = 32; /*4*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 3, &nr);
+						nr = 32; /*4*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 2, &nr);
+						nr = 32; /*4*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 1, &nr);
+						nr = 24; /*3*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
 #endif
-			} else {
+					} else {
 #ifdef IN_QOS
-				nr = 200; /*25*8*/
-				fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
-				nr = 48; /*6*8*/
-				fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
-				fal_qos_port_red_en_set(dev_id, i, A_TRUE);
-				if (SSDK_CURRENT_CHIP_TYPE == CHIP_ISISC) {
-					nr = 64; /*8*8*/
-				} else if (SSDK_CURRENT_CHIP_TYPE == CHIP_ISIS) {
-					nr = 60;
-				}
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 3, &nr);
-				nr = 48; /*6*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 2, &nr);
-				nr = 32; /*4*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 1, &nr);
-				nr = 24; /*3*8*/
-				fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
+						nr = 200; /*25*8*/
+						fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
+						nr = 48; /*6*8*/
+						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
+						fal_qos_port_red_en_set(dev_id, i, A_TRUE);
+						if (chip_type == CHIP_ISISC) {
+							nr = 64; /*8*8*/
+						} else if (chip_type == CHIP_ISIS) {
+							nr = 60;
+						}
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 3, &nr);
+						nr = 48; /*6*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 2, &nr);
+						nr = 32; /*4*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 1, &nr);
+						nr = 24; /*3*8*/
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, 0, &nr);
 #endif
+					}
+#endif
+					break;
+				case CHIP_MHT:
+#if defined(MHT)
+					aos_mem_zero(&port_hol_ctrl, sizeof(port_hol_ctrl));
+					aos_mem_zero(&queue_hol_ctrl, sizeof(queue_hol_ctrl));
+					cpu_bmp = ssdk_cpu_bmp_get(dev_id);
+#if defined(IN_PORTCONTROL)
+					fal_port_txmac_status_set(dev_id, i, A_FALSE);
+					fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+#endif
+					if (cpu_bmp & BIT(i)) {
+#if defined(IN_PORTCONTROL)
+						fal_port_flowctrl_set(dev_id, i, A_FALSE);
+						fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
+						fal_header_type_set(dev_id,
+								A_TRUE, MHT_HEADER_TYPE_VAL);
+						fal_port_rxhdr_mode_set(dev_id,
+								i, FAL_ONLY_MANAGE_FRAME_EN);
+						fal_port_txhdr_mode_set(dev_id,
+								i, FAL_NO_HEADER_EN);
+#endif
+						/* port tx buf number */
+						port_hol_ctrl[0] = 600;
+						/* port rx buf number */
+						port_hol_ctrl[1] = 48;
+						/* queue0 tx buf number */
+						queue_hol_ctrl[0] = 24;
+						/* queue1 tx buf number */
+						queue_hol_ctrl[1] = 32;
+						/* queue2 tx buf number */
+						queue_hol_ctrl[2] = 32;
+						/* queue3 tx buf number */
+						queue_hol_ctrl[3] = 32;
+						/* queue4 tx buf number */
+						queue_hol_ctrl[4] = 48;
+						/* queue5 tx buf number */
+						queue_hol_ctrl[5] = 64;
+					} else {
+#if defined(IN_PORTCONTROL)
+						fal_port_flowctrl_set(dev_id, i, A_TRUE);
+						fal_port_flowctrl_forcemode_set(dev_id, i,
+								A_FALSE);
+#endif
+						/* port tx buf number */
+						port_hol_ctrl[0] = 500;
+						/* port rx buf number */
+						port_hol_ctrl[1] = 48;
+						/* queue0 tx buf number */
+						queue_hol_ctrl[0] = 24;
+						/* queue1 tx buf number */
+						queue_hol_ctrl[1] = 32;
+						/* queue2 tx buf number */
+						queue_hol_ctrl[2] = 48;
+						/* queue3 tx buf number */
+						queue_hol_ctrl[3] = 64;
+					}
+
+#if defined(IN_INTERFACECONTROL)
+					fal_port_3az_status_set(dev_id, i, A_FALSE);
+#endif
+#if defined(IN_QOS)
+					fal_qos_port_red_en_set(dev_id, i, A_TRUE);
+					fal_qos_port_tx_buf_nr_set(dev_id, i, &port_hol_ctrl[0]);
+					fal_qos_port_rx_buf_nr_set(dev_id, i, &port_hol_ctrl[1]);
+
+					for (j = 0; j < ARRAY_SIZE(queue_hol_ctrl)
+							&& queue_hol_ctrl[j] != 0; j++)
+						fal_qos_queue_tx_buf_nr_set(dev_id, i, j,
+								&queue_hol_ctrl[j]);
+#endif
+#endif
+					break;
+				default:
+					break;
 			}
-#endif
 		}
+		port_bmp >>=1;
+		i++;
 	}
 
 	return SW_OK;
@@ -1640,7 +1750,7 @@ qca_phy_id_chip(struct qca_phy_priv *priv)
 {
 	a_uint32_t value, version;
 
-	value = qca_ar8216_mii_read(priv->device_id, AR8327_REG_CTRL);
+	value = qca_mii_read(priv->device_id, AR8327_REG_CTRL);
 	version = value & (AR8327_CTRL_REVISION |
                 AR8327_CTRL_VERSION);
 	priv->version = (version & AR8327_CTRL_VERSION) >>
@@ -1689,6 +1799,10 @@ static int qca_switchdev_register(struct qca_phy_priv *priv)
 		case QCA_VER_HPPE:
 			sw_dev->name = "QCA HPPE";
 			sw_dev->alias = "QCA HPPE";
+			break;
+		case QCA_VER_MHT:
+			sw_dev->name = "QCA MHT";
+			sw_dev->alias = "QCA MHT";
 			break;
 		case QCA_VER_SCOMPHY:
 #ifdef MP
@@ -1829,8 +1943,8 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	a_uint32_t chip_id = 0;
 	priv = qca_phy_priv_global[dev_id];
 
-	priv->mii_read = qca_ar8216_mii_read;
-	priv->mii_write = qca_ar8216_mii_write;
+	priv->mii_read = qca_mii_read;
+	priv->mii_write = qca_mii_write;
 	priv->phy_write = qca_ar8327_phy_write;
 	priv->phy_read = qca_ar8327_phy_read;
 	priv->phy_dbg_write = qca_ar8327_phy_dbg_write;
@@ -2794,36 +2908,44 @@ static void ssdk_driver_unregister(a_uint32_t dev_id)
 	}
 }
 /*qca808x_start*/
-static int chip_is_scomphy(a_uint32_t dev_id, ssdk_init_cfg* cfg)
+static inline a_uint32_t qca_detect_phyid(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 {
-	int rv = -ENODEV;
 	a_uint32_t phy_id = 0, port_id = 0;
 	a_uint32_t port_bmp = qca_ssdk_port_bmp_get(dev_id);
 	while (port_bmp) {
 		if (port_bmp & 0x1) {
 			phy_id = hsl_phyid_get(dev_id, port_id, cfg);
-			switch (phy_id) {
-/*qca808x_end*/
-				case QCA8030_PHY:
-				case QCA8033_PHY:
-				case QCA8035_PHY:
-				case MP_GEPHY:
-/*qca808x_start*/
-				case QCA8081_PHY_V1_1:
-						cfg->chip_type = CHIP_SCOMPHY;
-						/*MP GEPHY is always the first port*/
-						if(cfg->phy_id == 0)
-						{
-							cfg->phy_id = phy_id;
-						}
-						rv = SW_OK;
-					break;
-				default:
-					break;
-			}
+			if (INVALID_PHY_ID != phy_id)
+				break;
 		}
 		port_bmp >>= 1;
 		port_id++;
+	}
+	return phy_id;
+}
+
+static int chip_is_scomphy(a_uint32_t dev_id, ssdk_init_cfg* cfg)
+{
+	int rv = -ENODEV;
+	a_uint32_t phy_id = qca_detect_phyid(dev_id, cfg);
+
+	switch (phy_id) {
+		/*qca808x_end*/
+		case QCA8030_PHY:
+		case QCA8033_PHY:
+		case QCA8035_PHY:
+		case MP_GEPHY:
+			/*qca808x_start*/
+		case QCA8081_PHY_V1_1:
+			cfg->chip_type = CHIP_SCOMPHY;
+			/*MP GEPHY is always the first port*/
+			if(cfg->phy_id == 0) {
+				cfg->phy_id = phy_id;
+			}
+			rv = SW_OK;
+			break;
+		default:
+			break;
 	}
 
 	return rv;
@@ -2838,36 +2960,56 @@ static int chip_ver_get(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 	hsl_reg_mode reg_mode;
 
 	reg_mode= ssdk_switch_reg_access_mode_get(dev_id);
-	if(reg_mode == HSL_REG_MDIO)
-	{
-		chip_ver = (qca_ar8216_mii_read(dev_id, 0)&0xff00)>>8;
-	}
-	else {
+	if(reg_mode == HSL_REG_MDIO) {
+		/**
+		 * For the Manhattan phy detected, the Manhattan MDIO read function
+		 * should be used, which is different from the other chips
+		 **/
+		a_uint32_t phy_id = qca_detect_phyid(dev_id, cfg);
+		a_uint16_t reg_val;
+		switch (phy_id) {
+			case QCA8084_PHY:
+				reg_val = qca_mht_mii_read(dev_id, 0);
+				break;
+			default:
+				reg_val = qca_ar8216_mii_read(dev_id, 0);
+				break;
+		}
+		chip_ver = (reg_val & BITS(8,8)) >> 8;
+	} else {
 		a_uint32_t reg_val = 0;
 		qca_switch_reg_read(dev_id,0,(a_uint8_t *)&reg_val, 4);
 		chip_ver = (reg_val&0xff00)>>8;
 		chip_revision = reg_val&0xff;
 	}
 /*qca808x_start*/
-	if(chip_ver == QCA_VER_AR8227)
-		cfg->chip_type = CHIP_SHIVA;
-	else if(chip_ver == QCA_VER_AR8337)
-		cfg->chip_type = CHIP_ISISC;
-	else if(chip_ver == QCA_VER_AR8327)
-		cfg->chip_type = CHIP_ISIS;
-	else if(chip_ver == QCA_VER_DESS)
-		cfg->chip_type = CHIP_DESS;
-	else if(chip_ver == QCA_VER_HPPE) {
-		cfg->chip_type = CHIP_HPPE;
-		cfg->chip_revision = chip_revision;
-	}
-	else if(chip_ver == QCA_VER_APPE) {
-		cfg->chip_type = CHIP_APPE;
-		cfg->chip_revision = chip_revision;
-	}
-	else {
-		/* try single phy without switch connected */
-		rv = chip_is_scomphy(dev_id, cfg);
+	switch (chip_ver) {
+		case QCA_VER_AR8227:
+			cfg->chip_type = CHIP_SHIVA;
+			break;
+		case QCA_VER_AR8337:
+			cfg->chip_type = CHIP_ISISC;
+			break;
+		case QCA_VER_AR8327:
+			cfg->chip_type = CHIP_ISIS;
+			break;
+		case QCA_VER_DESS:
+			cfg->chip_type = CHIP_DESS;
+			break;
+		case QCA_VER_HPPE:
+			cfg->chip_type = CHIP_HPPE;
+			cfg->chip_revision = chip_revision;
+			break;
+		case QCA_VER_APPE:
+			cfg->chip_type = CHIP_APPE;
+			cfg->chip_revision = chip_revision;
+			break;
+		case QCA_VER_MHT:
+			cfg->chip_type = CHIP_MHT;
+			break;
+		default:
+			/* try single phy without switch connected */
+			rv = chip_is_scomphy(dev_id, cfg);
 	}
 
 	return rv;
@@ -3233,8 +3375,8 @@ static void ssdk_cfg_default_init(ssdk_init_cfg *cfg)
 
 	cfg->reg_func.header_reg_set = qca_switch_reg_write;
 	cfg->reg_func.header_reg_get = qca_switch_reg_read;
-	cfg->reg_func.mii_reg_set = qca_ar8216_mii_write;
-	cfg->reg_func.mii_reg_get = qca_ar8216_mii_read;
+	cfg->reg_func.mii_reg_set = qca_mii_write;
+	cfg->reg_func.mii_reg_get = qca_mii_read;
 /*qca808x_start*/
 }
 /*qca808x_end*/
@@ -3738,6 +3880,17 @@ static int __init regi_init(void)
 					rv = qca_ar8327_hw_init(qca_phy_priv_global[dev_id]);
 					SSDK_INFO("Initializing ISISC Done!!\n");
 				}
+#endif
+				break;
+			case CHIP_MHT:
+#if defined(MHT)
+				SSDK_INFO("Initializing MHT!!\n");
+				ssdk_mht_clk_reset(dev_id, MHT_SWITCH_CORE_CLK);
+				rv = qca_mht_hw_init(&cfg, dev_id);
+				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
+				rv = ssdk_switch_register(dev_id, cfg.chip_type);
+				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
+				SSDK_INFO("Initializing MHT Done!!\n");
 #endif
 				break;
 			case CHIP_APPE:

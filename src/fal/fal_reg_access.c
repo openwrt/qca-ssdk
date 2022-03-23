@@ -92,34 +92,47 @@ static sw_error_t
 _fal_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
              a_uint32_t value_len)
 {
-    sw_error_t rv;
-    hsl_api_t *p_api;
+	sw_error_t rv;
+	hsl_api_t *p_api;
 
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
+	p_api = hsl_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
 
-    if (NULL == p_api->reg_get)
-        return SW_NOT_SUPPORTED;
+	/* access switch reg from MDIO bus */
+	if (reg_addr & 0xff000000 && NULL != p_api->mii_reg_get) {
+		rv = p_api->mii_reg_get(dev_id, reg_addr, value, value_len);
+		return rv;
+	}
 
-    rv = p_api->reg_get(dev_id, reg_addr, value, value_len);
-    return rv;
+	if (NULL == p_api->reg_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->reg_get(dev_id, reg_addr, value, value_len);
+	return rv;
 }
 
 static sw_error_t
 _fal_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
-             a_uint32_t value_len)
+		a_uint32_t value_len)
 {
-    sw_error_t rv;
-    hsl_api_t *p_api;
+	sw_error_t rv;
+	hsl_api_t *p_api;
 
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
+	p_api = hsl_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_api);
 
-    if (NULL == p_api->reg_set)
-        return SW_NOT_SUPPORTED;
+	/* access switch reg from MDIO bus */
+	if (reg_addr & 0xff000000 && NULL != p_api->mii_reg_set) {
+		rv = p_api->mii_reg_set(dev_id, reg_addr, value, value_len);
+		return rv;
+	}
 
-    rv = p_api->reg_set(dev_id, reg_addr, value, value_len);
-    return rv;
+	if (NULL == p_api->reg_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->reg_set(dev_id, reg_addr, value, value_len);
+	return rv;
 }
-
 
 static sw_error_t
 _fal_psgmii_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],

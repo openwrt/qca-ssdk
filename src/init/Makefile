@@ -29,6 +29,10 @@ ifneq (,$(filter APPE, $(SUPPORT_CHIP)))
 	SRC_LIST += ssdk_appe.c
 endif
 
+ifneq (,$(filter MHT, $(SUPPORT_CHIP)))
+	SRC_LIST += ssdk_mht.c ssdk_mht_clk.c ssdk_mht_pinctrl.c
+endif
+
 ifeq (TRUE, $(SWCONFIG))
 	SRC_LIST += ssdk_uci.c
 endif

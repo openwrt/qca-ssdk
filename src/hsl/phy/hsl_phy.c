@@ -154,6 +154,11 @@ sw_error_t phy_api_ops_init(phy_type_t phy_type)
 	return SW_OK;
 }
 /*qca808x_end*/
+phy_info_t *hsl_phy_info_get(a_uint32_t dev_id)
+{
+	return phy_info[dev_id];
+}
+
 a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	a_bool_t sfp_port = 0;
@@ -177,6 +182,21 @@ a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 	else
 		return A_FALSE;
 }
+
+a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
+{
+	a_uint32_t cpu_bmp = ssdk_cpu_bmp_get(dev_id);
+	a_bool_t is_fport = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+
+	if (A_FALSE == hsl_port_validity_check(dev_id, port_id))
+		return A_FALSE;
+
+	if ((cpu_bmp & BIT(port_id)) || is_fport == A_TRUE)
+		return A_FALSE;
+
+	return A_TRUE;
+}
+
 /*qca808x_start*/
 a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 		a_uint32_t port_id, ssdk_init_cfg *cfg)
@@ -264,6 +284,7 @@ phy_type_t hsl_phytype_get_by_phyid(a_uint32_t dev_id, a_uint32_t phy_id)
 		case MP_GEPHY:
 			phytype = MPGE_PHY_CHIP;
 			break;
+		case QCA8084_PHY:
 /*qca808x_start*/
 		case QCA8081_PHY_V1_1:
 			phytype = QCA808X_PHY_CHIP;
@@ -403,6 +424,8 @@ int qca_ssdk_phy_info_init(a_uint32_t dev_id)
 	for (j = SSDK_PHYSICAL_PORT0; j < SW_MAX_NR_PORT; j ++)
 	{
 		phy_info[dev_id]->phy_type[j] = MAX_PHY_CHIP;
+		phy_info[dev_id]->port_link_status[j] = PORT_LINK_DOWN;
+		phy_info[dev_id]->port_mode[j] = PORT_INTERFACE_MODE_MAX;
 		if(j == SSDK_PHYSICAL_PORT0)
 		{
 			phy_info[dev_id]->phy_address[j] = INVALID_PHY_ADDR;
@@ -442,7 +465,6 @@ void qca_ssdk_port_bmp_set(a_uint32_t dev_id, a_uint32_t value)
 
 a_uint32_t qca_ssdk_port_bmp_get(a_uint32_t dev_id)
 {
-
 	return port_bmp[dev_id];
 }
 /*qca808x_end*/
@@ -627,28 +649,23 @@ hsl_port_phyid_get(a_uint32_t dev_id, fal_port_t port_id)
 }
 
 sw_error_t
-hsl_port_phy_mode_set(a_uint32_t dev_id, fal_port_interface_mode_t mode)
+hsl_port_phy_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t mode)
 {
-	sw_error_t rv;
-	a_uint32_t i = 0, phy_addr = 0;
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
 	hsl_phy_ops_t *phy_drv;
 
-	for (i = 0; i < SW_MAX_NR_PORT; i++)
-	{
-		if (phy_info[dev_id]->phy_type[i] == MALIBU_PHY_CHIP)
-		{
-			SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get (dev_id, i));
-			if (NULL == phy_drv->phy_interface_mode_set)
-				return SW_NOT_SUPPORTED;
+	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_interface_mode_set)
+		return SW_NOT_SUPPORTED;
 
-			phy_addr = qca_ssdk_port_to_phy_addr(dev_id, i);
-			rv = phy_drv->phy_interface_mode_set(dev_id, phy_addr, mode);
-			return rv;
-		}
-	}
+	phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
+	rv = phy_drv->phy_interface_mode_set(dev_id, phy_addr, mode);
 
-	return SW_OK;
+	return rv;
 }
+
 phy_type_t hsl_phy_type_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
 

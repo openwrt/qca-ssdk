@@ -359,6 +359,11 @@ ifeq ($(MINI_SSDK), enable)
 		IN_LED=FALSE
 		IN_INTERFACECONTROL=FALSE
 	endif
+
+	ifeq ($(MHT_ENABLE), enable)
+		IN_INTERFACECONTROL=TRUE
+		IN_NAT=TRUE
+	endif
 	
 	ifeq ($(HNAT_FEATURE), enable)
 		IN_MISC_MINI=FALSE

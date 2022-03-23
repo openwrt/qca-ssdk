@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2015-2019, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*qca808x_start*/
@@ -1038,7 +1041,7 @@ _fal_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
 
 static sw_error_t
 _fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
-			       a_uint8_t on_thres, a_uint8_t off_thres)
+			       a_uint16_t on_thres, a_uint16_t off_thres)
 {
   sw_error_t rv;
   hsl_api_t *p_api;
@@ -1054,7 +1057,7 @@ _fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
 
 static sw_error_t
 _fal_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
-			       a_uint8_t * on_thres, a_uint8_t * off_thres)
+			       a_uint16_t * on_thres, a_uint16_t * off_thres)
 {
   sw_error_t rv;
   hsl_api_t *p_api;
@@ -2079,6 +2082,70 @@ _fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
 #endif
 
 sw_error_t
+_fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_flow_ctrl_status_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_flow_ctrl_status_get(dev_id, ring_id, status);
+
+	return rv;
+}
+
+sw_error_t
+_fal_ring_union_set(a_uint32_t dev_id, a_bool_t en)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_union_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_union_set(dev_id, en);
+
+	return rv;
+}
+
+sw_error_t
+_fal_ring_union_get(a_uint32_t dev_id, a_bool_t *en)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_union_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_union_get(dev_id, en);
+
+	return rv;
+}
+
+sw_error_t
+_fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t on_thres, a_uint16_t off_thres)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->port_flowctrl_thresh_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->port_flowctrl_thresh_set(dev_id, port_id, on_thres, off_thres);
+	return rv;
+}
+
+sw_error_t
 _fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
 {
 	sw_error_t rv;
@@ -2090,6 +2157,39 @@ _fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t 
 		return SW_NOT_SUPPORTED;
 
 	rv = p_api->adpt_port_cnt_cfg_set(dev_id, port_id, cnt_cfg);
+	return rv;
+}
+
+sw_error_t
+_fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t *on_thres, a_uint16_t *off_thres)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->port_flowctrl_thresh_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->port_flowctrl_thresh_get(dev_id, port_id, on_thres, off_thres);
+
+	return rv;
+}
+
+
+sw_error_t
+_fal_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_flow_ctrl_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_flow_ctrl_get(dev_id, ring_id, status);
 	return rv;
 }
 
@@ -2120,6 +2220,21 @@ _fal_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cn
 		return SW_NOT_SUPPORTED;
 
 	rv = p_api->adpt_port_cnt_get(dev_id, port_id, port_cnt);
+	return rv;
+}
+
+sw_error_t
+_fal_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status)
+{
+	sw_error_t rv;
+	hsl_api_t *p_api = hsl_api_ptr_get(dev_id);
+
+	SW_RTN_ON_NULL(p_api);
+
+	if (NULL == p_api->ring_flow_ctrl_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->ring_flow_ctrl_set(dev_id, ring_id, status);
 	return rv;
 }
 
@@ -3027,7 +3142,7 @@ fal_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
  */
 sw_error_t
 fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
-			      a_uint8_t on_thres, a_uint8_t off_thres)
+			      a_uint16_t on_thres, a_uint16_t off_thres)
 {
   sw_error_t rv;
 
@@ -3047,7 +3162,7 @@ fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
  */
 sw_error_t
 fal_ring_flow_ctrl_thres_get (a_uint32_t dev_id, a_uint32_t ring_id,
-			      a_uint8_t * on_thres, a_uint8_t * off_thres)
+			      a_uint16_t * on_thres, a_uint16_t * off_thres)
 {
   sw_error_t rv;
 
@@ -3857,6 +3972,85 @@ fal_port_8023ah_get(a_uint32_t dev_id, fal_port_t port_id,
 #endif
 
 sw_error_t
+fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_flow_ctrl_status_get(dev_id, ring_id, status);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_ring_union_set(a_uint32_t dev_id, a_bool_t en)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_union_set(dev_id, en);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_ring_union_get(a_uint32_t dev_id, a_bool_t *en)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_union_get(dev_id, en);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t on_thres, a_uint16_t off_thres)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_flow_ctrl_thres_set(dev_id, port_id, on_thres, off_thres);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
+		a_uint16_t *on_thres, a_uint16_t *off_thres)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_port_flow_ctrl_thres_get(dev_id, port_id, on_thres, off_thres);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_flow_ctrl_config_get(dev_id, ring_id, status);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_ring_flow_ctrl_config_set(dev_id, ring_id, status);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
 fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg)
 {
     sw_error_t rv = SW_OK;
@@ -4007,6 +4201,11 @@ EXPORT_SYMBOL(fal_switch_port_loopback_get);
 EXPORT_SYMBOL(fal_port_8023ah_set);
 EXPORT_SYMBOL(fal_port_8023ah_get);
 #endif
+EXPORT_SYMBOL(fal_ring_flow_ctrl_status_get);
+EXPORT_SYMBOL(fal_ring_union_set);
+EXPORT_SYMBOL(fal_ring_union_get);
+EXPORT_SYMBOL(fal_ring_flow_ctrl_config_get);
+EXPORT_SYMBOL(fal_ring_flow_ctrl_config_set);
 EXPORT_SYMBOL(fal_port_cnt_cfg_set);
 EXPORT_SYMBOL(fal_port_cnt_cfg_get);
 EXPORT_SYMBOL(fal_port_cnt_get);

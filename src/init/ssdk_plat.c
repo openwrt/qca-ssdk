@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*qca808x_start*/
@@ -107,6 +107,10 @@
 #endif
 #endif
 
+#if defined(MHT)
+#include "ssdk_mht_clk.h"
+#endif
+
 #include "adpt.h"
 
 #ifdef IN_LINUX_STD_PTP
@@ -115,7 +119,6 @@
 /*qca808x_start*/
 
 extern struct qca_phy_priv **qca_phy_priv_global;
-extern ssdk_chip_type SSDK_CURRENT_CHIP_TYPE;
 /*qca808x_end*/
 struct mutex switch_mdio_lock;
 
@@ -175,6 +178,78 @@ static uint32_t switch_chip_id_adjuest(a_uint32_t dev_id)
 #endif
 
 static inline void
+mht_split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page,
+		uint16_t *switch_phy_id)
+{
+	*r1 = regaddr & 0x1c;
+
+	regaddr >>= 5;
+	*r2 = regaddr & 0x7;
+
+	regaddr >>= 3;
+	*page = regaddr & 0xffff;
+
+	regaddr >>= 16;
+	*switch_phy_id = regaddr & 0xff;
+}
+
+a_uint32_t
+qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+{
+	struct mii_bus *bus;
+	uint16_t r1, r2, page, switch_phy_id;
+	uint16_t lo, hi;
+
+	bus = qca_phy_priv_global[dev_id]->miibus;
+
+	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
+	mutex_lock(&switch_mdio_lock);
+	mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
+	udelay(100);
+	lo = mdiobus_read(bus, 0x10 | r2, r1);
+	hi = mdiobus_read(bus, 0x10 | r2, r1 + 2);
+	mutex_unlock(&switch_mdio_lock);
+	return (hi << 16) | lo;
+}
+
+void
+qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
+{
+	struct mii_bus *bus;
+	uint16_t r1, r2, page, switch_phy_id;
+	uint16_t lo, hi;
+
+	bus = qca_phy_priv_global[dev_id]->miibus;
+
+	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
+	lo = val & 0xffff;
+	hi = (a_uint16_t) (val >> 16);
+
+	mutex_lock(&switch_mdio_lock);
+	mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
+	udelay(100);
+	mdiobus_write(bus, 0x10 | r2, r1, lo);
+	mdiobus_write(bus, 0x10 | r2, r1 + 2, hi);
+	mutex_unlock(&switch_mdio_lock);
+}
+
+void
+qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val)
+{
+	a_uint32_t new_val = 0, org_val = 0;
+
+	org_val = qca_mht_mii_read(dev_id, reg);
+
+	new_val = org_val & ~mask;
+	new_val |= val & mask;
+
+	if (new_val != org_val)
+		qca_mht_mii_write(dev_id, reg, new_val);
+
+	return;
+}
+
+static inline void
 split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page)
 {
 	regaddr >>= 1;
@@ -213,6 +288,7 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	struct mii_bus *bus;
 	uint16_t r1, r2, r3;
 	uint16_t lo, hi;
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	bus = qca_phy_priv_global[dev_id]->miibus;
 
@@ -223,7 +299,7 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	mutex_lock(&switch_mdio_lock);
 	mdiobus_write(bus, switch_chip_id, switch_chip_reg, r3);
 	udelay(100);
-	if(SSDK_CURRENT_CHIP_TYPE != CHIP_SHIVA) {
+	if(chip_type != CHIP_SHIVA) {
 		mdiobus_write(bus, 0x10 | r2, r1, lo);
 		mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
 	} else {
@@ -232,6 +308,36 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	}
 	mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
 	mutex_unlock(&switch_mdio_lock);
+}
+
+a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+{
+	a_uint32_t val = 0xffffffff;
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
+
+	switch (chip_type) {
+		case CHIP_MHT:
+			val = qca_mht_mii_read(dev_id, reg);
+			break;
+		default:
+			val = qca_ar8216_mii_read(dev_id, reg);
+			break;
+	}
+	return val;
+}
+
+void qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
+{
+	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
+
+	switch (chip_type) {
+		case CHIP_MHT:
+			qca_mht_mii_write(dev_id, reg, val);
+			break;
+		default:
+			qca_ar8216_mii_write(dev_id, reg, val);
+			break;
+	}
 }
 
 /*qca808x_start*/
@@ -566,7 +672,7 @@ static int miibus_get(a_uint32_t dev_id)
 	struct device_node *mdio_node = NULL;
 	struct device_node *switch_node = NULL;
 	struct platform_device *mdio_plat = NULL;
-	struct ipq40xx_mdio_data *mdio_data = NULL;
+	struct qca_mdio_data *mdio_data = NULL;
 	struct qca_phy_priv *priv;
 	hsl_reg_mode reg_mode = HSL_REG_LOCAL_BUS;
 	priv = qca_phy_priv_global[dev_id];
@@ -712,6 +818,27 @@ static int miibus_get(a_uint32_t dev_id)
 struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id)
 {
 	return qca_phy_priv_global[dev_id]->miibus;
+}
+
+sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq)
+{
+	struct mii_bus *bus = NULL;
+	struct qca_mdio_data *mdio_priv = NULL;
+
+	bus = ssdk_miibus_get_by_device(dev_id);
+	if (!bus) {
+		SSDK_ERROR("Can't get MDIO bus of device id %d\n", dev_id);
+		return SW_BAD_PTR;
+	}
+
+	mdio_priv = bus->priv;
+	if (!mdio_priv) {
+		SSDK_ERROR("MDIO bus private data is NULL\n");
+		return SW_BAD_PTR;
+	}
+
+	mdio_priv->clk_div = freq;
+	return SW_OK;
 }
 
 static ssize_t ssdk_dev_id_get(struct device *dev,
@@ -1217,6 +1344,110 @@ static ssize_t ssdk_ptp_counter_set(struct device *dev,
 }
 #endif
 
+#if defined(MHT)
+static ssize_t ssdk_clk_show(struct device *dev,
+		struct device_attribute *attr,
+		char *buf)
+{
+	return ssdk_mht_clk_dump(ssdk_dev_id, buf);
+}
+
+static ssize_t ssdk_clk_store(struct device *dev,
+		struct device_attribute *attr,
+		const char *buf, size_t count)
+{
+	char *clk_str, *clk_id, *op_str, *val_str = NULL;
+	a_uint32_t op_val;
+
+	clk_str = kstrndup(buf, count, GFP_KERNEL);
+	if (!clk_str)
+		return -ENOMEM;
+
+	if (clk_str[count - 1] == '\n')
+		clk_str[count - 1] = '\0';
+
+	clk_id = strsep(&clk_str, " ");
+	if (!clk_id)
+		goto parse_fail;
+
+	op_str = strsep(&clk_str, " ");
+	if (!op_str)
+		goto parse_fail;
+
+	/* the op_val is optinal */
+	val_str = strsep(&clk_str, " ");
+	if (val_str) {
+		if (kstrtou32(val_str, 0, &op_val) < 0)
+			goto parse_fail;
+	}
+
+	SSDK_DEBUG("clk_id: %s, option: %s %s\n", clk_id, op_str, val_str ? val_str : "");
+
+	if (strncasecmp(op_str, "parent", 6) == 0) {
+		if (val_str != NULL)
+			ssdk_mht_clk_parent_set(ssdk_dev_id, clk_id, op_val);
+		else {
+			SSDK_ERROR("parent value needed\n");
+			goto parse_fail;
+		}
+	}
+
+	if (strncasecmp(op_str, "rate", 4) == 0) {
+		if (val_str != NULL)
+			ssdk_mht_clk_rate_set(ssdk_dev_id, clk_id, op_val);
+		else {
+			SSDK_ERROR("rate value needed\n");
+			goto parse_fail;
+		}
+	}
+
+	if (strncasecmp(op_str, "reset", 5) == 0) {
+		ssdk_mht_clk_reset(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "deassert", 8) == 0) {
+		ssdk_mht_clk_deassert(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "assert", 6) == 0) {
+		ssdk_mht_clk_assert(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "enable", 6) == 0) {
+		ssdk_mht_clk_enable(ssdk_dev_id, clk_id);
+	}
+
+	if (strncasecmp(op_str, "disable", 7) == 0) {
+		ssdk_mht_clk_disable(ssdk_dev_id, clk_id);
+	}
+
+	kfree(clk_str);
+	return count;
+
+parse_fail:
+	if (clk_str)
+		kfree(clk_str);
+
+	SSDK_INFO("clk_cfg supported options:\n"
+			"clock_id parent parent_value[0-6]\n"
+			"Example: echo mht_gcc_mac1_tx_clk parent 6 > /sys/ssdk/clk_cfg\n"
+			"clock_id rate rate_value\n"
+			"Example: echo mht_gcc_mac1_tx_clk rate 312500000 > /sys/ssdk/clk_cfg\n"
+			"clock_id reset\n"
+			"Example: echo mht_gcc_mac1_tx_clk reset > /sys/ssdk/clk_cfg\n"
+			"clock_id deassert\n"
+			"Example: echo mht_gcc_mac1_tx_clk deassert > /sys/ssdk/clk_cfg\n"
+			"clock_id assert\n"
+			"Example: echo mht_gcc_mac1_tx_clk assert > /sys/ssdk/clk_cfg\n"
+			"clock_id enable\n"
+			"Example: echo mht_gcc_mac1_tx_clk enable > /sys/ssdk/clk_cfg\n"
+			"clock_id disable\n"
+			"Example: echo mht_gcc_mac1_tx_clk disable > /sys/ssdk/clk_cfg\n");
+
+	return -EINVAL;
+}
+#endif
+
 static const struct device_attribute ssdk_dev_id_attr =
 	__ATTR(dev_id, 0660, ssdk_dev_id_get, ssdk_dev_id_set);
 static const struct device_attribute ssdk_log_level_attr =
@@ -1235,6 +1466,11 @@ static const struct device_attribute ssdk_phy_read_reg_attr =
 static const struct device_attribute ssdk_ptp_counter_attr =
 	__ATTR(ptp_packet_counter, 0660, ssdk_ptp_counter_get, ssdk_ptp_counter_set);
 #endif
+#if defined(MHT)
+static const struct device_attribute ssdk_clk_cfg_attr =
+	__ATTR(clk_cfg, 0660, ssdk_clk_show, ssdk_clk_store);
+#endif
+
 struct kobject *ssdk_sys = NULL;
 
 int ssdk_sysfs_init (void)
@@ -1306,7 +1542,23 @@ int ssdk_sysfs_init (void)
 	}
 #endif
 
+#if defined(MHT)
+	/* create /sys/ssdk/dts_clk file */
+	ret = sysfs_create_file(ssdk_sys, &ssdk_clk_cfg_attr.attr);
+	if (ret) {
+		printk("Failed to register SSDK clk_cfg file\n");
+		goto CLEANUP_9;
+	}
+#endif
+
 	return 0;
+
+#if defined(MHT)
+CLEANUP_9:
+#if defined(IN_LINUX_STD_PTP)
+	sysfs_remove_file(ssdk_sys, &ssdk_ptp_counter_attr.attr);
+#endif
+#endif
 
 #ifdef IN_LINUX_STD_PTP
 CLEANUP_8:
@@ -1332,6 +1584,10 @@ CLEANUP_1:
 
 void ssdk_sysfs_exit (void)
 {
+#if defined(MHT)
+	sysfs_remove_file(ssdk_sys, &ssdk_clk_cfg_attr.attr);
+#endif
+
 #ifdef IN_LINUX_STD_PTP
 	sysfs_remove_file(ssdk_sys, &ssdk_ptp_counter_attr.attr);
 #endif
@@ -1358,7 +1614,7 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	int rv = 0;
 	#endif
 /*qca808x_start*/
-	printk("ssdk_plat_init start\n");
+	SSDK_INFO("ssdk_plat_init start\n");
 /*qca808x_end*/
 	mutex_init(&switch_mdio_lock);
 
@@ -1385,7 +1641,7 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	}
 #endif
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
-	if(reg_mode == HSL_REG_LOCAL_BUS) {
+	if (reg_mode == HSL_REG_LOCAL_BUS) {
 		ssdk_switch_reg_map_info_get(dev_id, &map);
 		qca_phy_priv_global[dev_id]->hw_addr = ioremap_nocache(map.base_addr,
 								map.size);
@@ -1405,11 +1661,20 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 				ssdk_gcc_clock_init();
 			}
 #endif
-			return 0;
 		}
 
 		cfg->reg_mode = HSL_HEADER;
+#if defined(MHT)
+		/* when manhattan works in PHY mode, the clock mode will be defined in dts,
+		 * the registers of manhattan need to be accessed, mii_reg_set/mii_reg_get
+		 * can be leveraged for this purpose. */
+		cfg->reg_func.mii_reg_set = qca_mht_mii_write;
+		cfg->reg_func.mii_reg_get = qca_mht_mii_read;
+#endif
+	} else if (reg_mode == HSL_REG_MDIO) {
+		cfg->reg_mode = HSL_MDIO;
 	}
+
 #ifdef DESS
 	reg_mode = ssdk_psgmii_reg_access_mode_get(dev_id);
 	if(reg_mode == HSL_REG_LOCAL_BUS) {
@@ -1433,11 +1698,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 		cfg->reg_func.psgmii_reg_get = qca_psgmii_reg_read;
 	}
 #endif
-	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
-	if(reg_mode == HSL_REG_MDIO) {
-		cfg->reg_mode = HSL_MDIO;
-	} else
-		return 0;
 /*qca808x_start*/
 
 	return 0;
@@ -1452,7 +1712,7 @@ ssdk_plat_exit(a_uint32_t dev_id)
 	ssdk_reg_map_info map;
 #endif
 /*qca808x_start*/
-	printk("ssdk_plat_exit\n");
+	SSDK_INFO("ssdk_plat_exit\n");
 /*qca808x_end*/
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
 	if (reg_mode == HSL_REG_LOCAL_BUS) {

@@ -1,10 +1,11 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all copies.
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -872,19 +873,12 @@ adpt_mp_port_interface_mode_status_get(a_uint32_t dev_id,
 	a_uint32_t port_id, fal_port_interface_mode_t * mode)
 {
 	sw_error_t rv = SW_OK;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mode);
 
-	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
-	SW_RTN_ON_NULL(phy_drv->phy_interface_mode_status_get);
-
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = phy_drv->phy_interface_mode_status_get(dev_id, phy_id,mode);
+	rv = hsl_port_phy_interface_mode_status_get(dev_id, port_id, mode);
+	SW_RTN_ON_ERROR(rv);
 
 	return rv;
 }

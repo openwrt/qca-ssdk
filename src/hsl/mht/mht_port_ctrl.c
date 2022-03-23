@@ -1236,12 +1236,53 @@ mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
 }
 #endif
 
+static sw_error_t
+mht_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	fal_port_interface_mode_t port_mode_old = PORT_INTERFACE_MODE_MAX;
+	fal_port_interface_mode_t port_mode_new = PORT_INTERFACE_MODE_MAX;
+	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
+	fal_mac_config_t mac_config = {0};
+
+	rv = hsl_port_phy_interface_mode_status_get(dev_id, port_id,
+			&port_mode_new);
+	SW_RTN_ON_ERROR(rv);
+
+	port_mode_old = phy_info->port_mode[port_id];
+
+	if (port_mode_new != port_mode_old) {
+		if (port_mode_new == PORT_SGMII_PLUS) {
+			mac_config.mac_mode = FAL_MAC_MODE_SGMII_PLUS;
+		} else if (port_mode_new == PHY_SGMII_BASET) {
+			mac_config.mac_mode = FAL_MAC_MODE_SGMII;
+		} else {
+			return SW_NOT_SUPPORTED;
+		}
+		mac_config.config.sgmii.clock_mode = FAL_INTERFACE_CLOCK_MAC_MODE;
+		mac_config.config.sgmii.auto_neg = A_TRUE;
+		rv = mht_interface_mac_mode_set(dev_id, port_id,&mac_config);
+		SW_RTN_ON_ERROR(rv);
+		phy_info->port_mode[port_id] = port_mode_new;
+
+		SSDK_INFO("mht port %d phy changed interface mode to %d from %d\n",
+				port_id, port_mode_new, port_mode_old);
+	}
+
+	return rv;
+}
+
 sw_error_t
 mht_port_link_update(struct qca_phy_priv *priv, a_uint32_t port_id,
 	struct port_phy_status phy_status)
 {
 	sw_error_t rv = 0;
 
+	if ((port_id == SSDK_PHYSICAL_PORT5) &&
+			(A_TRUE == hsl_port_phy_connected(priv->device_id, port_id))) {
+		rv = mht_port_interface_mode_switch(priv->device_id, port_id);
+		SW_RTN_ON_ERROR (rv);
+	}
 	/* configure gcc uniphy and mac speed frequency*/
 	rv = mht_port_speed_clock_set(priv->device_id, port_id, phy_status.speed);
 	SW_RTN_ON_ERROR (rv);
@@ -1277,18 +1318,20 @@ mht_port_link_update(struct qca_phy_priv *priv, a_uint32_t port_id,
 			SW_RTN_ON_ERROR (rv);
 		}
 	}
-	if (phy_status.link_status == PORT_LINK_DOWN) {
-		/* disable eth phy clock */
-		rv = ssdk_mht_port_clk_en_set(priv->device_id, port_id,
-			MHT_CLK_TYPE_EPHY, A_FALSE);
+	if (port_id != SSDK_PHYSICAL_PORT5) {
+		if (phy_status.link_status == PORT_LINK_DOWN) {
+			/* disable eth phy clock */
+			rv = ssdk_mht_port_clk_en_set(priv->device_id, port_id,
+				MHT_CLK_TYPE_EPHY, A_FALSE);
+			SW_RTN_ON_ERROR (rv);
+		}
+		/* reset eth phy clock */
+		rv = ssdk_mht_port_clk_reset(priv->device_id, port_id, MHT_CLK_TYPE_EPHY);
+		SW_RTN_ON_ERROR (rv);
+		/* reset eth phy fifo */
+		rv = hsl_port_phy_function_reset(priv->device_id, port_id);
 		SW_RTN_ON_ERROR (rv);
 	}
-	/* reset eth phy clock */
-	rv = ssdk_mht_port_clk_reset(priv->device_id, port_id, MHT_CLK_TYPE_EPHY);
-	SW_RTN_ON_ERROR (rv);
-	/* reset eth phy fifo */
-	rv = hsl_port_phy_function_reset(priv->device_id, port_id);
-	SW_RTN_ON_ERROR (rv);
 
 	return rv;
 }

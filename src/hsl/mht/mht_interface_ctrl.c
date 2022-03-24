@@ -56,7 +56,7 @@ mht_uniphy_xpcs_mmd_write(a_uint32_t dev_id, a_uint16_t mmd_num,
 		reg_val);
 	/*check the mmd register value*/
 	phy_data = mht_uniphy_xpcs_mmd_read(dev_id, mmd_num, mmd_reg);
-	SSDK_INFO ("phy_addr:0x%x, mmd_num:0x%x, mmd_reg:0x%x, phy_data:0x%x",
+	SSDK_DEBUG ("phy_addr:0x%x, mmd_num:0x%x, mmd_reg:0x%x, phy_data:0x%x",
 		uniphy_xpcs_addr, mmd_num, mmd_reg, phy_data);
 
 	return rv;
@@ -416,22 +416,22 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	a_uint32_t mht_port_id = 0, phy_addr = 0;
 
 	/*reset xpcs*/
-	SSDK_INFO("reset xpcs\n");
+	SSDK_DEBUG("reset xpcs\n");
 	rv = ssdk_mht_clk_assert(dev_id, MHT_UNIPHY_XPCS_RST);
 	SW_RTN_ON_ERROR (rv);
 	/*select xpcs mode*/
-	SSDK_INFO("select xpcs mode\n");
+	SSDK_DEBUG("select xpcs mode\n");
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
 		MHT_UNIPHY_MMD1_MODE_CTRL, 0x1f00, MHT_UNIPHY_MMD1_XPCS_MODE);
 	SW_RTN_ON_ERROR (rv);
 	/*config dapa pass as usxgmii*/
-	SSDK_INFO("config dapa pass as usxgmii\n");
+	SSDK_DEBUG("config dapa pass as usxgmii\n");
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
 		MHT_UNIPHY_MMD1_GMII_DATAPASS_SEL, MHT_UNIPHY_MMD1_DATAPASS_MASK,
 		MHT_UNIPHY_MMD1_DATAPASS_USXGMII);
 	SW_RTN_ON_ERROR (rv);
 	/*reset and release uniphy GMII/XGMII and ethphy GMII*/
-	SSDK_INFO("reset and release uniphy GMII/XGMII and ethphy GMII\n");
+	SSDK_DEBUG("reset and release uniphy GMII/XGMII and ethphy GMII\n");
 	for(mht_port_id = SSDK_PHYSICAL_PORT1; mht_port_id <= SSDK_PHYSICAL_PORT4;
 		mht_port_id++)
 	{
@@ -441,7 +441,7 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	}
 
 	/*ana sw reset and release*/
-	SSDK_INFO("ana sw reset and release\n");
+	SSDK_DEBUG("ana sw reset and release\n");
 	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr,
 		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RESET);
 	SW_RTN_ON_ERROR (rv);
@@ -451,19 +451,19 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	SW_RTN_ON_ERROR (rv);
 
 	/*Wait calibration done*/
-	SSDK_INFO("Wait calibration done\n");
+	SSDK_DEBUG("Wait calibration done\n");
 	mht_uniphy_calibration(dev_id, uniphy_addr);
 	/*Enable SSCG(Spread Spectrum Clock Generator)*/
-	SSDK_INFO("enable uniphy sscg\n");
+	SSDK_DEBUG("enable uniphy sscg\n");
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
 		MHT_UNIPHY_MMD1_CDA_CONTROL1, 0x8, MHT_UNIPHY_MMD1_SSCG_ENABLE);
 	SW_RTN_ON_ERROR (rv);
 	/*release XPCS*/
-	SSDK_INFO("release XPCS\n");
+	SSDK_DEBUG("release XPCS\n");
 	rv = ssdk_mht_clk_deassert(dev_id, MHT_UNIPHY_XPCS_RST);
 	SW_RTN_ON_ERROR (rv);
 	/*ethphy software reset*/
-	SSDK_INFO("ethphy software reset\n");
+	SSDK_DEBUG("ethphy software reset\n");
 	for(mht_port_id = SSDK_PHYSICAL_PORT1; mht_port_id <= SSDK_PHYSICAL_PORT4;
 		mht_port_id++)
 	{
@@ -473,31 +473,31 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 		SW_RTN_ON_ERROR (rv);
 	}
 	/*Set BaseR mode*/
-	SSDK_INFO("Set BaseR mode\n");
+	SSDK_DEBUG("Set BaseR mode\n");
 	rv = mht_uniphy_xpcs_modify_mmd(dev_id, MHT_UNIPHY_MMD3,
 		MHT_UNIPHY_MMD3_PCS_CTRL2, 0xf, MHT_UNIPHY_MMD3_PCS_TYPE_10GBASE_R);
 	SW_RTN_ON_ERROR (rv);
 	/*wait 10G base_r link up*/
-	SSDK_INFO("wait 10G base_r link up\n");
+	SSDK_DEBUG("wait 10G base_r link up\n");
 	rv = mht_uniphy_xpcs_10g_r_linkup(dev_id);
 	SW_RTN_ON_ERROR (rv);
 	/*enable UQXGMII mode*/
-	SSDK_INFO("enable UQSXGMII mode\n");
+	SSDK_DEBUG("enable UQSXGMII mode\n");
 	rv = mht_uniphy_xpcs_modify_mmd(dev_id, MHT_UNIPHY_MMD3,
 		MHT_UNIPHY_MMD3_DIG_CTRL1, 0x200, MHT_UNIPHY_MMD3_USXGMII_EN);
 	SW_RTN_ON_ERROR (rv);
 	/*set UQXGMII mode*/
-	SSDK_INFO("set QXGMII mode\n");
+	SSDK_DEBUG("set QXGMII mode\n");
 	rv = mht_uniphy_xpcs_modify_mmd(dev_id, MHT_UNIPHY_MMD3,
 		MHT_UNIPHY_MMD3_VR_RPCS_TPC, 0x1c00, MHT_UNIPHY_MMD3_QXGMII_EN);
 	SW_RTN_ON_ERROR (rv);
 	/*set AM interval*/
-	SSDK_INFO("set AM interval\n");
+	SSDK_DEBUG("set AM interval\n");
 	rv = mht_uniphy_xpcs_mmd_write(dev_id, MHT_UNIPHY_MMD3,
 		MHT_UNIPHY_MMD3_MII_AM_INTERVAL, MHT_UNIPHY_MMD3_MII_AM_INTERVAL_VAL);
 	SW_RTN_ON_ERROR (rv);
 	/*xpcs software reset*/
-	SSDK_INFO("xpcs software reset\n");
+	SSDK_DEBUG("xpcs software reset\n");
 	rv = mht_uniphy_xpcs_soft_reset(dev_id);
 
 	return rv;
@@ -513,13 +513,13 @@ mht_interface_uqxgmii_mode_set(a_uint32_t dev_id)
 	SW_RTN_ON_ERROR (rv);
 
 	/*disable IPG_tuning bypass*/
-	SSDK_INFO("disable IPG_tuning bypass\n");
+	SSDK_DEBUG("disable IPG_tuning bypass\n");
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
 		MHT_UNIPHY_MMD1_BYPASS_TUNING_IPG,
 		MHT_UNIPHY_MMD1_BYPASS_TUNING_IPG_EN, 0);
 	SW_RTN_ON_ERROR (rv);
 	/*disable uniphy GMII/XGMII clock and disable ethphy GMII clock*/
-	SSDK_INFO("disable uniphy GMII/XGMII clock and ethphy GMII clock\n");
+	SSDK_DEBUG("disable uniphy GMII/XGMII clock and ethphy GMII clock\n");
 	for(mht_port_id = SSDK_PHYSICAL_PORT1; mht_port_id <= SSDK_PHYSICAL_PORT4;
 		mht_port_id++)
 	{
@@ -528,12 +528,12 @@ mht_interface_uqxgmii_mode_set(a_uint32_t dev_id)
 		SW_RTN_ON_ERROR (rv);
 	}
 	/*configure uqxgmii mode*/
-	SSDK_INFO("configure uqxgmii mode\n");
+	SSDK_DEBUG("configure uqxgmii mode\n");
 	rv = _mht_interface_uqxgmii_mode_set(dev_id, uniphy_addr);
 	SW_RTN_ON_ERROR (rv);
 	/*enable auto-neg complete interrupt,Mii using mii-4bits,
 		configure as PHY mode, enable autoneg ability*/
-	SSDK_INFO("enable auto-neg complete interrupt,Mii using mii-4bits,"
+	SSDK_DEBUG("enable auto-neg complete interrupt,Mii using mii-4bits,"
 		"configure as PHY mode, enable autoneg ability, disable TICD\n");
 	for (mht_port_id = SSDK_PHYSICAL_PORT1; mht_port_id <= SSDK_PHYSICAL_PORT4;
 		mht_port_id++)
@@ -560,7 +560,7 @@ mht_interface_uqxgmii_mode_set(a_uint32_t dev_id)
 	}
 
 	/*enable EEE for xpcs*/
-	SSDK_INFO("enable EEE for xpcs\n");
+	SSDK_DEBUG("enable EEE for xpcs\n");
 	rv = mht_uniphy_xpcs_8023az_enable(dev_id);
 
 	return rv;

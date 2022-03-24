@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -26,71 +28,21 @@ static sw_error_t
 adpt_mp_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
 	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern)
 {
-	sw_error_t rv;
-	a_uint32_t port_id;
-
-	HSL_DEV_ID_CHECK(dev_id);
-	if(group != LED_LAN_PORT_GROUP && group != LED_WAN_PORT_GROUP)
-	{
-		SSDK_ERROR("group %x is not supported\n", group);
-		return SW_NOT_SUPPORTED;
-	}
-
-	port_id = led_pattern_id;
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	rv = hsl_port_phy_led_ctrl_pattern_set (dev_id, port_id, pattern);
-
-	return rv;
+	return hsl_port_phy_led_ctrl_pattern_set(dev_id, group, led_pattern_id, pattern);
 }
 
 static sw_error_t
 adpt_mp_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
 	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern)
 {
-	sw_error_t rv;
-	a_uint32_t port_id;
-
-	HSL_DEV_ID_CHECK(dev_id);
-	if(group != LED_LAN_PORT_GROUP && group != LED_WAN_PORT_GROUP)
-	{
-		SSDK_ERROR("group %x is not supported\n", group);
-		return SW_NOT_SUPPORTED;
-	}
-
-	port_id = led_pattern_id;
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	rv = hsl_port_phy_led_ctrl_pattern_get (dev_id, port_id, pattern);
-
-	return rv;
+	return hsl_port_phy_led_ctrl_pattern_get(dev_id, group, led_pattern_id, pattern);
 }
 
 static sw_error_t
 adpt_mp_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	led_ctrl_pattern_t *pattern)
 {
-	sw_error_t rv;
-	a_uint32_t port_id;
-
-	HSL_DEV_ID_CHECK(dev_id);
-	/*one port can support max three led source*/
-	port_id = source_id/PORT_LED_SOURCE_MAX+1;
-	source_id = source_id%PORT_LED_SOURCE_MAX;
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	rv = hsl_port_phy_led_ctrl_source_set (dev_id, port_id, source_id, pattern);
-
-	return rv;
+	return hsl_port_phy_led_ctrl_source_set(dev_id, source_id, pattern);
 }
 
 sw_error_t adpt_mp_led_init(a_uint32_t dev_id)

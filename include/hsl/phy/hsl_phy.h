@@ -730,14 +730,14 @@ sw_error_t
 hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct phy_device **phydev);
 sw_error_t
-hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
-	led_ctrl_pattern_t * pattern);
+hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
+	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern);
 sw_error_t
-hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
-	led_ctrl_pattern_t * pattern);
+hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
+	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern);
 sw_error_t
-hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
+hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
+	led_ctrl_pattern_t *pattern);
 phy_info_t *hsl_phy_info_get(a_uint32_t dev_id);
 
 sw_error_t

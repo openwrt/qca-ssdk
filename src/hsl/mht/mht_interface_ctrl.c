@@ -333,16 +333,16 @@ mht_uniphy_uqxgmii_function_reset(a_uint32_t dev_id, a_uint32_t mht_port_id)
 	SW_RTN_ON_ERROR (rv);
 	if(mht_port_id == SSDK_PHYSICAL_PORT1)
 	{
-		rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
+		rv = mht_uniphy_xpcs_modify_mmd(dev_id, MHT_UNIPHY_MMD3,
 			MHT_UNIPHY_MMD_MII_DIG_CTRL,
-			0x7ff, MHT_UNIPHY_MMD3_USXG_FIFO_INIT);
+			0x400, MHT_UNIPHY_MMD3_USXG_FIFO_RESET);
 		SW_RTN_ON_ERROR (rv);
 	}
 	else
 	{
 		rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
 			MHT_UNIPHY_MMD_MII_DIG_CTRL,
-			0x3f, MHT_UNIPHY_MMD_USXG_FIFO_INIT);
+			0x20, MHT_UNIPHY_MMD_USXG_FIFO_RESET);
 		SW_RTN_ON_ERROR (rv);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -93,7 +93,7 @@
 #define MHT_UNIPHY_MMD3_EEE_RWR_REG_REGS                                 0x1c00
 #define MHT_UNIPHY_MMD3_EEE_TRANS_LPI_MODE                               0x1
 #define MHT_UNIPHY_MMD3_EEE_TRANS_RX_LPI_MODE                            0x100
-#define MHT_UNIPHY_MMD3_USXG_FIFO_INIT                                   0x400
+#define MHT_UNIPHY_MMD3_USXG_FIFO_RESET                                  0x400
 
 /*UNIPHY MMD26 27 28 31 registers*/
 #define MHT_UNIPHY_MMD_MII_CTRL                                          0
@@ -109,7 +109,7 @@
 #define MHT_UNIPHY_MMD_MII_AN_ENABLE                                     0x1000
 #define MHT_UNIPHY_MMD_MII_AN_RESTART                                    0x200
 #define MHT_UNIPHY_MMD_MII_AN_COMPLETE_INT                               0x1
-#define MHT_UNIPHY_MMD_USXG_FIFO_INIT                                    0x20
+#define MHT_UNIPHY_MMD_USXG_FIFO_RESET                                   0x20
 #define MHT_UNIPHY_MMD_XPC_SPEED_MASK                                    0x2060
 #define MHT_UNIPHY_MMD_XPC_SPEED_2500                                    0x20
 #define MHT_UNIPHY_MMD_XPC_SPEED_1000                                    0x40

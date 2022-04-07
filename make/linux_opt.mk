@@ -477,7 +477,9 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(SYS_PATH)/include/generated/uapi \
               -I$(SYS_PATH)/include/uapi \
               -I$(SYS_PATH)/arch/arm64/include/uapi \
-              -I$(SYS_PATH)/source/arch/arm64/include/asm/mach
+              -I$(SYS_PATH)/source/arch/arm64/include/asm/mach \
+              -I$(SYS_PATH)/arch/arm64/include/generated/uapi \
+              -I$(SYS_PATH)/source/include/uapi
 
 	      ifneq ($(wildcard $(SYS_PATH)/include/linux/kconfig.h),)
 	          MODULE_INC += -include $(SYS_PATH)/include/linux/kconfig.h

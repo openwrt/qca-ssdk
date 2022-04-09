@@ -90,6 +90,15 @@ sw_error_t
 qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t intr_bmp);
 
+sw_error_t
+qca_mht_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask);
+
+sw_error_t
+qca_mht_intr_mask_get(a_uint32_t dev_id, a_uint32_t *intr_mask);
+
+sw_error_t
+qca_mht_intr_status_get(a_uint32_t dev_id, a_uint32_t *intr_status);
+
 #if defined(IN_PTP)
 sw_error_t
 qca_mht_ptp_sync_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_bool_t enable);

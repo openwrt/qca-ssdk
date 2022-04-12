@@ -338,10 +338,12 @@ qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id)
 							QCA808X_MMD1_PMA_CAP_REG);
 
 /*qca808x_end*/
+#ifdef MHT
 	/*the bit0 of mmd7 reg0x901d is used for ipq runing and 1G napa flag,
 	and qca8084 support 2.5G always*/
 	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
 		return A_TRUE;
+#endif
 /*qca808x_start*/
 
 	if (phy_data & QCA808X_STATUS_2500T_FD_CAPS) {
@@ -890,7 +892,16 @@ qca808x_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 
 			break;
 	}
-
+#ifdef MHT
+	/*CDT status open and short are reversed for MHT PHY at analog level*/
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+	{
+		if(*cable_status == FAL_CABLE_STATUS_OPENED)
+			*cable_status = FAL_CABLE_STATUS_SHORT;
+		else if(*cable_status == FAL_CABLE_STATUS_SHORT)
+			*cable_status = FAL_CABLE_STATUS_OPENED;
+	}
+#endif
 	/* the actual cable length equals to CableDeltaTime * 0.824 */
 	*cable_len = ((cable_delta_time & 0xff) * 824) / 1000;
 

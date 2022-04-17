@@ -100,6 +100,8 @@ sw_error_t adpt_hppe_ptp_init(a_uint32_t dev_id);
 
 #define HPPE_REVISION              0x0
 #define CPPE_REVISION              0x1
+#define APPE_REVISION              0x0
+#define MPPE_REVISION              0x1
 #define UNKNOWN_REVISION           0xff
 
 a_uint32_t adpt_hppe_chip_revision_get(a_uint32_t dev_id);

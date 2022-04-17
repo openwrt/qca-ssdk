@@ -71,6 +71,10 @@ else
      SUPPORT_CHIP = HPPE APPE
   endif
 
+  ifeq (MPPE, $(CHIP_TYPE))
+     SUPPORT_CHIP = HPPE APPE MPPE
+  endif
+
   ifeq ($(ISISC_ENABLE), enable)
       SUPPORT_CHIP += ISISC
   endif

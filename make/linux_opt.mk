@@ -372,6 +372,10 @@ ifneq (,$(findstring APPE, $(SUPPORT_CHIP)))
   MODULE_CFLAG += -DAPPE
 endif
 
+ifneq (,$(findstring MPPE, $(SUPPORT_CHIP)))
+  MODULE_CFLAG += -DMPPE
+endif
+
 ifneq (,$(findstring SCOMPHY, $(SUPPORT_CHIP)))
   MODULE_INC   += -I$(PRJ_PATH)/include/hsl/scomphy
   MODULE_CFLAG += -DSCOMPHY

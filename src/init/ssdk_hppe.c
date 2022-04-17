@@ -1254,9 +1254,13 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 	fal_port_t port_id;
 	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
 	a_uint32_t index = 0, mode[3] = {mode0, mode1, mode2};
+	a_uint32_t chip_type = 0, chip_ver = 0;
 
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 	SW_RTN_ON_NULL(p_api->adpt_port_mux_mac_type_set);
+
+	chip_type = adpt_chip_type_get(dev_id);
+	chip_ver = adpt_hppe_chip_revision_get(dev_id);
 
 	SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
 
@@ -1266,16 +1270,12 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode1);
 	SW_RTN_ON_ERROR(rv);
 
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if ((chip_type == CHIP_APPE && chip_ver == APPE_REVISION) ||
+		(chip_type == CHIP_HPPE && chip_ver == HPPE_REVISION)) {
+
 		rv = p_api->adpt_uniphy_mode_set(dev_id,
 				SSDK_UNIPHY_INSTANCE2, mode2);
 		SW_RTN_ON_ERROR(rv);
-	} else {
-		if(adpt_hppe_chip_revision_get(dev_id) == HPPE_REVISION) {
-			rv = p_api->adpt_uniphy_mode_set(dev_id,
-					SSDK_UNIPHY_INSTANCE2, mode2);
-			SW_RTN_ON_ERROR(rv);
-		}
 	}
 
 	for (index = SSDK_UNIPHY_INSTANCE0; index <= SSDK_UNIPHY_INSTANCE2; index ++) {
@@ -1284,11 +1284,16 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 		}
 	}
 
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
-		port_max = SSDK_PHYSICAL_PORT7;
-		SSDK_INFO("appe interface mode initialization\n");
+	if (chip_type == CHIP_APPE) {
+		if (chip_ver == MPPE_REVISION) {
+			port_max = SSDK_PHYSICAL_PORT3;
+			SSDK_INFO("mppe interface mode initialization\n");
+		} else {
+			port_max = SSDK_PHYSICAL_PORT7;
+			SSDK_INFO("appe interface mode initialization\n");
+		}
 	} else {
-		if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+		if(chip_ver == CPPE_REVISION) {
 			port_max = SSDK_PHYSICAL_PORT6;
 		} else {
 			port_max = SSDK_PHYSICAL_PORT7;

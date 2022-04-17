@@ -21,6 +21,7 @@
 #include "ssdk_clk.h"
 #include "ssdk_dts.h"
 #include "adpt.h"
+#include "adpt_hppe.h"
 #include "fal.h"
 #ifdef IN_LED
 #include "ssdk_led.h"
@@ -280,6 +281,12 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 	a_bool_t force_port = 0;
 	fal_port_cnt_cfg_t init_cnt_cfg;
 
+#if defined(MPPE)
+	if (adpt_hppe_chip_revision_get(dev_id) == MPPE_REVISION)
+	{
+		port_max = SSDK_PHYSICAL_PORT3;
+	}
+#endif
 	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
 		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
 		if(force_port) {

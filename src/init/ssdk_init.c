@@ -136,6 +136,7 @@
 #include "adpt.h"
 #ifdef HPPE
 #include "ssdk_hppe.h"
+#include "adpt_hppe.h"
 #endif
 #ifdef APPE
 #include "ssdk_appe.h"
@@ -1979,7 +1980,13 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 		}
 #endif
 	} else {
-		priv->ports = SSDK_MAX_PORT_NUM;
+#ifdef MPPE
+		if (chip_type == CHIP_APPE &&
+			adpt_hppe_chip_revision_get(priv->device_id) == MPPE_REVISION) {
+			priv->ports = 3;
+		} else
+#endif
+			priv->ports = SSDK_MAX_PORT_NUM;
 	}
 
 #ifdef MP
@@ -2343,6 +2350,7 @@ static const struct of_device_id ssdk_of_mtable[] = {
 	{.compatible = "qcom,ess-switch-ipq60xx" },
 	{.compatible = "qcom,ess-switch-ipq807x" },
 	{.compatible = "qcom,ess-switch-ipq95xx" },
+	{.compatible = "qcom,ess-switch-ipq53xx" },
 	{.compatible = "qcom,ess-instance" },
 	{}
 };

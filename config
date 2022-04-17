@@ -248,15 +248,15 @@ IN_MACBLOCK=FALSE
 #############################################
 #        Platform Special Features          #
 #############################################
-ifeq ($(SoC),$(filter $(SoC),ipq95xx ipq807x ipq60xx))
+ifeq ($(SoC),$(filter $(SoC),ipq53xx ipq95xx ipq807x ipq60xx))
 	PTP_FEATURE=enable
 endif
 
-ifeq ($(SoC),$(filter $(SoC),ipq95xx))
+ifeq ($(SoC),$(filter $(SoC),ipq53xx ipq95xx))
 	MHT_ENABLE=enable
 endif
 
-ifeq ($(SoC),$(filter $(SoC),ipq807x ipq60xx ipq50xx))
+ifeq ($(SoC),$(filter $(SoC),ipq53xx ipq807x ipq60xx ipq50xx))
 	ISISC_ENABLE=enable
 endif
 
@@ -298,6 +298,12 @@ else ifeq (APPE, $(CHIP_TYPE))
 	IN_SFP_PHY=TRUE
 	IN_SFP=TRUE
 	IN_MALIBU_PHY=TRUE
+else ifeq (MPPE, $(CHIP_TYPE))
+	IN_AQUANTIA_PHY=TRUE
+	IN_QCA803X_PHY=TRUE
+	IN_QCA808X_PHY=TRUE
+	IN_SFP_PHY=TRUE
+	IN_SFP=TRUE
 else
 	IN_QCA803X_PHY=FALSE
 	IN_QCA808X_PHY=FALSE
@@ -330,7 +336,7 @@ endif
 #############################################
 # SDK Features According To Switch Chip     #
 #############################################
-ifneq (, $(filter APPE HPPE CPPE ALL_CHIP, $(CHIP_TYPE)))
+ifneq (, $(filter MPPE APPE HPPE CPPE ALL_CHIP, $(CHIP_TYPE)))
 	IN_FLOW=TRUE
 	IN_RSS_HASH=TRUE
 	IN_QM=TRUE
@@ -370,8 +376,8 @@ ifeq ($(MINI_SSDK), enable)
 	IN_SFP=FALSE
 	IN_PTP=FALSE
 
-	#disable modules for MINI HPPE/CPPE/APPE
-	ifneq (, $(filter APPE HPPE CPPE, $(CHIP_TYPE)))
+	#disable modules for MINI HPPE/CPPE/APPE/MPPE
+	ifneq (, $(filter MPPE APPE HPPE CPPE, $(CHIP_TYPE)))
 		IN_NAT=FALSE
 		IN_COSMAP=FALSE
 		IN_RATE=FALSE
@@ -433,7 +439,7 @@ ifeq (MP, $(CHIP_TYPE))
 	endif
 endif
 
-ifneq (, $(filter APPE , $(CHIP_TYPE)))
+ifneq (, $(filter MPPE APPE , $(CHIP_TYPE)))
 	IN_VPORT=TRUE
 	IN_TUNNEL=TRUE
 	IN_VXLAN=TRUE

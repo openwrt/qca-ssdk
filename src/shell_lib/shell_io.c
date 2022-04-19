@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2013, 2015-2017, 2019, 2021, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -1830,6 +1832,14 @@ cmd_data_check_interface_mode(char *cmd_str, a_uint32_t * arg_val, a_uint32_t si
     else if (!strncasecmp(cmd_str, "10gbase_r", 13))
     {
 	*arg_val = PORT_10GBASE_R;
+    }
+    else if (!strncasecmp(cmd_str, "uqxgmii", 20))
+    {
+	*arg_val = PORT_UQXGMII;
+    }
+    else if (!strncasecmp(cmd_str, "uqxgmii_3channels", 20))
+    {
+	*arg_val = PORT_UQXGMII_3CHANNELS;
     }
     else if (!strncasecmp(cmd_str, "interfacemode_max", 20))
     {

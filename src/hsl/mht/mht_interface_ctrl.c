@@ -445,7 +445,7 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr,
 		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RESET);
 	SW_RTN_ON_ERROR (rv);
-	mdelay(100);
+	mdelay(10);
 	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr,
 		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RELEASE);
 	SW_RTN_ON_ERROR (rv);

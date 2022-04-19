@@ -331,11 +331,11 @@ _adpt_xgmac_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 {
 	sw_error_t rv = SW_OK;
 
-	port_id = HPPE_TO_XGMAC_PORT_ID(port_id);
-	rv |= hppe_mac_tx_configuration_jd_set(dev_id, port_id, (a_uint32_t)A_TRUE);
-	rv |= hppe_mac_rx_configuration_gpsl_set(dev_id, port_id, max_frame);
-	rv |= hppe_mac_rx_configuration_wd_set(dev_id, port_id, 1);
-	rv |= hppe_mac_rx_configuration_gmpslce_set(dev_id, port_id, 1);
+	a_uint32_t index  = HPPE_TO_XGMAC_PORT_ID(port_id);
+	rv |= hppe_mac_tx_configuration_jd_set(dev_id, index, (a_uint32_t)A_TRUE);
+	rv |= hppe_mac_rx_configuration_gpsl_set(dev_id, index, max_frame);
+	rv |= hppe_mac_rx_configuration_wd_set(dev_id, index, 1);
+	rv |= hppe_mac_rx_configuration_gmpslce_set(dev_id, index, 1);
 	rv |= adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id, port_id);
 
 	return rv;

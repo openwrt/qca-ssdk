@@ -214,12 +214,29 @@ fal_port_tdm_tick_cfg_t appe_port_tdm0_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 6},
 };
 
+#if defined(MPPE)
+fal_port_tdm_tick_cfg_t mppe_port_tdm0_tbl[] = {
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+};
+
+fal_port_scheduler_cfg_t mppe_port_scheduler0_tbl[] = {
+	{0xfa, 1, 0},
+	{0xfc, 2, 1},
+	{0xf9, 0, 2},
+};
+#endif
+
 static sw_error_t
 qca_appe_tdm_hw_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_api;
 	a_uint32_t i = 0;
-	a_uint32_t num;
+	a_uint32_t num = 0;
 	fal_port_tdm_ctrl_t tdm_ctrl;
 	fal_port_scheduler_cfg_t *scheduler_cfg;
 	fal_port_tdm_tick_cfg_t *bm_cfg;
@@ -237,11 +254,22 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 		return SW_BAD_VALUE;
 	}
 
-	if (tm_tick_mode == 0x1) {
+	if (tm_tick_mode == 0) {
+#if defined(MPPE)
+		if (adpt_hppe_chip_revision_get(dev_id) == MPPE_REVISION) {
+			num = sizeof(mppe_port_scheduler0_tbl) /
+					sizeof(fal_port_scheduler_cfg_t);
+			scheduler_cfg = mppe_port_scheduler0_tbl;
+			for (i = 0; i < num; i++) {
+				p_api->adpt_port_scheduler_cfg_set(dev_id, i, &scheduler_cfg[i]);
+			}
+			p_api->adpt_tdm_tick_num_set(dev_id, num);
+		}
+#endif
+	} else if (tm_tick_mode == 0x1) {
 		num = sizeof(appe_port_scheduler1_tbl) /
 				sizeof(fal_port_scheduler_cfg_t);
 		scheduler_cfg = appe_port_scheduler1_tbl;
-
 		for (i = 0; i < num; i++) {
 			p_api->adpt_port_scheduler_cfg_set(dev_id, i, &scheduler_cfg[i]);
 		}
@@ -253,9 +281,19 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 	SW_RTN_ON_NULL(p_api->adpt_port_tdm_ctrl_set);
 
 	if (bm_tick_mode == 0) {
-		num = sizeof(appe_port_tdm0_tbl) /
-				sizeof(fal_port_tdm_tick_cfg_t);
-		bm_cfg = appe_port_tdm0_tbl;
+#if defined(MPPE)
+		if (adpt_hppe_chip_revision_get(dev_id) == MPPE_REVISION) {
+			num = sizeof(mppe_port_tdm0_tbl) /
+					sizeof(fal_port_tdm_tick_cfg_t);
+			bm_cfg = mppe_port_tdm0_tbl;
+		}
+		else
+#endif
+		{
+			num = sizeof(appe_port_tdm0_tbl) /
+					sizeof(fal_port_tdm_tick_cfg_t);
+			bm_cfg = appe_port_tdm0_tbl;
+		}
 	} else {
 		return SW_BAD_VALUE;
 	}

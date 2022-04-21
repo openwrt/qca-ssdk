@@ -1080,12 +1080,16 @@ sw_error_t ssdk_mht_port_clk_en_set(a_uint32_t dev_id,
 	return SW_OK;
 }
 
-void ssdk_mht_gcc_common_clk_parent_enable(a_uint32_t dev_id)
+void ssdk_mht_gcc_common_clk_parent_enable(a_uint32_t dev_id, mht_work_mode_t clk_mode)
 {
 	/* Switch core */
 	ssdk_mht_clk_parent_set(dev_id, MHT_SWITCH_CORE_CLK, MHT_P_UNIPHY1_TX312P5M);
 	ssdk_mht_clk_rate_set(dev_id, MHT_SWITCH_CORE_CLK, UQXGMII_SPEED_2500M_CLK);
-	ssdk_mht_clk_enable(dev_id, MHT_SWITCH_CORE_CLK);
+	/* Disable switch core clock to save power in phy mode */
+	if (MHT_PHY_UQXGMII_MODE == clk_mode || MHT_PHY_SGMII_UQXGMII_MODE == clk_mode)
+		ssdk_mht_clk_disable(dev_id, MHT_SWITCH_CORE_CLK);
+	else
+		ssdk_mht_clk_enable(dev_id, MHT_SWITCH_CORE_CLK);
 	ssdk_mht_clk_enable(dev_id, MHT_APB_BRIDGE_CLK);
 
 	/* AHB bridge */
@@ -1102,7 +1106,11 @@ void ssdk_mht_gcc_common_clk_parent_enable(a_uint32_t dev_id)
 	/* System */
 	ssdk_mht_clk_parent_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_P_XO);
 	ssdk_mht_clk_rate_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_SYS_CLK_RATE_25M);
-	ssdk_mht_clk_enable(dev_id, MHT_SRDS0_SYS_CLK);
+	/* Disable serdes0 clock to save power in phy mode */
+	if (MHT_PHY_UQXGMII_MODE == clk_mode || MHT_PHY_SGMII_UQXGMII_MODE == clk_mode)
+		ssdk_mht_clk_disable(dev_id, MHT_SRDS0_SYS_CLK);
+	else
+		ssdk_mht_clk_enable(dev_id, MHT_SRDS0_SYS_CLK);
 	ssdk_mht_clk_enable(dev_id, MHT_SRDS1_SYS_CLK);
 	ssdk_mht_clk_enable(dev_id, MHT_GEPHY0_SYS_CLK);
 	ssdk_mht_clk_enable(dev_id, MHT_GEPHY1_SYS_CLK);
@@ -1269,7 +1277,7 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 	}
 
 	if (!gcc_common_clk_init) {
-		ssdk_mht_gcc_common_clk_parent_enable(dev_id);
+		ssdk_mht_gcc_common_clk_parent_enable(dev_id, clk_mode);
 		gcc_common_clk_init = A_TRUE;
 
 		/* Initialize the uniphy raw clock, if the port4 is in bypass mode, the uniphy0

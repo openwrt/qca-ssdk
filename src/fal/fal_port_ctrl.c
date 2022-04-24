@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -853,6 +853,39 @@ _fal_port_link_forcemode_get (a_uint32_t dev_id, fal_port_t port_id,
   rv = p_api->port_link_forcemode_get (dev_id, port_id, enable);
   return rv;
 }
+
+static sw_error_t
+_fal_port_congestion_drop_set (a_uint32_t dev_id, fal_port_t port_id,
+			       a_uint32_t queue_id, a_bool_t enable)
+{
+  sw_error_t rv;
+  hsl_api_t *p_api;
+
+  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
+
+  if (NULL == p_api->port_congestion_drop_set)
+    return SW_NOT_SUPPORTED;
+
+  rv = p_api->port_congestion_drop_set (dev_id, port_id, queue_id, enable);
+  return rv;
+}
+
+static sw_error_t
+_fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
+			       a_uint16_t on_thres, a_uint16_t off_thres)
+{
+  sw_error_t rv;
+  hsl_api_t *p_api;
+
+  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
+
+  if (NULL == p_api->ring_flow_ctrl_thres_set)
+    return SW_NOT_SUPPORTED;
+
+  rv = p_api->ring_flow_ctrl_thres_set (dev_id, ring_id, on_thres, off_thres);
+  return rv;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _fal_port_txmac_status_get (a_uint32_t dev_id, fal_port_t port_id,
@@ -1008,22 +1041,6 @@ _fal_port_mac_loopback_get (a_uint32_t dev_id, fal_port_t port_id,
 }
 
 static sw_error_t
-_fal_port_congestion_drop_set (a_uint32_t dev_id, fal_port_t port_id,
-			       a_uint32_t queue_id, a_bool_t enable)
-{
-  sw_error_t rv;
-  hsl_api_t *p_api;
-
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_congestion_drop_set)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_congestion_drop_set (dev_id, port_id, queue_id, enable);
-  return rv;
-}
-
-static sw_error_t
 _fal_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
 			       a_uint32_t queue_id, a_bool_t * enable)
 {
@@ -1036,22 +1053,6 @@ _fal_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
     return SW_NOT_SUPPORTED;
 
   rv = p_api->port_congestion_drop_get (dev_id, port_id, queue_id, enable);
-  return rv;
-}
-
-static sw_error_t
-_fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
-			       a_uint16_t on_thres, a_uint16_t off_thres)
-{
-  sw_error_t rv;
-  hsl_api_t *p_api;
-
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->ring_flow_ctrl_thres_set)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->ring_flow_ctrl_thres_set (dev_id, ring_id, on_thres, off_thres);
   return rv;
 }
 
@@ -2998,6 +2999,46 @@ fal_port_link_forcemode_get (a_uint32_t dev_id, fal_port_t port_id,
   FAL_API_UNLOCK;
   return rv;
 }
+
+/**
+ * @brief Set congestion drop on a particular port queue.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_port_congestion_drop_set (a_uint32_t dev_id, fal_port_t port_id,
+			      a_uint32_t queue_id, a_bool_t enable)
+{
+  sw_error_t rv;
+
+  FAL_API_LOCK;
+  rv = _fal_port_congestion_drop_set (dev_id, port_id, queue_id, enable);
+  FAL_API_UNLOCK;
+  return rv;
+}
+
+/**
+ * @brief Set flow control threshold on a DMA ring.
+ * @param[in] dev_id device id
+ * @param[in] ring_id ring_id
+ * @param[in] on_thres on_thres
+ * @param[in] off_thres on_thres
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
+			      a_uint16_t on_thres, a_uint16_t off_thres)
+{
+  sw_error_t rv;
+
+  FAL_API_LOCK;
+  rv = _fal_ring_flow_ctrl_thres_set (dev_id, ring_id, on_thres, off_thres);
+  FAL_API_UNLOCK;
+  return rv;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Set status of back pressure on a particular port.
@@ -3094,25 +3135,6 @@ fal_port_mac_loopback_get (a_uint32_t dev_id, fal_port_t port_id,
 }
 
 /**
- * @brief Set congestion drop on a particular port queue.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[in] enable A_TRUE or A_FALSE
- * @return SW_OK or error code
- */
-sw_error_t
-fal_port_congestion_drop_set (a_uint32_t dev_id, fal_port_t port_id,
-			      a_uint32_t queue_id, a_bool_t enable)
-{
-  sw_error_t rv;
-
-  FAL_API_LOCK;
-  rv = _fal_port_congestion_drop_set (dev_id, port_id, queue_id, enable);
-  FAL_API_UNLOCK;
-  return rv;
-}
-
-/**
  * @brief Get congestion drop on a particular port queue.
  * @param[in] dev_id device id
  * @param[in] port_id port id
@@ -3128,26 +3150,6 @@ fal_port_congestion_drop_get (a_uint32_t dev_id, fal_port_t port_id,
 
   FAL_API_LOCK;
   rv = _fal_port_congestion_drop_get (dev_id, port_id, queue_id, enable);
-  FAL_API_UNLOCK;
-  return rv;
-}
-
-/**
- * @brief Set flow control threshold on a DMA ring.
- * @param[in] dev_id device id
- * @param[in] ring_id ring_id
- * @param[in] on_thres on_thres
- * @param[in] off_thres on_thres
- * @return SW_OK or error code
- */
-sw_error_t
-fal_ring_flow_ctrl_thres_set (a_uint32_t dev_id, a_uint32_t ring_id,
-			      a_uint16_t on_thres, a_uint16_t off_thres)
-{
-  sw_error_t rv;
-
-  FAL_API_LOCK;
-  rv = _fal_ring_flow_ctrl_thres_set (dev_id, ring_id, on_thres, off_thres);
   FAL_API_UNLOCK;
   return rv;
 }

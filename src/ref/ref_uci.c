@@ -1,10 +1,11 @@
 /*
  * Copyright (c) 2013, 2015, 2017-2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all copies.
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -2118,7 +2119,89 @@ parse_port_ringfcthresh(struct switch_val *val)
 	return rv;
 }
 
+static int
+parse_port_ptfcthresh(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
 
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "port_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "on_thresh")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "off_thresh")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_port_ringfcen(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "ring_id")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		} else if(!strcmp(ext_value_p->option_name, "ringfc_en")) {
+			val_ptr[1] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
+
+static int
+parse_port_ringunion(struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	switch_ext_p = val->value.ext_val;
+	while(switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if(!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if(!strcmp(ext_value_p->option_name, "ring_union_en")) {
+			val_ptr[0] = (char*)ext_value_p->option_value;
+		}  else {
+			rv = -1;
+			break;
+		}
+
+		parameter_length++;
+		switch_ext_p = switch_ext_p->next;
+	}
+
+	return rv;
+}
 
 static int
 parse_port_ieee8023az(struct switch_val *val)
@@ -11931,6 +12014,12 @@ parse_port(const char *command_name, struct switch_val *val)
 		rv = parse_port_congedrop(val);
 	} else if(!strcmp(command_name, "RingFcThresh")) {
 		rv = parse_port_ringfcthresh(val);
+	} else if(!strcmp(command_name, "PtFcThresh")) {
+		rv = parse_port_ptfcthresh(val);
+	} else if(!strcmp(command_name, "RingUnion")) {
+		rv = parse_port_ringunion(val);
+	} else if(!strcmp(command_name, "RingFcen")) {
+		rv = parse_port_ringfcen(val);
 	} else if(!strcmp(command_name, "Ieee8023az")) {
 		rv = parse_port_ieee8023az(val);
 	} else if(!strcmp(command_name, "Crossover")) {

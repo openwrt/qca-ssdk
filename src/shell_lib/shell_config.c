@@ -1,10 +1,11 @@
 /*
  * Copyright (c) 2013, 2015-2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all copies.
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -654,6 +655,9 @@ struct sub_cmd_des_t g_port_des[] =
 	{"wolstatus", "set",   SW_API_PT_WOL_STATUS_SET, NULL},
 	{"interfaceMode", "set",   SW_API_PT_INTERFACE_MODE_SET, NULL},
 	{"InterfaceModeApply", "set",   SW_API_PT_INTERFACE_MODE_APPLY, NULL},
+	{"ringunion", "set",   SW_API_PT_RING_UNION_SET, NULL},
+	{"ptfcthresh", "set",   SW_API_PT_FLOW_CTRL_THRES_SET, NULL},
+	{"ringfcen", "set",   SW_API_PT_RING_FLOW_CTRL_SET, NULL},
 #endif
 	{"mtu", "set",   SW_API_PT_MTU_SET, NULL},
 	{"mru", "set",   SW_API_PT_MRU_SET, NULL},

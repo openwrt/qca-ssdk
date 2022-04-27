@@ -246,6 +246,25 @@ IN_INTERFACECONTROL=TRUE
 IN_MACBLOCK=FALSE
 
 #############################################
+#        Platform Special Features          #
+#############################################
+ifeq ($(SoC),$(filter $(SoC),ipq95xx ipq807x ipq60xx))
+	PTP_FEATURE=enable
+endif
+
+ifeq ($(SoC),$(filter $(SoC),ipq95xx))
+	MHT_ENABLE=enable
+endif
+
+ifeq ($(SoC),$(filter $(SoC),ipq50xx))
+	ISISC_ENABLE=enable
+endif
+
+ifeq ($(SoC),$(filter $(SoC),ipq40xx ipq806x))
+	CHIP_TYPE=NONHK_CHIP
+endif
+
+#############################################
 # PHY CHIP Features According To Switch     #
 #############################################
 ifeq (ALL_CHIP, $(CHIP_TYPE))
@@ -348,6 +367,7 @@ ifeq ($(MINI_SSDK), enable)
 	IN_UNIPHY_MINI=TRUE
 	IN_IP_MINI=TRUE
 	IN_SFP=FALSE
+	IN_PTP=FALSE
 
 	#disable modules for MINI HPPE/CPPE/APPE
 	ifneq (, $(filter APPE HPPE CPPE, $(CHIP_TYPE)))
@@ -379,10 +399,6 @@ endif
 #############################################
 # SDK Features According To Specfic Switch  #
 #############################################
-ifneq ($(HK_CHIP), enable)
-	CHIP_TYPE=NONHK_CHIP
-endif
-
 ifeq (MP, $(CHIP_TYPE))
 	ifeq (disable, $(ISISC_ENABLE))
 		IN_ACL=FALSE

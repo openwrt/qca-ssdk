@@ -33,19 +33,43 @@
 #include "mht_init.h"
 #include "mht_sec_ctrl.h"
 #include "ssdk_dts.h"
+#include "ssdk_mht_clk.h"
 
 static sw_error_t
 _mht_reset(a_uint32_t dev_id)
 {
 	sw_error_t rv;
-	a_uint8_t val;
-
 	HSL_DEV_ID_CHECK(dev_id);
 
-	val = 0x1;
-	HSL_REG_FIELD_SET(rv, dev_id, GCC_SWITCH_CORE_CBCR, 0, CLK_ARES,
-			(a_uint8_t *)(&val), sizeof(a_uint8_t));
-	SW_RTN_ON_ERROR(rv);
+	ssdk_mht_clk_assert(dev_id, MHT_SWITCH_CORE_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC0_TX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC0_RX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC1_TX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC1_RX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC2_TX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC2_RX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC3_TX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC3_RX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC4_TX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC4_RX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC5_TX_CLK);
+	ssdk_mht_clk_assert(dev_id, MHT_MAC5_RX_CLK);
+	udelay(10);
+	ssdk_mht_clk_deassert(dev_id, MHT_SWITCH_CORE_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC0_TX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC0_RX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC1_TX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC1_RX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC2_TX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC2_RX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC3_TX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC3_RX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC4_TX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC4_RX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC5_TX_CLK);
+	ssdk_mht_clk_deassert(dev_id, MHT_MAC5_RX_CLK);
+	/* Need to wait 50us to complete switch initialization. */
+	udelay(50);
 
 	ISISC_ACL_RESET(rv, dev_id);
 	ISISC_IP_RESET(rv, dev_id);

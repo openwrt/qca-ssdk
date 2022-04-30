@@ -256,7 +256,7 @@ ifeq ($(SoC),$(filter $(SoC),ipq95xx))
 	MHT_ENABLE=enable
 endif
 
-ifeq ($(SoC),$(filter $(SoC),ipq50xx))
+ifeq ($(SoC),$(filter $(SoC),ipq807x ipq60xx ipq50xx))
 	ISISC_ENABLE=enable
 endif
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1119,6 +1120,12 @@ adpt_mp_port_netdev_change_notify(struct qca_phy_priv *priv,
 	sw_error_t rv = 0;
 	struct port_phy_status phy_status = {0};
 	a_uint32_t portbmp[SW_MAX_NR_DEV] = {0};
+
+	/*if uniphy is not used, no need to configure mac and gcc*/
+	if(port_id == SSDK_PHYSICAL_PORT2 &&
+		ssdk_dt_global_get_mac_mode(priv->device_id, SSDK_UNIPHY_INSTANCE0) ==
+		PORT_WRAPPER_MAX)
+		return SW_OK;
 
 	portbmp[priv->device_id] = qca_ssdk_port_bmp_get(priv->device_id);
 

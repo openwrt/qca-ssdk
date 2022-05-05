@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -710,8 +713,8 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			SW_RTN_ON_ERROR(rv);
 #endif
 			g_adpt_api[dev_id]->adpt_mapt_func_bitmap = 0;
-#if defined(IN_TUNNEL)
-			adpt_appe_tunnel_func_bitmap_init(dev_id);
+#if defined(IN_MAPT)
+			adpt_appe_mapt_func_bitmap_init(dev_id);
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_MAPT);
 			SW_RTN_ON_ERROR(rv);
 #endif

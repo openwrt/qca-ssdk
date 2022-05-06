@@ -22,6 +22,7 @@
 #include "adpt.h"
 #include "ssdk_led.h"
 #include "ssdk_clk.h"
+#include "hsl_phy.h"
 
 #ifdef IN_PORTCONTROL
 sw_error_t
@@ -44,14 +45,15 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 			fal_port_interface_eee_cfg_get(dev_id, i, &port_eee_cfg);
 			port_eee_cfg.lpi_wakeup_timer = MP_LPI_WAKEUP_TIMER;
 			fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
+			fal_port_rxfc_status_set(dev_id, i, A_TRUE);
+			fal_port_txfc_status_set(dev_id, i, A_TRUE);
 		} else {
 			fal_port_txmac_status_set (dev_id, i, A_TRUE);
 			fal_port_rxmac_status_set (dev_id, i, A_TRUE);
+			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
+			fal_port_txfc_status_set(dev_id, i, A_FALSE);
 		}
-		fal_port_rxfc_status_set(dev_id, i, A_FALSE);
-		fal_port_txfc_status_set(dev_id, i, A_FALSE);
-		fal_port_max_frame_size_set(dev_id, i,
-			FAL_DEFAULT_MAX_FRAME_SIZE);
+		fal_port_max_frame_size_set(dev_id, i, FAL_DEFAULT_MAX_FRAME_SIZE);
 		fal_port_promisc_mode_set(dev_id, i, A_TRUE);
 		/* init software level port status */
 		qca_mac_port_status_init(dev_id, i);

@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "ssdk_init.h"
@@ -98,8 +101,8 @@ sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 static sw_error_t
 qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 {
-	a_uint32_t i = 0;
-	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
+	a_uint32_t i = 0, port_max = SSDK_PHYSICAL_PORT7;
+	a_bool_t force_port = 0, sfp_port = 0;
 #if defined(CPPE)
 	fal_loopback_config_t loopback_cfg;
 #endif
@@ -115,8 +118,17 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 		qca_hppe_port_mac_type_set(dev_id, i, PORT_GMAC_TYPE);
 		fal_port_txmac_status_set (dev_id, i, A_FALSE);
 		fal_port_rxmac_status_set (dev_id, i, A_FALSE);
-		fal_port_rxfc_status_set(dev_id, i, A_FALSE);
-		fal_port_txfc_status_set(dev_id, i, A_FALSE);
+		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
+		if(force_port)
+		{
+			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
+			fal_port_txfc_status_set(dev_id, i, A_FALSE);
+		}
+		else
+		{
+			fal_port_rxfc_status_set(dev_id, i, A_TRUE);
+			fal_port_txfc_status_set(dev_id, i, A_TRUE);
+		}
 		fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
 	}
 
@@ -124,8 +136,18 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 		qca_hppe_port_mac_type_set(dev_id, i, PORT_XGMAC_TYPE);
 		fal_port_txmac_status_set (dev_id, i, A_FALSE);
 		fal_port_rxmac_status_set (dev_id, i, A_FALSE);
-		fal_port_rxfc_status_set(dev_id, i, A_FALSE);
-		fal_port_txfc_status_set(dev_id, i, A_FALSE);
+		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
+		if(force_port)
+		{
+			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
+			fal_port_txfc_status_set(dev_id, i, A_FALSE);
+		}
+		sfp_port = ssdk_port_feature_get(dev_id, i, PHY_F_SFP);
+		if(sfp_port)
+		{
+			fal_port_rxfc_status_set(dev_id, i, A_TRUE);
+			fal_port_txfc_status_set(dev_id, i, A_TRUE);
+		}
 		fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
 	}
 

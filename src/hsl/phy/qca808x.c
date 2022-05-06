@@ -173,6 +173,13 @@ static sw_error_t qca808x_phy_config_init(struct phy_device *phydev)
 	phydev->advertising = features;
 #else
 	linkmode_copy(phydev->supported, mask);
+	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, phydev->supported);
+	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, phydev->supported);
+
+	if(linkmode_test_bit(ETHTOOL_LINK_MODE_Pause_BIT, phydev->advertising))
+		linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, mask);
+	if(linkmode_test_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, phydev->advertising))
+		linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, mask);
 	linkmode_copy(phydev->advertising, mask);
 #endif
 

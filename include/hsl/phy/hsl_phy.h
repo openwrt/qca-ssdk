@@ -727,6 +727,9 @@ sw_error_t
 hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
 	struct phy_device **phydev);
 sw_error_t
+hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	struct phy_device **phydev);
+sw_error_t
 hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
 	led_ctrl_pattern_t * pattern);
 sw_error_t
@@ -753,7 +756,15 @@ sw_error_t
 hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_port_interface_mode_t *interface_mode_status);
 /*qca808x_end*/
-
+sw_error_t
+hsl_phy_linkmode_adv_to_adv(a_ulong_t *advertising, a_uint32_t *autoadv);
+sw_error_t
+hsl_port_phy_adv_update(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t adv_mask, a_uint32_t adv);
+sw_error_t
+hsl_port_phy_txfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);
+sw_error_t
+hsl_port_phy_rxfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);
 /*qca808x_start*/
 sw_error_t
 hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);
@@ -762,6 +773,14 @@ hsl_port_phy_counter_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable
 sw_error_t
 hsl_port_phy_counter_show(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_counter_info_t *counter_info);
+sw_error_t
+hsl_port_phy_autoadv_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *autoadv);
+sw_error_t
+hsl_port_phy_autoadv_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t autoadv);
+sw_error_t
+hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

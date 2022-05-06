@@ -1585,8 +1585,17 @@ qca_mac_port_status_init(a_uint32_t dev_id, a_uint32_t port_id)
 	qca_phy_priv_global[dev_id]->port_old_duplex[port_id - 1] = FAL_DUPLEX_BUTT;
 	qca_phy_priv_global[dev_id]->port_old_tx_flowctrl[port_id - 1] = A_FALSE;
 	qca_phy_priv_global[dev_id]->port_old_rx_flowctrl[port_id - 1] = A_FALSE;
-	qca_phy_priv_global[dev_id]->port_tx_flowctrl_forcemode[port_id - 1] = A_FALSE;
-	qca_phy_priv_global[dev_id]->port_rx_flowctrl_forcemode[port_id - 1] = A_FALSE;
+	if(ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE) || ssdk_port_feature_get
+		(dev_id, port_id, PHY_F_SFP))
+	{
+		qca_phy_priv_global[dev_id]->port_tx_flowctrl_forcemode[port_id - 1] = A_TRUE;
+		qca_phy_priv_global[dev_id]->port_rx_flowctrl_forcemode[port_id - 1] = A_TRUE;
+	}
+	else
+	{
+		qca_phy_priv_global[dev_id]->port_tx_flowctrl_forcemode[port_id - 1] = A_FALSE;
+		qca_phy_priv_global[dev_id]->port_rx_flowctrl_forcemode[port_id - 1] = A_FALSE;
+	}
 }
 
 void

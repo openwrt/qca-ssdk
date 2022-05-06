@@ -840,15 +840,48 @@ hsl_phy_adv_to_linkmode_adv(a_uint32_t autoadv, a_ulong_t *advertising)
 }
 
 sw_error_t
+hsl_phy_linkmode_adv_to_adv(a_ulong_t *advertising, a_uint32_t *autoadv)
+{
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_Pause_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_PAUSE;
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_ASY_PAUSE;
+
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_10T_HD;
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_10T_FD;
+
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_100TX_HD;
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_100TX_FD;
+
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_1000T_FD;
+
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_2500T_FD;
+
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_5000T_FD;
+
+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, advertising))
+		*autoadv |= FAL_PHY_ADV_10000T_FD;
+
+	return SW_OK;
+}
+
+sw_error_t
 hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t autoneg_en, a_uint32_t autoadv)
 {
 	sw_error_t rv = SW_OK;
 	struct phy_device *phydev;
+	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
 
 #if defined(IN_PHY_I2C_MODE)
 	/*if phy is accessed by I2C, so the phydev address is mdio fake address*/
-	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
 	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS)
 		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
 #endif
@@ -862,8 +895,11 @@ hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
 			SW_RTN_ON_ERROR(rv);
 		}
 	}
-
-	phydev->autoneg = autoneg_en;
+	/*PHY port need to update autoneg*/
+	if(!hsl_port_is_sfp(dev_id, port_id))
+	{
+		phydev->autoneg = autoneg_en;
+	}
 
 	return SW_OK;
 }
@@ -1122,6 +1158,137 @@ sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)
 		kfree(phy_info[dev_id]);
 		phy_info[dev_id] = NULL;
 	}
+	return SW_OK;
+}
+
+sw_error_t
+hsl_port_phy_autoadv_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *autoadv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_autoneg_adv_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	*autoadv = 0;
+	rv = phy_drv->phy_autoneg_adv_get(dev_id, phy_addr, autoadv);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_autoadv_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t autoadv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv  = NULL;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_autoneg_adv_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+	rv = phy_drv->phy_autoneg_adv_set(dev_id, phy_addr, autoadv);
+
+	return rv;
+}
+/*qca808x_end*/
+
+sw_error_t
+hsl_port_phy_adv_update(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t adv_mask, a_uint32_t adv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t new_adv = 0;
+
+	rv = hsl_port_phy_autoadv_get(dev_id, port_id, &new_adv);
+	SW_RTN_ON_ERROR (rv);
+	new_adv &= ~adv_mask;
+	new_adv |= adv;
+	rv = hsl_port_phy_autoadv_set(dev_id, port_id, new_adv);
+
+	return rv;
+}
+
+sw_error_t
+hsl_port_phy_txfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+
+	if(enable)
+	{
+		rv = hsl_port_phy_adv_update(dev_id, port_id, FAL_PHY_ADV_ASY_PAUSE,
+			FAL_PHY_ADV_ASY_PAUSE);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = hsl_port_phy_adv_update(dev_id, port_id, FAL_PHY_ADV_ASY_PAUSE,
+			0);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+hsl_port_phy_rxfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+
+	if(enable)
+	{
+		rv = hsl_port_phy_adv_update(dev_id, port_id, FAL_PHY_ADV_ASY_PAUSE|
+			FAL_PHY_ADV_PAUSE, FAL_PHY_ADV_ASY_PAUSE | FAL_PHY_ADV_PAUSE);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = hsl_port_phy_adv_update(dev_id, port_id, FAL_PHY_ADV_ASY_PAUSE |
+			FAL_PHY_ADV_PAUSE, 0);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+/*qca808x_start*/
+sw_error_t
+hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_restart_autoneg)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = phy_drv->phy_restart_autoneg(dev_id, phy_addr);
+	SW_RTN_ON_ERROR(rv);
+
 	return SW_OK;
 }
 /*qca808x_end*/

@@ -5,7 +5,6 @@
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -190,88 +189,6 @@ _scomphy_port_autoneg_enable (a_uint32_t dev_id, fal_port_t port_id)
 
 	rv = phy_drv->phy_autoneg_enable_set (dev_id, phy_id);
 	return rv;
-}
-
-static sw_error_t
-_scomphy_port_autoneg_restart (a_uint32_t dev_id, fal_port_t port_id)
-{
-	sw_error_t rv;
-	a_uint32_t phy_id;
-	hsl_phy_ops_t *phy_drv;
-
-	HSL_DEV_ID_CHECK (dev_id);
-
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_restart_autoneg)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = phy_drv->phy_restart_autoneg (dev_id, phy_id);
-	return rv;
-}
-
-static sw_error_t
-_scomphy_port_autoneg_adv_set (a_uint32_t dev_id, fal_port_t port_id,
-			    a_uint32_t autoadv)
-{
-	sw_error_t rv;
-	a_uint32_t phy_id;
-	hsl_phy_ops_t *phy_drv;
-
-	HSL_DEV_ID_CHECK (dev_id);
-
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_autoneg_adv_set)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = phy_drv->phy_autoneg_adv_set (dev_id, phy_id, autoadv);
-	SW_RTN_ON_ERROR (rv);
-
-	return SW_OK;
-}
-
-static sw_error_t
-_scomphy_port_autoneg_adv_get (a_uint32_t dev_id, fal_port_t port_id,
-			    a_uint32_t * autoadv)
-{
-	sw_error_t rv;
-	a_uint32_t phy_id;
-	hsl_phy_ops_t *phy_drv;
-
-	HSL_DEV_ID_CHECK (dev_id);
-
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_autoneg_adv_get)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-
-	*autoadv = 0;
-	rv = phy_drv->phy_autoneg_adv_get (dev_id, phy_id, autoadv);
-	SW_RTN_ON_ERROR (rv);
-
-	return SW_OK;
 }
 
 #ifndef IN_PORTCONTROL_MINI
@@ -1298,64 +1215,6 @@ scomphy_port_autoneg_enable (a_uint32_t dev_id, fal_port_t port_id)
 	return rv;
 }
 
-/**
- * @brief Restart auto negotiation procedule on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @return SW_OK or error code
- */
-HSL_LOCAL sw_error_t
-scomphy_port_autoneg_restart (a_uint32_t dev_id, fal_port_t port_id)
-{
-	sw_error_t rv;
-
-	HSL_API_LOCK;
-	rv = _scomphy_port_autoneg_restart (dev_id, port_id);
-	HSL_API_UNLOCK;
-	return rv;
-}
-
-/**
- * @brief Set auto negotiation advtisement ability on a particular port.
- *   @details  Comments:
- *   auto negotiation advtisement ability is defined by macro such as
- *   FAL_PHY_ADV_10T_HD, FAL_PHY_ADV_PAUSE...
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[in] autoadv auto negotiation advtisement ability bit map
- * @return SW_OK or error code
- */
-HSL_LOCAL sw_error_t
-scomphy_port_autoneg_adv_set (a_uint32_t dev_id, fal_port_t port_id,
-			   a_uint32_t autoadv)
-{
-	sw_error_t rv;
-
-	HSL_API_LOCK;
-	rv = _scomphy_port_autoneg_adv_set (dev_id, port_id, autoadv);
-	HSL_API_UNLOCK;
-	return rv;
-}
-
-/**
- * @brief Get auto negotiation advtisement ability on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[out] autoadv auto negotiation advtisement ability bit map
- * @return SW_OK or error code
- */
-HSL_LOCAL sw_error_t
-scomphy_port_autoneg_adv_get (a_uint32_t dev_id, fal_port_t port_id,
-			   a_uint32_t * autoadv)
-{
-	sw_error_t rv;
-
-	HSL_API_LOCK;
-	rv = _scomphy_port_autoneg_adv_get (dev_id, port_id, autoadv);
-	HSL_API_UNLOCK;
-	return rv;
-}
-
 #ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Set powersaving status on a particular port.
@@ -2014,9 +1873,6 @@ scomphy_port_ctrl_init(a_uint32_t dev_id)
 	p_api->port_speed_set = scomphy_port_speed_set;
 	p_api->port_autoneg_status_get = scomphy_port_autoneg_status_get;
 	p_api->port_autoneg_enable = scomphy_port_autoneg_enable;
-	p_api->port_autoneg_restart = scomphy_port_autoneg_restart;
-	p_api->port_autoneg_adv_get = scomphy_port_autoneg_adv_get;
-	p_api->port_autoneg_adv_set = scomphy_port_autoneg_adv_set;
 #ifndef IN_PORTCONTROL_MINI
 	p_api->port_powersave_set = scomphy_port_powersave_set;
 	p_api->port_powersave_get = scomphy_port_powersave_get;

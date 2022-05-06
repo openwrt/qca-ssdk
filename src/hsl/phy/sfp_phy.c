@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2018, 2020-2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "sw.h"
@@ -207,7 +210,7 @@ static void sfp_features_init(void)
 		ETHTOOL_LINK_MODE_100baseT_Full_BIT,
 		ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
 		ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
-		ETHTOOL_LINK_MODE_2500baseX_Full_BIT,
+		ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
 		ETHTOOL_LINK_MODE_Pause_BIT,
 		ETHTOOL_LINK_MODE_Asym_Pause_BIT,
 		ETHTOOL_LINK_MODE_Autoneg_BIT,
@@ -344,4 +347,24 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 	}
 
 	return SW_OK;
+}
+
+sw_error_t
+sfp_phy_phydev_adv_update(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t adv_mask,
+	a_uint32_t adv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t new_adv = 0;
+	struct phy_device *phydev = NULL;
+
+	rv = hsl_phy_phydev_get(dev_id, phy_addr, &phydev);
+	SW_RTN_ON_ERROR (rv);
+	rv = hsl_phy_linkmode_adv_to_adv(phydev->advertising, &new_adv);
+	SW_RTN_ON_ERROR (rv);
+	new_adv &= ~adv_mask;
+	new_adv |= adv;
+
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, new_adv);
+
+	return rv;
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -275,26 +276,22 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 static sw_error_t
 qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 {
-	a_uint32_t i = 0;
-	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
-	a_bool_t force_port;
+	a_uint32_t i = 0, port_max = SSDK_PHYSICAL_PORT7;
+	a_bool_t force_port = 0;
 	fal_port_cnt_cfg_t init_cnt_cfg;
 
 	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
-		force_port = ssdk_port_feature_get(dev_id, i,
-			PHY_F_FORCE);
-		if (force_port == A_TRUE) {
+		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
+		if(force_port) {
 			fal_port_txmac_status_set(dev_id, i, A_TRUE);
 			fal_port_rxmac_status_set(dev_id, i, A_TRUE);
-			fal_port_rxfc_status_set(dev_id, i, A_TRUE);
-			fal_port_txfc_status_set(dev_id, i, A_TRUE);
 			SSDK_INFO("appe port %d is force port\n", i);
 		} else {
 			fal_port_txmac_status_set(dev_id, i, A_FALSE);
 			fal_port_rxmac_status_set(dev_id, i, A_FALSE);
-			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
-			fal_port_txfc_status_set(dev_id, i, A_FALSE);
 		}
+		fal_port_rxfc_status_set(dev_id, i, A_FALSE);
+		fal_port_txfc_status_set(dev_id, i, A_FALSE);
 		fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
 	}
 

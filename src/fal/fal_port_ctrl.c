@@ -30,6 +30,8 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 /*qca808x_start*/
+#include "hsl_phy.h"
+
 static sw_error_t
 _fal_port_duplex_set (a_uint32_t dev_id, fal_port_t port_id,
 		      fal_port_duplex_t duplex)
@@ -202,24 +204,7 @@ _fal_port_autoneg_enable (a_uint32_t dev_id, fal_port_t port_id)
 static sw_error_t
 _fal_port_autoneg_restart (a_uint32_t dev_id, fal_port_t port_id)
 {
-  sw_error_t rv;
-  hsl_api_t *p_api;
-/*qca808x_end*/
-    adpt_api_t *p_adpt_api;
-
-    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
-        p_adpt_api->adpt_port_autoneg_restart != NULL) {
-        rv = p_adpt_api->adpt_port_autoneg_restart(dev_id, port_id);
-        return rv;
-    }
-/*qca808x_start*/
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_autoneg_restart)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_autoneg_restart (dev_id, port_id);
-  return rv;
+	return hsl_port_phy_autoneg_restart(dev_id, port_id);
 }
 
 
@@ -227,24 +212,7 @@ static sw_error_t
 _fal_port_autoneg_adv_set (a_uint32_t dev_id, fal_port_t port_id,
 			   a_uint32_t autoadv)
 {
-  sw_error_t rv;
-  hsl_api_t *p_api;
-/*qca808x_end*/
-    adpt_api_t *p_adpt_api;
-
-    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
-        p_adpt_api->adpt_port_autoneg_adv_set != NULL) {
-        rv = p_adpt_api->adpt_port_autoneg_adv_set(dev_id, port_id, autoadv);
-        return rv;
-    }
-/*qca808x_start*/
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_autoneg_adv_set)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_autoneg_adv_set (dev_id, port_id, autoadv);
-  return rv;
+	return hsl_port_phy_autoadv_set(dev_id, port_id, autoadv);
 }
 
 static sw_error_t
@@ -275,24 +243,7 @@ static sw_error_t
 _fal_port_autoneg_adv_get (a_uint32_t dev_id, fal_port_t port_id,
 			   a_uint32_t * autoadv)
 {
-  sw_error_t rv;
-  hsl_api_t *p_api;
-/*qca808x_end*/
-    adpt_api_t *p_adpt_api;
-
-    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
-        p_adpt_api->adpt_port_autoneg_adv_get != NULL) {
-        rv = p_adpt_api->adpt_port_autoneg_adv_get(dev_id, port_id, autoadv);
-        return rv;
-    }
-/*qca808x_start*/
-  SW_RTN_ON_NULL (p_api = hsl_api_ptr_get (dev_id));
-
-  if (NULL == p_api->port_autoneg_adv_get)
-    return SW_NOT_SUPPORTED;
-
-  rv = p_api->port_autoneg_adv_get (dev_id, port_id, autoadv);
-  return rv;
+  return hsl_port_phy_autoadv_get(dev_id, port_id, autoadv);
 }
 /*qca808x_end*/
 #ifndef IN_PORTCONTROL_MINI

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -81,6 +82,11 @@ qca_mp_interface_mode_init(a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 
 	for (i = SSDK_PHYSICAL_PORT1; i <= SSDK_PHYSICAL_PORT2; i++) {
+		/*if uniphy is not uesed, no need to configure por2's mac*/
+		if(i == SSDK_PHYSICAL_PORT2 &&
+			ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0) ==
+			PORT_WRAPPER_MAX)
+			continue;
 		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
 		if (force_port == A_TRUE) {
 			force_speed = ssdk_port_force_speed_get(dev_id, i);

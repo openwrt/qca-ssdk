@@ -297,6 +297,7 @@ adpt_mp_uniphy_mode_configure(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mo
 	}
 
 	if (mode == PORT_WRAPPER_MAX) {
+		SSDK_INFO("uniphy %d is not used\n", index);
 		adpt_mp_gcc_uniphy_port_set(dev_id, SSDK_PHYSICAL_PORT2,
 			A_FALSE);
 		return SW_OK;
@@ -370,13 +371,16 @@ adpt_mp_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 
 	rv = adpt_mp_uniphy_mode_configure(dev_id, index, mode);
 	SW_RTN_ON_ERROR(rv);
-	_adpt_mp_uniphy_clk_output_set(dev_id, index);
-
-	/*port2 is connected with PHY, need gpio reset*/
-	if(!ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
+	if(mode != PORT_WRAPPER_MAX)
 	{
-		hsl_port_phy_gpio_reset(dev_id, SSDK_PHYSICAL_PORT2);
-		hsl_port_phy_hw_init(dev_id, SSDK_PHYSICAL_PORT2);
+		_adpt_mp_uniphy_clk_output_set(dev_id, index);
+
+		/*port2 is connected with PHY, need gpio reset*/
+		if(!ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
+		{
+			hsl_port_phy_gpio_reset(dev_id, SSDK_PHYSICAL_PORT2);
+			hsl_port_phy_hw_init(dev_id, SSDK_PHYSICAL_PORT2);
+		}
 	}
 
 	return rv;

@@ -3729,31 +3729,24 @@ adpt_hppe_port_interface_mode_status_get(a_uint32_t dev_id, fal_port_t port_id,
 {
 
 	sw_error_t rv = SW_OK;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mode);
 
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
-	  {
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
 		return SW_BAD_PARAM;
-	  }
+	}
 
 	/* for those ports without PHY device should be sfp port */
-	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id)) {
+	if (A_FALSE == _adpt_hppe_port_phy_connected(dev_id, port_id)) {
 		rv = sfp_phy_interface_get_mode_status(dev_id, port_id, mode);
 		SW_RTN_ON_ERROR (rv);
 	} else {
-		SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-		if (NULL == phy_drv->phy_interface_mode_status_get)
-			return SW_NOT_SUPPORTED;
-
-		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-		SW_RTN_ON_ERROR (rv);
-
-		rv = phy_drv->phy_interface_mode_status_get (dev_id, phy_id,mode);
+		rv = hsl_port_phy_interface_mode_status_get(dev_id, port_id, mode);
+		SW_RTN_ON_ERROR(rv);
 	}
+
 	return rv;
 }
 #ifndef IN_PORTCONTROL_MINI

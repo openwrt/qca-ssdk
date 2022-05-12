@@ -748,6 +748,11 @@ hsl_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	struct port_phy_status *phy_status);
 sw_error_t
 hsl_port_phy_function_reset(a_uint32_t dev_id, a_uint32_t port_id);
+/*qca808x_start*/
+sw_error_t
+hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t *interface_mode_status);
+/*qca808x_end*/
 
 /*qca808x_start*/
 #ifdef __cplusplus

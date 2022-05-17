@@ -3460,7 +3460,7 @@ cmd_data_check_fdbentry(char *info, void *val, a_uint32_t size)
 
     rv = __cmd_data_check_boolean("cross_pt_state", "no",
                         "usage: <yes/no/y/n>\n",
-                        cmd_data_check_confirm, A_FALSE, 
+                        cmd_data_check_confirm, A_FALSE,
 			&entry.cross_pt_state, sizeof (a_bool_t));
     if (rv)
         return rv;
@@ -6704,7 +6704,7 @@ cmd_data_check_host_entry(char *cmd_str, void * val, a_uint32_t size)
     if (rv)
         return rv;
 
-    if ((FAL_IP_IP4_ADDR & (entry.flags)) ==  FAL_IP_IP4_ADDR|| 
+    if ((FAL_IP_IP4_ADDR & (entry.flags)) ==  FAL_IP_IP4_ADDR||
 		(FAL_IP_IP4_ADDR_MCAST & (entry.flags)) ==  FAL_IP_IP4_ADDR_MCAST)
     {
         rv = __cmd_data_check_complex("ip4 addr", NULL,
@@ -6714,7 +6714,7 @@ cmd_data_check_host_entry(char *cmd_str, void * val, a_uint32_t size)
         if (rv)
             return rv;
     }
-    else if ((FAL_IP_IP6_ADDR & (entry.flags)) == FAL_IP_IP6_ADDR || 
+    else if ((FAL_IP_IP6_ADDR & (entry.flags)) == FAL_IP_IP6_ADDR ||
 		(FAL_IP_IP6_ADDR_MCAST& (entry.flags)) == FAL_IP_IP6_ADDR_MCAST)
     {
         rv = __cmd_data_check_complex("ip6 addr", NULL,
@@ -6812,7 +6812,7 @@ cmd_data_check_host_entry(char *cmd_str, void * val, a_uint32_t size)
     if (rv)
         return rv;
 
-    if ((FAL_IP_IP4_ADDR_MCAST & (entry.flags)) == FAL_IP_IP4_ADDR_MCAST || 
+    if ((FAL_IP_IP4_ADDR_MCAST & (entry.flags)) == FAL_IP_IP4_ADDR_MCAST ||
 		(FAL_IP_IP6_ADDR_MCAST& (entry.flags)) == FAL_IP_IP6_ADDR_MCAST) {
          rv = __cmd_data_check_complex("vsi", "0",
                         "usage: integer\n",
@@ -6837,7 +6837,7 @@ cmd_data_check_host_entry(char *cmd_str, void * val, a_uint32_t size)
         }
     }
 
-    
+
 
     *(fal_host_entry_t *)val = entry;
     return SW_OK;
@@ -7987,6 +7987,8 @@ cmd_data_check_sec_tcp(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
         *arg_val = FAL_NROM_TCP_RST_SCAN_CMD;
     else if (!strcasecmp(cmd_str, "rst_with_data"))
         *arg_val = FAL_NROM_TCP_RST_WITH_DATA_CMD;
+    else if (!strcasecmp(cmd_str, "syn_with_data"))
+        *arg_val = FAL_NROM_TCP_SYN_WITH_DATA_CMD;
     else if (!strcasecmp(cmd_str, "fa_block"))
         *arg_val = FAL_NROM_TCP_FA_BLOCK_CMD;
     else if (!strcasecmp(cmd_str, "pa_block"))
@@ -9336,10 +9338,10 @@ cmd_data_check_ip4_rfs_entry(char *cmd_str, void * val, a_uint32_t size)
                         sizeof (a_uint32_t));
     if (rv)
         return rv;
-    
+
     entry.load_balance = tmp;
     *(fal_ip4_rfs_t *)val = entry;
-    
+
     return SW_OK;
 }
 #endif
@@ -9947,7 +9949,7 @@ cmd_data_check_ip_pub(char *cmd_str, void * val, a_uint32_t size)
                             (param_check_t)cmd_data_check_ip4addr, &(entry.pub_ip_addr),
                             4);
     if (rv)
-        return rv; 
+        return rv;
 
     *(fal_ip_pub_addr_t *)val = entry;
     return SW_OK;
@@ -10437,8 +10439,8 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
                             (param_check_t)cmd_data_check_ip4addr, &(entry.dnat_ip),
                             4);
     if (rv)
-        return rv;   
-	
+        return rv;
+
 
     *(fal_ip_nexthop_t *)val = entry;
     return SW_OK;
@@ -11959,7 +11961,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
     }
     while (talk_mode && (SW_OK != rv));
 
-    
+
     do
     {
         cmd = get_sub_cmd("snat_nexthop", "0");
@@ -12287,7 +12289,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
 		4);
         if (rv)
 		return rv;
-		
+
     } else if (entry.entry_type & FAL_FLOW_IP6_5TUPLE_ADDR || entry.entry_type & FAL_FLOW_IP6_3TUPLE_ADDR) {
         rv = __cmd_data_check_complex("ip addr", NULL,
 		"usage: the format is xxxx::xxxx \n",
@@ -13181,7 +13183,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
-	
+
     *(fal_ac_static_threshold_t *)val = entry;
     return SW_OK;
 }
@@ -13438,7 +13440,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         }
     }
     while (talk_mode && (SW_OK != rv));
-	
+
     *(fal_ac_dynamic_threshold_t *)val = entry;
     return SW_OK;
 }

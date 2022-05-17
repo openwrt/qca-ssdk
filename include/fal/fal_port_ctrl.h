@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -659,18 +659,11 @@ fal_port_link_status_get(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_ports_link_status_get(a_uint32_t dev_id, a_uint32_t * status);
 /*qca808x_end*/
-sw_error_t
-fal_port_congestion_drop_set(a_uint32_t dev_id, fal_port_t port_id,
-					 a_uint32_t queue_id, a_bool_t enable);
 
 sw_error_t
 fal_port_congestion_drop_get(a_uint32_t dev_id, fal_port_t port_id,
 					 a_uint32_t queue_id,
 					 a_bool_t * enable);
-sw_error_t
-fal_ring_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t ring_id,
-					 a_uint16_t on_thres,
-					 a_uint16_t off_thres);
 
 sw_error_t
 fal_ring_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t ring_id,
@@ -901,7 +894,12 @@ fal_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt
 
 sw_error_t
 fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id);
-
+sw_error_t
+fal_port_congestion_drop_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t queue_id, a_bool_t enable);
+sw_error_t
+fal_ring_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t ring_id,
+		a_uint16_t on_thres, a_uint16_t off_thres);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

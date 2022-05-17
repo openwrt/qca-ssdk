@@ -294,6 +294,12 @@ extern "C" {
     SW_API_DEF(SW_API_PT_POWER_ON, fal_port_power_on), \
     SW_API_DEF(SW_API_TXFC_STATUS_SET, fal_port_txfc_status_set), \
     SW_API_DEF(SW_API_RXFC_STATUS_SET, fal_port_rxfc_status_set), \
+    SW_API_DEF(SW_API_PT_CONGESTION_DROP_SET, fal_port_congestion_drop_set), \
+    SW_API_DEF(SW_API_PT_RING_FLOW_CTRL_THRES_SET, fal_ring_flow_ctrl_thres_set), \
+    SW_API_DEF(SW_API_PT_RING_FLOW_CTRL_STATUS_GET, fal_ring_flow_ctrl_status_get), \
+    SW_API_DEF(SW_API_PT_RING_UNION_SET, fal_ring_union_set), \
+    SW_API_DEF(SW_API_PT_FLOW_CTRL_THRES_SET, fal_port_flow_ctrl_thres_set), \
+    SW_API_DEF(SW_API_PT_RING_FLOW_CTRL_SET, fal_ring_flow_ctrl_config_set), \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_SET, fal_switch_port_loopback_set),  \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_GET, fal_switch_port_loopback_get), \
     SW_API_DEF(SW_API_PT_CNT_CFG_SET, fal_port_cnt_cfg_set), \
@@ -333,6 +339,12 @@ extern "C" {
     SW_API_DESC(SW_API_PT_POWER_ON) \
     SW_API_DESC(SW_API_TXFC_STATUS_SET) \
     SW_API_DESC(SW_API_RXFC_STATUS_SET) \
+    SW_API_DESC(SW_API_PT_CONGESTION_DROP_SET) \
+    SW_API_DESC(SW_API_PT_RING_FLOW_CTRL_THRES_SET) \
+    SW_API_DESC(SW_API_PT_RING_FLOW_CTRL_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_RING_UNION_SET) \
+    SW_API_DESC(SW_API_PT_FLOW_CTRL_THRES_SET) \
+    SW_API_DESC(SW_API_PT_RING_FLOW_CTRL_SET) \
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_SET)  \
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_GET) \
     SW_API_DESC(SW_API_PT_CNT_CFG_SET) \

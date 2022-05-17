@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -493,6 +493,13 @@ _isisc_qos_port_mode_set(a_uint32_t dev_id, fal_port_t port_id,
         HSL_REG_FIELD_SET(rv, dev_id, PRI_CTL, port_id, IP_PRI_EN,
                           (a_uint8_t *) (&val), sizeof (a_uint32_t));
     }
+#if defined(MHT)
+    else if (FAL_QOS_FLOW_MODE == mode)
+    {
+        HSL_REG_FIELD_SET(rv, dev_id, PRI_CTL, port_id, FLOW_PRI_EN,
+                          (a_uint8_t *) (&val), sizeof (a_uint32_t));
+    }
+#endif
     else
     {
         return SW_BAD_PARAM;
@@ -531,6 +538,13 @@ _isisc_qos_port_mode_get(a_uint32_t dev_id, fal_port_t port_id,
         HSL_REG_FIELD_GET(rv, dev_id, PRI_CTL, port_id, IP_PRI_EN,
                           (a_uint8_t *) (&val), sizeof (a_uint32_t));
     }
+#if defined(MHT)
+    else if (FAL_QOS_FLOW_MODE == mode)
+    {
+        HSL_REG_FIELD_GET(rv, dev_id, PRI_CTL, port_id, FLOW_PRI_EN,
+                          (a_uint8_t *) (&val), sizeof (a_uint32_t));
+    }
+#endif
     else
     {
         return SW_BAD_PARAM;
@@ -584,6 +598,12 @@ _isisc_qos_port_mode_pri_set(a_uint32_t dev_id, fal_port_t port_id,
     {
         SW_SET_REG_BY_FIELD(PRI_CTL, IP_PRI_SEL, pri, val);
     }
+#if defined(MHT)
+    else if (FAL_QOS_FLOW_MODE == mode)
+    {
+        SW_SET_REG_BY_FIELD(PRI_CTL, FLOW_PRI_SEL, pri, val);
+    }
+#endif
     else
     {
         return SW_NOT_SUPPORTED;
@@ -624,6 +644,12 @@ _isisc_qos_port_mode_pri_get(a_uint32_t dev_id, fal_port_t port_id,
     {
         SW_GET_FIELD_BY_REG(PRI_CTL, IP_PRI_SEL, f_val, entry);
     }
+#if defined(MHT)
+    else if (FAL_QOS_FLOW_MODE == mode)
+    {
+        SW_GET_FIELD_BY_REG(PRI_CTL, FLOW_PRI_SEL, f_val, entry);
+    }
+#endif
     else
     {
         return SW_NOT_SUPPORTED;

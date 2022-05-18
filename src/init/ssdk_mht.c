@@ -211,10 +211,13 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 			(phy_status.link_status == PORT_LINK_DOWN)) {
 			/* disable mac rx function */
 			rv = fal_port_rxmac_status_set(priv->device_id, port_id, A_FALSE);
-			SW_RTN_ON_ERROR (rv);
+			SW_RTN_ON_ERROR(rv);
+			/* disable mac tx function */
+			rv = fal_port_txmac_status_set(priv->device_id, port_id, A_FALSE);
+			SW_RTN_ON_ERROR(rv);
 			/* update gcc, mac speed, mac duplex and phy stauts */
 			rv = mht_port_link_update(priv, port_id, phy_status);
-			SW_RTN_ON_ERROR (rv);
+			SW_RTN_ON_ERROR(rv);
 			priv->port_old_link[port_id] = phy_status.link_status;
 			ssdk_port_link_notify(port_id, 0, 0, 0);
 #ifdef IN_FDB
@@ -225,18 +228,15 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 		/* Down --> Up */
 		if ((priv->port_old_link[port_id] == PORT_LINK_DOWN) &&
 			(phy_status.link_status == PORT_LINK_UP)) {
-			/* disable mac tx function */
-			rv = fal_port_txmac_status_set(priv->device_id, port_id, A_FALSE);
-			SW_RTN_ON_ERROR (rv);
 			/* update gcc, mac speed, mac duplex and phy stauts */
 			rv = mht_port_link_update(priv, port_id, phy_status);
-			SW_RTN_ON_ERROR (rv);
+			SW_RTN_ON_ERROR(rv);
 			/* enable mac tx function */
 			rv = fal_port_txmac_status_set(priv->device_id, port_id, A_TRUE);
-			SW_RTN_ON_ERROR (rv);
+			SW_RTN_ON_ERROR(rv);
 			/* enable mac rx function */
 			rv = fal_port_rxmac_status_set(priv->device_id, port_id, A_TRUE);
-			SW_RTN_ON_ERROR (rv);
+			SW_RTN_ON_ERROR(rv);
 			/* save the current link status */
 			priv->port_old_link[port_id] = phy_status.link_status;
 			ssdk_port_link_notify(port_id, phy_status.link_status,

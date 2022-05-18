@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2015-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup isisc_interface_ctrl ISISC_INTERFACE_CONTROL
@@ -99,37 +101,28 @@ _isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enabl
 {
     sw_error_t rv;
     a_uint32_t reg = 0, field, offset, device_id, rev_id, reverse = 0;
+    a_uint32_t eee_mask = 0;
 
     HSL_REG_ENTRY_GET(rv, dev_id, MASK_CTL, 0,
                       (a_uint8_t *) (&reg), sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
 
     SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    switch (device_id) {
-	    case S17C_DEVICE_ID:
-	    case MHT_DEVICE_ID:
-		    break;
-	    default:
-		    return SW_NOT_SUPPORTED;
-    }
-
     SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
-    if (S17_REVISION_A == rev_id)
-    {
-        reverse = 0;
-    }
-    else
-    {
-        reverse = 1;
-    }
-
-    if (rev_id == 0)
-    {
-        reverse = 1;
-    }
-    else
-    {
-        reverse = 0;
+    switch (device_id) {
+        case S17C_DEVICE_ID:
+            eee_mask = 1;
+            if (rev_id == 0)
+                reverse = 1;
+            else
+                reverse = 0;
+            break;
+        case MHT_DEVICE_ID:
+            eee_mask = 3;
+            reverse = 0;
+            break;
+        default:
+            return SW_NOT_SUPPORTED;
     }
 
     if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
@@ -143,7 +136,7 @@ _isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enabl
 
     if (A_TRUE == enable)
     {
-        field  = 1;
+        field  = eee_mask;
     }
     else if (A_FALSE == enable)
     {
@@ -156,11 +149,11 @@ _isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enabl
 
     if (reverse)
     {
-        field = (~field) & 0x1UL;
+        field = (~field) & eee_mask;
     }
 
     offset = (port_id - 1) * ISISC_LPI_BIT_STEP + ISISC_LPI_PORT1_OFFSET;
-    reg &= (~(0x1UL << offset));
+    reg &= (~(eee_mask << offset));
     reg |= (field << offset);
 
     HSL_REG_ENTRY_SET(rv, dev_id, EEE_CTL, 0,
@@ -173,37 +166,28 @@ _isisc_port_3az_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * ena
 {
     sw_error_t rv;
     a_uint32_t reg = 0, field, offset, device_id, rev_id, reverse = 0;
+    a_uint32_t eee_mask = 0;
 
     HSL_REG_ENTRY_GET(rv, dev_id, MASK_CTL, 0,
                       (a_uint8_t *) (&reg), sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
 
     SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    switch (device_id) {
-	    case S17C_DEVICE_ID:
-	    case MHT_DEVICE_ID:
-		    break;
-	    default:
-		    return SW_NOT_SUPPORTED;
-    }
-
     SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
-    if (S17_REVISION_A == rev_id)
-    {
-        reverse = 0;
-    }
-    else
-    {
-        reverse = 1;
-    }
-
-    if (rev_id == 0)
-    {
-        reverse = 1;
-    }
-    else
-    {
-        reverse = 0;
+    switch (device_id) {
+        case S17C_DEVICE_ID:
+            eee_mask = 1;
+            if (rev_id == 0)
+                reverse = 1;
+            else
+                reverse = 0;
+            break;
+        case MHT_DEVICE_ID:
+            eee_mask = 3;
+            reverse = 0;
+            break;
+        default:
+            return SW_NOT_SUPPORTED;
     }
 
     if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
@@ -216,14 +200,14 @@ _isisc_port_3az_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * ena
     SW_RTN_ON_ERROR(rv);
 
     offset = (port_id - 1) * ISISC_LPI_BIT_STEP + ISISC_LPI_PORT1_OFFSET;
-    field = (reg >> offset) & 0x1;
+    field = (reg >> offset) & eee_mask;
 
     if (reverse)
     {
-        field = (~field) & 0x1UL;
+        field = (~field) & eee_mask;
     }
 
-    if (field)
+    if (field == eee_mask)
     {
         *enable = A_TRUE;
     }

@@ -107,7 +107,7 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 	fal_loopback_config_t loopback_cfg;
 #endif
 
-	if(adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+	if(adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
 		SSDK_INFO("Cypress PPE port initializing\n");
 		port_max = SSDK_PHYSICAL_PORT6;
 	} else {
@@ -152,7 +152,7 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 	}
 
 #if defined(CPPE)
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+	if (adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
 		loopback_cfg.enable = A_TRUE;
 		loopback_cfg.crc_stripped = A_TRUE;
 		loopback_cfg.loopback_rate = FAL_DEFAULT_LOOPBACK_RATE;  /* Mpps */
@@ -660,7 +660,7 @@ qca_hppe_tdm_hw_init(a_uint32_t dev_id, a_bool_t enable)
 	bm_tick_mode = ssdk_bm_tick_mode_get(dev_id);
 
 	if (tm_tick_mode == 0) {
-		if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+		if (adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
 			num = sizeof(cppe_port_scheduler0_tbl) /
 				sizeof(fal_port_scheduler_cfg_t);
 			scheduler_cfg = cppe_port_scheduler0_tbl;
@@ -685,7 +685,7 @@ qca_hppe_tdm_hw_init(a_uint32_t dev_id, a_bool_t enable)
 	SW_RTN_ON_NULL(p_api->adpt_port_tdm_ctrl_set);
 
 	if (bm_tick_mode == 0) {
-		if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION) {
+		if (adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
 			num = sizeof(cppe_port_tdm0_tbl) /
 				sizeof(fal_port_tdm_tick_cfg_t);
 			bm_cfg = cppe_port_tdm0_tbl;
@@ -727,7 +727,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 	fal_bm_dynamic_cfg_t cfg;
 	a_uint32_t chip_ver = 0;
 
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	chip_ver = adpt_chip_revision_get(dev_id);
 
 	for (i = 0; i <  HPPE_BM_PORT_NUM; i++) {
 		/*disable fc for phy ports and enable fc for port 0 and port 7*/
@@ -813,7 +813,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 	memset(&queue_dst, 0, sizeof(queue_dst));
 
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	chip_ver = adpt_chip_revision_get(dev_id);
 
 	/*
 	 * Redirect service code 2 to queue 1
@@ -1260,7 +1260,7 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 	SW_RTN_ON_NULL(p_api->adpt_port_mux_mac_type_set);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
+	chip_ver = adpt_chip_revision_get(dev_id);
 
 	SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
 

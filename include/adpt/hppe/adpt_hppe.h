@@ -104,8 +104,6 @@ sw_error_t adpt_hppe_ptp_init(a_uint32_t dev_id);
 #define MPPE_REVISION              0x1
 #define UNKNOWN_REVISION           0xff
 
-a_uint32_t adpt_hppe_chip_revision_get(a_uint32_t dev_id);
-
 #ifdef IN_FDB
 sw_error_t
 adpt_hppe_fdb_del_by_port(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t flag);

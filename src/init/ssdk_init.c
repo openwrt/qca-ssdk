@@ -1982,7 +1982,7 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	} else {
 #ifdef MPPE
 		if (chip_type == CHIP_APPE &&
-			adpt_hppe_chip_revision_get(priv->device_id) == MPPE_REVISION) {
+			adpt_chip_revision_get(priv->device_id) == MPPE_REVISION) {
 			priv->ports = 3;
 		} else
 #endif

@@ -256,7 +256,7 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 
 	if (tm_tick_mode == 0) {
 #if defined(MPPE)
-		if (adpt_hppe_chip_revision_get(dev_id) == MPPE_REVISION) {
+		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
 			num = sizeof(mppe_port_scheduler0_tbl) /
 					sizeof(fal_port_scheduler_cfg_t);
 			scheduler_cfg = mppe_port_scheduler0_tbl;
@@ -282,7 +282,7 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 
 	if (bm_tick_mode == 0) {
 #if defined(MPPE)
-		if (adpt_hppe_chip_revision_get(dev_id) == MPPE_REVISION) {
+		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
 			num = sizeof(mppe_port_tdm0_tbl) /
 					sizeof(fal_port_tdm_tick_cfg_t);
 			bm_cfg = mppe_port_tdm0_tbl;
@@ -320,7 +320,7 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 	fal_port_cnt_cfg_t init_cnt_cfg;
 
 #if defined(MPPE)
-	if (adpt_hppe_chip_revision_get(dev_id) == MPPE_REVISION)
+	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION)
 	{
 		port_max = SSDK_PHYSICAL_PORT3;
 	}

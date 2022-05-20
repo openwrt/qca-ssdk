@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2019, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -69,7 +72,8 @@ adpt_ppe_mib_cpukeep_set(a_uint32_t dev_id, a_bool_t enable)
 	for (port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT6; port_id++)
 	{
 #ifdef CPPE
-		if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION &&
+		if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+			adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
 			port_id == SSDK_PHYSICAL_PORT6)
 		{
 			rv = adpt_cppe_lpbk_mib_cpukeep_set(dev_id, port_id, enable);
@@ -175,7 +179,8 @@ adpt_ppe_get_mib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mib_info);
 #ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION &&
+	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
 		port_id == SSDK_PHYSICAL_PORT6)
 	{
 		return adpt_cppe_lpbk_get_mib_info(dev_id, port_id, mib_info);
@@ -243,7 +248,8 @@ adpt_ppe_mib_status_set(a_uint32_t dev_id, a_bool_t enable)
 	memset(&mmc_control, 0, sizeof(mmc_control));
 	ADPT_DEV_ID_CHECK(dev_id);
 #ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION)
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_chip_revision_get(dev_id) == CPPE_REVISION)
 	{
 		port_num = SSDK_PHYSICAL_PORT5;
 		rv = adpt_cppe_lpbk_mib_status_set(dev_id, SSDK_PHYSICAL_PORT6, enable);
@@ -309,7 +315,8 @@ sw_error_t
 adpt_ppe_mib_port_flush_counters(a_uint32_t dev_id, fal_port_t port_id)
 {
 #ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION &&
+	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
 		port_id == SSDK_PHYSICAL_PORT6)
 	{
 		return adpt_cppe_lpbk_mib_flush_counters(dev_id, port_id);
@@ -392,7 +399,8 @@ adpt_ppe_get_rx_mib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mib_info);
 #ifdef CPPE
-	if (adpt_hppe_chip_revision_get(dev_id) == CPPE_REVISION &&
+	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
 		port_id == SSDK_PHYSICAL_PORT6)
 	{
 		return adpt_cppe_lpbk_get_mib_info(dev_id, port_id, mib_info);

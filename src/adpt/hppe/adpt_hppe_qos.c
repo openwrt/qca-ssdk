@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -155,8 +158,8 @@ adpt_ppe_qos_port_pri_set(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_NULL_POINT_CHECK(pri);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_pri_set(dev_id, port_id, pri);
@@ -202,8 +205,8 @@ adpt_ppe_qos_port_pri_get(a_uint32_t dev_id, fal_port_t port_id,
         ADPT_NULL_POINT_CHECK(pri);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_pri_get(dev_id, port_id, pri);
@@ -263,8 +266,8 @@ adpt_ppe_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
         ADPT_NULL_POINT_CHECK(cosmap);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_pcp_get(dev_id, group_id,
@@ -423,8 +426,8 @@ adpt_ppe_qos_cosmap_pcp_set(a_uint32_t dev_id, a_uint8_t group_id,
         ADPT_NULL_POINT_CHECK(cosmap);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_pcp_set(dev_id, group_id,
@@ -508,8 +511,8 @@ adpt_ppe_qos_cosmap_dscp_get(a_uint32_t dev_id, a_uint8_t group_id,
         ADPT_NULL_POINT_CHECK(cosmap);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_dscp_get(dev_id, group_id,
@@ -567,8 +570,8 @@ adpt_ppe_qos_cosmap_flow_set(a_uint32_t dev_id, a_uint8_t group_id,
         ADPT_NULL_POINT_CHECK(cosmap);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_flow_set(dev_id, group_id,
@@ -611,8 +614,8 @@ adpt_ppe_qos_port_group_set(a_uint32_t dev_id, fal_port_t port_id,
         ADPT_NULL_POINT_CHECK(group);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_group_set(dev_id, port_id, group);
@@ -684,8 +687,8 @@ adpt_ppe_qos_cosmap_dscp_set(a_uint32_t dev_id, a_uint8_t group_id,
         ADPT_NULL_POINT_CHECK(cosmap);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_dscp_set(dev_id, group_id,
@@ -836,11 +839,11 @@ adpt_ppe_qos_cosmap_flow_get(a_uint32_t dev_id, a_uint8_t group_id,
 	a_uint32_t chip_ver = 0, chip_type = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-        ADPT_NULL_POINT_CHECK(cosmap);
+	ADPT_NULL_POINT_CHECK(cosmap);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_flow_get(dev_id, group_id,
@@ -886,8 +889,8 @@ adpt_ppe_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
         ADPT_NULL_POINT_CHECK(group);
 
 	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_hppe_chip_revision_get(dev_id);
-	if (chip_ver == CPPE_REVISION ||
+	chip_ver = adpt_chip_revision_get(dev_id);
+	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
 			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_group_get(dev_id, port_id, group);

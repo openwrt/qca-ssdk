@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -340,7 +342,7 @@ union mac_packet_filter_u {
 	a_uint32_t val;
 	struct mac_packet_filter bf;
 };
-
+#if 0
 /*[register] MAC_WATCHDOG_TIMEOUT*/
 #define MAC_WATCHDOG_TIMEOUT
 #define MAC_WATCHDOG_TIMEOUT_ADDRESS 0xc
@@ -489,7 +491,7 @@ union mac_rx_eth_type_match_u {
 	a_uint32_t val;
 	struct mac_rx_eth_type_match bf;
 };
-
+#endif
 /*[register] MAC_Q0_TX_FLOW_CTRL*/
 #define MAC_Q0_TX_FLOW_CTRL
 #define MAC_Q0_TX_FLOW_CTRL_ADDRESS 0x70
@@ -573,7 +575,7 @@ union mac_rx_flow_ctrl_u {
 	a_uint32_t val;
 	struct mac_rx_flow_ctrl bf;
 };
-
+#if 0
 /*[register] MAC_INTERRUPT_STATUS*/
 #define MAC_INTERRUPT_STATUS
 #define MAC_INTERRUPT_STATUS_ADDRESS 0xb0
@@ -732,7 +734,7 @@ union mac_rx_tx_status_u {
 	a_uint32_t val;
 	struct mac_rx_tx_status bf;
 };
-
+#endif
 /*[register] MAC_LPI_CONTROL_STATUS*/
 #define MAC_LPI_CONTROL_STATUS
 #define MAC_LPI_CONTROL_STATUS_ADDRESS 0xd0
@@ -911,7 +913,7 @@ union mac_1us_tic_counter_u {
 	a_uint32_t val;
 	struct mac_1us_tic_counter bf;
 };
-
+#if 0
 /*[register] MAC_ADDRESS0_HIGH*/
 #define MAC_ADDRESS0_HIGH
 #define MAC_ADDRESS0_HIGH_ADDRESS 0x300
@@ -1624,5 +1626,5 @@ union mmc_transmit_interrupt_enable_u {
 	a_uint32_t val;
 	struct mmc_transmit_interrupt_enable bf;
 };
-
+#endif
 #endif

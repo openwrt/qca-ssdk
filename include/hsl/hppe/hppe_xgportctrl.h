@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -101,7 +103,7 @@ hppe_mac_packet_filter_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mac_packet_filter_u *value);
-
+#if 0
 sw_error_t
 hppe_mac_watchdog_timeout_get(
 		a_uint32_t dev_id,
@@ -137,7 +139,7 @@ hppe_mac_rx_eth_type_match_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mac_rx_eth_type_match_u *value);
-
+#endif
 sw_error_t
 hppe_mac_q0_tx_flow_ctrl_get(
 		a_uint32_t dev_id,
@@ -161,7 +163,7 @@ hppe_mac_rx_flow_ctrl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mac_rx_flow_ctrl_u *value);
-
+#if 0
 sw_error_t
 hppe_mac_interrupt_status_get(
 		a_uint32_t dev_id,
@@ -197,7 +199,7 @@ hppe_mac_rx_tx_status_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mac_rx_tx_status_u *value);
-
+#endif
 sw_error_t
 hppe_mac_lpi_control_status_get(
 		a_uint32_t dev_id,
@@ -245,7 +247,7 @@ hppe_mac_1us_tic_counter_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mac_1us_tic_counter_u *value);
-
+#if 0
 sw_error_t
 hppe_mac_address0_high_get(
 		a_uint32_t dev_id,
@@ -467,7 +469,7 @@ hppe_mac_tx_configuration_jd_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_mac_tx_configuration_jd_set(
 		a_uint32_t dev_id,
@@ -485,7 +487,7 @@ hppe_mac_rx_configuration_lm_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_rx_configuration_je_get(
 		a_uint32_t dev_id,
@@ -527,13 +529,13 @@ hppe_mac_rx_configuration_gmpslce_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_mac_rx_configuration_gmpslce_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_rx_configuration_hdsms_get(
 		a_uint32_t dev_id,
@@ -581,7 +583,7 @@ hppe_mac_rx_configuration_ipc_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#endif
 sw_error_t
 hppe_mac_rx_configuration_gpsl_get(
 		a_uint32_t dev_id,
@@ -593,7 +595,7 @@ hppe_mac_rx_configuration_gpsl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_rx_configuration_re_get(
 		a_uint32_t dev_id,
@@ -635,13 +637,13 @@ hppe_mac_rx_configuration_wd_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_mac_rx_configuration_wd_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_rx_configuration_acs_get(
 		a_uint32_t dev_id,
@@ -671,13 +673,13 @@ hppe_mac_packet_filter_pcf_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_mac_packet_filter_pcf_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_packet_filter_hmc_get(
 		a_uint32_t dev_id,
@@ -767,13 +769,13 @@ hppe_mac_packet_filter_ra_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_mac_packet_filter_ra_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_packet_filter_hpf_get(
 		a_uint32_t dev_id,
@@ -815,13 +817,13 @@ hppe_mac_packet_filter_pr_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_mac_packet_filter_pr_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_packet_filter_ipfe_get(
 		a_uint32_t dev_id,
@@ -2777,6 +2779,6 @@ hppe_mmc_transmit_interrupt_enable_txmcgbfie_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#endif
 #endif
 

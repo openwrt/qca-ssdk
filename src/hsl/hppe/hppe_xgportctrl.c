@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -106,6 +108,7 @@ hppe_mac_packet_filter_set(
 				index * MAC_PACKET_FILTER_INC,
 				value->val);
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -192,6 +195,7 @@ hppe_mac_rx_eth_type_match_set(
 				value->val);
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_q0_tx_flow_ctrl_get(
 		a_uint32_t dev_id,
@@ -247,6 +251,7 @@ hppe_mac_rx_flow_ctrl_set(
 				index * MAC_RX_FLOW_CTRL_INC,
 				value->val);
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -326,6 +331,7 @@ hppe_mac_rx_tx_status_set(
 	return SW_NOT_SUPPORTED;
 
 }
+#endif
 #endif
 sw_error_t
 hppe_mac_lpi_control_status_get(
@@ -438,7 +444,7 @@ hppe_mac_1us_tic_counter_set(
 				index * MAC_1US_TIC_COUNTER_INC,
 				value->val);
 }
-
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_mac_address0_high_get(
@@ -986,6 +992,7 @@ hppe_mac_tx_configuration_jd_get(
 	return ret;
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_tx_configuration_jd_set(
 		a_uint32_t dev_id,
@@ -1034,7 +1041,7 @@ hppe_mac_rx_configuration_lm_set(
 	ret = hppe_mac_rx_configuration_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 hppe_mac_rx_configuration_je_get(
 		a_uint32_t dev_id,
@@ -1142,6 +1149,7 @@ hppe_mac_rx_configuration_gmpslce_get(
 	return ret;
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_rx_configuration_gmpslce_set(
 		a_uint32_t dev_id,
@@ -1158,6 +1166,7 @@ hppe_mac_rx_configuration_gmpslce_set(
 	ret = hppe_mac_rx_configuration_set(dev_id, index, &reg_val);
 	return ret;
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -1284,6 +1293,7 @@ hppe_mac_rx_configuration_ipc_set(
 	return ret;
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_rx_configuration_gpsl_get(
 		a_uint32_t dev_id,
@@ -1314,6 +1324,7 @@ hppe_mac_rx_configuration_gpsl_set(
 	ret = hppe_mac_rx_configuration_set(dev_id, index, &reg_val);
 	return ret;
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -1423,6 +1434,7 @@ hppe_mac_rx_configuration_wd_get(
 	return ret;
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_rx_configuration_wd_set(
 		a_uint32_t dev_id,
@@ -1439,6 +1451,7 @@ hppe_mac_rx_configuration_wd_set(
 	ret = hppe_mac_rx_configuration_set(dev_id, index, &reg_val);
 	return ret;
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -1517,6 +1530,7 @@ hppe_mac_packet_filter_pcf_get(
 	return ret;
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_packet_filter_pcf_set(
 		a_uint32_t dev_id,
@@ -1533,6 +1547,7 @@ hppe_mac_packet_filter_pcf_set(
 	ret = hppe_mac_packet_filter_set(dev_id, index, &reg_val);
 	return ret;
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -1873,6 +1888,7 @@ hppe_mac_packet_filter_pr_get(
 	return ret;
 }
 #endif
+#endif
 sw_error_t
 hppe_mac_packet_filter_pr_set(
 		a_uint32_t dev_id,
@@ -1906,7 +1922,7 @@ hppe_mac_packet_filter_ra_set(
 	ret = hppe_mac_packet_filter_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
@@ -6073,4 +6089,5 @@ hppe_mmc_transmit_interrupt_enable_txmcgbfie_set(
 {
 	return SW_NOT_SUPPORTED;
 }
+#endif
 #endif

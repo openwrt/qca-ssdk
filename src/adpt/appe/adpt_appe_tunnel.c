@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -618,6 +619,24 @@ adpt_appe_tunnel_key_op(a_uint32_t dev_id, fal_tunnel_type_t tunnel_type,
 				rule_key->key_bmp |= BIT(FAL_TUNNEL_KEY_DPORT_EN);
 			} else {
 				rule_key->key_bmp &= ~BIT(FAL_TUNNEL_KEY_DPORT_EN);
+			}
+
+			if (key_gen.bf.vni_resv_inc) {
+				rule_key->key_bmp |= BIT(FAL_TUNNEL_KEY_TLINFO_EN);
+			} else {
+				rule_key->key_bmp &= ~BIT(FAL_TUNNEL_KEY_TLINFO_EN);
+			}
+
+			if (key_gen.bf.udf0_inc) {
+				rule_key->key_bmp |= BIT(FAL_TUNNEL_KEY_UDF0_EN);
+			} else {
+				rule_key->key_bmp &= ~BIT(FAL_TUNNEL_KEY_UDF0_EN);
+			}
+
+			if (key_gen.bf.udf1_inc) {
+				rule_key->key_bmp |= BIT(FAL_TUNNEL_KEY_UDF1_EN);
+			} else {
+				rule_key->key_bmp &= ~BIT(FAL_TUNNEL_KEY_UDF1_EN);
 			}
 
 			rule_key->udf0_idx = key_gen.bf.udf0_id;

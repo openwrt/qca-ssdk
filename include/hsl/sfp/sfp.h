@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -129,6 +131,7 @@ sfp_ext_get(
 		a_uint32_t index,
 		union sfp_ext_u *value);
 
+#if 0
 sw_error_t
 sfp_dev_type_id_get(
 		a_uint32_t dev_id,
@@ -502,6 +505,7 @@ sfp_ext_check_code_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		unsigned int *value);
+#endif
 
 sw_error_t
 sfp_diag_threshold_get(
@@ -545,6 +549,7 @@ sfp_diag_extended_ctrl_status_get(
 		a_uint32_t index,
 		union sfp_diag_extended_ctrl_status_u *value);
 
+#if 0
 sw_error_t
 sfp_diag_threshold_rx_pwr_low_alarm_get(
 		a_uint32_t dev_id,
@@ -952,5 +957,6 @@ sfp_diag_extended_ctrl_status_pwr_level_sel_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		unsigned int *value);
+#endif
 
 #endif

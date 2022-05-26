@@ -823,6 +823,7 @@ qca808x_ptp_event1_timestamp4_reg_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		union ptp_event1_timestamp4_reg_u *value);
 
+#if 0
 sw_error_t
 qca808x_ptp_imr_reg_mask_bmp_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
@@ -1482,12 +1483,14 @@ sw_error_t
 qca808x_ptp_gm_conf0_reg_gm_maxfreq_offset_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		unsigned int value);
+#endif
 
 sw_error_t
 qca808x_ptp_gm_conf0_reg_grandmaster_mode_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		unsigned int *value);
 
+#if 0
 sw_error_t
 qca808x_ptp_gm_conf0_reg_grandmaster_mode_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
@@ -2192,6 +2195,7 @@ sw_error_t
 qca808x_ptp_event1_timestamp4_reg_ts_nsec_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		unsigned int value);
+#endif
 
 sw_error_t
 qca808x_ptp_phase_adjust_0_reg_get(
@@ -2994,6 +2998,7 @@ qca808x_ptp_rx_buffer_read_reg_set(
 		union ptp_rx_buffer_read_reg_u *value);
 
 
+#if 0
 sw_error_t
 qca808x_ptp_rx_com_ts_ctrl_reg_ipv4_da_en_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
@@ -4393,6 +4398,7 @@ sw_error_t
 qca808x_ptp_rx_buffer_read_reg_rx_buffer_data_present_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		unsigned int value);
+#endif
 
 sw_error_t
 qca808x_ptp_loc_mac_addr_0_reg_get(
@@ -4424,6 +4430,7 @@ qca808x_ptp_loc_mac_addr_2_reg_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		union ptp_loc_mac_addr_2_reg_u *value);
 
+#if 0
 sw_error_t
 qca808x_ptp_loc_mac_addr_0_reg_mac_addr_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
@@ -4453,6 +4460,7 @@ sw_error_t
 qca808x_ptp_loc_mac_addr_2_reg_mac_addr_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		unsigned int value);
+#endif
 
 sw_error_t
 qca808x_ptp_link_delay_0_reg_get(
@@ -4474,6 +4482,7 @@ qca808x_ptp_link_delay_1_reg_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		union ptp_link_delay_1_reg_u *value);
 
+#if 0
 sw_error_t
 qca808x_ptp_link_delay_0_reg_link_delay_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,
@@ -4494,6 +4503,7 @@ qca808x_ptp_link_delay_1_reg_link_delay_set(
 		a_uint32_t dev_id, a_uint32_t phy_id,
 		unsigned int value);
 
+#endif
 sw_error_t
 qca808x_ptp_misc_control_reg_get(
 		a_uint32_t dev_id, a_uint32_t phy_id,

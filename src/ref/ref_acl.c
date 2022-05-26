@@ -23,6 +23,7 @@
 #include "ssdk_init.h"
 #include "ssdk_plat.h"
 #include <linux/etherdevice.h>
+#include <linux/if_bridge.h>
 
 /* entry 0-1 is for global deny all and accept eapol rule
    entry 2-9 is for phy port1 specific mac accept rule
@@ -127,6 +128,7 @@ _ref_acl_mac_entry_create_rule(a_uint32_t dev_id,
 {
 	sw_error_t rv = SW_OK;
 	fal_acl_rule_t rule = {0};
+	struct net_device *eth_dev = NULL;
 	a_uint32_t port_id = ssdk_ifname_to_port(dev_id, entry->ifname);
 	SSDK_DEBUG("port_id %d entry_idx %d\n", port_id, entry_idx);
 
@@ -221,6 +223,15 @@ _ref_acl_mac_entry_create_rule(a_uint32_t dev_id,
 				entry->src_mac.uc);
 		ref_acl_mac_entry[dev_id][entry_idx].port_map = BIT(port_id);
 		ref_acl_mac_entry[dev_id][entry_idx].acl_policy = 1;
+	}
+	else if (!is_deny_all_mac(entry->src_mac.uc) && !entry->acl_policy)
+	{
+		eth_dev = dev_get_by_name(&init_net, entry->ifname);
+		if (eth_dev)
+		{
+			br_fdb_delete_by_netdev(eth_dev, entry->src_mac.uc, 0);
+			dev_put(eth_dev);
+		}
 	}
 	return rv;
 }

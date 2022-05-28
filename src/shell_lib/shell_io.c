@@ -18269,7 +18269,7 @@ sw_error_t
 cmd_data_check_ecn_val(char *cmd_str, fal_tunnel_ecn_val_t *arg_val, a_uint32_t size)
 {
 	char *cmd;
-	fal_tunnel_ecn_val_t ecn_val;
+	fal_tunnel_ecn_val_t ecn_val = FAL_TUNNEL_ECN_NOT_ECT;
 
 	cmd_data_check_element("ecn_val", "no_ect",
 			"usage: no_ect, ect_0, ect_1, ce\n",

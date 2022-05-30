@@ -26,6 +26,8 @@
 #include "hsl_ptp.h"
 #include "qca808x_phy.h"
 
+#define QCA808X_PHY_DRIVER_NAME	"Qualcomm QCA8081"
+
 #if defined(IN_LINUX_STD_PTP)
 #include <linux/ptp_clock_kernel.h>
 typedef struct {
@@ -106,9 +108,13 @@ int qca808x_ts_info(struct phy_device *phydev, struct ethtool_ts_info *info);
 sw_error_t qca808x_ptp_config_init(struct phy_device *phydev);
 int qca808x_ptp_init(qca808x_priv *priv);
 void qca808x_ptp_deinit(qca808x_priv *priv);
+int qca808x_ptp_hook_init(void);
+void qca808x_ptp_hook_cleanup(void);
 #endif
 
 void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id);
 void qca808x_phydev_deinit(a_uint32_t dev_id, a_uint32_t port_id);
 a_int32_t qca808x_phy_driver_register(void);
 void qca808x_phy_driver_unregister(void);
+int qca808x_phy_probe(struct phy_device *phydev);
+void qca808x_phy_remove(struct phy_device *phydev);

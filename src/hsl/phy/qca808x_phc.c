@@ -1394,3 +1394,77 @@ void qca808x_ptp_deinit(qca808x_priv *priv)
 
 	qca808x_ptp_unregister(priv->phydev);
 }
+
+static int qca808x_ptp_callback_init(struct device *dev, void *ptp_instance)
+{
+	int rv = 0;
+	struct phy_device *phydev;
+
+	phydev = to_phy_device(dev);
+	rv = qca808x_phy_probe(phydev);
+	if (rv)
+		return rv;
+
+	rv = qca808x_ptp_config_init(phydev);
+	(*(int *)ptp_instance)++;
+
+	return rv;
+}
+
+int qca808x_ptp_hook_init(void)
+{
+	int rv = 0;
+	int ptp_instance = 0;
+	struct device_driver *drv = NULL;
+	struct phy_driver *phydrv = NULL;
+
+	drv = driver_find(QCA808X_PHY_DRIVER_NAME, &mdio_bus_type);
+	if (drv) {
+		phydrv = to_phy_driver(drv);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+		phydrv->link_change_notify = qca808x_ptp_change_notify;
+		phydrv->ts_info = qca808x_ts_info;
+#endif
+		phydrv->hwtstamp = qca808x_hwtstamp;
+		phydrv->rxtstamp = qca808x_rxtstamp;
+		phydrv->txtstamp = qca808x_txtstamp;
+		rv = driver_for_each_device(drv, NULL, &ptp_instance, qca808x_ptp_callback_init);
+	}
+
+	if (ptp_instance)
+		SSDK_INFO("qca808x ptp driver hooked on %d instance\n", ptp_instance);
+
+	return rv;
+}
+
+static int qca808x_ptp_callback_cleanup(struct device *dev, void *p)
+{
+	struct phy_device *phydev;
+
+	phydev = to_phy_device(dev);
+	qca808x_phy_remove(phydev);
+
+	return 0;
+}
+
+void qca808x_ptp_hook_cleanup(void)
+{
+	int rv = 0;
+	struct device_driver *drv = NULL;
+	struct phy_driver *phydrv = NULL;
+
+	drv = driver_find(QCA808X_PHY_DRIVER_NAME, &mdio_bus_type);
+	if (drv) {
+		rv = driver_for_each_device(drv, NULL, NULL, qca808x_ptp_callback_cleanup);
+		phydrv = to_phy_driver(drv);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+		phydrv->link_change_notify = NULL;
+		phydrv->ts_info = NULL;
+#endif
+		phydrv->hwtstamp = NULL;
+		phydrv->rxtstamp = NULL;
+		phydrv->txtstamp = NULL;
+	}
+
+	return;
+}

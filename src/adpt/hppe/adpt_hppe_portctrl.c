@@ -11,10 +11,9 @@
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -2711,7 +2710,8 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id,
 		else
 			return SW_NOT_SUPPORTED;
 
-		if ((mode == PORT_WRAPPER_SGMII_PLUS) || (mode == PORT_WRAPPER_UQXGMII))
+		if ((mode == PORT_WRAPPER_SGMII_PLUS) || (mode == PORT_WRAPPER_UQXGMII) ||
+			(mode == PORT_WRAPPER_UDXGMII))
 		{
 			rv = adpt_hppe_port_mac_speed_set(dev_id, port_id, FAL_SPEED_2500);
 			rv = adpt_hppe_port_mac_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
@@ -2886,6 +2886,7 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 			}
 			break;
 		case PORT_WRAPPER_UQXGMII:
+		case PORT_WRAPPER_UDXGMII:
 			if(port_id >= SSDK_PHYSICAL_PORT1 && port_id <= SSDK_PHYSICAL_PORT4)
 			{
 				qca_hppe_port_mac_type_set(dev_id, port_id, PORT_XGMAC_TYPE);
@@ -4852,10 +4853,11 @@ adpt_hppe_uniphy_usxgmii_port_reset(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		hppe_vr_xs_pcs_dig_ctrl1_set(dev_id, uniphy_index,
 				&vr_xs_pcs_dig_ctrl1);
 	}
-
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 #if defined(APPE)
-		if (ssdk_dt_global_get_mac_mode(dev_id, uniphy_index) == PORT_WRAPPER_UQXGMII) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		a_uint32_t mode;
+		mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
+		if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_UDXGMII)) {
 			if (port_id == SSDK_PHYSICAL_PORT2) {
 				hppe_vr_mii_dig_ctrl1_channel1_get(0, uniphy_index,
 						&vr_mii_dig_ctrl1);
@@ -4875,10 +4877,9 @@ adpt_hppe_uniphy_usxgmii_port_reset(a_uint32_t dev_id, a_uint32_t uniphy_index,
 				hppe_vr_mii_dig_ctrl1_channel3_set(0, uniphy_index,
 						&vr_mii_dig_ctrl1);
 			}
-			SSDK_INFO("uqxgmii uniphy %d port %d adapter reset\n", uniphy_index, port_id);
 		}
-#endif
 	}
+#endif
 
 	return;
 }
@@ -5066,8 +5067,8 @@ adpt_hppe_uniphy_speed_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_speed
 		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 
 	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
-	if ((mode == PORT_WRAPPER_USXGMII) || (mode == PORT_WRAPPER_UQXGMII))
-	{
+	if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_USXGMII) ||
+		(mode == PORT_WRAPPER_UDXGMII)) {
 		/* adpt_hppe_uniphy_usxgmii_autoneg_completed(dev_id,uniphy_index); */
 		/* configure xpcs speed at usxgmii mode */
 		adpt_hppe_uniphy_usxgmii_speed_set(dev_id, uniphy_index, port_id, speed);
@@ -5088,8 +5089,8 @@ adpt_hppe_uniphy_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_dupl
 		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 
 	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
-	if ((mode == PORT_WRAPPER_USXGMII) || (mode == PORT_WRAPPER_UQXGMII))
-	{
+	if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_USXGMII) ||
+		(mode == PORT_WRAPPER_UDXGMII)) {
 		/* adpt_hppe_uniphy_usxgmii_autoneg_completed(0,uniphy_index); */
 		/* configure xpcs duplex at usxgmii mode */
 		adpt_hppe_uniphy_usxgmii_duplex_set(dev_id, uniphy_index, port_id, duplex);
@@ -5110,8 +5111,8 @@ adpt_hppe_uniphy_autoneg_status_check(a_uint32_t dev_id, a_uint32_t port_id)
 		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 
 	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
-	if ((mode == PORT_WRAPPER_USXGMII) || (mode == PORT_WRAPPER_UQXGMII))
-	{
+	if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_USXGMII) ||
+		(mode == PORT_WRAPPER_UDXGMII)) {
 		adpt_hppe_uniphy_usxgmii_autoneg_completed(dev_id,uniphy_index, port_id);
 	}
 	return;
@@ -5229,7 +5230,8 @@ adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
 		}
 #endif
 		mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
-		if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_USXGMII)) {
+		if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_USXGMII) ||
+			(mode == PORT_WRAPPER_UDXGMII)) {
 #if defined(APPE)
 			adpt_hppe_usxgmii_speed_clock_set(dev_id,port_id, phy_speed);
 #endif

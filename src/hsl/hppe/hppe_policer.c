@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -8,10 +11,9 @@
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -190,6 +192,20 @@ hppe_in_acl_meter_cfg_tbl_set(
 				(sizeof(union in_acl_meter_cfg_tbl_u) / sizeof(a_uint32_t)));
 }
 
+sw_error_t
+hppe_in_port_meter_cfg_tbl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union in_port_meter_cfg_tbl_u *value)
+{
+	return hppe_reg_tbl_set(
+				dev_id,
+				INGRESS_POLICER_BASE_ADDR + IN_PORT_METER_CFG_TBL_ADDRESS + \
+				index * IN_PORT_METER_CFG_TBL_INC,
+				value->val,
+				4);
+}
+
 #ifndef IN_POLICER_MINI
 sw_error_t
 hppe_in_acl_meter_crdt_tbl_get(
@@ -226,20 +242,6 @@ hppe_in_port_meter_cfg_tbl_get(
 		union in_port_meter_cfg_tbl_u *value)
 {
 	return hppe_reg_tbl_get(
-				dev_id,
-				INGRESS_POLICER_BASE_ADDR + IN_PORT_METER_CFG_TBL_ADDRESS + \
-				index * IN_PORT_METER_CFG_TBL_INC,
-				value->val,
-				4);
-}
-
-sw_error_t
-hppe_in_port_meter_cfg_tbl_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union in_port_meter_cfg_tbl_u *value)
-{
-	return hppe_reg_tbl_set(
 				dev_id,
 				INGRESS_POLICER_BASE_ADDR + IN_PORT_METER_CFG_TBL_ADDRESS + \
 				index * IN_PORT_METER_CFG_TBL_INC,

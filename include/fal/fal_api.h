@@ -2592,12 +2592,14 @@ extern "C" {
     SW_API_DEF(SW_API_POLICER_TIMESLOT_SET, fal_policer_timeslot_set), \
     SW_API_DEF(SW_API_POLICER_COMPENSATION_SET, fal_port_policer_compensation_byte_set), \
     SW_API_DEF(SW_API_POLICER_ACL_ENTRY_SET, fal_acl_policer_entry_set), \
+    SW_API_DEF(SW_API_POLICER_PORT_ENTRY_SET, fal_port_policer_entry_set), \
     SW_API_DEF(SW_API_POLICER_BYPASS_EN_SET, fal_policer_bypass_en_set), \
     SW_API_DEF(SW_API_POLICER_CTRL_SET, fal_policer_ctrl_set),
 
 #define POLICER_API_PARAM \
     SW_API_DESC(SW_API_POLICER_TIMESLOT_SET)  \
     SW_API_DESC(SW_API_POLICER_COMPENSATION_SET) \
+    SW_API_DESC(SW_API_POLICER_PORT_ENTRY_SET) \
     SW_API_DESC(SW_API_POLICER_ACL_ENTRY_SET) \
     SW_API_DESC(SW_API_POLICER_BYPASS_EN_SET) \
     SW_API_DESC(SW_API_POLICER_CTRL_SET)

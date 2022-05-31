@@ -1,17 +1,20 @@
 /*
  * Copyright (c) 2017, 2019-2020, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -60,11 +63,13 @@ hppe_uniphy_offset_calib_4_get(
 		a_uint32_t index,
 		union uniphy_offset_calib_4_u *value);
 
+#if 0
 sw_error_t
 hppe_uniphy_offset_calib_4_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union uniphy_offset_calib_4_u *value);
+#endif
 
 sw_error_t
 hppe_uniphy_mode_ctrl_get(
@@ -167,12 +172,13 @@ hppe_sr_xs_pcs_kr_sts1_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union sr_xs_pcs_kr_sts1_u *value);
-
+#if 0
 sw_error_t
 hppe_sr_xs_pcs_kr_sts1_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union sr_xs_pcs_kr_sts1_u *value);
+#endif
 
 sw_error_t
 hppe_vr_xs_pcs_dig_ctrl1_get(
@@ -355,19 +361,7 @@ hppe_vr_mii_an_ctrl_set(
 		union vr_mii_an_ctrl_u *value);
 
 sw_error_t
-hppe_vr_mii_an_ctrl_channel1_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union vr_mii_an_ctrl_u *value);
-
-sw_error_t
 hppe_vr_mii_an_ctrl_channel1_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union vr_mii_an_ctrl_u *value);
-
-sw_error_t
-hppe_vr_mii_an_ctrl_channel2_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_mii_an_ctrl_u *value);
@@ -379,16 +373,29 @@ hppe_vr_mii_an_ctrl_channel2_set(
 		union vr_mii_an_ctrl_u *value);
 
 sw_error_t
-hppe_vr_mii_an_ctrl_channel3_get(
+hppe_vr_mii_an_ctrl_channel3_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+#if 0
+sw_error_t
+hppe_vr_mii_an_ctrl_channel1_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_mii_an_ctrl_u *value);
 
 sw_error_t
-hppe_vr_mii_an_ctrl_channel3_set(
+hppe_vr_mii_an_ctrl_channel2_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_mii_an_ctrl_u *value);
+
+sw_error_t
+hppe_vr_mii_an_ctrl_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_mii_an_ctrl_u *value);
+#endif
 
 sw_error_t
 hppe_vr_mii_an_intr_sts_get(
@@ -415,19 +422,7 @@ hppe_vr_xaui_mode_ctrl_set(
 		union vr_xaui_mode_ctrl_u *value);
 
 sw_error_t
-hppe_vr_xaui_mode_ctrl_channel1_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union vr_xaui_mode_ctrl_u *value);
-
-sw_error_t
 hppe_vr_xaui_mode_ctrl_channel1_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union vr_xaui_mode_ctrl_u *value);
-
-sw_error_t
-hppe_vr_xaui_mode_ctrl_channel2_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_xaui_mode_ctrl_u *value);
@@ -439,16 +434,30 @@ hppe_vr_xaui_mode_ctrl_channel2_set(
 		union vr_xaui_mode_ctrl_u *value);
 
 sw_error_t
-hppe_vr_xaui_mode_ctrl_channel3_get(
+hppe_vr_xaui_mode_ctrl_channel3_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+
+#if 0
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel1_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_xaui_mode_ctrl_u *value);
 
 sw_error_t
-hppe_vr_xaui_mode_ctrl_channel3_set(
+hppe_vr_xaui_mode_ctrl_channel2_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union vr_xaui_mode_ctrl_u *value);
+
+sw_error_t
+hppe_vr_xaui_mode_ctrl_channel3_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union vr_xaui_mode_ctrl_u *value);
+#endif
 
 sw_error_t
 hppe_vr_mii_an_intr_sts_channel1_get(
@@ -486,6 +495,7 @@ hppe_vr_mii_an_intr_sts_channel3_set(
 		a_uint32_t index,
 		union vr_mii_an_intr_sts_u *value);
 
+#if 0
 sw_error_t
 hppe_uniphy_offset_calib_4_mmd1_reg_cal_rep_time_get(
 		a_uint32_t dev_id,
@@ -779,6 +789,7 @@ hppe_uniphy_channel0_force_speed_mode_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
+#endif
 
 sw_error_t
 hppe_uniphy_channel0_force_speed_mode_set(
@@ -786,6 +797,7 @@ hppe_uniphy_channel0_force_speed_mode_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#if 0
 sw_error_t
 hppe_uniphy_channel0_input_output_4_newaddedfromhere_ch0_adp_sw_rstn_get(
 		a_uint32_t dev_id,
@@ -2693,6 +2705,7 @@ hppe_pll_control_vco_related_selection_2_cmn_mmd1_reg_src_cmn_pll_fbclk_div_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 sw_error_t
 hppe_uniphy_phy_mode_ctrl_get(

@@ -9779,6 +9779,15 @@ parse_flow_entry(struct switch_val *val)
 			val_ptr[35] = (char*)ext_value_p->option_value;
 		}
 #endif
+#if defined(MPPE)
+		else if (!strcmp(ext_value_p->option_name, "qos_type")) {
+			val_ptr[36] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "bridge_nexthop_valid")) {
+			val_ptr[37] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "bridge_nexthop")) {
+			val_ptr[38] = (char*)ext_value_p->option_value;
+		}
+#endif
 		else {
 			rv = -1;
 			break;

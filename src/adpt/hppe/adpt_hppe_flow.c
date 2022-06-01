@@ -286,6 +286,10 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -332,6 +336,10 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
 #endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
@@ -386,6 +394,10 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -431,6 +443,10 @@ adpt_hppe_flow_entry_host_op_add(
 			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf0.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf0.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -458,15 +474,22 @@ adpt_hppe_flow_entry_host_op_add(
 		return SW_FAIL;
 	if (rv == SW_OK) {
 		union eg_flow_tree_map_tbl_u eg_treemap;
+		fal_flow_qos_t *flow_qos = &(flow_entry->flow_qos);
 		aos_mem_zero(&eg_treemap, sizeof(eg_treemap));
 
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
 		SW_RTN_ON_ERROR(rv);
 
-		eg_treemap.bf.tree_id = flow_entry->tree_id;
+#if defined(MPPE)
+		eg_treemap.bf.type = flow_qos->qos_type;
+		/* flow cookies only has 16bits */
+		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
+			flow_qos->tree_id &= 0xffff;
+#endif
+		eg_treemap.bf.tree_id = flow_qos->tree_id;
 #if defined(APPE)
-		eg_treemap.bf.wifi_qos_flag = flow_entry->wifi_qos_en;
-		eg_treemap.bf.wifi_qos = flow_entry->wifi_qos;
+		eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
+		eg_treemap.bf.wifi_qos = flow_qos->wifi_qos;
 #endif
 		rv = hppe_eg_flow_tree_map_tbl_set(dev_id, flow_entry->entry_id, &eg_treemap);
 	}
@@ -528,6 +551,10 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
+#endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf1.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf1.next_hop4;
 #endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
@@ -593,6 +620,10 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf1.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf1.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -655,6 +686,10 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf1.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf1.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -715,6 +750,10 @@ adpt_hppe_flow_entry_host_op_get(
 			flow_entry->svlan_fmt = entry.bf0.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf0.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf0.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf0.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -742,14 +781,21 @@ adpt_hppe_flow_entry_host_op_get(
 	if (rv == SW_OK) {
 		union eg_flow_tree_map_tbl_u eg_treemap;
 		union in_flow_cnt_tbl_u cnt;
+		fal_flow_qos_t *flow_qos = &(flow_entry->flow_qos);
 		aos_mem_zero(&eg_treemap, sizeof(eg_treemap));
 		aos_mem_zero(&cnt, sizeof(cnt));
 
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
-		flow_entry->tree_id = eg_treemap.bf.tree_id;
+		flow_qos->tree_id = eg_treemap.bf.tree_id;
 #if defined(APPE)
-		flow_entry->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
-		flow_entry->wifi_qos = eg_treemap.bf.wifi_qos;
+		flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
+		flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
+#endif
+#if defined(MPPE)
+		flow_qos->qos_type = eg_treemap.bf.type;
+		/* flow cookies only has 16bits */
+		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
+			flow_qos->tree_id &= 0xffff;
 #endif
 		rv = hppe_in_flow_cnt_tbl_get(dev_id, flow_entry->entry_id, &cnt);
 		flow_entry->pkt_counter = cnt.bf.hit_pkt_counter;
@@ -804,6 +850,10 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -849,6 +899,10 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
 #endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
@@ -902,6 +956,10 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -945,6 +1003,10 @@ adpt_hppe_flow_entry_host_op_del(
 			entry.bf0.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
 			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
+#if defined(MPPE)
+			entry.bf0.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf0.next_hop4 = flow_entry->bridge_nexthop;
 #endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
@@ -1102,6 +1164,10 @@ adpt_hppe_flow_entry_get(
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf1.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf1.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1173,6 +1239,10 @@ adpt_hppe_flow_entry_get(
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf1.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf1.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1243,6 +1313,10 @@ adpt_hppe_flow_entry_get(
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf1.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf1.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf1.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1310,6 +1384,10 @@ adpt_hppe_flow_entry_get(
 			flow_entry->svlan_fmt = entry.bf0.svlan_fmt;
 			flow_entry->cvlan_fmt = entry.bf0.cvlan_fmt;
 #endif
+#if defined(MPPE)
+			flow_entry->bridge_nexthop_valid = entry.bf0.next_hop4_valid;
+			flow_entry->bridge_nexthop = entry.bf0.next_hop4;
+#endif
 		}
 		flow_entry->deacclr_en = entry.bf0.de_acce;
 		flow_entry->copy_tocpu_en = entry.bf0.copy_to_cpu_en;
@@ -1337,14 +1415,21 @@ adpt_hppe_flow_entry_get(
 	if (rv == SW_OK) {
 		union eg_flow_tree_map_tbl_u eg_treemap;
 		union in_flow_cnt_tbl_u cnt;
+		fal_flow_qos_t *flow_qos = &(flow_entry->flow_qos);
 		aos_mem_zero(&eg_treemap, sizeof(eg_treemap));
 		aos_mem_zero(&cnt, sizeof(cnt));
 
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
-		flow_entry->tree_id = eg_treemap.bf.tree_id;
+		flow_qos->tree_id = eg_treemap.bf.tree_id;
 #if defined(APPE)
-		flow_entry->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
-		flow_entry->wifi_qos = eg_treemap.bf.wifi_qos;
+		flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
+		flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
+#endif
+#if defined(MPPE)
+		flow_qos->qos_type = eg_treemap.bf.type;
+		/* flow cookies only has 16bits */
+		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
+			flow_qos->tree_id &= 0xffff;
 #endif
 		rv = hppe_in_flow_cnt_tbl_get(dev_id, flow_entry->entry_id, &cnt);
 		flow_entry->pkt_counter = cnt.bf.hit_pkt_counter;
@@ -1438,6 +1523,10 @@ adpt_hppe_flow_entry_del(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1483,6 +1572,10 @@ adpt_hppe_flow_entry_del(
 			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
 #endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
@@ -1536,6 +1629,10 @@ adpt_hppe_flow_entry_del(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1579,6 +1676,10 @@ adpt_hppe_flow_entry_del(
 			entry.bf0.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
 			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
+#if defined(MPPE)
+			entry.bf0.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf0.next_hop4 = flow_entry->bridge_nexthop;
 #endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
@@ -1838,6 +1939,10 @@ adpt_hppe_flow_entry_add(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1884,6 +1989,10 @@ adpt_hppe_flow_entry_add(
 			entry.bf1.vlan_fmt_valid = flow_entry->vlan_fmt_valid;
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
+#endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
 #endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
@@ -1938,6 +2047,10 @@ adpt_hppe_flow_entry_add(
 			entry.bf1.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf1.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf1.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf1.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -1983,6 +2096,10 @@ adpt_hppe_flow_entry_add(
 			entry.bf0.svlan_fmt = flow_entry->svlan_fmt;
 			entry.bf0.cvlan_fmt = flow_entry->cvlan_fmt;
 #endif
+#if defined(MPPE)
+			entry.bf0.next_hop4_valid = flow_entry->bridge_nexthop_valid;
+			entry.bf0.next_hop4 = flow_entry->bridge_nexthop;
+#endif
 		}
 		entry.bf0.de_acce = flow_entry->deacclr_en;
 		entry.bf0.copy_to_cpu_en = flow_entry->copy_tocpu_en;
@@ -2010,15 +2127,22 @@ adpt_hppe_flow_entry_add(
 		return SW_FAIL;
 	if (rv == SW_OK) {
 		union eg_flow_tree_map_tbl_u eg_treemap;
+		fal_flow_qos_t *flow_qos = &(flow_entry->flow_qos);
 		aos_mem_zero(&eg_treemap, sizeof(eg_treemap));
 
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
 		SW_RTN_ON_ERROR(rv);
 
-		eg_treemap.bf.tree_id = flow_entry->tree_id;
+#if defined(MPPE)
+		eg_treemap.bf.type = flow_qos->qos_type;
+		/* flow cookies only has 16bits */
+		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
+			flow_qos->tree_id &= 0xffff;
+#endif
+		eg_treemap.bf.tree_id = flow_qos->tree_id;
 #if defined(APPE)
-		eg_treemap.bf.wifi_qos_flag = flow_entry->wifi_qos_en;
-		eg_treemap.bf.wifi_qos = flow_entry->wifi_qos;
+		eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
+		eg_treemap.bf.wifi_qos = flow_qos->wifi_qos;
 #endif
 		rv = hppe_eg_flow_tree_map_tbl_set(dev_id, flow_entry->entry_id, &eg_treemap);
 	}
@@ -2128,6 +2252,12 @@ adpt_hppe_flow_qos_set(a_uint32_t dev_id, a_uint32_t flow_index, fal_flow_qos_t 
 	rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_index, &eg_treemap);
 	SW_RTN_ON_ERROR(rv);
 
+#if defined(MPPE)
+	eg_treemap.bf.type = flow_qos->qos_type;
+	/* flow cookies only has 16bits */
+	if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
+		flow_qos->tree_id &= 0xffff;
+#endif
 	eg_treemap.bf.tree_id = flow_qos->tree_id;
 #if defined(APPE)
 	eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
@@ -2159,6 +2289,12 @@ adpt_hppe_flow_qos_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_flow_qos_t 
 #if defined(APPE)
 	flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
 	flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
+#endif
+#if defined(MPPE)
+	flow_qos->qos_type = eg_treemap.bf.type;
+	/* flow cookies only has 16bits */
+	if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
+		flow_qos->tree_id &= 0xffff;
 #endif
 
 	return rv;
@@ -2323,6 +2459,7 @@ void adpt_hppe_flow_func_bitmap_init(a_uint32_t dev_id)
 		BIT(FUNC_FLOW_GLOBAL_CFG_SET) |
 		BIT(FUNC_FLOW_ENTRY_NEXT) |
 		BIT(FUNC_FLOW_COUNTER_GET) |
+		BIT(FUNC_FLOW_COUNTER_CLEANUP) |
 		BIT(FUNC_FLOW_ENTRY_EN_SET) |
 		BIT(FUNC_FLOW_ENTRY_EN_GET) |
 		BIT(FUNC_FLOW_QOS_SET) |

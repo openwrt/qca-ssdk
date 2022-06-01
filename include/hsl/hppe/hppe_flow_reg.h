@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -943,7 +945,13 @@ struct in_flow_tbl_1 {
 	a_uint32_t  vlan_fmt_valid:1;
 	a_uint32_t  svlan_fmt:1;
 	a_uint32_t  cvlan_fmt:1;
+#if defined(MPPE)
+	a_uint32_t  next_hop4_valid:1;
+	a_uint32_t  next_hop4:12;
+	a_uint32_t  _reserved0:4;
+#else
 	a_uint32_t  _reserved0:17;
+#endif
 #else
 	a_uint32_t  _reserved0:20;
 #endif
@@ -1285,7 +1293,13 @@ struct in_flow_3tuple_tbl_1 {
 	a_uint32_t  vlan_fmt_valid:1;
 	a_uint32_t  svlan_fmt:1;
 	a_uint32_t  cvlan_fmt:1;
+#if defined(MPPE)
+	a_uint32_t  next_hop4_valid:1;
+	a_uint32_t  next_hop4:12;
+	a_uint32_t  _reserved0:4;
+#else
 	a_uint32_t  _reserved0:17;
+#endif
 #else
 	a_uint32_t  _reserved0:20;
 #endif
@@ -1570,7 +1584,13 @@ struct in_flow_ipv6_5tuple_tbl_1 {
 	a_uint32_t  vlan_fmt_valid:1;
 	a_uint32_t  svlan_fmt:1;
 	a_uint32_t  cvlan_fmt:1;
+#if defined(MPPE)
+	a_uint32_t  next_hop4_valid:1;
+	a_uint32_t  next_hop4:12;
+	a_uint32_t  _reserved0:4;
+#else
 	a_uint32_t  _reserved0:17;
+#endif
 #else
 	a_uint32_t  _reserved0:20;
 #endif
@@ -1996,7 +2016,13 @@ struct in_flow_ipv6_3tuple_tbl_0 {
 	a_uint32_t  vlan_fmt_valid:1;
 	a_uint32_t  svlan_fmt:1;
 	a_uint32_t  cvlan_fmt:1;
+#if defined(MPPE)
+	a_uint32_t  next_hop4_valid:1;
+	a_uint32_t  next_hop4:12;
+	a_uint32_t  _reserved0:4;
+#else
 	a_uint32_t  _reserved0:17;
+#endif
 #else
 	a_uint32_t  _reserved0:20;
 #endif
@@ -2114,7 +2140,12 @@ struct eg_flow_tree_map_tbl {
 #if defined(APPE)
 	a_uint32_t  wifi_qos:8;
 	a_uint32_t  wifi_qos_flag:1;
+#if defined(MPPE)
+	a_uint32_t  type:2;
+	a_uint32_t  _reserved0:29;
+#else
 	a_uint32_t  _reserved0:31;
+#endif
 #else
 	a_uint32_t  _reserved0:8;
 #endif

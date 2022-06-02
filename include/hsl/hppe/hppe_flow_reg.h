@@ -1759,7 +1759,11 @@ union in_flow_ipv6_5tuple_tbl_u {
 /*[table] IN_FLOW_TBL*/
 #define IN_FLOW_TBL
 #define IN_FLOW_TBL_ADDRESS 0x40000
+#if defined(MPPE) || defined(CPPE)
+#define IN_FLOW_TBL_NUM     2048
+#else
 #define IN_FLOW_TBL_NUM     4096
+#endif
 #define IN_FLOW_TBL_INC     0x20
 #define IN_FLOW_TBL_TYPE    REG_TYPE_RW
 #define IN_FLOW_TBL_DEFAULT 0x0

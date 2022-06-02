@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, 2019-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -1765,7 +1767,11 @@ union host_ipv4_mcast_tbl_u {
 /*[table] HOST_TBL*/
 #define HOST_TBL
 #define HOST_TBL_ADDRESS 0x20000
+#if defined(MPPE) || defined(CPPE)
+#define HOST_TBL_NUM     768
+#else
 #define HOST_TBL_NUM     6144
+#endif
 #define HOST_TBL_INC     0x10
 #define HOST_TBL_TYPE    REG_TYPE_RW
 #define HOST_TBL_DEFAULT 0x0
@@ -1889,7 +1895,11 @@ union host_ipv6_tbl_u {
 /*[table] IN_NEXTHOP_TBL*/
 #define IN_NEXTHOP_TBL
 #define IN_NEXTHOP_TBL_ADDRESS 0x60000
+#if defined(MPPE) || defined(CPPE)
+#define IN_NEXTHOP_TBL_NUM     768
+#else
 #define IN_NEXTHOP_TBL_NUM     2560
+#endif
 #if defined(APPE)
 #define IN_NEXTHOP_TBL_INC     0x20
 #else

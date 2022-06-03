@@ -355,6 +355,8 @@ _mht_port_flowctrl_forcemode_set(a_uint32_t dev_id, fal_port_t port_id,
 	}
 	if (!priv)
 		return SW_FAIL;
+	if(!hsl_port_phy_connected(dev_id, port_id) && !enable)
+		return SW_NOT_SUPPORTED;
 
 	priv->port_tx_flowctrl_forcemode[port_id] = enable;
 	priv->port_rx_flowctrl_forcemode[port_id] = enable;
@@ -363,7 +365,7 @@ _mht_port_flowctrl_forcemode_set(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 static sw_error_t
-_mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+__mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
 	sw_error_t rv;
 	a_uint32_t val, reg = 0, tmp;
@@ -437,7 +439,7 @@ _mht_port_txfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enab
 }
 
 static sw_error_t
-_mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+__mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
 	sw_error_t rv;
 	a_uint32_t val = 0, reg, tmp;
@@ -507,24 +509,6 @@ _mht_port_rxfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enab
 	}
 
 	return SW_OK;
-}
-
-static sw_error_t
-_mht_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
-{
-	sw_error_t rv = 0;
-
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
-	{
-	    return SW_BAD_PARAM;
-	}
-
-	rv = _mht_port_txfc_status_set(dev_id, port_id, enable);
-	SW_RTN_ON_ERROR(rv);
-	rv = _mht_port_rxfc_status_set(dev_id, port_id, enable);
-	SW_RTN_ON_ERROR(rv);
-
-	return rv;
 }
 
 static sw_error_t
@@ -788,6 +772,7 @@ _mht_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
 
 	return rv;
 }
+#endif
 
 static sw_error_t
 _mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
@@ -809,7 +794,6 @@ _mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-#endif
 
 /**
  * @brief Set flow congestion drop on a particular port queue.
@@ -1020,6 +1004,34 @@ mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *s
  * @param[in] enable A_TRUE or A_FALSE
  * @return SW_OK or error code
  */
+ sw_error_t
+_mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_bool_t force_mode = A_FALSE;
+
+	if(A_FALSE == hsl_port_phy_connected(dev_id, port_id))
+	{
+		rv = __mht_port_txfc_status_set(dev_id, port_id, enable);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		/*if force mode is enabled, need to configure mac manually*/
+		rv = _mht_port_flowctrl_forcemode_get(dev_id, port_id, &force_mode);
+		SW_RTN_ON_ERROR (rv);
+		if(force_mode)
+		{
+			rv = __mht_port_txfc_status_set(dev_id, port_id, enable);
+			SW_RTN_ON_ERROR(rv);
+		}
+		rv = hsl_port_phy_txfc_set(dev_id, port_id, enable);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+
 sw_error_t
 mht_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
@@ -1056,6 +1068,52 @@ mht_port_txfc_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enabl
  * @param[in] enable A_TRUE or A_FALSE
  * @return SW_OK or error code
  */
+ sw_error_t
+_mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_bool_t force_mode = A_FALSE;
+
+	if(A_FALSE == hsl_port_phy_connected(dev_id, port_id))
+	{
+		rv = __mht_port_rxfc_status_set(dev_id, port_id, enable);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		/*if force mode is enabled, need to configure mac manually*/
+		rv = _mht_port_flowctrl_forcemode_get(dev_id, port_id, &force_mode);
+		SW_RTN_ON_ERROR (rv);
+		if(force_mode)
+		{
+			rv = __mht_port_rxfc_status_set(dev_id, port_id, enable);
+			SW_RTN_ON_ERROR(rv);
+		}
+		rv = hsl_port_phy_rxfc_set(dev_id, port_id, enable);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+_mht_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+	    return SW_BAD_PARAM;
+	}
+
+	rv = _mht_port_txfc_status_set(dev_id, port_id, enable);
+	SW_RTN_ON_ERROR(rv);
+	rv = _mht_port_rxfc_status_set(dev_id, port_id, enable);
+	SW_RTN_ON_ERROR(rv);
+
+	return SW_OK;
+}
+
 sw_error_t
 mht_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
@@ -1298,14 +1356,14 @@ mht_port_link_update(struct qca_phy_priv *priv, a_uint32_t port_id,
 	{
 		/* sync mac flowctrl */
 		if (priv->port_tx_flowctrl_forcemode[port_id] != A_TRUE) {
-			rv = mht_port_txfc_status_set(priv->device_id,
+			rv = __mht_port_txfc_status_set(priv->device_id,
 				port_id, phy_status.tx_flowctrl);
 			SW_RTN_ON_ERROR (rv);
 			SSDK_DEBUG("mht port %d link up update txfc %d\n",
 			port_id, phy_status.tx_flowctrl);
 		}
 		if (priv->port_tx_flowctrl_forcemode[port_id] != A_TRUE) {
-			rv = mht_port_rxfc_status_set(priv->device_id,
+			rv = __mht_port_rxfc_status_set(priv->device_id,
 				port_id, phy_status.rx_flowctrl);
 			SW_RTN_ON_ERROR (rv);
 			SSDK_DEBUG("mht port %d link up update rxfc %d\n",

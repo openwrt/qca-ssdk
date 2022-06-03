@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -412,7 +414,7 @@ adpt_hppe_vsi_stamove_set(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_stamove_
 
 	return SW_OK;
 }
-#ifndef IN_VSI_MINI
+
 sw_error_t
 adpt_hppe_vsi_stamove_get(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_stamove_t *stamove)
 {
@@ -450,7 +452,6 @@ adpt_hppe_vsi_newaddr_lrn_get(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_newa
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_hppe_vsi_newaddr_lrn_set(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_newaddr_lrn_t *newaddr_lrn)
@@ -688,10 +689,12 @@ sw_error_t adpt_hppe_vsi_init(a_uint32_t dev_id)
 #ifndef IN_VSI_MINI
 	if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_PORT_VSI_GET))
 		p_adpt_api->adpt_port_vsi_get = adpt_hppe_port_vsi_get;
+#endif
 	if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_STAMOVE_GET))
 		p_adpt_api->adpt_vsi_stamove_get = adpt_hppe_vsi_stamove_get;
 	if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_NEWADDR_LRN_GET))
 		p_adpt_api->adpt_vsi_newaddr_lrn_get = adpt_hppe_vsi_newaddr_lrn_get;
+#ifndef IN_VSI_MINI
 	if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_COUNTER_GET))
 		p_adpt_api->adpt_vsi_counter_get = adpt_hppe_vsi_counter_get;
 	if(p_adpt_api->adpt_vsi_func_bitmap & (1<<FUNC_VSI_COUNTER_CLEANUP))

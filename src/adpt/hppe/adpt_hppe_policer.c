@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -8,10 +11,9 @@
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -910,6 +912,28 @@ adpt_hppe_port_policer_entry_get(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 sw_error_t
+adpt_hppe_policer_time_slot_get(a_uint32_t dev_id, a_uint32_t *time_slot)
+{
+	sw_error_t rv = SW_OK;
+	union time_slot_reg_u time_slot_reg;
+
+	memset(&time_slot_reg, 0, sizeof(time_slot_reg));
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(time_slot);
+
+
+	rv = hppe_time_slot_reg_get(dev_id, &time_slot_reg);
+
+	if( rv != SW_OK )
+		return rv;
+
+	*time_slot = time_slot_reg.bf.time_slot;
+
+	return SW_OK;
+}
+#endif
+
+sw_error_t
 adpt_hppe_port_policer_entry_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_policer_config_t *policer, fal_policer_action_t *action)
 {
@@ -1049,28 +1073,6 @@ adpt_hppe_port_policer_entry_set(a_uint32_t dev_id, fal_port_t port_id,
 	return SW_OK;
 
 }
-
-sw_error_t
-adpt_hppe_policer_time_slot_get(a_uint32_t dev_id, a_uint32_t *time_slot)
-{
-	sw_error_t rv = SW_OK;
-	union time_slot_reg_u time_slot_reg;
-
-	memset(&time_slot_reg, 0, sizeof(time_slot_reg));
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(time_slot);
-
-
-	rv = hppe_time_slot_reg_get(dev_id, &time_slot_reg);
-
-	if( rv != SW_OK )
-		return rv;
-
-	*time_slot = time_slot_reg.bf.time_slot;
-
-	return SW_OK;
-}
-#endif
 
 sw_error_t
 adpt_hppe_port_compensation_byte_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -1289,15 +1291,15 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_policer_entry_get = adpt_hppe_port_policer_entry_get;
 	}
-	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_PORT_POLICER_ENTRY_SET))
-	{
-		p_adpt_api->adpt_port_policer_entry_set = adpt_hppe_port_policer_entry_set;
-	}
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_ACL_POLICER_ENTRY_GET))
 	{
 		p_adpt_api->adpt_acl_policer_entry_get = adpt_hppe_acl_policer_entry_get;
 	}
 #endif
+	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_PORT_POLICER_ENTRY_SET))
+	{
+		p_adpt_api->adpt_port_policer_entry_set = adpt_hppe_port_policer_entry_set;
+	}
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_ACL_POLICER_ENTRY_SET))
 	{
 		p_adpt_api->adpt_acl_policer_entry_set = adpt_hppe_acl_policer_entry_set;

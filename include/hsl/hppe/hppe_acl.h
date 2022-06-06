@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -23,6 +23,15 @@
 #ifndef _HPPE_ACL_H_
 #define _HPPE_ACL_H_
 
+#if defined(MPPE)
+#define IPO_RULE_REG_MAX_ENTRY	128
+#define IPO_MASK_REG_MAX_ENTRY	128
+#define RULE_EXT_1_REG_MAX_ENTRY	16
+#define RULE_EXT_2_REG_MAX_ENTRY	16
+#define RULE_EXT_4_REG_MAX_ENTRY	16
+#define IPO_ACTION_MAX_ENTRY	128
+#define IPO_CNT_TBL_MAX_ENTRY	128
+#else
 #define IPO_RULE_REG_MAX_ENTRY	512
 #define IPO_MASK_REG_MAX_ENTRY	512
 #define RULE_EXT_1_REG_MAX_ENTRY	64
@@ -30,6 +39,7 @@
 #define RULE_EXT_4_REG_MAX_ENTRY	64
 #define IPO_ACTION_MAX_ENTRY	512
 #define IPO_CNT_TBL_MAX_ENTRY	512
+#endif
 
 sw_error_t
 hppe_non_ip_udf0_ctrl_reg_get(

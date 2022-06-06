@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,8 +27,12 @@
 extern "C" {
 #endif                          /* __cplusplus */
 
-#define ADPT_PRE_ACL_HW_LIST_NUM 64 /*hw list number*/
-#define ADPT_PRE_ACL_ENTRY_NUM_PER_LIST 8 /*hw rule entries number per hw list */
+#if defined(MPPE)
+#define ADPT_PRE_ACL_HW_LIST_NUM 16 /* hw list number */
+#else
+#define ADPT_PRE_ACL_HW_LIST_NUM 64
+#endif
+#define ADPT_PRE_ACL_ENTRY_NUM_PER_LIST 8 /* hw rule entries number per hw list */
 
 #define ADPT_ACL_APPE_TUNNEL_RULE 16
 #define ADPT_ACL_APPE_EXT_UDF0_RULE 17

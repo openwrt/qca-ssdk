@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -252,7 +255,11 @@ union udf_ctrl_reg_u {
 /*[table] IPO_RULE_REG*/
 #define IPO_RULE_REG
 #define IPO_RULE_REG_ADDRESS 0x0
+#if defined(MPPE)
+#define IPO_RULE_REG_NUM     128
+#else
 #define IPO_RULE_REG_NUM     512
+#endif
 #define IPO_RULE_REG_INC     0x10
 #define IPO_RULE_REG_TYPE    REG_TYPE_RW
 #define IPO_RULE_REG_DEFAULT 0x0
@@ -406,7 +413,11 @@ union ipo_rule_reg_u {
 /*[table] IPO_MASK_REG*/
 #define IPO_MASK_REG
 #define IPO_MASK_REG_ADDRESS 0x2000
+#if defined(MPPE)
+#define IPO_MASK_REG_NUM     128
+#else
 #define IPO_MASK_REG_NUM     512
+#endif
 #define IPO_MASK_REG_INC     0x10
 #define IPO_MASK_REG_TYPE    REG_TYPE_RW
 #define IPO_MASK_REG_DEFAULT 0x0
@@ -430,7 +441,11 @@ union ipo_mask_reg_u {
 /*[register] RULE_EXT_1_REG*/
 #define RULE_EXT_1_REG
 #define RULE_EXT_1_REG_ADDRESS 0x4000
+#if defined(MPPE)
+#define RULE_EXT_1_REG_NUM     16
+#else
 #define RULE_EXT_1_REG_NUM     64
+#endif
 #define RULE_EXT_1_REG_INC     0x4
 #define RULE_EXT_1_REG_TYPE    REG_TYPE_RW
 #define RULE_EXT_1_REG_DEFAULT 0x0
@@ -471,7 +486,11 @@ union rule_ext_1_reg_u {
 /*[register] RULE_EXT_2_REG*/
 #define RULE_EXT_2_REG
 #define RULE_EXT_2_REG_ADDRESS 0x4100
+#if defined(MPPE)
+#define RULE_EXT_2_REG_NUM     16
+#else
 #define RULE_EXT_2_REG_NUM     64
+#endif
 #define RULE_EXT_2_REG_INC     0x4
 #define RULE_EXT_2_REG_TYPE    REG_TYPE_RW
 #define RULE_EXT_2_REG_DEFAULT 0x0
@@ -500,7 +519,11 @@ union rule_ext_2_reg_u {
 /*[register] RULE_EXT_4_REG*/
 #define RULE_EXT_4_REG
 #define RULE_EXT_4_REG_ADDRESS 0x4200
+#if defined(MPPE)
+#define RULE_EXT_4_REG_NUM     16
+#else
 #define RULE_EXT_4_REG_NUM     64
+#endif
 #define RULE_EXT_4_REG_INC     0x4
 #define RULE_EXT_4_REG_TYPE    REG_TYPE_RW
 #define RULE_EXT_4_REG_DEFAULT 0x0
@@ -655,7 +678,11 @@ union ipo_glb_bypass_counter_reg_u {
 /*[table] IPO_CNT_TBL*/
 #define IPO_CNT_TBL
 #define IPO_CNT_TBL_ADDRESS 0x74000
+#if defined(MPPE)
+#define IPO_CNT_TBL_NUM     128
+#else
 #define IPO_CNT_TBL_NUM     512
+#endif
 #define IPO_CNT_TBL_INC     0x10
 #define IPO_CNT_TBL_TYPE    REG_TYPE_RW
 #define IPO_CNT_TBL_DEFAULT 0x0
@@ -685,7 +712,11 @@ union ipo_cnt_tbl_u {
 /*[table] IPO_ACTION*/
 #define IPO_ACTION
 #define IPO_ACTION_ADDRESS 0x8000
+#if defined(MPPE)
+#define IPO_ACTION_NUM     128
+#else
 #define IPO_ACTION_NUM     512
+#endif
 #define IPO_ACTION_INC     0x20
 #define IPO_ACTION_TYPE    REG_TYPE_RW
 #define IPO_ACTION_DEFAULT 0x0
@@ -864,6 +895,23 @@ union ipo_cnt_tbl_u {
 	#define IPO_ACTION_METADATA_EN_OFFSET  145
 	#define IPO_ACTION_METADATA_EN_LEN     1
 	#define IPO_ACTION_METADATA_EN_DEFAULT 0x0
+	/*[field] DSCP_TC_MASK*/
+	#define IPO_ACTION_DSCP_TC_MASK
+	#define IPO_ACTION_DSCP_TC_MASK_OFFSET  146
+	#define IPO_ACTION_DSCP_TC_MASK_LEN     8
+	#define IPO_ACTION_DSCP_TC_MASK_DEFAULT 0x0
+	/*[field] QOS_RES_PREC*/
+	#define IPO_ACTION_QOS_RES_PREC
+	#define IPO_ACTION_QOS_RES_PREC_OFFSET  154
+	#define IPO_ACTION_QOS_RES_PREC_LEN     3
+	#define IPO_ACTION_QOS_RES_PREC_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] METADATA_PRI*/
+	#define IPO_ACTION_METADATA_PRI
+	#define IPO_ACTION_METADATA_PRI_OFFSET  157
+	#define IPO_ACTION_METADATA_PRI_LEN     4
+	#define IPO_ACTION_METADATA_PRI_DEFAULT 0x0
+#endif
 
 struct ipo_action {
 	a_uint32_t  dest_info_change_en:1;
@@ -906,11 +954,21 @@ struct ipo_action {
 	a_uint32_t  metadata_en:1;
 	a_uint32_t  dscp_tc_mask:8;
 	a_uint32_t  qos_res_prec:3;
+#if defined(MPPE)
+	a_uint32_t metadata_pri_0:3;
+	a_uint32_t metadata_pri_1:1;
+	a_uint32_t _reserved0:31;
+#else
 	a_uint32_t  _reserved0:3;
+#endif
 };
 
 union ipo_action_u {
+#if defined(MPPE)
+	a_uint32_t val[6];
+#else
 	a_uint32_t val[5];
+#endif
 	struct ipo_action bf;
 };
 

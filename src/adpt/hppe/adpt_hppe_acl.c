@@ -45,10 +45,19 @@
 #define ADPT_ACL_HPPE_IPV6_SIP2_RULE 11
 #define ADPT_ACL_HPPE_IPMISC_RULE 12
 
-#define ADPT_ACL_HW_LIST_NUM 64 /*hw list number*/
-#define ADPT_ACL_ENTRY_NUM_PER_LIST 8 /*hw rule entries number per hw list */
+#if defined(MPPE)
+#define ADPT_ACL_HW_LIST_NUM 16 /* hw list number */
+#else
+#define ADPT_ACL_HW_LIST_NUM 64
+#endif
+#define ADPT_ACL_ENTRY_NUM_PER_LIST 8 /* hw rule entries number per hw list */
+
 #if defined(APPE)
+#if defined(MPPE)
+#define ADPT_ACL_SW_LIST_NUM 256
+#else
 #define ADPT_ACL_SW_LIST_NUM 1024
+#endif
 #else
 #define ADPT_ACL_SW_LIST_NUM 512
 #endif

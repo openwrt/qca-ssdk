@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -167,7 +168,11 @@ union ipr_udf_profile_offset_u {
 /*[table] EG_IPO_EXT_TBL*/
 #define EG_IPO_EXT_TBL
 #define EG_IPO_EXT_TBL_ADDRESS 0x2c000
+#if defined(MPPE)
+#define EG_IPO_EXT_TBL_NUM     256
+#else
 #define EG_IPO_EXT_TBL_NUM     1024
+#endif
 #define EG_IPO_EXT_TBL_INC     0x10
 #define EG_IPO_EXT_TBL_TYPE    REG_TYPE_RW
 #define EG_IPO_EXT_TBL_DEFAULT 0x0
@@ -190,7 +195,11 @@ union eg_ipo_ext_tbl_u {
 /*[table] PRE_IPO_RULE_REG*/
 #define PRE_IPO_RULE_REG
 #define PRE_IPO_RULE_REG_ADDRESS 0x0
+#if defined(MPPE)
+#define PRE_IPO_RULE_REG_NUM     128
+#else
 #define PRE_IPO_RULE_REG_NUM     512
+#endif
 #define PRE_IPO_RULE_REG_INC     0x10
 #define PRE_IPO_RULE_REG_TYPE    REG_TYPE_RW
 #define PRE_IPO_RULE_REG_DEFAULT 0x0
@@ -269,7 +278,11 @@ union pre_ipo_rule_reg_u {
 /*[table] PRE_IPO_MASK_REG*/
 #define PRE_IPO_MASK_REG
 #define PRE_IPO_MASK_REG_ADDRESS 0x2000
+#if defined(MPPE)
+#define PRE_IPO_MASK_REG_NUM     128
+#else
 #define PRE_IPO_MASK_REG_NUM     512
+#endif
 #define PRE_IPO_MASK_REG_INC     0x10
 #define PRE_IPO_MASK_REG_TYPE    REG_TYPE_RW
 #define PRE_IPO_MASK_REG_DEFAULT 0x0
@@ -293,7 +306,11 @@ union pre_ipo_mask_reg_u {
 /*[register] PRE_IPO_RULE_EXT_1*/
 #define PRE_IPO_RULE_EXT_1
 #define PRE_IPO_RULE_EXT_1_ADDRESS 0x4000
+#if defined(MPPE)
+#define PRE_IPO_RULE_EXT_1_NUM     16
+#else
 #define PRE_IPO_RULE_EXT_1_NUM     64
+#endif
 #define PRE_IPO_RULE_EXT_1_INC     0x4
 #define PRE_IPO_RULE_EXT_1_TYPE    REG_TYPE_RW
 #define PRE_IPO_RULE_EXT_1_DEFAULT 0x0
@@ -334,7 +351,11 @@ union pre_ipo_rule_ext_1_u {
 /*[register] PRE_IPO_RULE_EXT_2*/
 #define PRE_IPO_RULE_EXT_2
 #define PRE_IPO_RULE_EXT_2_ADDRESS 0x4100
+#if defined(MPPE)
+#define PRE_IPO_RULE_EXT_2_NUM     16
+#else
 #define PRE_IPO_RULE_EXT_2_NUM     64
+#endif
 #define PRE_IPO_RULE_EXT_2_INC     0x4
 #define PRE_IPO_RULE_EXT_2_TYPE    REG_TYPE_RW
 #define PRE_IPO_RULE_EXT_2_DEFAULT 0x0
@@ -363,7 +384,11 @@ union pre_ipo_rule_ext_2_u {
 /*[register] PRE_IPO_RULE_EXT_4*/
 #define PRE_IPO_RULE_EXT_4
 #define PRE_IPO_RULE_EXT_4_ADDRESS 0x4200
+#if defined(MPPE)
+#define PRE_IPO_RULE_EXT_4_NUM     16
+#else
 #define PRE_IPO_RULE_EXT_4_NUM     64
+#endif
 #define PRE_IPO_RULE_EXT_4_INC     0x4
 #define PRE_IPO_RULE_EXT_4_TYPE    REG_TYPE_RW
 #define PRE_IPO_RULE_EXT_4_DEFAULT 0x0
@@ -518,7 +543,11 @@ union pre_ipo_glb_bypass_counter_u {
 /*[table] PRE_IPO_CNT_TBL*/
 #define PRE_IPO_CNT_TBL
 #define PRE_IPO_CNT_TBL_ADDRESS 0x76000
+#if defined(MPPE)
+#define PRE_IPO_CNT_TBL_NUM     128
+#else
 #define PRE_IPO_CNT_TBL_NUM     512
+#endif
 #define PRE_IPO_CNT_TBL_INC     0x10
 #define PRE_IPO_CNT_TBL_TYPE    REG_TYPE_RW
 #define PRE_IPO_CNT_TBL_DEFAULT 0x0
@@ -548,7 +577,11 @@ union pre_ipo_cnt_tbl_u {
 /*[table] PRE_IPO_ACTION*/
 #define PRE_IPO_ACTION
 #define PRE_IPO_ACTION_ADDRESS 0x8000
+#if defined(MPPE)
+#define PRE_IPO_ACTION_NUM     128
+#else
 #define PRE_IPO_ACTION_NUM     512
+#endif
 #define PRE_IPO_ACTION_INC     0x40
 #define PRE_IPO_ACTION_TYPE    REG_TYPE_RW
 #define PRE_IPO_ACTION_DEFAULT 0x0
@@ -772,6 +805,13 @@ union pre_ipo_cnt_tbl_u {
 	#define PRE_IPO_ACTION_LEARN_DIS_OFFSET  161
 	#define PRE_IPO_ACTION_LEARN_DIS_LEN     1
 	#define PRE_IPO_ACTION_LEARN_DIS_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] METADATA_PRI*/
+	#define IPO_ACTION_METADATA_PRI
+	#define IPO_ACTION_METADATA_PRI_OFFSET  162
+	#define IPO_ACTION_METADATA_PRI_LEN     4
+	#define IPO_ACTION_METADATA_PRI_DEFAULT 0x0
+#endif
 
 struct pre_ipo_action {
 	a_uint32_t  dest_info_change_en:1;
@@ -823,7 +863,12 @@ struct pre_ipo_action {
 	a_uint32_t  vpn_id_0:5;
 	a_uint32_t  vpn_id_1:1;
 	a_uint32_t  learn_dis:1;
+#if defined(MPPE)
+	a_uint32_t metadata_pri:4;
+	a_uint32_t  _reserved1:26;
+#else
 	a_uint32_t  _reserved1:30;
+#endif
 };
 
 union pre_ipo_action_u {

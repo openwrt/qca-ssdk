@@ -26,7 +26,7 @@
 #include "hsl_ptp.h"
 #include "qca808x_phy.h"
 
-#define QCA808X_PHY_DRIVER_NAME	"Qualcomm QCA8081"
+#define QCA808X_PHY_DRIVER_NAME	"QCA808X ethernet"
 
 #if defined(IN_LINUX_STD_PTP)
 #include <linux/ptp_clock_kernel.h>

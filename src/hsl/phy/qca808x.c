@@ -625,7 +625,7 @@ void qca808x_phy_remove(struct phy_device *phydev)
 struct phy_driver qca808x_phy_driver = {
 	.phy_id		= QCA8081_PHY_V1_1,
 	.phy_id_mask    = 0xffffff00,
-	.name		= "Qualcomm QCA8081",
+	.name		= QCA808X_PHY_DRIVER_NAME,
 	.features	= PHY_GBIT_FEATURES,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 	.flags		= PHY_HAS_INTERRUPT,

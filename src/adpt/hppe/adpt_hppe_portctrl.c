@@ -2012,10 +2012,10 @@ adpt_hppe_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	if(A_FALSE == _adpt_hppe_port_phy_connected(dev_id, port_id))
 	{
+		rv = _adpt_hppe_port_txfc_status_set(dev_id, port_id, enable);
+		SW_RTN_ON_ERROR(rv);
 		if(hsl_port_is_sfp(dev_id, port_id))
 		{
-			rv = _adpt_hppe_port_txfc_status_set(dev_id, port_id, enable);
-			SW_RTN_ON_ERROR(rv);
 			rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
 			SW_RTN_ON_ERROR(rv);
 			if(enable)
@@ -2092,10 +2092,10 @@ adpt_hppe_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	if(A_FALSE == _adpt_hppe_port_phy_connected(dev_id, port_id))
 	{
+		rv = _adpt_hppe_port_rxfc_status_set(dev_id, port_id, enable);
+		SW_RTN_ON_ERROR(rv);
 		if(hsl_port_is_sfp(dev_id, port_id))
 		{
-			rv = _adpt_hppe_port_rxfc_status_set(dev_id, port_id, enable);
-			SW_RTN_ON_ERROR(rv);
 			rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
 			SW_RTN_ON_ERROR(rv);
 			if(enable)

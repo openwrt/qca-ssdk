@@ -1,5 +1,6 @@
 /*
 * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+* Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 *
 * Permission to use, copy, modify, and/or distribute this software for any
 * purpose with or without fee is hereby granted, provided that the above
@@ -190,6 +191,27 @@ typedef struct {
 		fal_tunnel_overlay_type_t overlay_type;
 		fal_tunnel_program_type_t program_type;
 } fal_tunnel_udf_profile_entry_t;
+
+/* Tunnel UDP entry IP version */
+enum {
+	FAL_TUNNEL_IP_VER_V4 = 1,
+	FAL_TUNNEL_IP_VER_V6,
+	FAL_TUNNEL_IP_VER_V4_OR_V6,
+};
+
+/* Tunnel UDP entry UDP type */
+enum {
+	FAL_TUNNEL_L4_TYPE_UDP = 1,
+	FAL_TUNNEL_L4_TYPE_UDP_LITE,
+	FAL_TUNNEL_L4_TYPE_UDP_OR_UDP_LITE,
+};
+
+/* Tunnel UDP entry port type */
+enum {
+	FAL_TUNNEL_L4_PORT_TYPE_DST = 1,
+	FAL_TUNNEL_L4_PORT_TYPE_SRC,
+	FAL_TUNNEL_L4_PORT_TYPE_DST_OR_SRC,
+};
 
 /* tunnel udp entry */
 typedef struct {
@@ -443,6 +465,16 @@ typedef enum {
 	FAL_TUNNEL_INNER_RESERVED,
 } fal_tunnel_encap_payload_type_t;
 
+/* Tunnel encapsulation L4 proto type */
+enum {
+	FAL_TUNNEL_ENCAP_L4_PROTO_NONE = 0,
+	FAL_TUNNEL_ENCAP_L4_PROTO_TCP,
+	FAL_TUNNEL_ENCAP_L4_PROTO_UDP,
+	FAL_TUNNEL_ENCAP_L4_PROTO_UDP_LITE,
+	FAL_TUNNEL_ENCAP_L4_PROTO_ICMP,
+	FAL_TUNNEL_ENCAP_L4_PROTO_GRE,
+};
+
 #define FAL_TUNNEL_ENCAP_HEADER_MAX_LEN 128
 typedef struct {
 	fal_mac_addr_t smac_addr; /* source mac address */
@@ -552,6 +584,8 @@ typedef struct {
 	fal_tunnel_edit_rule_entry_t src3_entry[2];
 } fal_tunnel_encap_rule_t;
 
+#define FAL_TUNNEL_UDP_ENTROPY_SPORT_BASE	49152
+#define FAL_TUNNEL_UDP_ENTROPY_SPORT_MASK	0xffff
 typedef struct {
 	a_uint16_t ipv4_id_seed; /* used for pseudo random number generation */
 	a_uint16_t ipv4_df_set; /* 0 = Always 0, 1= Follow RFC7915, 2 = Always 1 */

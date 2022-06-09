@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -22,7 +25,9 @@
 #include "hsl_dev.h"
 #include "isisc_led.h"
 #include "isisc_reg.h"
-
+#ifdef MHT
+#include "mht_led.h"
+#endif
 #define MAX_LED_PATTERN_ID   2
 #define LED_PATTERN_ADDR     0x50
 
@@ -391,8 +396,20 @@ isisc_led_init(a_uint32_t dev_id)
         hsl_api_t *p_api;
 
         SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-        p_api->led_ctrl_pattern_set = isisc_led_ctrl_pattern_set;
-        p_api->led_ctrl_pattern_get = isisc_led_ctrl_pattern_get;
+
+#ifdef MHT
+        if(hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+        {
+            p_api->led_ctrl_source_set = mht_led_ctrl_source_set;
+            p_api->led_ctrl_pattern_set = mht_led_ctrl_pattern_set;
+            p_api->led_ctrl_pattern_get = mht_led_ctrl_pattern_get;
+        }
+        else
+#endif
+        {
+            p_api->led_ctrl_pattern_set = isisc_led_ctrl_pattern_set;
+            p_api->led_ctrl_pattern_get = isisc_led_ctrl_pattern_get;
+        }
     }
 #endif
 

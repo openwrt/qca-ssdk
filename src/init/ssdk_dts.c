@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1004,7 +1004,7 @@ static sw_error_t ssdk_dt_parse_access_mode(struct device_node *switch_node,
 	return SW_OK;
 
 }
-#if (defined(DESS) || defined(MP) || defined(APPE))
+#if (defined(DESS) || defined(MP) || defined(APPE) || defined(MHT))
 #ifdef IN_LED
 static void ssdk_dt_parse_led(struct device_node *switch_node,
 		ssdk_init_cfg *cfg)
@@ -1198,8 +1198,13 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 		SSDK_INFO("switch node is qca83xx!\n");
 	}
 	else if (of_device_is_compatible(switch_node, "qcom,ess-switch-qca8386")) {
+#ifdef MHT
 		/* manhattan chip */
 		SSDK_INFO("switch node is qca8386!\n");
+#ifdef IN_LED
+		ssdk_dt_parse_led(switch_node, cfg);
+#endif
+#endif
 	}
 	else {
 		SSDK_WARN("invalid compatible property\n");

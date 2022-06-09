@@ -31,6 +31,9 @@
 #include "ssdk_mht_clk.h"
 #include "mht_port_ctrl.h"
 #include "ref_port_ctrl.h"
+#ifdef IN_LED
+#include "ssdk_led.h"
+#endif
 
 static sw_error_t
 qca_mht_work_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0, a_uint32_t mac_mode1)
@@ -182,6 +185,10 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	ssdk_mht_gcc_clock_init(dev_id, work_mode, port_bmp);
 
 	ret = ssdk_mht_pinctrl_init(dev_id);
+	SW_RTN_ON_ERROR(ret);
+#ifdef IN_LED
+	ret = ssdk_led_init(dev_id, cfg);
+#endif
 
 	return ret;
 }

@@ -1405,6 +1405,15 @@ sw_error_t qca808x_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_id)
 
 	phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
+#ifdef MHT
+	/*power off PHY with traffic may cause PPE logic issue, so restart
+	 autoneg before power off phy to work around the issue*/
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+	{
+		rv = qca808x_phy_restart_autoneg(dev_id, phy_id);
+		SW_RTN_ON_ERROR (rv);
+	}
+#endif
 
 	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL,
 				     phy_data | QCA808X_CTRL_POWER_DOWN);

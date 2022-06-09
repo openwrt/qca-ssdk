@@ -67,12 +67,24 @@ sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 
 #if defined(IN_CTRLPKT)
 #define RFDB_PROFILE_ID_STP 31
+#define APPE_CPU_CODE_CTRL_NUM	256
 sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 {
 	fal_mac_addr_t mcast_mac_addr;
 	fal_ctrlpkt_action_t ctrlpkt_action;
 	fal_ctrlpkt_profile_t ctrlpkt_profile;
 	sw_error_t rv = SW_OK;
+#if defined(APPE)
+	a_uint32_t cpu_code = 0;
+
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		while (cpu_code < APPE_CPU_CODE_CTRL_NUM) {
+			rv = fal_mgmtctrl_tunnel_decap_set(dev_id, cpu_code, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+			cpu_code++;
+		}
+	}
+#endif
 
 	memset(&ctrlpkt_action, 0, sizeof(ctrlpkt_action));
 	memset(&ctrlpkt_profile, 0, sizeof(ctrlpkt_profile));

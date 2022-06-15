@@ -590,10 +590,8 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 
-	if(!ssdk_is_emulation(dev_id)) {
-		/* reset ppe */
-		ssdk_ppe_reset_init();
-	}
+	/* reset ppe */
+	ssdk_ppe_reset_init(dev_id);
 
 	rv = qca_switch_init(dev_id);
 	SW_RTN_ON_ERROR(rv);

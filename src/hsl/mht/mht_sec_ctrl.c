@@ -364,6 +364,32 @@ qca_mht_ptp_async_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t *src
 }
 #endif
 
+sw_error_t
+qca_mht_mem_ctrl_set(a_uint32_t dev_id, a_uint32_t dvs_value, a_uint32_t acc_value)
+{
+	a_uint32_t data = 0;
+
+	/*configure dvs value*/
+	data = qca_mht_mii_read(dev_id, MEM_CTRL_OFFSET);
+	data &= ~MHT_MEM_CTRL_DVS_MASK;
+
+	/*configure dvs value, for hw limit, the two bit need to be set one by one*/
+	if(dvs_value & BIT(MEM_CTRL_DVS_SA_RELAX_BOFFSET))
+	{
+		data |= BIT(MEM_CTRL_DVS_SA_RELAX_BOFFSET);
+		qca_mht_mii_write(dev_id, MEM_CTRL_OFFSET, data);
+	}
+	if(dvs_value & BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET))
+	{
+		data |= BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET);
+		qca_mht_mii_write(dev_id, MEM_CTRL_OFFSET, data);
+	}
+
+	/*configure acc value*/
+	qca_mht_mii_write(dev_id, MEM_ACC_0_OFFSET, acc_value);
+
+	return SW_OK;
+}
 /**
  * @}
  */

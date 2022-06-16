@@ -719,7 +719,14 @@ mht_interface_mac_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	/*get uniphy index*/
 	if(port_id == SSDK_PHYSICAL_PORT0)
+	{
+		/*for switch mode, the uniphy1 must be initialized firstly and initialized
+		only one time, so configure dvs and acc for memory before uniphy1 initialization*/
+		rv = qca_mht_mem_ctrl_set(dev_id, MHT_MEM_CTRL_DVS_SWITCH_MODE,
+			MHT_MEM_ACC_0_SWITCH_MODE);
+		SW_RTN_ON_ERROR (rv);
 		uniphy_index = MHT_UNIPHY_SGMII_1;
+	}
 	else if(port_id == SSDK_PHYSICAL_PORT5)
 		uniphy_index = MHT_UNIPHY_SGMII_0;
 	else

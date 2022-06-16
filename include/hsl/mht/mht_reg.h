@@ -669,6 +669,32 @@ extern "C" {
 #define PTP_MUX_EXT_RTC_REF_CLK_SEL_BLEN		1
 #define PTP_MUX_EXT_RTC_REF_CLK_SEL_FLAG		HSL_RW
 
+#define MEM_CTRL
+#define MEM_CTRL_OFFSET					0xC90F044
+#define MEM_CTRL_E_LENGTH				4
+#define MEM_CTRL_E_OFFSET				0
+#define MEM_CTRL_NR_E					1
+
+#define MEM_CTRL_DVS_SA_RELAX
+#define MEM_CTRL_DVS_SA_RELAX_BOFFSET			4
+#define MEM_CTRL_DVS_SA_RELAX_BLEN			1
+#define MEM_CTRL_DVS_SA_RELAX_FLAG			HSL_RW
+
+#define MEM_CTRL_DVS_RAWA_ASSERT
+#define MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET		5
+#define MEM_CTRL_DVS_RAWA_ASSERT_BLEN			1
+#define MEM_CTRL_DVS_RAWA_ASSERT_FLAG			HSL_RW
+
+#define MEM_ACC_0
+#define MEM_ACC_0_OFFSET				0xC90F048
+#define MEM_ACC_0_E_LENGTH				4
+#define MEM_ACC_0_E_OFFSET				0
+#define MEM_ACC_0_NR_E					1
+
+#define MEM_ACC_0_VALUE
+#define MEM_ACC_0_VALUE_BOFFSET				0
+#define MEM_ACC_0_VALUE_BLEN				32
+#define MEM_ACC_0_VALUE_FLAG				HSL_RW
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

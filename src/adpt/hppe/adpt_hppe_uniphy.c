@@ -714,7 +714,17 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 		return rv;
 	}
 #endif
-
+	if(uniphy_index == SSDK_UNIPHY_INSTANCE0)
+	{
+		/*set src as PHY mode*/
+		hppe_uniphy_reg_set(dev_id, UNIPHY_MISC_SOURCE_SELECTION_REG_OFFSET,
+			SSDK_UNIPHY_INSTANCE0, UNIPHY_MISC_SRC_PHY_MODE);
+		SW_RTN_ON_ERROR (rv);
+		/*configure as force mode for uniphy0 sgmii plus based on sgmii*/
+		rv = hppe_uniphy_channel0_force_speed_mode_set(dev_id, SSDK_UNIPHY_INSTANCE0,
+			UNIPHY_FORCE_SPEED_MODE_ENABLE);
+		SW_RTN_ON_ERROR (rv);
+	}
 	hppe_uniphy_reg_set(dev_id, UNIPHY_MISC2_REG_OFFSET,
 		uniphy_index, UNIPHY_MISC2_REG_SGMII_PLUS_MODE);
 	/*reset uniphy*/
@@ -750,11 +760,18 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 		UNIPHY_CH0_SGMII_MODE;
 	uniphy_mode_ctrl.bf.newaddedfromhere_sg_mode =
 		UNIPHY_SGMII_MODE_DISABLE;
-	uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
-		UNIPHY_SGMIIPLUS_MODE_ENABLE;
 	uniphy_mode_ctrl.bf.newaddedfromhere_xpcs_mode =
 		UNIPHY_XPCS_MODE_DISABLE;
-
+	if(uniphy_index == SSDK_UNIPHY_INSTANCE0)
+	{
+		uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
+			UNIPHY_SGMIIPLUS_MODE_DISABLE;
+	}
+	else
+	{
+		uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
+			UNIPHY_SGMIIPLUS_MODE_ENABLE;
+	}
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
 
 	/* configure uniphy gcc software reset */

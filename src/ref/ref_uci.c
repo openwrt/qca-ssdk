@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2013, 2015, 2017-2019, 2021, The Linux Foundation. All rights reserved.
- *
  * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -8802,6 +8802,21 @@ parse_acl_action_field(struct switch_ext *ext_value_p, fal_acl_rule_t *rule)
 		cmd_data_check_uint16((char*)ext_value_p->option_value,
 			&(tmpdata), sizeof(tmpdata));
 		rule->policy_id = tmpdata & 0xffff;
+	}
+#endif
+#if defined(MPPE)
+	else if(!strcmp(ext_value_p->option_name, "metadata_pri")) {
+		cmd_data_check_uint8((char*)ext_value_p->option_value,
+			&tmpdata, sizeof(tmpdata));
+		rule->metadata_pri = tmpdata & 0xf;
+	} else if(!strcmp(ext_value_p->option_name, "cookie_val")) {
+		cmd_data_check_uint16((char*)ext_value_p->option_value,
+			&(tmpdata), sizeof(tmpdata));
+		rule->cookie_val = tmpdata & 0xffff;
+	} else if(!strcmp(ext_value_p->option_name, "cookie_pri")) {
+		cmd_data_check_uint8((char*)ext_value_p->option_value,
+			&tmpdata, sizeof(tmpdata));
+		rule->cookie_pri = tmpdata & 0xf;
 	}
 #endif
 	return SW_OK;

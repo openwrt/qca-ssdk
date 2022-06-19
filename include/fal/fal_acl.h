@@ -720,6 +720,11 @@ typedef struct
 	/*new add acl rule fields for IPQ95xx*/
 	fal_acl_tunnel_info_t  tunnel_info; /*tunnel info fields*/
 	fal_acl_rule_field_t   inner_rule_field; /*tunnel inner packet rule fileds*/
+
+	/*new add acl action for IPQ53xx*/
+	a_uint8_t metadata_pri; /*metadata priority*/
+	a_uint16_t cookie_val; /*cookie vaule*/
+	a_uint8_t cookie_pri; /*cookie priority */
 } fal_acl_rule_t;
 
 

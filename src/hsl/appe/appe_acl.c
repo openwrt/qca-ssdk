@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -553,11 +552,12 @@ appe_eg_ipo_ext_tbl_get(
 {
 	if (index >= EG_IPO_EXT_TBL_MAX_ENTRY)
 		return SW_OUT_OF_RANGE;
-	return hppe_reg_get(
+	return hppe_reg_tbl_get(
 				dev_id,
 				NSS_PTX_CSR_BASE_ADDR + EG_IPO_EXT_TBL_ADDRESS + \
 				index * EG_IPO_EXT_TBL_INC,
-				&value->val);
+				value->val,
+				sizeof(union eg_ipo_ext_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -566,11 +566,12 @@ appe_eg_ipo_ext_tbl_set(
 		a_uint32_t index,
 		union eg_ipo_ext_tbl_u *value)
 {
-	return hppe_reg_set(
+	return hppe_reg_tbl_set(
 				dev_id,
 				NSS_PTX_CSR_BASE_ADDR + EG_IPO_EXT_TBL_ADDRESS + \
 				index * EG_IPO_EXT_TBL_INC,
-				value->val);
+				value->val,
+				sizeof(union eg_ipo_ext_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -603,6 +604,72 @@ appe_eg_ipo_ext_tbl_policy_id_set(
 	ret = appe_eg_ipo_ext_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+
+#if 0
+#if defined(MPPE)
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_ipo_ext_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_eg_ipo_ext_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.cookie;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_ipo_ext_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_eg_ipo_ext_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.cookie = value;
+	ret = appe_eg_ipo_ext_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_pri_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_ipo_ext_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_eg_ipo_ext_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.cookie_pri;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_pri_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_ipo_ext_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_eg_ipo_ext_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.cookie_pri = value;
+	ret = appe_eg_ipo_ext_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif
+#endif
 
 sw_error_t
 appe_pre_ipo_rule_reg_get(

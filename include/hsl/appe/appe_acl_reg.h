@@ -181,14 +181,35 @@ union ipr_udf_profile_offset_u {
 	#define EG_IPO_EXT_TBL_POLICY_ID_OFFSET  0
 	#define EG_IPO_EXT_TBL_POLICY_ID_LEN     16
 	#define EG_IPO_EXT_TBL_POLICY_ID_DEFAULT 0x0
-
+#if defined(MPPE)
+	/*[field] COOKIE*/
+	#define EG_IPO_EXT_TBL_COOKIE
+	#define EG_IPO_EXT_TBL_COOKIE_OFFSET  16
+	#define EG_IPO_EXT_TBL_COOKIE_LEN     16
+	#define EG_IPO_EXT_TBL_COOKIE_DEFAULT 0x0
+	/*[field] COOKIE_PRI*/
+	#define EG_IPO_EXT_TBL_COOKIE_PRI
+	#define EG_IPO_EXT_TBL_COOKIE_PRI_OFFSET  32
+	#define EG_IPO_EXT_TBL_COOKIE_PRI_LEN     4
+	#define EG_IPO_EXT_TBL_COOKIE_PRI_DEFAULT 0x0
+#endif
 struct eg_ipo_ext_tbl {
 	a_uint32_t  policy_id:16;
+#if defined(MPPE)
+	a_uint32_t  cookie:16;
+	a_uint32_t  cookie_pri:4;
+	a_uint32_t  _reserved0:28;
+#else
 	a_uint32_t  _reserved0:16;
+#endif
 };
 
 union eg_ipo_ext_tbl_u {
-	a_uint32_t val;
+#if defined(MPPE)
+	a_uint32_t val[2];
+#else
+	a_uint32_t val[1];
+#endif
 	struct eg_ipo_ext_tbl bf;
 };
 

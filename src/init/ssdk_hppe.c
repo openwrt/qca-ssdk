@@ -730,8 +730,11 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 	chip_ver = adpt_hppe_chip_revision_get(dev_id);
 
 	for (i = 0; i <  HPPE_BM_PORT_NUM; i++) {
-		/* enable fc */
-		fal_port_bm_ctrl_set(0, i, A_TRUE);
+		/*disable fc for phy ports and enable fc for port 0 and port 7*/
+		if(i >= HPPE_BM_PHY_PORT_OFFSET && i <= HPPE_BM_PHY_PORT6_OFFSET)
+			fal_port_bm_ctrl_set(0, i, A_FALSE);
+		else
+			fal_port_bm_ctrl_set(0, i, A_TRUE);
 		/* map to group 0 */
 		fal_port_bufgroup_map_set(0, i, 0);
 	}

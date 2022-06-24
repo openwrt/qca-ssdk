@@ -2985,6 +2985,10 @@ static sw_error_t
 _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 {
 	a_uint32_t port_id = 0;
+	a_uint32_t chip_type = 0, chip_ver = 0;
+
+	chip_type = adpt_chip_type_get(dev_id);
+	chip_ver = adpt_chip_revision_get(dev_id);
 
 	for(port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT5; port_id++)
 	{
@@ -3024,7 +3028,22 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 			}
 			*mode0 = PORT_WRAPPER_QSGMII;
 		}
-
+#if defined(APPE)
+		if (chip_type == CHIP_APPE && chip_ver == APPE_REVISION) {
+			if(port_interface_mode[dev_id][port_id] == PORT_UQXGMII)
+			{
+				if((*mode0 != PORT_WRAPPER_MAX && *mode0 != PORT_WRAPPER_UQXGMII) ||
+					port_id == SSDK_PHYSICAL_PORT5)
+				{
+					SSDK_ERROR("when the port_interface_mode of port %d is %d, "
+						"mode0:%d cannot be supported\n",
+						port_id, port_interface_mode[dev_id][port_id], *mode0);
+					return SW_NOT_SUPPORTED;
+				}
+				*mode0 = PORT_WRAPPER_UQXGMII;
+			}
+		}
+#endif
 		if(port_interface_mode[dev_id][port_id] == PHY_SGMII_BASET ||
 			port_interface_mode[dev_id][port_id] == PORT_SGMII_FIBER)
 		{

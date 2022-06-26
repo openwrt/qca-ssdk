@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -92,7 +93,7 @@ appe_egress_vp_tbl_get(
 				NSS_PTX_CSR_BASE_ADDR + EG_VP_TBL_ADDRESS + \
 				index * EG_VP_TBL_INC,
 				value->val,
-				2);
+				sizeof(union eg_vp_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -106,7 +107,7 @@ appe_egress_vp_tbl_set(
 				NSS_PTX_CSR_BASE_ADDR + EG_VP_TBL_ADDRESS + \
 				index * EG_VP_TBL_INC,
 				value->val,
-				2);
+				sizeof(union eg_vp_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -1277,6 +1278,198 @@ appe_eg_vp_tbl_port_def_cvid_set(
 	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+
+#if 0
+#if defined(MPPE)
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_insert_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_insert;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_insert_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_insert = value;
+	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_ver_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_ver;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_ver_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_ver = value;
+	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_default_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_default_type;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_default_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_default_type = value;
+	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_port_bitmap_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_port_bitmap_1 << 6 | \
+		reg_val.bf.ath_port_bitmap_0;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_port_bitmap_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_port_bitmap_1 = value >> 6;
+	reg_val.bf.ath_port_bitmap_0 = value & (((a_uint64_t)1<<6)-1);
+	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_disable_bit_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_disable_bit;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_disable_bit_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_disable_bit = value;
+	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_from_cpu_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_from_cpu;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_from_cpu_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_vp_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_egress_vp_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_from_cpu = value;
+	ret = appe_egress_vp_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif
+#endif
 
 sw_error_t
 appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_get(

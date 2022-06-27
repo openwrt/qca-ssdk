@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1134,3 +1135,69 @@ appe_tl_map_lpm_act_src_info_valid_set(
 	ret = appe_tl_map_lpm_act_set(dev_id, index, &reg_val);
 	return ret;
 }
+
+#if 0
+#if defined(MPPE)
+sw_error_t
+mppe_tl_map_lpm_act_service_code_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union tl_map_lpm_act_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_map_lpm_act_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.service_code;
+	return ret;
+}
+
+sw_error_t
+mppe_tl_map_lpm_act_service_code_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union tl_map_lpm_act_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_map_lpm_act_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.service_code = value;
+	ret = appe_tl_map_lpm_act_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_tl_map_lpm_act_service_code_en_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union tl_map_lpm_act_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_map_lpm_act_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.service_code_en;
+	return ret;
+}
+
+sw_error_t
+mppe_tl_map_lpm_act_service_code_en_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union tl_map_lpm_act_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = appe_tl_map_lpm_act_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.service_code_en = value;
+	ret = appe_tl_map_lpm_act_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif
+#endif

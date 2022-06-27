@@ -201,6 +201,10 @@ adpt_mapt_decap_entry_convert(fal_mapt_decap_entry_t *mapt_entry, a_bool_t to_hs
 		tl_map_act->bf.src_info_type = mapt_entry->src_info_type;
 		tl_map_act->bf.src_info = mapt_entry->src_info;
 		tl_map_act->bf.exp_profile = mapt_entry->exp_profile;
+#if defined(MPPE)
+		tl_map_act->bf.service_code = mapt_entry->service_code;
+		tl_map_act->bf.service_code_en = mapt_entry->service_code_en;
+#endif
 	} else {
 		mapt_entry->ip6_addr.ul[3] = tl_map_lpm->bf.ipv6_addr_0;
 		mapt_entry->ip6_addr.ul[2] = tl_map_lpm->bf.ipv6_addr_1;
@@ -235,6 +239,10 @@ adpt_mapt_decap_entry_convert(fal_mapt_decap_entry_t *mapt_entry, a_bool_t to_hs
 		mapt_entry->src_info_type = tl_map_act->bf.src_info_type;
 		mapt_entry->src_info = tl_map_act->bf.src_info;
 		mapt_entry->exp_profile = tl_map_act->bf.exp_profile;
+#if defined(MPPE)
+		mapt_entry->service_code = tl_map_act->bf.service_code;
+		mapt_entry->service_code_en = tl_map_act->bf.service_code_en;
+#endif
 	}
 
 	return rv;

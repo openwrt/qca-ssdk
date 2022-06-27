@@ -18763,6 +18763,18 @@ cmd_data_check_mapt_decap_entry(char *cmd_str, void *arg_val, a_uint32_t size)
 			cmd_data_check_uint32, (cmd, &tmp,
 				sizeof(a_uint32_t)));
 	entry.exp_profile = tmp;
+#if defined(MPPE)
+	rv = __cmd_data_check_boolean("service_code_en", "no",
+			"usage: <yes/no/y/n>\n",
+			cmd_data_check_confirm, A_FALSE, &(entry.service_code_en),
+			sizeof (a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+
+	cmd_data_check_element("service_code", "0",
+		"usage: updated service code\n",
+		cmd_data_check_uint32, (cmd, &tmp, sizeof(a_uint32_t)));
+		entry.service_code = tmp;
+#endif
 
 	*(fal_mapt_decap_entry_t *)arg_val = entry;
 

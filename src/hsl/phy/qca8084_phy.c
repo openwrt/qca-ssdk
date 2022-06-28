@@ -185,6 +185,9 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 	switch (interface_mode) {
 		case PORT_UQXGMII:
 			SSDK_INFO("configure manhattan phy as PORT_UQXGMII\n");
+			rv = qca_mht_mem_ctrl_set(dev_id, MHT_MEM_CTRL_DVS_PHY_MODE,
+				MHT_MEM_ACC_0_PHY_MODE);
+			SW_RTN_ON_ERROR (rv);
 			/*the work mode is PORT_UQXGMII in default*/
 			rv = mht_interface_uqxgmii_mode_set(dev_id);
 			SW_RTN_ON_ERROR (rv);

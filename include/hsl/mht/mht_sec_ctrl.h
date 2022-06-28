@@ -51,6 +51,17 @@ typedef enum {
 #define MHT_WORK_MODE_MASK \
 	(BITS(WORK_MODE_PHY0_SEL_BOFFSET, WORK_MODE_PORT5_SEL_BOFFSET + 1))
 
+#define MHT_MEM_CTRL_DVS_MASK \
+	(BITS(MEM_CTRL_DVS_SA_RELAX_BOFFSET, MEM_CTRL_DVS_SA_RELAX_BLEN+1))
+
+#define MHT_MEM_CTRL_DVS_PHY_MODE \
+	(BIT(MEM_CTRL_DVS_SA_RELAX_BOFFSET) | BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET))
+#define MHT_MEM_CTRL_DVS_SWITCH_MODE \
+	BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET)
+
+#define MHT_MEM_ACC_0_SWITCH_MODE				0x000c0c0c
+#define MHT_MEM_ACC_0_PHY_MODE					0
+
 sw_error_t
 qca_mht_work_mode_set(a_uint32_t dev_id, mht_work_mode_t work_mode);
 
@@ -86,6 +97,9 @@ qca_mht_ptp_async_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t src_
 sw_error_t
 qca_mht_ptp_async_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t *src_id);
 #endif
+
+sw_error_t
+qca_mht_mem_ctrl_set(a_uint32_t dev_id, a_uint32_t dvs_value, a_uint32_t acc_value);
 
 #ifdef __cplusplus
 }

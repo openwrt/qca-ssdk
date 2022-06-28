@@ -17,9 +17,9 @@
 #include "ref_vsi.h"
 #include "ssdk_init.h"
 #include "ssdk_plat.h"
+#include "adpt.h"
 
 #define PPE_VSI_MAX FAL_VSI_MAX
-#define PPE_VSI_RESERVE_MAX 6
 
 static ref_vsi_t ref_vsi_mapping[SW_MAX_NR_DEV][PPE_VSI_MAX+1] ={{{0, 0, {0},NULL},
 								{0, 0, {0}, NULL},
@@ -485,7 +485,7 @@ sw_error_t ppe_vsi_alloc(a_uint32_t dev_id, a_uint32_t *vsi)
 	REF_NULL_POINT_CHECK(vsi);
 	SSDK_DEBUG("requesting vsi\n");
 
-	for( vsi_id = PPE_VSI_RESERVE_MAX+1; vsi_id <= PPE_VSI_MAX; vsi_id++ )
+	for( vsi_id = 0; vsi_id <= PPE_VSI_MAX; vsi_id++ )
 	{
 		if(ref_vsi_mapping[dev_id][vsi_id].valid == 0)
 		{
@@ -517,7 +517,7 @@ sw_error_t ppe_vsi_free(a_uint32_t dev_id, a_uint32_t vsi_id)
 	ref_vlan_info_t *p_vsi_info = NULL;
 	REF_DEV_ID_CHECK(dev_id);
 
-	if( vsi_id <= PPE_VSI_RESERVE_MAX || vsi_id > PPE_VSI_MAX )
+	if(vsi_id > PPE_VSI_MAX)
 		return SW_OUT_OF_RANGE;
 
 	p_vsi_info = ref_vsi_mapping[dev_id][vsi_id].pHead;
@@ -561,10 +561,19 @@ sw_error_t ppe_vsi_init(a_uint32_t dev_id)
 	fal_vsi_newaddr_lrn_t newaddr_lrn = {0};
 	fal_vsi_stamove_t stamove = {0};
 
+	/*ppe_port_vlan_vsi_set/get need to use ppe_vlan_vsi_lock*/
+	aos_lock_init(&ppe_vlan_vsi_lock[dev_id]);
+
 	newaddr_lrn.action = 0;
 	newaddr_lrn.lrn_en = 1;
 	stamove.action = 0;
 	stamove.stamove_en = 1;
+
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+		return SW_OK;
+#endif
+
 	for(port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT7; port_id++)
 	{
 		ppe_init_one_vsi(dev_id, default_pport_vsi[port_id-1]);
@@ -573,8 +582,6 @@ sw_error_t ppe_vsi_init(a_uint32_t dev_id)
 		/*fal_port_vsi_set(0, port_id, default_port_vsi[port_id-1]);*/
 		ppe_port_vsi_set(dev_id, port_id, default_pport_vsi[port_id-1]);
 	}
-
-	aos_lock_init(&ppe_vlan_vsi_lock[dev_id]);
 
 	return SW_OK;
 }

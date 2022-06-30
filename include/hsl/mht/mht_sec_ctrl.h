@@ -62,6 +62,12 @@ typedef enum {
 #define MHT_MEM_ACC_0_SWITCH_MODE				0x000c0c0c
 #define MHT_MEM_ACC_0_PHY_MODE					0
 
+#define MHT_SKU_MASK						0xfffff
+#define MHT_SKU_8082						0x1dc
+#define MHT_SKU_8084						0x1dd
+#define MHT_SKU_8085						0x1de
+#define MHT_SKU_8386						0x1df
+
 sw_error_t
 qca_mht_work_mode_set(a_uint32_t dev_id, mht_work_mode_t work_mode);
 
@@ -101,6 +107,14 @@ qca_mht_ptp_async_get(a_uint32_t dev_id, a_uint32_t mht_port_id, a_uint32_t *src
 sw_error_t
 qca_mht_mem_ctrl_set(a_uint32_t dev_id, a_uint32_t dvs_value, a_uint32_t acc_value);
 
+a_bool_t
+qca_mht_sku_check(a_uint32_t dev_id, a_uint32_t mht_sku);
+
+a_bool_t
+qca_mht_sku_uniphy_enabled(a_uint32_t dev_id, a_uint32_t uniphy_index);
+
+a_bool_t
+qca_mht_sku_switch_core_enabled(a_uint32_t dev_id);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -166,6 +166,11 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	mht_work_mode_t work_mode;
 	a_uint32_t port_bmp = 0;
 
+	if(!qca_mht_sku_switch_core_enabled(dev_id))
+	{
+		SSDK_ERROR("MHT switch core is not enabled on the SKU\n");
+		return SW_NOT_SUPPORTED;
+	}
 	qca_mht_switch_reset(dev_id);
 
 	ret = qca_mht_work_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);

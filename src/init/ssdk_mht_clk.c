@@ -1107,7 +1107,7 @@ void ssdk_mht_gcc_common_clk_parent_enable(a_uint32_t dev_id, mht_work_mode_t cl
 	ssdk_mht_clk_parent_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_P_XO);
 	ssdk_mht_clk_rate_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_SYS_CLK_RATE_25M);
 	/* Disable serdes0 clock to save power in phy mode */
-	if (MHT_PHY_UQXGMII_MODE == clk_mode || MHT_PHY_SGMII_UQXGMII_MODE == clk_mode)
+	if (MHT_PHY_UQXGMII_MODE == clk_mode)
 		ssdk_mht_clk_disable(dev_id, MHT_SRDS0_SYS_CLK);
 	else
 		ssdk_mht_clk_enable(dev_id, MHT_SRDS0_SYS_CLK);

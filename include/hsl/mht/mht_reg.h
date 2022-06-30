@@ -695,6 +695,12 @@ extern "C" {
 #define MEM_ACC_0_VALUE_BOFFSET				0
 #define MEM_ACC_0_VALUE_BLEN				32
 #define MEM_ACC_0_VALUE_FLAG				HSL_RW
+
+#define QFPROM_RAW_PTE_ROW0_LSB
+#define QFPROM_RAW_PTE_ROW0_LSB_OFFSET			0xC900000
+#define QFPROM_RAW_PTE_ROW0_LSB_E_LENGTH		4
+#define QFPROM_RAW_PTE_ROW0_LSB_E_OFFSET		0
+#define QFPROM_RAW_PTE_ROW0_LSB_NR_E			1
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

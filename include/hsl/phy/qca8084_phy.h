@@ -49,8 +49,15 @@
 #define QCA8084_PHY_8023AZ_EEE_2500BT                                    0x1
 #define QCA8084_PHY_MMD7_IPG_10_EN                                       0
 #define QCA8084_PHY_MMD7_IPG_11_EN                                       0x1
+/*DEBUG port register*/
+#define QCA8084_PHY_CONTROL_DEBUG_REGISTER0                              0x1f
+#define QCA8084_PHY_CONTROL_DEBUG_REGISTER0_VAL                          0x308
 /*DEBUG port analog register*/
 #define QCA8084_PHY_DEBUG_ANA_INTERFACE_CLK_SEL                          0x8b80
+#define QCA8084_PHY_AFE25_CMN_6_MII                                      0x380
+#define QCA8084_PHY_AFE25_CMN_6_MII_VAL                                  0x1640
+#define QCA8084_PHY_AFE25_CMN_9_MII                                      0x680
+#define QCA8084_PHY_AFE25_CMN_9_MII_VAL                                  0xc
 
 typedef enum {
 	ADC_RISING = 0,

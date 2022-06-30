@@ -390,6 +390,50 @@ qca_mht_mem_ctrl_set(a_uint32_t dev_id, a_uint32_t dvs_value, a_uint32_t acc_val
 
 	return SW_OK;
 }
+
+a_bool_t
+qca_mht_sku_check(a_uint32_t dev_id, a_uint32_t mht_sku)
+{
+	a_uint32_t data = 0, sku_value = 0;
+
+	/*fuse register need use lower mdio clock to read*/
+	ssdk_miibus_freq_set(dev_id, 0xff);
+	data = qca_mht_mii_read(dev_id, QFPROM_RAW_PTE_ROW0_LSB_OFFSET);
+	/*after read fuse, need recovery the mdio clock*/
+	ssdk_miibus_freq_set(dev_id, 0xf);
+
+	sku_value = data & MHT_SKU_MASK;
+	SSDK_DEBUG("MHT SKU is 0x%x\n", sku_value);
+	if(mht_sku == sku_value)
+		return A_TRUE;
+
+	return A_FALSE;
+}
+
+a_bool_t
+qca_mht_sku_uniphy_enabled(a_uint32_t dev_id, a_uint32_t uniphy_index)
+{
+	if(qca_mht_sku_check(dev_id, MHT_SKU_8082) ||
+		qca_mht_sku_check(dev_id, MHT_SKU_8084) ||
+		qca_mht_sku_check(dev_id, MHT_SKU_8085))
+	{
+		if(uniphy_index == MHT_UNIPHY_SGMII_0)
+			return A_FALSE;
+	}
+
+	return A_TRUE;;
+}
+
+a_bool_t
+qca_mht_sku_switch_core_enabled(a_uint32_t dev_id)
+{
+	if(qca_mht_sku_check(dev_id, MHT_SKU_8082) ||
+		qca_mht_sku_check(dev_id, MHT_SKU_8084) ||
+		qca_mht_sku_check(dev_id, MHT_SKU_8085))
+		return A_FALSE;
+
+	return A_TRUE;
+}
 /**
  * @}
  */

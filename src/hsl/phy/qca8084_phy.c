@@ -174,17 +174,50 @@ qca8084_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	return rv;
 }
 
+static sw_error_t
+qca8084_phy_pll_disable(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = qca808x_phy_debug_write( dev_id, phy_addr,
+		QCA8084_PHY_CONTROL_DEBUG_REGISTER0,
+		QCA8084_PHY_CONTROL_DEBUG_REGISTER0_VAL);
+	SW_RTN_ON_ERROR(rv);
+	rv = qca808x_phy_debug_write( dev_id, phy_addr,
+		QCA8084_PHY_AFE25_CMN_6_MII, QCA8084_PHY_AFE25_CMN_6_MII_VAL);
+	SW_RTN_ON_ERROR(rv);
+	rv = qca808x_phy_debug_write( dev_id, phy_addr,
+		QCA8084_PHY_AFE25_CMN_9_MII, QCA8084_PHY_AFE25_CMN_9_MII_VAL);
+
+	return rv;
+}
+
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 		fal_port_interface_mode_t interface_mode)
 {
 	sw_error_t rv = SW_OK;
 	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
-	a_uint32_t port_id  = 0;
+	a_uint32_t port_id  = 0, mht_port_id = 0, phy_addr = 0;
 
 	switch (interface_mode) {
 		case PORT_UQXGMII:
 			SSDK_INFO("configure manhattan phy as PORT_UQXGMII\n");
+			if(qca_mht_sku_check(dev_id, MHT_SKU_8082))
+			{
+				/*for qca8082, mht port 1, 2 is disabled, so need power down and
+					disable below PLL to save power*/
+				for(mht_port_id = SSDK_PHYSICAL_PORT1;
+					mht_port_id <= SSDK_PHYSICAL_PORT2; mht_port_id++)
+				{
+					rv = qca_mht_ephy_addr_get(dev_id, mht_port_id, &phy_addr);
+					SW_RTN_ON_ERROR(rv);
+					rv = qca808x_phy_poweroff(dev_id, phy_addr);
+					SW_RTN_ON_ERROR(rv);
+					rv = qca8084_phy_pll_disable(dev_id, phy_addr);
+					SW_RTN_ON_ERROR(rv);
+				}
+			}
 			rv = qca_mht_mem_ctrl_set(dev_id, MHT_MEM_CTRL_DVS_PHY_MODE,
 				MHT_MEM_ACC_0_PHY_MODE);
 			SW_RTN_ON_ERROR (rv);
@@ -206,8 +239,11 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 			break;
 		case PHY_SGMII_BASET:
 		case PORT_SGMII_PLUS:
-			SSDK_INFO("configure manhattan work mode:PHY_SGMII_USXGMII_MODE,"
-				"interface_mode:%d\n", interface_mode);
+			if(!qca_mht_sku_uniphy_enabled(dev_id, MHT_UNIPHY_SGMII_0))
+			{
+				SSDK_ERROR("MHT uniphy 0 is not enabled on the sku\n");
+				return SW_NOT_SUPPORTED;
+			}
 			/*need to configure work mode as MHT_PHY_SGMII_USXGMII_MODE*/
 			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);
 			SW_RTN_ON_ERROR (rv);

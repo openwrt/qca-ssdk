@@ -1664,8 +1664,17 @@ ssdk_plat_exit(a_uint32_t dev_id)
 /*qca808x_end*/
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
 	if (reg_mode == HSL_REG_LOCAL_BUS) {
+		struct clk *cmn_clk = NULL;
+
 		iounmap(qca_phy_priv_global[dev_id]->hw_addr);
+		cmn_clk = ssdk_dts_cmnclk_get(dev_id);
+		if (!IS_ERR(cmn_clk)) {
+#if defined(HPPE) || defined(MP)
+			ssdk_gcc_clock_exit();
+#endif
+		}
 	}
+
 #ifdef DESS
 	reg_mode = ssdk_psgmii_reg_access_mode_get(dev_id);
 	if (reg_mode == HSL_REG_LOCAL_BUS) {

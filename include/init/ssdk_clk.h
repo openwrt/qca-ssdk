@@ -345,6 +345,7 @@ void
 qca_gcc_uniphy_port_clock_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
                                 a_uint32_t port_id, a_bool_t enable);
 void ssdk_gcc_clock_init(void);
+void ssdk_gcc_clock_exit(void);
 void
 ssdk_port_speed_clock_set(
 	a_uint32_t dev_id,

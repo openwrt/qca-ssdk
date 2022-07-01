@@ -2600,9 +2600,12 @@ adpt_hppe_port_speed_change_mac_reset(a_uint32_t dev_id, a_uint32_t port_id)
 		uniphy_index = SSDK_UNIPHY_INSTANCE1;
 	} else if (port_id == HPPE_MUX_PORT2) {
 		uniphy_index = SSDK_UNIPHY_INSTANCE2;
+	} else if (port_id == SSDK_PHYSICAL_PORT1) {
+		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 	} else {
 		return SW_OK;
 	}
+
 	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
 	if (mode == PORT_WRAPPER_USXGMII) {
 		ssdk_port_mac_clock_reset(dev_id, port_id);
@@ -2644,6 +2647,8 @@ adpt_hppe_port_interface_mode_switch_mac_reset(a_uint32_t dev_id,
 		uniphy_index = SSDK_UNIPHY_INSTANCE1;
 	} else if (port_id == HPPE_MUX_PORT2) {
 		uniphy_index = SSDK_UNIPHY_INSTANCE2;
+	} else if (port_id == SSDK_PHYSICAL_PORT1) {
+		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 	} else {
 		return SW_OK;
 	}
@@ -2924,7 +2929,7 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 				_adpt_hppe_port_interface_mode_set(dev_id, port_id, PORT_UQXGMII);
 			}
 			break;
-#if defined(MPPE)
+#if defined(APPE)
 		case PORT_WRAPPER_USXGMII:
 			if(port_id == SSDK_PHYSICAL_PORT1)
 			{
@@ -3078,10 +3083,16 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 					{
 						*mode0 = PORT_WRAPPER_SGMII_FIBER;
 					}
-					else
+					else if (port_interface_mode[dev_id][port_id] == PHY_SGMII_BASET)
 					{
 						*mode0 = PORT_WRAPPER_SGMII_CHANNEL0;
 					}
+#if defined(APPE)
+					else if (port_interface_mode[dev_id][port_id] == PORT_USXGMII)
+					{
+						*mode0 = PORT_WRAPPER_USXGMII;
+					}
+#endif
 					break;
 				case SSDK_PHYSICAL_PORT2:
 					*mode0 = PORT_WRAPPER_SGMII_CHANNEL1;
@@ -3377,6 +3388,13 @@ _adpt_hppe_port_phy_config(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
 					SSDK_PHYSICAL_PORT6, PORT_USXGMII);
 			}
+#if defined(APPE)
+			if(index == SSDK_UNIPHY_INSTANCE0)
+			{
+				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
+					SSDK_PHYSICAL_PORT1, PORT_USXGMII);
+			}
+#endif
 			break;
 		case PORT_WRAPPER_SGMII_PLUS:
 #ifdef CPPE

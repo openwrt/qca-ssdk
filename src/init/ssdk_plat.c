@@ -116,6 +116,7 @@
 #ifdef IN_LINUX_STD_PTP
 #include "hsl_ptp.h"
 #endif
+
 /*qca808x_start*/
 
 extern struct qca_phy_priv **qca_phy_priv_global;
@@ -556,6 +557,11 @@ u16 qca_phy_mmd_read(u32 dev_id, u32 phy_id,
 	return value;
 }
 /*qca808x_end*/
+
+#if defined(SSDK_PCIE_BUS)
+extern u32 ppe_mem_read(u32 reg);
+extern void ppe_mem_write(u32 reg, u32 val);
+#endif
 sw_error_t
 qca_switch_reg_read(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len)
 {
@@ -567,7 +573,13 @@ qca_switch_reg_read(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t * reg_data
 	if ((reg_addr%4)!= 0)
 	return SW_BAD_PARAM;
 
-	reg_val = readl(qca_phy_priv_global[dev_id]->hw_addr + reg_addr);
+#if defined(SSDK_PCIE_BUS)
+	if (HSL_REG_PCIE_BUS == ssdk_switch_reg_access_mode_get(dev_id)) {
+		uint32_t pcie_base = ssdk_switch_pcie_base_get(dev_id);
+		reg_val = ppe_mem_read(pcie_base + reg_addr);
+	} else
+#endif
+		reg_val = readl(qca_phy_priv_global[dev_id]->hw_addr + reg_addr);
 
 	aos_mem_copy(reg_data, &reg_val, sizeof (a_uint32_t));
 	return 0;
@@ -584,7 +596,14 @@ qca_switch_reg_write(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t * reg_dat
 	return SW_BAD_PARAM;
 
 	aos_mem_copy(&reg_val, reg_data, sizeof (a_uint32_t));
-	writel(reg_val, qca_phy_priv_global[dev_id]->hw_addr + reg_addr);
+
+#if defined(SSDK_PCIE_BUS)
+	if (HSL_REG_PCIE_BUS == ssdk_switch_reg_access_mode_get(dev_id)) {
+		uint32_t pcie_base = ssdk_switch_pcie_base_get(dev_id);
+		ppe_mem_write(pcie_base + reg_addr, reg_val);
+	} else
+#endif
+		writel(reg_val, qca_phy_priv_global[dev_id]->hw_addr + reg_addr);
 	return 0;
 }
 

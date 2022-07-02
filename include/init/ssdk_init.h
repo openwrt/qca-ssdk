@@ -70,6 +70,7 @@ extern "C" {
     {
         HSL_REG_MDIO = 0,
         HSL_REG_LOCAL_BUS,
+        HSL_REG_PCIE_BUS,
     } hsl_reg_mode;
 
     typedef sw_error_t

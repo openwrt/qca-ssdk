@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -112,6 +112,7 @@ typedef struct
 	a_bool_t is_emulation;
 	a_uint32_t emu_chip_ver; /*only valid when is_emulation is true*/
 	a_uint32_t clk_mode;
+	a_uint32_t pcie_hw_base;
 } ssdk_dt_cfg;
 
 #define SSDK_MAX_NR_ETH 6
@@ -162,6 +163,7 @@ struct mii_bus *
 ssdk_dts_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
 hsl_reg_mode ssdk_switch_reg_access_mode_get(a_uint32_t dev_id);
 void ssdk_switch_reg_map_info_get(a_uint32_t dev_id, ssdk_reg_map_info *info);
+a_uint32_t ssdk_switch_pcie_base_get(a_uint32_t dev_id);
 #ifdef DESS
 hsl_reg_mode ssdk_psgmii_reg_access_mode_get(a_uint32_t dev_id);
 void ssdk_psgmii_reg_map_info_get(a_uint32_t dev_id, ssdk_reg_map_info *info);

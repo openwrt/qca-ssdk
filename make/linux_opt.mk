@@ -259,6 +259,10 @@ ifeq (TRUE, $(IN_TUNNEL_PROGRAM))
   MODULE_CFLAG += -DIN_TUNNEL_PROGRAM
 endif
 
+ifeq (TRUE, $(IN_ATHTAG))
+  MODULE_CFLAG += -DIN_ATHTAG
+endif
+
 ifneq (TRUE, $(FAL))
   MODULE_CFLAG += -DHSL_STANDALONG
 endif
@@ -373,6 +377,7 @@ ifneq (,$(findstring APPE, $(SUPPORT_CHIP)))
 endif
 
 ifneq (,$(findstring MPPE, $(SUPPORT_CHIP)))
+  MODULE_INC   += -I$(PRJ_PATH)/include/hsl/mppe
   MODULE_CFLAG += -DMPPE
 endif
 

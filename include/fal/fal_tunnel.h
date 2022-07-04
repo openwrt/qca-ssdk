@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2021, The Linux Foundation. All rights reserved.
-* Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
-*
-* Permission to use, copy, modify, and/or distribute this software for any
-* purpose with or without fee is hereby granted, provided that the above
-* copyright notice and this permission notice appear in all copies.
-*
-* THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-* WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-* MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-* ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-* WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-* ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
 
 /**
@@ -575,6 +575,9 @@ typedef struct {
 	a_uint32_t rt_tlid_index; /*tunnel id from the index of vp or l3_if by getnext cmd */
 	a_uint32_t rt_tunnel_id; /*tunnel id returned by getnext cmd */
 	fal_tunnel_encap_header_t pkt_header; /* packet header data for egress */
+	/* new add for ipq53xx */
+	a_bool_t mapt_udp_csm0_keep; /* keep udp checksum if original ipv4 udp checksum is zero
+					for mapt */
 } fal_tunnel_encap_cfg_t;
 
 #define FAL_TUNNEL_ENCAP_SRC1_DATA_WORD_START	1

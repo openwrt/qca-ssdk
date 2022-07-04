@@ -1827,6 +1827,9 @@ adpt_appe_tunnel_encap_entry_add(a_uint32_t dev_id,
 	eg_xlat_tun_ctrl.bf.payload_type = tunnel_encap_cfg->payload_inner_type;
 	eg_xlat_tun_ctrl.bf.output_vp_valid = tunnel_encap_cfg->vport_en;
 	eg_xlat_tun_ctrl.bf.output_vp= tunnel_encap_cfg->vport;
+#if defined(MPPE)
+	eg_xlat_tun_ctrl.bf.mapt_udp_csm0_dis = tunnel_encap_cfg->mapt_udp_csm0_keep;
+#endif
 
 	aos_mem_copy(eg_header_data.val, tunnel_encap_cfg->pkt_header.pkt_header_data,
 			sizeof(union eg_header_data_u));
@@ -1913,6 +1916,9 @@ adpt_appe_tunnel_encap_entry_get(a_uint32_t dev_id,
 	tunnel_encap_cfg->payload_inner_type = eg_xlat_tun_ctrl.bf.payload_type;
 	tunnel_encap_cfg->vport_en = eg_xlat_tun_ctrl.bf.output_vp_valid;
 	tunnel_encap_cfg->vport = eg_xlat_tun_ctrl.bf.output_vp;
+#if defined(MPPE)
+	tunnel_encap_cfg->mapt_udp_csm0_keep = eg_xlat_tun_ctrl.bf.mapt_udp_csm0_dis;
+#endif
 
 	aos_mem_copy(tunnel_encap_cfg->pkt_header.pkt_header_data, eg_header_data.val,
 			sizeof(union eg_header_data_u));

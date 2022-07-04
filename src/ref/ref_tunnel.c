@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -158,6 +159,9 @@ static const char *tunnel_encapentry[] = {
 	"pppoe_en",
 	"vport_en",
 	"cpu_vport",
+#if defined(MPPE)
+	"mapt_udp_csm0_keep",
+#endif
 	"eg_header_data",
 };
 

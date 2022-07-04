@@ -18080,7 +18080,13 @@ cmd_data_check_tunnel_encap_entry(char *cmd_str, fal_tunnel_encap_cfg_t *arg_val
 			"usage:  virtual port carried to cpu\n",
 			cmd_data_check_uint32, (cmd, &tmp, sizeof(a_uint32_t)));
 	entry.vport = tmp;
-
+#if defined(MPPE)
+	rv = __cmd_data_check_boolean("mapt_udp_csm0_keep", "no",
+			"usage: <yes/no/y/n>\n",
+			cmd_data_check_confirm, A_FALSE, &(entry.mapt_udp_csm0_keep),
+			sizeof (a_bool_t));
+	SW_RTN_ON_ERROR(rv);
+#endif
 	do {
 		cmd = get_sub_cmd("eg_header_data", "0x0");
 		SW_RTN_ON_NULL_PARAM(cmd);

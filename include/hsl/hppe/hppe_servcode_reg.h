@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -142,6 +145,38 @@ union in_l2_service_tbl_u {
 	#define EG_SERVICE_TBL_TX_COUNTING_EN_OFFSET  47
 	#define EG_SERVICE_TBL_TX_COUNTING_EN_LEN     1
 	#define EG_SERVICE_TBL_TX_COUNTING_EN_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] IP_LENGTH_UPDATE*/
+	#define EG_SERVICE_TBL_IP_LENGTH_UPDATE
+	#define EG_SERVICE_TBL_IP_LENGTH_UPDATE_OFFSET  48
+	#define EG_SERVICE_TBL_IP_LENGTH_UPDATE_LEN     1
+	#define EG_SERVICE_TBL_IP_LENGTH_UPDATE_DEFAULT 0x0
+	/*[field] ATH_HDR_INSERT_DIS*/
+	#define EG_SERVICE_TBL_ATH_HDR_INSERT_DIS
+	#define EG_SERVICE_TBL_ATH_HDR_INSERT_DIS_OFFSET  49
+	#define EG_SERVICE_TBL_ATH_HDR_INSERT_DIS_LEN     1
+	#define EG_SERVICE_TBL_ATH_HDR_INSERT_DIS_DEFAULT 0x0
+	/*[field] ATH_HDR_TYPE*/
+	#define EG_SERVICE_TBL_ATH_HDR_TYPE
+	#define EG_SERVICE_TBL_ATH_HDR_TYPE_OFFSET  50
+	#define EG_SERVICE_TBL_ATH_HDR_TYPE_LEN     3
+	#define EG_SERVICE_TBL_ATH_HDR_TYPE_DEFAULT 0x0
+	/*[field] ATH_FROM_CPU*/
+	#define EG_SERVICE_TBL_ATH_FROM_CPU
+	#define EG_SERVICE_TBL_ATH_FROM_CPU_OFFSET  53
+	#define EG_SERVICE_TBL_ATH_FROM_CPU_LEN     1
+	#define EG_SERVICE_TBL_ATH_FROM_CPU_DEFAULT 0x0
+	/*[field] ATH_DISABLE_BIT*/
+	#define EG_SERVICE_TBL_ATH_DISABLE_BIT
+	#define EG_SERVICE_TBL_ATH_DISABLE_BIT_OFFSET  54
+	#define EG_SERVICE_TBL_ATH_DISABLE_BIT_LEN     1
+	#define EG_SERVICE_TBL_ATH_DISABLE_BIT_DEFAULT 0x0
+	/*[field] ATH_PORT_BITMAP*/
+	#define EG_SERVICE_TBL_ATH_PORT_BITMAP
+	#define EG_SERVICE_TBL_ATH_PORT_BITMAP_OFFSET  55
+	#define EG_SERVICE_TBL_ATH_PORT_BITMAP_LEN     7
+	#define EG_SERVICE_TBL_ATH_PORT_BITMAP_DEFAULT 0x0
+#endif
 
 struct eg_service_tbl {
 	a_uint32_t  field_update_action:32;
@@ -149,7 +184,17 @@ struct eg_service_tbl {
 	a_uint32_t  hw_services:6;
 	a_uint32_t  offset_sel:1;
 	a_uint32_t  tx_counting_en:1;
+#if defined(MPPE)
+	a_uint32_t  ip_length_update:1;
+	a_uint32_t  ath_hdr_insert_dis:1;
+	a_uint32_t  ath_hdr_type:3;
+	a_uint32_t  ath_from_cpu:1;
+	a_uint32_t  ath_disable_bit:1;
+	a_uint32_t  ath_port_bitmap:7;
+	a_uint32_t  _reserved0:2;
+#else
 	a_uint32_t  _reserved0:16;
+#endif
 };
 
 union eg_service_tbl_u {

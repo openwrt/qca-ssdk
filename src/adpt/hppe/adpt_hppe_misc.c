@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2017, 2019, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -499,7 +501,7 @@ char *dropcode[] = {
 };
 
 static sw_error_t
-adpt_hppe_debug_counter_set(void)
+adpt_hppe_debug_counter_set(a_uint32_t dev_id)
 {
 	union vlan_cnt_tbl_u vlan_cnt_tbl = {0};
 	union pre_l2_cnt_tbl_u pre_l2_cnt_tbl = {0};
@@ -520,77 +522,77 @@ adpt_hppe_debug_counter_set(void)
 
 	/* clear PRX DROP_CNT */
 	for (i = 0; i < DROP_CNT_MAX_ENTRY; i++)
-		hppe_drop_cnt_drop_cnt_set(0, i, 0);
+		hppe_drop_cnt_drop_cnt_set(dev_id, i, 0);
 
 	/* clear PRX DROP_PKT_STAT */
 	for (i = 0; i < DROP_PKT_STAT_MAX_ENTRY; i++) {
-		hppe_drop_stat_pkts_set(0, i, 0);
-		hppe_drop_stat_bytes_set(0, i, 0);
+		hppe_drop_stat_pkts_set(dev_id, i, 0);
+		hppe_drop_stat_bytes_set(dev_id, i, 0);
 	}
 
 	/* clear IPR_PKT_NUM */
 	for (i = 0; i < IPR_PKT_NUM_TBL_REG_MAX_ENTRY; i++) {
-		hppe_ipr_pkt_num_tbl_reg_packets_set(0, i, 0);
-		hppe_ipr_byte_low_reg_reg_bytes_set(0, i, 0);
-		hppe_ipr_byte_high_reg_bytes_set(0, i, 0);
+		hppe_ipr_pkt_num_tbl_reg_packets_set(dev_id, i, 0);
+		hppe_ipr_byte_low_reg_reg_bytes_set(dev_id, i, 0);
+		hppe_ipr_byte_high_reg_bytes_set(dev_id, i, 0);
 	}
 
 	/* clear VLAN_CNT_TBL */
 	for (i = 0; i < VLAN_CNT_TBL_MAX_ENTRY; i++)
-		hppe_vlan_cnt_tbl_set(0, i, &vlan_cnt_tbl);
+		hppe_vlan_cnt_tbl_set(dev_id, i, &vlan_cnt_tbl);
 
 	/* clear PRE_L2_CNT_TBL */
 	for (i = 0; i < PRE_L2_CNT_TBL_MAX_ENTRY; i++)
-		hppe_pre_l2_cnt_tbl_set(0, i, &pre_l2_cnt_tbl);
+		hppe_pre_l2_cnt_tbl_set(dev_id, i, &pre_l2_cnt_tbl);
 
 	/* clear PORT_TX_DROP_CNT_TBL */
 	for (i = 0; i < PORT_TX_DROP_CNT_TBL_MAX_ENTRY; i++)
-		hppe_port_tx_drop_cnt_tbl_set(0, i, &port_tx_drop_cnt_tbl);
+		hppe_port_tx_drop_cnt_tbl_set(dev_id, i, &port_tx_drop_cnt_tbl);
 
 	/* clear EG_VSI_COUNTER_TBL */
 	for (i = 0; i < EG_VSI_COUNTER_TBL_MAX_ENTRY; i++)
-		hppe_eg_vsi_counter_tbl_set(0, i, &eg_vsi_counter_tbl);
+		hppe_eg_vsi_counter_tbl_set(dev_id, i, &eg_vsi_counter_tbl);
 
 	/* clear PORT_TX_COUNTER_TBL */
 	for (i = 0; i < PORT_TX_COUNTER_TBL_REG_MAX_ENTRY; i++)
-		hppe_port_tx_counter_tbl_reg_set(0, i, &port_tx_counter_tbl);
+		hppe_port_tx_counter_tbl_reg_set(dev_id, i, &port_tx_counter_tbl);
 
 	/* clear VP_TX_COUNTER_TBL */
 	for (i = 0; i < VP_TX_COUNTER_TBL_REG_MAX_ENTRY; i++)
-		hppe_vp_tx_counter_tbl_reg_set(0, i, &vp_tx_counter_tbl);
+		hppe_vp_tx_counter_tbl_reg_set(dev_id, i, &vp_tx_counter_tbl);
 
 	/* clear QUEUE_TX_COUNTER_TBL */
 	for (i = 0; i < QUEUE_TX_COUNTER_TBL_MAX_ENTRY; i++)
-		hppe_queue_tx_counter_tbl_set(0, i, &queue_tx_counter_tbl);
+		hppe_queue_tx_counter_tbl_set(dev_id, i, &queue_tx_counter_tbl);
 
 	/* clear EPE_DBG_IN_CNT & EPE_DBG_OUT_CNT */
-	hppe_epe_dbg_in_cnt_reg_set(0, &epe_dbg_in_cnt);
-	hppe_epe_dbg_out_cnt_reg_set(0, &epe_dbg_out_cnt);
+	hppe_epe_dbg_in_cnt_reg_set(dev_id, &epe_dbg_in_cnt);
+	hppe_epe_dbg_out_cnt_reg_set(dev_id, &epe_dbg_out_cnt);
 
 	/* clear VP_TX_DROP_CNT_TBL */
 	for (i = 0; i < VP_TX_DROP_CNT_TBL_MAX_ENTRY; i++)
-		hppe_vp_tx_drop_cnt_tbl_set(0, i, &vp_tx_drop_cnt_tbl);
+		hppe_vp_tx_drop_cnt_tbl_set(dev_id, i, &vp_tx_drop_cnt_tbl);
 
 	/* clear DROP_CPU_CNT_TBL */
 	for (i = 0; i < DROP_CPU_CNT_TBL_MAX_ENTRY; i++)
-		hppe_drop_cpu_cnt_tbl_set(0, i, &drop_cpu_cnt_tbl);
+		hppe_drop_cpu_cnt_tbl_set(dev_id, i, &drop_cpu_cnt_tbl);
 
 #ifdef APPE
-	if(adpt_chip_type_get (0) == CHIP_APPE)
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
 	{
 		/* clear VP_RX_COUNTER_TBL and VP_RX_DROP_CNT_TBL */
 		for (i = 0; i < PORT_RX_CNT_TBL_NUM; i++)
-			appe_port_rx_cnt_tbl_set (0, i, &port_rx_cnt_tbl);
+			appe_port_rx_cnt_tbl_set (dev_id, i, &port_rx_cnt_tbl);
 		/* clear PORT_RX_COUNTER_TBL and PORT_RX_DROP_CNT_TBL */
 		for (i = 0; i < PHY_PORT_RX_CNT_TBL_NUM; i++)
-			appe_phy_port_rx_cnt_tbl_set (0, i, &phy_port_rx_cnt_tbl);
+			appe_phy_port_rx_cnt_tbl_set (dev_id, i, &phy_port_rx_cnt_tbl);
 	}
 #endif
 	return SW_OK;
 }
 
 static void
-adpt_hppe_debug_prx_drop_cnt_get(void)
+adpt_hppe_debug_prx_drop_cnt_get(a_uint32_t dev_id)
 {
 	a_uint32_t value;
 	int i, tags, sign;
@@ -599,7 +601,7 @@ adpt_hppe_debug_prx_drop_cnt_get(void)
 	printk("%-35s", "PRX_DROP_CNT RX:");
 	for (i = 0; i < DROP_CNT_MAX_ENTRY; i++)
 	{
-		hppe_drop_cnt_drop_cnt_get(0, i, &value);
+		hppe_drop_cnt_drop_cnt_get(dev_id, i, &value);
 		if (value > 0)
 		{
 			if (sign) {
@@ -616,7 +618,7 @@ adpt_hppe_debug_prx_drop_cnt_get(void)
 }
 
 static void
-adpt_hppe_debug_prx_drop_pkt_stat_get(a_bool_t show_type)
+adpt_hppe_debug_prx_drop_pkt_stat_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	a_uint32_t value32;
 	a_uint64_t value;
@@ -628,11 +630,11 @@ adpt_hppe_debug_prx_drop_pkt_stat_get(a_bool_t show_type)
 	{
 		if (show_type == A_FALSE)
 		{
-			hppe_drop_stat_pkts_get(0, i, &value32);
+			hppe_drop_stat_pkts_get(dev_id, i, &value32);
 			value = (a_uint64_t)value32;
 		}
 		else
-			hppe_drop_stat_bytes_get(0, i, &value);
+			hppe_drop_stat_bytes_get(dev_id, i, &value);
 		if (value > 0)
 		{
 			if (sign) {
@@ -649,7 +651,7 @@ adpt_hppe_debug_prx_drop_pkt_stat_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_ipx_pkt_num_get(a_bool_t show_type)
+adpt_hppe_debug_ipx_pkt_num_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union ipr_pkt_num_tbl_reg_u ipr_pkt_num_tbl_reg;
 	union ipr_byte_low_reg_reg_u ipr_byte_low_reg;
@@ -661,9 +663,9 @@ adpt_hppe_debug_ipx_pkt_num_get(a_bool_t show_type)
 	printk("%-35s", "IPR_PKT_NUM RX:");
 	for (i = 0; i < IPR_PKT_NUM_TBL_REG_MAX_ENTRY; i++)
 	{
-		hppe_ipr_pkt_num_tbl_reg_get(0, i, &ipr_pkt_num_tbl_reg);
-		hppe_ipr_byte_low_reg_reg_get(0, i, &ipr_byte_low_reg);
-		hppe_ipr_byte_high_reg_get(0, i, &ipr_byte_high_reg);
+		hppe_ipr_pkt_num_tbl_reg_get(dev_id, i, &ipr_pkt_num_tbl_reg);
+		hppe_ipr_byte_low_reg_reg_get(dev_id, i, &ipr_byte_low_reg);
+		hppe_ipr_byte_high_reg_get(dev_id, i, &ipr_byte_high_reg);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)ipr_pkt_num_tbl_reg.bf.packets;
 		else
@@ -685,7 +687,7 @@ adpt_hppe_debug_ipx_pkt_num_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_vlan_counter_get(a_bool_t show_type)
+adpt_hppe_debug_vlan_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union vlan_cnt_tbl_u vlan_cnt_tbl;
 	a_uint64_t value;
@@ -695,7 +697,7 @@ adpt_hppe_debug_vlan_counter_get(a_bool_t show_type)
 	printk("%-35s", "VLAN_CNT_TBL RX:");
 	for (i = 0; i < VLAN_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_vlan_cnt_tbl_get(0, i, &vlan_cnt_tbl);
+		hppe_vlan_cnt_tbl_get(dev_id, i, &vlan_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)vlan_cnt_tbl.bf.rx_pkt_cnt;
 		else
@@ -716,7 +718,7 @@ adpt_hppe_debug_vlan_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_pre_l2_counter_get(a_bool_t show_type)
+adpt_hppe_debug_pre_l2_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union pre_l2_cnt_tbl_u pre_l2_cnt_tbl;
 	a_uint64_t value;
@@ -726,7 +728,7 @@ adpt_hppe_debug_pre_l2_counter_get(a_bool_t show_type)
 	printk("%-35s", "PRE_L2_CNT_TBL RX:");
 	for (i = 0; i < PRE_L2_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_pre_l2_cnt_tbl_get(0, i, &pre_l2_cnt_tbl);
+		hppe_pre_l2_cnt_tbl_get(dev_id, i, &pre_l2_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)pre_l2_cnt_tbl.bf.rx_pkt_cnt;
 		else
@@ -749,7 +751,7 @@ adpt_hppe_debug_pre_l2_counter_get(a_bool_t show_type)
 	printk("%-35s", "PRE_L2_CNT_TBL RX_DROP:");
 	for (i = 0; i < PRE_L2_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_pre_l2_cnt_tbl_get(0, i, &pre_l2_cnt_tbl);
+		hppe_pre_l2_cnt_tbl_get(dev_id, i, &pre_l2_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = pre_l2_cnt_tbl.bf.rx_drop_pkt_cnt_0 | ((a_uint64_t)pre_l2_cnt_tbl.bf.rx_drop_pkt_cnt_1 << 24);
 		else
@@ -769,7 +771,7 @@ adpt_hppe_debug_pre_l2_counter_get(a_bool_t show_type)
 	printk(KERN_CONT "\n");
 }
 
-static void adpt_hppe_debug_port_tx_drop_counter_get(a_bool_t show_type)
+static void adpt_hppe_debug_port_tx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union port_tx_drop_cnt_tbl_u port_tx_drop_cnt_tbl;
 	a_uint64_t value;
@@ -779,7 +781,7 @@ static void adpt_hppe_debug_port_tx_drop_counter_get(a_bool_t show_type)
 	printk("%-35s", "PORT_TX_DROP_CNT_TBL TX_DROP:");
 	for (i = 0; i < PORT_TX_DROP_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_port_tx_drop_cnt_tbl_get(0, i, &port_tx_drop_cnt_tbl);
+		hppe_port_tx_drop_cnt_tbl_get(dev_id, i, &port_tx_drop_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)port_tx_drop_cnt_tbl.bf.tx_drop_pkt_cnt;
 		else
@@ -800,7 +802,7 @@ static void adpt_hppe_debug_port_tx_drop_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_eg_vsi_counter_get(a_bool_t show_type)
+adpt_hppe_debug_eg_vsi_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union eg_vsi_counter_tbl_u eg_vsi_counter_tbl;
 	a_uint64_t value;
@@ -810,7 +812,7 @@ adpt_hppe_debug_eg_vsi_counter_get(a_bool_t show_type)
 	printk("%-35s", "EG_VSI_COUNTER_TBL TX:");
 	for (i = 0; i < EG_VSI_COUNTER_TBL_MAX_ENTRY; i++)
 	{
-		hppe_eg_vsi_counter_tbl_get(0, i, &eg_vsi_counter_tbl);
+		hppe_eg_vsi_counter_tbl_get(dev_id, i, &eg_vsi_counter_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)eg_vsi_counter_tbl.bf.tx_packets;
 		else
@@ -831,7 +833,7 @@ adpt_hppe_debug_eg_vsi_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_port_tx_counter_get(a_bool_t show_type)
+adpt_hppe_debug_port_tx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union port_tx_counter_tbl_reg_u port_tx_counter_tbl;
 	a_uint64_t value;
@@ -841,7 +843,7 @@ adpt_hppe_debug_port_tx_counter_get(a_bool_t show_type)
 	printk("%-35s", "PORT_TX_COUNTER_TBL TX:");
 	for (i = 0; i < PORT_TX_COUNTER_TBL_REG_MAX_ENTRY; i++)
 	{
-		hppe_port_tx_counter_tbl_reg_get(0, i, &port_tx_counter_tbl);
+		hppe_port_tx_counter_tbl_reg_get(dev_id, i, &port_tx_counter_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)port_tx_counter_tbl.bf.tx_packets;
 		else
@@ -862,7 +864,7 @@ adpt_hppe_debug_port_tx_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_vp_tx_counter_get(a_bool_t show_type)
+adpt_hppe_debug_vp_tx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union vp_tx_counter_tbl_reg_u vp_tx_counter_tbl;
 	a_uint64_t value;
@@ -872,7 +874,7 @@ adpt_hppe_debug_vp_tx_counter_get(a_bool_t show_type)
 	printk("%-35s", "VP_TX_COUNTER_TBL TX:");
 	for (i = 0; i < VP_TX_COUNTER_TBL_REG_MAX_ENTRY; i++)
 	{
-		hppe_vp_tx_counter_tbl_reg_get(0, i, &vp_tx_counter_tbl);
+		hppe_vp_tx_counter_tbl_reg_get(dev_id, i, &vp_tx_counter_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)vp_tx_counter_tbl.bf.tx_packets;
 		else
@@ -893,7 +895,7 @@ adpt_hppe_debug_vp_tx_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_queue_tx_counter_get(a_bool_t show_type)
+adpt_hppe_debug_queue_tx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union queue_tx_counter_tbl_u queue_tx_counter_tbl;
 	a_uint64_t value;
@@ -903,7 +905,7 @@ adpt_hppe_debug_queue_tx_counter_get(a_bool_t show_type)
 	printk("%-35s", "QUEUE_TX_COUNTER_TBL TX:");
 	for (i = 0; i < QUEUE_TX_COUNTER_TBL_MAX_ENTRY; i++)
 	{
-		hppe_queue_tx_counter_tbl_get(0, i, &queue_tx_counter_tbl);
+		hppe_queue_tx_counter_tbl_get(dev_id, i, &queue_tx_counter_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)queue_tx_counter_tbl.bf.tx_packets;
 		else
@@ -924,7 +926,7 @@ adpt_hppe_debug_queue_tx_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_vp_tx_drop_counter_get(a_bool_t show_type)
+adpt_hppe_debug_vp_tx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union vp_tx_drop_cnt_tbl_u vp_tx_drop_cnt_tbl;
 	a_uint64_t value;
@@ -934,7 +936,7 @@ adpt_hppe_debug_vp_tx_drop_counter_get(a_bool_t show_type)
 	printk("%-35s", "VP_TX_DROP_CNT_TBL TX_DROP:");
 	for (i = 0; i < VP_TX_DROP_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_vp_tx_drop_cnt_tbl_get(0, i, &vp_tx_drop_cnt_tbl);
+		hppe_vp_tx_drop_cnt_tbl_get(dev_id, i, &vp_tx_drop_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)vp_tx_drop_cnt_tbl.bf.tx_drop_pkt_cnt;
 		else
@@ -955,7 +957,7 @@ adpt_hppe_debug_vp_tx_drop_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_cpu_code_counter_get(a_bool_t show_type)
+adpt_hppe_debug_cpu_code_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union drop_cpu_cnt_tbl_u drop_cpu_cnt_tbl;
 	a_uint64_t value;
@@ -965,7 +967,7 @@ adpt_hppe_debug_cpu_code_counter_get(a_bool_t show_type)
 	printk("%-35s", "CPU_CODE_CNT_TBL:");
 	for (i = 0; i < CPU_CODE_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_drop_cpu_cnt_tbl_get(0, i, &drop_cpu_cnt_tbl);
+		hppe_drop_cpu_cnt_tbl_get(dev_id, i, &drop_cpu_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)drop_cpu_cnt_tbl.bf.pkt_cnt;
 		else
@@ -1010,7 +1012,7 @@ adpt_hppe_debug_cpu_code_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_hppe_debug_drop_cpu_counter_get(a_bool_t show_type)
+adpt_hppe_debug_drop_cpu_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	union drop_cpu_cnt_tbl_u drop_cpu_cnt_tbl;
 	a_uint64_t value;
@@ -1020,7 +1022,7 @@ adpt_hppe_debug_drop_cpu_counter_get(a_bool_t show_type)
 	printk("%-35s", "DROP_CPU_CNT_TBL:");
 	for (i = CPU_CODE_CNT_TBL_MAX_ENTRY; i < DROP_CPU_CNT_TBL_MAX_ENTRY; i++)
 	{
-		hppe_drop_cpu_cnt_tbl_get(0, i, &drop_cpu_cnt_tbl);
+		hppe_drop_cpu_cnt_tbl_get(dev_id, i, &drop_cpu_cnt_tbl);
 		if (show_type == A_FALSE)
 			value = (a_uint64_t)drop_cpu_cnt_tbl.bf.pkt_cnt;
 		else
@@ -1037,7 +1039,7 @@ adpt_hppe_debug_drop_cpu_counter_get(a_bool_t show_type)
 
 #ifdef APPE
 static void
-adpt_appe_debug_vp_rx_counter_get(a_bool_t show_type)
+adpt_appe_debug_vp_rx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	a_uint64_t rx_value;
 	int i, tags, sign;
@@ -1047,9 +1049,9 @@ adpt_appe_debug_vp_rx_counter_get(a_bool_t show_type)
 	for (i = 0; i < PORT_RX_CNT_TBL_NUM; i++)
 	{
 		if (show_type == A_FALSE)
-			appe_port_rx_cnt_tbl_rx_pkt_cnt_get(0, i, (a_uint32_t*)(&rx_value));
+			appe_port_rx_cnt_tbl_rx_pkt_cnt_get(dev_id, i, (a_uint32_t*)(&rx_value));
 		else
-			appe_port_rx_cnt_tbl_rx_byte_cnt_get(0, i, &rx_value);
+			appe_port_rx_cnt_tbl_rx_byte_cnt_get(dev_id, i, &rx_value);
 		if (rx_value > 0)
 		{
 			if (sign) {
@@ -1066,7 +1068,7 @@ adpt_appe_debug_vp_rx_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_appe_debug_vp_rx_drop_counter_get(a_bool_t show_type)
+adpt_appe_debug_vp_rx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	a_uint64_t rx_value;
 	int i, tags, sign;
@@ -1076,9 +1078,10 @@ adpt_appe_debug_vp_rx_drop_counter_get(a_bool_t show_type)
 	for (i = 0; i < PORT_RX_CNT_TBL_NUM; i++)
 	{
 		if (show_type == A_FALSE)
-			appe_port_rx_cnt_tbl_rx_drop_pkt_cnt_get(0, i, (a_uint32_t*)(&rx_value));
+			appe_port_rx_cnt_tbl_rx_drop_pkt_cnt_get(dev_id, i,
+					(a_uint32_t*)(&rx_value));
 		else
-			appe_port_rx_cnt_tbl_rx_drop_byte_cnt_get(0, i, &rx_value);
+			appe_port_rx_cnt_tbl_rx_drop_byte_cnt_get(dev_id, i, &rx_value);
 		if (rx_value > 0)
 		{
 			if (sign) {
@@ -1095,7 +1098,7 @@ adpt_appe_debug_vp_rx_drop_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_appe_debug_port_rx_counter_get(a_bool_t show_type)
+adpt_appe_debug_port_rx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	a_uint64_t rx_value;
 	int i, tags, sign;
@@ -1105,9 +1108,10 @@ adpt_appe_debug_port_rx_counter_get(a_bool_t show_type)
 	for (i = 0; i < PHY_PORT_RX_CNT_TBL_NUM; i++)
 	{
 		if (show_type == A_FALSE)
-			appe_phy_port_rx_cnt_tbl_rx_pkt_cnt_get(0, i, (a_uint32_t*)(&rx_value));
+			appe_phy_port_rx_cnt_tbl_rx_pkt_cnt_get(dev_id, i,
+					(a_uint32_t*)(&rx_value));
 		else
-			appe_phy_port_rx_cnt_tbl_rx_byte_cnt_get(0, i, &rx_value);
+			appe_phy_port_rx_cnt_tbl_rx_byte_cnt_get(dev_id, i, &rx_value);
 		if (rx_value > 0)
 		{
 			if (sign) {
@@ -1124,7 +1128,7 @@ adpt_appe_debug_port_rx_counter_get(a_bool_t show_type)
 }
 
 static void
-adpt_appe_debug_port_rx_drop_counter_get(a_bool_t show_type)
+adpt_appe_debug_port_rx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	a_uint64_t rx_value;
 	int i, tags, sign;
@@ -1134,10 +1138,10 @@ adpt_appe_debug_port_rx_drop_counter_get(a_bool_t show_type)
 	for (i = 0; i < PHY_PORT_RX_CNT_TBL_NUM; i++)
 	{
 		if (show_type == A_FALSE)
-			appe_phy_port_rx_cnt_tbl_rx_drop_pkt_cnt_get(0, i,
+			appe_phy_port_rx_cnt_tbl_rx_drop_pkt_cnt_get(dev_id, i,
 				(a_uint32_t*)(&rx_value));
 		else
-			appe_phy_port_rx_cnt_tbl_rx_drop_byte_cnt_get(0, i,
+			appe_phy_port_rx_cnt_tbl_rx_drop_byte_cnt_get(dev_id, i,
 				&rx_value);
 		if (rx_value > 0)
 		{
@@ -1159,57 +1163,57 @@ adpt_appe_debug_port_rx_drop_counter_get(a_bool_t show_type)
  * if show_type = A_TRUE, show bytes.
  */
 static sw_error_t
-adpt_hppe_debug_counter_get(a_bool_t show_type)
+adpt_hppe_debug_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
 	/* show PRX DROP_CNT */
-	adpt_hppe_debug_prx_drop_cnt_get();
+	adpt_hppe_debug_prx_drop_cnt_get(dev_id);
 
 	/* show PRX DROP_PKT_STAT */
-	adpt_hppe_debug_prx_drop_pkt_stat_get(show_type);
+	adpt_hppe_debug_prx_drop_pkt_stat_get(dev_id, show_type);
 
 	/* show IPR_PKT_NUM */
-	adpt_hppe_debug_ipx_pkt_num_get(show_type);
+	adpt_hppe_debug_ipx_pkt_num_get(dev_id, show_type);
 
 	/* show VLAN_CNT_TBL */
-	adpt_hppe_debug_vlan_counter_get(show_type);
+	adpt_hppe_debug_vlan_counter_get(dev_id, show_type);
 
 	/* show PRE_L2_CNT_TBL */
-	adpt_hppe_debug_pre_l2_counter_get(show_type);
+	adpt_hppe_debug_pre_l2_counter_get(dev_id, show_type);
 
 	/* show PORT_TX_DROP_CNT_TBL */
-	adpt_hppe_debug_port_tx_drop_counter_get(show_type);
+	adpt_hppe_debug_port_tx_drop_counter_get(dev_id, show_type);
 
 	/* show EG_VSI_COUNTER_TBL */
-	adpt_hppe_debug_eg_vsi_counter_get(show_type);
+	adpt_hppe_debug_eg_vsi_counter_get(dev_id, show_type);
 
 	/* show PORT_TX_COUNTER_TBL */
-	adpt_hppe_debug_port_tx_counter_get(show_type);
+	adpt_hppe_debug_port_tx_counter_get(dev_id, show_type);
 
 	/* show VP_TX_COUNTER_TBL */
-	adpt_hppe_debug_vp_tx_counter_get(show_type);
+	adpt_hppe_debug_vp_tx_counter_get(dev_id, show_type);
 
 	/* show QUEUE_TX_COUNTER_TBL */
-	adpt_hppe_debug_queue_tx_counter_get(show_type);
+	adpt_hppe_debug_queue_tx_counter_get(dev_id, show_type);
 
 	/* show VP_TX_DROP_CNT_TBL */
-	adpt_hppe_debug_vp_tx_drop_counter_get(show_type);
+	adpt_hppe_debug_vp_tx_drop_counter_get(dev_id, show_type);
 
 	/* show CPU_CODE_CNT */
-	adpt_hppe_debug_cpu_code_counter_get(show_type);
+	adpt_hppe_debug_cpu_code_counter_get(dev_id, show_type);
 
 	/* show DROP_CPU_CNT_TBL */
-	adpt_hppe_debug_drop_cpu_counter_get(show_type);
+	adpt_hppe_debug_drop_cpu_counter_get(dev_id, show_type);
 #ifdef APPE
-	if(adpt_chip_type_get (0) == CHIP_APPE)
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
 	{
 		/* show VP_PORT_RX_COUNTER_TBL*/
-		adpt_appe_debug_vp_rx_counter_get(show_type);
+		adpt_appe_debug_vp_rx_counter_get(dev_id, show_type);
 		/* show VP_PORT_RX_DROP_CNT_TBL*/
-		adpt_appe_debug_vp_rx_drop_counter_get(show_type);
+		adpt_appe_debug_vp_rx_drop_counter_get(dev_id, show_type);
 		/* show PORT_RX_COUNTER_TBL*/
-		adpt_appe_debug_port_rx_counter_get(show_type);
+		adpt_appe_debug_port_rx_counter_get(dev_id, show_type);
 		/* show PORT_RX_DROP_CNT_TBL*/
-		adpt_appe_debug_port_rx_drop_counter_get(show_type);
+		adpt_appe_debug_port_rx_drop_counter_get(dev_id, show_type);
 	}
 #endif
 	return SW_OK;

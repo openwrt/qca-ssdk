@@ -980,7 +980,7 @@ static ssize_t ssdk_packet_counter_get(struct device *dev,
 
 	count = snprintf(buf, (ssize_t)PAGE_SIZE, "\n");
 
-	p_api->adpt_debug_counter_get(A_FALSE);
+	p_api->adpt_debug_counter_get(ssdk_dev_id, A_FALSE);
 
 	return count;
 }
@@ -998,7 +998,7 @@ static ssize_t ssdk_packet_counter_set(struct device *dev,
 		return count;
 	}
 
-	p_api->adpt_debug_counter_set();
+	p_api->adpt_debug_counter_set(ssdk_dev_id);
 
 	if (count >= sizeof(num_buf))
 		return 0;
@@ -1025,7 +1025,7 @@ static ssize_t ssdk_byte_counter_get(struct device *dev,
 
 	count = snprintf(buf, (ssize_t)PAGE_SIZE, "\n");
 
-	p_api->adpt_debug_counter_get(A_TRUE);
+	p_api->adpt_debug_counter_get(ssdk_dev_id, A_TRUE);
 
 	return count;
 }
@@ -1043,7 +1043,7 @@ static ssize_t ssdk_byte_counter_set(struct device *dev,
 		return count;
 	}
 
-	p_api->adpt_debug_counter_set();
+	p_api->adpt_debug_counter_set(ssdk_dev_id);
 
 	if (count >= sizeof(num_buf))
 		return 0;

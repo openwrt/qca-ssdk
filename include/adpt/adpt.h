@@ -1057,8 +1057,8 @@ typedef sw_error_t (*adpt_policer_ctrl_set_func)(a_uint32_t dev_id, fal_policer_
 typedef sw_error_t (*adpt_policer_ctrl_get_func)(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 /* misc */
-typedef sw_error_t (*adpt_debug_counter_get_func)(a_bool_t show_type);
-typedef sw_error_t (*adpt_debug_counter_set_func)(void);
+typedef sw_error_t (*adpt_debug_counter_get_func)(a_uint32_t dev_id, a_bool_t show_type);
+typedef sw_error_t (*adpt_debug_counter_set_func)(a_uint32_t dev_id);
 typedef sw_error_t (*adpt_intr_port_link_mask_set_func) (a_uint32_t dev_id,
 			fal_port_t port_id, a_uint32_t intr_mask);
 typedef sw_error_t (*adpt_intr_port_link_mask_get_func) (a_uint32_t dev_id,

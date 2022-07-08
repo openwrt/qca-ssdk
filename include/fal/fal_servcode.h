@@ -39,6 +39,7 @@ extern "C" {
 #endif
 
 #define SERVICE_BYP_NUM 4
+#define FAL_SERVCODE_INVALID 0xffff
 
 /* field_update_bitmap */
 enum {
@@ -187,12 +188,16 @@ enum
 	FUNC_SERVCODE_CONFIG_GET,
 	FUNC_SERVCODE_LOOPCHECK_EN,
 	FUNC_SERVCODE_LOOPCHECK_STATUS_GET,
+	FUNC_PORT_SERVCODE_SET,
+	FUNC_PORT_SERVCODE_GET,
 };
 
 sw_error_t fal_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_index, fal_servcode_config_t *entry);
 sw_error_t fal_servcode_config_get(a_uint32_t dev_id, a_uint32_t servcode_index, fal_servcode_config_t *entry);
 sw_error_t fal_servcode_loopcheck_en(a_uint32_t dev_id, a_bool_t enable);
 sw_error_t fal_servcode_loopcheck_status_get(a_uint32_t dev_id, a_bool_t *enable);
+sw_error_t fal_port_servcode_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t servcode_index);
+sw_error_t fal_port_servcode_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *servcode_index);
 
 #ifdef __cplusplus
 }

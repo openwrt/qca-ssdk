@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- *
  * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -909,6 +909,8 @@ extern "C" {
 #define SW_API_SERVCODE_CONFIG_GET	(1  + SW_API_SERVCODE_OFFSET)
 #define SW_API_SERVCODE_LOOPCHECK_EN	(2  + SW_API_SERVCODE_OFFSET)
 #define SW_API_SERVCODE_LOOPCHECK_STATUS_GET	(3  + SW_API_SERVCODE_OFFSET)
+#define SW_API_PORT_SERVCODE_SET	(4  + SW_API_SERVCODE_OFFSET)
+#define SW_API_PORT_SERVCODE_GET	(5  + SW_API_SERVCODE_OFFSET)
 
 	/* POLICER */
 #define SW_API_POLICER_OFFSET        2800

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- *
  * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -4650,6 +4650,17 @@ extern "C" {
     SW_PARAM_DEF(SW_API_SERVCODE_LOOPCHECK_STATUS_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_SERVCODE_LOOPCHECK_STATUS_GET, SW_ENABLE, 4, \
 		    SW_PARAM_PTR|SW_PARAM_OUT, "Enable"),
+
+#define SW_API_PORT_SERVCODE_SET_DESC \
+    SW_PARAM_DEF(SW_API_PORT_SERVCODE_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PORT_SERVCODE_SET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"), \
+    SW_PARAM_DEF(SW_API_PORT_SERVCODE_SET, SW_UINT32, 4, SW_PARAM_IN, "Servcode Value"),
+
+#define SW_API_PORT_SERVCODE_GET_DESC \
+    SW_PARAM_DEF(SW_API_PORT_SERVCODE_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PORT_SERVCODE_GET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"), \
+    SW_PARAM_DEF(SW_API_PORT_SERVCODE_GET, SW_UINT32, 4, \
+		    SW_PARAM_PTR|SW_PARAM_OUT, "Servcode Value"),
 
 #define SW_API_BM_CTRL_SET_DESC \
     SW_PARAM_DEF(SW_API_BM_CTRL_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \

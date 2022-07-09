@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -259,6 +260,38 @@ union vlan_port_vp_tbl_u {
 	#define EG_VP_TBL_CNT_MODE_OFFSET  51
 	#define EG_VP_TBL_CNT_MODE_LEN     1
 	#define EG_VP_TBL_CNT_MODE_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] ATH_HDR_INSERT*/
+	#define EG_VP_TBL_ATH_HDR_INSERT
+	#define EG_VP_TBL_ATH_HDR_INSERT_OFFSET  52
+	#define EG_VP_TBL_ATH_HDR_INSERT_LEN     1
+	#define EG_VP_TBL_ATH_HDR_INSERT_DEFAULT 0x0
+	/*[field] ATH_HDR_VER*/
+	#define EG_VP_TBL_ATH_HDR_VER
+	#define EG_VP_TBL_ATH_HDR_VER_OFFSET  53
+	#define EG_VP_TBL_ATH_HDR_VER_LEN     2
+	#define EG_VP_TBL_ATH_HDR_VER_DEFAULT 0x0
+	/*[field] ATH_HDR_DEFAULT_TYPE*/
+	#define EG_VP_TBL_ATH_HDR_DEFAULT_TYPE
+	#define EG_VP_TBL_ATH_HDR_DEFAULT_TYPE_OFFSET  55
+	#define EG_VP_TBL_ATH_HDR_DEFAULT_TYPE_LEN     3
+	#define EG_VP_TBL_ATH_HDR_DEFAULT_TYPE_DEFAULT 0x0
+	/*[field] ATH_PORT_BITMAP*/
+	#define EG_VP_TBL_ATH_PORT_BITMAP
+	#define EG_VP_TBL_ATH_PORT_BITMAP_OFFSET  58
+	#define EG_VP_TBL_ATH_PORT_BITMAP_LEN     7
+	#define EG_VP_TBL_ATH_PORT_BITMAP_DEFAULT 0x0
+	/*[field] ATH_HDR_DISABLE_BIT*/
+	#define EG_VP_TBL_ATH_HDR_DISABLE_BIT
+	#define EG_VP_TBL_ATH_HDR_DISABLE_BIT_OFFSET  65
+	#define EG_VP_TBL_ATH_HDR_DISABLE_BIT_LEN     1
+	#define EG_VP_TBL_ATH_HDR_DISABLE_BIT_DEFAULT 0x0
+	/*[field] ATH_HDR_FROM_CPU*/
+	#define EG_VP_TBL_ATH_HDR_FROM_CPU
+	#define EG_VP_TBL_ATH_HDR_FROM_CPU_OFFSET  66
+	#define EG_VP_TBL_ATH_HDR_FROM_CPU_LEN     1
+	#define EG_VP_TBL_ATH_HDR_FROM_CPU_DEFAULT 0x0
+#endif
 
 struct eg_vp_tbl {
 	a_uint32_t  port_def_svid:12;
@@ -276,11 +309,26 @@ struct eg_vp_tbl {
 	a_uint32_t  tunnel_valid:1;
 	a_uint32_t  tunnel_id:7;
 	a_uint32_t  cnt_mode:1;
+#if defined(MPPE)
+	a_uint32_t  ath_hdr_insert:1;
+	a_uint32_t  ath_hdr_ver:2;
+	a_uint32_t  ath_hdr_default_type:3;
+	a_uint32_t  ath_port_bitmap_0:6;
+	a_uint32_t  ath_port_bitmap_1:1;
+	a_uint32_t  ath_hdr_disable_bit:1;
+	a_uint32_t  ath_hdr_from_cpu:1;
+	a_uint32_t  _reserved0:29;
+#else
 	a_uint32_t  _reserved0:12;
+#endif
 };
 
 union eg_vp_tbl_u {
+#if defined(MPPE)
+	a_uint32_t val[3];
+#else
 	a_uint32_t val[2];
+#endif
 	struct eg_vp_tbl bf;
 };
 

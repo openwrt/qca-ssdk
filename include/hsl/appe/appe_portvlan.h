@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -519,6 +520,82 @@ appe_eg_vp_tbl_port_def_cvid_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+
+#if 0
+#if defined(MPPE)
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_insert_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_insert_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_ver_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_ver_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_default_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_default_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_port_bitmap_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_port_bitmap_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_disable_bit_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_disable_bit_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_from_cpu_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_vp_tbl_ath_hdr_from_cpu_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+#endif
+#endif
 
 sw_error_t
 appe_eg_vsi_vp_tag_tagged_mode_vp_bitmap_get(

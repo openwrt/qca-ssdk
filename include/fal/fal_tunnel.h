@@ -230,6 +230,13 @@ typedef struct {
 	a_uint16_t udf1_mask; /*UDF1 mask for udf1 */
 } fal_tunnel_decap_key_t;
 
+enum {
+	FAL_TUNNEL_IP_VER_4 = 0,
+	FAL_TUNNEL_IP_VER_6,
+};
+
+#define FAL_TUNNEL_DECAP_TUNNEL_INFO_MASK	0xffffffff
+
 typedef struct {
 	a_uint32_t entry_id; /*entry index*/
 	a_uint8_t ip_ver; /*0 for ipv4 or 1 for ipv6*/
@@ -256,6 +263,11 @@ typedef enum {
 	FAL_TUNNEL_UNIFORM_MODE = 1,
 	FAL_TUNNEL_MODE_MAX,
 } fal_tunnel_mode_t;
+
+enum {
+	FAL_TUNNEL_VLAN_FMT_UNTAG = 0,
+	FAL_TUNNEL_VALN_FMT_TAG,
+};
 
 #define FAL_TUNNEL_SVLAN_CHECK_EN		(0x1UL << 0)
 #define FAL_TUNNEL_CVLAN_CHECK_EN		(0x1UL << 1)
@@ -428,6 +440,7 @@ typedef struct {
 	a_bool_t pppoe_en; /* enable pppoe based on vlan packet */
 } fal_tunnel_vlan_intf_t;
 
+#define FAL_TUNNEL_INTF_ENTRY_MAX	128
 typedef struct {
 	a_bool_t ipv4_decap_en; /* ipv4 decapsulation or not */
 	a_bool_t ipv6_decap_en; /* ipv6 decapsulation or not */
@@ -475,7 +488,30 @@ enum {
 	FAL_TUNNEL_ENCAP_L4_PROTO_GRE,
 };
 
+enum {
+	FAL_TUNNEL_ENCAP_DF_MODE_FIX = 0,
+	FAL_TUNNEL_ENCAP_DF_MODE_COPY,
+};
+
+enum {
+	FAL_TUNNEL_ENCAP_EXT_DF_MODE_RANDOM = 0,
+	FAL_TUNNEL_ENCAP_EXT_DF_MODE_FIX,
+};
+
+enum {
+	FAL_TUNNEL_ENCAP_FLOWLABLE_MODE_FIX = 0,
+	FAL_TUNNEL_ENCAP_FLOWLABLE_MODE_HASH,
+	FAL_TUNNEL_ENCAP_FLOWLABLE_MODE_COPY,
+};
+
+enum {
+	FAL_TUNNEL_ENCAP_IPV4_ID_MODE_FIX = 0,
+	FAL_TUNNEL_ENCAP_IPV4_ID_MODE_RANDOM,
+};
+
 #define FAL_TUNNEL_ENCAP_HEADER_MAX_LEN 128
+#define FAL_TUNNEL_ENCAP_VLAN_OFFSET	14
+
 typedef struct {
 	fal_mac_addr_t smac_addr; /* source mac address */
 	fal_mac_addr_t dmac_addr; /* destination mac address */

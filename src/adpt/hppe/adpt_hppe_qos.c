@@ -15,7 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /**
  * @defgroup
  * @{
@@ -1239,8 +1238,11 @@ sw_error_t adpt_hppe_qos_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_port_queues_get = adpt_hppe_port_queues_get;
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_COSMAP_PCP_SET))
 		p_adpt_api->adpt_qos_cosmap_pcp_set = adpt_ppe_qos_cosmap_pcp_set;
-	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_REMARK_GET))
-		p_adpt_api->adpt_qos_port_remark_get = adpt_hppe_qos_port_remark_get;
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+			adpt_chip_revision_get(dev_id) == HPPE_REVISION) {
+		if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_REMARK_GET))
+			p_adpt_api->adpt_qos_port_remark_get = adpt_hppe_qos_port_remark_get;
+	}
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_COSMAP_DSCP_GET))
 		p_adpt_api->adpt_qos_cosmap_dscp_get = adpt_ppe_qos_cosmap_dscp_get;
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_COSMAP_FLOW_SET))
@@ -1251,8 +1253,11 @@ sw_error_t adpt_hppe_qos_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_ring_queue_map_set = adpt_hppe_ring_queue_map_set;
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_COSMAP_DSCP_SET))
 		p_adpt_api->adpt_qos_cosmap_dscp_set = adpt_ppe_qos_cosmap_dscp_set;
-	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_REMARK_SET))
-		p_adpt_api->adpt_qos_port_remark_set = adpt_hppe_qos_port_remark_set;
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+			adpt_chip_revision_get(dev_id) == HPPE_REVISION) {
+		if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_REMARK_SET))
+			p_adpt_api->adpt_qos_port_remark_set = adpt_hppe_qos_port_remark_set;
+	}
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_COSMAP_FLOW_GET))
 		p_adpt_api->adpt_qos_cosmap_flow_get = adpt_ppe_qos_cosmap_flow_get;
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_GROUP_GET))
@@ -1276,10 +1281,13 @@ sw_error_t adpt_hppe_qos_init(a_uint32_t dev_id)
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_SCHEDULER_DEQUEUE_CTRL_SET))
 		p_adpt_api->adpt_scheduler_dequeue_ctrl_set = adpt_hppe_scheduler_dequeue_ctrl_set;
 #ifndef IN_QOS_MINI
-	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_MODE_PRI_GET))
-		p_adpt_api->adpt_qos_port_mode_pri_get = adpt_hppe_qos_port_mode_pri_get;
-	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_MODE_PRI_SET))
-		p_adpt_api->adpt_qos_port_mode_pri_set = adpt_hppe_qos_port_mode_pri_set;
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+			adpt_chip_revision_get(dev_id) == HPPE_REVISION) {
+		if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_MODE_PRI_GET))
+			p_adpt_api->adpt_qos_port_mode_pri_get = adpt_hppe_qos_port_mode_pri_get;
+		if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_MODE_PRI_SET))
+			p_adpt_api->adpt_qos_port_mode_pri_set = adpt_hppe_qos_port_mode_pri_set;
+	}
 #endif
 	if (p_adpt_api->adpt_qos_func_bitmap & (1 << FUNC_QOS_PORT_SCHEDULER_CFG_RESET))
 		p_adpt_api->adpt_port_scheduler_cfg_reset = adpt_hppe_port_scheduler_cfg_reset;

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2019, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +13,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_flow
@@ -65,6 +66,8 @@ typedef enum {
 #define FAL_FLOW_PROTOCOL_UDP	  2
 #define FAL_FLOW_PROTOCOL_UDPLITE  3
 
+#define FAL_FLOW_PKT_CNT_MASK	0xFFFFFFFFULL
+#define FAL_FLOW_BYTE_CNT_MASK	0xFFFFFFFFFFULL
 
 typedef struct {
 	fal_fwd_cmd_t miss_action; /* flow mismatch action*/

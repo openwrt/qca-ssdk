@@ -77,6 +77,14 @@ a_uint16_t ssdk_ucast_queue_num_get(a_uint32_t dev_id, a_uint32_t port)
 	return cfg->scheduler_cfg.pool[port].ucastq_end -
 		cfg->scheduler_cfg.pool[port].ucastq_start + 1;
 }
+
+a_uint16_t ssdk_ucast_l0_cdrr_num_get(a_uint32_t dev_id, a_uint32_t port)
+{
+	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
+
+	return cfg->scheduler_cfg.pool[port].l0cdrr_end -
+		cfg->scheduler_cfg.pool[port].l0cdrr_start + 1;
+}
 #endif
 a_uint32_t ssdk_intf_mac_num_get(void)
 {

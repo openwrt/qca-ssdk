@@ -31,6 +31,7 @@
 #include "ssdk_mht_clk.h"
 #include "mht_port_ctrl.h"
 #include "ref_port_ctrl.h"
+#include "mht_interface_ctrl.h"
 #ifdef IN_LED
 #include "ssdk_led.h"
 #endif
@@ -48,20 +49,23 @@ qca_mht_work_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0, a_uint32_t mac_m
 			return SW_NOT_SUPPORTED;
 	}
 
+	if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_PHY))
+	{
+		return qca_mht_work_mode_set(dev_id, MHT_SWITCH_BYPASS_PORT5_MODE);
+	}
+
 	switch (mac_mode1) {
 		case PORT_WRAPPER_SGMII_PLUS:
 		case PORT_WRAPPER_SGMII_CHANNEL0:
+		case PORT_WRAPPER_MAX:
 			ret = qca_mht_work_mode_set(dev_id, MHT_SWITCH_MODE);
 			SW_RTN_ON_ERROR(ret);
 			break;
-		case PORT_WRAPPER_MAX:
-			ret = qca_mht_work_mode_set(dev_id, MHT_SWITCH_BYPASS_PORT5_MODE);
-			SW_RTN_ON_ERROR(ret);
 		default:
-			break;
+			return SW_NOT_SUPPORTED;
 	}
 
-	return ret;
+	return SW_OK;
 }
 
 static sw_error_t

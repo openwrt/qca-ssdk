@@ -2868,22 +2868,31 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 #endif
 			if(port_id == SSDK_PHYSICAL_PORT1)
 			{
-				qca_hppe_port_mac_type_set(dev_id, SSDK_PHYSICAL_PORT1,
-						PORT_GMAC_TYPE);
 				if(mode0 == PORT_WRAPPER_SGMII_FIBER)
 				{
+					qca_hppe_port_mac_type_set(dev_id, SSDK_PHYSICAL_PORT1,
+						PORT_GMAC_TYPE);
 					_adpt_hppe_port_interface_mode_set(dev_id,
-							SSDK_PHYSICAL_PORT1, PORT_SGMII_FIBER);
+						SSDK_PHYSICAL_PORT1, PORT_SGMII_FIBER);
 				}
 				else if(mode0 == PORT_WRAPPER_SGMII_PLUS)
 				{
+					if (ssdk_port_feature_get(dev_id, port_id, PHY_F_QGMAC)) {
+						qca_hppe_port_mac_type_set(dev_id, port_id,
+							PORT_GMAC_TYPE);
+					} else {
+						qca_hppe_port_mac_type_set(dev_id, port_id,
+							PORT_XGMAC_TYPE);
+					}
 					_adpt_hppe_port_interface_mode_set(dev_id,
 						SSDK_PHYSICAL_PORT1, PORT_SGMII_PLUS);
 				}
 				else
 				{
+					qca_hppe_port_mac_type_set(dev_id, SSDK_PHYSICAL_PORT1,
+						PORT_GMAC_TYPE);
 					_adpt_hppe_port_interface_mode_set(dev_id,
-							SSDK_PHYSICAL_PORT1, PHY_SGMII_BASET);
+						SSDK_PHYSICAL_PORT1, PHY_SGMII_BASET);
 				}
 			}
 			break;

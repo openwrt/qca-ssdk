@@ -1416,6 +1416,10 @@ typedef sw_error_t (*adpt_mapt_decap_entry_getfirst_func)(a_uint32_t dev_id,
 		fal_mapt_decap_entry_t *mapt_entry);
 typedef sw_error_t (*adpt_mapt_decap_entry_getnext_func)(a_uint32_t dev_id,
 		fal_mapt_decap_entry_t *mapt_entry);
+typedef sw_error_t (*adpt_mapt_decap_en_set_func)(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t en);
+typedef sw_error_t (*adpt_mapt_decap_en_get_func)(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t *en);
 
 /* auto_insert_flag */
 typedef struct
@@ -2127,6 +2131,8 @@ typedef struct
 	adpt_mapt_decap_entry_del_func adpt_mapt_decap_entry_del;
 	adpt_mapt_decap_entry_getfirst_func adpt_mapt_decap_entry_getfirst;
 	adpt_mapt_decap_entry_getnext_func adpt_mapt_decap_entry_getnext;
+	adpt_mapt_decap_en_set_func adpt_mapt_decap_en_set;
+	adpt_mapt_decap_en_get_func adpt_mapt_decap_en_get;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

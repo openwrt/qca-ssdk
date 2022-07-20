@@ -1,18 +1,19 @@
 /*
-* Copyright (c) 2021, The Linux Foundation. All rights reserved.
-*
-* Permission to use, copy, modify, and/or distribute this software for any
-* purpose with or without fee is hereby granted, provided that the above
-* copyright notice and this permission notice appear in all copies.
-*
-* THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-* WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-* MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-* ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-* WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-* ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
 
 /**
@@ -40,6 +41,8 @@ enum {
 	FUNC_MAPT_DECAP_ENTRY_DEL,
 	FUNC_MAPT_DECAP_ENTRY_GETFIRST,
 	FUNC_MAPT_DECAP_ENTRY_GETNEXT,
+	FUNC_MAPT_DECAP_EN_SET,
+	FUNC_MAPT_DECAP_EN_GET,
 };
 
 typedef struct {
@@ -109,6 +112,8 @@ typedef struct {
 	a_uint8_t exp_profile; /*Exception profile ID */
 	a_uint32_t pkt_counter; /* hit packet counter */
 	a_uint64_t byte_counter; /* hit byte counter */
+	a_uint32_t entry_index; /* mapt entry index */
+	fal_tunnel_op_mode_t op_mode; /* hash or index */
 } fal_mapt_decap_entry_t;
 
 sw_error_t
@@ -140,6 +145,12 @@ fal_mapt_decap_entry_getfirst(a_uint32_t dev_id, fal_mapt_decap_entry_t *mapt_en
 
 sw_error_t
 fal_mapt_decap_entry_getnext(a_uint32_t dev_id, fal_mapt_decap_entry_t *mapt_entry);
+
+sw_error_t
+fal_mapt_decap_en_set(a_uint32_t dev_id, a_uint32_t mapt_index, a_bool_t en);
+
+sw_error_t
+fal_mapt_decap_en_get(a_uint32_t dev_id, a_uint32_t mapt_index, a_bool_t *en);
 
 #ifdef __cplusplus
 }

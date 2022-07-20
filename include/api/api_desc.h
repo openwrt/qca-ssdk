@@ -5965,6 +5965,22 @@ extern "C" {
 			sizeof(fal_mapt_decap_entry_t), \
 			SW_PARAM_PTR|SW_PARAM_OUT|SW_PARAM_IN, "Mapt Entry"),
 
+#define SW_API_MAPT_DECAP_EN_SET_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Mapt Entry Index "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_SET, SW_ENABLE, \
+			sizeof(a_bool_t), SW_PARAM_IN, "Decap enable"),
+
+#define SW_API_MAPT_DECAP_EN_GET_DESC \
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Mapt Entry Index "),\
+	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_GET, SW_ENABLE, \
+			sizeof(a_bool_t), SW_PARAM_PTR|SW_PARAM_OUT, "Decap enable"),
+
 /* auto_insert_flag */
 /*qca808x_start*/
 

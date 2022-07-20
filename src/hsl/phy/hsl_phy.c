@@ -659,7 +659,11 @@ hsl_port_phy_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
 
 	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
 	if (NULL == phy_drv->phy_interface_mode_set)
-		return SW_NOT_SUPPORTED;
+	{
+		/*PHY driver did not register phy_interface_mode_set,
+		so no need to configure PHY interface mode*/
+		return SW_OK;
+	}
 
 	phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
 	rv = phy_drv->phy_interface_mode_set(dev_id, phy_addr, mode);

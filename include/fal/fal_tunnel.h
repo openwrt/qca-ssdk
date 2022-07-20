@@ -266,7 +266,7 @@ typedef enum {
 
 enum {
 	FAL_TUNNEL_VLAN_FMT_UNTAG = 0,
-	FAL_TUNNEL_VALN_FMT_TAG,
+	FAL_TUNNEL_VLAN_FMT_TAG,
 };
 
 #define FAL_TUNNEL_SVLAN_CHECK_EN		(0x1UL << 0)
@@ -294,6 +294,9 @@ enum {
 	FAL_TUNNEL_EXP_PROFILE_UPDATE,
 	FAL_TUNNEL_FWD_CMD_UPDATE,
 };
+
+#define FAL_TUNNEL_DECAP_PKT_CNT_MASK	0xFFFFFFFFULL
+#define FAL_TUNNEL_DECAP_BYTE_CNT_MASK	0xFFFFFFFFFFULL
 
 typedef struct {
 	a_uint32_t update_bmp; /* the bitmap for updating the field of this structure */
@@ -510,7 +513,7 @@ enum {
 };
 
 #define FAL_TUNNEL_ENCAP_HEADER_MAX_LEN 128
-#define FAL_TUNNEL_ENCAP_VLAN_OFFSET	14
+#define FAL_TUNNEL_ENCAP_VLAN_OFFSET	12
 
 typedef struct {
 	fal_mac_addr_t smac_addr; /* source mac address */

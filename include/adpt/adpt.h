@@ -61,6 +61,7 @@ extern "C" {
 #include "fal_tunnel_program.h"
 #include "fal_mapt.h"
 #include "fal_vport.h"
+#include "fal_athtag.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1425,6 +1426,23 @@ typedef sw_error_t (*adpt_mapt_decap_en_set_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_mapt_decap_en_get_func)(a_uint32_t dev_id,
 		a_uint32_t mapt_index, a_bool_t *en);
 
+/*athtag*/
+typedef sw_error_t (*adpt_athtag_pri_mapping_set_func)(a_uint32_t dev_id,
+		fal_direction_t direction, fal_athtag_pri_mapping_t * pri_mapping);
+typedef sw_error_t (*adpt_athtag_pri_mapping_get_func)(a_uint32_t dev_id,
+		fal_direction_t direction, fal_athtag_pri_mapping_t * pri_mapping);
+typedef sw_error_t (*adpt_athtag_port_mapping_set_func)(a_uint32_t dev_id,
+		fal_direction_t direction, fal_athtag_port_mapping_t * port_mapping);
+typedef sw_error_t (*adpt_athtag_port_mapping_get_func)(a_uint32_t dev_id,
+		fal_direction_t direction, fal_athtag_port_mapping_t * port_mapping);
+typedef sw_error_t (*adpt_port_athtag_rx_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_athtag_rx_cfg_t *cfg);
+typedef sw_error_t (*adpt_port_athtag_rx_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_athtag_rx_cfg_t *cfg);
+typedef sw_error_t (*adpt_port_athtag_tx_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_athtag_tx_cfg_t *cfg);
+typedef sw_error_t (*adpt_port_athtag_tx_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, fal_athtag_tx_cfg_t *cfg);
 /* auto_insert_flag */
 typedef struct
 {
@@ -2139,6 +2157,16 @@ typedef struct
 	adpt_mapt_decap_entry_getnext_func adpt_mapt_decap_entry_getnext;
 	adpt_mapt_decap_en_set_func adpt_mapt_decap_en_set;
 	adpt_mapt_decap_en_get_func adpt_mapt_decap_en_get;
+	/*athtag*/
+	a_uint32_t adpt_athtag_func_bitmap;
+	adpt_athtag_pri_mapping_set_func adpt_athtag_pri_mapping_set;
+	adpt_athtag_pri_mapping_get_func adpt_athtag_pri_mapping_get;
+	adpt_athtag_port_mapping_set_func adpt_athtag_port_mapping_set;
+	adpt_athtag_port_mapping_get_func adpt_athtag_port_mapping_get;
+	adpt_port_athtag_rx_set_func adpt_port_athtag_rx_set;
+	adpt_port_athtag_rx_get_func adpt_port_athtag_rx_get;
+	adpt_port_athtag_tx_set_func adpt_port_athtag_tx_set;
+	adpt_port_athtag_tx_get_func adpt_port_athtag_tx_get;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

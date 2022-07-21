@@ -9,6 +9,10 @@ ifeq (TRUE, $(IN_SERVCODE))
   SRC_LIST += adpt_mppe_servcode.c
 endif
 
+ifeq (TRUE, $(IN_ATHTAG))
+  SRC_LIST += adpt_mppe_athtag.c
+endif
+
 ifeq (, $(filter MPPE, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

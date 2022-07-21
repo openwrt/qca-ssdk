@@ -1137,9 +1137,9 @@ qca803x_phy_get_powersave(a_uint32_t dev_id, a_uint32_t phy_id,
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
 	if (phy_data & QCA803X_PWR_SAVE_EN)
-		*enable = A_FALSE;
-	else
 		*enable = A_TRUE;
+	else
+		*enable = A_FALSE;
 
 	return SW_OK;
 }

@@ -1013,6 +1013,13 @@ adpt_hppe_port_scheduler_cfg_set(a_uint32_t dev_id,
 	psch_tdm_cfg.bf.ens_port_bitmap = cfg->en_scheduler_port_bmp;
 	psch_tdm_cfg.bf.ens_port = cfg->en_scheduler_port;
 	psch_tdm_cfg.bf.des_port = cfg->de_scheduler_port;
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		psch_tdm_cfg.bf.des_second_port_en = cfg->de_scheduler_2nd_port_en;
+		psch_tdm_cfg.bf.des_second_port = cfg->de_scheduler_2nd_port;
+	}
+#endif
+
 	return hppe_psch_tdm_cfg_tbl_set(dev_id, tick_index, &psch_tdm_cfg);
 }
 #ifndef IN_QOS_MINI
@@ -1030,6 +1037,12 @@ adpt_hppe_port_scheduler_cfg_get(a_uint32_t dev_id,
 	cfg->en_scheduler_port_bmp = psch_tdm_cfg.bf.ens_port_bitmap;
 	cfg->en_scheduler_port = psch_tdm_cfg.bf.ens_port;
 	cfg->de_scheduler_port = psch_tdm_cfg.bf.des_port;
+#if defined(APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		cfg->de_scheduler_2nd_port_en = psch_tdm_cfg.bf.des_second_port_en;
+		cfg->de_scheduler_2nd_port = psch_tdm_cfg.bf.des_second_port;
+	}
+#endif
 
 	return SW_OK;
 }

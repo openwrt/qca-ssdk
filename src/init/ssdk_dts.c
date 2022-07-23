@@ -1192,6 +1192,9 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 		ssdk_dt_priv->cmnblk_clk = of_clk_get_by_name(switch_node, "cmn_ahb_clk");
 		if (!of_property_read_u32(switch_node, "tm_tick_mode", &mode))
 			ssdk_dt_priv->tm_tick_mode = mode;
+
+		if (!of_property_read_u32(switch_node, "bm_tick_mode", &mode))
+			ssdk_dt_priv->bm_tick_mode = mode;
 #ifdef APPE
 #ifdef IN_LED
 		ssdk_dt_parse_led(switch_node, cfg);

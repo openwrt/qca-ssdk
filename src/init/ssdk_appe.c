@@ -224,10 +224,46 @@ fal_port_tdm_tick_cfg_t mppe_port_tdm0_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
 };
 
+fal_port_tdm_tick_cfg_t mppe_port_tdm1_tbl[] = {
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+};
+
 fal_port_scheduler_cfg_t mppe_port_scheduler0_tbl[] = {
 	{0xfa, 1, 0},
 	{0xfc, 2, 1},
 	{0xf9, 0, 2},
+};
+
+fal_port_scheduler_cfg_t mppe_port_scheduler1_tbl[] = {
+	{0x0, 0xf, 0},
+	{0x2, 0x1, 2},
+	{0x0, 0xf, 1},
+	{0x1, 0x0, 2},
+	{0x0, 0xf, 0},
+	{0x0, 0xf, 2},
+	{0x1, 0x1, 0},
+	{0x0, 0xf, 1},
+	{0x4, 0x2, 0},
+	{0x0, 0xf, 2},
 };
 #endif
 
@@ -254,58 +290,73 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 		return SW_BAD_VALUE;
 	}
 
-	if (tm_tick_mode == 0) {
 #if defined(MPPE)
-		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
-			num = sizeof(mppe_port_scheduler0_tbl) /
-					sizeof(fal_port_scheduler_cfg_t);
+	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
+		if (tm_tick_mode == 0) {
 			scheduler_cfg = mppe_port_scheduler0_tbl;
+			num = sizeof(mppe_port_scheduler0_tbl) / sizeof(fal_port_scheduler_cfg_t);
+		} else {
+			scheduler_cfg = mppe_port_scheduler1_tbl;
+			num = sizeof(mppe_port_scheduler1_tbl) / sizeof(fal_port_scheduler_cfg_t);
+		}
+
+		for (i = 0; i < num; i++) {
+			p_api->adpt_port_scheduler_cfg_set(dev_id, i, &scheduler_cfg[i]);
+		}
+		p_api->adpt_tdm_tick_num_set(dev_id, num);
+
+		SSDK_INFO("mppe scheduler tdm mode = %d, num = %d\n", tm_tick_mode, num);
+	} else
+#endif
+	{
+		if (tm_tick_mode == 0x1) {
+			num = sizeof(appe_port_scheduler1_tbl) / sizeof(fal_port_scheduler_cfg_t);
+
+			scheduler_cfg = appe_port_scheduler1_tbl;
 			for (i = 0; i < num; i++) {
 				p_api->adpt_port_scheduler_cfg_set(dev_id, i, &scheduler_cfg[i]);
 			}
 			p_api->adpt_tdm_tick_num_set(dev_id, num);
 		}
-#endif
-	} else if (tm_tick_mode == 0x1) {
-		num = sizeof(appe_port_scheduler1_tbl) /
-				sizeof(fal_port_scheduler_cfg_t);
-		scheduler_cfg = appe_port_scheduler1_tbl;
-		for (i = 0; i < num; i++) {
-			p_api->adpt_port_scheduler_cfg_set(dev_id, i, &scheduler_cfg[i]);
-		}
-		p_api->adpt_tdm_tick_num_set(dev_id, num);
+
+		SSDK_INFO("appe scheduler tdm mode =%d\n", tm_tick_mode);
 	}
-	SSDK_INFO("appe scheduler tdm mode =%d\n", tm_tick_mode);
 
 	SW_RTN_ON_NULL(p_api->adpt_port_tdm_tick_cfg_set);
 	SW_RTN_ON_NULL(p_api->adpt_port_tdm_ctrl_set);
 
-	if (bm_tick_mode == 0) {
 #if defined(MPPE)
-		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
-			num = sizeof(mppe_port_tdm0_tbl) /
-					sizeof(fal_port_tdm_tick_cfg_t);
+	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
+		if (bm_tick_mode == 0) {
 			bm_cfg = mppe_port_tdm0_tbl;
+			num = sizeof(mppe_port_tdm0_tbl) / sizeof(fal_port_tdm_tick_cfg_t);
+		} else {
+			bm_cfg = mppe_port_tdm1_tbl;
+			num = sizeof(mppe_port_tdm1_tbl) / sizeof(fal_port_tdm_tick_cfg_t);
 		}
-		else
+
+		SSDK_INFO("mppe bm mode = %d setup num= %d\n", bm_tick_mode, num);
+	} else
 #endif
-		{
-			num = sizeof(appe_port_tdm0_tbl) /
-					sizeof(fal_port_tdm_tick_cfg_t);
+	{
+		if (bm_tick_mode == 0) {
+			num = sizeof(appe_port_tdm0_tbl) / sizeof(fal_port_tdm_tick_cfg_t);
 			bm_cfg = appe_port_tdm0_tbl;
+		} else {
+			return SW_BAD_VALUE;
 		}
-	} else {
-		return SW_BAD_VALUE;
+
+		SSDK_INFO("appe tdm setup num=%d\n", num);
 	}
 
 	for (i = 0; i < num; i++) {
 		p_api->adpt_port_tdm_tick_cfg_set(dev_id, i, &bm_cfg[i]);
 	}
+
 	tdm_ctrl.enable = A_TRUE;
 	tdm_ctrl.offset = A_FALSE;
 	tdm_ctrl.depth = num;
 	p_api->adpt_port_tdm_ctrl_set(dev_id, &tdm_ctrl);
-	SSDK_INFO("appe tdm setup num=%d\n", num);
 
 	return SW_OK;
 }

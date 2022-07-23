@@ -808,7 +808,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 
 #if defined(IN_QM)
 #define SSDK_PRI_MAX		16
-#define SSDK_CPU_QUEUE_NUM	1
+#define SSDK_CPU_PRI_NUM	1
 sw_error_t
 qca_hppe_qm_hw_init(a_uint32_t dev_id)
 {
@@ -870,10 +870,12 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 		 * 8 queues per port for appe, class 0~6 matches with priority 0~6, and
 		 * class 7 matches with priority >=7.
 		 */
-		if (i == 0)
-			max_pri_supported = SSDK_CPU_QUEUE_NUM;
-		else
-			max_pri_supported = ssdk_ucast_queue_num_get(dev_id, i);
+		max_pri_supported = ssdk_ucast_l0_cdrr_num_get(dev_id, i);
+
+		if (max_pri_supported > SSDK_PRI_MAX) {
+			max_pri_supported = SSDK_CPU_PRI_NUM;
+		}
+
 		for (pri = 0; pri < SSDK_PRI_MAX; pri++) {
 			if (pri >= max_pri_supported)
 				class = max_pri_supported - 1;

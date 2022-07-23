@@ -11778,8 +11778,12 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
     char *cmd;
     sw_error_t rv;
     fal_flow_entry_t entry;
+    a_uint32_t tmp;
+    fal_flow_qos_t *flow_qos;
 
     aos_mem_zero(&entry, sizeof (fal_flow_entry_t));
+    tmp = 0;
+    flow_qos = &(entry.flow_qos);
 
     do
     {
@@ -12314,7 +12318,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         }
         else
         {
-            rv = cmd_data_check_uint32(cmd, &(entry.tree_id), sizeof (a_uint32_t));
+            rv = cmd_data_check_uint32(cmd, &(flow_qos->tree_id), sizeof (a_uint32_t));
         }
     }
     while (talk_mode && (SW_OK != rv));
@@ -12442,7 +12446,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
 		    rv = SW_BAD_VALUE;
 	    }
 	    else {
-		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.wifi_qos_en),
+		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(flow_qos->wifi_qos_en),
 				    sizeof (a_bool_t));
 	    }
     } while (talk_mode && (SW_OK != rv));
@@ -12458,9 +12462,26 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
 		    rv = SW_BAD_VALUE;
 	    }
 	    else {
-		    rv = cmd_data_check_uint32(cmd, &(entry.wifi_qos), sizeof(a_uint32_t));
+		    rv = cmd_data_check_uint32(cmd, &(flow_qos->wifi_qos), sizeof(a_uint32_t));
 	    }
     } while (talk_mode && (SW_OK != rv));
+#endif
+#if defined(MPPE)
+    cmd_data_check_element("qos_type", "0",
+		    "usage: 0 for tree_id, 1 for flowcookie\n",
+		    cmd_data_check_uint8, (cmd, &tmp, sizeof(a_uint8_t)));
+    flow_qos->qos_type = tmp;
+
+    rv = __cmd_data_check_boolean("bridge_nexthop_valid", "no",
+		    "usage: <yes/no/y/n>\n",
+		    cmd_data_check_confirm, A_FALSE, &(entry.bridge_nexthop_valid),
+		    sizeof (a_bool_t));
+    SW_RTN_ON_ERROR(rv);
+
+    cmd_data_check_element("bridge_nexthop", "0",
+		    "usage: next hop of bridge type\n",
+		    cmd_data_check_uint16, (cmd, &tmp, sizeof(a_uint16_t)));
+    entry.bridge_nexthop = tmp;
 #endif
 
     *(fal_flow_entry_t *)val = entry;

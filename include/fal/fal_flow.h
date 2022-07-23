@@ -69,6 +69,15 @@ typedef enum {
 #define FAL_FLOW_PKT_CNT_MASK	0xFFFFFFFFULL
 #define FAL_FLOW_BYTE_CNT_MASK	0xFFFFFFFFFFULL
 
+#define FAL_FLOW_QOS_TYPE_TREE_ID	0
+#define FAL_FLOW_QOS_TYPE_COOKIE	1
+typedef struct {
+	a_uint32_t tree_id; /*for qos for flow cookie */
+	a_bool_t wifi_qos_en; /* enable wifi qos or not, added for ipq95xx */
+	a_uint32_t wifi_qos; /* wifi qos value, added for ipq95xx */
+	a_uint8_t qos_type; /* wifi qos value, added for ipq53xx */
+} fal_flow_qos_t;
+
 typedef struct {
 	fal_fwd_cmd_t miss_action; /* flow mismatch action*/
 	a_bool_t frag_bypass_en; /*0 for disable and 1 for enable*/
@@ -107,7 +116,6 @@ typedef struct {
 	} flow_ip;
 	a_uint16_t src_port; /*l4 source port*/
 	a_uint16_t dst_port; /*l4 destination port*/
-	a_uint32_t tree_id; /*for qos*/
 	a_uint32_t pkt_counter; /*flow packet counter*/
 	a_uint64_t byte_counter; /*flow byte counter*/
 	a_bool_t pmtu_check_l3; /* compare pmtu with paket length of L3 or L2, added for ipq95xx */
@@ -116,8 +124,9 @@ typedef struct {
 	a_bool_t vlan_fmt_valid; /*egress with vlan format of bridge, added for ipq95xx */
 	a_bool_t svlan_fmt; /*egress with svlan tag of bridge, added for ipq95xx */
 	a_bool_t cvlan_fmt; /*egress with cvlan tag of bridge, added for ipq95xx */
-	a_bool_t wifi_qos_en; /* enable wifi qos or not, added for ipq95xx */
-	a_uint32_t wifi_qos; /* wifi qos value, added for ipq95xx */
+	fal_flow_qos_t flow_qos; /* egress with wifi qos, wifi tree id or flow cookie */
+	a_bool_t bridge_nexthop_valid; /*bridge nexthop valid, added for ipq53xx */
+	a_uint16_t bridge_nexthop; /*nexthop index for bridge, added for ipq53xx */
 	a_bool_t invalid; /* added for host data path */
 } fal_flow_entry_t;
 
@@ -182,12 +191,6 @@ enum  {
 	FUNC_FLOW_QOS_SET,
 	FUNC_FLOW_QOS_GET,
 };
-
-typedef struct {
-	a_uint32_t tree_id; /*for qos*/
-	a_bool_t wifi_qos_en; /* enable wifi qos or not, added for ipq95xx */
-	a_uint32_t wifi_qos; /* wifi qos value, added for ipq95xx */
-} fal_flow_qos_t;
 
 sw_error_t
 fal_flow_counter_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_entry_counter_t *flow_counter);

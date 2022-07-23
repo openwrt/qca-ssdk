@@ -2130,6 +2130,16 @@ typedef struct
 /* auto_insert_flag_1 */
 }adpt_api_t;
 
+typedef enum {
+	HPPE_TYPE,
+	CPPE_TYPE,
+	APPE_TYPE,
+	MPPE_TYPE,
+	MAX_PPE_TYPE,
+} adpt_ppe_type_t;
+
+adpt_ppe_type_t adpt_ppe_type_get(a_uint32_t dev_id);
+
 #define ADPT_IS_PPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_PPORT && \
 			FAL_PORT_ID_VALUE(port_id) < SSDK_MAX_PORT_NUM)?1:0)
 #define ADPT_IS_TRUNK(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_TRUNK && \

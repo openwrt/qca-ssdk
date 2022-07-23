@@ -64,6 +64,32 @@ a_uint32_t adapt_scomphy_revision_get(a_uint32_t dev_id)
 }
 #endif
 
+adpt_ppe_type_t adpt_ppe_type_get(a_uint32_t dev_id)
+{
+	adpt_ppe_type_t ppe_type = MAX_PPE_TYPE;
+#if defined(HPPE)
+	ssdk_chip_type chip_type = g_chip_ver[dev_id].chip_type;
+	a_uint32_t revision = g_chip_ver[dev_id].chip_revision;
+
+	switch (chip_type) {
+		case CHIP_HPPE:
+			ppe_type = HPPE_TYPE;
+			if (revision == CPPE_REVISION)
+				ppe_type = CPPE_TYPE;
+			break;
+		case CHIP_APPE:
+			ppe_type = APPE_TYPE;
+			if (revision == MPPE_REVISION)
+				ppe_type = MPPE_TYPE;
+			break;
+		default:
+			break;
+	}
+#endif
+
+	return ppe_type;
+}
+
 a_uint32_t adpt_chip_type_get(a_uint32_t dev_id)
 {
 	return g_chip_ver[dev_id].chip_type;

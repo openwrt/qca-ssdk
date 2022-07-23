@@ -246,6 +246,12 @@ void ssdk_switch_reg_map_info_get(a_uint32_t dev_id, ssdk_reg_map_info *info)
 	info->base_addr = cfg->switchreg_base_addr;
 	info->size = cfg->switchreg_size;
 }
+a_uint32_t ssdk_switch_pcie_base_get(a_uint32_t dev_id)
+{
+	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
+
+	return cfg->pcie_hw_base;
+}
 #ifdef DESS
 void ssdk_psgmii_reg_map_info_get(a_uint32_t dev_id, ssdk_reg_map_info *info)
 {
@@ -996,8 +1002,19 @@ static sw_error_t ssdk_dt_parse_access_mode(struct device_node *switch_node,
 
 		SSDK_INFO("switchreg_base_addr: 0x%x\n", ssdk_dt_priv->switchreg_base_addr);
 		SSDK_INFO("switchreg_size: 0x%x\n", ssdk_dt_priv->switchreg_size);
-	}
-	else {
+	} else if (!strcmp(ssdk_dt_priv->reg_access_mode, "pcie bus")) {
+		ssdk_dt_priv->switch_reg_access_mode = HSL_REG_PCIE_BUS;
+
+		reg_cfg = of_get_property(switch_node, "reg", &len);
+		if(!reg_cfg) {
+			SSDK_ERROR("%s: error reading properties for reg\n",
+				switch_node->name);
+			return SW_BAD_PARAM;
+		}
+		ssdk_dt_priv->pcie_hw_base = be32_to_cpup(reg_cfg);
+		SSDK_INFO("PCIE bus pcie_base_addr: 0x%x\n",
+				ssdk_dt_priv->pcie_hw_base);
+	} else {
 		ssdk_dt_priv->switch_reg_access_mode = HSL_REG_MDIO;
 	}
 

@@ -603,6 +603,8 @@ int qca808x_phy_probe(struct phy_device *phydev)
 #else
 	priv->phy_info = qca808x_phy_info_get(phydev->mdio.addr);
 #endif
+	if(!priv->phy_info)
+		return -ENXIO;
 	phydev->priv = priv;
 
 #if defined(IN_LINUX_STD_PTP)

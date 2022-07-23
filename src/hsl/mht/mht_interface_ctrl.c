@@ -599,13 +599,13 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		ethphy_clk_mask = MHT_CLK_TYPE_EPHY;
 	}
 
-	SSDK_INFO("uniphy:%d,mode:%s,autoneg_en:%d,force_speed:%d,clk_mask:0x%x\n",
+	SSDK_DEBUG("uniphy:%d,mode:%s,autoneg_en:%d,force_speed:%d,clk_mask:0x%x\n",
 		uniphy_index, (config->mac_mode == FAL_MAC_MODE_SGMII)?"sgmii":"sgmii plus",
 		config->config.sgmii.auto_neg, config->config.sgmii.force_speed,
 		ethphy_clk_mask);
 
 	/*GMII interface clock disable*/
-	SSDK_INFO("GMII interface clock disable\n");
+	SSDK_DEBUG("GMII interface clock disable\n");
 	rv = ssdk_mht_port_clk_en_set(dev_id, mht_port_id, ethphy_clk_mask,
 		A_FALSE);
 	SW_RTN_ON_ERROR (rv);
@@ -621,7 +621,7 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	/*uniphy1 xpcs reset, and configure raw clk*/
 	if(uniphy_index == MHT_UNIPHY_SGMII_1)
 	{
-		SSDK_INFO("uniphy1 xpcs reset, confiugre raw clock as:%lld\n",
+		SSDK_DEBUG("uniphy1 xpcs reset, confiugre raw clock as:%lld\n",
 			raw_clk);
 		rv = ssdk_mht_clk_assert(dev_id, MHT_UNIPHY_XPCS_RST);
 		SW_RTN_ON_ERROR (rv);
@@ -630,7 +630,7 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	}
 	else
 	{
-		SSDK_INFO("uniphy0 configure raw clock as %lld\n",
+		SSDK_DEBUG("uniphy0 configure raw clock as %lld\n",
 			raw_clk);
 		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_RX, raw_clk);
 		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_TX, raw_clk);
@@ -679,13 +679,13 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		speed_mode);
 	SW_RTN_ON_ERROR (rv);
 	/*GMII interface clock reset and release\n*/
-	SSDK_INFO("GMII interface clock reset and release\n");
+	SSDK_DEBUG("GMII interface clock reset and release\n");
 	rv = ssdk_mht_port_clk_reset(dev_id, mht_port_id, ethphy_clk_mask);
 	SW_RTN_ON_ERROR (rv);
 	rv = ssdk_mht_port_clk_reset(dev_id, uniphy_port_id, MHT_CLK_TYPE_UNIPHY);
 	SW_RTN_ON_ERROR (rv);
 	/*analog software reset and release*/
-	SSDK_INFO("analog software reset and release\n");
+	SSDK_DEBUG("analog software reset and release\n");
 	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr,
 		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RESET);
 	SW_RTN_ON_ERROR (rv);
@@ -694,10 +694,10 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		MHT_UNIPHY_PLL_POWER_ON_AND_RESET, 0x40, MHT_UNIPHY_ANA_SOFT_RELEASE);
 	SW_RTN_ON_ERROR (rv);
 	/*wait uniphy calibration done*/
-	SSDK_INFO("wait uniphy calibration done\n");
+	SSDK_DEBUG("wait uniphy calibration done\n");
 	mht_uniphy_calibration(dev_id, uniphy_addr);
 	/*GMII interface clock enable*/
-	SSDK_INFO("GMII interface clock enable\n");
+	SSDK_DEBUG("GMII interface clock enable\n");
 	rv = ssdk_mht_port_clk_en_set(dev_id, mht_port_id, ethphy_clk_mask, A_TRUE);
 	SW_RTN_ON_ERROR (rv);
 	rv = ssdk_mht_port_clk_en_set(dev_id, uniphy_port_id, MHT_CLK_TYPE_UNIPHY,
@@ -712,6 +712,25 @@ mht_interface_mac_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t uniphy_index = 0;
+
+	if(port_id == SSDK_PHYSICAL_PORT5)
+	{
+		/*if uniphy0 is used as switch bypass, then will do nothing here*/
+		if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_PHY))
+		{
+			SSDK_INFO("the uniphy0 is used for switch bypass\n");
+			return SW_OK;
+		}
+		else
+		{
+			if(config->mac_mode == FAL_MAC_MODE_MAX)
+			{
+				SSDK_INFO("the uniphy for port %d is not used\n", port_id);
+				ssdk_mht_clk_disable(dev_id, MHT_SRDS0_SYS_CLK);
+				return SW_OK;
+			}
+		}
+	}
 
 	if(config->mac_mode != FAL_MAC_MODE_SGMII && config->mac_mode !=
 		FAL_MAC_MODE_SGMII_PLUS)
@@ -735,7 +754,7 @@ mht_interface_mac_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 	rv = mht_interface_sgmii_mode_set(dev_id, uniphy_index, port_id, config);
 	SW_RTN_ON_ERROR (rv);
 	/*do sgmii function reset*/
-	SSDK_INFO("ipg_tune reset and function reset\n");
+	SSDK_DEBUG("ipg_tune reset and function reset\n");
 	rv = mht_uniphy_sgmii_function_reset(dev_id, uniphy_index);
 
 	return rv;

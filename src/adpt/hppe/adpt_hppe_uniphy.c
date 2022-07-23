@@ -939,6 +939,13 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 		qca_gcc_uniphy_port_clock_set(dev_id, uniphy_index,
 			i, A_TRUE);
 	}
+#ifdef MHT
+	if(hsl_port_phyid_get(dev_id, ssdk_port) == QCA8084_PHY)
+	{
+		rv = hsl_port_phy_mode_set(dev_id, ssdk_port, PHY_SGMII_BASET);
+		SW_RTN_ON_ERROR (rv);
+	}
+#endif
 
 	return rv;
 }

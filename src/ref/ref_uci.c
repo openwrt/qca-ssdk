@@ -13799,8 +13799,12 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 		rv = parse_mapt(command_name, val);
 #endif
 	} else if(!strcmp(module_name, "Vport")) {
-#ifdef IN_MAPT
+#ifdef IN_VPORT
 		rv = parse_vport(command_name, val);
+#endif
+	} else if(!strcmp(module_name, "Athtag")) {
+#ifdef IN_ATHTAG
+		rv = parse_athtag(command_name, val);
 #endif
 	}
 

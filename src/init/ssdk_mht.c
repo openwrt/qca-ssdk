@@ -217,7 +217,8 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 	portbmp = qca_ssdk_port_bmp_get(priv->device_id);
 	SSDK_DEBUG("mht sw mac polling task portbmp value is 0x%x\n", portbmp);
 	for (port_id = 1; port_id < SW_MAX_NR_PORT; port_id++) {
-		if(!(portbmp & (0x1 << port_id)))
+		if(!(portbmp & (0x1 << port_id)) ||
+			!(hsl_port_phy_connected(priv->device_id, port_id)))
 			continue;
 		rv = hsl_port_phy_status_get(priv->device_id, port_id, &phy_status);
 		if (rv != SW_OK) {

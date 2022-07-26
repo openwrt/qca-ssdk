@@ -922,6 +922,12 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 		SSDK_INFO("ssdk uniphy %d connects force port\n",
 				uniphy_index);
 	}
+	else
+	{
+		rv = hppe_uniphy_channel0_force_speed_mode_set(dev_id,
+			uniphy_index, UNIPHY_FORCE_SPEED_MODE_DISABLE);
+		SW_RTN_ON_ERROR (rv);
+	}
 	/* configure uniphy gcc software reset */
 	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
 

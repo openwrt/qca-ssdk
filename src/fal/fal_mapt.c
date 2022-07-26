@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -171,6 +172,40 @@ _fal_mapt_decap_entry_getnext(a_uint32_t dev_id, fal_mapt_decap_entry_t *mapt_en
     return rv;
 }
 
+sw_error_t
+_fal_mapt_decap_en_set(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t en)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_mapt_decap_en_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_mapt_decap_en_set(dev_id, mapt_index, en);
+    return rv;
+}
+
+sw_error_t
+_fal_mapt_decap_en_get(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t *en)
+{
+    adpt_api_t *p_api;
+    sw_error_t rv = SW_OK;
+
+    p_api = adpt_api_ptr_get(dev_id);
+    SW_RTN_ON_NULL(p_api);
+
+    if (NULL == p_api->adpt_mapt_decap_en_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_mapt_decap_en_get(dev_id, mapt_index, en);
+    return rv;
+}
+
 /**
  * @brief Set mapt decap control config
  * @param[in] dev_id device id
@@ -339,6 +374,46 @@ fal_mapt_decap_entry_getnext(a_uint32_t dev_id, fal_mapt_decap_entry_t *mapt_ent
     return rv;
 }
 
+/**
+ * @brief Set mapt decap enable or not
+ * @param[in] dev_id device id
+ * @param[in] mapt_index mapt decap entry index
+ * @param[in] en true or false
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_mapt_decap_en_set(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t en)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_mapt_decap_en_set(dev_id, mapt_index, en);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
+/**
+ * @brief Get mapt decap enable status
+ * @param[in] dev_id device id
+ * @param[in] mapt_index mapt decap entry index
+ * @param[out] en true or false
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_mapt_decap_en_get(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t *en)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_API_LOCK;
+    rv = _fal_mapt_decap_en_get(dev_id, mapt_index, en);
+    FAL_API_UNLOCK;
+
+    return rv;
+}
+
 EXPORT_SYMBOL(fal_mapt_decap_ctrl_set);
 EXPORT_SYMBOL(fal_mapt_decap_ctrl_get);
 EXPORT_SYMBOL(fal_mapt_decap_rule_entry_set);
@@ -348,6 +423,8 @@ EXPORT_SYMBOL(fal_mapt_decap_entry_add);
 EXPORT_SYMBOL(fal_mapt_decap_entry_del);
 EXPORT_SYMBOL(fal_mapt_decap_entry_getfirst);
 EXPORT_SYMBOL(fal_mapt_decap_entry_getnext);
+EXPORT_SYMBOL(fal_mapt_decap_en_set);
+EXPORT_SYMBOL(fal_mapt_decap_en_get);
 /**
  * @}
  */

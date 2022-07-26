@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -283,17 +284,22 @@ adpt_appe_mapt_decap_entry_add(a_uint32_t dev_id,
 
 	index = 0;
 	update_index = TL_MAP_LPM_TBL_MAX_ENTRY;
-	while (index < TL_MAP_LPM_TBL_MAX_ENTRY) {
-		rv = appe_tl_map_lpm_tbl_get(dev_id, index, &tl_map_lpm);
-		SW_RTN_ON_ERROR(rv);
 
-		if (!tl_map_lpm.bf.valid && update_index == TL_MAP_LPM_TBL_MAX_ENTRY) {
-			update_index = index;
+	if (mapt_entry->op_mode == FAL_TUNNEL_OP_MODE_INDEX) {
+		update_index = mapt_entry->entry_index;
+	} else {
+		while (index < TL_MAP_LPM_TBL_MAX_ENTRY) {
+			rv = appe_tl_map_lpm_tbl_get(dev_id, index, &tl_map_lpm);
+			SW_RTN_ON_ERROR(rv);
+
+			if (!tl_map_lpm.bf.valid && update_index == TL_MAP_LPM_TBL_MAX_ENTRY) {
+				update_index = index;
+			}
+
+			if (adpt_lpm_compare(*mapt_entry, tl_map_lpm))
+				return SW_ALREADY_EXIST;
+			index++;
 		}
-
-		if (adpt_lpm_compare(*mapt_entry, tl_map_lpm))
-			return SW_ALREADY_EXIST;
-		index++;
 	}
 
 	if (update_index != TL_MAP_LPM_TBL_MAX_ENTRY) {
@@ -305,6 +311,8 @@ adpt_appe_mapt_decap_entry_add(a_uint32_t dev_id,
 
 		rv = appe_tl_map_lpm_act_set(dev_id, update_index, &tl_map_act);
 		SW_RTN_ON_ERROR(rv);
+
+		mapt_entry->entry_index = update_index;
 	} else {
 		return SW_FULL;
 	}
@@ -329,14 +337,18 @@ adpt_appe_mapt_decap_entry_del(a_uint32_t dev_id,
 	aos_mem_zero(&tl_map_act, sizeof(union tl_map_lpm_act_u));
 	aos_mem_zero(&tl_map_cnt, sizeof(union tl_map_lpm_counter_u));
 
-	index = 0;
-	while (index < TL_MAP_LPM_TBL_MAX_ENTRY) {
-		rv = appe_tl_map_lpm_tbl_get(dev_id, index, &tl_map_lpm);
-		SW_RTN_ON_ERROR(rv);
+	if (mapt_entry->op_mode == FAL_TUNNEL_OP_MODE_INDEX) {
+		index = mapt_entry->entry_index;
+	} else {
+		index = 0;
+		while (index < TL_MAP_LPM_TBL_MAX_ENTRY) {
+			rv = appe_tl_map_lpm_tbl_get(dev_id, index, &tl_map_lpm);
+			SW_RTN_ON_ERROR(rv);
 
-		if (adpt_lpm_compare(*mapt_entry, tl_map_lpm))
-			break;
-		index++;
+			if (adpt_lpm_compare(*mapt_entry, tl_map_lpm))
+				break;
+			index++;
+		}
 	}
 
 	if (index != TL_MAP_LPM_TBL_MAX_ENTRY) {
@@ -390,6 +402,8 @@ adpt_appe_mapt_decap_entry_getfirst(a_uint32_t dev_id,
 
 		rv = adpt_mapt_decap_entry_convert(mapt_entry, A_FALSE, &tl_map_lpm, &tl_map_act);
 		SW_RTN_ON_ERROR(rv);
+
+		mapt_entry->entry_index = index;
 
 		rv = appe_tl_map_lpm_counter_get(dev_id, index, &tl_map_cnt);
 		SW_RTN_ON_ERROR(rv);
@@ -449,6 +463,8 @@ adpt_appe_mapt_decap_entry_getnext(a_uint32_t dev_id,
 		rv = adpt_mapt_decap_entry_convert(mapt_entry, A_FALSE, &tl_map_lpm, &tl_map_act);
 		SW_RTN_ON_ERROR(rv);
 
+		mapt_entry->entry_index = index;
+
 		rv = appe_tl_map_lpm_counter_get(dev_id, index, &tl_map_cnt);
 		SW_RTN_ON_ERROR(rv);
 
@@ -460,6 +476,37 @@ adpt_appe_mapt_decap_entry_getnext(a_uint32_t dev_id,
 		return SW_NOT_FOUND;
 	}
 
+	return rv;
+}
+
+sw_error_t
+adpt_appe_mapt_decap_en_set(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t en)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (mapt_index >= TL_MAP_LPM_TBL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	rv = appe_tl_map_lpm_tbl_valid_set(dev_id, mapt_index, en);
+	return rv;
+}
+
+sw_error_t
+adpt_appe_mapt_decap_en_get(a_uint32_t dev_id,
+		a_uint32_t mapt_index, a_bool_t *en)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(en);
+
+	if (mapt_index >= TL_MAP_LPM_TBL_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	rv = appe_tl_map_lpm_tbl_valid_get(dev_id, mapt_index, en);
 	return rv;
 }
 
@@ -480,7 +527,9 @@ void adpt_appe_mapt_func_bitmap_init(a_uint32_t dev_id)
 		BIT(FUNC_MAPT_DECAP_ENTRY_ADD) |
 		BIT(FUNC_MAPT_DECAP_ENTRY_DEL) |
 		BIT(FUNC_MAPT_DECAP_ENTRY_GETFIRST) |
-		BIT(FUNC_MAPT_DECAP_ENTRY_GETNEXT);
+		BIT(FUNC_MAPT_DECAP_ENTRY_GETNEXT) |
+		BIT(FUNC_MAPT_DECAP_EN_SET) |
+		BIT(FUNC_MAPT_DECAP_EN_GET);
 
 	return;
 }
@@ -499,6 +548,8 @@ static void adpt_appe_mapt_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt
 	p_adpt_api->adpt_mapt_decap_entry_del = NULL;
 	p_adpt_api->adpt_mapt_decap_entry_getfirst = NULL;
 	p_adpt_api->adpt_mapt_decap_entry_getnext = NULL;
+	p_adpt_api->adpt_mapt_decap_en_set = NULL;
+	p_adpt_api->adpt_mapt_decap_en_get = NULL;
 
 	return;
 }
@@ -532,6 +583,10 @@ adpt_appe_mapt_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_mapt_decap_entry_getfirst = adpt_appe_mapt_decap_entry_getfirst;
 	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_ENTRY_GETNEXT))
 		p_adpt_api->adpt_mapt_decap_entry_getnext = adpt_appe_mapt_decap_entry_getnext;
+	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_EN_SET))
+		p_adpt_api->adpt_mapt_decap_en_set = adpt_appe_mapt_decap_en_set;
+	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_EN_GET))
+		p_adpt_api->adpt_mapt_decap_en_get = adpt_appe_mapt_decap_en_get;
 
 	return SW_OK;
 }

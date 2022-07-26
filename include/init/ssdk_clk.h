@@ -40,6 +40,12 @@ extern "C" {
 #define UNIPHY0_SYS_RESET_ID	"uniphy0_sys_rst"
 #define UNIPHY1_SYS_RESET_ID	"uniphy1_sys_rst"
 #define UNIPHY2_SYS_RESET_ID	"uniphy2_sys_rst"
+#define UNIPHY0_AHB_RESET_ID	"uniphy0_ahb_rst"
+#define UNIPHY1_AHB_RESET_ID	"uniphy1_ahb_rst"
+#define UNIPHY_PORT1_RX_RESET_ID	"uniphy_port1_rx_rst"
+#define UNIPHY_PORT1_TX_RESET_ID	"uniphy_port1_tx_rst"
+#define UNIPHY_PORT2_RX_RESET_ID	"uniphy_port2_rx_rst"
+#define UNIPHY_PORT2_TX_RESET_ID	"uniphy_port2_tx_rst"
 
 #define SSDK_PORT1_RESET_ID	"nss_port1_rst"
 #define SSDK_PORT2_RESET_ID	"nss_port2_rst"
@@ -47,6 +53,11 @@ extern "C" {
 #define SSDK_PORT4_RESET_ID	"nss_port4_rst"
 #define SSDK_PORT5_RESET_ID	"nss_port5_rst"
 #define SSDK_PORT6_RESET_ID	"nss_port6_rst"
+#define SSDK_PORT1_RX_RESET_ID	"nss_port1_rx_rst"
+#define SSDK_PORT1_TX_RESET_ID	"nss_port1_tx_rst"
+#define SSDK_PORT2_RX_RESET_ID	"nss_port2_rx_rst"
+#define SSDK_PORT2_TX_RESET_ID	"nss_port2_tx_rst"
+
 #define SSDK_PORT1_MAC_RESET_ID	"nss_port1_mac_rst"
 #define SSDK_PORT2_MAC_RESET_ID	"nss_port2_mac_rst"
 #define SSDK_PORT3_MAC_RESET_ID	"nss_port3_mac_rst"
@@ -77,9 +88,16 @@ enum unphy_rst_type {
 	UNIPHY0_SYS_RESET_E,
 	UNIPHY1_SYS_RESET_E,
 	UNIPHY2_SYS_RESET_E,
+	UNIPHY0_AHB_RESET_E,
+	UNIPHY1_AHB_RESET_E,
+	UNIPHY0_PORT1_RX_DISABLE_E,
+	UNIPHY0_PORT1_TX_DISABLE_E,
+	UNIPHY1_PORT5_RX_DISABLE_E,
+	UNIPHY1_PORT5_TX_DISABLE_E,
 	UNIPHY_RST_MAX
 };
 
+#define GCC_IM_SLEEP_CLK	"gcc_im_sleep_clk"
 #define CMN_AHB_CLK		"cmn_ahb_clk"
 #define CMN_SYS_CLK		"cmn_sys_clk"
 #define UNIPHY0_AHB_CLK	"uniphy0_ahb_clk"
@@ -157,6 +175,10 @@ enum unphy_rst_type {
 #define UNIPHY2_PORT6_TX_CLK	"uniphy2_port6_tx_clk"
 #define PORT5_RX_SRC		"nss_port5_rx_clk_src"
 #define PORT5_TX_SRC		"nss_port5_tx_clk_src"
+#define UNIPHY_PORT1_RX_CLK	"uniphy_port1_rx_clk"
+#define UNIPHY_PORT1_TX_CLK	"uniphy_port1_tx_clk"
+#define UNIPHY_PORT2_RX_CLK	"uniphy_port2_rx_clk"
+#define UNIPHY_PORT2_TX_CLK	"uniphy_port2_tx_clk"
 
 enum unphy_clk_type {
 	NSS_PORT1_RX_CLK_E = 0,
@@ -251,6 +273,8 @@ enum mp_bcr_rst_type {
 #define NSS_NSSNOC_NSSCC_CLK_RATE   100000000
 #define NSS_NSSNOC_SNOC_1_CLK_RATE  342857143
 #define NSS_NSSNOC_SNOC_CLK_RATE    342857143
+#define MPPE_NSS_NSSNOC_SNOC_1_CLK_RATE  266660000
+#define MPPE_NSS_NSSNOC_SNOC_CLK_RATE    266660000
 
 #define UNIPHY_CLK_RATE_25M         25000000
 #define UNIPHY_CLK_RATE_50M         50000000
@@ -278,6 +302,7 @@ enum mp_bcr_rst_type {
 
 #define APPE_UNIPHY_SYS_CLK_RATE    24000000
 #define APPE_CLK_RATE               353000000
+#define MPPE_CLK_RATE               200000000
 
 enum {
 	UNIPHY_RX = 0,
@@ -314,7 +339,7 @@ void ssdk_port_mac_clock_reset(
 #endif
 
 #if defined(HPPE)
-void ssdk_ppe_reset_init(void);
+void ssdk_ppe_reset_init(a_uint32_t dev_id);
 void ssdk_uniphy_raw_clock_reset(a_uint8_t uniphy_index);
 void ssdk_uniphy_raw_clock_set(
 	a_uint8_t uniphy_index,

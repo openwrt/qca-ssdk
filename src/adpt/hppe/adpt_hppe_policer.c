@@ -33,11 +33,6 @@
 #define NR_ADPT_HPPE_POLICER_METER_TOKEN_UNIT         8
 #define ADPT_HPPE_POLICER_METER_UNIT_BYTE       0
 #define ADPT_HPPE_POLICER_METER_UNIT_FRAME      1
-#ifdef APPE
-#define ADPT_HPPE_FREQUENCY      353  /*MHZ*/
-#else
-#define ADPT_HPPE_FREQUENCY      300  /*MHZ*/
-#endif
 #define ADPT_HPPE_POLICER_BURST_SIZE_UNIT      65536
 #define ADPT_HPPE_POLICER_REFRESH_BITS  18
 #define ADPT_HPPE_POLICER_BUCKET_SIZE_BITS  16
@@ -323,15 +318,16 @@ __adpt_hppe_policer_bucket_size_to_burst_size(a_uint32_t bucket_size,
 #endif
 
 static sw_error_t
-__adpt_hppe_policer_max_rate(a_uint32_t time_slot)
+__adpt_hppe_policer_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
 {
 	a_uint32_t i = 0, j = 0;
 	a_uint32_t time_cycle = 0;
 	a_uint64_t temp = 0, temp1 = 0, temp2 = 0;
+	a_uint32_t ppe_freq = adpt_chip_freq_get(dev_id);
 
 
 	/* time_cycle is ns*/
-	time_cycle = ( time_slot * 8)/ ADPT_HPPE_FREQUENCY;
+	time_cycle = ( time_slot * 8)/ ppe_freq;
 
 	for (j = 0; j < 8; j++)
 	{
@@ -1118,7 +1114,7 @@ adpt_hppe_policer_time_slot_set(a_uint32_t dev_id, a_uint32_t time_slot)
 	time_slot_reg.bf.time_slot = time_slot;
 	hppe_time_slot_reg_set(dev_id, &time_slot_reg);
 
-	__adpt_hppe_policer_max_rate(time_slot);
+	__adpt_hppe_policer_max_rate(dev_id, time_slot);
 
 	__adpt_hppe_policer_max_burst_size();
 

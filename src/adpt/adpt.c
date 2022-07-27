@@ -100,6 +100,30 @@ a_uint32_t adpt_chip_revision_get(a_uint32_t dev_id)
 	return g_chip_ver[dev_id].chip_revision;
 }
 
+a_uint32_t adpt_chip_freq_get(a_uint32_t dev_id)
+{
+	a_uint32_t ppe_freq = ADPT_HPPE_FREQUENCY;
+	adpt_ppe_type_t ppe_type = adpt_ppe_type_get(dev_id);
+
+	switch (ppe_type) {
+		case HPPE_TYPE:
+		case CPPE_TYPE:
+			ppe_freq = ADPT_HPPE_FREQUENCY;
+			break;
+		case APPE_TYPE:
+			ppe_freq = ADPT_APPE_FREQUENCY;
+			break;
+		case MPPE_TYPE:
+			ppe_freq = ADPT_MPPE_FREQUENCY;
+			break;
+		default:
+			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
+			break;
+	}
+
+	return ppe_freq;
+}
+
 #if defined(APPE)
 static sw_error_t adpt_appe_module_func_register(a_uint32_t dev_id, a_uint32_t module)
 {

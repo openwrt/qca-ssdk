@@ -33,9 +33,6 @@
 #define NR_ADPT_HPPE_SHAPER_METER_TOKEN_UNIT         8
 #define ADPT_HPPE_SHAPER_METER_UNIT_BYTE       0
 #define ADPT_HPPE_SHAPER_METER_UNIT_FRAME      1
-#define ADPT_MPPE_FREQUENCY      200  /*MHZ*/
-#define ADPT_APPE_FREQUENCY      353  /*MHZ*/
-#define ADPT_HPPE_FREQUENCY      300  /*MHZ*/
 #define ADPT_HPPE_SHAPER_BURST_SIZE_UNIT      65536
 #define ADPT_HPPE_SHAPER_REFRESH_BITS  18
 #define ADPT_HPPE_SHAPER_BUCKET_SIZE_BITS  14
@@ -178,37 +175,13 @@ hppe_shaper_burst_size[NR_ADPT_HPPE_SHAPER_METER_UNIT][NR_ADPT_HPPE_SHAPER_METER
 	},
 };
 
-static inline a_uint32_t __adpt_hppe_freq_get(a_uint32_t dev_id)
-{
-	a_uint32_t ppe_freq = ADPT_HPPE_FREQUENCY;
-	adpt_ppe_type_t ppe_type = adpt_ppe_type_get(dev_id);
-
-	switch (ppe_type) {
-		case HPPE_TYPE:
-		case CPPE_TYPE:
-			ppe_freq = ADPT_HPPE_FREQUENCY;
-			break;
-		case APPE_TYPE:
-			ppe_freq = ADPT_APPE_FREQUENCY;
-			break;
-		case MPPE_TYPE:
-			ppe_freq = ADPT_MPPE_FREQUENCY;
-			break;
-		default:
-			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
-			break;
-	}
-
-	return ppe_freq;
-}
-
 static sw_error_t
 __adpt_hppe_port_shaper_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
 {
 	a_uint32_t i = 0, j = 0;
 	a_uint32_t time_cycle;
 	a_uint64_t temp, temp1,temp2;
-	a_uint32_t ppe_freq = __adpt_hppe_freq_get(dev_id);
+	a_uint32_t ppe_freq = adpt_chip_freq_get(dev_id);
 
 	/* time_cycle is ns*/
 	time_cycle = ( time_slot * 8);
@@ -259,7 +232,7 @@ __adpt_hppe_flow_shaper_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
 	a_uint32_t i = 0, j = 0;
 	a_uint32_t time_cycle;
 	a_uint64_t temp, temp1,temp2;
-	a_uint32_t ppe_freq = __adpt_hppe_freq_get(dev_id);
+	a_uint32_t ppe_freq = adpt_chip_freq_get(dev_id);
 
 	/* time_cycle is ns*/
 	time_cycle = ( time_slot * 8);
@@ -310,7 +283,7 @@ __adpt_hppe_queue_shaper_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
 	a_uint32_t i = 0, j = 0;
 	a_uint32_t time_cycle;
 	a_uint64_t temp, temp1,temp2;
-	a_uint32_t ppe_freq = __adpt_hppe_freq_get(dev_id);
+	a_uint32_t ppe_freq = adpt_chip_freq_get(dev_id);
 
 	/* time_cycle is ns*/
 	time_cycle = ( time_slot * 8) / ppe_freq;

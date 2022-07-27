@@ -881,7 +881,22 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 				class = max_pri_supported - 1;
 			else
 				class = pri;
-			fal_ucast_priority_class_set(dev_id, i, pri, class);
+
+			if (i == 0) {
+				/*
+				 * For CPU port, ARM core and direct switch take the common
+				 * profile ID 0, point offload(NSS) takes the special profile
+				 * ID 15.
+				 */
+				fal_ucast_priority_class_set(dev_id, FAL_QM_PROFILE_COMMON_ID,
+						pri, class);
+
+				fal_ucast_priority_class_set(dev_id, FAL_QM_PROFILE_PO_ID,
+						pri, class);
+			} else {
+				fal_ucast_priority_class_set(dev_id, i, pri, class);
+			}
+
 		}
 	}
 

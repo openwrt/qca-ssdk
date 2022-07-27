@@ -34,6 +34,8 @@
 #if defined(MPPE)
 #include "cppe_qos_reg.h"
 #include "cppe_qos.h"
+#include "mppe_athtag_reg.h"
+#include "mppe_athtag.h"
 #endif
 
 #define FLOW_ENTRY_TYPE_IPV4 0
@@ -2330,13 +2332,10 @@ adpt_hppe_flow_global_cfg_get(
 		fal_flow_global_cfg_t *cfg)
 {
 	sw_error_t rv = SW_OK;
-#if defined(CPPE) || defined(APPE)
-	a_uint32_t chip_ver = 0, chip_type = 0;
-	a_bool_t flow_cpy_escape = A_FALSE;
-#endif
 	union flow_ctrl0_u flow_ctrl0;
 	union l3_route_ctrl_u route_ctrl;
 	union l3_route_ctrl_ext_u route_ctrl_ext;
+	adpt_ppe_type_t ppe_type = MAX_PPE_TYPE;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(cfg);
@@ -2344,6 +2343,20 @@ adpt_hppe_flow_global_cfg_get(
 	memset(&flow_ctrl0, 0, sizeof(flow_ctrl0));
 	memset(&route_ctrl, 0, sizeof(route_ctrl));
 	memset(&route_ctrl_ext, 0, sizeof(route_ctrl_ext));
+
+	ppe_type = adpt_ppe_type_get(dev_id);
+
+#if defined(MPPE)
+	if (ppe_type == MPPE_TYPE) {
+		union eg_gen_ctrl_u eg_ctrl;
+
+		memset(&eg_ctrl, 0, sizeof(eg_ctrl));
+		rv = mppe_eg_gen_ctrl_get(dev_id, &eg_ctrl);
+		SW_RTN_ON_ERROR(rv);
+
+		cfg->flow_cookie_pri = eg_ctrl.bf.flow_cookie_pri;
+	}
+#endif
 
 	rv = hppe_flow_ctrl0_get(dev_id, &flow_ctrl0);
 	SW_RTN_ON_ERROR(rv);
@@ -2355,12 +2368,12 @@ adpt_hppe_flow_global_cfg_get(
 	SW_RTN_ON_ERROR(rv);
 
 #if defined(CPPE) || defined(APPE)
-	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_chip_revision_get(dev_id);
-	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE) {
+	if (ppe_type != MAX_PPE_TYPE && ppe_type != HPPE_TYPE) {
+		a_bool_t flow_cpy_escape = A_FALSE;
+
 		rv = adpt_cppe_flow_copy_escape_get(dev_id, &flow_cpy_escape);
 		SW_RTN_ON_ERROR(rv);
+
 		cfg->flow_mismatch_copy_escape_en = flow_cpy_escape;
 	}
 #endif
@@ -2393,12 +2406,10 @@ adpt_hppe_flow_global_cfg_set(
 		fal_flow_global_cfg_t *cfg)
 {
 	sw_error_t rv = SW_OK;
-#if defined(CPPE) || defined(APPE)
-	a_uint32_t chip_ver = 0, chip_type = 0;
-#endif
 	union flow_ctrl0_u flow_ctrl0;
 	union l3_route_ctrl_u route_ctrl;
 	union l3_route_ctrl_ext_u route_ctrl_ext;
+	adpt_ppe_type_t ppe_type = MAX_PPE_TYPE;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(cfg);
@@ -2406,6 +2417,8 @@ adpt_hppe_flow_global_cfg_set(
 	memset(&flow_ctrl0, 0, sizeof(flow_ctrl0));
 	memset(&route_ctrl, 0, sizeof(route_ctrl));
 	memset(&route_ctrl_ext, 0, sizeof(route_ctrl_ext));
+
+	ppe_type = adpt_ppe_type_get(dev_id);
 
 	rv = hppe_flow_ctrl0_get(dev_id, &flow_ctrl0);
 	SW_RTN_ON_ERROR(rv);
@@ -2445,12 +2458,24 @@ adpt_hppe_flow_global_cfg_set(
 	SW_RTN_ON_ERROR(rv);
 
 #if defined(CPPE) || defined(APPE)
-	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_chip_revision_get(dev_id);
-	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE) {
+	if (ppe_type != MAX_PPE_TYPE && ppe_type != HPPE_TYPE) {
 		rv = adpt_cppe_flow_copy_escape_set(dev_id,
 				cfg->flow_mismatch_copy_escape_en);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+
+#if defined(MPPE)
+	if (ppe_type == MPPE_TYPE) {
+		union eg_gen_ctrl_u eg_ctrl;
+		memset(&eg_ctrl, 0, sizeof(eg_ctrl));
+
+		rv = mppe_eg_gen_ctrl_get(dev_id, &eg_ctrl);
+		SW_RTN_ON_ERROR(rv);
+
+		eg_ctrl.bf.flow_cookie_pri = cfg->flow_cookie_pri;
+
+		rv = mppe_eg_gen_ctrl_set(dev_id, &eg_ctrl);
 		SW_RTN_ON_ERROR(rv);
 	}
 #endif

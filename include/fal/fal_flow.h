@@ -158,6 +158,7 @@ typedef struct {
 			     * added for ipq95xx */
 	a_bool_t l3_vpn_en; /* enable vrf(vpn_id configured by ip globalctrl) as flow key or not
 			     * added for ipq95xx */
+	a_uint8_t flow_cookie_pri; /* flow cookie priority compared with IPO, added for ipq53xx */
 } fal_flow_global_cfg_t;
 
 typedef struct {

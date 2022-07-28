@@ -128,6 +128,8 @@ typedef struct {
 	a_bool_t bridge_nexthop_valid; /*bridge nexthop valid, added for ipq53xx */
 	a_uint16_t bridge_nexthop; /*nexthop index for bridge, added for ipq53xx */
 	a_bool_t invalid; /* added for host data path */
+	a_bool_t policer_valid; /* flow based policer valid or not, added for ipq53xx */
+	a_uint32_t policer_index; /* flow based policer index, added for ipq53xx */
 } fal_flow_entry_t;
 
 typedef struct {

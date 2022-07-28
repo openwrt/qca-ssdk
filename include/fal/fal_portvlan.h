@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2016-2018, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -217,6 +219,16 @@ typedef enum
 	FAL_QINQ_CORE_PORT,
 	FAL_QINQ_PORT_ROLE_BUTT
 } fal_qinq_port_role_t;
+
+/**
+  @brief This enum defines which port to use for qinq role.
+  */
+typedef enum
+{
+	FAL_QINQ_SEL_TNL_DECAP_SRC_VP = 0,
+	FAL_QINQ_SEL_ORG_SRC_PORT,
+	FAL_QINQ_SEL_PORT_TYPE_BUTT
+} fal_qinq_port_sel_t;
 
 enum {
 	FUNC_PORT_INVLAN_MODE_SET = 0,
@@ -474,6 +486,10 @@ typedef struct {
 	fal_qinq_port_role_t egress_port_role; /* port egress direction role */
 	fal_qinq_port_role_t tunnel_port_role; /* tunnel ingress parse role
 						* added for ipq95xx */
+	fal_qinq_port_sel_t ingress_port_sel; /*which port used for ingress_port_role in tunnel decap scenario.
+						* 0 is used to selcet srcvp of tunnel decap, 1 always selet original source port.
+						* default: 0, will use srcvp of tunnel decap.
+						* added for ipq5332*/
 } fal_port_qinq_role_t;
 
 #define FAL_TPID_CTAG_EN (0x1UL << 0)

@@ -417,6 +417,14 @@ struct attr_des_t g_attr_des[] =
 			{NULL, FAL_PORT_CNT_MODE_BUTT}
 		}
 	},
+	{
+		"port_select",
+		{
+			{"tnl_decap_src_vp", FAL_QINQ_SEL_TNL_DECAP_SRC_VP},
+			{"org_src_port", FAL_QINQ_SEL_ORG_SRC_PORT},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
 
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
@@ -4537,6 +4545,12 @@ cmd_data_check_port_qinqmode(char *info, void *val, a_uint32_t size)
 				    &(pEntry->tunnel_port_role), sizeof(a_uint32_t));
 	    }
     } while (talk_mode && (SW_OK != rv));
+#if defined(MPPE)
+	cmd_data_check_element("tunnel_ingress_port_select", "tnl_decap_src_vp",
+					"usage: tnl_decap_src_vp or org_src_port\n",
+					cmd_data_check_attr, ("port_select", cmd,
+					&(pEntry->ingress_port_sel), sizeof(pEntry->ingress_port_sel)));
+#endif
 #endif
 
     return SW_OK;

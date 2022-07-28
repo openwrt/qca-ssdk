@@ -250,6 +250,11 @@ qca_hppe_portvlan_hw_init(a_uint32_t dev_id)
 	fal_tpid_t in_eg_tpid;
 	fal_vlantag_egress_mode_t vlantag_eg_mode;
 
+	aos_mem_zero(&global_qinq_mode, sizeof(global_qinq_mode));
+	aos_mem_zero(&port_qinq_role, sizeof(port_qinq_role));
+	aos_mem_zero(&in_eg_tpid, sizeof(in_eg_tpid));
+	aos_mem_zero(&vlantag_eg_mode, sizeof(vlantag_eg_mode));
+
 	/* configure ingress/egress global QinQ mode as ctag/ctag */
 	global_qinq_mode.mask = 0x3;
 	global_qinq_mode.ingress_mode = FAL_QINQ_CTAG_MODE;

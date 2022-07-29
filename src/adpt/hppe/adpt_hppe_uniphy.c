@@ -538,8 +538,13 @@ __adpt_hppe_uniphy_uxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	/* enable uniphy eee transparent mode*/
 	__adpt_hppe_uniphy_uqxgmii_eee_set(dev_id, uniphy_index);
 
-	rv = hsl_port_phy_mode_set(dev_id, SSDK_PHYSICAL_PORT1, PORT_UQXGMII);
-	return rv;
+	if(mode == PORT_WRAPPER_UQXGMII)
+	{
+		rv = hsl_port_phy_mode_set(dev_id, SSDK_PHYSICAL_PORT1, PORT_UQXGMII);
+		SW_RTN_ON_ERROR (rv);
+	}
+
+	return SW_OK;
 }
 
 static sw_error_t

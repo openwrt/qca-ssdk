@@ -977,7 +977,7 @@ adpt_hppe_debug_cpu_code_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 			printk(KERN_CONT "\n");
 			printk(KERN_CONT "%-35s", "");
 			if (i >=0 && i <= 70)
-				printk(KERN_CONT "%15llu(%s)", value, cpucode[i]);
+				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i], i);
 			else if (i >= 79 && i <= 92)
 				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 8], i);
 			else if (i >= 97 && i <= 102)

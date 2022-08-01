@@ -1458,8 +1458,11 @@ static int config_gpio(a_uint32_t  gpio_num)
 static int qca_link_polling_select(struct qca_phy_priv *priv)
 {
 	struct device_node *np = NULL;
-	const __be32 *link_polling_required, *link_intr_gpio;
-	a_int32_t len;
+	const __be32 *link_polling_required;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
+	const __be32 *link_intr_gpio;
+#endif
+	a_int32_t len = 0, intr_gpio_num = 0;
 
 	if (priv->ess_switch_flag == A_TRUE)
 		np = priv->of_node;
@@ -1487,15 +1490,25 @@ static int qca_link_polling_select(struct qca_phy_priv *priv)
 	priv->link_polling_required  = be32_to_cpup(link_polling_required);
 	if(!priv->link_polling_required)
 	{
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 		link_intr_gpio = of_get_property(np, "link-intr-gpio", &len);
 		if (!link_intr_gpio )
 		{
 			SSDK_ERROR("cannot find link-intr-gpio node\n");
 			return -1;
 		}
-		if(config_gpio(be32_to_cpup(link_intr_gpio)))
+		intr_gpio_num = be32_to_cpup(link_intr_gpio);
+#else
+		intr_gpio_num = of_get_named_gpio(np, "link-intr-gpio", 0);
+		if(intr_gpio_num < 0)
+		{
+			SSDK_ERROR("cannot find link-intr-gpio node\n");
 			return -1;
-		priv->link_interrupt_no = gpio_to_irq (be32_to_cpup(link_intr_gpio));
+		}
+#endif
+		if(config_gpio(intr_gpio_num))
+			return -1;
+		priv->link_interrupt_no = gpio_to_irq (intr_gpio_num);
 		SSDK_INFO("the interrupt number is:%x\n",priv->link_interrupt_no);
 	}
 
@@ -1952,7 +1965,7 @@ qca_phy_config_init(struct phy_device *pdev)
 	return ret;
 }
 
-#if defined(DESS) || defined(HPPE) || defined (ISISC) || defined (ISIS) || defined(MP)
+#if defined(DESS) || defined(HPPE) || defined (ISISC) || defined (ISIS) || defined(MP) || defined(MHT)
 static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 {
 	struct qca_phy_priv *priv;
@@ -1968,7 +1981,7 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	priv->phy_dbg_read = qca_ar8327_phy_dbg_read;
 	priv->phy_mmd_write = qca_ar8327_mmd_write;
 
-	if (chip_type == CHIP_DESS) {
+	if (chip_type == CHIP_DESS || chip_type == CHIP_MHT) {
 		priv->ports = 6;
 	} else if ((chip_type == CHIP_ISIS) || (chip_type == CHIP_ISISC)) {
 		priv->ports = 7;
@@ -2038,7 +2051,22 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	else
 	{
 		SSDK_INFO("interrupt is selected\n");
-		priv->interrupt_flag = IRQF_TRIGGER_MASK;
+		switch(priv->version)
+		{
+#ifdef MHT
+			case QCA_VER_MHT:
+				priv->interrupt_flag = IRQF_TRIGGER_HIGH;
+				break;
+#endif
+#ifdef ISISC
+			case QCA_VER_AR8337:
+				priv->interrupt_flag = IRQF_TRIGGER_LOW;
+				break;
+#endif
+			default:
+				priv->interrupt_flag = IRQF_TRIGGER_NONE;
+				break;
+		}
 		ret = qca_intr_init(priv);
 		if(ret)
 		{

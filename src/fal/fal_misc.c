@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2017, 2020, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -500,7 +503,7 @@ _fal_port_arp_ack_status_get(a_uint32_t dev_id, fal_port_t port_id,
     rv = p_api->port_arp_ack_status_get(dev_id, port_id, enable);
     return rv;
 }
-
+#endif
 static sw_error_t
 _fal_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
 {
@@ -677,6 +680,22 @@ _fal_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t* port_bitmap)
 }
 
 static sw_error_t
+_fal_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
+{
+    sw_error_t rv;
+    hsl_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
+
+    if (NULL == p_api->intr_status_mac_linkchg_clear)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->intr_status_mac_linkchg_clear(dev_id);
+    return rv;
+}
+
+#ifndef IN_MISC_MINI
+static sw_error_t
 _fal_cpu_vid_en_set(a_uint32_t dev_id, a_bool_t enable)
 {
     sw_error_t rv;
@@ -706,22 +725,6 @@ _fal_cpu_vid_en_get(a_uint32_t dev_id, a_bool_t * enable)
     rv = p_api->cpu_vid_en_get(dev_id, enable);
     return rv;
 }
-
-static sw_error_t
-_fal_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
-{
-    sw_error_t rv;
-    hsl_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    if (NULL == p_api->intr_status_mac_linkchg_clear)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->intr_status_mac_linkchg_clear(dev_id);
-    return rv;
-}
-
 
 static sw_error_t
 _fal_global_macaddr_set(a_uint32_t dev_id, fal_mac_addr_t * addr)
@@ -1378,7 +1381,7 @@ fal_port_arp_ack_status_get(a_uint32_t dev_id, fal_port_t port_id,
     FAL_API_UNLOCK;
     return rv;
 }
-
+#endif
 /**
  * @brief Set switch interrupt mask on one particular device.
  * @param[in] dev_id device id
@@ -1554,6 +1557,23 @@ fal_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t* port_bitmap)
 }
 
 /**
+ * @brief Get mac link change interrupt mask on particular port.
+ * @param[in] dev_id device id
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
+{
+    sw_error_t rv;
+
+    FAL_API_LOCK;
+    rv = _fal_intr_status_mac_linkchg_clear(dev_id);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+#ifndef IN_MISC_MINI
+/**
  * @brief Set to cpu vid enable status on a particular device.
  * @param[in] dev_id device id
  * @param[in] enable A_TRUE or A_FALSE
@@ -1583,22 +1603,6 @@ fal_cpu_vid_en_get(a_uint32_t dev_id, a_bool_t * enable)
 
     FAL_API_LOCK;
     rv = _fal_cpu_vid_en_get(dev_id, enable);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-/**
- * @brief Get mac link change interrupt mask on particular port.
- * @param[in] dev_id device id
- * @return SW_OK or error code
- */
-sw_error_t
-fal_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_intr_status_mac_linkchg_clear(dev_id);
     FAL_API_UNLOCK;
     return rv;
 }

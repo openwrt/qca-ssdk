@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2017-2018, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -160,7 +163,7 @@ extern "C" {
 
     sw_error_t
     fal_port_arp_ack_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
-
+#endif
 
     sw_error_t
     fal_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask);
@@ -201,13 +204,14 @@ extern "C" {
     fal_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t *port_bitmap);
 
     sw_error_t
+    fal_intr_status_mac_linkchg_clear(a_uint32_t dev_id);
+
+#ifndef IN_MISC_MINI
+    sw_error_t
     fal_cpu_vid_en_set(a_uint32_t dev_id, a_bool_t enable);
 
     sw_error_t
     fal_cpu_vid_en_get(a_uint32_t dev_id, a_bool_t * enable);
-
-    sw_error_t
-    fal_intr_status_mac_linkchg_clear(a_uint32_t dev_id);
 
 	sw_error_t
     fal_global_macaddr_set(a_uint32_t dev_id, fal_mac_addr_t * addr);

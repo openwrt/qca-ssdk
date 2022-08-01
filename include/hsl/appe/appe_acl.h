@@ -275,6 +275,34 @@ appe_eg_ipo_ext_tbl_policy_id_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#if 0
+#if defined(MPPE)
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_pri_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+
+sw_error_t
+mppe_eg_ipo_ext_tbl_cookie_pri_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value);
+#endif
+#endif
+
 sw_error_t
 appe_pre_ipo_rule_reg_get(
 		a_uint32_t dev_id,

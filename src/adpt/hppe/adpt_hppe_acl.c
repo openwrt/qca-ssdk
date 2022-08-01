@@ -1651,6 +1651,13 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 	if(hw_act->bf.metadata_en == 1)
 	{
 		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_METADATA_EN);
+#if defined(MPPE)
+		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+		{
+			rule->metadata_pri =
+				(hw_act->bf.metadata_pri_1<<3)|hw_act->bf.metadata_pri_0;
+		}
+#endif
 	}
 #if defined(CPPE) || defined(APPE)
 	if((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
@@ -1837,7 +1844,7 @@ _adpt_ppe_acl_rule_sw_query(a_uint32_t dev_id,
 				hw_list_id - ADPT_ACL_HW_LIST_NUM , hw_entries, rule);
 		SW_RTN_ON_ERROR(rv);
 	}
-	rv = _adpt_appe_acl_policy_id_get(dev_id, hw_list_id, hw_entries, rule);
+	rv = _adpt_appe_acl_ext_get(dev_id, hw_list_id, hw_entries, rule);
 #endif
 	return rv;
 }
@@ -3375,6 +3382,13 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 	if(FAL_ACTION_FLG_TST(rule->action_flg, FAL_ACL_ACTION_METADATA_EN))
 	{
 		hw_act->bf.metadata_en = 1;
+#if defined(MPPE)
+		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+		{
+			hw_act->bf.metadata_pri_0 = rule->metadata_pri&0x7;
+			hw_act->bf.metadata_pri_1 = (rule->metadata_pri>>3)&0x1;
+		}
+#endif
 	}
 #if defined(CPPE) || defined(APPE)
 	if((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
@@ -3609,7 +3623,7 @@ _adpt_ppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 			rule_type_map, inner_rule_type_map, allocated_entries);
 		SW_RTN_ON_ERROR(rv);
 	}
-	rv = _adpt_appe_acl_policy_id_set(dev_id, rule, hw_list_id, allocated_entries);
+	rv = _adpt_appe_acl_ext_set(dev_id, rule, hw_list_id, allocated_entries);
 #endif
 	return rv;
 }
@@ -4317,7 +4331,7 @@ _adpt_ppe_acl_rule_hw_delete(a_uint32_t dev_id,
 					hw_entries, rule_nr);
 		SW_RTN_ON_ERROR(rv);
 	}
-	rv = _adpt_appe_acl_policy_id_clear(dev_id, hw_list_id, hw_entries);
+	rv = _adpt_appe_acl_ext_clear(dev_id, hw_list_id, hw_entries);
 #endif
 	return rv;
 }

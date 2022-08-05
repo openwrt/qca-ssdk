@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -263,6 +264,18 @@ union tl_map_lpm_tbl_u {
 	#define TL_MAP_LPM_ACT_EXP_PROFILE_OFFSET  52
 	#define TL_MAP_LPM_ACT_EXP_PROFILE_LEN     2
 	#define TL_MAP_LPM_ACT_EXP_PROFILE_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] SERVICE_CODE*/
+	#define TL_MAP_LPM_ACT_SERVICE_CODE
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_OFFSET  54
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_LEN     8
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_DEFAULT 0x0
+	/*[field] SERVICE_CODE_EN*/
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_EN
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_EN_OFFSET  62
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_EN_LEN     1
+	#define TL_MAP_LPM_ACT_SERVICE_CODE_EN_DEFAULT 0x0
+#endif
 
 struct tl_map_lpm_act {
 	a_uint32_t  map_rule_id:5;
@@ -279,7 +292,13 @@ struct tl_map_lpm_act {
 	a_uint32_t  src_info_type:1;
 	a_uint32_t  src_info:8;
 	a_uint32_t  exp_profile:2;
+#if defined(MPPE)
+	a_uint32_t  service_code:8;
+	a_uint32_t  service_code_en:1;
+	a_uint32_t  _reserved0:1;
+#else
 	a_uint32_t  _reserved0:10;
+#endif
 };
 
 union tl_map_lpm_act_u {

@@ -114,6 +114,9 @@ typedef struct {
 	a_uint64_t byte_counter; /* hit byte counter */
 	a_uint32_t entry_index; /* mapt entry index */
 	fal_tunnel_op_mode_t op_mode; /* hash or index */
+	/* new add for IPQ53xx */
+	a_bool_t service_code_en; /* enable new service code or not */
+	a_uint8_t service_code; /* updated service code */
 } fal_mapt_decap_entry_t;
 
 sw_error_t

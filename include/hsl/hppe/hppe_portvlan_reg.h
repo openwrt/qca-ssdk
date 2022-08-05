@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -32,10 +34,22 @@
 	#define PORT_PARSING_REG_PORT_ROLE_OFFSET  0
 	#define PORT_PARSING_REG_PORT_ROLE_LEN     1
 	#define PORT_PARSING_REG_PORT_ROLE_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] SRC_PORT_SEL*/
+	#define PORT_PARSING_REG_SRC_PORT_SEL
+	#define PORT_PARSING_REG_SRC_PORT_SEL_OFFSET  1
+	#define PORT_PARSING_REG_SRC_PORT_SEL_LEN     1
+	#define PORT_PARSING_REG_SRC_PORT_SEL_DEFAULT 0x0
+#endif
 
 struct port_parsing_reg {
 	a_uint32_t  port_role:1;
+#if defined(MPPE)
+	a_uint32_t  src_port_sel:1;
+	a_uint32_t  _reserved0:30;
+#else
 	a_uint32_t  _reserved0:31;
+#endif
 };
 
 union port_parsing_reg_u {

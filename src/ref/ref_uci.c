@@ -3195,6 +3195,11 @@ parse_portvlan_ptqinqmode(struct switch_val *val)
 		else if (!strcmp(ext_value_p->option_name, "tunnel_qinq_role")) {
 			val_ptr[4] = (char*)ext_value_p->option_value;
 		}
+#if defined(MPPE)
+		else if (!strcmp(ext_value_p->option_name, "tunnel_ingress_port_select")) {
+			val_ptr[5] = (char*)ext_value_p->option_value;
+		}
+#endif
 #endif
 		else {
 			rv = -1;

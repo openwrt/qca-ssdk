@@ -35,10 +35,22 @@
 	#define IPR_VP_PARSING_PORT_ROLE_OFFSET  0
 	#define IPR_VP_PARSING_PORT_ROLE_LEN     1
 	#define IPR_VP_PARSING_PORT_ROLE_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] SRC_PORT_SEL*/
+	#define IPR_VP_PARSING_SRC_PORT_SEL
+	#define IPR_VP_PARSING_SRC_PORT_SEL_OFFSET  1
+	#define IPR_VP_PARSING_SRC_PORT_SEL_LEN     1
+	#define IPR_VP_PARSING_SRC_PORT_SEL_DEFAULT 0x0
+#endif
 
 struct ipr_vp_parsing {
 	a_uint32_t  port_role:1;
+#if defined(MPPE)
+	a_uint32_t  src_port_sel:1;
+	a_uint32_t  _reserved0:30;
+#else
 	a_uint32_t  _reserved0:31;
+#endif
 };
 
 union ipr_vp_parsing_u {

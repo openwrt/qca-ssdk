@@ -770,6 +770,11 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_AC_CTRL, (param_check_t)cmd_data_check_ac_ctrl, NULL),
     SW_TYPE_DEF(SW_AC_OBJ, (param_check_t)cmd_data_check_ac_obj, NULL),
     SW_TYPE_DEF(SW_UCAST_QUEUE_MAP, (param_check_t)cmd_data_check_u_qmap, NULL),
+    SW_TYPE_DEF(SW_QM_PROFILE, (param_check_t)cmd_data_check_queue_profile, NULL),
+    SW_TYPE_DEF(SW_QM_PRI, (param_check_t)cmd_data_check_queue_priority, NULL),
+    SW_TYPE_DEF(SW_QM_CLASS, (param_check_t)cmd_data_check_queue_class, NULL),
+    SW_TYPE_DEF(SW_QM_QBASE, (param_check_t)cmd_data_check_queue_base, NULL),
+    SW_TYPE_DEF(SW_QM_HASH, (param_check_t)cmd_data_check_queue_hash, NULL),
 #endif
 #ifdef IN_BM
     SW_TYPE_DEF(SW_BMSTHRESH, (param_check_t)cmd_data_check_bm_static_thresh, NULL),
@@ -13631,6 +13636,60 @@ cmd_data_check_ac_obj(char *cmd_str, void * val, a_uint32_t size)
 
     *(fal_ac_obj_t *)val = entry;
     return SW_OK;
+}
+
+static inline sw_error_t
+cmd_data_check_queue_config(char *cmd_str, char *config_name, a_uint32_t *arg_val)
+{
+	sw_error_t rv = SW_OK;
+	char *cmd = cmd_str;
+
+	do {
+		if (talk_mode) {
+			cmd = get_sub_cmd(config_name, "0");
+		}
+		SW_RTN_ON_NULL_PARAM(cmd);
+
+		if (!strncasecmp(cmd, "quit", 4)) {
+			return SW_BAD_VALUE;
+		} else if (!strncasecmp(cmd, "help", 4)) {
+			rv = SW_BAD_VALUE;
+		} else {
+			rv = cmd_data_check_uint32(cmd, arg_val, sizeof(a_uint32_t));
+		}
+	} while (talk_mode && (SW_OK != rv));
+
+	return rv;
+}
+
+sw_error_t
+cmd_data_check_queue_profile(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
+{
+	return cmd_data_check_queue_config(cmd_str, "profile_id", arg_val);
+}
+
+sw_error_t
+cmd_data_check_queue_priority(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
+{
+	return cmd_data_check_queue_config(cmd_str, "priority", arg_val);
+}
+
+sw_error_t
+cmd_data_check_queue_class(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
+{
+	return cmd_data_check_queue_config(cmd_str, "class", arg_val);
+}
+
+sw_error_t
+cmd_data_check_queue_base(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
+{
+	return cmd_data_check_queue_config(cmd_str, "queue_base", arg_val);
+}
+
+sw_error_t
+cmd_data_check_queue_hash(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
+{
+	return cmd_data_check_queue_config(cmd_str, "rss_hash", arg_val);
 }
 
 #endif

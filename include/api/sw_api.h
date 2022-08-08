@@ -304,6 +304,11 @@ typedef enum
 	SW_TUNNEL_DECAP_ACTION,
 	SW_PPE_CAPACITY,
 	SW_RTC_SRC_TYPE,
+	SW_QM_PROFILE,
+	SW_QM_PRI,
+	SW_QM_CLASS,
+	SW_QM_QBASE,
+	SW_QM_HASH,
 /* auto_insert_flag */
 } sw_data_type_e;
 

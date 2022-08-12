@@ -31,6 +31,20 @@ extern "C" {
 /*
  * Manhattan GCC Gloabl Control Register
  */
+ /*global intr status*/
+#define GLOBAL_INTR_STATUS
+#define GLOBAL_INTR_STATUS_ID                           0
+#define GLOBAL_INTR_STATUS_OFFSET                       0xC90F004
+#define GLOBAL_INTR_STATUS_E_LENGTH                     4
+#define GLOBAL_INTR_STATUS_E_OFFSET                     0
+#define GLOBAL_INTR_STATUS_NR_E                         1
+
+/*switch_int_status*/
+#define GLOBAL_INTR_STATUS_SWITCH
+#define GLOBAL_INTR_STATUS_SWITCH_BOFFSET               11
+#define GLOBAL_INTR_STATUS_SWITCH_BLEN                  1
+#define GLOBAL_INTR_STATUS_SWITCH_FLAG                  HSL_RW
+
 /*global intr enable*/
 #define GLOBAL_INTR_ENABLE
 #define GLOBAL_INTR_ENABLE_ID                           0
@@ -38,6 +52,12 @@ extern "C" {
 #define GLOBAL_INTR_ENABLE_E_LENGTH                     4
 #define GLOBAL_INTR_ENABLE_E_OFFSET                     0
 #define GLOBAL_INTR_ENABLE_NR_E                         1
+
+/*switch_int_enable*/
+#define GLOBAL_INTR_ENABLE_SWITCH
+#define GLOBAL_INTR_ENABLE_SWITCH_BOFFSET               11
+#define GLOBAL_INTR_ENABLE_SWITCH_BLEN                  1
+#define GLOBAL_INTR_ENABLE_SWITCH_FLAG                  HSL_RW
 
 /*phy0 intr enable*/
 #define GLOBAL_INTR_ENABLE_PHY0

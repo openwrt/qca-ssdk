@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2012, 2015-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -24,7 +27,9 @@
 #include "isisc_misc.h"
 #include "isisc_reg.h"
 #include "hsl_phy.h"
-
+#ifdef MHT
+#include "mht_sec_ctrl.h"
+#endif
 
 #define ISISC_MAX_FRMAE_SIZE      9216
 
@@ -32,6 +37,10 @@
 #define ARP_ACK_EN_OFFSET    5
 #define DHCP_EN_OFFSET       4
 #define EAPOL_EN_OFFSET      3
+
+#ifdef MHT
+#define MHT_SWITCH_INT_PHY_INT     0x1E
+#endif
 
 #define ISISC_SWITCH_INT_PHY_INT   0x8000
 
@@ -1063,7 +1072,12 @@ _isisc_intr_status_clear(a_uint32_t dev_id, a_uint32_t intr_status)
     reg = 0;
     if (intr_status & FAL_SWITCH_INTR_LINK_STATUS)
     {
-        reg |= ISISC_SWITCH_INT_PHY_INT;
+#if defined(MHT)
+        if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+            reg |= MHT_SWITCH_INT_PHY_INT;
+        else
+#endif
+            reg |= ISISC_SWITCH_INT_PHY_INT;
     }
 
     HSL_REG_ENTRY_SET(rv, dev_id, GBL_INT_STATUS1, 0, (a_uint8_t *) (&reg),
@@ -2179,9 +2193,20 @@ isisc_misc_init(a_uint32_t dev_id)
         p_api->port_arp_req_status_get = isisc_port_arp_req_status_get;
         p_api->port_arp_ack_status_set = isisc_port_arp_ack_status_set;
         p_api->port_arp_ack_status_get = isisc_port_arp_ack_status_get;
-        p_api->intr_mask_set = isisc_intr_mask_set;
-        p_api->intr_mask_get = isisc_intr_mask_get;
-        p_api->intr_status_get = isisc_intr_status_get;
+#if defined(MHT)
+        if(hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+        {
+            p_api->intr_mask_set = qca_mht_intr_mask_set;
+            p_api->intr_mask_get = qca_mht_intr_mask_get;
+            p_api->intr_status_get = qca_mht_intr_status_get;
+        }
+        else
+#endif
+        {
+            p_api->intr_mask_set = isisc_intr_mask_set;
+            p_api->intr_mask_get = isisc_intr_mask_get;
+            p_api->intr_status_get = isisc_intr_status_get;
+        }
         p_api->intr_status_clear = isisc_intr_status_clear;
         p_api->intr_port_link_mask_set = isisc_intr_port_link_mask_set;
         p_api->intr_port_link_mask_get = isisc_intr_port_link_mask_get;

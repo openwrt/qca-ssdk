@@ -168,6 +168,58 @@ qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return SW_OK;
 }
 
+sw_error_t
+qca_mht_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	data = qca_mht_mii_read(dev_id, GLOBAL_INTR_ENABLE_OFFSET);
+
+	if(intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
+		data |= BIT(GLOBAL_INTR_ENABLE_SWITCH_BOFFSET);
+	else
+		data &= ~(BIT(GLOBAL_INTR_ENABLE_SWITCH_BOFFSET));
+
+	qca_mht_mii_write(dev_id, GLOBAL_INTR_ENABLE_OFFSET, data);
+
+	return SW_OK;
+}
+
+sw_error_t
+qca_mht_intr_mask_get(a_uint32_t dev_id, a_uint32_t *intr_mask)
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	*intr_mask = 0;
+	data = qca_mht_mii_read(dev_id, GLOBAL_INTR_ENABLE_OFFSET);
+
+	if(data & BIT(GLOBAL_INTR_ENABLE_SWITCH_BOFFSET))
+		*intr_mask |= FAL_SWITCH_INTR_LINK_STATUS;
+
+	return SW_OK;
+}
+
+sw_error_t
+qca_mht_intr_status_get(a_uint32_t dev_id, a_uint32_t *intr_status)
+
+{
+	a_uint32_t data = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	*intr_status = 0;
+	data = qca_mht_mii_read(dev_id, GLOBAL_INTR_STATUS_OFFSET);
+
+	if(data & BIT(GLOBAL_INTR_STATUS_SWITCH_BOFFSET))
+		*intr_status |= FAL_SWITCH_INTR_LINK_STATUS;
+
+	return SW_OK;
+}
+
 #if defined(IN_PTP)
 sw_error_t
 qca_mht_ptp_sync_set(a_uint32_t dev_id, a_uint32_t mht_port_id, a_bool_t enable)

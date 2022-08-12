@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -38,6 +39,10 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 #define APPE_POLICER_TIMESLOT_DFT           353*4
 #define APPE_POLICER_HEAD                   0
 #define APPE_POLICER_TAIL                   511
+#define MPPE_POLICER_TIMESLOT_DFT           200*2
+#define MPPE_POLICER_TAIL                   127
+#define APPE_ACL_POLICER_CFG_MAX            512
+#define MPPE_ACL_POLICER_CFG_MAX            128
 
 #ifdef __cplusplus
 }

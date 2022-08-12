@@ -594,6 +594,9 @@ static sw_error_t
 qca_appe_policer_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
+	a_uint32_t timeslot = 0;
+	a_uint32_t revision = APPE_REVISION;
+	a_uint32_t acl_policer_cfg_max = 0;
 	fal_policer_config_t policer;
 	fal_policer_action_t action;
 	fal_policer_ctrl_t policer_ctrl;
@@ -603,16 +606,20 @@ qca_appe_policer_hw_init(a_uint32_t dev_id)
 	memset(&action, 0, sizeof(action));
 	memset(&policer_ctrl, 0, sizeof(policer_ctrl));
 
-	fal_policer_timeslot_set(dev_id, APPE_POLICER_TIMESLOT_DFT);
+	revision = adpt_chip_revision_get(dev_id);
+
+	timeslot = (revision == MPPE_REVISION)? MPPE_POLICER_TIMESLOT_DFT: APPE_POLICER_TIMESLOT_DFT;
+	fal_policer_timeslot_set(dev_id, timeslot);
 
 	for (i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT7; i++) {
 		fal_port_policer_compensation_byte_set(dev_id, i, 4);
 	}
 
-	for (i = 0; i < SSDK_ACL_POLICER_CFG_MAX; i++) {
+	acl_policer_cfg_max = (revision == MPPE_REVISION)? MPPE_ACL_POLICER_CFG_MAX: APPE_ACL_POLICER_CFG_MAX;
+	for (i = 0; i < acl_policer_cfg_max; i++) {
 		policer.meter_type = FAL_POLICER_METER_MEF10_3;
 		policer.next_ptr = i + 1;
-		if (policer.next_ptr == SSDK_ACL_POLICER_CFG_MAX) {
+		if (policer.next_ptr == acl_policer_cfg_max) {
 			policer.next_ptr = 0;
 		}
 		policer.grp_end = A_TRUE;
@@ -620,7 +627,7 @@ qca_appe_policer_hw_init(a_uint32_t dev_id)
 	}
 
 	policer_ctrl.head = APPE_POLICER_HEAD;
-	policer_ctrl.tail = APPE_POLICER_TAIL;
+	policer_ctrl.tail = (revision == MPPE_REVISION)? MPPE_POLICER_TAIL: APPE_POLICER_TAIL;
 	fal_policer_ctrl_set(dev_id, &policer_ctrl);
 
 	/* bypass policer for dropped frame */

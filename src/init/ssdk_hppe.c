@@ -67,6 +67,7 @@ sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 
 #if defined(IN_CTRLPKT)
 #define RFDB_PROFILE_ID_STP 31
+#define RFDB_PROFILE_ID_ARP 30
 #define APPE_CPU_CODE_CTRL_NUM	256
 sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 {
@@ -74,6 +75,9 @@ sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 	fal_ctrlpkt_action_t ctrlpkt_action;
 	fal_ctrlpkt_profile_t ctrlpkt_profile;
 	sw_error_t rv = SW_OK;
+	a_uint8_t mac_id = 0, mac_num = 0;
+	a_uint8_t *mac = NULL;
+	a_uint32_t rfdb_profile_bmp = 0, rfdb_profile_index = 0;
 #if defined(APPE)
 	a_uint32_t cpu_code = 0;
 
@@ -103,6 +107,41 @@ sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 	ctrlpkt_profile.action = ctrlpkt_action;
 	ctrlpkt_profile.port_map = qca_ssdk_port_bmp_get(dev_id);
 	ctrlpkt_profile.rfdb_profile_bitmap = (1 << RFDB_PROFILE_ID_STP);
+	rv = fal_mgmtctrl_ctrlpkt_profile_add(dev_id, &ctrlpkt_profile);
+	SW_RTN_ON_ERROR(rv);
+
+	/*
+	 * Redirect ARP response packet to CPU port with a valid CPU code.
+	 * queue management assigns the highest priority queue based on this
+	 * CPU code.
+	 */
+	mac_id = 0;
+	mac_num = ssdk_intf_mac_num_get();
+	while (mac_id < mac_num) {
+		/*
+		 * The MAC of all ports(ethx) should be involved, since the MAC
+		 * of bridge can be any one of them.
+		 */
+		mac = ssdk_intf_macaddr_get(mac_id);
+		memcpy(mcast_mac_addr.uc, mac, 6);
+
+		rfdb_profile_index = RFDB_PROFILE_ID_ARP - mac_id;
+		rv = fal_mgmtctrl_rfdb_profile_set(dev_id, rfdb_profile_index, &mcast_mac_addr);
+		SW_RTN_ON_ERROR(rv);
+
+		rfdb_profile_bmp |= BIT(rfdb_profile_index);
+		mac_id++;
+	}
+
+	memset(&ctrlpkt_action, 0, sizeof(ctrlpkt_action));
+	memset(&ctrlpkt_profile, 0, sizeof(ctrlpkt_profile));
+
+	ctrlpkt_action.action = FAL_MAC_RDT_TO_CPU;
+	ctrlpkt_profile.action = ctrlpkt_action;
+	ctrlpkt_profile.port_map = qca_ssdk_port_bmp_get(dev_id);
+	ctrlpkt_profile.rfdb_profile_bitmap = rfdb_profile_bmp;
+	ctrlpkt_profile.protocol_types.mgt_arp_rep = A_TRUE;
+
 	rv = fal_mgmtctrl_ctrlpkt_profile_add(dev_id, &ctrlpkt_profile);
 
 	return rv;
@@ -849,6 +888,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 #if defined(IN_QM)
 #define SSDK_PRI_MAX		16
 #define SSDK_CPU_PRI_NUM	1
+#define SSDK_MGMT_ARP_REP_CPU_CODE	101
 sw_error_t
 qca_hppe_qm_hw_init(a_uint32_t dev_id)
 {
@@ -941,6 +981,22 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 		}
 	}
+
+	/*
+	 * Configure the RDTCPU ARP reply packet with the max priority.
+	 */
+	queue_dst.cpu_code_en = A_TRUE;
+	queue_dst.cpu_code = SSDK_MGMT_ARP_REP_CPU_CODE;
+	qbase = ssdk_ucast_queue_start_get(dev_id, SSDK_PORT_CPU);
+	max_pri_supported = ssdk_ucast_l0_cdrr_num_get(dev_id, SSDK_PORT_CPU);
+	if (max_pri_supported > SSDK_PRI_MAX) {
+		max_pri_supported = SSDK_CPU_PRI_NUM;
+	}
+
+	fal_ucast_queue_base_profile_set(dev_id, &queue_dst, qbase + max_pri_supported - 1, 0);
+
+	queue_dst.cpu_code_en = A_FALSE;
+	queue_dst.cpu_code = 0;
 
 	/*
 	 * Enable PPE source profile 1 and map it to PPE queue 4

@@ -1122,6 +1122,100 @@ hsl_port_phy_function_reset(a_uint32_t dev_id, a_uint32_t port_id)
 	return rv;
 }
 
+a_uint32_t hsl_port_mode_to_phydev_interface(a_uint32_t dev_id,
+	a_uint32_t port_mode)
+{
+	a_uint32_t interface = PHY_INTERFACE_MODE_MAX;
+
+	switch(port_mode)
+	{
+		case PHY_SGMII_BASET:
+			interface = PHY_INTERFACE_MODE_SGMII;
+			break;
+		case PORT_SGMII_PLUS:
+			interface = PHY_INTERFACE_MODE_2500BASEX;
+			break;
+		case PORT_SGMII_FIBER:
+			interface = PHY_INTERFACE_MODE_1000BASEX;
+			break;
+		case PORT_USXGMII:
+			interface = PHY_INTERFACE_MODE_USXGMII;
+			break;
+		case PORT_10GBASE_R:
+			interface = PHY_INTERFACE_MODE_10GKR;
+			break;
+		case PORT_QSGMII:
+			interface = PHY_INTERFACE_MODE_QSGMII;
+			break;
+		default:
+			break;
+	}
+
+	return interface;
+}
+
+a_uint32_t hsl_port_mode_to_uniphy_mode(a_uint32_t dev_id,
+	a_uint32_t port_mode)
+{
+	a_uint32_t uniphy_mode = PORT_WRAPPER_MAX;
+
+	switch(port_mode)
+	{
+		case PHY_SGMII_BASET:
+		case PORT_SGMII_FIBER:
+			uniphy_mode = PORT_WRAPPER_SGMII_CHANNEL0;
+			break;
+		case PORT_SGMII_PLUS:
+			uniphy_mode = PORT_WRAPPER_SGMII_PLUS;
+			break;
+		case PORT_USXGMII:
+			uniphy_mode = PORT_WRAPPER_USXGMII;
+			break;
+		case PORT_10GBASE_R:
+			uniphy_mode = PORT_WRAPPER_10GBASE_R;
+			break;
+		case PORT_QSGMII:
+			uniphy_mode = PORT_WRAPPER_QSGMII;
+			break;
+		default:
+			break;
+	}
+
+	return uniphy_mode;
+}
+
+a_uint32_t hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	a_uint32_t uniphy_index = SSDK_MAX_UNIPHY_INSTANCE;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		SSDK_ERROR("port%d is not supported\n", port_id);
+		return SSDK_MAX_UNIPHY_INSTANCE;
+	}
+
+	if(port_id <= SSDK_PHYSICAL_PORT4)
+	{
+		uniphy_index = SSDK_UNIPHY_INSTANCE0;
+#ifdef MPPE
+		if(port_id == SSDK_PHYSICAL_PORT2)
+			uniphy_index = SSDK_UNIPHY_INSTANCE1;
+#endif
+	}
+	else if(port_id == SSDK_PHYSICAL_PORT5)
+	{
+		if(ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1) !=
+			PORT_WRAPPER_MAX)
+			uniphy_index = SSDK_UNIPHY_INSTANCE1;
+		else
+			uniphy_index = SSDK_UNIPHY_INSTANCE0;
+	}
+	else if(port_id == SSDK_PHYSICAL_PORT6)
+		uniphy_index = SSDK_UNIPHY_INSTANCE2;
+
+	return uniphy_index;
+}
+
 static sw_error_t
 hsl_port_phydev_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_port_interface_mode_t *interface_mode_status)

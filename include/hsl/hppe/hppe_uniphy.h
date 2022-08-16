@@ -31,6 +31,9 @@
 #define UNIPHY_CHANNEL3_INPUT_OUTPUT_4_MAX_ENTRY        3
 #define UNIPHY_CHANNEL4_INPUT_OUTPUT_4_MAX_ENTRY        3
 #define UNIPHY_CHANNEL0_INPUT_OUTPUT_6_MAX_ENTRY        3
+#define UNIPHY_SPEED_1000M                              2
+#define UNIPHY_SPEED_100M                               1
+#define UNIPHY_SPEED_10M                                0
 #define SR_XS_PCS_KR_STS1_MAX_ENTRY                     3
 #define VR_XS_PCS_DIG_CTRL1_MAX_ENTRY                   3
 #define SR_MII_CTRL_MAX_ENTRY                           3

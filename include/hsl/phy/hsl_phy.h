@@ -772,6 +772,12 @@ sw_error_t
 hsl_port_phy_txfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);
 sw_error_t
 hsl_port_phy_rxfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);
+a_uint32_t
+hsl_port_mode_to_phydev_interface(a_uint32_t dev_id, a_uint32_t port_mode);
+a_uint32_t
+hsl_port_mode_to_uniphy_mode(a_uint32_t dev_id, a_uint32_t port_mode);
+a_uint32_t
+hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id);
 /*qca808x_start*/
 sw_error_t
 hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);

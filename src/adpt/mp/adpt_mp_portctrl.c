@@ -27,6 +27,9 @@
 #include "hsl_phy.h"
 #include "ssdk_dts.h"
 #include "ssdk_clk.h"
+#ifdef IN_SFP_PHY
+#include "sfp_phy.h"
+#endif
 
 static a_uint32_t port_lpi_status[SW_MAX_NR_DEV] = {0};
 
@@ -1231,6 +1234,45 @@ adpt_mp_port_lpi_polling_task(struct qca_phy_priv *priv)
 }
 
 static sw_error_t
+adpt_mp_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	struct port_phy_status *phy_status)
+{
+	sw_error_t rv = SW_OK;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(phy_status);
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	if(_adpt_mp_port_phy_connected(dev_id, port_id) == A_FALSE)
+	{
+		if(ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE))
+		{
+			rv = adpt_mp_port_mac_status_get(dev_id, port_id, phy_status);
+			SW_RTN_ON_ERROR (rv);
+		}
+#ifdef IN_SFP_PHY
+		else if(ssdk_port_feature_get(dev_id, port_id, PHY_F_SFP))
+		{
+			rv = sfp_port_status_get_from_uniphy(dev_id, port_id, phy_status);
+			SW_RTN_ON_ERROR (rv);
+		}
+#endif
+		else
+			return SW_NOT_SUPPORTED;
+	}
+	else
+	{
+		rv = hsl_port_phy_status_get(dev_id, port_id, phy_status);
+		SW_RTN_ON_ERROR (rv);
+	}
+
+	return SW_OK;
+}
+
+static sw_error_t
 adpt_mp_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_speed_t * pspeed)
 {
@@ -1381,6 +1423,7 @@ adpt_mp_portctrl_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_port_interface_eee_cfg_get = adpt_mp_port_interface_eee_cfg_get;
 	p_adpt_api->adpt_port_netdev_notify_set = adpt_mp_port_netdev_change_notify;
 	p_adpt_api->adpt_port_polling_sw_sync_set = adpt_mp_port_lpi_polling_task;
+	p_adpt_api->adpt_port_phy_status_get = adpt_mp_port_phy_status_get;
 
 	return SW_OK;
 }

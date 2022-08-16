@@ -225,6 +225,21 @@ hppe_uniphy_channel4_input_output_4_set(
 }
 
 sw_error_t
+hppe_uniphy_channel0_input_output_6_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_channel0_input_output_6_u *value)
+{
+	if (index >= UNIPHY_CHANNEL0_INPUT_OUTPUT_6_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + UNIPHY_CHANNEL0_INPUT_OUTPUT_6_ADDRESS,
+				index * UNIPHY_CHANNEL0_INPUT_OUTPUT_6_INC,
+				&value->val);
+}
+
+sw_error_t
 hppe_uniphy_instance_link_detect_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,

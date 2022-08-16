@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -8,10 +10,9 @@
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -27,10 +28,6 @@
 #define ADPT_RTN_ON_INVALID_DATA_OFFSET(offset) \
     do { if (offset > 0xff) return(SW_BAD_PARAM); } while(0);
 
-#define ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id) \
-	do { if (PHY_I2C_ACCESS != hsl_port_phy_access_type_get(dev_id, port_id)) \
-		return(SW_NOT_SUPPORTED); } while(0);
-
 sw_error_t
 adpt_sfp_diag_ctrl_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 		fal_sfp_ctrl_status_t *ctrl_status)
@@ -40,7 +37,6 @@ adpt_sfp_diag_ctrl_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_diag_extended_ctrl_status_u sfp_diag_extended_ctrl_status;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(ctrl_status);
 
 	memset(&sfp_diag_optional_ctrl_status, 0, sizeof(sfp_diag_optional_ctrl_status));
@@ -78,7 +74,6 @@ adpt_sfp_diag_extenal_calibration_const_get(a_uint32_t dev_id, a_uint32_t port_i
 	union sfp_diag_cal_const_u sfp_diag_cal_const;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(cal_const);
 
 	memset(&sfp_diag_cal_const, 0, sizeof(sfp_diag_cal_const));
@@ -138,7 +133,6 @@ adpt_sfp_link_length_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_link_len_u sfp_link_len;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(link_len);
 
 	memset(&sfp_link_len, 0, sizeof(sfp_link_len));
@@ -164,7 +158,6 @@ adpt_sfp_diag_internal_threshold_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_diag_threshold_u sfp_diag_threshold;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(threshold);
 
 	memset(&sfp_diag_threshold, 0, sizeof(sfp_diag_threshold));
@@ -224,7 +217,6 @@ adpt_sfp_diag_realtime_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_diag_realtime_u sfp_diag_realtime;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(real_diag);
 
 	memset(&sfp_diag_realtime, 0, sizeof(sfp_diag_realtime));
@@ -254,7 +246,6 @@ adpt_sfp_laser_wavelength_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_laser_u sfp_laser;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(laser_wavelen);
 
 	memset(&sfp_laser, 0, sizeof(sfp_laser));
@@ -276,7 +267,6 @@ adpt_sfp_option_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_option_u sfp_option;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(option);
 
 	memset(&sfp_option, 0, sizeof(sfp_option));
@@ -306,7 +296,6 @@ adpt_sfp_checkcode_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_diag_dmi_u sfp_dmi;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(ccode);
 
 	memset(&sfp_base, 0, sizeof(sfp_base));
@@ -345,7 +334,6 @@ adpt_sfp_diag_alarm_warning_flag_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_diag_flag_u sfp_diag_flag;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(alarm_warn_flag);
 
 	memset(&sfp_diag_flag, 0, sizeof(sfp_diag_flag));
@@ -388,7 +376,6 @@ adpt_sfp_device_type_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_dev_connector_type_u sfp_dev_connector_type;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(sfp_id);
 
 	memset(&sfp_dev_type, 0, sizeof(sfp_dev_type));
@@ -421,7 +408,6 @@ adpt_sfp_vendor_info_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_vendor_ext_u sfp_vendor_ext;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(vender_info);
 
 	memset(&sfp_vendor, 0, sizeof(sfp_vendor));
@@ -473,7 +459,6 @@ adpt_sfp_transceiver_code_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_transc_u sfp_transc;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(transc_code);
 
 	memset(&sfp_transc, 0, sizeof(sfp_transc));
@@ -505,7 +490,6 @@ adpt_sfp_ctrl_rate_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_rate_ctrl_u sfp_rate_ctrl;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(rate_limit);
 
 	memset(&sfp_rate_ctrl, 0, sizeof(sfp_rate_ctrl));
@@ -527,7 +511,6 @@ adpt_sfp_enhanced_cfg_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_enhanced_u sfp_enhanced;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(enhanced_feature);
 
 	memset(&sfp_enhanced, 0, sizeof(sfp_enhanced));
@@ -565,7 +548,6 @@ adpt_sfp_rate_encode_get(a_uint32_t dev_id, a_uint32_t port_id,
 	union sfp_rate_u sfp_rate;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(encode);
 
 	memset(&sfp_encoding, 0, sizeof(sfp_encoding));
@@ -594,7 +576,6 @@ adpt_sfp_eeprom_data_get(a_uint32_t dev_id, a_uint32_t port_id, fal_sfp_data_t *
 	sw_error_t rv = SW_OK;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(entry);
 
 	ADPT_RTN_ON_INVALID_DATA_OFFSET(entry->offset + entry->count);
@@ -612,7 +593,6 @@ adpt_sfp_eeprom_data_set(a_uint32_t dev_id, a_uint32_t port_id, fal_sfp_data_t *
 	sw_error_t rv = SW_OK;
 
 	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_PORT_I2C_CAP_CHECK(dev_id, port_id);
 	ADPT_NULL_POINT_CHECK(entry);
 
 	ADPT_RTN_ON_INVALID_DATA_OFFSET(entry->offset + entry->count);

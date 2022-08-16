@@ -27,6 +27,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/phy.h>
+#include <linux/gpio.h>
 #include "ssdk_plat.h"
 #include "ssdk_phy_i2c.h"
 #include "ssdk_dts.h"
@@ -266,7 +267,22 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 	a_uint16_t sfp_type = 0;
 	struct phy_device *phydev;
 	ssdk_port_phyinfo *port_phyinfo;
+	a_bool_t mod_present_status = A_FALSE;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
 
+	/*if sfp_mode_present_pin is available, then need to check it*/
+	if(priv && priv->sfp_mod_present_pin[port_id] != SSDK_INVALID_GPIO)
+	{
+		rv = sfp_phy_mod_present_status_get(dev_id, port_id,
+			&mod_present_status);
+		SW_RTN_ON_ERROR(rv);
+		/*if sfp mod is not present, so no need to read SFP module with I2C*/
+		if(!mod_present_status)
+		{
+			SSDK_DEBUG("port%d sfp mod is not present now\n", port_id);
+			return SW_OK;
+		}
+	}
 	port_phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
 	SW_RTN_ON_NULL(port_phyinfo);
 	rv = hsl_port_phydev_get(dev_id, port_id, &phydev);
@@ -368,4 +384,104 @@ sfp_phy_phydev_adv_update(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t adv
 	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, new_adv);
 
 	return rv;
+}
+
+sw_error_t
+sfp_phy_rx_los_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_bool_t *rx_los_status)
+{
+	a_uint32_t rx_los_pin = 0;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if(!priv)
+		return SW_NOT_INITIALIZED;
+	rx_los_pin = priv->sfp_rx_los_pin[port_id];
+	if(rx_los_pin == SSDK_INVALID_GPIO)
+	{
+		return SW_NOT_FOUND;
+	}
+	*rx_los_status = gpio_get_value(rx_los_pin);
+	SSDK_DEBUG("port%d sfp rx_los_pin is %d, the rx_los_status is %d",
+		port_id, rx_los_pin, *rx_los_status);
+
+	return SW_OK;
+}
+
+sw_error_t
+sfp_phy_tx_dis_status_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_bool_t tx_dis_status)
+{
+	a_uint32_t tx_dis_pin = 0;
+	int ret = 0;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if(!priv)
+		return SW_NOT_INITIALIZED;
+	tx_dis_pin = priv->sfp_tx_dis_pin[port_id];
+	if(tx_dis_pin == SSDK_INVALID_GPIO)
+	{
+		return SW_NOT_FOUND;
+	}
+	ret = gpio_request(tx_dis_pin, "sfp_tx_dis_pin");
+	if(ret)
+	{
+		SSDK_ERROR("tx_dis_pin request failed, ret:%d\n", ret);
+		return SW_FAIL;
+	}
+	ret = gpio_direction_output(tx_dis_pin, tx_dis_status);
+	gpio_free(tx_dis_pin);
+	if(ret)
+	{
+		SSDK_ERROR("tx_dis_pin configure faied, ret:%d\n", ret);
+		return SW_FAIL;
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+sfp_phy_tx_dis_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_bool_t *tx_dis_status)
+{
+	a_uint32_t tx_dis_pin = 0;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if(!priv)
+		return SW_NOT_INITIALIZED;
+	tx_dis_pin = priv->sfp_tx_dis_pin[port_id];
+	if(tx_dis_pin == SSDK_INVALID_GPIO)
+	{
+		return SW_NOT_FOUND;
+	}
+	*tx_dis_status = gpio_get_value(tx_dis_pin);
+	SSDK_DEBUG("port%d sfp tx_dis_pin is %d, the tx_dis_status is %d",
+		port_id, tx_dis_pin, *tx_dis_status);
+
+	return SW_OK;
+}
+
+sw_error_t
+sfp_phy_mod_present_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_bool_t *mod_present_status)
+{
+	a_uint32_t mod_present_pin = 0;
+	a_bool_t mod_present_pin_status = A_FALSE;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if(!priv)
+		return SW_NOT_INITIALIZED;
+	mod_present_pin = priv->sfp_mod_present_pin[port_id];
+	if(mod_present_pin == SSDK_INVALID_GPIO)
+	{
+		return SW_NOT_FOUND;
+	}
+	mod_present_pin_status = gpio_get_value(mod_present_pin);
+	SSDK_DEBUG("port%d sfp mod_present_pin is %d, mod_present_pin_status is %d",
+		port_id, mod_present_pin, mod_present_pin_status);
+	if(mod_present_pin_status)
+		*mod_present_status = A_FALSE;
+	else
+		*mod_present_status = A_TRUE;
+
+	return SW_OK;
 }

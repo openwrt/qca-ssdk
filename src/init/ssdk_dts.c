@@ -626,8 +626,10 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 	const char *mac_type = NULL, *media_type = NULL;
 	sw_error_t rv = SW_OK;
 	struct device_node *mdio_node;
-	int phy_reset_gpio = 0;
+	int phy_reset_gpio = 0, sfp_rx_los_pin = 0, sfp_tx_dis_pin = 0,
+		sfp_mod_present_pin = 0;
 	phy_dac_t phy_dac = {0};
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
 
 	phy_info_node = of_get_child_by_name(switch_node, "qcom,port_phyinfo");
 	if (!phy_info_node) {
@@ -746,6 +748,32 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 						phy_reset_gpio);
 					hsl_port_phy_reset_gpio_set(dev_id, port_id,
 						(a_uint32_t)phy_reset_gpio);
+				}
+			}
+			/*get related PINs for SFP port*/
+			if(priv)
+			{
+				sfp_rx_los_pin = of_get_named_gpio(port_node, "sfp_rx_los_pin", 0);
+				if(sfp_rx_los_pin > 0)
+				{
+					SSDK_INFO("port%d sfp_rx_los_pin is GPIO%d\n", port_id,
+						sfp_rx_los_pin);
+					priv->sfp_rx_los_pin[port_id] = sfp_rx_los_pin;
+				}
+				sfp_tx_dis_pin = of_get_named_gpio(port_node, "sfp_tx_dis_pin", 0);
+				if(sfp_tx_dis_pin > 0)
+				{
+					SSDK_INFO("port%d sfp_tx_dis_pin is GPIO%d\n", port_id,
+						sfp_tx_dis_pin);
+					priv->sfp_tx_dis_pin[port_id] = sfp_tx_dis_pin;
+				}
+				sfp_mod_present_pin = of_get_named_gpio(port_node,
+					"sfp_mod_present_pin",0);
+				if(sfp_mod_present_pin > 0)
+				{
+					SSDK_INFO("port%d sfp_mod_present_pin is GPIO%d\n", port_id,
+						sfp_mod_present_pin);
+					priv->sfp_mod_present_pin[port_id] = sfp_mod_present_pin;
 				}
 			}
 		}

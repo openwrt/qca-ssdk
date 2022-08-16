@@ -347,6 +347,10 @@ struct qca_phy_priv {
 	u8 __iomem *hw_addr;
 	u8 __iomem *psgmii_hw_addr;
 	u8 __iomem *uniphy_hw_addr;
+	/*rx_los_pin, tx_dis_pin and mod_present_pin are for SFP port*/
+	a_uint32_t sfp_rx_los_pin[SW_MAX_NR_PORT];
+	a_uint32_t sfp_tx_dis_pin[SW_MAX_NR_PORT];
+	a_uint32_t sfp_mod_present_pin[SW_MAX_NR_PORT];
 /*qca808x_start*/
 };
 

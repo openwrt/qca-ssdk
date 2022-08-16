@@ -959,7 +959,8 @@ adpt_mp_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)
 	} else if (port_mode_new == PORT_SGMII_PLUS) {
 		uniphy_mode_new = PORT_WRAPPER_SGMII_PLUS;
 	} else {
-		return SW_NOT_SUPPORTED;
+		/*for maple, no need to change mode here for other modes*/
+		return SW_OK;
 	}
 	uniphy_mode_old = ssdk_dt_global_get_mac_mode(dev_id,
 		SSDK_UNIPHY_INSTANCE0);
@@ -967,8 +968,6 @@ adpt_mp_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)
 		rv = adpt_mp_uniphy_mode_configure(dev_id,
 			SSDK_UNIPHY_INSTANCE0, uniphy_mode_new);
 		SW_RTN_ON_ERROR(rv);
-		ssdk_dt_global_set_mac_mode(dev_id,
-			SSDK_UNIPHY_INSTANCE0, uniphy_mode_new);
 	}
 
 	return rv;

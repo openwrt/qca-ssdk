@@ -181,36 +181,53 @@ adpt_mp_uniphy_mode_ctrl_set(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	union uniphy_mode_ctrl_u uniphy_mode_ctrl;
 	union uniphy_channel0_input_output_4_u uniphy_force_ctrl;
-	a_bool_t force_port = 0;
 
 	memset(&uniphy_mode_ctrl, 0, sizeof(uniphy_mode_ctrl));
 	memset(&uniphy_force_ctrl, 0, sizeof(uniphy_force_ctrl));
 
-	force_port = ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2,
-				PHY_F_FORCE);
+	/*configure force mode*/
+	rv = hppe_uniphy_channel0_input_output_4_get(dev_id, uniphy_index,
+		&uniphy_force_ctrl);
+	SW_RTN_ON_ERROR (rv);
+	if (ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
+	{
+		uniphy_force_ctrl.bf.newaddedfromhere_ch0_force_speed_25m =
+			UNIPHY_FORCE_SPEED_ENABLE;
+	}
+	else
+	{
+		uniphy_force_ctrl.bf.newaddedfromhere_ch0_force_speed_25m =
+			UNIPHY_FORCE_SPEED_MODE_DISABLE;
+	}
+	rv = hppe_uniphy_channel0_input_output_4_set(dev_id, uniphy_index,
+		&uniphy_force_ctrl);
+	SW_RTN_ON_ERROR (rv);
 	/* configure uniphy mode ctrl to sgmii/sgmiiplus */
 	rv = hppe_uniphy_mode_ctrl_get(dev_id, uniphy_index, &uniphy_mode_ctrl);
 	SW_RTN_ON_ERROR (rv);
+	/*confige uniphy as mac mode*/
+	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
+		UNIPHY_SGMII_MAC_MODE;
 	if (mode == PORT_WRAPPER_SGMII_CHANNEL0) {
 		uniphy_mode_ctrl.bf.newaddedfromhere_sg_mode =
 			UNIPHY_SGMII_MODE_ENABLE;
 		uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
 			UNIPHY_SGMIIPLUS_MODE_DISABLE;
-		if (force_port == A_TRUE) {
-			rv = hppe_uniphy_channel0_input_output_4_get(dev_id,
-				uniphy_index, &uniphy_force_ctrl);
-			SW_RTN_ON_ERROR (rv);
-			uniphy_force_ctrl.bf.newaddedfromhere_ch0_force_speed_25m =
-				UNIPHY_FORCE_SPEED_ENABLE;
-			rv = hppe_uniphy_channel0_input_output_4_set(dev_id,
-				uniphy_index, &uniphy_force_ctrl);
-			SW_RTN_ON_ERROR (rv);
+		if ((A_TRUE == hsl_port_is_sfp(dev_id, SSDK_PHYSICAL_PORT2)) &&
+			(A_TRUE != ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2,
+				PHY_F_SFP_SGMII))) {
+				uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
+					UNIPHY_1000BASE_X_MODE;
+				SSDK_DEBUG("uniphy %d is sgmii serdes mode!\n", uniphy_index);
+		} else {
+			SSDK_DEBUG("uniphy %d is sgmii mode!\n", uniphy_index);
 		}
 	} else {
 		uniphy_mode_ctrl.bf.newaddedfromhere_sg_mode =
 			UNIPHY_SGMII_MODE_DISABLE;
 		uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
 			UNIPHY_SGMIIPLUS_MODE_ENABLE;
+		SSDK_DEBUG("uniphy %d is sgmiiplus mode!\n", uniphy_index);
 	}
 	uniphy_mode_ctrl.bf.newaddedfromhere_ch0_autoneg_mode =
 		UNIPHY_ATHEROS_NEGOTIATION;
@@ -360,6 +377,8 @@ adpt_mp_uniphy_mode_configure(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mo
 	} else {
 		SSDK_DEBUG("mp uniphy %d sgmiiplus configuration is done!\n", index);
 	}
+	/*update dts mode*/
+	ssdk_dt_global_set_mac_mode(dev_id, index, mode);
 
 	return rv;
 }
@@ -376,7 +395,8 @@ adpt_mp_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 		_adpt_mp_uniphy_clk_output_set(dev_id, index);
 
 		/*port2 is connected with PHY, need gpio reset*/
-		if(!ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
+		if(!ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE) &&
+			!hsl_port_is_sfp(dev_id, SSDK_PHYSICAL_PORT2))
 		{
 			hsl_port_phy_gpio_reset(dev_id, SSDK_PHYSICAL_PORT2);
 			hsl_port_phy_hw_init(dev_id, SSDK_PHYSICAL_PORT2);

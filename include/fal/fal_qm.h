@@ -64,6 +64,7 @@ typedef struct {
 	a_uint16_t green_resume_off; /* green resume offset */
 	a_uint16_t yel_resume_off; /* yellow resume offset */
 	a_uint16_t red_resume_off; /* red resume offset */
+	a_bool_t status; /* static threshold enabled or not */
 } fal_ac_static_threshold_t;
 
 typedef struct {
@@ -79,6 +80,7 @@ typedef struct {
 	a_uint16_t yel_resume_off; /* yellow resume offset */
 	a_uint16_t red_resume_off; /* red resume offset */
 	a_uint16_t ceiling; /*shared ceiling*/
+	a_bool_t status; /* dynamic threshold enabled or not */
 } fal_ac_dynamic_threshold_t;
 
 typedef struct {

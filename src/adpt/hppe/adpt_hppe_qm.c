@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +13,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -103,6 +104,7 @@ adpt_hppe_ac_dynamic_threshold_get(
 	cfg->red_resume_off = ac_uni_queue_cfg_tbl.bf.ac_cfg_red_resume_offset_0 | \
 					ac_uni_queue_cfg_tbl.bf.ac_cfg_red_resume_offset_1 << 9;
 	cfg->ceiling = ac_uni_queue_cfg_tbl.bf.ac_cfg_shared_ceiling;
+	cfg->status = ac_uni_queue_cfg_tbl.bf.ac_cfg_shared_dynamic;
 
 	return SW_OK;
 }
@@ -849,6 +851,8 @@ adpt_hppe_ac_static_threshold_get(
 	sw_error_t rv;
 	ADPT_DEV_ID_CHECK(dev_id);
 
+	cfg->status = A_TRUE;
+
 	if (obj->type == FAL_AC_GROUP) {
 		union ac_grp_cfg_tbl_u ac_grp_cfg_tbl;
 
@@ -885,6 +889,7 @@ adpt_hppe_ac_static_threshold_get(
 			cfg->red_resume_off = ac_uni_queue_cfg_tbl.bf.ac_cfg_red_resume_offset_0 |
 					ac_uni_queue_cfg_tbl.bf.ac_cfg_red_resume_offset_1 << 9;
 			cfg->green_max = ac_uni_queue_cfg_tbl.bf.ac_cfg_shared_ceiling;
+			cfg->status = !ac_uni_queue_cfg_tbl.bf.ac_cfg_shared_dynamic;
 			return rv;
 			
 		} else {

@@ -47,14 +47,11 @@ _adpt_mp_gcc_mac_clock_set(a_uint32_t dev_id,
 static a_bool_t
 _adpt_mp_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 {
-	a_bool_t force_port = 0;
-
 	ADPT_DEV_ID_CHECK(dev_id);
 
 	/* force port which connect s17c or other device chip*/
-	force_port = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
-	if (force_port == A_TRUE) {
-		SSDK_DEBUG("port_id %d is a force port!\n", port_id);
+	if (ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE | PHY_F_SFP)) {
+		SSDK_DEBUG("port_id %d did not connect PHY!\n", port_id);
 		return A_FALSE;
 	} else {
 		return A_TRUE;
@@ -320,11 +317,29 @@ adpt_mp_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 {
 	sw_error_t rv = SW_OK;
 	a_bool_t force_mode = A_FALSE;
+	a_uint32_t phy_addr = 0;
 
 	if(A_FALSE == _adpt_mp_port_phy_connected (dev_id, port_id))
 	{
 		rv = _adpt_mp_port_txfc_status_set(dev_id, port_id, enable);
 		SW_RTN_ON_ERROR(rv);
+		if(hsl_port_is_sfp(dev_id, port_id))
+		{
+			rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+			SW_RTN_ON_ERROR(rv);
+			if(enable)
+			{
+				rv = sfp_phy_phydev_adv_update(dev_id, phy_addr,
+					FAL_PHY_ADV_ASY_PAUSE, FAL_PHY_ADV_ASY_PAUSE);
+				SW_RTN_ON_ERROR(rv);
+			}
+			else
+			{
+				rv = sfp_phy_phydev_adv_update(dev_id, phy_addr,
+					FAL_PHY_ADV_ASY_PAUSE, 0);
+				SW_RTN_ON_ERROR(rv);
+			}
+		}
 	}
 	else
 	{
@@ -410,11 +425,30 @@ adpt_mp_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 {
 	sw_error_t rv = SW_OK;
 	a_bool_t force_mode = A_FALSE;
+	a_uint32_t phy_addr = 0;
 
 	if(A_FALSE == _adpt_mp_port_phy_connected (dev_id, port_id))
 	{
 		rv = _adpt_mp_port_rxfc_status_set(dev_id, port_id, enable);
 		SW_RTN_ON_ERROR(rv);
+		if(hsl_port_is_sfp(dev_id, port_id))
+		{
+			rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+			SW_RTN_ON_ERROR(rv);
+			if(enable)
+			{
+				rv = sfp_phy_phydev_adv_update(dev_id, phy_addr,
+					FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE,
+					FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE);
+				SW_RTN_ON_ERROR(rv);
+			}
+			else
+			{
+				rv = sfp_phy_phydev_adv_update(dev_id, phy_addr,
+					FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE, 0);
+				SW_RTN_ON_ERROR(rv);
+			}
+		}
 	}
 	else
 	{
@@ -1277,36 +1311,15 @@ adpt_mp_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_speed_t * pspeed)
 {
 	sw_error_t rv = 0;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
-	struct port_phy_status port_mac_status = {0};
+	struct port_phy_status port_status = {0};
 
-	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(pspeed);
 
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY)) {
-		return SW_BAD_PARAM;
-	}
+	rv = adpt_mp_port_phy_status_get(dev_id, port_id, &port_status);
+	SW_RTN_ON_ERROR (rv);
+	*pspeed = port_status.speed;
 
-	/* for those ports without PHY device should be s17c port */
-	if (A_FALSE == _adpt_mp_port_phy_connected (dev_id, port_id)) {
-		rv = adpt_mp_port_mac_status_get(dev_id, port_id, &port_mac_status);
-		SW_RTN_ON_ERROR (rv);
-		*pspeed= port_mac_status.speed;
-	} else {
-		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id,
-				port_id));
-		if (NULL == phy_drv->phy_speed_get) {
-			return SW_NOT_SUPPORTED;
-		}
-
-		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-		SW_RTN_ON_ERROR (rv);
-		rv = phy_drv->phy_speed_get (dev_id, phy_id, pspeed);
-		SW_RTN_ON_ERROR (rv);
-	}
-
-	return rv;
+	return SW_OK;
 }
 
 static sw_error_t
@@ -1314,36 +1327,15 @@ adpt_mp_port_duplex_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_duplex_t * pduplex)
 {
 	sw_error_t rv = 0;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
-	struct port_phy_status port_mac_status = {0};
+	struct port_phy_status port_status = {0};
 
-	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(pduplex);
 
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY)) {
-		return SW_BAD_PARAM;
-	}
+	rv = adpt_mp_port_phy_status_get(dev_id, port_id, &port_status);
+	SW_RTN_ON_ERROR (rv);
+	*pduplex = port_status.duplex;
 
-	/* for those ports without PHY device should be s17c port */
-	if (A_FALSE == _adpt_mp_port_phy_connected (dev_id, port_id)) {
-		rv = adpt_mp_port_mac_status_get(dev_id, port_id, &port_mac_status);
-		SW_RTN_ON_ERROR (rv);
-		*pduplex = port_mac_status.duplex;
-	} else {
-		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id,
-				port_id));
-		if (NULL == phy_drv->phy_duplex_get) {
-			return SW_NOT_SUPPORTED;
-		}
-
-		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-		SW_RTN_ON_ERROR (rv);
-		rv = phy_drv->phy_duplex_get (dev_id, phy_id, pduplex);
-		SW_RTN_ON_ERROR (rv);
-	}
-
-	return rv;
+	return SW_OK;
 }
 
 static sw_error_t
@@ -1351,34 +1343,15 @@ adpt_mp_port_link_status_get(a_uint32_t dev_id, fal_port_t port_id,
 	a_bool_t * status)
 {
 	sw_error_t rv = 0;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
+	struct port_phy_status port_status = {0};
 
-	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(status);
 
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY)) {
-		return SW_BAD_PARAM;
-	}
-
-	/* for those ports without PHY device should be s17c port */
-	if (A_FALSE == _adpt_mp_port_phy_connected (dev_id, port_id)) {
-		*status = A_TRUE;
-	} else {
-		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id,
-				port_id));
-		if (NULL == phy_drv->phy_link_status_get) {
-			return SW_NOT_SUPPORTED;
-		}
-
-		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-		SW_RTN_ON_ERROR (rv);
-
-		*status = phy_drv->phy_link_status_get (dev_id, phy_id);
-	}
+	rv = adpt_mp_port_phy_status_get(dev_id, port_id, &port_status);
+	SW_RTN_ON_ERROR (rv);
+	*status = port_status.link_status;
 
 	return SW_OK;
-
 }
 
 sw_error_t 

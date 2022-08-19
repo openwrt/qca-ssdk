@@ -193,5 +193,20 @@ cppe_qos_mapping_tbl_int_dscp_en_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#if defined(MPPE)
+sw_error_t
+mppe_qos_mapping_tbl_flow_policer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *policer_en,
+		a_uint32_t *policer_index);
+
+sw_error_t
+mppe_qos_mapping_tbl_flow_policer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t policer_en,
+		a_uint32_t policer_index);
+#endif
 
 #endif

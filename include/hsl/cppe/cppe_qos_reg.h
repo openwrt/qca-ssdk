@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -91,6 +93,18 @@
 	#define QOS_MAPPING_TBL_QOS_RES_PREC_OFFSET  31
 	#define QOS_MAPPING_TBL_QOS_RES_PREC_LEN     3
 	#define QOS_MAPPING_TBL_QOS_RES_PREC_DEFAULT 0x0
+#if defined(MPPE)
+	/*[field] FLOW_POLICY_VALID*/
+	#define QOS_MAPPING_TBL_FLOW_POLICY_VALID
+	#define QOS_MAPPING_TBL_FLOW_POLICY_VALID_OFFSET  34
+	#define QOS_MAPPING_TBL_FLOW_POLICY_VALID_LEN     1
+	#define QOS_MAPPING_TBL_FLOW_POLICY_VALID_DEFAULT 0x0
+	/*[field] FLOW_POLICY_ID*/
+	#define QOS_MAPPING_TBL_FLOW_POLICY_ID
+	#define QOS_MAPPING_TBL_FLOW_POLICY_ID_OFFSET  35
+	#define QOS_MAPPING_TBL_FLOW_POLICY_ID_LEN     7
+	#define QOS_MAPPING_TBL_FLOW_POLICY_ID_DEFAULT 0x0
+#endif
 
 struct qos_mapping_tbl {
 	a_uint32_t  int_dscp_tc:8;
@@ -106,7 +120,13 @@ struct qos_mapping_tbl {
 	a_uint32_t  int_dp:2;
 	a_uint32_t  qos_res_prec_0:1;
 	a_uint32_t  qos_res_prec_1:2;
+#if defined(MPPE)
+	a_uint32_t  flow_policy_valid:1;
+	a_uint32_t  flow_policy_id:7;
+	a_uint32_t  _reserved0:22;
+#else
 	a_uint32_t  _reserved0:30;
+#endif
 };
 
 union qos_mapping_tbl_u {

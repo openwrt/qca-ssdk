@@ -43,7 +43,12 @@
 #define FRAME_POLICER_MAX_RATE 14881000
 #define FRAME_POLICER_MIN_RATE 6
 #define ADPT_HPPE_ACL_POLICER_MIN_ENTRY  0
+#ifdef MPPE
+#define ADPT_HPPE_ACL_POLICER_MAX_ENTRY 127
+#else
 #define ADPT_HPPE_ACL_POLICER_MAX_ENTRY 511
+#endif
+
 #define ADPT_APPE_POLICER_MAX           0x3ffff
 
 #if defined(APPE)
@@ -128,7 +133,8 @@ adpt_hppe_acl_policer_counter_get(a_uint32_t dev_id, a_uint32_t index,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(counter);
 
-	if (index < 0 || index > 511)
+	if ((index < ADPT_HPPE_ACL_POLICER_MIN_ENTRY) ||
+		(index > ADPT_HPPE_ACL_POLICER_MAX_ENTRY))
 		return SW_BAD_PARAM;
 
 	hppe_in_acl_meter_cnt_tbl_get(dev_id, index * 3, &in_acl_meter_cnt_tbl);

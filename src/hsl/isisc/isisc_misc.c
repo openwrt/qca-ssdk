@@ -1000,7 +1000,7 @@ _isisc_ripv1_status_get(a_uint32_t dev_id, a_bool_t * enable)
 
     return SW_OK;
 }
-
+#endif
 static sw_error_t
 _isisc_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
 {
@@ -1261,7 +1261,6 @@ _isisc_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
     return rv;
 
 }
-#endif
 
 /**
  * @brief Set max frame size which device can received on a particular device.
@@ -1884,7 +1883,7 @@ isisc_port_arp_ack_status_get(a_uint32_t dev_id, fal_port_t port_id,
     HSL_API_UNLOCK;
     return rv;
 }
-
+#endif
 /**
  * @brief Set switch interrupt mask on one particular device.
  * @param[in] dev_id device id
@@ -2060,6 +2059,23 @@ isisc_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t* port_bitmap)
 }
 
 /**
+ * @brief Clear link change interrupt status for all ports.
+ * @param[in] dev_id device id
+ * @return SW_OK or error code
+ */
+HSL_LOCAL sw_error_t
+isisc_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
+{
+    sw_error_t rv;
+
+    FAL_API_LOCK;
+    rv = _isisc_intr_status_mac_linkchg_clear(dev_id);
+    FAL_API_UNLOCK;
+    return rv;
+}
+
+#ifndef IN_MISC_MINI
+/**
  * @brief Set cpu vid enable status on a particular device.
  * @param[in] dev_id device id
  * @param[in] enable A_TRUE or A_FALSE
@@ -2126,22 +2142,6 @@ isisc_rtd_pppoe_en_get(a_uint32_t dev_id, a_bool_t * enable)
     HSL_API_UNLOCK;
     return rv;
 }
-
-/**
- * @brief Clear link change interrupt status for all ports.
- * @param[in] dev_id device id
- * @return SW_OK or error code
- */
-HSL_LOCAL sw_error_t
-isisc_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _isisc_intr_status_mac_linkchg_clear(dev_id);
-    FAL_API_UNLOCK;
-    return rv;
-}
 #endif
 
 sw_error_t
@@ -2193,6 +2193,7 @@ isisc_misc_init(a_uint32_t dev_id)
         p_api->port_arp_req_status_get = isisc_port_arp_req_status_get;
         p_api->port_arp_ack_status_set = isisc_port_arp_ack_status_set;
         p_api->port_arp_ack_status_get = isisc_port_arp_ack_status_get;
+#endif
 #if defined(MHT)
         if(hsl_get_current_chip_type(dev_id) == CHIP_MHT)
         {
@@ -2214,13 +2215,13 @@ isisc_misc_init(a_uint32_t dev_id)
         p_api->intr_mask_mac_linkchg_set = isisc_intr_mask_mac_linkchg_set;
         p_api->intr_mask_mac_linkchg_get = isisc_intr_mask_mac_linkchg_get;
         p_api->intr_status_mac_linkchg_get = isisc_intr_status_mac_linkchg_get;
+        p_api->intr_status_mac_linkchg_clear = isisc_intr_status_mac_linkchg_clear;
+#ifndef IN_MISC_MINI
         p_api->cpu_vid_en_set = isisc_cpu_vid_en_set;
         p_api->cpu_vid_en_get = isisc_cpu_vid_en_get;
         p_api->rtd_pppoe_en_set = isisc_rtd_pppoe_en_set;
         p_api->rtd_pppoe_en_get = isisc_rtd_pppoe_en_get;
-        p_api->intr_status_mac_linkchg_clear = isisc_intr_status_mac_linkchg_clear;
 #endif
-
     }
 #endif
 

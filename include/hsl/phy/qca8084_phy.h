@@ -19,6 +19,9 @@
 #define QCA8084_PHY_FIFO_RESET                                           0x3
 /*MMD1 register*/
 #define QCA8084_PHY_MMD1_NUM                                             0x1
+#define QCA8084_PHY_MMD1_MSE_THRESH_DEBUG_12                             0x800a
+/*MMD1 register field*/
+#define QCA8084_PHY_MMD1_MSE_THRESH_ENERGY_DETECT                        0x51c6
 /*MMD3 register*/
 #define QCA8084_PHY_MMD3_NUM                                             0x3
 #define QCA8084_PHY_MMD3_ADDR_8023AZ_EEE_2500M_CAPABILITY                0x15

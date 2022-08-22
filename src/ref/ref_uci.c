@@ -10859,6 +10859,54 @@ parse_servcode_portservcode(struct switch_val *val)
 
 	return rv;
 }
+
+static int
+parse_servcode_athtag(a_uint32_t dev_id, struct switch_val *val)
+{
+	struct switch_ext *switch_ext_p, *ext_value_p;
+	int rv = 0;
+	a_uint32_t tmpdata = 0, servcode_index = 0;
+	fal_servcode_athtag_t entry = {0};
+
+	switch_ext_p = val->value.ext_val;
+	while (switch_ext_p) {
+		ext_value_p = switch_ext_p;
+
+		if (!strcmp(ext_value_p->option_name, "name")) {
+			switch_ext_p = switch_ext_p->next;
+			continue;
+		} else if (!strcmp(ext_value_p->option_name, "servcode_id")) {
+			cmd_data_check_uint32((char*)ext_value_p->option_value,
+						&servcode_index, sizeof(a_uint32_t));
+		} else if(!strcmp(ext_value_p->option_name, "athtag_en")) {
+			cmd_data_check_confirm((char*)ext_value_p->option_value, A_FALSE,
+						&(entry.athtag_en), sizeof(entry.athtag_en));
+			entry.athtag_update_bitmap |= BIT(FLD_UPDATE_ATH_TAG_INSERT);
+		} else if (!strcmp(ext_value_p->option_name, "athtag_action")) {
+			cmd_data_check_attr("athtag_action", (char*)ext_value_p->option_value,
+						&tmpdata, sizeof(tmpdata));
+			entry.action = tmpdata & 0x7;
+			entry.athtag_update_bitmap |= BIT(FLD_UPDATE_ATH_TAG_ACTION);
+		} else if(!strcmp(ext_value_p->option_name, "athtag_bypass_fwd_en")) {
+			cmd_data_check_confirm((char*)ext_value_p->option_value, A_FALSE,
+					&(entry.bypass_fwd_en), sizeof(entry.bypass_fwd_en));
+			entry.athtag_update_bitmap |= BIT(FLD_UPDATE_ATH_TAG_BYPASS_FWD_EN);
+		} else if(!strcmp(ext_value_p->option_name, "athtag_dest_port")) {
+			cmd_data_check_uint8((char*)ext_value_p->option_value,
+					&tmpdata, sizeof(a_uint32_t));
+			entry.dest_port = tmpdata & 0x7f;
+			entry.athtag_update_bitmap |= BIT(FLD_UPDATE_ATH_TAG_DEST_PORT);
+		}  else if(!strcmp(ext_value_p->option_name, "athtag_field_disable")) {
+			cmd_data_check_confirm((char*)ext_value_p->option_value, A_FALSE,
+					&(entry.field_disable), sizeof(entry.field_disable));
+			entry.athtag_update_bitmap |= BIT(FLD_UPDATE_ATH_TAG_FIELD_DISABLE);
+		}
+		switch_ext_p = switch_ext_p->next;
+	}
+	rv = fal_servcode_athtag_set(dev_id, servcode_index, &entry);
+	SSDK_DEBUG("uci set servcode athtag rv %d\n", rv);
+	return rv;
+}
 #endif
 #endif
 
@@ -12802,7 +12850,7 @@ parse_qm(const char *command_name, struct switch_val *val)
 
 #ifdef IN_SERVCODE
 static int
-parse_servcode(const char *command_name, struct switch_val *val)
+parse_servcode(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
 {
 	int rv = -1;
 	if (!strcmp(command_name, "Config")) {
@@ -12812,6 +12860,8 @@ parse_servcode(const char *command_name, struct switch_val *val)
 #if defined(MPPE)
 	} else if (!strcmp(command_name, "PortServcode")) {
 		rv = parse_servcode_portservcode(val);
+	} else if (!strcmp(command_name, "Athtag")) {
+		rv = parse_servcode_athtag(dev_id, val);
 #endif
 	}
 
@@ -13764,7 +13814,7 @@ qca_ar8327_sw_switch_ext(struct switch_dev *dev,
 #endif
 	} else if(!strcmp(module_name, "Servcode")) {
 #ifdef IN_SERVCODE
-		rv = parse_servcode(command_name, val);
+		rv = parse_servcode(priv->device_id, command_name, val);
 #endif
 	} else if(!strcmp(module_name, "Ctrlpkt")) {
 #ifdef IN_CTRLPKT

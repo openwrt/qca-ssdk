@@ -314,6 +314,7 @@ typedef enum
 	SW_ATHTAG_PORT_MAPPING,
 	SW_ATHTAG_RX_CFG,
 	SW_ATHTAG_TX_CFG,
+	SW_SERVCODE_ATHTAG,
 /* auto_insert_flag */
 } sw_data_type_e;
 

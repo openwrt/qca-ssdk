@@ -2040,6 +2040,8 @@ adpt_hppe_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 	{
 		rv = _adpt_hppe_port_txfc_status_set(dev_id, port_id, enable);
 		SW_RTN_ON_ERROR(rv);
+
+#if defined(IN_SFP_PHY)
 		if(hsl_port_is_sfp(dev_id, port_id))
 		{
 			rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
@@ -2056,8 +2058,8 @@ adpt_hppe_port_txfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 					FAL_PHY_ADV_ASY_PAUSE, 0);
 				SW_RTN_ON_ERROR(rv);
 			}
-
 		}
+#endif
 	}
 	else
 	{
@@ -2124,6 +2126,7 @@ adpt_hppe_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 		{
 			rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
 			SW_RTN_ON_ERROR(rv);
+#if defined(IN_SFP_PHY)
 			if(enable)
 			{
 				rv = sfp_phy_phydev_adv_update(dev_id, phy_addr, FAL_PHY_ADV_PAUSE |
@@ -2137,6 +2140,7 @@ adpt_hppe_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 					FAL_PHY_ADV_ASY_PAUSE, 0);
 				SW_RTN_ON_ERROR(rv);
 			}
+#endif
 		}
 	}
 	else

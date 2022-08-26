@@ -323,8 +323,9 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 					if (*interface_mode_status == PHY_SGMII_BASET) {
 						*interface_mode_status = PORT_SGMII_PLUS;
 					} else {
+						/* sfp copper module interface is serdes mode */
 						*interface_mode_status = PHY_SGMII_BASET;
-						port_phyinfo->phy_features |= PHY_F_SFP_SGMII;
+						port_phyinfo->phy_features &= ~PHY_F_SFP_SGMII;
 					}
 				}
 			} else {

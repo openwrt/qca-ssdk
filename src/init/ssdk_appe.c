@@ -505,6 +505,15 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 		fal_port_rxfc_status_set(dev_id, i, A_FALSE);
 		fal_port_txfc_status_set(dev_id, i, A_FALSE);
 		fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
+#if defined(MPPE)
+		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
+			/* PTX buffer threshold need to be updated to 3 on MPPE
+			 * for fixing tunnel perfomance issue where MAPT inbound case,
+			 * only the buffer size >= 48 can be transmitted out.
+			 */
+			fal_port_flow_ctrl_thres_set(dev_id, i, 3, 3);
+		}
+#endif
 	}
 
 	aos_mem_zero(&init_cnt_cfg, sizeof(init_cnt_cfg));

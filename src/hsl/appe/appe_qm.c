@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,6 +21,7 @@
 #include "appe_qm_reg.h"
 #include "appe_qm.h"
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 appe_port_vsi_enqueue_map_get(
 		a_uint32_t dev_id,
@@ -47,7 +49,9 @@ appe_port_vsi_enqueue_map_set(
 				index * PORT_VSI_ENQUEUE_MAP_INC,
 				value->val);
 }
+#endif
 
+#if 0
 sw_error_t
 appe_port_vsi_enqueue_map_enqueue_valid_get(
 		a_uint32_t dev_id,
@@ -109,3 +113,4 @@ appe_port_vsi_enqueue_map_enqueue_vp_set(
 	ret = appe_port_vsi_enqueue_map_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif

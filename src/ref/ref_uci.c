@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013, 2015, 2017-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -10271,6 +10272,7 @@ parse_qm_ucastpriclass(struct switch_val *val)
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 static int
 parse_qm_mcastpriclass(struct switch_val *val)
 {
@@ -10301,6 +10303,7 @@ parse_qm_mcastpriclass(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_qm_queue(struct switch_val *val)
@@ -10362,6 +10365,7 @@ parse_qm_ucasthash(struct switch_val *val)
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 static int
 parse_qm_ucastdflthash(struct switch_val *val)
 {
@@ -10417,6 +10421,7 @@ parse_qm_mcastcpucode(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_qm_acctrl(struct switch_val *val)
@@ -10698,6 +10703,7 @@ parse_qm_cnt(struct switch_val *val)
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 static int
 parse_qm_enqueue(struct switch_val *val)
 {
@@ -10726,6 +10732,7 @@ parse_qm_enqueue(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_qm_srcprofile(struct switch_val *val)
@@ -12841,16 +12848,20 @@ parse_qm(const char *command_name, struct switch_val *val)
 		rv = parse_qm_ucastqbase(val);
 	} else if (!strcmp(command_name, "Ucastpriclass")) {
 		rv = parse_qm_ucastpriclass(val);
+#if !defined(IN_QM_MINI)
 	} else if (!strcmp(command_name, "Mcastpriclass")) {
 		rv = parse_qm_mcastpriclass(val);
+#endif
 	} else if (!strcmp(command_name, "Queue")) {
 		rv = parse_qm_queue(val);
 	} else if (!strcmp(command_name, "Ucasthash")) {
 		rv = parse_qm_ucasthash(val);
+#if !defined(IN_QM_MINI)
 	} else if (!strcmp(command_name, "Ucastdflthash")) {
 		rv = parse_qm_ucastdflthash(val);
 	} else if (!strcmp(command_name, "Mcastcpucode")) {
 		rv = parse_qm_mcastcpucode(val);
+#endif
 	} else if (!strcmp(command_name, "Acctrl")) {
 		rv = parse_qm_acctrl(val);
 	} else if (!strcmp(command_name, "Acprebuffer")) {
@@ -12867,8 +12878,10 @@ parse_qm(const char *command_name, struct switch_val *val)
 		rv = parse_qm_cntctrl(val);
 	} else if (!strcmp(command_name, "Cnt")) {
 		rv = parse_qm_cnt(val);
+#if !defined(IN_QM_MINI)
 	} else if (!strcmp(command_name, "Enqueue")) {
 		rv = parse_qm_enqueue(val);
+#endif
 	} else if (!strcmp(command_name, "Srcprofile")) {
 		rv = parse_qm_srcprofile(val);
 	}

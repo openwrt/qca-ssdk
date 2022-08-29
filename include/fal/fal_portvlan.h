@@ -283,187 +283,6 @@ enum {
 	FUNC_PORT_EGRESS_VLAN_FILTER_GET,
 };
 
-sw_error_t
-fal_port_1qmode_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pt_1qmode_t port_1qmode);
-
-sw_error_t
-fal_port_egvlanmode_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pt_1q_egmode_t port_egvlanmode);
-
-
-sw_error_t
-fal_portvlan_member_add(a_uint32_t dev_id, fal_port_t port_id,
-		fal_port_t mem_port_id);
-
-sw_error_t
-fal_portvlan_member_del(a_uint32_t dev_id, fal_port_t port_id,
-		fal_port_t mem_port_id);
-
-sw_error_t
-fal_portvlan_member_update(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pbmp_t mem_port_map);
-
-sw_error_t
-fal_port_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t vid);
-
-sw_error_t
-fal_port_force_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-sw_error_t
-fal_port_force_portvlan_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-sw_error_t
-fal_port_nestvlan_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-sw_error_t
-fal_nestvlan_tpid_set(a_uint32_t dev_id, a_uint32_t tpid);
-
-sw_error_t
-fal_port_invlan_mode_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pt_invlan_mode_t mode);
-
-sw_error_t
-fal_port_tls_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-sw_error_t
-fal_port_default_svid_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t vid);
-
-sw_error_t
-fal_port_default_cvid_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t vid);
-
-sw_error_t
-fal_port_vlan_propagation_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_vlan_propagation_mode_t mode);
-
-#ifndef IN_PORTVLAN_MINI
-sw_error_t
-fal_port_1qmode_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pt_1qmode_t * pport_1qmode);
-
-sw_error_t
-fal_port_egvlanmode_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pt_1q_egmode_t * pport_egvlanmode);
-
-sw_error_t
-fal_portvlan_member_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pbmp_t * mem_port_map);
-
-sw_error_t
-fal_port_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t * vid);
-
-sw_error_t
-fal_port_force_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-
-sw_error_t
-fal_port_force_portvlan_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-
-sw_error_t
-fal_port_nestvlan_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-
-sw_error_t
-fal_nestvlan_tpid_get(a_uint32_t dev_id, a_uint32_t * tpid);
-
-sw_error_t
-fal_port_invlan_mode_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_pt_invlan_mode_t * mode);
-
-sw_error_t
-fal_port_tls_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-
-
-sw_error_t
-fal_port_pri_propagation_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-
-sw_error_t
-fal_port_pri_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-sw_error_t
-fal_port_default_svid_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t * vid);
-
-sw_error_t
-fal_port_default_cvid_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t * vid);
-
-sw_error_t
-fal_port_vlan_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_vlan_propagation_mode_t * mode);
-#endif
-
-sw_error_t
-fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
-
-#ifndef IN_PORTVLAN_MINI
-sw_error_t
-fal_port_vlan_trans_del(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
-
-sw_error_t
-fal_port_vlan_trans_get(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
-#endif
-
-sw_error_t
-fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode);
-
-#ifndef IN_PORTVLAN_MINI
-sw_error_t
-fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode);
-#endif
-
-sw_error_t
-fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t role);
-
-#ifndef IN_PORTVLAN_MINI
-sw_error_t
-fal_port_qinq_role_get(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t * role);
-
-sw_error_t
-fal_port_vlan_trans_iterate(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t * iterator, fal_vlan_trans_entry_t * entry);
-
-sw_error_t
-fal_port_mac_vlan_xlt_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-sw_error_t
-fal_port_mac_vlan_xlt_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-
-sw_error_t
-fal_netisolate_set(a_uint32_t dev_id, a_uint32_t enable);
-
-sw_error_t
-fal_netisolate_get(a_uint32_t dev_id, a_uint32_t * enable);
-
-sw_error_t
-fal_eg_trans_filter_bypass_en_set(a_uint32_t dev_id, a_uint32_t enable);
-
-sw_error_t
-fal_eg_trans_filter_bypass_en_get(a_uint32_t dev_id, a_uint32_t * enable);
-
-sw_error_t
-fal_port_vrf_id_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t vrf_id);
-
-sw_error_t
-fal_port_vrf_id_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t * vrf_id);
-#endif
-
 #define FAL_FLG_TST(flag, field) \
     (((flag) & (field)) ? 1 : 0)
 
@@ -655,6 +474,96 @@ typedef struct {
 	a_bool_t membership_filter; /* membership filter or not for vport */
 } fal_egress_vlan_filter_t;
 
+#ifndef IN_PORTVLAN_MINI
+sw_error_t
+fal_port_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t vid);
+
+sw_error_t
+fal_port_force_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+
+sw_error_t
+fal_port_force_portvlan_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+
+sw_error_t
+fal_port_nestvlan_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+
+sw_error_t
+fal_port_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t * vid);
+
+sw_error_t
+fal_port_force_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable);
+
+sw_error_t
+fal_port_force_portvlan_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable);
+
+sw_error_t
+fal_port_nestvlan_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable);
+
+sw_error_t
+fal_port_tls_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable);
+
+sw_error_t
+fal_port_pri_propagation_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+
+sw_error_t
+fal_port_pri_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable);
+
+sw_error_t
+fal_port_vlan_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_vlan_propagation_mode_t * mode);
+
+sw_error_t
+fal_port_vlan_trans_add(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
+
+sw_error_t
+fal_port_vlan_trans_del(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
+
+sw_error_t
+fal_port_vlan_trans_get(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_trans_entry_t *entry);
+
+sw_error_t
+fal_port_vlan_trans_iterate(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t * iterator, fal_vlan_trans_entry_t * entry);
+
+sw_error_t
+fal_port_mac_vlan_xlt_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+
+sw_error_t
+fal_port_mac_vlan_xlt_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable);
+
+sw_error_t
+fal_netisolate_set(a_uint32_t dev_id, a_uint32_t enable);
+
+sw_error_t
+fal_netisolate_get(a_uint32_t dev_id, a_uint32_t * enable);
+
+sw_error_t
+fal_eg_trans_filter_bypass_en_set(a_uint32_t dev_id, a_uint32_t enable);
+
+sw_error_t
+fal_eg_trans_filter_bypass_en_get(a_uint32_t dev_id, a_uint32_t * enable);
+
+sw_error_t
+fal_port_vrf_id_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t vrf_id);
+
+sw_error_t
+fal_port_vrf_id_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t * vrf_id);
+
 sw_error_t
 fal_port_egress_vlan_filter_set(a_uint32_t dev_id,
 		fal_port_t port_id, fal_egress_vlan_filter_t *filter);
@@ -680,49 +589,6 @@ sw_error_t
 fal_port_vlan_counter_cleanup(a_uint32_t dev_id, a_uint32_t cnt_index);
 
 sw_error_t
-fal_global_qinq_mode_set(a_uint32_t dev_id, fal_global_qinq_mode_t *mode);
-
-sw_error_t
-fal_global_qinq_mode_get(a_uint32_t dev_id, fal_global_qinq_mode_t *mode);
-
-sw_error_t
-fal_port_qinq_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_qinq_role_t *mode);
-
-sw_error_t
-fal_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qinq_role_t *mode);
-
-sw_error_t
-fal_ingress_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid);
-
-sw_error_t
-fal_ingress_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid);
-
-sw_error_t
-fal_egress_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid);
-
-sw_error_t
-fal_egress_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid);
-
-sw_error_t
-fal_port_ingress_vlan_filter_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_ingress_vlan_filter_t *filter);
-
-sw_error_t
-fal_port_ingress_vlan_filter_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_ingress_vlan_filter_t *filter);
-
-sw_error_t
-fal_port_default_vlantag_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_port_vlan_direction_t direction,
-		fal_port_default_vid_enable_t *default_vid_en,
-		fal_port_vlan_tag_t *default_tag);
-sw_error_t
-fal_port_default_vlantag_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_port_vlan_direction_t direction,
-		fal_port_default_vid_enable_t *default_vid_en,
-		fal_port_vlan_tag_t *default_tag);
-
-sw_error_t
 fal_port_tag_propagation_set(a_uint32_t dev_id, fal_port_t port_id,
 		fal_port_vlan_direction_t direction,
 		fal_vlantag_propagation_t *prop);
@@ -733,36 +599,13 @@ fal_port_tag_propagation_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_vlantag_propagation_t *prop);
 
 sw_error_t
-fal_port_vlan_xlt_miss_cmd_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_fwd_cmd_t cmd);
+fal_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport,
+		fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id);
 
 sw_error_t
-fal_port_vlan_xlt_miss_cmd_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_fwd_cmd_t *cmd);
-
-sw_error_t
-fal_port_vlantag_egmode_set(a_uint32_t dev_id, fal_port_t port_id,
-		fal_vlantag_egress_mode_t *port_egvlanmode);
-
-sw_error_t
-fal_port_vlantag_egmode_get(a_uint32_t dev_id, fal_port_t port_id,
-		fal_vlantag_egress_mode_t *port_egvlanmode);
-
-sw_error_t
-fal_port_vsi_egmode_set(a_uint32_t dev_id, a_uint32_t vsi,
-		a_uint32_t port_id, fal_pt_1q_egmode_t egmode);
-
-sw_error_t
-fal_port_vsi_egmode_get(a_uint32_t dev_id, a_uint32_t vsi,
-		a_uint32_t port_id, fal_pt_1q_egmode_t * egmode);
-
-sw_error_t
-fal_port_vlantag_vsi_egmode_enable(a_uint32_t dev_id,
-		fal_port_t port_id, a_bool_t enable);
-
-sw_error_t
-fal_port_vlantag_vsi_egmode_status_get(a_uint32_t dev_id,
-		fal_port_t port_id, a_bool_t * enable);
+fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
+		fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id);
+#endif
 
 sw_error_t
 fal_port_vlan_trans_adv_add(a_uint32_t dev_id, fal_port_t port_id,
@@ -785,12 +628,163 @@ fal_port_vlan_trans_adv_getnext(a_uint32_t dev_id, fal_port_t port_id,
 		fal_vlan_trans_adv_rule_t * rule, fal_vlan_trans_adv_action_t * action);
 
 sw_error_t
-fal_port_vlan_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport,
-		fal_port_vlan_direction_t direction, a_uint32_t vpgroup_id);
+fal_portvlan_member_update(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pbmp_t mem_port_map);
 
 sw_error_t
-fal_port_vlan_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport,
-		fal_port_vlan_direction_t direction, a_uint32_t *vpgroup_id);
+fal_portvlan_member_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pbmp_t * mem_port_map);
+
+sw_error_t
+fal_port_vlantag_egmode_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_vlantag_egress_mode_t *port_egvlanmode);
+
+sw_error_t
+fal_port_vlantag_egmode_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_vlantag_egress_mode_t *port_egvlanmode);
+
+sw_error_t
+fal_port_vlantag_vsi_egmode_enable(a_uint32_t dev_id,
+		fal_port_t port_id, a_bool_t enable);
+
+sw_error_t
+fal_port_vlantag_vsi_egmode_status_get(a_uint32_t dev_id,
+		fal_port_t port_id, a_bool_t * enable);
+
+sw_error_t
+fal_port_vlan_xlt_miss_cmd_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_fwd_cmd_t cmd);
+
+sw_error_t
+fal_port_vlan_xlt_miss_cmd_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_fwd_cmd_t *cmd);
+
+sw_error_t
+fal_port_qinq_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_qinq_role_t *mode);
+
+sw_error_t
+fal_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qinq_role_t *mode);
+
+sw_error_t
+fal_ingress_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid);
+
+sw_error_t
+fal_ingress_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid);
+
+sw_error_t
+fal_egress_tpid_set(a_uint32_t dev_id, fal_tpid_t *tpid);
+
+sw_error_t
+fal_egress_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid);
+
+sw_error_t
+fal_port_vlan_propagation_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_vlan_propagation_mode_t mode);
+
+sw_error_t
+fal_port_egvlanmode_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pt_1q_egmode_t port_egvlanmode);
+
+sw_error_t
+fal_port_egvlanmode_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pt_1q_egmode_t * pport_egvlanmode);
+
+sw_error_t
+fal_global_qinq_mode_set(a_uint32_t dev_id, fal_global_qinq_mode_t *mode);
+
+sw_error_t
+fal_global_qinq_mode_get(a_uint32_t dev_id, fal_global_qinq_mode_t *mode);
+
+sw_error_t
+fal_port_vsi_egmode_set(a_uint32_t dev_id, a_uint32_t vsi,
+		a_uint32_t port_id, fal_pt_1q_egmode_t egmode);
+
+sw_error_t
+fal_port_vsi_egmode_get(a_uint32_t dev_id, a_uint32_t vsi,
+		a_uint32_t port_id, fal_pt_1q_egmode_t * egmode);
+
+sw_error_t
+fal_port_1qmode_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pt_1qmode_t port_1qmode);
+
+sw_error_t
+fal_port_1qmode_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pt_1qmode_t * pport_1qmode);
+
+sw_error_t
+fal_port_default_svid_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t vid);
+
+sw_error_t
+fal_port_default_svid_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t * vid);
+
+sw_error_t
+fal_port_default_cvid_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t vid);
+
+sw_error_t
+fal_port_default_cvid_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t * vid);
+
+sw_error_t
+fal_port_tls_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable);
+
+sw_error_t
+fal_qinq_mode_set(a_uint32_t dev_id, fal_qinq_mode_t mode);
+
+sw_error_t
+fal_qinq_mode_get(a_uint32_t dev_id, fal_qinq_mode_t * mode);
+
+sw_error_t
+fal_port_qinq_role_set(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t role);
+
+sw_error_t
+fal_port_qinq_role_get(a_uint32_t dev_id, fal_port_t port_id, fal_qinq_port_role_t * role);
+
+sw_error_t
+fal_port_default_vlantag_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_vlan_direction_t direction,
+		fal_port_default_vid_enable_t *default_vid_en,
+		fal_port_vlan_tag_t *default_tag);
+
+sw_error_t
+fal_port_default_vlantag_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_vlan_direction_t direction,
+		fal_port_default_vid_enable_t *default_vid_en,
+		fal_port_vlan_tag_t *default_tag);
+
+sw_error_t
+fal_portvlan_member_add(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_t mem_port_id);
+
+sw_error_t
+fal_portvlan_member_del(a_uint32_t dev_id, fal_port_t port_id,
+		fal_port_t mem_port_id);
+
+sw_error_t
+fal_nestvlan_tpid_set(a_uint32_t dev_id, a_uint32_t tpid);
+
+sw_error_t
+fal_nestvlan_tpid_get(a_uint32_t dev_id, a_uint32_t * tpid);
+
+sw_error_t
+fal_port_invlan_mode_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pt_invlan_mode_t mode);
+
+sw_error_t
+fal_port_invlan_mode_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_pt_invlan_mode_t * mode);
+
+sw_error_t
+fal_port_ingress_vlan_filter_set(a_uint32_t dev_id, fal_port_t port_id,
+		fal_ingress_vlan_filter_t *filter);
+
+sw_error_t
+fal_port_ingress_vlan_filter_get(a_uint32_t dev_id, fal_port_t port_id,
+		fal_ingress_vlan_filter_t *filter);
+
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

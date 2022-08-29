@@ -46,6 +46,7 @@ extern "C" {
 #define SSDK_L1SCHEDULER_CFG_MAX        64
 #define SSDK_SP_MAX_PRIORITY            8
 #define SSDK_MAX_FRAME_SIZE             0x3000
+#define SSDK_MAX_MTU                    0x3FFF
 
 #define PORT_GMAC_TYPE                  1
 #define PORT_XGMAC_TYPE                 2

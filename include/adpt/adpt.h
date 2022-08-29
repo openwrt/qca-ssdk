@@ -69,9 +69,9 @@ do { \
         return SW_OUT_OF_RANGE; \
 } while (0)
 
-#define ADPT_PORT_ID_CHECK(port_id) \
+#define ADPT_PPE_PORT_ID_CHECK(port_id) \
 do { \
-    if (port_id >= SW_MAX_NR_PORT) \
+    if (port_id > SSDK_MAX_VIRTUAL_PORT_ID) \
         return SW_OUT_OF_RANGE; \
 } while (0)
 

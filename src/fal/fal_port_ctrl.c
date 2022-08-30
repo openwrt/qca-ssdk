@@ -2172,6 +2172,13 @@ _fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 	return rv;
 }
 
+static sw_error_t
+_fal_port_combo_link_status_get (a_uint32_t dev_id, fal_port_t port_id,
+				fal_port_combo_link_status_t * status)
+{
+	return hsl_port_combo_phy_link_status_get(dev_id, port_id, status);;
+}
+
 /*qca808x_start*/
 /*insert flag for inner fal, don't remove it*/
 /**
@@ -4018,6 +4025,25 @@ fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
     return rv;
 }
 
+/**
+ * @brief Get combo fiber mode  on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] get combo fiber mode [1000bx or 100fx]
+ * @return SW_OK or error code
+ */
+sw_error_t
+fal_port_combo_link_status_get (a_uint32_t dev_id,
+				fal_port_t port_id, fal_port_combo_link_status_t * status)
+{
+	sw_error_t rv;
+
+	FAL_API_LOCK;
+	rv = _fal_port_combo_link_status_get (dev_id, port_id, status);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
 /*insert flag for outter fal, don't remove it*/
 /**
  * @}
@@ -4132,3 +4158,4 @@ EXPORT_SYMBOL(fal_port_cnt_cfg_set);
 EXPORT_SYMBOL(fal_port_cnt_cfg_get);
 EXPORT_SYMBOL(fal_port_cnt_get);
 EXPORT_SYMBOL(fal_port_cnt_flush);
+EXPORT_SYMBOL(fal_port_combo_link_status_get);

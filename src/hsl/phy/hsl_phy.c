@@ -1526,3 +1526,48 @@ hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id)
 	return SW_OK;
 }
 /*qca808x_end*/
+sw_error_t hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,
+	a_uint32_t port_id, fal_port_combo_link_status_t * status)
+{
+	phy_type_t copper_phy_type;
+	hsl_phy_ops_t *copper_phy_drv;
+#if defined(IN_SFP_PHY)
+	a_bool_t sfp_rx_los_status;
+#endif
+
+	if (dev_id >= SW_MAX_NR_DEV)
+		return SW_BAD_PARAM;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	if (A_TRUE != hsl_port_phy_combo_capability_get(dev_id, port_id))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	/*get fiber link status*/
+#if defined(IN_SFP_PHY)
+	SW_RTN_ON_ERROR(sfp_phy_rx_los_status_get(dev_id, port_id, &sfp_rx_los_status));
+	status->fiber_link_status = !sfp_rx_los_status;
+#endif
+
+	/*get copper link status*/
+	if (phy_info[dev_id]->phy_type[port_id] == SFP_PHY_CHIP)
+	{
+		copper_phy_type = phy_info[dev_id]->combo_phy_type[port_id];
+	}
+	else
+	{
+		copper_phy_type = phy_info[dev_id]->phy_type[port_id];
+	}
+	copper_phy_drv = ssdk_phy_driver[copper_phy_type].phy_ops;
+	if (copper_phy_drv && copper_phy_drv->phy_link_status_get)
+	{
+		status->copper_link_status =
+		copper_phy_drv->phy_link_status_get(dev_id, phy_info[dev_id]->phy_address[port_id]);
+	}
+
+	return SW_OK;
+}

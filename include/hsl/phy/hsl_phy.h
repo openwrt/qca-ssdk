@@ -568,6 +568,7 @@ typedef struct {
 	phy_dac_t phy_dac[SW_MAX_NR_PORT];
 	a_bool_t port_link_status[SW_MAX_NR_PORT];
 	a_uint32_t port_mode[SW_MAX_NR_PORT];
+	a_uint32_t combo_phy_type[SW_MAX_NR_PORT];
 } phy_info_t;
 /*qca808x_end*/
 #define MALIBU5PORT_PHY         0x004DD0B1
@@ -778,6 +779,9 @@ a_uint32_t
 hsl_port_mode_to_uniphy_mode(a_uint32_t dev_id, a_uint32_t port_mode);
 a_uint32_t
 hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id);
+sw_error_t
+hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,
+	a_uint32_t port_id, fal_port_combo_link_status_t * status);
 /*qca808x_start*/
 sw_error_t
 hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);

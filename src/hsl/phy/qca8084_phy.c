@@ -643,6 +643,12 @@ qca8084_phy_hw_init(a_uint32_t dev_id, a_uint32_t phy_addr)
 	SW_RTN_ON_ERROR(rv);
 	/*invert ADC clock edge as falling edge to fix link issue*/
 	rv = qca8084_phy_adc_edge_set(dev_id, phy_addr, ADC_FALLING);
+	SW_RTN_ON_ERROR(rv);
+	/*configure signal energy detect threshold to fix link issue
+		for some chips*/
+	rv = qca808x_phy_mmd_write(dev_id, phy_addr, QCA8084_PHY_MMD1_NUM,
+		QCA8084_PHY_MMD1_MSE_THRESH_DEBUG_12,
+		QCA8084_PHY_MMD1_MSE_THRESH_ENERGY_DETECT);
 
 	return rv;
 }

@@ -12501,6 +12501,17 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
 		    "usage: next hop of bridge type\n",
 		    cmd_data_check_uint16, (cmd, &tmp, sizeof(a_uint16_t)));
     entry.bridge_nexthop = tmp;
+
+    rv = __cmd_data_check_boolean("policer_valid", "no",
+		    "usage: <yes/no/y/n>\n",
+		    cmd_data_check_confirm, A_FALSE, &(entry.policer_valid),
+		    sizeof (a_bool_t));
+    SW_RTN_ON_ERROR(rv);
+
+    cmd_data_check_element("policer_index", "0",
+		    "usage: flow based policer index\n",
+		    cmd_data_check_uint32, (cmd, &tmp, sizeof(a_uint32_t)));
+    entry.policer_index = tmp;
 #endif
 
     *(fal_flow_entry_t *)val = entry;

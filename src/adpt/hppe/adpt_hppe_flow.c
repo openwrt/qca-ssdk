@@ -31,6 +31,10 @@
 #if defined(CPPE) || defined(APPE)
 #include "adpt_cppe_flow.h"
 #endif
+#if defined(MPPE)
+#include "cppe_qos_reg.h"
+#include "cppe_qos.h"
+#endif
 
 #define FLOW_ENTRY_TYPE_IPV4 0
 #define FLOW_ENTRY_TYPE_IPV6 1
@@ -481,6 +485,9 @@ adpt_hppe_flow_entry_host_op_add(
 		SW_RTN_ON_ERROR(rv);
 
 #if defined(MPPE)
+		mppe_qos_mapping_tbl_flow_policer_set(dev_id, flow_entry->entry_id,
+				flow_entry->policer_valid, flow_entry->policer_index);
+
 		eg_treemap.bf.type = flow_qos->qos_type;
 		/* flow cookies only has 16bits */
 		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
@@ -792,6 +799,9 @@ adpt_hppe_flow_entry_host_op_get(
 		flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
 #endif
 #if defined(MPPE)
+		mppe_qos_mapping_tbl_flow_policer_get(dev_id, flow_entry->entry_id,
+				&(flow_entry->policer_valid), &(flow_entry->policer_index));
+
 		flow_qos->qos_type = eg_treemap.bf.type;
 		/* flow cookies only has 16bits */
 		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
@@ -1426,6 +1436,9 @@ adpt_hppe_flow_entry_get(
 		flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
 #endif
 #if defined(MPPE)
+		mppe_qos_mapping_tbl_flow_policer_get(dev_id, flow_entry->entry_id,
+				&(flow_entry->policer_valid), &(flow_entry->policer_index));
+
 		flow_qos->qos_type = eg_treemap.bf.type;
 		/* flow cookies only has 16bits */
 		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)
@@ -2134,6 +2147,9 @@ adpt_hppe_flow_entry_add(
 		SW_RTN_ON_ERROR(rv);
 
 #if defined(MPPE)
+		mppe_qos_mapping_tbl_flow_policer_set(dev_id, flow_entry->entry_id,
+				flow_entry->policer_valid, flow_entry->policer_index);
+
 		eg_treemap.bf.type = flow_qos->qos_type;
 		/* flow cookies only has 16bits */
 		if (flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE)

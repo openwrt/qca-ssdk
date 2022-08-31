@@ -9806,6 +9806,10 @@ parse_flow_entry(struct switch_val *val)
 			val_ptr[37] = (char*)ext_value_p->option_value;
 		} else if (!strcmp(ext_value_p->option_name, "bridge_nexthop")) {
 			val_ptr[38] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "policer_valid")) {
+			val_ptr[39] = (char*)ext_value_p->option_value;
+		} else if (!strcmp(ext_value_p->option_name, "policer_index")) {
+			val_ptr[40] = (char*)ext_value_p->option_value;
 		}
 #endif
 		else {

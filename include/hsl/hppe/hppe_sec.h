@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -26,6 +29,7 @@
 #define L3_EXP_L2_FLOW_CTRL_MAX_ENTRY	72
 #define L3_EXP_L3_FLOW_CTRL_MAX_ENTRY	72
 #define L3_EXP_MULTICAST_CTRL_MAX_ENTRY	72
+
 
 sw_error_t
 hppe_l3_exception_cmd_get(
@@ -99,6 +103,47 @@ hppe_l3_exp_multicast_ctrl_set(
 		a_uint32_t index,
 		union l3_exp_multicast_ctrl_u *value);
 
+sw_error_t
+hppe_l4_exception_parsing_ctrl_0_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_0_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_0_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_0_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_1_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_1_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_1_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_1_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_2_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_2_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_2_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_2_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_3_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_3_reg_u *value);
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_3_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_3_reg_u *value);
+
+#ifndef IN_SEC_MINI
 sw_error_t
 hppe_l3_exception_cmd_l3_excep_cmd_get(
 		a_uint32_t dev_id,
@@ -192,46 +237,6 @@ sw_error_t
 hppe_l3_exception_parsing_ctrl_reg_set(
 		a_uint32_t dev_id,
 		union l3_exception_parsing_ctrl_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_0_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_0_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_0_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_0_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_1_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_1_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_1_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_1_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_2_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_2_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_2_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_2_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_3_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_3_reg_u *value);
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_3_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_3_reg_u *value);
 
 sw_error_t
 hppe_l3_exception_parsing_ctrl_reg_small_hop_limit_get(
@@ -412,5 +417,5 @@ sw_error_t
 hppe_l4_exception_parsing_ctrl_3_reg_tcp_flags7_mask_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 #endif

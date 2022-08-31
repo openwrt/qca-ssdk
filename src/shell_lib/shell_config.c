@@ -948,14 +948,18 @@ struct sub_cmd_des_t g_sec_des[] =
 	{"icmp4", "set", SW_API_SEC_ICMP4_SET, NULL},
 	{"icmp6", "set", SW_API_SEC_ICMP6_SET, NULL},
 #endif
+#ifndef IN_SEC_MINI
 	{"l3parser", "set", SW_API_SEC_L3_PARSER_CTRL_SET, NULL},
+#endif
 	{"l4parser", "set", SW_API_SEC_L4_PARSER_CTRL_SET, NULL},
 	{"expctrl", "set", SW_API_SEC_EXP_CTRL_SET, NULL},
+#ifndef IN_SEC_MINI
 	{"l2expctrl", "set", SW_API_SEC_L2_EXP_CTRL_SET, NULL},
 	{"tunnelexpctrl", "set", SW_API_SEC_TUNNEL_EXP_CTRL_SET, NULL},
 	{"tunnell3parser", "set", SW_API_SEC_TUNNEL_L3_PARSER_CTRL_SET, NULL},
 	{"tunnell4parser", "set", SW_API_SEC_TUNNEL_L4_PARSER_CTRL_SET, NULL},
 	{"tunnelflagsparser", "set", SW_API_SEC_TUNNEL_FLAGS_PARSER_CTRL_SET, NULL},
+#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif

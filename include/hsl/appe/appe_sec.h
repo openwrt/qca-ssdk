@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -34,26 +36,6 @@
 #define TPR_EXCEPTION_CTRL_0_MAX_ENTRY  16
 #define TPR_EXCEPTION_CTRL_1_MAX_ENTRY  16
 
-
-sw_error_t
-appe_l2_excep_ctrl_get(
-		a_uint32_t dev_id,
-		union l2_excep_ctrl_u *value);
-
-sw_error_t
-appe_l2_excep_ctrl_set(
-		a_uint32_t dev_id,
-		union l2_excep_ctrl_u *value);
-
-sw_error_t
-appe_l2_excep_ctrl_tunnel_excep_fwd_get(
-		a_uint32_t dev_id,
-		unsigned int *value);
-
-sw_error_t
-appe_l2_excep_ctrl_tunnel_excep_fwd_set(
-		a_uint32_t dev_id,
-		unsigned int value);
 
 sw_error_t
 appe_l2_flow_hit_exp_ctrl_get(
@@ -102,6 +84,27 @@ appe_l2_flow_hit_miss_exp_ctrl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union l2_flow_hit_miss_exp_ctrl_u *value);
+
+#ifndef IN_SEC_MINI
+sw_error_t
+appe_l2_excep_ctrl_get(
+		a_uint32_t dev_id,
+		union l2_excep_ctrl_u *value);
+
+sw_error_t
+appe_l2_excep_ctrl_set(
+		a_uint32_t dev_id,
+		union l2_excep_ctrl_u *value);
+
+sw_error_t
+appe_l2_excep_ctrl_tunnel_excep_fwd_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+appe_l2_excep_ctrl_tunnel_excep_fwd_set(
+		a_uint32_t dev_id,
+		unsigned int value);
 
 sw_error_t
 appe_l2_flow_hit_exp_ctrl_excep_en_get(
@@ -596,7 +599,7 @@ appe_tpr_exception_ctrl_1_comp_mode_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#endif
 
 #endif
 

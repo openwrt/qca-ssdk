@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2016 The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup isisc_rate ISISC_RATE
@@ -31,6 +33,12 @@
 #define ACL_POLICER_CNT_SEL_ADDR          0x09f0
 #define ACL_POLICER_CNT_MODE_ADDR         0x09f4
 #define ACL_POLICER_CNT_RST_ADDR          0x09f8
+#define ISISC_BYTE_RATE_UNIT              32 /* unit is kbps*/
+#define MHT_BYTE_RATE_UNIT                80 /* unit kbps*/
+#define ISISC_FRAME_RATE_UNIT             125 /* 2*62.5pps unit */
+#define MHT_FRAME_RATE_UNIT               625 /* 4*156.25pps unit */
+#define ISISC_MIN_FRAME_RATE              63 /* unit pps */
+#define MHT_MIN_FRAME_RATE                157 /* unit pps */
 
 static sw_error_t
 _isisc_rate_port_queue_check(fal_port_t port_id, fal_queue_t queue_id)
@@ -293,6 +301,56 @@ _isisc_rate_ts_reparse(a_uint32_t hw, fal_rate_mt_t * sw)
     }
 }
 
+static void
+_isisc_rate_sw_to_hw(a_uint32_t dev_id, fal_traffic_unit_t meter_unit,
+    a_uint32_t sw_rate, a_uint32_t *hw_rate)
+{
+    ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
+
+    chip_type = hsl_get_current_chip_type(dev_id);
+
+    if (FAL_BYTE_BASED == meter_unit) {
+        if (chip_type == CHIP_MHT) {
+            *hw_rate = sw_rate / MHT_BYTE_RATE_UNIT;
+        } else {
+            *hw_rate = sw_rate / ISISC_BYTE_RATE_UNIT;
+        }
+    } else if (FAL_FRAME_BASED == meter_unit) {
+        if (chip_type == CHIP_MHT) {
+            *hw_rate = (sw_rate * 4) / MHT_FRAME_RATE_UNIT;
+        } else {
+            *hw_rate = (sw_rate * 2) / ISISC_FRAME_RATE_UNIT;
+        }
+    } else {
+        return;
+    }
+}
+
+static void
+_isisc_rate_hw_to_sw(a_uint32_t dev_id, fal_traffic_unit_t meter_unit,
+    a_uint32_t hw_rate, a_uint32_t *sw_rate)
+{
+    ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
+
+    chip_type = hsl_get_current_chip_type(dev_id);
+
+    if (FAL_BYTE_BASED == meter_unit) {
+        if (chip_type == CHIP_MHT) {
+            *sw_rate = hw_rate * MHT_BYTE_RATE_UNIT;
+        } else {
+            *sw_rate = hw_rate * ISISC_BYTE_RATE_UNIT;
+        }
+    } else if (FAL_FRAME_BASED == meter_unit) {
+        if (chip_type == CHIP_MHT) {
+            *sw_rate = hw_rate / 4 * MHT_FRAME_RATE_UNIT + hw_rate % 4 * MHT_MIN_FRAME_RATE;
+        } else {
+            *sw_rate = hw_rate / 2 * ISISC_FRAME_RATE_UNIT + hw_rate % 2 * ISISC_MIN_FRAME_RATE;
+        }
+    } else {
+        return;
+    }
+}
+
 static sw_error_t
 _isisc_rate_port_policer_set(a_uint32_t dev_id, fal_port_t port_id,
                             fal_port_policer_t * policer)
@@ -312,16 +370,14 @@ _isisc_rate_port_policer_set(a_uint32_t dev_id, fal_port_t port_id,
     {
         if (A_TRUE == policer->c_enable)
         {
-            cir = policer->cir >> 5;
-            policer->cir = cir << 5;
+            _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->cir, &cir);
             _isisc_ingress_bs_byte_sw_to_hw(policer->cbs, &cbs);
             _isisc_ingress_bs_byte_hw_to_sw(cbs, &(policer->cbs));
         }
 
         if (A_TRUE == policer->e_enable)
         {
-            eir = policer->eir >> 5;
-            policer->eir = eir << 5;
+            _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->eir, &eir);
             _isisc_ingress_bs_byte_sw_to_hw(policer->ebs, &ebs);
             _isisc_ingress_bs_byte_hw_to_sw(ebs, &(policer->ebs));
         }
@@ -332,16 +388,14 @@ _isisc_rate_port_policer_set(a_uint32_t dev_id, fal_port_t port_id,
     {
         if (A_TRUE == policer->c_enable)
         {
-            cir = (policer->cir * 2) / 125;
-            policer->cir = cir / 2 * 125 + cir % 2 * 63;
+            _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->cir, &cir);
             _isisc_ingress_bs_frame_sw_to_hw(policer->cbs, &cbs);
             _isisc_ingress_bs_frame_hw_to_sw(cbs, &(policer->cbs));
         }
 
         if (A_TRUE == policer->e_enable)
         {
-            eir = (policer->eir * 2) / 125;
-            policer->eir = eir / 2 * 125 + eir % 2 * 63;
+            _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->eir, &eir);
             _isisc_ingress_bs_frame_sw_to_hw(policer->ebs, &ebs);
             _isisc_ingress_bs_frame_hw_to_sw(ebs, &(policer->ebs));
         }
@@ -452,16 +506,16 @@ _isisc_rate_port_policer_get(a_uint32_t dev_id, fal_port_t port_id,
     if (unit)
     {
         policer->meter_unit = FAL_FRAME_BASED;
-        policer->cir = cir / 2 * 125 + cir % 2 * 63;
-        policer->eir = eir / 2 * 125 + eir % 2 * 63;
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, cir, &policer->cir);
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, eir, &policer->eir);
         _isisc_ingress_bs_frame_hw_to_sw(cbs, &(policer->cbs));
         _isisc_ingress_bs_frame_hw_to_sw(ebs, &(policer->ebs));
     }
     else
     {
         policer->meter_unit = FAL_BYTE_BASED;
-        policer->cir = cir << 5;
-        policer->eir = eir << 5;
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, cir, &policer->cir);
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, eir, &policer->eir);
         _isisc_ingress_bs_byte_hw_to_sw(cbs, &(policer->cbs));
         _isisc_ingress_bs_byte_hw_to_sw(ebs, &(policer->ebs));
     }
@@ -515,11 +569,8 @@ _isisc_rate_port_shaper_set(a_uint32_t dev_id, fal_port_t port_id,
     {
         if (FAL_BYTE_BASED == shaper->meter_unit)
         {
-            cir = shaper->cir >> 5;
-            shaper->cir = cir << 5;
-
-            eir = shaper->eir >> 5;
-            shaper->eir = eir << 5;
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->cir, &cir);
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->eir, &eir);
 
             _isisc_egress_bs_byte_sw_to_hw(shaper->cbs, &cbs);
             _isisc_egress_bs_byte_hw_to_sw(cbs, &(shaper->cbs));
@@ -531,11 +582,8 @@ _isisc_rate_port_shaper_set(a_uint32_t dev_id, fal_port_t port_id,
         }
         else if (FAL_FRAME_BASED == shaper->meter_unit)
         {
-            cir = (shaper->cir * 2) / 125;
-            shaper->cir = cir / 2 * 125 + cir % 2 * 63;
-
-            eir = (shaper->eir * 2) / 125;
-            shaper->eir = eir / 2 * 125 + eir % 2 * 63;
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->cir, &cir);
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->eir, &eir);
 
             _isisc_egress_bs_frame_sw_to_hw(shaper->cbs, &cbs);
             _isisc_egress_bs_frame_hw_to_sw(cbs, &(shaper->cbs));
@@ -633,16 +681,16 @@ _isisc_rate_port_shaper_get(a_uint32_t dev_id, fal_port_t port_id,
     if (data)
     {
         shaper->meter_unit = FAL_FRAME_BASED;
-        shaper->cir = cir / 2 * 125 + cir % 2 * 63;
-        shaper->eir = eir / 2 * 125 + eir % 2 * 63;
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, cir, &shaper->cir);
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, eir, &shaper->eir);
         _isisc_egress_bs_frame_hw_to_sw(cbs, &(shaper->cbs));
         _isisc_egress_bs_frame_hw_to_sw(ebs, &(shaper->ebs));
     }
     else
     {
         shaper->meter_unit = FAL_BYTE_BASED;
-        shaper->cir = cir << 5;
-        shaper->eir = eir << 5;
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, cir, &shaper->cir);
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, eir, &shaper->eir);
         _isisc_egress_bs_byte_hw_to_sw(cbs, &(shaper->cbs));
         _isisc_egress_bs_byte_hw_to_sw(ebs, &(shaper->ebs));
     }
@@ -679,11 +727,8 @@ _isisc_rate_queue_shaper_set(a_uint32_t dev_id, fal_port_t port_id,
     {
         if (FAL_BYTE_BASED == shaper->meter_unit)
         {
-            cir = shaper->cir >> 5;
-            shaper->cir = cir << 5;
-
-            eir = shaper->eir >> 5;
-            shaper->eir = eir << 5;
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->cir, &cir);
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->eir, &eir);
 
             _isisc_egress_bs_byte_sw_to_hw(shaper->cbs, &cbs);
             _isisc_egress_bs_byte_hw_to_sw(cbs, &(shaper->cbs));
@@ -695,11 +740,8 @@ _isisc_rate_queue_shaper_set(a_uint32_t dev_id, fal_port_t port_id,
         }
         else if (FAL_FRAME_BASED == shaper->meter_unit)
         {
-            cir = (shaper->cir * 2) / 125;
-            shaper->cir = cir / 2 * 125 + cir % 2 * 63;
-
-            eir = (shaper->eir * 2) / 125;
-            shaper->eir = eir / 2 * 125 + eir % 2 * 63;
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->cir, &cir);
+            _isisc_rate_sw_to_hw(dev_id, shaper->meter_unit, shaper->eir, &eir);
 
             _isisc_egress_bs_frame_sw_to_hw(shaper->cbs, &cbs);
             _isisc_egress_bs_frame_hw_to_sw(cbs, &(shaper->cbs));
@@ -1025,16 +1067,16 @@ _isisc_rate_queue_shaper_get(a_uint32_t dev_id, fal_port_t port_id,
     if (data)
     {
         shaper->meter_unit = FAL_FRAME_BASED;
-        shaper->cir = cir / 2 * 125 + cir % 2 * 63;
-        shaper->eir = eir / 2 * 125 + eir % 2 * 63;
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, cir, &shaper->cir);
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, eir, &shaper->eir);
         _isisc_egress_bs_frame_hw_to_sw(cbs, &(shaper->cbs));
         _isisc_egress_bs_frame_hw_to_sw(ebs, &(shaper->ebs));
     }
     else
     {
         shaper->meter_unit = FAL_BYTE_BASED;
-        shaper->cir = cir << 5;
-        shaper->eir = eir << 5;
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, cir, &shaper->cir);
+        _isisc_rate_hw_to_sw(dev_id, shaper->meter_unit, eir, &shaper->eir);
         _isisc_egress_bs_byte_hw_to_sw(cbs, &(shaper->cbs));
         _isisc_egress_bs_byte_hw_to_sw(ebs, &(shaper->ebs));
     }
@@ -1097,11 +1139,8 @@ _isisc_rate_acl_policer_set(a_uint32_t dev_id, a_uint32_t policer_id,
 
     if (FAL_BYTE_BASED == policer->meter_unit)
     {
-        cir = policer->cir >> 5;
-        policer->cir = cir << 5;
-
-        eir = policer->eir >> 5;
-        policer->eir = eir << 5;
+        _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->cir, &cir);
+        _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->eir, &eir);
 
         _isisc_ingress_bs_byte_sw_to_hw(policer->cbs, &cbs);
         _isisc_ingress_bs_byte_hw_to_sw(cbs, &(policer->cbs));
@@ -1113,11 +1152,8 @@ _isisc_rate_acl_policer_set(a_uint32_t dev_id, a_uint32_t policer_id,
     }
     else if (FAL_FRAME_BASED == policer->meter_unit)
     {
-        cir = (policer->cir * 2) / 125;
-        policer->cir = cir / 2 * 125 + cir % 2 * 63;
-
-        eir = (policer->eir * 2) / 125;
-        policer->eir = eir / 2 * 125 + eir % 2 * 63;
+        _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->cir, &cir);
+        _isisc_rate_sw_to_hw(dev_id, policer->meter_unit, policer->eir, &eir);
 
         _isisc_ingress_bs_frame_sw_to_hw(policer->cbs, &cbs);
         _isisc_ingress_bs_frame_hw_to_sw(cbs, &(policer->cbs));
@@ -1233,8 +1269,8 @@ _isisc_rate_acl_policer_get(a_uint32_t dev_id, a_uint32_t policer_id,
     if (unit)
     {
         policer->meter_unit = FAL_FRAME_BASED;
-        policer->cir = cir / 2 * 125 + cir % 2 * 63;
-        policer->eir = eir / 2 * 125 + eir % 2 * 63;
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, cir, &policer->cir);
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, eir, &policer->eir);
         _isisc_ingress_bs_frame_hw_to_sw(cbs, &(policer->cbs));
         _isisc_ingress_bs_frame_hw_to_sw(ebs, &(policer->ebs));
 
@@ -1242,8 +1278,8 @@ _isisc_rate_acl_policer_get(a_uint32_t dev_id, a_uint32_t policer_id,
     else
     {
         policer->meter_unit = FAL_BYTE_BASED;
-        policer->cir = cir << 5;
-        policer->eir = eir << 5;
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, cir, &policer->cir);
+        _isisc_rate_hw_to_sw(dev_id, policer->meter_unit, eir, &policer->eir);
         _isisc_ingress_bs_byte_hw_to_sw(cbs, &(policer->cbs));
         _isisc_ingress_bs_byte_hw_to_sw(ebs, &(policer->ebs));
     }

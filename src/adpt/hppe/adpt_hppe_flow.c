@@ -1163,12 +1163,14 @@ adpt_hppe_flow_entry_get(
 			flow_entry->route_nexthop = entry.bf2.next_hop3;
 			flow_entry->port_valid = entry.bf2.port_vp_valid1;
 			flow_entry->route_port = entry.bf2.port_vp1;
-			if (entry.bf2.port_vp1 >= 64)
-				flow_entry->route_port |= 0x1000000;
+			if (entry.bf2.port_vp1 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->route_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf2.port_vp1);
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf1.port_vp2;
-			if (entry.bf1.port_vp2 >= 64)
-				flow_entry->bridge_port |= 0x1000000;
+			if (entry.bf1.port_vp2 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->bridge_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf1.port_vp2);
 #if defined(APPE)
 			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
@@ -1238,12 +1240,14 @@ adpt_hppe_flow_entry_get(
 			flow_entry->route_nexthop = entry.bf2.next_hop3;
 			flow_entry->port_valid = entry.bf2.port_vp_valid1;
 			flow_entry->route_port = entry.bf2.port_vp1;
-			if (entry.bf2.port_vp1 >= 64)
-				flow_entry->route_port |= 0x1000000;
+			if (entry.bf2.port_vp1 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->route_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf2.port_vp1);
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf1.port_vp2;
-			if (entry.bf1.port_vp2 >= 64)
-				flow_entry->bridge_port |= 0x1000000;
+			if (entry.bf1.port_vp2 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->bridge_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf1.port_vp2);
 #if defined(APPE)
 			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
@@ -1312,12 +1316,14 @@ adpt_hppe_flow_entry_get(
 			flow_entry->route_nexthop = entry.bf2.next_hop3;
 			flow_entry->port_valid = entry.bf2.port_vp_valid1;
 			flow_entry->route_port = entry.bf2.port_vp1;
-			if (entry.bf2.port_vp1 >= 64)
-				flow_entry->route_port |= 0x1000000;
+			if (entry.bf2.port_vp1 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->route_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf2.port_vp1);
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf1.port_vp2;
-			if (entry.bf1.port_vp2 >= 64)
-				flow_entry->bridge_port |= 0x1000000;
+			if (entry.bf1.port_vp2 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->bridge_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf1.port_vp2);
 #if defined(APPE)
 			flow_entry->vlan_fmt_valid = entry.bf1.vlan_fmt_valid;
 			flow_entry->svlan_fmt = entry.bf1.svlan_fmt;
@@ -1383,12 +1389,14 @@ adpt_hppe_flow_entry_get(
 			flow_entry->route_nexthop = entry.bf2.next_hop3;
 			flow_entry->port_valid = entry.bf2.port_vp_valid1;
 			flow_entry->route_port = entry.bf2.port_vp1;
-			if (entry.bf2.port_vp1 >= 64)
-				flow_entry->route_port |= 0x1000000;
+			if (entry.bf2.port_vp1 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->route_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf2.port_vp1);
 		} else if (flow_entry->fwd_type == FAL_FLOW_BRIDGE) {
 			flow_entry->bridge_port = entry.bf0.port_vp2;
-			if (entry.bf0.port_vp2 >= 64)
-				flow_entry->bridge_port |= 0x1000000;
+			if (entry.bf0.port_vp2 >= SSDK_MIN_VIRTUAL_PORT_ID)
+				flow_entry->bridge_port =
+					FAL_PORT_ID(FAL_PORT_TYPE_VPORT, entry.bf0.port_vp2);
 #if defined(APPE)
 			flow_entry->vlan_fmt_valid = entry.bf0.vlan_fmt_valid;
 			flow_entry->svlan_fmt = entry.bf0.svlan_fmt;

@@ -1,14 +1,12 @@
-LOC_DIR=src/hsl/mppe
-LIB=HSL
+LOC_DIR=src/adpt/mppe
+LIB=ADPT
 
 include $(PRJ_PATH)/make/config.mk
 
-ifeq (TRUE, $(IN_ATHTAG))
-  SRC_LIST+=mppe_athtag.c
-endif
+SRC_LIST=
 
 ifeq (TRUE, $(IN_SERVCODE))
-  SRC_LIST+=mppe_servcode.c
+  SRC_LIST += adpt_mppe_servcode.c
 endif
 
 ifeq (, $(filter MPPE, $(SUPPORT_CHIP)))

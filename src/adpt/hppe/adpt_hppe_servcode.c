@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -23,10 +26,13 @@
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
 #include "adpt.h"
+#include "adpt_hppe.h"
 #if defined(APPE)
 #include "adpt_appe_servcode.h"
 #endif
-#include "adpt_hppe.h"
+#if defined(MPPE)
+#include "adpt_mppe_servcode.h"
+#endif
 
 #define MAX_PHYSICAL_PORT 8
 
@@ -150,6 +156,13 @@ void adpt_hppe_servcode_func_bitmap_init(a_uint32_t dev_id)
 						(1<<FUNC_SERVCODE_CONFIG_GET) |
 						(1<<FUNC_SERVCODE_LOOPCHECK_EN) |
 						(1<<FUNC_SERVCODE_LOOPCHECK_STATUS_GET));
+#if defined(MPPE)
+	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+	{
+		p_adpt_api->adpt_servcode_func_bitmap |= ((1<<FUNC_PORT_SERVCODE_SET) |
+						(1<<FUNC_PORT_SERVCODE_GET));
+	}
+#endif
 
 	return;
 }
@@ -163,6 +176,8 @@ static void adpt_hppe_servcode_func_unregister(a_uint32_t dev_id, adpt_api_t *p_
 	p_adpt_api->adpt_servcode_config_get = NULL;
 	p_adpt_api->adpt_servcode_loopcheck_en = NULL;
 	p_adpt_api->adpt_servcode_loopcheck_status_get = NULL;
+	p_adpt_api->adpt_port_servcode_set = NULL;
+	p_adpt_api->adpt_port_servcode_get = NULL;
 
 	return;
 }
@@ -186,6 +201,15 @@ sw_error_t adpt_hppe_servcode_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_servcode_loopcheck_en = adpt_hppe_servcode_loopcheck_en;
 	if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_LOOPCHECK_STATUS_GET))
 		p_adpt_api->adpt_servcode_loopcheck_status_get = adpt_hppe_servcode_loopcheck_status_get;
+#if defined(MPPE)
+	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+	{
+		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_PORT_SERVCODE_SET))
+			p_adpt_api->adpt_port_servcode_set = adpt_mppe_port_servcode_set;
+		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_PORT_SERVCODE_GET))
+			p_adpt_api->adpt_port_servcode_get = adpt_mppe_port_servcode_get;
+	}
+#endif
 
 	return SW_OK;
 }

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- *
  * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -2438,13 +2438,17 @@ extern "C" {
     SW_API_DEF(SW_API_SERVCODE_CONFIG_SET, fal_servcode_config_set), \
     SW_API_DEF(SW_API_SERVCODE_CONFIG_GET, fal_servcode_config_get), \
     SW_API_DEF(SW_API_SERVCODE_LOOPCHECK_EN, fal_servcode_loopcheck_en), \
-    SW_API_DEF(SW_API_SERVCODE_LOOPCHECK_STATUS_GET, fal_servcode_loopcheck_status_get),
+    SW_API_DEF(SW_API_SERVCODE_LOOPCHECK_STATUS_GET, fal_servcode_loopcheck_status_get), \
+    SW_API_DEF(SW_API_PORT_SERVCODE_SET, fal_port_servcode_set), \
+    SW_API_DEF(SW_API_PORT_SERVCODE_GET, fal_port_servcode_get),
 
 #define SERVCODE_API_PARAM \
     SW_API_DESC(SW_API_SERVCODE_CONFIG_SET) \
     SW_API_DESC(SW_API_SERVCODE_CONFIG_GET) \
     SW_API_DESC(SW_API_SERVCODE_LOOPCHECK_EN) \
-    SW_API_DESC(SW_API_SERVCODE_LOOPCHECK_STATUS_GET)
+    SW_API_DESC(SW_API_SERVCODE_LOOPCHECK_STATUS_GET) \
+    SW_API_DESC(SW_API_PORT_SERVCODE_SET) \
+    SW_API_DESC(SW_API_PORT_SERVCODE_GET)
 #else
 #define SERVCODE_API
 #define SERVCODE_API_PARAM

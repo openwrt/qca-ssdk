@@ -794,6 +794,10 @@ typedef sw_error_t (*adpt_servcode_config_get_func)(a_uint32_t dev_id,
 		a_uint32_t servcode_index, fal_servcode_config_t *entry);
 typedef sw_error_t (*adpt_servcode_loopcheck_en_func)(a_uint32_t dev_id, a_bool_t enable);
 typedef sw_error_t (*adpt_servcode_loopcheck_status_get_func)(a_uint32_t dev_id, a_bool_t *enable);
+typedef sw_error_t (*adpt_port_servcode_set_func)(a_uint32_t dev_id,
+		fal_port_t port_id, a_uint32_t servcode_index);
+typedef sw_error_t (*adpt_port_servcode_get_func)(a_uint32_t dev_id,
+		fal_port_t port_id, a_uint32_t *servcode_index);
 /*service module end*/
 
 //pppoe
@@ -1805,6 +1809,8 @@ typedef struct
 	adpt_servcode_config_get_func adpt_servcode_config_get;
 	adpt_servcode_loopcheck_en_func adpt_servcode_loopcheck_en;
 	adpt_servcode_loopcheck_status_get_func adpt_servcode_loopcheck_status_get;
+	adpt_port_servcode_set_func adpt_port_servcode_set;
+	adpt_port_servcode_get_func adpt_port_servcode_get;
 	/*servcode module end*/
 
 	/* pppoe */

@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -509,3 +512,193 @@ hppe_eg_service_tbl_hw_services_set(
 	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+
+#if 0
+#if defined(MPPE)
+sw_error_t
+mppe_eg_service_tbl_ip_length_update_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ip_length_update;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ip_length_update_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ip_length_update = value;
+	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_hdr_insert_dis_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_insert_dis;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_hdr_insert_dis_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_insert_dis = value;
+	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_hdr_type_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_hdr_type;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_hdr_type_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_hdr_type = value;
+	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_from_cpu_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_from_cpu;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_from_cpu_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_from_cpu = value;
+	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_disable_bit_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_disable_bit;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_disable_bit_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_disable_bit = value;
+	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_port_bitmap_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.ath_port_bitmap;
+	return ret;
+}
+
+sw_error_t
+mppe_eg_service_tbl_ath_port_bitmap_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t value)
+{
+	union eg_service_tbl_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_eg_service_tbl_get(dev_id, index, &reg_val);
+	if (SW_OK != ret)
+		return ret;
+	reg_val.bf.ath_port_bitmap = value;
+	ret = hppe_eg_service_tbl_set(dev_id, index, &reg_val);
+	return ret;
+}
+#endif
+#endif

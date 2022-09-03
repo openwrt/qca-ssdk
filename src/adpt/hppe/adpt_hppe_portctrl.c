@@ -4773,8 +4773,6 @@ adpt_hppe_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 				struct port_phy_status *phy_status)
 {
 	sw_error_t rv = 0;
-	a_uint32_t phy_id;
-	hsl_phy_ops_t *phy_drv;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(phy_status);
@@ -4789,13 +4787,7 @@ adpt_hppe_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 			return SW_NOT_SUPPORTED;
 		}
 	} else {
-		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-		if (NULL == phy_drv->phy_get_status)
-			return SW_NOT_SUPPORTED;
-
-		rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-		SW_RTN_ON_ERROR (rv);
-		rv = phy_drv->phy_get_status (dev_id, phy_id, phy_status);
+		rv = hsl_port_phy_status_get(dev_id, port_id, phy_status);
 		SW_RTN_ON_ERROR (rv);
 	}
 

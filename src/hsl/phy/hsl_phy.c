@@ -586,7 +586,6 @@ hsl_port_phy_c45_capability_set(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 hsl_port_phy_serdes_reset(a_uint32_t dev_id)
 {
-	sw_error_t rv;
 	int i = 0;
 	hsl_phy_ops_t *phy_drv;
 
@@ -594,11 +593,13 @@ hsl_port_phy_serdes_reset(a_uint32_t dev_id)
 	{
 		if (phy_info[dev_id]->phy_type[i] == MALIBU_PHY_CHIP)
 		{
-			SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get (dev_id, i));
-			if (NULL == phy_drv->phy_serdes_reset)
-				return SW_NOT_SUPPORTED;
-			rv = phy_drv->phy_serdes_reset(dev_id);
-			return rv;
+			/*if phy_drv is null or phy_serdes_reset is null, then no need to do
+			 serdes reset*/
+			phy_drv = hsl_phy_api_ops_get (dev_id, i);
+			if (phy_drv && phy_drv->phy_serdes_reset)
+			{
+				return phy_drv->phy_serdes_reset(dev_id);
+			}
 		}
 	}
 
@@ -1032,6 +1033,52 @@ hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	return rv;
 }
 
+static sw_error_t
+hsl_port_phydev_get_status(a_uint32_t dev_id, a_uint32_t port_id,
+	struct port_phy_status *phy_status)
+{
+	sw_error_t rv = SW_OK;
+	struct phy_device *phydev = NULL;
+	a_uint32_t pause = 0, asym_pause = 0, lp_pause = 0, lp_asym_pause = 0;
+
+	rv = hsl_port_phydev_get(dev_id, port_id, &phydev);
+	SW_RTN_ON_ERROR(rv);
+	if(!phydev)
+	{
+		SSDK_ERROR("port %d phydev is not initialized\n", port_id);
+		return SW_NOT_INITIALIZED;
+	}
+
+	mutex_lock(&phydev->lock);
+	phy_status->link_status = phydev->link;
+	phy_status->speed = phydev->speed;
+	phy_status->duplex = phydev->duplex;
+	pause = linkmode_test_bit(ETHTOOL_LINK_MODE_Pause_BIT, phydev->advertising);
+	asym_pause = linkmode_test_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+		phydev->advertising);
+	lp_pause = phydev->pause;
+	lp_asym_pause = phydev->asym_pause;
+	mutex_unlock(&phydev->lock);
+
+	phy_status->rx_flowctrl = A_FALSE;
+	phy_status->tx_flowctrl = A_FALSE;
+	if(pause && asym_pause && !lp_pause && lp_asym_pause)
+		phy_status->rx_flowctrl = A_TRUE;
+	if(!pause && asym_pause && lp_pause && lp_asym_pause)
+		phy_status->tx_flowctrl = A_TRUE;
+	if((pause && !asym_pause && lp_pause) || (pause && asym_pause && lp_pause))
+	{
+		phy_status->rx_flowctrl = A_TRUE;
+		phy_status->tx_flowctrl = A_TRUE;
+	}
+	SSDK_DEBUG("dev_id:%d, port:%d, link:%d, speed:%d, duplex:%d,"
+		"rx_flowctrl:%d, tx_flowctrl:%d", dev_id, port_id,
+		phy_status->link_status, phy_status->speed, phy_status->duplex,
+		phy_status->rx_flowctrl, phy_status->tx_flowctrl);
+
+	return SW_OK;
+}
+
 sw_error_t
 hsl_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	struct port_phy_status *phy_status)
@@ -1040,15 +1087,21 @@ hsl_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t phy_id;
 	hsl_phy_ops_t *phy_drv;
 
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_get_status)
-		return SW_NOT_SUPPORTED;
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-	rv = phy_drv->phy_get_status(dev_id, phy_id, phy_status);
-	SW_RTN_ON_ERROR (rv);
+	phy_drv = hsl_phy_api_ops_get (dev_id, port_id);
+	if(phy_drv && phy_drv->phy_get_status)
+	{
+		rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+		SW_RTN_ON_ERROR (rv);
+		rv = phy_drv->phy_get_status(dev_id, phy_id, phy_status);
+		SW_RTN_ON_ERROR (rv);
+	}
+	else
+	{
+		rv = hsl_port_phydev_get_status(dev_id, port_id, phy_status);
+		SW_RTN_ON_ERROR (rv);
+	}
 
-	return rv;
+	return SW_OK;
 }
 
 sw_error_t
@@ -1069,6 +1122,54 @@ hsl_port_phy_function_reset(a_uint32_t dev_id, a_uint32_t port_id)
 	return rv;
 }
 
+static sw_error_t
+hsl_port_phydev_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t *interface_mode_status)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t interface = 0;
+	struct phy_device *phydev = NULL;
+
+	rv = hsl_port_phydev_get(dev_id, port_id, &phydev);
+	SW_RTN_ON_ERROR(rv);
+	if(!phydev)
+	{
+		SSDK_ERROR("port %d phydev is not initialized\n", port_id);
+		return SW_NOT_INITIALIZED;
+	}
+	mutex_lock(&phydev->lock);
+	interface = phydev->interface;
+	mutex_unlock(&phydev->lock);
+	switch(interface)
+	{
+		case PHY_INTERFACE_MODE_SGMII:
+			*interface_mode_status = PHY_SGMII_BASET;
+			break;
+		case PHY_INTERFACE_MODE_2500BASEX:
+			*interface_mode_status = PORT_SGMII_PLUS;
+			break;
+		case PHY_INTERFACE_MODE_1000BASEX:
+			*interface_mode_status = PORT_SGMII_FIBER;
+			break;
+		case PHY_INTERFACE_MODE_USXGMII:
+			*interface_mode_status = PORT_USXGMII;
+			break;
+		case PHY_INTERFACE_MODE_10GKR:
+			*interface_mode_status = PORT_10GBASE_R;
+			break;
+		case PHY_INTERFACE_MODE_QSGMII:
+			*interface_mode_status = PORT_QSGMII;
+			break;
+		default:
+			break;
+	}
+	SSDK_DEBUG("dev_id:%d, port:%d, phydev interface:0x%x, "
+		"ssdk interface:0x%x\n", dev_id, port_id, interface,
+		*interface_mode_status);
+
+	return SW_OK;
+}
+
 /*qca808x_start*/
 sw_error_t
 hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
@@ -1078,15 +1179,23 @@ hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t phy_addr;
 	hsl_phy_ops_t *phy_drv;
 
-	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
-	if (NULL == phy_drv->phy_interface_mode_status_get)
-		return SW_NOT_SUPPORTED;
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR (rv);
-	rv = phy_drv->phy_interface_mode_status_get(dev_id, phy_addr,
-		interface_mode_status);
-	SW_RTN_ON_ERROR(rv);
-
+	phy_drv = hsl_phy_api_ops_get(dev_id, port_id);
+	if(phy_drv && phy_drv->phy_interface_mode_status_get)
+	{
+		rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+		SW_RTN_ON_ERROR (rv);
+		rv = phy_drv->phy_interface_mode_status_get(dev_id, phy_addr,
+			interface_mode_status);
+		SW_RTN_ON_ERROR(rv);
+	}
+/*qca808x_end*/
+	else
+	{
+		rv = hsl_port_phydev_interface_mode_status_get(dev_id, port_id,
+			interface_mode_status);
+		SW_RTN_ON_ERROR(rv);
+	}
+/*qca808x_start*/
 	return SW_OK;
 }
 

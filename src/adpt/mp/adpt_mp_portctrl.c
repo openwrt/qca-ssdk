@@ -979,19 +979,11 @@ _adpt_mp_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	struct port_phy_status *phy_status)
 {
 	sw_error_t rv = 0;
-	a_uint32_t phy_addr;
-	hsl_phy_ops_t *phy_drv;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(phy_status);
 
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	SW_RTN_ON_NULL (phy_drv->phy_get_status);
-
-	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR (rv);
-	rv = phy_drv->phy_get_status (dev_id, phy_addr, phy_status);
-	SW_RTN_ON_ERROR (rv);
+	rv = hsl_port_phy_status_get(dev_id, port_id, phy_status);
 
 	return rv;
 }

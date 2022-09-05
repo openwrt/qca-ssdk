@@ -201,6 +201,30 @@ a_bool_t ssdk_port_feature_get(a_uint32_t dev_id, a_uint32_t port_id, phy_featur
 	return A_FALSE;
 }
 
+sw_error_t
+ssdk_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
+{
+	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
+	if (phyinfo)
+	{
+		phyinfo->phy_features |= feature;
+		return SW_OK;
+	}
+	return SW_FAIL;
+}
+
+sw_error_t
+ssdk_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
+{
+	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
+	if (phyinfo)
+	{
+		phyinfo->phy_features &= ~feature;
+		return SW_OK;
+	}
+	return SW_FAIL;
+}
+
 a_uint32_t ssdk_port_force_speed_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);

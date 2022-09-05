@@ -33,11 +33,9 @@
 #include "ssdk_dts.h"
 #include "hppe_uniphy_reg.h"
 #include "hppe_uniphy.h"
-/******************************************************************************
-*
-* sfp_phy_init -
-*
-*/
+
+static a_bool_t sfp_phy_drv_registered = A_FALSE;
+
 #if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
 #define SFP_PHY_FEATURES        (SUPPORTED_FIBRE | \
                                 SUPPORTED_1000baseT_Full | \
@@ -47,8 +45,6 @@
                                 SUPPORTED_Pause | \
                                 SUPPORTED_Asym_Pause) | \
                                 SUPPORTED_2500baseX_Full
-#else
-__ETHTOOL_DECLARE_LINK_MODE_MASK(SFP_PHY_FEATURES) __ro_after_init;
 #endif
 
 static int
@@ -244,6 +240,28 @@ sfp_phy_update_link(struct phy_device *pdev)
 
 	return ret;
 }
+#else
+static int sfp_phy_read_abilities(struct phy_device *pdev)
+{
+	int features[] = {
+		ETHTOOL_LINK_MODE_FIBRE_BIT,
+		ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+		ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+#ifndef MP
+		ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+#endif
+		ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+		ETHTOOL_LINK_MODE_Pause_BIT,
+		ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+		ETHTOOL_LINK_MODE_Autoneg_BIT,
+	};
+
+	linkmode_set_bit_array(features,
+		ARRAY_SIZE(features),
+		pdev->supported);
+
+	return 0;
+}
 #endif
 
 static struct phy_driver sfp_phy_driver = {
@@ -255,9 +273,11 @@ static struct phy_driver sfp_phy_driver = {
 	.config_aneg	= sfp_phy_config_aneg,
 	.aneg_done	= sfp_phy_aneg_done,
 	.read_status	= sfp_read_status,
-	.features	= SFP_PHY_FEATURES,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
+	.features	= SFP_PHY_FEATURES,
 	.update_link	= sfp_phy_update_link,
+#else
+	.get_features	= sfp_phy_read_abilities,
 #endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
 	.mdiodrv.driver	= { .owner = THIS_MODULE },
@@ -273,6 +293,11 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
 	struct qca_phy_priv *priv;
 	a_uint32_t addr = 0;
 	struct mii_bus *bus;
+
+	if (A_TRUE == hsl_port_phy_combo_capability_get(dev_id, port))
+	{
+		return 0;
+	}
 
 	priv = ssdk_phy_priv_data_get(dev_id);
 	/*create phy device*/
@@ -305,6 +330,11 @@ void sfp_phy_device_remove(a_uint32_t dev_id, a_uint32_t port)
 	a_uint32_t addr = 0;
 	struct mii_bus *bus;
 
+	if (A_TRUE == hsl_port_phy_combo_capability_get(dev_id, port))
+	{
+		return;
+	}
+
 	bus = ssdk_miibus_get_by_device(dev_id);
 #if defined(IN_PHY_I2C_MODE)
 	if (hsl_port_phy_access_type_get(dev_id, port) == PHY_I2C_ACCESS) {
@@ -327,27 +357,28 @@ void sfp_phy_device_remove(a_uint32_t dev_id, a_uint32_t port)
 #endif
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
-static void sfp_features_init(void)
+int sfp_phy_driver_register(void)
 {
-	const int features[] = {
-		ETHTOOL_LINK_MODE_FIBRE_BIT,
-		ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-		ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-#ifndef MP
-		ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+	int ret = 0;
+	if(sfp_phy_drv_registered == A_FALSE)
+	{
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
+		ret = phy_driver_register(&sfp_phy_driver, THIS_MODULE);
+#else
+		ret = phy_driver_register(&sfp_phy_driver);
 #endif
-		ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-		ETHTOOL_LINK_MODE_Pause_BIT,
-		ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-		ETHTOOL_LINK_MODE_Autoneg_BIT,
-	};
-
-	linkmode_set_bit_array(features,
-		ARRAY_SIZE(features),
-		SFP_PHY_FEATURES);
+		sfp_phy_drv_registered = A_TRUE;
+	}
+	return ret;
 }
-#endif
+
+void sfp_phy_driver_unregister(void)
+{
+	if (sfp_phy_drv_registered == A_TRUE)
+	{
+		phy_driver_unregister(&sfp_phy_driver);
+	}
+}
 
 int sfp_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 {
@@ -360,22 +391,14 @@ int sfp_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 			sfp_phy_device_setup(dev_id, port_id, SFP_PHY);
 		}
 	}
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
-	sfp_features_init();
-#endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-	phy_driver_register(&sfp_phy_driver, THIS_MODULE);
-#else
-	phy_driver_register(&sfp_phy_driver);
-#endif
-	return 0;
+	return sfp_phy_driver_register();
 }
 
 void sfp_phy_exit(a_uint32_t dev_id, a_uint32_t port_bmp)
 {
 	a_uint32_t port_id = 0;
 
-	phy_driver_unregister(&sfp_phy_driver);
+	sfp_phy_driver_unregister();
 
 	for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++) {
 		if (port_bmp & (0x1 << port_id)) {

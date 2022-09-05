@@ -782,6 +782,9 @@ hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id);
 sw_error_t
 hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,
 	a_uint32_t port_id, fal_port_combo_link_status_t * status);
+sw_error_t
+hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
+	a_uint32_t port_id, fal_port_medium_t medium);
 /*qca808x_start*/
 sw_error_t
 hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);

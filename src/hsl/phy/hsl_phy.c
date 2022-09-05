@@ -169,6 +169,11 @@ a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 	if (sfp_port == A_TRUE) {
 		return A_TRUE;
 	}
+	else if (A_TRUE == hsl_port_phy_combo_capability_get(dev_id, port_id))
+	{
+		/* combo port copper mode */
+		return A_FALSE;
+	}
 
 	mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
 	mode2 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE2);
@@ -1567,6 +1572,101 @@ sw_error_t hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,
 	{
 		status->copper_link_status =
 		copper_phy_drv->phy_link_status_get(dev_id, phy_info[dev_id]->phy_address[port_id]);
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
+	a_uint32_t port_id, fal_port_medium_t medium)
+{
+	phy_type_t phytype = 0;
+	struct phy_device *phydev;
+	struct device *dev;
+	struct net_device *eth_dev = NULL;
+
+	if (dev_id >= SW_MAX_NR_DEV)
+	{
+		return SW_BAD_PARAM;
+	}
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	if (A_TRUE != hsl_port_phy_combo_capability_get(dev_id, port_id))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	/*get current phytype*/
+	phytype = phy_info[dev_id]->phy_type[port_id];
+
+	if ((phytype == SFP_PHY_CHIP && medium == PHY_MEDIUM_FIBER) ||
+		(phytype != SFP_PHY_CHIP && medium == PHY_MEDIUM_COPPER))
+	{
+		return SW_OK;
+	}
+
+	/*update ssdk port phy info*/
+	if (medium == PHY_MEDIUM_FIBER)
+	{
+		ssdk_port_feature_set(dev_id, port_id, PHY_F_SFP);
+		phy_info[dev_id]->phy_type[port_id] = SFP_PHY_CHIP;
+#if defined(IN_SFP_PHY)
+		/*register sfp phy driver*/
+		sfp_phy_driver_register();
+#endif
+	}
+	else
+	{
+		ssdk_port_feature_clear(dev_id, port_id, PHY_F_SFP);
+		phy_info[dev_id]->phy_type[port_id] =
+			phy_info[dev_id]->combo_phy_type[port_id];
+	}
+	phy_info[dev_id]->combo_phy_type[port_id] = phytype;
+	ssdk_phy_driver[phytype].port_bmp[dev_id] &= ~BIT(port_id);
+	ssdk_phy_driver[phy_info[dev_id]->phy_type[port_id]].port_bmp[dev_id] |=
+			BIT(port_id);
+
+	/*update phydev info*/
+	SW_RTN_ON_ERROR(hsl_port_phydev_get(dev_id, port_id, &phydev));
+
+	mutex_lock(&phydev->lock);
+	eth_dev = phydev->attached_dev;
+	dev = &phydev->mdio.dev;
+	linkmode_zero(phydev->supported);
+	linkmode_zero(phydev->advertising);
+	linkmode_zero(phydev->lp_advertising);
+	phydev->autoneg = AUTONEG_ENABLE;
+
+	if (phy_info[dev_id]->phy_type[port_id] == SFP_PHY_CHIP)
+	{
+		/*update SFP phyid and c45 info*/
+		phydev->phy_id = SFP_PHY;
+		phydev->is_c45 = A_FALSE;
+		/*update sfp specific phy private data*/
+		phydev->priv = ssdk_phy_priv_data_get(dev_id);
+	}
+	else if (phy_info[dev_id]->phy_type[port_id] == AQUANTIA_PHY_CHIP)
+	{
+		/*update AQR phyid and c45 info*/
+		phydev->phy_id = 0;
+		phydev->is_c45 = A_TRUE;
+	}
+	mutex_unlock(&phydev->lock);
+
+	/*reprobe phy driver*/
+	device_reprobe(dev);
+
+	SSDK_DEBUG("combo phy switched to: phy_type %d, phyid 0x%x, is_c45 %d, "
+		"phydrv %s, phydev state %d\n", phy_info[dev_id]->phy_type[port_id],
+		phydev->phy_id, phydev->is_c45, phydev->drv->name, phydev->state);
+
+	/*start phy and state machine*/
+	if (eth_dev->flags & IFF_UP)
+	{
+		phy_start(phydev);
 	}
 
 	return SW_OK;

@@ -1015,11 +1015,42 @@ extern "C" {
     SW_API_DESC(SW_API_QOS_PORT_SCHEDULER_RESOURCE_GET)
 #else
 #define QOS_API \
-    SW_API_DEF(SW_API_QOS_PT_MODE_SET, fal_qos_port_mode_set),
-
+    SW_API_DEF(SW_API_QOS_PT_MODE_SET, fal_qos_port_mode_set), \
+    SW_API_DEF(SW_API_QOS_SCHEDULER_DEQUEU_CTRL_GET, fal_scheduler_dequeue_ctrl_get), \
+    SW_API_DEF(SW_API_QOS_SCHEDULER_DEQUEU_CTRL_SET, fal_scheduler_dequeue_ctrl_set), \
+    SW_API_DEF(SW_API_QOS_QUEUE_SCHEDULER_GET, fal_queue_scheduler_get), \
+    SW_API_DEF(SW_API_QOS_QUEUE_SCHEDULER_SET, fal_queue_scheduler_set), \
+    SW_API_DEF(SW_API_QOS_PORT_PRI_GET, fal_qos_port_pri_precedence_get), \
+    SW_API_DEF(SW_API_QOS_PORT_PRI_SET, fal_qos_port_pri_precedence_set), \
+    SW_API_DEF(SW_API_QOS_PORT_GROUP_GET, fal_qos_port_group_get), \
+    SW_API_DEF(SW_API_QOS_PORT_GROUP_SET, fal_qos_port_group_set), \
+    SW_API_DEF(SW_API_QOS_FLOW_MAP_GET, fal_qos_cosmap_flow_get), \
+    SW_API_DEF(SW_API_QOS_FLOW_MAP_SET, fal_qos_cosmap_flow_set), \
+    SW_API_DEF(SW_API_QOS_DSCP_MAP_GET, fal_qos_cosmap_dscp_get), \
+    SW_API_DEF(SW_API_QOS_DSCP_MAP_SET, fal_qos_cosmap_dscp_set), \
+    SW_API_DEF(SW_API_QOS_RING_QUEUE_MAP_GET, fal_edma_ring_queue_map_get), \
+    SW_API_DEF(SW_API_QOS_RING_QUEUE_MAP_SET, fal_edma_ring_queue_map_set), \
+    SW_API_DEF(SW_API_QOS_PORT_SCHEDULER_CFG_RESET, fal_port_scheduler_cfg_reset), \
+    SW_API_DEF(SW_API_QOS_PORT_SCHEDULER_RESOURCE_GET, fal_port_scheduler_resource_get),
 
 #define QOS_API_PARAM \
-    SW_API_DESC(SW_API_QOS_PT_MODE_SET)
+    SW_API_DESC(SW_API_QOS_PT_MODE_SET) \
+    SW_API_DESC(SW_API_QOS_SCHEDULER_DEQUEU_CTRL_GET) \
+    SW_API_DESC(SW_API_QOS_SCHEDULER_DEQUEU_CTRL_SET) \
+    SW_API_DESC(SW_API_QOS_QUEUE_SCHEDULER_GET) \
+    SW_API_DESC(SW_API_QOS_QUEUE_SCHEDULER_SET) \
+    SW_API_DESC(SW_API_QOS_PORT_PRI_GET) \
+    SW_API_DESC(SW_API_QOS_PORT_PRI_SET) \
+    SW_API_DESC(SW_API_QOS_PORT_GROUP_GET) \
+    SW_API_DESC(SW_API_QOS_PORT_GROUP_SET) \
+    SW_API_DESC(SW_API_QOS_FLOW_MAP_GET) \
+    SW_API_DESC(SW_API_QOS_FLOW_MAP_SET) \
+    SW_API_DESC(SW_API_QOS_DSCP_MAP_GET) \
+    SW_API_DESC(SW_API_QOS_DSCP_MAP_SET) \
+    SW_API_DESC(SW_API_QOS_RING_QUEUE_MAP_GET) \
+    SW_API_DESC(SW_API_QOS_RING_QUEUE_MAP_SET) \
+    SW_API_DESC(SW_API_QOS_PORT_SCHEDULER_CFG_RESET) \
+    SW_API_DESC(SW_API_QOS_PORT_SCHEDULER_RESOURCE_GET)
 
 #endif
 #else

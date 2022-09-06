@@ -670,6 +670,7 @@ _fal_qos_port_pri_precedence_get(a_uint32_t dev_id, fal_port_t port_id,
 	rv = p_api->adpt_qos_port_pri_get(dev_id, port_id, pri);
 	return rv;
 }
+#ifndef IN_QOS_MINI
 sw_error_t
 _fal_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t pcp, fal_qos_cosmap_t *cosmap)
@@ -685,6 +686,7 @@ _fal_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 	rv = p_api->adpt_qos_cosmap_pcp_get(dev_id, group_id, pcp, cosmap);
 	return rv;
 }
+#endif
 sw_error_t 
 _fal_queue_scheduler_set(a_uint32_t dev_id,
 					a_uint32_t node_id, fal_queue_scheduler_level_t level,
@@ -721,6 +723,7 @@ _fal_queue_scheduler_get(a_uint32_t dev_id,
 					level, port_id, scheduler_cfg);
 	return rv;
 }
+#ifndef IN_QOS_MINI
 sw_error_t
 _fal_qos_cosmap_pcp_set(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t pcp, fal_qos_cosmap_t *cosmap)
@@ -751,6 +754,7 @@ _fal_qos_port_remark_get(a_uint32_t dev_id, fal_port_t port_id,
 	rv = p_api->adpt_qos_port_remark_get(dev_id, port_id, remark);
 	return rv;
 }
+#endif
 sw_error_t
 _fal_qos_cosmap_dscp_get(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t dscp, fal_qos_cosmap_t *cosmap)
@@ -826,6 +830,7 @@ _fal_qos_cosmap_dscp_set(a_uint32_t dev_id, a_uint8_t group_id,
 	rv = p_api->adpt_qos_cosmap_dscp_set(dev_id, group_id, dscp, cosmap);
 	return rv;
 }
+#ifndef IN_QOS_MINI
 sw_error_t
 _fal_qos_port_remark_set(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_remark_enable_t *remark)
@@ -841,6 +846,7 @@ _fal_qos_port_remark_set(a_uint32_t dev_id, fal_port_t port_id,
 	rv = p_api->adpt_qos_port_remark_set(dev_id, port_id, remark);
 	return rv;
 }
+#endif
 
 sw_error_t
 _fal_qos_cosmap_flow_get(a_uint32_t dev_id, a_uint8_t group_id,
@@ -857,6 +863,7 @@ _fal_qos_cosmap_flow_get(a_uint32_t dev_id, a_uint8_t group_id,
 	rv = p_api->adpt_qos_cosmap_flow_get(dev_id, group_id, flow, cosmap);
 	return rv;
 }
+
 sw_error_t
 _fal_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_group_t *group)
@@ -872,6 +879,7 @@ _fal_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 	rv = p_api->adpt_qos_port_group_get(dev_id, port_id, group);
 	return rv;
 }
+
 sw_error_t
 _fal_edma_ring_queue_map_get(a_uint32_t dev_id, 
 					a_uint32_t ring_id, fal_queue_bmp_t *queue_bmp)
@@ -888,6 +896,7 @@ _fal_edma_ring_queue_map_get(a_uint32_t dev_id,
 	return rv;
 }
 
+#ifndef IN_QOS_MINI
 sw_error_t
 _fal_port_queues_get(a_uint32_t dev_id, 
 				fal_port_t port_id, fal_queue_bmp_t *queue_bmp)
@@ -903,6 +912,7 @@ _fal_port_queues_get(a_uint32_t dev_id,
 	rv = p_api->adpt_port_queues_get(dev_id, port_id, queue_bmp);
 	return rv;
 }
+#endif
 
 sw_error_t
 _fal_scheduler_dequeue_ctrl_set(
@@ -975,6 +985,7 @@ _fal_port_scheduler_resource_get(
 	return rv;
 }
 
+#ifndef IN_QOS_MINI
 sw_error_t
 _fal_reservedpool_scheduler_resource_get(
 		a_uint32_t dev_id,
@@ -985,13 +996,12 @@ _fal_reservedpool_scheduler_resource_get(
 
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 
-	if (NULL == p_api->adpt_port_scheduler_resource_get)
+	if (NULL == p_api->adpt_reservedpool_scheduler_resource_get)
 		return SW_NOT_SUPPORTED;
 
 	rv = p_api->adpt_reservedpool_scheduler_resource_get(dev_id, cfg);
 	return rv;
 }
-#ifndef IN_QOS_MINI
 /*insert flag for inner fal, don't remove it*/
 
 /**
@@ -1743,6 +1753,7 @@ fal_qos_port_pri_precedence_get(a_uint32_t dev_id, fal_port_t port_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t pcp, fal_qos_cosmap_t *cosmap)
@@ -1754,6 +1765,7 @@ fal_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
 sw_error_t
 fal_queue_scheduler_set(a_uint32_t dev_id,
 					a_uint32_t node_id, fal_queue_scheduler_level_t level,
@@ -1780,6 +1792,7 @@ fal_queue_scheduler_get(a_uint32_t dev_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_qos_cosmap_pcp_set(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t pcp, fal_qos_cosmap_t *cosmap)
@@ -1802,6 +1815,7 @@ fal_qos_port_remark_get(a_uint32_t dev_id, fal_port_t port_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
 sw_error_t
 fal_qos_cosmap_dscp_get(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t dscp, fal_qos_cosmap_t *cosmap)
@@ -1857,6 +1871,7 @@ fal_qos_cosmap_dscp_set(a_uint32_t dev_id, a_uint8_t group_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_qos_port_remark_set(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_remark_enable_t *remark)
@@ -1868,6 +1883,7 @@ fal_qos_port_remark_set(a_uint32_t dev_id, fal_port_t port_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
 
 sw_error_t
 fal_qos_cosmap_flow_get(a_uint32_t dev_id, a_uint8_t group_id,
@@ -1880,6 +1896,7 @@ fal_qos_cosmap_flow_get(a_uint32_t dev_id, a_uint8_t group_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+
 sw_error_t
 fal_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_group_t *group)
@@ -1891,6 +1908,7 @@ fal_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+
 sw_error_t
 fal_edma_ring_queue_map_get(a_uint32_t dev_id, 
 					a_uint32_t ring_id, fal_queue_bmp_t *queue_bmp)
@@ -1903,6 +1921,7 @@ fal_edma_ring_queue_map_get(a_uint32_t dev_id,
 	return rv;
 }
 
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_port_queues_get(a_uint32_t dev_id, 
 				fal_port_t port_id, fal_queue_bmp_t *queue_bmp)
@@ -1914,6 +1933,7 @@ fal_port_queues_get(a_uint32_t dev_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
 
 sw_error_t
 fal_scheduler_dequeue_ctrl_set(
@@ -1970,6 +1990,7 @@ fal_port_scheduler_resource_get(
 	return rv;
 }
 
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_reservedpool_scheduler_resource_get(
 		a_uint32_t dev_id,
@@ -1982,6 +2003,7 @@ fal_reservedpool_scheduler_resource_get(
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
 
 EXPORT_SYMBOL(fal_scheduler_dequeue_ctrl_get);
 
@@ -1991,8 +2013,6 @@ EXPORT_SYMBOL(fal_queue_scheduler_set);
 
 EXPORT_SYMBOL(fal_queue_scheduler_get);
 
-EXPORT_SYMBOL(fal_port_queues_get);
-
 EXPORT_SYMBOL(fal_qos_port_pri_precedence_set);
 
 EXPORT_SYMBOL(fal_qos_port_pri_precedence_get);
@@ -2001,19 +2021,13 @@ EXPORT_SYMBOL(fal_qos_port_group_set);
 
 EXPORT_SYMBOL(fal_qos_port_group_get);
 
-EXPORT_SYMBOL(fal_qos_cosmap_pcp_set);
-
-EXPORT_SYMBOL(fal_qos_cosmap_pcp_get);
-
 EXPORT_SYMBOL(fal_qos_cosmap_dscp_set);
 
 EXPORT_SYMBOL(fal_qos_cosmap_dscp_get);
 
 EXPORT_SYMBOL(fal_qos_cosmap_flow_set);
 
-EXPORT_SYMBOL(fal_qos_port_remark_set);
-
-EXPORT_SYMBOL(fal_qos_port_remark_get);
+EXPORT_SYMBOL(fal_qos_cosmap_flow_get);
 
 EXPORT_SYMBOL(fal_edma_ring_queue_map_set);
 
@@ -2023,8 +2037,19 @@ EXPORT_SYMBOL(fal_port_scheduler_cfg_reset);
 
 EXPORT_SYMBOL(fal_port_scheduler_resource_get);
 
+#ifndef IN_QOS_MINI
 EXPORT_SYMBOL(fal_reservedpool_scheduler_resource_get);
 
+EXPORT_SYMBOL(fal_port_queues_get);
+
+EXPORT_SYMBOL(fal_qos_cosmap_pcp_set);
+
+EXPORT_SYMBOL(fal_qos_cosmap_pcp_get);
+
+EXPORT_SYMBOL(fal_qos_port_remark_set);
+
+EXPORT_SYMBOL(fal_qos_port_remark_get);
+#endif
 /*insert flag for outter fal, don't remove it*/
 /**
  * @}

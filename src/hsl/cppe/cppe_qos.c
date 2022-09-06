@@ -55,6 +55,7 @@ cppe_qos_mapping_tbl_set(
 				2);
 }
 
+#if 0
 sw_error_t
 cppe_qos_mapping_tbl_int_pcp_get(
 		a_uint32_t dev_id,
@@ -428,6 +429,7 @@ cppe_qos_mapping_tbl_int_dscp_en_set(
 	ret = cppe_qos_mapping_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 #if defined(MPPE)
 sw_error_t

@@ -644,6 +644,7 @@ parse_qos_ptpri(struct switch_val *val)
 	return rv;
 }
 
+#ifndef IN_QOS_MINI
 static int
 parse_qos_ptremark(struct switch_val *val)
 {
@@ -728,6 +729,7 @@ parse_qos_pcpmap(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_qos_flowmap(struct switch_val *val)
@@ -12007,11 +12009,15 @@ parse_qos(const char *command_name, struct switch_val *val)
 		rv = parse_qos_ptgroup(val);
 	} else if (!strcmp(command_name, "Ptpriprece")) {
 		rv = parse_qos_ptpri(val);
-	} else if (!strcmp(command_name, "Ptremark")) {
+	}
+#ifndef IN_QOS_MINI
+	else if (!strcmp(command_name, "Ptremark")) {
 		rv = parse_qos_ptremark(val);
 	} else if (!strcmp(command_name, "Pcpmap")) {
 		rv = parse_qos_pcpmap(val);
-	} else if (!strcmp(command_name, "Flowmap")) {
+	}
+#endif
+	else if (!strcmp(command_name, "Flowmap")) {
 		rv = parse_qos_flowmap(val);
 	} else if (!strcmp(command_name, "Dscpmap")) {
 		rv = parse_qos_dscpmap(val);

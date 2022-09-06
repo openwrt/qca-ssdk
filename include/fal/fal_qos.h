@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2012, 2016-2018, The Linux Foundation. All rights reserved.
- *
  * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -356,11 +355,11 @@ sw_error_t
 
 sw_error_t
 fal_qos_port_group_set(a_uint32_t dev_id, fal_port_t port_id,
-					fal_qos_group_t *group);
+		fal_qos_group_t *group);
 
 sw_error_t
 fal_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
-					fal_qos_group_t *group);
+		fal_qos_group_t *group);
 
 sw_error_t
 fal_qos_port_pri_precedence_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -370,6 +369,7 @@ sw_error_t
 fal_qos_port_pri_precedence_get(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_pri_precedence_t *pri);
 
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_qos_port_remark_set(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_remark_enable_t *remark);
@@ -385,6 +385,7 @@ fal_qos_cosmap_pcp_set(a_uint32_t dev_id, a_uint8_t group_id,
 sw_error_t
 fal_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 					a_uint8_t pcp, fal_qos_cosmap_t *cosmap);
+#endif
 
 sw_error_t
 fal_qos_cosmap_flow_set(a_uint32_t dev_id, a_uint8_t group_id,
@@ -422,9 +423,11 @@ fal_edma_ring_queue_map_get(a_uint32_t dev_id,
 sw_error_t
 fal_edma_ring_queue_map_set(a_uint32_t dev_id, 
 					a_uint32_t ring_id, fal_queue_bmp_t *queue_bmp);
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_port_queues_get(a_uint32_t dev_id, 
 				fal_port_t port_id, fal_queue_bmp_t *queue_bmp);
+#endif
 
 sw_error_t
 fal_scheduler_dequeue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable);
@@ -443,10 +446,12 @@ fal_port_scheduler_resource_get(
 		fal_port_t port_id,
 		fal_portscheduler_resource_t *cfg);
 
+#ifndef IN_QOS_MINI
 sw_error_t
 fal_reservedpool_scheduler_resource_get(
 		a_uint32_t dev_id,
 		fal_portscheduler_resource_t *cfg);
+#endif
 
 #ifdef __cplusplus
 }

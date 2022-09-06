@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -147,6 +149,7 @@ adpt_cppe_qos_port_pri_get(a_uint32_t dev_id, fal_port_t port_id,
 	return SW_OK;
 }
 
+#ifndef IN_QOS_MINI
 sw_error_t
 adpt_cppe_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 			a_uint8_t pcp,
@@ -186,6 +189,7 @@ adpt_cppe_qos_cosmap_pcp_set(a_uint32_t dev_id, a_uint8_t group_id,
 
 	return adpt_cppe_qos_mapping_set(dev_id, index, cosmap);
 }
+#endif
 
 sw_error_t
 adpt_cppe_qos_cosmap_dscp_get(a_uint32_t dev_id, a_uint8_t group_id,
@@ -293,7 +297,6 @@ adpt_cppe_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_OK;
 }
-
 
 /**
  * @}

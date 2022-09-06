@@ -1113,7 +1113,7 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 	group_sel.flow_group = 0;
 	group_sel.pcp_group = 0;
 	for (i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT7; i++) {
-		fal_qos_port_group_get(dev_id, i, &group_sel);
+		fal_qos_port_group_set(dev_id, i, &group_sel);
 	}
 	/* qos precedence */
 	pri_pre.flow_pri = 4;

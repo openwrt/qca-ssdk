@@ -1616,6 +1616,8 @@ hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 #if defined(IN_SFP_PHY)
 		/*register sfp phy driver*/
 		sfp_phy_driver_register();
+		/*gpio select sfp*/
+		sfp_phy_medium_status_set(dev_id, port_id, A_TRUE);
 #endif
 	}
 	else
@@ -1623,6 +1625,10 @@ hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 		ssdk_port_feature_clear(dev_id, port_id, PHY_F_SFP);
 		phy_info[dev_id]->phy_type[port_id] =
 			phy_info[dev_id]->combo_phy_type[port_id];
+#if defined(IN_SFP_PHY)
+		/*gpio select copper*/
+		sfp_phy_medium_status_set(dev_id, port_id, A_FALSE);
+#endif
 	}
 	phy_info[dev_id]->combo_phy_type[port_id] = phytype;
 	ssdk_phy_driver[phytype].port_bmp[dev_id] &= ~BIT(port_id);

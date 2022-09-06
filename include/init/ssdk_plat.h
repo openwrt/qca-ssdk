@@ -351,6 +351,8 @@ struct qca_phy_priv {
 	a_uint32_t sfp_rx_los_pin[SW_MAX_NR_PORT];
 	a_uint32_t sfp_tx_dis_pin[SW_MAX_NR_PORT];
 	a_uint32_t sfp_mod_present_pin[SW_MAX_NR_PORT];
+	/*sfp_medium_pin, use to select sfp medium or not in combo mode*/
+	a_uint32_t sfp_medium_pin[SW_MAX_NR_PORT];
 /*qca808x_start*/
 };
 

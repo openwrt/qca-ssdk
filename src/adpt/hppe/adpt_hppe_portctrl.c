@@ -3223,37 +3223,6 @@ _adpt_hppe_instance_mode_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
 extern sw_error_t
 adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode);
 
-static sw_error_t
-_adpt_hppe_port_interface_mode_phy_config(a_uint32_t dev_id, a_uint32_t port_id,
-	fal_port_interface_mode_t mode)
-{
-	sw_error_t rv;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
-	{
-		SSDK_ERROR("port %d is not in bitmap\n", port_id);
-		return SW_BAD_PARAM;
-	}
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_interface_mode_set)
-	{
-		SSDK_ERROR("the phy_interface_mode_set api is null for port %d\n",
-			port_id);
-		return SW_NOT_SUPPORTED;
-	}
-
-	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-	SSDK_DEBUG("port_id:%d, phy_id:%d, mode:%d\n", port_id, phy_id, mode);
-	rv = phy_drv->phy_interface_mode_set (dev_id, phy_id,mode);
-
-	return rv;
-}
-
 static sw_error_t _adpt_hppe_port_mac_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
 {
 	sw_error_t rv = SW_OK;
@@ -3322,106 +3291,11 @@ _adpt_hppe_sfp_copper_phydriver_switch(a_uint32_t dev_id, a_uint32_t port_id,
 }
 
 static sw_error_t
-_adpt_hppe_port_phy_config(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
-{
-	sw_error_t rv = SW_OK;
-
-	switch(mode)
-	{
-		case PORT_WRAPPER_PSGMII:
-			/*interface mode changed form psgmii+usxgmii to psgmii+10gbase-r+usxgmii, cannot
-			use port 5 to configure malibu*/
-			rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-				SSDK_PHYSICAL_PORT4, PHY_PSGMII_BASET);
-			break;
-		case PORT_WRAPPER_PSGMII_FIBER:
-			rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-				SSDK_PHYSICAL_PORT4, PHY_PSGMII_FIBER);
-			break;
-		case PORT_WRAPPER_SGMII_CHANNEL4:
-			rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-				SSDK_PHYSICAL_PORT5, PHY_SGMII_BASET);
-			break;
-		case PORT_WRAPPER_QSGMII:
-			rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-				SSDK_PHYSICAL_PORT4, PORT_QSGMII);
-			break;
-		case PORT_WRAPPER_SGMII_CHANNEL0:
-#ifdef CPPE
-			if(index == SSDK_UNIPHY_INSTANCE0 &&
-				adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-				adpt_chip_revision_get(dev_id) == CPPE_REVISION &&
-				(hsl_port_prop_check (dev_id, SSDK_PHYSICAL_PORT4,
-					HSL_PP_EXCL_CPU)))
-			{
-					rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-						SSDK_PHYSICAL_PORT4, PHY_SGMII_BASET);
-			}
-#endif
-			if(index == SSDK_UNIPHY_INSTANCE1)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT5, PHY_SGMII_BASET);
-			}
-			if(index == SSDK_UNIPHY_INSTANCE2)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT6, PHY_SGMII_BASET);
-			}
-			break;
-		case PORT_WRAPPER_USXGMII:
-			if(index == SSDK_UNIPHY_INSTANCE1)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT5, PORT_USXGMII);
-			}
-			if(index == SSDK_UNIPHY_INSTANCE2)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT6, PORT_USXGMII);
-			}
-#if defined(APPE)
-			if(index == SSDK_UNIPHY_INSTANCE0)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT1, PORT_USXGMII);
-			}
-#endif
-			break;
-		case PORT_WRAPPER_SGMII_PLUS:
-#ifdef CPPE
-			if(index == SSDK_UNIPHY_INSTANCE0 &&
-				adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-				adpt_chip_revision_get(dev_id) == CPPE_REVISION)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT4, PORT_SGMII_PLUS);
-			}
-#endif
-			if(index == SSDK_UNIPHY_INSTANCE1)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT5, PORT_SGMII_PLUS);
-			}
-			if(index == SSDK_UNIPHY_INSTANCE2)
-			{
-				rv = _adpt_hppe_port_interface_mode_phy_config(dev_id,
-					SSDK_PHYSICAL_PORT6, PORT_SGMII_PLUS);
-			}
-			break;
-		default:
-			break;
-	}
-
-	return rv;
-}
-
-static sw_error_t
 adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 	a_uint32_t mode[], a_bool_t force_switch)
 {
 	sw_error_t rv = SW_OK;
-	a_uint32_t port_id = 0, port_id_from = 0, port_id_end = 0;
+	a_uint32_t port_id = 0, port_id_from = 0, port_id_end = 0, port_mode = 0;
 
 	if(mode_index == SSDK_UNIPHY_INSTANCE0)
 	{
@@ -3511,7 +3385,7 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 		mode_index, mode[mode_index], rv);
 	SW_RTN_ON_ERROR(rv);
 
-	/*configure the mac*/
+	/*configure the mac mux and phy mode*/
 	for(port_id = port_id_from; port_id <= port_id_end; port_id++)
 	{
 		rv = adpt_hppe_port_mux_mac_type_set(dev_id, port_id, mode[SSDK_UNIPHY_INSTANCE0],
@@ -3520,21 +3394,23 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 			port_id, mode[SSDK_UNIPHY_INSTANCE0], mode[SSDK_UNIPHY_INSTANCE1],
 			mode[SSDK_UNIPHY_INSTANCE2], rv);
 		SW_RTN_ON_ERROR(rv);
+		if (force_switch != A_FALSE)
+		{
+			rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode);
+			SW_RTN_ON_ERROR(rv);
+			rv = hsl_port_phy_mode_set(dev_id, port_id, port_mode);
+			SW_RTN_ON_ERROR(rv);
+			SSDK_DEBUG("port_id:%d is configured as port_mode:0x%x\n",
+				port_id, port_mode);
+		}
 	}
-
-	/*configure the phy*/
+	/*swith PHY driver if need*/
 	if(SSDK_PHYSICAL_PORT5 >= port_id_from && SSDK_PHYSICAL_PORT5 <= port_id_end)
 	{
 		rv = _adpt_hppe_sfp_copper_phydriver_switch(dev_id, SSDK_PHYSICAL_PORT5,
 			mode[SSDK_UNIPHY_INSTANCE1]);
+		SW_RTN_ON_ERROR(rv);
 	}
-	SW_RTN_ON_ERROR(rv);
-	if (force_switch != A_FALSE) {
-		rv = _adpt_hppe_port_phy_config(dev_id, mode_index, mode[mode_index]);
-		SSDK_DEBUG("configure phy, mode_index:%x,interface_mode:%x, rv:%x\n",
-			mode_index, mode[mode_index], rv);
-	}
-
 	/*init port status for special ports to triger polling*/
 	for(port_id = port_id_from; port_id <= port_id_end; port_id++)
 	{

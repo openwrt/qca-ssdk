@@ -2008,10 +2008,14 @@ sw_error_t
 malibu_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id, fal_port_interface_mode_t interface_mode)
 {
 	a_uint16_t phy_data;
+	static fal_port_interface_mode_t phy_mode = PORT_INTERFACE_MODE_MAX;
 
 	if ((phy_id < first_phy_addr) ||
 				(phy_id > (first_phy_addr + MALIBU_PHY_MAX_ADDR_INC)))
 		return SW_NOT_SUPPORTED;
+	/*if interface_mode have been configured, then no need to configure again*/
+	if(phy_mode == interface_mode)
+		return SW_OK;
 
 	phy_data = malibu_phy_reg_read(dev_id,
 		first_phy_addr + MALIBU_PHY_MAX_ADDR_INC, MALIBU_PHY_CHIP_CONFIG);
@@ -2048,6 +2052,8 @@ malibu_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id, fal_port_int
 		hsl_phy_phydev_autoneg_update(dev_id,
 			first_phy_addr + MALIBU_PHY_MAX_ADDR_INC, A_FALSE, 0);
 	}
+	phy_mode = interface_mode;
+	SSDK_DEBUG("malibu phy is configured as phy_mode:0x%x\n", phy_mode);
 
 	return SW_OK;
 }

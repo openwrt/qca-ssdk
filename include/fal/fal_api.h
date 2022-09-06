@@ -418,14 +418,10 @@ extern "C" {
     SW_API_DEF(SW_API_PT_VLAN_MEM_DEL, fal_portvlan_member_del), \
     SW_API_DEF(SW_API_PT_VLAN_MEM_UPDATE, fal_portvlan_member_update), \
     SW_API_DEF(SW_API_PT_VLAN_MEM_GET, fal_portvlan_member_get), \
-    SW_API_DEF(SW_API_PT_DEF_VID_SET, fal_port_default_vid_set), \
-    SW_API_DEF(SW_API_PT_DEF_VID_GET, fal_port_default_vid_get), \
     SW_API_DEF(SW_API_PT_FORCE_DEF_VID_SET, fal_port_force_default_vid_set), \
     SW_API_DEF(SW_API_PT_FORCE_DEF_VID_GET, fal_port_force_default_vid_get), \
     SW_API_DEF(SW_API_PT_FORCE_PORTVLAN_SET, fal_port_force_portvlan_set), \
     SW_API_DEF(SW_API_PT_FORCE_PORTVLAN_GET, fal_port_force_portvlan_get), \
-    SW_API_DEF(SW_API_PT_NESTVLAN_SET, fal_port_nestvlan_set), \
-    SW_API_DEF(SW_API_PT_NESTVLAN_GET, fal_port_nestvlan_get), \
     SW_API_DEF(SW_API_NESTVLAN_TPID_SET, fal_nestvlan_tpid_set), \
     SW_API_DEF(SW_API_NESTVLAN_TPID_GET, fal_nestvlan_tpid_get), \
     SW_API_DEF(SW_API_PT_IN_VLAN_MODE_SET, fal_port_invlan_mode_set), \
@@ -502,14 +498,10 @@ extern "C" {
     SW_API_DESC(SW_API_PT_VLAN_MEM_DEL) \
     SW_API_DESC(SW_API_PT_VLAN_MEM_UPDATE) \
     SW_API_DESC(SW_API_PT_VLAN_MEM_GET)    \
-    SW_API_DESC(SW_API_PT_DEF_VID_SET)    \
-    SW_API_DESC(SW_API_PT_DEF_VID_GET)    \
     SW_API_DESC(SW_API_PT_FORCE_DEF_VID_SET)    \
     SW_API_DESC(SW_API_PT_FORCE_DEF_VID_GET)    \
     SW_API_DESC(SW_API_PT_FORCE_PORTVLAN_SET)    \
     SW_API_DESC(SW_API_PT_FORCE_PORTVLAN_GET)    \
-    SW_API_DESC(SW_API_PT_NESTVLAN_SET)    \
-    SW_API_DESC(SW_API_PT_NESTVLAN_GET)    \
     SW_API_DESC(SW_API_NESTVLAN_TPID_SET)    \
     SW_API_DESC(SW_API_NESTVLAN_TPID_GET)    \
     SW_API_DESC(SW_API_PT_IN_VLAN_MODE_SET)   \

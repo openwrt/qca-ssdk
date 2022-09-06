@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2012, 2015, 2017-2018, The Linux Foundation. All rights reserved.
  * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -659,26 +660,10 @@ extern "C"
 				fal_pbmp_t * mem_port_map);
 
   typedef sw_error_t
-    (*hsl_port_nestvlan_set) (a_uint32_t dev_id, fal_port_t port_id,
-			      a_bool_t enable);
-
-  typedef sw_error_t
-    (*hsl_port_nestvlan_get) (a_uint32_t dev_id, fal_port_t port_id,
-			      a_bool_t * enable);
-
-  typedef sw_error_t
     (*hsl_nestvlan_tpid_set) (a_uint32_t dev_id, a_uint32_t tpid);
 
   typedef sw_error_t
     (*hsl_nestvlan_tpid_get) (a_uint32_t dev_id, a_uint32_t * tpid);
-
-  typedef sw_error_t
-    (*hsl_port_default_vid_set) (a_uint32_t dev_id, fal_port_t port_id,
-				 a_uint32_t vid);
-
-  typedef sw_error_t
-    (*hsl_port_default_vid_get) (a_uint32_t dev_id, fal_port_t port_id,
-				 a_uint32_t * vid);
 
   typedef sw_error_t
     (*hsl_port_force_default_vid_set) (a_uint32_t dev_id,
@@ -2225,14 +2210,10 @@ typedef sw_error_t
     hsl_portvlan_member_del portvlan_member_del;
     hsl_portvlan_member_update portvlan_member_update;
     hsl_portvlan_member_get portvlan_member_get;
-    hsl_port_default_vid_set port_default_vid_set;
-    hsl_port_default_vid_get port_default_vid_get;
     hsl_port_force_default_vid_set port_force_default_vid_set;
     hsl_port_force_default_vid_get port_force_default_vid_get;
     hsl_port_force_portvlan_set port_force_portvlan_set;
     hsl_port_force_portvlan_get port_force_portvlan_get;
-    hsl_port_nestvlan_set port_nestvlan_set;
-    hsl_port_nestvlan_get port_nestvlan_get;
     hsl_port_invlan_mode_set port_invlan_mode_set;
     hsl_port_invlan_mode_get port_invlan_mode_get;
     hsl_port_tls_set port_tls_set;

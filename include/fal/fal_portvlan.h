@@ -476,10 +476,6 @@ typedef struct {
 
 #ifndef IN_PORTVLAN_MINI
 sw_error_t
-fal_port_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t vid);
-
-sw_error_t
 fal_port_force_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_bool_t enable);
 
@@ -488,23 +484,11 @@ fal_port_force_portvlan_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_bool_t enable);
 
 sw_error_t
-fal_port_nestvlan_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable);
-
-sw_error_t
-fal_port_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t * vid);
-
-sw_error_t
 fal_port_force_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
 		a_bool_t * enable);
 
 sw_error_t
 fal_port_force_portvlan_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable);
-
-sw_error_t
-fal_port_nestvlan_get(a_uint32_t dev_id, fal_port_t port_id,
 		a_bool_t * enable);
 
 sw_error_t

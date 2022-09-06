@@ -1519,21 +1519,6 @@ fal_port_invlan_mode_get(a_uint32_t dev_id, fal_port_t port_id,
 
 #ifndef IN_PORTVLAN_MINI
 static sw_error_t
-_fal_port_default_vid_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vid)
-{
-    sw_error_t rv;
-    hsl_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    if (NULL == p_api->port_default_vid_set)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->port_default_vid_set(dev_id, port_id, vid);
-    return rv;
-}
-
-static sw_error_t
 _fal_port_force_default_vid_set(a_uint32_t dev_id, fal_port_t port_id,
                                 a_bool_t enable)
 {
@@ -1566,36 +1551,6 @@ _fal_port_force_portvlan_set(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 static sw_error_t
-_fal_port_nestvlan_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
-{
-    sw_error_t rv;
-    hsl_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    if (NULL == p_api->port_nestvlan_set)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->port_nestvlan_set(dev_id, port_id, enable);
-    return rv;
-}
-
-static sw_error_t
-_fal_port_nestvlan_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
-{
-    sw_error_t rv;
-    hsl_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    if (NULL == p_api->port_nestvlan_get)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->port_nestvlan_get(dev_id, port_id, enable);
-    return rv;
-}
-
-static sw_error_t
 _fal_port_force_portvlan_get(a_uint32_t dev_id, fal_port_t port_id,
                              a_bool_t * enable)
 {
@@ -1624,22 +1579,6 @@ _fal_port_force_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
         return SW_NOT_SUPPORTED;
 
     rv = p_api->port_force_default_vid_get(dev_id, port_id, enable);
-    return rv;
-}
-
-static sw_error_t
-_fal_port_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
-                          a_uint32_t * vid)
-{
-    sw_error_t rv;
-    hsl_api_t *p_api;
-
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    if (NULL == p_api->port_default_vid_get)
-        return SW_NOT_SUPPORTED;
-
-    rv = p_api->port_default_vid_get(dev_id, port_id, vid);
     return rv;
 }
 
@@ -1929,43 +1868,6 @@ _fal_port_vrf_id_get(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 /**
- * @brief Set default vlan id on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[in] vid default vlan id
- * @return SW_OK or error code
- */
-sw_error_t
-fal_port_default_vid_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t vid)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_port_default_vid_set(dev_id, port_id, vid);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-/**
- * @brief Get default vlan id on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[out] vid default vlan id
- * @return SW_OK or error code
- */
-sw_error_t
-fal_port_default_vid_get(a_uint32_t dev_id, fal_port_t port_id,
-                         a_uint32_t * vid)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_port_default_vid_get(dev_id, port_id, vid);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-/**
  * @brief Set force default vlan id status on a particular port.
  * @param[in] dev_id device id
  * @param[in] port_id port id
@@ -2037,42 +1939,6 @@ fal_port_force_portvlan_get(a_uint32_t dev_id, fal_port_t port_id,
 
     FAL_API_LOCK;
     rv = _fal_port_force_portvlan_get(dev_id, port_id, enable);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-/**
- * @brief Set nest vlan feature status on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[in] enable A_TRUE or A_FALSE
- * @return SW_OK or error code
- */
-sw_error_t
-fal_port_nestvlan_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_port_nestvlan_set(dev_id, port_id, enable);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-/**
- * @brief Get nest vlan feature status on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[out] enable A_TRUE or A_FALSE
- * @return SW_OK or error code
- */
-sw_error_t
-fal_port_nestvlan_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_port_nestvlan_get(dev_id, port_id, enable);
     FAL_API_UNLOCK;
     return rv;
 }

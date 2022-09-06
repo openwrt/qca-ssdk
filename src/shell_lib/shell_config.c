@@ -711,10 +711,8 @@ struct sub_cmd_des_t g_portvlan_des[] =
 	{"member", "add",   SW_API_PT_VLAN_MEM_ADD, NULL},
 	{"member", "del",   SW_API_PT_VLAN_MEM_DEL, NULL},
 	{"member", "update",   SW_API_PT_VLAN_MEM_UPDATE, NULL},
-	{"defaultVid", "set",   SW_API_PT_DEF_VID_SET, NULL},
 	{"forceVid", "set",   SW_API_PT_FORCE_DEF_VID_SET, NULL},
 	{"forceMode", "set",   SW_API_PT_FORCE_PORTVLAN_SET, NULL},
-	{"nestVlan", "set",   SW_API_PT_NESTVLAN_SET, NULL},
 	{"sVlanTPID", "set",   SW_API_NESTVLAN_TPID_SET, NULL},
 	{"invlan", "set",   SW_API_PT_IN_VLAN_MODE_SET, NULL},
 	{"globalQinQMode", "set", SW_API_GLOBAL_QINQ_MODE_SET, NULL},
@@ -736,13 +734,13 @@ struct sub_cmd_des_t g_portvlan_des[] =
 	{"Isol", "set", SW_API_PT_VLAN_ISOL_SET, NULL},
 	{"IsolGroup", "set", SW_API_PT_VLAN_ISOL_GROUP_SET, NULL},
 #endif
-	#ifndef IN_PORTVLAN_MINI
+#ifndef IN_PORTVLAN_MINI
 	{"tlsMode", "set",   SW_API_PT_TLS_SET, NULL},
 	{"priPropagation", "set",   SW_API_PT_PRI_PROPAGATION_SET, NULL},
-	#endif
+#endif
 	{"defaultSVid", "set",   SW_API_PT_DEF_SVID_SET, NULL},
 	{"defaultCVid", "set",   SW_API_PT_DEF_CVID_SET, NULL},
-	#ifndef IN_PORTVLAN_MINI
+#ifndef IN_PORTVLAN_MINI
 	{"vlanPropagation", "set",   SW_API_PT_VLAN_PROPAGATION_SET, NULL},
 	{"translation", "set",   SW_API_PT_VLAN_TRANS_ADD, NULL},
 	{"translation", "add",   SW_API_PT_VLAN_TRANS_ADD, NULL},
@@ -752,8 +750,10 @@ struct sub_cmd_des_t g_portvlan_des[] =
 	{"macvlanxlt", "set",   SW_API_PT_MAC_VLAN_XLT_SET, NULL},
 	{"netiso", "set",   SW_API_NETISOLATE_SET, NULL},
 	{"egbypass", "set",   SW_API_EG_FLTR_BYPASS_EN_SET, NULL},
+#ifdef DESS
 	{"ptvrfid", "set",   SW_API_PT_VRF_ID_SET, NULL},
-	#endif
+#endif
+#endif
 	{NULL, NULL,  0, NULL},/*end of desc*/
 };
 #endif

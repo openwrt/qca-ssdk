@@ -3976,7 +3976,7 @@ parse_portvlan_egbypass(struct switch_val *val)
 
 	return rv;
 }
-
+#ifdef DESS
 static int
 parse_portvlan_ptvrfid(struct switch_val *val)
 {
@@ -4004,6 +4004,7 @@ parse_portvlan_ptvrfid(struct switch_val *val)
 
 	return rv;
 }
+#endif
 #endif
 #endif
 
@@ -12220,7 +12221,7 @@ parse_portvlan(const char *command_name, struct switch_val *val)
 		rv = parse_portvlan_isol_group(val);
 #endif
 	}
-	#ifndef IN_PORTVLAN_MINI
+#ifndef IN_PORTVLAN_MINI
 	else if(!strcmp(command_name, "InVlan")) {
 		rv = parse_portvlan_invlan(val);
 	} else if(!strcmp(command_name, "TlsMode")) {
@@ -12241,10 +12242,12 @@ parse_portvlan(const char *command_name, struct switch_val *val)
 		rv = parse_portvlan_netiso(val);
 	} else if(!strcmp(command_name, "EgBypass")) {
 		rv = parse_portvlan_egbypass(val);
+#ifdef DESS
 	} else if(!strcmp(command_name, "Ptvrfid")) {
 		rv = parse_portvlan_ptvrfid(val);
+#endif
 	}
-	#endif
+#endif
 
 	return rv;
 }

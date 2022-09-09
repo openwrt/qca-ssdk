@@ -632,6 +632,27 @@ _adpt_gmac_port_rxfc_status_set(a_uint32_t dev_id,fal_port_t port_id, a_bool_t e
 	return SW_OK;
 }
 
+static sw_error_t
+adpt_hppe_port_xgmac_reconfig(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t rxfc_status = 0, txfc_status = 0;
+
+	rv = adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id, port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = _adpt_xgmac_port_rxfc_status_get(dev_id, port_id, &rxfc_status);
+	SW_RTN_ON_ERROR(rv);
+	rv = _adpt_xgmac_port_rxfc_status_set(dev_id, port_id, rxfc_status);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = _adpt_xgmac_port_txfc_status_get(dev_id, port_id, &txfc_status);
+	SW_RTN_ON_ERROR(rv);
+	rv = _adpt_xgmac_port_txfc_status_set(dev_id, port_id, txfc_status);
+
+	return rv;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_local_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
@@ -2597,40 +2618,17 @@ _adpt_hppe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t po
 static sw_error_t
 adpt_hppe_port_speed_change_mac_reset(a_uint32_t dev_id, a_uint32_t port_id)
 {
-	a_uint32_t uniphy_index = 0, mode = 0;
-	a_uint32_t rxfc_status = 0, txfc_status = 0;
+	fal_port_interface_mode_t mode = PORT_INTERFACE_MODE_MAX;
 	sw_error_t rv = 0;
 
-	if (port_id == HPPE_MUX_PORT1) {
-		uniphy_index = SSDK_UNIPHY_INSTANCE1;
-	} else if (port_id == HPPE_MUX_PORT2) {
-		uniphy_index = SSDK_UNIPHY_INSTANCE2;
-	} else if (port_id == SSDK_PHYSICAL_PORT1) {
-		uniphy_index = SSDK_UNIPHY_INSTANCE0;
-	} else {
-		return SW_OK;
-	}
-
-	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
-	if (mode == PORT_WRAPPER_USXGMII) {
+	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &mode);
+	SW_RTN_ON_ERROR(rv);
+	if (mode == PORT_USXGMII) {
 		ssdk_port_mac_clock_reset(dev_id, port_id);
-		/*restore xgmac's pr and pcf setting after reset operation*/
-		rv = adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id,
-			port_id);
+		/*restore xgmac's pr and pcf setting, re-config flowctrl after reset
+		operation*/
+		rv = adpt_hppe_port_xgmac_reconfig(dev_id, port_id);
 		SW_RTN_ON_ERROR(rv);
-		/*flowctrl need to be configured when reset XGMAC*/
-		rv = _adpt_xgmac_port_rxfc_status_get(dev_id, port_id,
-			&rxfc_status);
-		SW_RTN_ON_ERROR(rv);
-		rv = _adpt_xgmac_port_rxfc_status_set(dev_id, port_id,
-			rxfc_status);
-		SW_RTN_ON_ERROR(rv);
-
-		rv = _adpt_xgmac_port_txfc_status_get(dev_id, port_id,
-			&txfc_status);
-		SW_RTN_ON_ERROR(rv);
-		rv = _adpt_xgmac_port_txfc_status_set(dev_id, port_id,
-			txfc_status);
 	}
 	return rv;
 }
@@ -2638,39 +2636,28 @@ static sw_error_t
 adpt_hppe_port_interface_mode_switch_mac_reset(a_uint32_t dev_id,
 	a_uint32_t port_id)
 {
-	a_uint32_t uniphy_index = 0, mode = 0;
 	sw_error_t rv = 0;
 	phy_type_t phy_type;
 	a_uint32_t port_mac_type;
+	fal_port_interface_mode_t mode = PORT_INTERFACE_MODE_MAX;
 
 	phy_type = hsl_phy_type_get(dev_id, port_id);
 	if (phy_type != AQUANTIA_PHY_CHIP && phy_type != SFP_PHY_CHIP) {
 		return SW_OK;
 	}
+	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &mode);
+	SW_RTN_ON_ERROR(rv);
 
-	if (port_id == HPPE_MUX_PORT1) {
-		uniphy_index = SSDK_UNIPHY_INSTANCE1;
-	} else if (port_id == HPPE_MUX_PORT2) {
-		uniphy_index = SSDK_UNIPHY_INSTANCE2;
-	} else if (port_id == SSDK_PHYSICAL_PORT1) {
-		uniphy_index = SSDK_UNIPHY_INSTANCE0;
-	} else {
-		return SW_OK;
-	}
-
-	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
-	if ((mode == PORT_WRAPPER_USXGMII) ||
-		(mode == PORT_WRAPPER_SGMII_CHANNEL0) ||
-		(mode == PORT_WRAPPER_SGMII0_RGMII4) ||
-		(mode == PORT_WRAPPER_SGMII_FIBER) ||
-		(mode == PORT_WRAPPER_10GBASE_R) ||
-		(mode == PORT_WRAPPER_SGMII_PLUS)) {
+	if ((mode == PORT_USXGMII) || (mode == PHY_SGMII_BASET) ||
+		(mode == PORT_SGMII_FIBER) || (mode == PORT_10GBASE_R) ||
+		(mode == PORT_SGMII_PLUS)) {
 		ssdk_port_mac_clock_reset(dev_id, port_id);
 		port_mac_type = qca_hppe_port_mac_type_get(dev_id, port_id);
 		if (port_mac_type == PORT_XGMAC_TYPE) {
-			/*restore xgmac's pr and pcf setting after reset operation*/
-			rv = adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id,
-			port_id);
+			/*restore xgmac's pr and pcf setting, re-config flowctrl after reset
+			operation*/
+			rv = adpt_hppe_port_xgmac_reconfig(dev_id, port_id);
+			SW_RTN_ON_ERROR(rv);
 		}
 	}
 	return rv;
@@ -3551,8 +3538,12 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 	/*init port status for special ports to triger polling*/
 	for(port_id = port_id_from; port_id <= port_id_end; port_id++)
 	{
-		_adpt_hppe_port_txfc_status_set(dev_id, port_id, A_FALSE);
-		_adpt_hppe_port_rxfc_status_set(dev_id, port_id, A_FALSE);
+		/*if the port did not connect phy, then no need to disable flow control*/
+		if(_adpt_hppe_port_phy_connected(dev_id, port_id) == A_TRUE)
+		{
+			_adpt_hppe_port_txfc_status_set(dev_id, port_id, A_FALSE);
+			_adpt_hppe_port_rxfc_status_set(dev_id, port_id, A_FALSE);
+		}
 		qca_mac_port_status_init(dev_id, port_id);
 	}
 

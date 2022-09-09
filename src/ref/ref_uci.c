@@ -9997,6 +9997,9 @@ static const char *flow_global[] = {
 	"l2_vpn_en",
 	"l3_vpn_en",
 #endif
+#if defined(MPPE)
+	"flow_cookie_pri",
+#endif
 };
 
 #endif

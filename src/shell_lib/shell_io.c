@@ -11786,6 +11786,13 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
     } while (talk_mode && (SW_OK != rv));
 #endif
 
+#if defined(MPPE)
+    cmd_data_check_element("flow_cookie_pri", "0",
+		    "usage: flow cookie priority\n",
+		    cmd_data_check_uint16, (cmd, &tmp, sizeof(a_uint16_t)));
+    entry.flow_cookie_pri = tmp;
+#endif
+
     *(fal_flow_global_cfg_t *)val = entry;
     return SW_OK;
 

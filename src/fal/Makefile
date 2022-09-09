@@ -157,6 +157,10 @@ ifeq (TRUE, $(IN_MAPT))
 	SRC_LIST += fal_mapt.c
 endif
 
+ifeq (TRUE, $(IN_ATHTAG))
+	SRC_LIST += fal_athtag.c
+endif
+
 #auto_insert_flag
 include $(PRJ_PATH)/make/components.mk
 include $(PRJ_PATH)/make/defs.mk

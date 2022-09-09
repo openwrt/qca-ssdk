@@ -1406,6 +1406,17 @@ struct sub_cmd_des_t g_vport_des[] =
 };
 #endif
 
+#ifdef IN_ATHTAG
+struct sub_cmd_des_t g_athtag_des[] =
+{
+    {"primapping", "set", SW_API_ATHTAG_PRI_MAPPING_SET, NULL},
+    {"portmapping", "set", SW_API_ATHTAG_PORT_MAPPING_SET, NULL},
+    {"rx", "set", SW_API_PORT_ATHTAG_RX_SET, NULL},
+    {"tx", "set", SW_API_PORT_ATHTAG_TX_SET, NULL},
+    {NULL, NULL, 0, NULL},/*end of desc*/
+};
+#endif
+
 struct cmd_des_t gcmd_des[] =
 {
     /*port ctrl*/
@@ -1635,6 +1646,11 @@ struct cmd_des_t gcmd_des[] =
 #ifdef IN_VPORT
     {
         "vport", g_vport_des,
+    },
+#endif
+#ifdef IN_ATHTAG
+    {
+        "athtag", g_athtag_des,
     },
 #endif
     {NULL, NULL} /*end of desc*/

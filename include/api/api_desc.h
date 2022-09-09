@@ -5992,6 +5992,73 @@ extern "C" {
 	SW_PARAM_DEF(SW_API_MAPT_DECAP_EN_GET, SW_ENABLE, \
 			sizeof(a_bool_t), SW_PARAM_PTR|SW_PARAM_OUT, "Decap enable"),
 
+#define SW_API_ATHTAG_PRI_MAPPING_SET_DESC \
+	SW_PARAM_DEF(SW_API_ATHTAG_PRI_MAPPING_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_ATHTAG_PRI_MAPPING_SET, SW_DIRECTION, \
+			sizeof(fal_direction_t), SW_PARAM_IN, "direction"), \
+	SW_PARAM_DEF(SW_API_ATHTAG_PRI_MAPPING_SET, SW_ATHTAG_PRI_MAPPING, \
+			sizeof(fal_athtag_pri_mapping_t), SW_PARAM_PTR|SW_PARAM_IN, "Pri Mapping"),
+
+#define SW_API_ATHTAG_PRI_MAPPING_GET_DESC \
+	SW_PARAM_DEF(SW_API_ATHTAG_PRI_MAPPING_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_ATHTAG_PRI_MAPPING_GET, SW_DIRECTION, \
+			sizeof(fal_direction_t), SW_PARAM_IN, "direction"), \
+	SW_PARAM_DEF(SW_API_ATHTAG_PRI_MAPPING_GET, SW_ATHTAG_PRI_MAPPING, \
+			sizeof(fal_athtag_pri_mapping_t), \
+			SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Pri Mapping"),
+
+#define SW_API_ATHTAG_PORT_MAPPING_SET_DESC \
+	SW_PARAM_DEF(SW_API_ATHTAG_PORT_MAPPING_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_ATHTAG_PORT_MAPPING_SET, SW_DIRECTION, \
+			sizeof(fal_direction_t), SW_PARAM_IN, "direction"), \
+	SW_PARAM_DEF(SW_API_ATHTAG_PORT_MAPPING_SET, SW_ATHTAG_PORT_MAPPING, \
+			sizeof(fal_athtag_port_mapping_t), \
+			SW_PARAM_PTR|SW_PARAM_IN, "Port Mapping"),
+
+#define SW_API_ATHTAG_PORT_MAPPING_GET_DESC \
+	SW_PARAM_DEF(SW_API_ATHTAG_PORT_MAPPING_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_ATHTAG_PORT_MAPPING_GET, SW_DIRECTION, \
+			sizeof(fal_direction_t), SW_PARAM_IN, "direction"), \
+	SW_PARAM_DEF(SW_API_ATHTAG_PORT_MAPPING_GET, SW_ATHTAG_PORT_MAPPING, \
+			sizeof(fal_athtag_port_mapping_t), \
+			SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Port Mapping"),
+
+#define SW_API_PORT_ATHTAG_RX_SET_DESC \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_RX_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_PORT_ATHTAG_RX_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_RX_SET, SW_ATHTAG_RX_CFG, \
+			sizeof(fal_athtag_rx_cfg_t), SW_PARAM_PTR|SW_PARAM_IN, "Rx Cfg"),
+
+#define SW_API_PORT_ATHTAG_RX_GET_DESC \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_RX_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_PORT_ATHTAG_RX_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_RX_GET, SW_ATHTAG_RX_CFG, \
+			sizeof(fal_athtag_rx_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "Rx Cfg"),
+
+#define SW_API_PORT_ATHTAG_TX_SET_DESC \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_TX_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_PORT_ATHTAG_TX_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_TX_SET, SW_ATHTAG_TX_CFG, \
+			sizeof(fal_athtag_tx_cfg_t), SW_PARAM_PTR|SW_PARAM_IN, "Tx Cfg"),
+
+#define SW_API_PORT_ATHTAG_TX_GET_DESC \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_TX_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF( SW_API_PORT_ATHTAG_TX_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
+	SW_PARAM_DEF(SW_API_PORT_ATHTAG_TX_GET, SW_ATHTAG_TX_CFG, \
+			sizeof(fal_athtag_tx_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "Tx Cfg"),
+
 /* auto_insert_flag */
 /*qca808x_start*/
 

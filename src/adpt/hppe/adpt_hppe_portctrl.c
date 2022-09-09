@@ -1078,11 +1078,13 @@ adpt_ppe_port_mru_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
-
+	if(ctrl->mru_size > SSDK_MAX_FRAME_SIZE)
+		return SW_OUT_OF_RANGE;
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	port_value = FAL_PORT_ID_VALUE(port_id);
+	ADPT_PPE_PORT_ID_CHECK(port_value);
 	if (chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
 		rv = adpt_cppe_port_mru_set(dev_id, port_value, ctrl);
@@ -1123,11 +1125,13 @@ adpt_ppe_port_mtu_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(ctrl);
-
+	if(ctrl->mtu_size > SSDK_MAX_MTU)
+		return SW_OUT_OF_RANGE;
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	port_value = FAL_PORT_ID_VALUE(port_id);
+	ADPT_PPE_PORT_ID_CHECK(port_value);
 	if (chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
 		rv = adpt_cppe_port_mtu_set(dev_id, port_value, ctrl);
@@ -1553,6 +1557,7 @@ adpt_ppe_port_mru_get(a_uint32_t dev_id, fal_port_t port_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	port_value = FAL_PORT_ID_VALUE(port_id);
+	ADPT_PPE_PORT_ID_CHECK(port_value);
 	if (chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
 		return adpt_cppe_port_mru_get(dev_id, port_value, ctrl);
@@ -3815,6 +3820,7 @@ adpt_ppe_port_mtu_get(a_uint32_t dev_id, fal_port_t port_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	port_value = FAL_PORT_ID_VALUE(port_id);
+	ADPT_PPE_PORT_ID_CHECK(port_value);
 	if (chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) {
 #if defined(CPPE)
 		return adpt_cppe_port_mtu_get(dev_id, port_value, ctrl);
@@ -4067,6 +4073,7 @@ _adpt_ppe_port_source_filter_config_get(a_uint32_t dev_id,
 	ADPT_NULL_POINT_CHECK(src_filter_config);
 
 	port_id = FAL_PORT_ID_VALUE(port_id);
+	ADPT_PPE_PORT_ID_CHECK(port_id);
 	rv = ppe_mru_mtu_ctrl_tbl_source_filtering_bypass_get(dev_id, port_id,
 			&src_filter_bypass);
 	SW_RTN_ON_ERROR(rv);
@@ -4096,6 +4103,7 @@ _adpt_ppe_port_source_filter_config_set(a_uint32_t dev_id,
 	ADPT_NULL_POINT_CHECK(src_filter_config);
 
 	port_id = FAL_PORT_ID_VALUE(port_id);
+	ADPT_PPE_PORT_ID_CHECK(port_id);
 	if(src_filter_config->src_filter_enable == A_TRUE)
 	{
 		src_filter_bypass = A_FALSE;
@@ -4180,7 +4188,8 @@ adpt_hppe_port_source_filter_set(a_uint32_t dev_id,
 	union port_in_forward_u port_in_forward = {0};
 
 	ADPT_DEV_ID_CHECK(dev_id);
-
+	if(port_id > SSDK_PHYSICAL_PORT7)
+		return SW_OUT_OF_RANGE;
 	if (enable == A_TRUE)
 		port_in_forward.bf.source_filtering_bypass = A_FALSE;
 	else

@@ -110,6 +110,7 @@ appe_ipr_udf_profile_offset_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 appe_ipr_udf_ctrl_l3_type_incl_get(
 		a_uint32_t dev_id,
@@ -543,6 +544,7 @@ appe_ipr_udf_profile_offset_udf2_offset_set(
 	ret = appe_ipr_udf_profile_offset_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 appe_eg_ipo_ext_tbl_get(
@@ -574,6 +576,7 @@ appe_eg_ipo_ext_tbl_set(
 				sizeof(union eg_ipo_ext_tbl_u)/sizeof(a_uint32_t));
 }
 
+#if 0
 sw_error_t
 appe_eg_ipo_ext_tbl_policy_id_get(
 		a_uint32_t dev_id,
@@ -605,7 +608,6 @@ appe_eg_ipo_ext_tbl_policy_id_set(
 	return ret;
 }
 
-#if 0
 #if defined(MPPE)
 sw_error_t
 mppe_eg_ipo_ext_tbl_cookie_get(
@@ -811,6 +813,7 @@ appe_pre_ipo_rule_ext_4_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 appe_pre_ipo_dbg_addr_get(
 		a_uint32_t dev_id,
@@ -939,6 +942,7 @@ appe_pre_ipo_glb_bypass_counter_set(
 				PRE_IPO_CSR_BASE_ADDR + PRE_IPO_GLB_BYPASS_COUNTER_ADDRESS,
 				value->val);
 }
+#endif
 
 sw_error_t
 appe_pre_ipo_cnt_tbl_get(
@@ -996,6 +1000,7 @@ appe_pre_ipo_action_set(
 				6);
 }
 
+#if 0
 sw_error_t
 appe_pre_ipo_rule_ext_1_ext2_2_get(
 		a_uint32_t dev_id,
@@ -1276,3 +1281,4 @@ appe_pre_ipo_cnt_tbl_hit_pkt_cnt_set(
 	ret = appe_pre_ipo_cnt_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif

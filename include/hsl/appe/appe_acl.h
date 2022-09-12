@@ -83,6 +83,7 @@ appe_ipr_udf_profile_offset_set(
 		a_uint32_t index,
 		union ipr_udf_profile_offset_u *value);
 
+#if 0
 sw_error_t
 appe_ipr_udf_ctrl_l3_type_incl_get(
 		a_uint32_t dev_id,
@@ -251,6 +252,8 @@ appe_ipr_udf_profile_offset_udf2_offset_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#endif
+
 sw_error_t
 appe_eg_ipo_ext_tbl_get(
 		a_uint32_t dev_id,
@@ -263,6 +266,7 @@ appe_eg_ipo_ext_tbl_set(
 		a_uint32_t index,
 		union eg_ipo_ext_tbl_u *value);
 
+#if 0
 sw_error_t
 appe_eg_ipo_ext_tbl_policy_id_get(
 		a_uint32_t dev_id,
@@ -275,7 +279,6 @@ appe_eg_ipo_ext_tbl_policy_id_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
-#if 0
 #if defined(MPPE)
 sw_error_t
 mppe_eg_ipo_ext_tbl_cookie_get(
@@ -363,6 +366,7 @@ appe_pre_ipo_rule_ext_4_set(
 		a_uint32_t index,
 		union pre_ipo_rule_ext_4_u *value);
 
+#if 0
 sw_error_t
 appe_pre_ipo_dbg_addr_get(
 		a_uint32_t dev_id,
@@ -422,6 +426,7 @@ sw_error_t
 appe_pre_ipo_glb_bypass_counter_set(
 		a_uint32_t dev_id,
 		union pre_ipo_glb_bypass_counter_u *value);
+#endif
 
 sw_error_t
 appe_pre_ipo_cnt_tbl_get(
@@ -447,6 +452,7 @@ appe_pre_ipo_action_set(
 		a_uint32_t index,
 		union pre_ipo_action_u *value);
 
+#if 0
 sw_error_t
 appe_pre_ipo_rule_ext_1_ext2_2_get(
 		a_uint32_t dev_id,
@@ -554,4 +560,5 @@ appe_pre_ipo_cnt_tbl_hit_pkt_cnt_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 #endif

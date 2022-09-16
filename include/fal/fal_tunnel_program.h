@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_tunnel_program FAL_TUNNEL_PROGRAM
@@ -30,6 +30,10 @@ extern "C" {
 #include "fal_type.h"
 #include "fal_tunnel.h"
 
+#define FAL_TUNNEL_PROGRAM_IPV4			1
+#define FAL_TUNNEL_PROGRAM_IPV6			2
+#define FAL_TUNNEL_PROGRAM_IPV4_IPV6		3
+#define FAL_TUNNEL_PROGRAM_GRE_PROTOCOL_MASK	0x2000ffff
 typedef struct {
 	a_uint8_t ip_ver;  /*ip version of outer packet, 1 ipv4, 2 ipv6, 3 ipv4 or ipv6 */
 	fal_hdr_type_t outer_hdr_type; /*current(outer) hdr type*/

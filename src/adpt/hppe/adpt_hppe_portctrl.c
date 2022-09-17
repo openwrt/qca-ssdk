@@ -1048,7 +1048,7 @@ sw_error_t
 adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
 {
 	a_uint32_t port_id = 0;
-	a_bool_t link_status;
+	a_bool_t link_status = A_FALSE;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
@@ -1057,7 +1057,7 @@ adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
 		if (enable == A_FALSE) {
 			for (port_id = 1; port_id < 7; port_id++) {
 				adpt_hppe_port_link_status_get(dev_id, port_id, &link_status);
-				if (link_status == PORT_LINK_UP) {
+				if (link_status == A_TRUE) {
 					/* contorl port mac */
 					adpt_hppe_port_rxmac_status_set(dev_id, port_id, enable);
 				}
@@ -1067,7 +1067,7 @@ adpt_ppe_port_tdm_resource_set(a_uint32_t dev_id, a_bool_t enable)
 			qca_hppe_tdm_hw_init(dev_id, enable);
 			for (port_id = 1; port_id < 7; port_id++) {
 				adpt_hppe_port_link_status_get(dev_id, port_id, &link_status);
-				if (link_status == PORT_LINK_UP) {
+				if (link_status == A_TRUE) {
 					/* contorl port mac */
 					adpt_hppe_port_rxmac_status_set(dev_id, port_id, enable);
 				}

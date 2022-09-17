@@ -742,71 +742,106 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
 	fal_bm_dynamic_cfg_t cfg;
-	a_uint32_t chip_ver = 0;
+	a_uint16_t group_buf = 0, share_ceiling = 0;
+	adpt_ppe_type_t chip_type = adpt_ppe_type_get(dev_id);
 
-	chip_ver = adpt_chip_revision_get(dev_id);
-
-	for (i = 0; i <  HPPE_BM_PORT_NUM; i++) {
+	for (i = 0; i <  PPE_BM_PORT_NUM; i++) {
 		/*disable fc for phy ports and enable fc for port 0 and port 7*/
-		if(i >= HPPE_BM_PHY_PORT_OFFSET && i <= HPPE_BM_PHY_PORT6_OFFSET)
-			fal_port_bm_ctrl_set(0, i, A_FALSE);
+		if(i >= PPE_BM_PHY_PORT_OFFSET && i <= PPE_BM_PHY_PORT_MAX)
+			fal_port_bm_ctrl_set(dev_id, i, A_FALSE);
 		else
-			fal_port_bm_ctrl_set(0, i, A_TRUE);
+			fal_port_bm_ctrl_set(dev_id, i, A_TRUE);
 		/* map to group 0 */
-		fal_port_bufgroup_map_set(0, i, 0);
+		fal_port_bufgroup_map_set(dev_id, i, 0);
 	}
 
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		fal_bm_bufgroup_buffer_set(dev_id, 0, 1400);
-		SSDK_INFO("appe bm initialization\n");
-#endif
-	} else {
-		if (chip_ver == CPPE_REVISION) {
-			fal_bm_bufgroup_buffer_set(dev_id, 0, 1024);
-		} else {
-			fal_bm_bufgroup_buffer_set(dev_id, 0, 1400);
-		}
+	switch (chip_type) {
+		case HPPE_TYPE:
+			group_buf = 1400;
+			share_ceiling = 250;
+			break;
+		case CPPE_TYPE:
+			group_buf = 1024;
+			share_ceiling = 216;
+			break;
+		case APPE_TYPE:
+			group_buf = 1400;
+			share_ceiling = 250;
+			break;
+		case MPPE_TYPE:
+			group_buf = 248;
+			share_ceiling = 20;
+			break;
+		default:
+			SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
+			return SW_OUT_OF_RANGE;
 	}
+
+	fal_bm_bufgroup_buffer_set(dev_id, 0, group_buf);
 
 	/* set reserved buffer */
-	for (i = 0; i < HPPE_BM_PHY_PORT_OFFSET; i++) {
-		fal_bm_port_reserved_buffer_set(dev_id, i, 0, 100);
-	}
-	for (i = HPPE_BM_PHY_PORT_OFFSET; i < HPPE_BM_PORT_NUM-1; i++) {
-		fal_bm_port_reserved_buffer_set(dev_id, i, 0, 128);
-	}
-
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM-1, 0, 40);
-#endif
-	} else {
-		if (chip_ver == CPPE_REVISION) {
-			fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM -2,
-				0, 40);
+	for (i = 0; i < PPE_BM_PORT_NUM; i++) {
+		a_uint16_t prealloc_buf = 0, react_buf = 0;
+		switch (chip_type) {
+			case HPPE_TYPE:
+			case APPE_TYPE:
+				if (i < PPE_BM_PHY_PORT_OFFSET) {
+					prealloc_buf = 0;
+					react_buf = 100;
+				} else if (i == PPE_BM_PORT_NUM-1) {
+					prealloc_buf = 0;
+					react_buf = 40;
+				} else {
+					prealloc_buf = 0;
+					react_buf = 128;
+				}
+				break;
+			case CPPE_TYPE:
+				if (i < PPE_BM_PHY_PORT_OFFSET) {
+					prealloc_buf = 0;
+					react_buf = 100;
+				} else if (i >= PPE_BM_PORT_NUM-2) {
+					/* port 6 is loopback port on CPPE */
+					prealloc_buf = 0;
+					react_buf = 40;
+				} else {
+					prealloc_buf = 0;
+					react_buf = 128;
+				}
+				break;
+			case MPPE_TYPE:
+				if (i < PPE_BM_PHY_PORT_OFFSET) {
+					prealloc_buf = 10;
+					react_buf = 25;
+				} else {
+					prealloc_buf = 12;
+					react_buf = 24;
+				}
+				break;
+			default:
+				SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
+				return SW_OUT_OF_RANGE;
 		}
-		fal_bm_port_reserved_buffer_set(dev_id, HPPE_BM_PORT_NUM-1, 0, 40);
+
+		fal_bm_port_reserved_buffer_set(dev_id, i, prealloc_buf, react_buf);
 	}
 
 	memset(&cfg, 0, sizeof(cfg));
-	cfg.resume_min_thresh = 0;
-	cfg.resume_off = 36;
-	cfg.weight= 4;
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		cfg.shared_ceiling = 250;
-#endif
+	if (chip_type == MPPE_TYPE) {
+		cfg.resume_min_thresh = 15;
+		cfg.resume_off = 6;
+		cfg.weight= 5;
 	} else {
-		if (chip_ver == CPPE_REVISION) {
-			cfg.shared_ceiling = 216;
-		} else {
-			cfg.shared_ceiling = 250;
-		}
+		cfg.resume_min_thresh = 0;
+		cfg.resume_off = 36;
+		cfg.weight= 4;
 	}
-	for (i = 0; i < HPPE_BM_PORT_NUM; i++) {
+	cfg.shared_ceiling = share_ceiling;
+
+	for (i = 0; i < PPE_BM_PORT_NUM; i++) {
 		fal_bm_port_dynamic_thresh_set(dev_id, i, &cfg);
 	}
+
 	return SW_OK;
 }
 #endif
@@ -826,7 +861,9 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	fal_ac_static_threshold_t sthresh_cfg;
 	a_uint32_t qbase = 0;
 	a_uint32_t chip_ver = 0;
+	a_uint16_t total_buf = 0, ceiling = 0, green_max = 0;
 	a_uint32_t max_pri_supported, pri, class;
+	adpt_ppe_type_t chip_type = adpt_ppe_type_get(dev_id);
 
 	memset(&queue_dst, 0, sizeof(queue_dst));
 
@@ -966,54 +1003,44 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 		fal_ac_prealloc_buffer_set(dev_id, &obj, 0);
 	}
 
-	group_buff.prealloc_buffer = 0;
-	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		group_buff.total_buffer = 2000;
-		SSDK_INFO("appe qm initialization\n");
-#endif
-	} else {
-		if (chip_ver == CPPE_REVISION) {
-			group_buff.total_buffer = 1506;
-		} else {
-			group_buff.total_buffer = 2000;
-		}
+	switch (chip_type) {
+		case HPPE_TYPE:
+		case APPE_TYPE:
+			total_buf = 2000;
+			ceiling = 400;
+			green_max = 250;
+			break;
+		case CPPE_TYPE:
+			total_buf = 1506;
+			ceiling = 216;
+			green_max = 144;
+			break;
+		case MPPE_TYPE:
+			total_buf = 500;
+			ceiling = 100;
+			green_max = 100;
+			break;
+		default:
+			SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
+			return SW_OUT_OF_RANGE;
 	}
+
+	group_buff.prealloc_buffer = 0;
+	group_buff.total_buffer = total_buf;
 	fal_ac_group_buffer_set(dev_id, 0, &group_buff);
 
 	memset(&dthresh_cfg, 0, sizeof(dthresh_cfg));
 	dthresh_cfg.shared_weight = 4;
-	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		dthresh_cfg.ceiling = 400;
-#endif
-	} else {
-		if (chip_ver == CPPE_REVISION) {
-			dthresh_cfg.ceiling = 216;
-		} else {
-			dthresh_cfg.ceiling = 400;
-		}
-	}
+	dthresh_cfg.ceiling = ceiling;
 	dthresh_cfg.green_resume_off = 36;
 	for (i = 0; i < SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i++) {
 		fal_ac_dynamic_threshold_set(dev_id, i, &dthresh_cfg);
 	}
 
 	memset(&sthresh_cfg, 0, sizeof(sthresh_cfg));
-	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		sthresh_cfg.green_max = 250;
-#endif
-	} else {
-		if (chip_ver == CPPE_REVISION) {
-			sthresh_cfg.green_max = 144;
-		} else {
-			sthresh_cfg.green_max = 250;
-		}
-	}
+	sthresh_cfg.green_max = green_max;
 	sthresh_cfg.green_resume_off = 36;
-	for (i = SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i < SSDK_L0SCHEDULER_CFG_MAX;
-			i++) {
+	for (i = SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i < SSDK_L0SCHEDULER_CFG_MAX; i++) {
 		obj.type = FAL_AC_QUEUE;
 		obj.obj_id = i;
 		fal_ac_static_threshold_set(dev_id, &obj, &sthresh_cfg);

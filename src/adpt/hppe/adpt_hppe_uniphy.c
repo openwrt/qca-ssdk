@@ -686,6 +686,8 @@ __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 		port_id = HPPE_MUX_PORT1;
 	else if (uniphy_index == SSDK_UNIPHY_INSTANCE2)
 		port_id = HPPE_MUX_PORT2;
+	else if (uniphy_index == SSDK_UNIPHY_INSTANCE0)
+		port_id = SSDK_PHYSICAL_PORT1;
 	adpt_hppe_gcc_port_speed_clock_set(dev_id, port_id, FAL_SPEED_10000);
 
 	/* enable instance clock */

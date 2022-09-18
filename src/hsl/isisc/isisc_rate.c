@@ -351,6 +351,27 @@ _isisc_rate_hw_to_sw(a_uint32_t dev_id, fal_traffic_unit_t meter_unit,
     }
 }
 
+static void
+_isisc_rate_drop_set(a_uint32_t dev_id, a_bool_t c_enable, a_bool_t e_enable)
+{
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+        sw_error_t rv;
+        a_uint32_t val = 0;
+        HSL_REG_ENTRY_GET (rv, dev_id, QM_CTRL_REG, 0,
+            (a_uint8_t *) (&val), sizeof (a_uint32_t));
+        if ((A_TRUE == c_enable) || (A_TRUE == e_enable)) {
+            SW_SET_REG_BY_FIELD (QM_CTRL_REG, RATE_DROP_EN, A_TRUE, val);
+        } else if ((A_FALSE == c_enable) && (A_FALSE == e_enable)) {
+            SW_SET_REG_BY_FIELD (QM_CTRL_REG, RATE_DROP_EN, A_FALSE, val);
+        }
+        HSL_REG_ENTRY_SET (rv, dev_id, QM_CTRL_REG, 0,
+            (a_uint8_t *) (&val), sizeof (a_uint32_t));
+    }
+#endif
+    return;
+}
+
 static sw_error_t
 _isisc_rate_port_policer_set(a_uint32_t dev_id, fal_port_t port_id,
                             fal_port_policer_t * policer)
@@ -454,6 +475,9 @@ _isisc_rate_port_policer_set(a_uint32_t dev_id, fal_port_t port_id,
 
     HSL_REG_ENTRY_SET(rv, dev_id, INGRESS_POLICER2, port_id,
                       (a_uint8_t *) (&data[2]), sizeof (a_uint32_t));
+
+    _isisc_rate_drop_set(dev_id, policer->c_enable, policer->e_enable);
+
     return rv;
 }
 

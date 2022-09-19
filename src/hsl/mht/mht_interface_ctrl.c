@@ -419,6 +419,10 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	SSDK_DEBUG("reset xpcs\n");
 	rv = ssdk_mht_clk_assert(dev_id, MHT_UNIPHY_XPCS_RST);
 	SW_RTN_ON_ERROR (rv);
+	/*fix PLL unlock issue with high temperature*/
+	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr, MHT_UNIPHY_PLL_LOOP_CONTROL,
+		MHT_UPHY_PLL_CML2CMS_IBSEL, MHT_UPHY_PLL_CML2CMS_IBSEL);
+	SW_RTN_ON_ERROR (rv);
 	/*select xpcs mode*/
 	SSDK_DEBUG("select xpcs mode\n");
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
@@ -635,6 +639,10 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_RX, raw_clk);
 		ssdk_mht_uniphy_raw_clock_set(dev_id, MHT_P_UNIPHY0_TX, raw_clk);
 	}
+	/*fix PLL unlock issue with high temperature*/
+	rv = qca808x_phy_modify_mii(dev_id, uniphy_addr, MHT_UNIPHY_PLL_LOOP_CONTROL,
+		MHT_UPHY_PLL_CML2CMS_IBSEL, MHT_UPHY_PLL_CML2CMS_IBSEL);
+	SW_RTN_ON_ERROR (rv);
 	/*configure SGMII mode or SGMII+ mode*/
 	rv = qca808x_phy_modify_mmd(dev_id, uniphy_addr, MHT_UNIPHY_MMD1,
 		MHT_UNIPHY_MMD1_MODE_CTRL, MHT_UNIPHY_MMD1_SGMII_MODE_CTRL_MASK,

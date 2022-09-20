@@ -161,6 +161,7 @@ hppe_ipv6_udf3_ctrl_reg_set(
 		a_uint32_t dev_id,
 		union udf_ctrl_reg_u *value);
 
+#if 0
 sw_error_t
 hppe_non_ip_udf0_ctrl_reg_udf0_base_get(
 		a_uint32_t dev_id,
@@ -400,6 +401,7 @@ sw_error_t
 hppe_ipv6_udf3_ctrl_reg_udf3_offset_set(
 		a_uint32_t dev_id,
 		unsigned int value);
+#endif
 
 sw_error_t
 hppe_ipo_rule_reg_get(
@@ -461,6 +463,7 @@ hppe_rule_ext_4_reg_set(
 		a_uint32_t index,
 		union rule_ext_4_reg_u *value);
 
+#if 0
 sw_error_t
 hppe_ipo_dbg_addr_reg_get(
 		a_uint32_t dev_id,
@@ -520,6 +523,7 @@ sw_error_t
 hppe_ipo_glb_bypass_counter_reg_set(
 		a_uint32_t dev_id,
 		union ipo_glb_bypass_counter_reg_u *value);
+#endif
 
 sw_error_t
 hppe_ipo_cnt_tbl_get(
@@ -533,6 +537,7 @@ hppe_ipo_cnt_tbl_set(
 		a_uint32_t index,
 		union ipo_cnt_tbl_u *value);
 
+#if 0
 sw_error_t
 hppe_ipo_cnt_tbl_hit_byte_cnt_get(
 		a_uint32_t dev_id,
@@ -640,6 +645,7 @@ hppe_rule_ext_4_reg_ext8_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 sw_error_t
 hppe_ipo_action_get(
@@ -652,6 +658,5 @@ hppe_ipo_action_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union ipo_action_u *value);
-
 #endif
 

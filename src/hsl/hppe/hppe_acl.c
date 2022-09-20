@@ -290,6 +290,7 @@ hppe_ipv6_udf3_ctrl_reg_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 hppe_non_ip_udf0_ctrl_reg_udf0_base_get(
 		a_uint32_t dev_id,
@@ -985,6 +986,7 @@ hppe_ipv6_udf3_ctrl_reg_udf3_offset_set(
 	ret = hppe_ipv6_udf3_ctrl_reg_set(dev_id, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_ipo_rule_reg_get(
@@ -1126,6 +1128,7 @@ hppe_rule_ext_4_reg_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 hppe_ipo_dbg_addr_reg_get(
 		a_uint32_t dev_id,
@@ -1462,6 +1465,7 @@ hppe_rule_ext_4_reg_ext8_set(
 	ret = hppe_rule_ext_4_reg_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_ipo_cnt_tbl_get(
@@ -1491,6 +1495,7 @@ hppe_ipo_cnt_tbl_set(
 				3);
 }
 
+#if 0
 sw_error_t
 hppe_ipo_cnt_tbl_hit_byte_cnt_get(
 		a_uint32_t dev_id,
@@ -1554,7 +1559,7 @@ hppe_ipo_cnt_tbl_hit_pkt_cnt_set(
 	ret = hppe_ipo_cnt_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 
 sw_error_t
 hppe_ipo_action_get(

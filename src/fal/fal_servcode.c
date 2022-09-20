@@ -127,6 +127,38 @@ _fal_port_servcode_get(a_uint32_t dev_id, fal_port_t port_id,
 }
 
 sw_error_t
+_fal_servcode_athtag_set(a_uint32_t dev_id, a_uint32_t servcode_index,
+			fal_servcode_athtag_t *entry)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_servcode_athtag_set)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_servcode_athtag_set(dev_id, servcode_index, entry);
+    return rv;
+}
+
+sw_error_t
+_fal_servcode_athtag_get(a_uint32_t dev_id, a_uint32_t servcode_index,
+			fal_servcode_athtag_t *entry)
+{
+    sw_error_t rv;
+    adpt_api_t *p_api;
+
+    SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+    if (NULL == p_api->adpt_servcode_athtag_get)
+        return SW_NOT_SUPPORTED;
+
+    rv = p_api->adpt_servcode_athtag_get(dev_id, servcode_index, entry);
+    return rv;
+}
+
+sw_error_t
 fal_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_index,
 			fal_servcode_config_t *entry)
 {
@@ -196,9 +228,35 @@ fal_port_servcode_get(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 
+sw_error_t
+fal_servcode_athtag_set(a_uint32_t dev_id, a_uint32_t servcode_index,
+			fal_servcode_athtag_t *entry)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_SERVCODE_API_LOCK;
+    rv = _fal_servcode_athtag_set(dev_id, servcode_index, entry);
+    FAL_SERVCODE_API_UNLOCK;
+    return rv;
+}
+
+sw_error_t
+fal_servcode_athtag_get(a_uint32_t dev_id, a_uint32_t servcode_index,
+			fal_servcode_athtag_t *entry)
+{
+    sw_error_t rv = SW_OK;
+
+    FAL_SERVCODE_API_LOCK;
+    rv = _fal_servcode_athtag_get(dev_id, servcode_index, entry);
+    FAL_SERVCODE_API_UNLOCK;
+    return rv;
+}
+
 EXPORT_SYMBOL(fal_servcode_config_set);
 EXPORT_SYMBOL(fal_servcode_config_get);
 EXPORT_SYMBOL(fal_servcode_loopcheck_en);
 EXPORT_SYMBOL(fal_servcode_loopcheck_status_get);
 EXPORT_SYMBOL(fal_port_servcode_set);
 EXPORT_SYMBOL(fal_port_servcode_get);
+EXPORT_SYMBOL(fal_servcode_athtag_set);
+EXPORT_SYMBOL(fal_servcode_athtag_get);

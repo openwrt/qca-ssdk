@@ -67,14 +67,21 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	service_tbl.bf.rx_counting_en = entry->bypass_bitmap[2] & 0x1;
 	SW_RTN_ON_ERROR(hppe_service_tbl_set(dev_id, servcode_index, &service_tbl));
 
+#if defined(MPPE)
+	/*do not touch the athtag configurations*/
+	SW_RTN_ON_ERROR(hppe_eg_service_tbl_get(dev_id, servcode_index, &eg_service_tbl));
+	eg_service_tbl.bf.field_update_action &= ATHTAG_UPDATE;
+	eg_service_tbl.bf.field_update_action |= entry->field_update_bitmap;
+#else
 	eg_service_tbl.bf.field_update_action = entry->field_update_bitmap;
+#endif
 	eg_service_tbl.bf.next_service_code = entry->next_service_code;
 	eg_service_tbl.bf.hw_services = entry->hw_services;
 	eg_service_tbl.bf.offset_sel = entry->offset_sel;
 	eg_service_tbl.bf.tx_counting_en = (entry->bypass_bitmap[2] >> 2) & 0x1;
 	SW_RTN_ON_ERROR(hppe_eg_service_tbl_set(dev_id, servcode_index, &eg_service_tbl));
 
-#if defined (APPE)
+#if defined(APPE)
 	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_set(dev_id, servcode_index, entry));
@@ -161,6 +168,8 @@ void adpt_hppe_servcode_func_bitmap_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_servcode_func_bitmap |= ((1<<FUNC_PORT_SERVCODE_SET) |
 						(1<<FUNC_PORT_SERVCODE_GET));
+		p_adpt_api->adpt_servcode_func_bitmap |= ((1<<FUNC_SERVCODE_ATHTAG_SET) |
+						(1<<FUNC_SERVCODE_ATHTAG_GET));
 	}
 #endif
 
@@ -178,6 +187,8 @@ static void adpt_hppe_servcode_func_unregister(a_uint32_t dev_id, adpt_api_t *p_
 	p_adpt_api->adpt_servcode_loopcheck_status_get = NULL;
 	p_adpt_api->adpt_port_servcode_set = NULL;
 	p_adpt_api->adpt_port_servcode_get = NULL;
+	p_adpt_api->adpt_servcode_athtag_set = NULL;
+	p_adpt_api->adpt_servcode_athtag_get = NULL;
 
 	return;
 }
@@ -208,6 +219,10 @@ sw_error_t adpt_hppe_servcode_init(a_uint32_t dev_id)
 			p_adpt_api->adpt_port_servcode_set = adpt_mppe_port_servcode_set;
 		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_PORT_SERVCODE_GET))
 			p_adpt_api->adpt_port_servcode_get = adpt_mppe_port_servcode_get;
+		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_ATHTAG_SET))
+			p_adpt_api->adpt_servcode_athtag_set = adpt_mppe_servcode_athtag_set;
+		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_ATHTAG_GET))
+			p_adpt_api->adpt_servcode_athtag_get = adpt_mppe_servcode_athtag_get;
 	}
 #endif
 

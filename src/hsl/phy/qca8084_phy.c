@@ -143,6 +143,26 @@ qca8084_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	return SW_OK;
 }
 
+sw_error_t
+qca8084_phy_fifo_reset(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint16_t phy_data = 0;
+
+	phy_data = qca808x_phy_reg_read (dev_id, phy_addr, QCA8084_PHY_FIFO_CONTROL);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if(enable)
+		phy_data &= ~QCA8084_PHY_FIFO_RESET;
+	else
+		phy_data |= QCA8084_PHY_FIFO_RESET;
+
+	rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA8084_PHY_FIFO_CONTROL,
+		phy_data);
+
+	return rv;
+}
+
 static sw_error_t
 _qca8084_phy_interface_mode_fixup(a_uint32_t dev_id, a_uint32_t phy_id,
 	fal_port_speed_t speed)
@@ -441,21 +461,14 @@ static sw_error_t
 qca8084_phy_function_reset(a_uint32_t dev_id, a_uint32_t phy_id,
 	hsl_phy_function_reset_t phy_reset_type)
 {
-	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	phy_data = qca808x_phy_reg_read (dev_id, phy_id, QCA8084_PHY_FIFO_CONTROL);
-	PHY_RTN_ON_READ_ERROR(phy_data);
-
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA8084_PHY_FIFO_CONTROL,
-		phy_data & (~QCA8084_PHY_FIFO_RESET));
+	rv = qca8084_phy_fifo_reset(dev_id, phy_id, A_TRUE);
 	SW_RTN_ON_ERROR(rv);
 
 	aos_mdelay(50);
 
-	rv = qca808x_phy_reg_write(dev_id, phy_id, QCA8084_PHY_FIFO_CONTROL,
-	phy_data | QCA8084_PHY_FIFO_RESET);
-	SW_RTN_ON_ERROR(rv);
+	rv = qca8084_phy_fifo_reset(dev_id, phy_id, A_FALSE);
 
 	return rv;
 }
@@ -491,6 +504,9 @@ _qca8084_phy_uqxgmii_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	rv = ssdk_mht_port_clk_en_set(dev_id, mht_port_id,
 		MHT_CLK_TYPE_UNIPHY|MHT_CLK_TYPE_EPHY, port_clock_en);
 	SW_RTN_ON_ERROR(rv);
+	/*delay 100ms after enable/disable clock*/
+	SSDK_DEBUG("delay 100ms after enable/disable clock\n");
+	aos_mdelay(100);
 	/*GMII/XGMII interface and ETHPHY GMII interface reset and release*/
 	SSDK_DEBUG("UNIPHY GMII/XGMII interface and ETHPHY GMII interface reset and release\n");
 	rv = ssdk_mht_port_clk_reset(dev_id, mht_port_id, MHT_CLK_TYPE_UNIPHY|MHT_CLK_TYPE_EPHY);
@@ -501,8 +517,16 @@ _qca8084_phy_uqxgmii_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	SW_RTN_ON_ERROR(rv);
 	/*do ethphy function reset*/
 	SSDK_DEBUG("do ethphy function reset\n");
-	rv = qca8084_phy_function_reset(dev_id, phy_addr, PHY_FIFO_RESET);
-	SW_RTN_ON_ERROR(rv);
+	if(link)
+	{
+		rv = qca8084_phy_function_reset(dev_id, phy_addr, PHY_FIFO_RESET);
+		SW_RTN_ON_ERROR(rv);
+	}
+	else
+	{
+		rv = qca8084_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+	}
 	/*change IPG from 10 to 11 for 1G speed*/
 	rv = qca8084_phy_ipg_config(dev_id, phy_addr, new_speed);
 

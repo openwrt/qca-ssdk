@@ -115,3 +115,5 @@ qca8084_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_id);
 sw_error_t
 qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct port_phy_status *phy_status);
+sw_error_t
+qca8084_phy_fifo_reset(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);

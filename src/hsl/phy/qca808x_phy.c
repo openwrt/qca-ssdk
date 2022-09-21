@@ -1335,6 +1335,14 @@ sw_error_t qca808x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 /*qca808x_end*/
 	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
 	SW_RTN_ON_ERROR(rv);
+#ifdef MHT
+	/*before autoneg restart, need to reset fifo to avoid garbage signal*/
+	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
+	{
+		rv = qca8084_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
 /*qca808x_start*/
 
 	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_PHY_CONTROL);

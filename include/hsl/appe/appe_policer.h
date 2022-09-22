@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -29,6 +31,7 @@ appe_in_meter_head_reg_set(
 		a_uint32_t dev_id,
 		union in_meter_head_reg_u *value);
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 appe_dscp_remap_tbl_get(
 		a_uint32_t dev_id,
@@ -238,5 +241,6 @@ appe_in_acl_meter_cfg_tbl_nxt_ptr_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 #endif
 

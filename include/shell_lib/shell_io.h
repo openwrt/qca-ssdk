@@ -290,8 +290,10 @@ cmd_data_check_sec_icmp4(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
 sw_error_t
 cmd_data_check_sec_icmp6(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size);
 #ifdef HPPE
+#ifndef IN_SEC_MINI
 sw_error_t
 cmd_data_check_l3_parser(char *cmd_str, void * val, a_uint32_t size);
+#endif
 
 sw_error_t
 cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size);
@@ -300,6 +302,7 @@ sw_error_t
 cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
 #endif
 
+#ifndef IN_SEC_MINI
 sw_error_t
 cmd_data_check_l2_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
 
@@ -308,6 +311,7 @@ cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size);
+#endif
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI
@@ -464,11 +468,13 @@ sw_error_t
 cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size);
 
 #if defined(APPE)
+#ifndef IN_POLICER_MINI
 sw_error_t
 cmd_data_check_policer_remap(char *cmd_str, void * val, a_uint32_t size);
 
 sw_error_t
 cmd_data_check_policer_priority(char *cmd_str, void * val, a_uint32_t size);
+#endif
 
 sw_error_t
 cmd_data_check_policer_ctrl(char *cmd_str, void * val, a_uint32_t size);

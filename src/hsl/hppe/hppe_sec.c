@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -22,6 +25,7 @@
 #include "hppe_reg_access.h"
 #include "hppe_sec_reg.h"
 #include "hppe_sec.h"
+
 
 sw_error_t
 hppe_l3_exception_cmd_get(
@@ -191,6 +195,95 @@ hppe_l3_exp_multicast_ctrl_set(
 				value->val);
 }
 
+sw_error_t
+hppe_l4_exception_parsing_ctrl_0_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_0_reg_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_0_REG_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_0_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_0_reg_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_0_REG_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_1_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_1_reg_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_1_REG_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_1_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_1_reg_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_1_REG_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_2_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_2_reg_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_2_REG_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_2_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_2_reg_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_2_REG_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_3_reg_get(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_3_reg_u *value)
+{
+	return hppe_reg_get(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_3_REG_ADDRESS,
+				&value->val);
+}
+
+sw_error_t
+hppe_l4_exception_parsing_ctrl_3_reg_set(
+		a_uint32_t dev_id,
+		union l4_exception_parsing_ctrl_3_reg_u *value)
+{
+	return hppe_reg_set(
+				dev_id,
+				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_3_REG_ADDRESS,
+				value->val);
+}
+
+#ifndef IN_SEC_MINI
 sw_error_t
 hppe_l3_exception_cmd_l3_excep_cmd_get(
 		a_uint32_t dev_id,
@@ -427,94 +520,6 @@ hppe_l3_exception_parsing_ctrl_reg_set(
 	return hppe_reg_set(
 				dev_id,
 				IPR_CSR_BASE_ADDR + L3_EXCEPTION_PARSING_CTRL_REG_ADDRESS,
-				value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_0_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_0_reg_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_0_REG_ADDRESS,
-				&value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_0_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_0_reg_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_0_REG_ADDRESS,
-				value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_1_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_1_reg_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_1_REG_ADDRESS,
-				&value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_1_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_1_reg_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_1_REG_ADDRESS,
-				value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_2_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_2_reg_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_2_REG_ADDRESS,
-				&value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_2_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_2_reg_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_2_REG_ADDRESS,
-				value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_3_reg_get(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_3_reg_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_3_REG_ADDRESS,
-				&value->val);
-}
-
-sw_error_t
-hppe_l4_exception_parsing_ctrl_3_reg_set(
-		a_uint32_t dev_id,
-		union l4_exception_parsing_ctrl_3_reg_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				IPR_CSR_BASE_ADDR + L4_EXCEPTION_PARSING_CTRL_3_REG_ADDRESS,
 				value->val);
 }
 
@@ -1038,4 +1043,5 @@ hppe_l4_exception_parsing_ctrl_3_reg_tcp_flags7_mask_set(
 	ret = hppe_l4_exception_parsing_ctrl_3_reg_set(dev_id, &reg_val);
 	return ret;
 }
+#endif
 

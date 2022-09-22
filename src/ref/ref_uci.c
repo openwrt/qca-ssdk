@@ -5257,6 +5257,7 @@ parse_sec_expctrl(struct switch_val *val)
 	return rv;
 }
 
+#ifndef IN_SEC_MINI
 static int
 parse_sec_l3parser(struct switch_val *val)
 {
@@ -5285,6 +5286,7 @@ parse_sec_l3parser(struct switch_val *val)
 
 	return rv;
 }
+#endif
 
 static int
 parse_sec_l4parser(struct switch_val *val)
@@ -5344,6 +5346,7 @@ parse_sec_l4parser(struct switch_val *val)
 }
 #endif
 #ifdef APPE
+#ifndef IN_SEC_MINI
 static int
 parse_sec_l2expctrl(struct switch_val *val)
 {
@@ -5536,6 +5539,7 @@ parse_sec_tunnelflagsparser(struct switch_val *val)
 
 	return rv;
 }
+#endif
 #endif
 #endif
 
@@ -11206,7 +11210,7 @@ parse_policer_portentry(struct switch_val *val)
 #endif
 		else if(!strcmp(ext_value_p->option_name, "ebs")) {
 			val_ptr[14] = (char*)ext_value_p->option_value;
-		} 
+		}
 #if defined(APPE)
 		else if(!strcmp(ext_value_p->option_name, "next_ptr")) {
 			val_ptr[15] = (char*)ext_value_p->option_value;
@@ -11450,6 +11454,7 @@ parse_policer_bypass(struct switch_val *val)
 }
 
 #ifdef APPE
+#ifndef IN_POLICER_MINI
 static int
 parse_policer_priremap(struct switch_val *val)
 {
@@ -11513,6 +11518,7 @@ parse_policer_ctrl(struct switch_val *val)
 
 	return rv;
 }
+#endif
 #endif
 
 #endif
@@ -12439,12 +12445,15 @@ parse_sec(const char *command_name, struct switch_val *val)
 #ifdef HPPE
 	} else if (!strcmp(command_name, "Expctrl")) {
 		rv = parse_sec_expctrl(val);
+#ifndef IN_SEC_MINI
 	} else if (!strcmp(command_name, "L3parser")) {
 		rv = parse_sec_l3parser(val);
+#endif
 	} else if (!strcmp(command_name, "L4parser")) {
 		rv = parse_sec_l4parser(val);
 #endif
 #ifdef APPE
+#ifndef IN_SEC_MINI
 	} else if (!strcmp(command_name, "L2expctrl")) {
 		rv = parse_sec_l2expctrl(val);
 	} else if (!strcmp(command_name, "Tunnelexpctrl")) {
@@ -12455,6 +12464,7 @@ parse_sec(const char *command_name, struct switch_val *val)
 		rv = parse_sec_tunnell4parser(val);
 	} else if (!strcmp(command_name, "Tunnelflagsparser")) {
 		rv = parse_sec_tunnelflagsparser(val);
+#endif
 #endif
 	}
 
@@ -12909,11 +12919,13 @@ parse_policer(const char *command_name, struct switch_val *val)
 		rv = parse_policer_bypass(val);
 	}
 #if defined(APPE)
+#ifndef IN_POLICER_MINI
 	else if(!strcmp(command_name, "Priremap")) {
 		rv = parse_policer_priremap(val);
 	} else if(!strcmp(command_name, "Ctrl")) {
 		rv = parse_policer_ctrl(val);
 	}
+#endif
 #endif
 	return rv;
 }

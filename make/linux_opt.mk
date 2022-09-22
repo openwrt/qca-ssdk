@@ -129,6 +129,10 @@ ifeq (TRUE, $(IN_SEC))
   MODULE_CFLAG += -DIN_SEC
 endif
 
+ifeq (TRUE, $(IN_SEC_MINI))
+  MODULE_CFLAG += -DIN_SEC_MINI
+endif
+
 ifeq (TRUE, $(IN_QM))
   MODULE_CFLAG += -DIN_QM
 endif

@@ -734,13 +734,17 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_SEC_ICMP4, cmd_data_check_sec_icmp4, NULL),
     SW_TYPE_DEF(SW_SEC_ICMP6, cmd_data_check_sec_icmp6, NULL),
 #ifdef HPPE
+#ifndef IN_SEC_MINI
     SW_TYPE_DEF(SW_L3_PARSER, (param_check_t)cmd_data_check_l3_parser, NULL),
+#endif
     SW_TYPE_DEF(SW_L4_PARSER, (param_check_t)cmd_data_check_l4_parser, NULL),
     SW_TYPE_DEF(SW_EXP_CTRL, (param_check_t)cmd_data_check_exp_ctrl, NULL),
 #endif
+#ifndef IN_SEC_MINI
     SW_TYPE_DEF(SW_L2_EXP_CTRL, (param_check_t)cmd_data_check_l2_exp_ctrl, NULL),
     SW_TYPE_DEF(SW_TUNNEL_EXP_CTRL, (param_check_t)cmd_data_check_tunnel_exp_ctrl, NULL),
     SW_TYPE_DEF(SW_TUNNEL_FLAGS_PARSER, (param_check_t)cmd_data_check_tunnel_flags_parser, NULL),
+#endif
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI
@@ -842,8 +846,10 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_POLICER_PORT_CONFIG, (param_check_t)cmd_data_check_port_policer_config, NULL),
     SW_TYPE_DEF(SW_POLICER_CMD_CONFIG, (param_check_t)cmd_data_check_policer_cmd_config, NULL),
 #if defined(APPE)
+#ifndef IN_POLICER_MINI
     SW_TYPE_DEF(SW_POLICER_REMAP, (param_check_t)cmd_data_check_policer_remap, NULL),
     SW_TYPE_DEF(SW_POLICER_PRIORITY, (param_check_t)cmd_data_check_policer_priority, NULL),
+#endif
     SW_TYPE_DEF(SW_POLICER_CTRL, (param_check_t)cmd_data_check_policer_ctrl, NULL),
 #endif
 #endif
@@ -8128,6 +8134,7 @@ cmd_data_check_sec_icmp6(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
     return SW_OK;
 }
 #ifdef HPPE
+#ifndef IN_SEC_MINI
 sw_error_t
 cmd_data_check_l3_parser(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -8190,6 +8197,7 @@ cmd_data_check_l3_parser(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 
 }
+#endif
 
 sw_error_t
 cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
@@ -8784,6 +8792,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
     return SW_OK;
 }
 #endif
+
+#ifndef IN_SEC_MINI
 sw_error_t
 cmd_data_check_l2_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -9030,6 +9040,7 @@ cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
     *(fal_tunnel_flags_excep_parser_ctrl_t *)val = entry;
     return SW_OK;
 }
+#endif
 #endif
 #ifdef IN_COSMAP
 #ifndef IN_COSMAP_MINI
@@ -15594,6 +15605,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
 }
 
 #if defined(APPE)
+#ifndef IN_POLICER_MINI
 sw_error_t
 cmd_data_check_policer_remap(char *cmd_str, void * val, a_uint32_t size)
 {
@@ -15725,6 +15737,7 @@ cmd_data_check_policer_priority(char *cmd_str, void * val, a_uint32_t size)
     *(fal_policer_priority_t *)val = entry;
     return SW_OK;
 }
+#endif
 
 sw_error_t
 cmd_data_check_policer_ctrl(char *cmd_str, void * val, a_uint32_t size)

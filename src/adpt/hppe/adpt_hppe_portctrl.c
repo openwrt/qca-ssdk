@@ -6006,7 +6006,9 @@ void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 		(1<< (FUNC_ADPT_PORT_MTU_CFG_SET% 32))|
 		(1<< (FUNC_ADPT_PORT_MTU_CFG_GET% 32)) |
 		(1<< (FUNC_ADPT_PORT_MRU_MTU_SET% 32)) |
-		(1<< (FUNC_ADPT_PORT_MRU_MTU_GET% 32)));
+		(1<< (FUNC_ADPT_PORT_MRU_MTU_GET% 32)) |
+		(1<< (FUNC_ADPT_PORT_TX_BUFF_THRESH_SET% 32)) |
+		(1<< (FUNC_ADPT_PORT_TX_BUFF_THRESH_GET% 32)));
 
 	return;
 
@@ -6098,6 +6100,8 @@ static void adpt_hppe_port_ctrl_func_unregister(a_uint32_t dev_id, adpt_api_t *p
 	p_adpt_api->adpt_port_mtu_cfg_get = NULL;
 	p_adpt_api->adpt_port_mru_mtu_set = NULL;
 	p_adpt_api->adpt_port_mru_mtu_get = NULL;
+	p_adpt_api->adpt_port_tx_buff_thresh_set = NULL;
+	p_adpt_api->adpt_port_tx_buff_thresh_get = NULL;
 
 	return;
 
@@ -6483,6 +6487,18 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 			(1 << (FUNC_ADPT_PORT_MTU_CFG_GET% 32)))
 		{
 			p_adpt_api->adpt_port_mtu_cfg_get = adpt_appe_port_mtu_cfg_get;
+		}
+		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_TX_BUFF_THRESH_SET % 32)))
+		{
+			p_adpt_api->adpt_port_tx_buff_thresh_set =
+				adpt_appe_port_tx_buff_thresh_set;
+		}
+		if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_TX_BUFF_THRESH_GET % 32)))
+		{
+			p_adpt_api->adpt_port_tx_buff_thresh_get =
+				adpt_appe_port_tx_buff_thresh_get;
 		}
 	}
 #endif

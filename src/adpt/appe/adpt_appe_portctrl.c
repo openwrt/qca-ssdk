@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -384,5 +385,46 @@ adpt_appe_port_rx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 	rv = appe_port_rx_cnt_tbl_set(dev_id, port_value, &vport_rx_cnt_tbl);
 	SW_RTN_ON_ERROR(rv);
 
+	return rv;
+}
+
+sw_error_t adpt_appe_port_tx_buff_thresh_get(a_uint32_t dev_id,
+		a_uint32_t port, a_uint16_t *on_thresh, a_uint16_t *off_thresh)
+{
+	sw_error_t rv = SW_OK;
+	union tx_buff_thrsh_u tx_thresh;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(on_thresh);
+	ADPT_NULL_POINT_CHECK(off_thresh);
+
+	memset(&tx_thresh, 0, sizeof(union tx_buff_thrsh_u));
+
+	rv = appe_tx_buff_thrsh_get(dev_id, port, &tx_thresh);
+	SW_RTN_ON_ERROR(rv);
+
+	*on_thresh = tx_thresh.bf.xon;
+	*off_thresh = tx_thresh.bf.xoff;
+
+	return rv;
+}
+
+sw_error_t adpt_appe_port_tx_buff_thresh_set(a_uint32_t dev_id,
+		a_uint32_t port, a_uint16_t on_thresh, a_uint16_t off_thresh)
+{
+	sw_error_t rv = SW_OK;
+	union tx_buff_thrsh_u tx_thresh;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	memset(&tx_thresh, 0, sizeof(union tx_buff_thrsh_u));
+
+	rv = appe_tx_buff_thrsh_get(dev_id, port, &tx_thresh);
+	SW_RTN_ON_ERROR(rv);
+
+	tx_thresh.bf.xon = on_thresh;
+	tx_thresh.bf.xoff = off_thresh;
+
+	rv = appe_tx_buff_thrsh_set(dev_id, port, &tx_thresh);
 	return rv;
 }

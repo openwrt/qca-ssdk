@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -38,5 +39,37 @@ appe_port_mux_ctrl_set(
 	return hppe_reg_set(
 				dev_id,
 				NSS_GLOBAL_BASE_ADDR + SWITCH_PORT_MUX_CTRL_ADDRESS,
+				value->val);
+}
+
+sw_error_t
+appe_tx_buff_thrsh_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tx_buff_thrsh_u *value)
+{
+	if (index >= TX_BUFF_THRSH_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	return hppe_reg_get(
+				dev_id,
+				NSS_PTX_CSR_BASE_ADDR + TX_BUFF_THRSH_ADDRESS + \
+				index * TX_BUFF_THRSH_INC,
+				&value->val);
+}
+
+sw_error_t
+appe_tx_buff_thrsh_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union tx_buff_thrsh_u *value)
+{
+	if (index >= TX_BUFF_THRSH_MAX_ENTRY)
+		return SW_OUT_OF_RANGE;
+
+	return hppe_reg_set(
+				dev_id,
+				NSS_PTX_CSR_BASE_ADDR + TX_BUFF_THRSH_ADDRESS + \
+				index * TX_BUFF_THRSH_INC,
 				value->val);
 }

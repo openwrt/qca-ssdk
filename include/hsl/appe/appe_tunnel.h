@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -31,7 +31,6 @@
 #define TL_TBL_MAX_ENTRY		128
 #define EG_PROTO_MAPPING0_MAX_ENTRY	2
 #define EG_PROTO_MAPPING1_MAX_ENTRY	2
-#define TX_BUFF_THRSH_MAX_ENTRY		8
 #define EG_HEADER_DATA_MAX_ENTRY	128
 #define EG_XLAT_TUN_CTRL_MAX_ENTRY	128
 #define EG_EDIT_RULE_MAX_ENTRY		16
@@ -643,18 +642,6 @@ sw_error_t
 appe_dbg_data_get(
 		a_uint32_t dev_id,
 		union dbg_data_u *value);
-
-sw_error_t
-appe_tx_buff_thrsh_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union tx_buff_thrsh_u *value);
-
-sw_error_t
-appe_tx_buff_thrsh_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union tx_buff_thrsh_u *value);
 
 sw_error_t
 appe_eg_header_data_get(

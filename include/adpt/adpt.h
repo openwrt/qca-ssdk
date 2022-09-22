@@ -358,6 +358,10 @@ typedef sw_error_t (*adpt_port_cnt_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_port_cnt_t *port_cnt);
 typedef sw_error_t (*adpt_port_cnt_flush_func)(a_uint32_t dev_id,
 		fal_port_t port_id);
+typedef sw_error_t (*adpt_port_tx_buff_thresh_set_func)(a_uint32_t dev_id,
+		a_uint32_t port, a_uint16_t on_thresh, a_uint16_t off_thresh);
+typedef sw_error_t (*adpt_port_tx_buff_thresh_get_func)(a_uint32_t dev_id,
+		a_uint32_t port, a_uint16_t *on_thresh, a_uint16_t *off_thresh);
 
 // mirror
 typedef sw_error_t (*adpt_mirr_port_in_set_func)(a_uint32_t dev_id, fal_port_t port_id,
@@ -1624,6 +1628,8 @@ typedef struct
 	adpt_port_mtu_cfg_get_func adpt_port_mtu_cfg_get;
 	adpt_port_mru_mtu_set_func adpt_port_mru_mtu_set;
 	adpt_port_mru_mtu_get_func adpt_port_mru_mtu_get;
+	adpt_port_tx_buff_thresh_set_func adpt_port_tx_buff_thresh_set;
+	adpt_port_tx_buff_thresh_get_func adpt_port_tx_buff_thresh_get;
 // mirror
 	a_uint32_t adpt_mirror_func_bitmap;
 	adpt_mirr_port_in_set_func adpt_mirr_port_in_set;

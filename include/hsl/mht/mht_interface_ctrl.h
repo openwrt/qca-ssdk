@@ -18,10 +18,12 @@
 #define MHT_UNIPHY_XPCS                                                  2
 /*UNIPHY MII registers*/
 #define MHT_UNIPHY_PLL_POWER_ON_AND_RESET                                0
+#define MHT_UNIPHY_PLL_LOOP_CONTROL                                      6
 
 /*UNIPHY MII register field*/
 #define MHT_UNIPHY_ANA_SOFT_RESET                                        0
 #define MHT_UNIPHY_ANA_SOFT_RELEASE                                      0x40
+#define MHT_UPHY_PLL_CML2CMS_IBSEL                                       0x30
 
 /*UNIPHY MMD*/
 #define MHT_UNIPHY_MMD1                                                  0x1

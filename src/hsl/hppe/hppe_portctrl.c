@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -477,7 +479,6 @@ hppe_drop_stat_get(
 				3);
 }
 
-#ifndef IN_MISC_MINI
 sw_error_t
 hppe_drop_stat_set(
 		a_uint32_t dev_id,
@@ -491,7 +492,6 @@ hppe_drop_stat_set(
 				value->val,
 				3);
 }
-#endif
 
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
@@ -2806,7 +2806,6 @@ hppe_port_in_forward_source_filtering_bypass_set(
 }
 #endif
 
-#ifndef IN_MISC_MINI
 sw_error_t
 hppe_drop_stat_bytes_get(
 		a_uint32_t dev_id,
@@ -2870,7 +2869,6 @@ hppe_drop_stat_pkts_set(
 	ret = hppe_drop_stat_set(dev_id, index, &reg_val);
 	return ret;
 }
-#endif
 
 sw_error_t
 hppe_port_tx_counter_tbl_reg_get(
@@ -2939,6 +2937,7 @@ hppe_epe_dbg_in_cnt_reg_get(
 				NSS_PTX_CSR_BASE_ADDR + EPE_DBG_IN_CNT_REG_ADDRESS,
 				&value->val);
 }
+#endif
 
 sw_error_t
 hppe_epe_dbg_in_cnt_reg_set(
@@ -2961,7 +2960,6 @@ hppe_epe_dbg_out_cnt_reg_set(
 				NSS_PTX_CSR_BASE_ADDR + EPE_DBG_OUT_CNT_REG_ADDRESS,
 				value->val);
 }
-#endif
 
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
@@ -3292,7 +3290,6 @@ hppe_lpi_cnt_set(
 }
 #endif
 
-#ifndef IN_MISC_MINI
 sw_error_t
 hppe_drop_cnt_get(
 		a_uint32_t dev_id,
@@ -3528,7 +3525,7 @@ hppe_ipr_byte_high_reg_bytes_set(
 	ret = hppe_ipr_byte_high_reg_set(dev_id, index, &reg_val);
 	return ret;
 }
-#endif
+
 #ifdef APPE
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t

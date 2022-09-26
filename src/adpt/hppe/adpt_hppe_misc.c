@@ -34,7 +34,6 @@
 #include "appe_counter.h"
 #endif
 
-#ifndef IN_MISC_MINI
 char *cpucode[] = {
 "Forwarding to CPU",
 "Unkown L2 protocol exception redirect/copy to CPU",
@@ -1218,7 +1217,7 @@ adpt_hppe_debug_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 #endif
 	return SW_OK;
 }
-#endif
+
 sw_error_t adpt_hppe_misc_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -1229,10 +1228,9 @@ sw_error_t adpt_hppe_misc_init(a_uint32_t dev_id)
 		return SW_FAIL;
 	}
 
-#ifndef IN_MISC_MINI
 	p_adpt_api->adpt_debug_counter_set = adpt_hppe_debug_counter_set;
 	p_adpt_api->adpt_debug_counter_get = adpt_hppe_debug_counter_get;
-#endif
+
 	return SW_OK;
 }
 

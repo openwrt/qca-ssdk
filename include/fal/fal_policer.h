@@ -153,11 +153,9 @@ typedef enum {
 	FAL_FRAME_DROPPED = 0,
 } fal_policer_frame_type_t;
 
-#ifndef IN_POLICER_MINI
 sw_error_t
 fal_port_policer_entry_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_policer_config_t *policer, fal_policer_action_t *atcion);
-#endif
 
 sw_error_t
 fal_port_policer_entry_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -167,11 +165,11 @@ sw_error_t
 fal_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 		fal_policer_config_t *policer, fal_policer_action_t *action);
 
-#ifndef IN_POLICER_MINI
 sw_error_t
 fal_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 		fal_policer_config_t *policer, fal_policer_action_t *action);
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 fal_port_policer_counter_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_policer_counter_t *counter);
@@ -181,22 +179,8 @@ fal_acl_policer_counter_get(a_uint32_t dev_id, a_uint32_t index,
 		fal_policer_counter_t *counter);
 
 sw_error_t
-fal_port_policer_compensation_byte_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_uint32_t *length);
-
-sw_error_t
-fal_policer_timeslot_get(a_uint32_t dev_id, a_uint32_t *timeslot);
-
-sw_error_t
 fal_policer_global_counter_get(a_uint32_t dev_id,
 		fal_policer_global_counter_t *counter);
-
-sw_error_t
-fal_policer_bypass_en_get(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
-	a_bool_t *enable);
-
-sw_error_t
-fal_policer_ctrl_get(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 sw_error_t
 fal_policer_priority_remap_get(a_uint32_t dev_id, fal_policer_priority_t *priority,
@@ -208,15 +192,29 @@ fal_policer_priority_remap_set(a_uint32_t dev_id, fal_policer_priority_t *priori
 #endif
 
 sw_error_t
+fal_port_policer_compensation_byte_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_uint32_t *length);
+
+sw_error_t
 fal_port_policer_compensation_byte_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t length);
+
+sw_error_t
+fal_policer_timeslot_get(a_uint32_t dev_id, a_uint32_t *timeslot);
 
 sw_error_t
 fal_policer_timeslot_set(a_uint32_t dev_id, a_uint32_t timeslot);
 
 sw_error_t
+fal_policer_bypass_en_get(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
+	a_bool_t *enable);
+
+sw_error_t
 fal_policer_bypass_en_set(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
 	a_bool_t enable);
+
+sw_error_t
+fal_policer_ctrl_get(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
 sw_error_t
 fal_policer_ctrl_set(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);

@@ -38,6 +38,7 @@
 #define ISISC_QOS_PORT_TX_BUFFER_MAX  504
 #define ISISC_QOS_PORT_RX_BUFFER_MAX  120
 #endif
+#define ISISC_QOS_REACT_BUFFER_MAX    64
 
 #define ISISC_QOS_HOL_STEP       8
 #define ISISC_QOS_HOL_MOD        3
@@ -264,13 +265,13 @@ _isisc_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     *number = val << ISISC_QOS_HOL_MOD;
     return SW_OK;
 }
-
+#endif
 
 static sw_error_t
 _isisc_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
-                             a_uint32_t * number)
+                             a_uint32_t * number, a_uint32_t * react_num)
 {
-    a_uint32_t val = 0;
+    a_uint32_t val = 0, val0 = 0;
     sw_error_t rv;
 
     if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
@@ -283,9 +284,21 @@ _isisc_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     SW_RTN_ON_ERROR(rv);
 
     *number = val << ISISC_QOS_HOL_MOD;
+
+    HSL_REG_ENTRY_GET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t *)(&val),
+        sizeof(a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+    SW_GET_FIELD_BY_REG(QM_CTRL_REG, FLOW_DROP_EN, val0, val);
+    if(val0 == 1)
+    {
+        SW_GET_FIELD_BY_REG(QM_CTRL_REG, FLOW_DROP_CNT, *react_num, val);
+    }
+    else
+        *react_num = ISISC_QOS_REACT_BUFFER_MAX;
+
     return SW_OK;
 }
-#endif
+
 static sw_error_t
 _isisc_qos_port_red_en_set(a_uint32_t dev_id, fal_port_t port_id,
                           a_bool_t enable)
@@ -429,7 +442,7 @@ _isisc_qos_port_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
 
 static sw_error_t
 _isisc_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
-                             a_uint32_t * number)
+                             a_uint32_t * number, a_uint32_t * react_num)
 {
     a_uint32_t val = 0;
     sw_error_t rv;
@@ -448,6 +461,27 @@ _isisc_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
     *number = val << ISISC_QOS_HOL_MOD;
     HSL_REG_FIELD_SET(rv, dev_id, PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
                       (a_uint8_t *) (&val), sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+
+    HSL_REG_ENTRY_GET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t*)(&val),
+        sizeof(a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+    if(*react_num < ISISC_QOS_REACT_BUFFER_MAX)
+    {
+        SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_EN, 0x1, val);
+        SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_CNT, *react_num, val);
+    }
+    else if(*react_num == ISISC_QOS_REACT_BUFFER_MAX)
+    {
+        SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_EN, 0, val);
+    }
+    else
+    {
+        return SW_OUT_OF_RANGE;
+    }
+    HSL_REG_ENTRY_SET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t *) (&val),
+        sizeof (a_uint32_t));
+
     return rv;
 }
 
@@ -1242,8 +1276,7 @@ isisc_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     HSL_API_UNLOCK;
     return rv;
 }
-
-
+#endif
 
 /**
  * @brief Get max occupied buffer number of receiving port on one particular port.
@@ -1254,16 +1287,15 @@ isisc_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
  */
 HSL_LOCAL sw_error_t
 isisc_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
-                            a_uint32_t * number)
+                            a_uint32_t * number, a_uint32_t * react_num)
 {
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_qos_port_rx_buf_nr_get(dev_id, port_id, number);
+    rv = _isisc_qos_port_rx_buf_nr_get(dev_id, port_id, number, react_num);
     HSL_API_UNLOCK;
     return rv;
 }
-#endif
 
 /**
  * @brief Set status of port red on one particular port.
@@ -1350,12 +1382,12 @@ isisc_qos_port_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
  */
 HSL_LOCAL sw_error_t
 isisc_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
-                            a_uint32_t * number)
+                            a_uint32_t * number, a_uint32_t * react_num)
 {
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_qos_port_rx_buf_nr_set(dev_id, port_id, number);
+    rv = _isisc_qos_port_rx_buf_nr_set(dev_id, port_id, number, react_num);
     HSL_API_UNLOCK;
     return rv;
 }
@@ -1741,7 +1773,9 @@ isisc_qos_init(a_uint32_t dev_id)
         p_api->qos_port_red_en_get = isisc_qos_port_red_en_get;
         p_api->qos_queue_tx_buf_nr_get = isisc_qos_queue_tx_buf_nr_get;
         p_api->qos_port_tx_buf_nr_get = isisc_qos_port_tx_buf_nr_get;
+#endif
         p_api->qos_port_rx_buf_nr_get = isisc_qos_port_rx_buf_nr_get;
+#ifndef IN_QOS_MINI
 	p_api->qos_port_mode_get = isisc_qos_port_mode_get;
         p_api->qos_port_mode_pri_set = isisc_qos_port_mode_pri_set;
         p_api->qos_port_mode_pri_get = isisc_qos_port_mode_pri_get;

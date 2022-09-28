@@ -1015,11 +1015,11 @@ extern "C"
 
   typedef sw_error_t
     (*hsl_qos_port_rx_buf_nr_set) (a_uint32_t dev_id, fal_port_t port_id,
-				   a_uint32_t * number);
+				   a_uint32_t * number, a_uint32_t * react_num);
 
   typedef sw_error_t
     (*hsl_qos_port_rx_buf_nr_get) (a_uint32_t dev_id, fal_port_t port_id,
-				   a_uint32_t * number);
+				   a_uint32_t * number, a_uint32_t * react_num);
 
   typedef sw_error_t
     (*hsl_qos_port_sch_mode_set) (a_uint32_t dev_id, a_uint32_t port_id,

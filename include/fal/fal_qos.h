@@ -237,11 +237,11 @@ typedef struct {
     sw_error_t
     fal_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
                                a_uint32_t * number);
-
+#endif
     sw_error_t
     fal_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
-                               a_uint32_t * number);
-
+                               a_uint32_t * number, a_uint32_t * react_num);
+#ifndef IN_QOS_MINI
     sw_error_t
     fal_cosmap_up_queue_set(a_uint32_t dev_id, a_uint32_t up,
                             fal_queue_t queue);
@@ -263,7 +263,7 @@ typedef struct {
 #endif
 	sw_error_t
     fal_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
-                               a_uint32_t * number);
+                               a_uint32_t * number, a_uint32_t * react_num);
 	sw_error_t
     fal_qos_port_red_en_set(a_uint32_t dev_id, fal_port_t port_id,
                             a_bool_t enable);

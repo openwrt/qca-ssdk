@@ -284,7 +284,9 @@ parse_qos_ptrxbufnr(struct switch_val *val)
 			val_ptr[0] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "number")) {
 			val_ptr[1] = (char*)ext_value_p->option_value;
-		}  else {
+		}  else if(!strcmp(ext_value_p->option_name, "react_num")) {
+			val_ptr[2] = (char*)ext_value_p->option_value;
+		} else {
 			rv = -1;
 			break;
 		}

@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_qos FAL_QOS
@@ -181,13 +183,11 @@ _fal_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     rv = p_api->qos_port_tx_buf_nr_get(dev_id, port_id, number);
     return rv;
 }
-
-
-
+#endif
 
 static sw_error_t
 _fal_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
-                            a_uint32_t * number)
+                            a_uint32_t * number, a_uint32_t * react_num)
 {
     sw_error_t rv;
     hsl_api_t *p_api;
@@ -197,11 +197,11 @@ _fal_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     if (NULL == p_api->qos_port_rx_buf_nr_get)
         return SW_NOT_SUPPORTED;
 
-    rv = p_api->qos_port_rx_buf_nr_get(dev_id, port_id, number);
+    rv = p_api->qos_port_rx_buf_nr_get(dev_id, port_id, number, react_num);
     return rv;
 }
 
-
+#ifndef IN_QOS_MINI
 static sw_error_t
 _fal_cosmap_up_queue_set(a_uint32_t dev_id, a_uint32_t up, fal_queue_t queue)
 {
@@ -299,7 +299,7 @@ _fal_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
 }
 static sw_error_t
 _fal_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
-                            a_uint32_t * number)
+                            a_uint32_t * number, a_uint32_t * react_num)
 {
     sw_error_t rv;
     hsl_api_t *p_api;
@@ -309,7 +309,7 @@ _fal_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
     if (NULL == p_api->qos_port_rx_buf_nr_set)
         return SW_NOT_SUPPORTED;
 
-    rv = p_api->qos_port_rx_buf_nr_set(dev_id, port_id, number);
+    rv = p_api->qos_port_rx_buf_nr_set(dev_id, port_id, number, react_num);
     return rv;
 }
 static sw_error_t
@@ -1184,8 +1184,7 @@ fal_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     FAL_API_UNLOCK;
     return rv;
 }
-
-
+#endif
 
 /**
  * @brief Get max reserved buffer number of receiving port on one particular port.
@@ -1196,16 +1195,16 @@ fal_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
  */
 sw_error_t
 fal_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
-                           a_uint32_t * number)
+                           a_uint32_t * number, a_uint32_t * react_num)
 {
     sw_error_t rv;
 
     FAL_API_LOCK;
-    rv = _fal_qos_port_rx_buf_nr_get(dev_id, port_id, number);
+    rv = _fal_qos_port_rx_buf_nr_get(dev_id, port_id, number, react_num);
     FAL_API_UNLOCK;
     return rv;
 }
-
+#ifndef IN_QOS_MINI
 /**
  * @brief Set user priority to queue mapping.
  * @param[in] dev_id device id
@@ -1353,12 +1352,12 @@ fal_qos_port_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
  */
 sw_error_t
 fal_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
-                           a_uint32_t * number)
+                           a_uint32_t * number, a_uint32_t * react_num)
 {
     sw_error_t rv;
 
     FAL_API_LOCK;
-    rv = _fal_qos_port_rx_buf_nr_set(dev_id, port_id, number);
+    rv = _fal_qos_port_rx_buf_nr_set(dev_id, port_id, number, react_num);
     FAL_API_UNLOCK;
     return rv;
 }

@@ -375,8 +375,12 @@ mht_uniphy_xpcs_autoneg_restart(a_uint32_t dev_id, a_uint32_t mht_port_id)
 			MHT_UNIPHY_MMD_MII_ERR_SEL);
 		PHY_RTN_ON_READ_ERROR(uniphy_data);
 	}
+	/*clear autoneg complete interrupt*/
+	SSDK_DEBUG("clear autoneg complete interrupt\n");
+	rv = mht_uniphy_xpcs_mmd_write(dev_id,mmd_id, MHT_UNIPHY_MMD_MII_ERR_SEL,
+		uniphy_data & (~BIT(0)));
 
-	return SW_OK;
+	return rv;
 }
 
 sw_error_t

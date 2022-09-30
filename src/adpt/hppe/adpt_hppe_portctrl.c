@@ -2623,7 +2623,8 @@ adpt_hppe_port_speed_change_mac_reset(a_uint32_t dev_id, a_uint32_t port_id)
 
 	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &mode);
 	SW_RTN_ON_ERROR(rv);
-	if (mode == PORT_USXGMII) {
+	if (mode == PORT_USXGMII || mode == PORT_UQXGMII) {
+		SSDK_DEBUG("xgmac reset for port%d\n", port_id);
 		ssdk_port_mac_clock_reset(dev_id, port_id);
 		/*restore xgmac's pr and pcf setting, re-config flowctrl after reset
 		operation*/
@@ -5478,14 +5479,24 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 					/* configure gcc speed clock according to current speed */
 					adpt_hppe_gcc_port_speed_clock_set(priv->device_id, port_id,
 							phy_status.speed);
-
+					aos_mdelay(100);
 					/* config uniphy speed to usxgmii mode */
 					adpt_hppe_uniphy_speed_set(priv->device_id, port_id,
 							phy_status.speed);
-
+					if(hsl_port_phyid_get(priv->device_id, port_id) ==
+						QCA8084_PHY)
+					{
+						/*do uniphy adpt reset before mac reset*/
+						adpt_hppe_gcc_uniphy_clock_status_set(
+							priv->device_id, port_id, A_TRUE);
+						adpt_hppe_uniphy_port_adapter_reset(priv->device_id,
+							port_id);
+						aos_mdelay(100);
+					}
 					/* reset port mac when speed change under usxgmii mode */
-					adpt_hppe_port_speed_change_mac_reset(priv->device_id, port_id);
-
+					adpt_hppe_port_speed_change_mac_reset(priv->device_id,
+						port_id);
+					aos_mdelay(100);
 					/* config mac speed */
 					adpt_hppe_port_mac_speed_set(priv->device_id, port_id,
 							phy_status.speed);

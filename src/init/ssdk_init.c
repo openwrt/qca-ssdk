@@ -422,7 +422,7 @@ sw_error_t
 qca_switch_init(a_uint32_t dev_id)
 {
 #if (defined(DESS) || defined(ISISC) || defined(ISIS)) && defined(IN_QOS)
-	a_uint32_t nr = 0;
+	a_uint32_t nr = 0, react_nr = 0;
 #endif
 #if defined(MHT)
 	a_uint32_t port_hol_ctrl[2] = {0}, queue_hol_ctrl[6] = {0};
@@ -520,8 +520,9 @@ qca_switch_init(a_uint32_t dev_id)
 #ifdef IN_QOS
 					nr = 240; /*30*8*/
 					fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
+					fal_qos_port_rx_buf_nr_get(dev_id, i, &nr, &react_nr);
 					nr = 48; /*6*8*/
-					fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
+					fal_qos_port_rx_buf_nr_set(dev_id, i, &nr, &react_nr);
 					fal_qos_port_red_en_set(dev_id, i, A_TRUE);
 					nr = 32;
 					fal_qos_queue_tx_buf_nr_set(dev_id, i, 5, &nr);
@@ -557,8 +558,11 @@ qca_switch_init(a_uint32_t dev_id)
 #ifdef IN_QOS
 						nr = 240; /*30*8*/
 						fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
+						fal_qos_port_rx_buf_nr_get(dev_id, i, &nr,
+							&react_nr);
 						nr = 48; /*6*8*/
-						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
+						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr,
+							&react_nr);
 						fal_qos_port_red_en_set(dev_id, i, A_TRUE);
 						if (chip_type == CHIP_ISISC) {
 							nr = 64; /*8*8*/
@@ -582,8 +586,11 @@ qca_switch_init(a_uint32_t dev_id)
 #ifdef IN_QOS
 						nr = 200; /*25*8*/
 						fal_qos_port_tx_buf_nr_set(dev_id, i, &nr);
+						fal_qos_port_rx_buf_nr_get(dev_id, i, &nr,
+							&react_nr);
 						nr = 48; /*6*8*/
-						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr);
+						fal_qos_port_rx_buf_nr_set(dev_id, i, &nr,
+							&react_nr);
 						fal_qos_port_red_en_set(dev_id, i, A_TRUE);
 						if (chip_type == CHIP_ISISC) {
 							nr = 64; /*8*8*/
@@ -663,7 +670,10 @@ qca_switch_init(a_uint32_t dev_id)
 #if defined(IN_QOS)
 					fal_qos_port_red_en_set(dev_id, i, A_TRUE);
 					fal_qos_port_tx_buf_nr_set(dev_id, i, &port_hol_ctrl[0]);
-					fal_qos_port_rx_buf_nr_set(dev_id, i, &port_hol_ctrl[1]);
+					fal_qos_port_rx_buf_nr_get(dev_id, i, &nr, &react_nr);
+					nr = port_hol_ctrl[1];
+					react_nr = 60;
+					fal_qos_port_rx_buf_nr_set(dev_id, i, &nr, &react_nr);
 
 					for (j = 0; j < ARRAY_SIZE(queue_hol_ctrl)
 							&& queue_hol_ctrl[j] != 0; j++)

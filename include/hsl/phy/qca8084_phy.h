@@ -61,6 +61,8 @@
 #define QCA8084_PHY_AFE25_CMN_6_MII_VAL                                  0x1640
 #define QCA8084_PHY_AFE25_CMN_9_MII                                      0x680
 #define QCA8084_PHY_AFE25_CMN_9_MII_VAL                                  0xc
+#define QCA8084_PHY_DEBUG_ANA_ICC                                        0x280
+#define QCA8084_PHY_DEBUG_ANA_ICC_MASK                                   0x1f
 
 typedef enum {
 	ADC_RISING = 0,

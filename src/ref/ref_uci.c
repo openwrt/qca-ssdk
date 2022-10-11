@@ -12816,6 +12816,23 @@ parse_bm(const char *command_name, struct switch_val *val)
 #endif
 
 #ifdef IN_QM
+
+#if defined(APPE)
+#if !defined(IN_QM_MINI)
+static const char *enqueue_cfg[] = {
+	"enqueue_type",
+	"flow_pri_profile",
+	"vsi",
+	"phy_port",
+	"dest_vport",
+	"enqueue_servcode",
+	"enqueue_servcode_phyport",
+	"enqueue_en",
+	"enqueue_vport",
+};
+#endif
+#endif
+
 static int
 parse_qm(const char *command_name, struct switch_val *val)
 {
@@ -12855,7 +12872,14 @@ parse_qm(const char *command_name, struct switch_val *val)
 	} else if (!strcmp(command_name, "Srcprofile")) {
 		rv = parse_qm_srcprofile(val);
 	}
-
+#if defined(APPE)
+#if !defined(IN_QM_MINI)
+	else if (!strcmp(command_name, "EnqueueCfg")) {
+		rv = parse_uci_option(val, enqueue_cfg,
+				sizeof(enqueue_cfg)/sizeof(char *));
+	}
+#endif
+#endif
 	return rv;
 }
 #endif

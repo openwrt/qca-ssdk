@@ -1494,6 +1494,15 @@ static char *ppe_rst_ids[UNIPHY_RST_MAX] = {
 	UNIPHY_PORT2_RX_RESET_ID,
 	UNIPHY_PORT2_TX_RESET_ID
 };
+
+#if defined(MPPE)
+static char *port_rst_ids[] = {
+	SSDK_PORT1_RX_RESET_ID,
+	SSDK_PORT1_TX_RESET_ID,
+	SSDK_PORT2_RX_RESET_ID,
+	SSDK_PORT2_TX_RESET_ID
+};
+#else
 static char *port_rst_ids[] = {
 	SSDK_PORT1_RESET_ID,
 	SSDK_PORT2_RESET_ID,
@@ -1502,6 +1511,8 @@ static char *port_rst_ids[] = {
 	SSDK_PORT5_RESET_ID,
 	SSDK_PORT6_RESET_ID
 };
+#endif
+
 #if defined(APPE)
 static char *port_mac_rst_ids[] = {
 	SSDK_PORT1_MAC_RESET_ID,
@@ -1547,63 +1558,81 @@ void ssdk_ppe_reset_init(a_uint32_t dev_id)
 #endif
 }
 
+#if defined(APPE)
+enum unphy_rst_type uniphy_sys_rst[SSDK_MAX_UNIPHY_INSTANCE] = {
+	UNIPHY0_SYS_RESET_E,
+	UNIPHY1_SYS_RESET_E,
+	UNIPHY2_SYS_RESET_E
+};
+#endif
+
+#if defined(MPPE)
+enum unphy_rst_type uniphy_soft_rst[SSDK_UNIPHY_INSTANCE2 * 2] = {
+	UNIPHY0_PORT1_RX_DISABLE_E,
+	UNIPHY0_PORT1_TX_DISABLE_E,
+	UNIPHY1_PORT5_RX_DISABLE_E,
+	UNIPHY1_PORT5_TX_DISABLE_E
+};
+#else
+enum unphy_rst_type uniphy_soft_rst[SSDK_MAX_UNIPHY_INSTANCE] = {
+	UNIPHY0_SOFT_RESET_E,
+	UNIPHY1_SOFT_RESET_E,
+	UNIPHY2_SOFT_RESET_E
+};
+#endif
+
 void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	a_bool_t enable)
 {
-	enum unphy_rst_type rst_type;
+	a_uint32_t index = 0, uniphy_max = SSDK_UNIPHY_INSTANCE2;
+	enum unphy_rst_type rst_type[SSDK_MAX_UNIPHY_INSTANCE * 2] = {UNIPHY_RST_MAX};
 
 	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq60xx") ||
 			of_device_is_compatible(clock_node, "qcom,ess-switch-ipq53xx")) {
-		if (uniphy_index > SSDK_UNIPHY_INSTANCE1) {
-			return;
-		}
+		uniphy_max = SSDK_UNIPHY_INSTANCE1;
 	}
-#if defined(APPE)
-	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx") ||
-			of_device_is_compatible(clock_node, "qcom,ess-switch-ipq53xx")) {
-		enum unphy_rst_type sys_rst;
 
-		if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
-			sys_rst = UNIPHY0_SYS_RESET_E;
-		} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
-			sys_rst = UNIPHY1_SYS_RESET_E;
-		} else {
-			sys_rst = UNIPHY2_SYS_RESET_E;
-		}
-		if (enable == A_TRUE) {
-			ssdk_uniphy_reset(dev_id, sys_rst, SSDK_RESET_DEASSERT);
-		} else {
-			ssdk_uniphy_reset(dev_id, sys_rst, SSDK_RESET_ASSERT);
-		}
+	if (uniphy_index > uniphy_max) {
+		SSDK_INFO("Unsupported uniphy index: %d\n", uniphy_index);
+		return;
 	}
+
+#if defined(MPPE)
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq53xx")) {
+		/* For MPPE, the UNIPHY SOFT RESET includes UNIPHY PORT RX, UNIPHY PORT TX RESET */
+		rst_type[index++] = uniphy_soft_rst[uniphy_index * 2];
+		rst_type[index++] = uniphy_soft_rst[uniphy_index * 2 + 1];
+	} else
 #endif
-
-	if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
-		rst_type = UNIPHY0_SOFT_RESET_E;
-	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
-		rst_type = UNIPHY1_SOFT_RESET_E;
+	{
+		rst_type[index++] = uniphy_soft_rst[uniphy_index];
 #if defined(APPE)
-		if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
+		if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx") &&
+				uniphy_index == SSDK_UNIPHY_INSTANCE1) {
 			a_uint32_t mode0, mode1;
 
 			mode0 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
 			mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
 			if ((mode0 == PORT_WRAPPER_PSGMII) && (mode1 == PORT_WRAPPER_MAX)) {
-				return;
+				SSDK_INFO("Uniphy instance %d unavailable\n", uniphy_index);
+				index--;
 			}
 		}
 #endif
-	} else {
-		rst_type = UNIPHY2_SOFT_RESET_E;
 	}
 
-	if (enable == A_TRUE) {
-		ssdk_uniphy_reset(dev_id, rst_type, SSDK_RESET_DEASSERT);
-	} else {
-		ssdk_uniphy_reset(dev_id, rst_type, SSDK_RESET_ASSERT);
+#if defined(APPE)
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx") ||
+			of_device_is_compatible(clock_node, "qcom,ess-switch-ipq53xx")) {
+		rst_type[index++] = uniphy_sys_rst[uniphy_index];
+	}
+#endif
+
+	while (index > 0) {
+		ssdk_uniphy_reset(dev_id, rst_type[--index],
+				enable == A_TRUE ? SSDK_RESET_DEASSERT : SSDK_RESET_ASSERT);
 	}
 
 	return;
 }
 #endif
-

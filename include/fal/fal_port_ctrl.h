@@ -723,6 +723,8 @@ sw_error_t
 fal_port_mdix_status_get(a_uint32_t dev_id, fal_port_t port_id,
 				     fal_port_mdix_status_t * mode);
 /*qca808x_end*/
+#endif
+
 sw_error_t
 fal_port_combo_prefer_medium_set(a_uint32_t dev_id,
 					     a_uint32_t port_id,
@@ -733,7 +735,7 @@ fal_port_combo_prefer_medium_get(a_uint32_t dev_id,
 						     a_uint32_t port_id,
 						     fal_port_medium_t *
 						     medium);
-
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_combo_medium_status_get(a_uint32_t dev_id,
 						     a_uint32_t port_id,

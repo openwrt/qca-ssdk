@@ -1806,6 +1806,7 @@ adpt_hppe_port_powersave_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
+#endif
 
 sw_error_t
 _adpt_hppe_port_combo_prefer_medium_get(a_uint32_t dev_id,
@@ -1865,7 +1866,7 @@ adpt_hppe_port_combo_prefer_medium_get(a_uint32_t dev_id,
 	return rv;
 
 }
-#endif
+
 sw_error_t
 adpt_hppe_port_max_frame_size_get(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t *max_frame)
@@ -2154,7 +2155,6 @@ adpt_hppe_port_rxfc_status_set(a_uint32_t dev_id, fal_port_t port_id,
 	return SW_OK;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 _adpt_hppe_port_combo_prefer_medium_set(a_uint32_t dev_id,
 					     a_uint32_t port_id,
@@ -2235,6 +2235,7 @@ adpt_hppe_port_combo_prefer_medium_set(a_uint32_t dev_id,
 
 }
 
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_counter_set(a_uint32_t dev_id, fal_port_t port_id,
 		   a_bool_t enable)
@@ -6412,6 +6413,7 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_powersave_get = adpt_hppe_port_powersave_get;
 	}
+#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] &
 		(1 <<  (FUNC_ADPT_PORT_COMBO_PREFER_MEDIUM_GET % 32)))
 	{
@@ -6424,7 +6426,6 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_port_combo_prefer_medium_set =
 			adpt_hppe_port_combo_prefer_medium_set;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] & (1 <<  (FUNC_ADPT_PORT_POWER_OFF % 32)))
 	{
 		p_adpt_api->adpt_port_power_off = adpt_hppe_port_power_off;

@@ -2203,6 +2203,9 @@ adpt_ppe_type_t adpt_ppe_type_get(a_uint32_t dev_id);
 #define ADPT_IS_VP_GROUP(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VP_GROUP && \
 			FAL_PORT_ID_VALUE(port_id) <= SSDK_MAX_VP_GROUP_ID)?1:0)
 
+#define DROP_CODE_L2_EXP_MTU_FAIL 80
+#define ADPT_GET_DROP_CODE_IDX(port_id, code_cats) ((port_id) + ((code_cats) * 8) + 256)
+
 static inline a_uint32_t adpt_port_type_convert(a_bool_t to_hsl, a_uint32_t port_type) {
 	a_uint32_t ptype = 0;
 

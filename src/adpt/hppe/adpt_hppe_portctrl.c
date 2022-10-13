@@ -5779,6 +5779,62 @@ adpt_ppe_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cf
 	return rv;
 }
 
+#if defined(IN_QM)
+sw_error_t
+_adpt_hppe_pport_tx_cnt_update(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt,
+										a_bool_t is_get)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t q_idx = 0, i = 0;
+	ssdk_dt_scheduler_cfg *dt_cfg = NULL;
+	ssdk_dt_portscheduler_cfg *ptscheduler = NULL;
+	adpt_api_t *p_adpt_api = NULL;
+	fal_queue_stats_t queue_stats;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (!ADPT_IS_PPORT(port_id))
+		return SW_OUT_OF_RANGE;
+
+	/*
+	 * update port tx counter by getting/resetting corresponding queue counter.
+	 */
+	dt_cfg = ssdk_bootup_shceduler_cfg_get(dev_id);
+	ADPT_NULL_POINT_CHECK(dt_cfg);
+
+	ptscheduler = &dt_cfg->pool[FAL_PORT_ID_VALUE(port_id)];
+
+	p_adpt_api = adpt_api_ptr_get(dev_id);
+	ADPT_NULL_POINT_CHECK(p_adpt_api);
+	ADPT_NULL_POINT_CHECK(p_adpt_api->adpt_queue_counter_get);
+	ADPT_NULL_POINT_CHECK(p_adpt_api->adpt_queue_counter_cleanup);
+
+	for (q_idx = ptscheduler->ucastq_start;
+		q_idx <= ptscheduler->mcastq_end;
+		(q_idx == ptscheduler->ucastq_end) ? (q_idx = ptscheduler->mcastq_start) : (q_idx++)) {
+		aos_mem_zero(&queue_stats, sizeof(fal_queue_stats_t));
+
+		if (is_get) {
+			ADPT_NULL_POINT_CHECK(port_cnt);
+			rv = p_adpt_api->adpt_queue_counter_get(dev_id, q_idx, &queue_stats);
+			SW_RTN_ON_ERROR(rv);
+
+			/* adding queue drop counter which indipendent with PORT_TX_DROP_CNT_TBL */
+			for (i = 0; i < FAL_QM_DROP_ITEMS; i++) {
+				port_cnt->tx_drop_pkt_cnt += queue_stats.drop_packets[i];
+				port_cnt->tx_drop_byte_cnt += queue_stats.drop_bytes[i];
+			}
+		} else {
+			/* reset port releated queue counter */
+			rv = p_adpt_api->adpt_queue_counter_cleanup(dev_id, q_idx);
+			SW_RTN_ON_ERROR(rv);
+		}
+	}
+
+	return rv;
+}
+#endif
+
 sw_error_t
 _adpt_hppe_port_tx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
 {
@@ -5812,6 +5868,10 @@ _adpt_hppe_port_tx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t
 		port_cnt->tx_drop_byte_cnt = ((a_uint64_t)phy_port_tx_drop_cnt.bf.tx_drop_byte_cnt_1 <<
 			SW_FIELD_OFFSET_IN_WORD(PORT_TX_DROP_CNT_TBL_TX_DROP_BYTE_CNT_OFFSET)) |
 			phy_port_tx_drop_cnt.bf.tx_drop_byte_cnt_0;
+#if defined(IN_QM)
+		rv = _adpt_hppe_pport_tx_cnt_update(dev_id, port_id, port_cnt, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
+#endif
 	}
 	else
 	{
@@ -5857,6 +5917,10 @@ _adpt_hppe_port_tx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 
 		rv = hppe_port_tx_drop_cnt_tbl_set(dev_id, port_value, &phy_port_tx_drop_cnt);
 		SW_RTN_ON_ERROR(rv);
+#if defined(IN_QM)
+		rv = _adpt_hppe_pport_tx_cnt_update(dev_id, port_id, NULL, A_FALSE);
+		SW_RTN_ON_ERROR(rv);
+#endif
 	}
 	else
 	{

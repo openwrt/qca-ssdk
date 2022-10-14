@@ -64,7 +64,6 @@ hppe_pc_drop_bypass_reg_set(
 				value->val);
 }
 
-#ifndef IN_POLICER_MINI
 sw_error_t
 hppe_pc_drop_bypass_reg_get(
 		a_uint32_t dev_id,
@@ -76,6 +75,7 @@ hppe_pc_drop_bypass_reg_get(
 				&value->val);
 }
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 hppe_pc_spare_reg_get(
 		a_uint32_t dev_id,
@@ -97,6 +97,7 @@ hppe_pc_spare_reg_set(
 				INGRESS_POLICER_BASE_ADDR + PC_SPARE_REG_ADDRESS,
 				value->val);
 }
+#endif
 
 sw_error_t
 hppe_time_slot_reg_get(
@@ -108,7 +109,6 @@ hppe_time_slot_reg_get(
 				INGRESS_POLICER_BASE_ADDR + TIME_SLOT_REG_ADDRESS,
 				&value->val);
 }
-#endif
 
 sw_error_t
 hppe_time_slot_reg_set(
@@ -206,6 +206,20 @@ hppe_in_port_meter_cfg_tbl_set(
 				4);
 }
 
+sw_error_t
+hppe_in_port_meter_cfg_tbl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union in_port_meter_cfg_tbl_u *value)
+{
+	return hppe_reg_tbl_get(
+				dev_id,
+				INGRESS_POLICER_BASE_ADDR + IN_PORT_METER_CFG_TBL_ADDRESS + \
+				index * IN_PORT_METER_CFG_TBL_INC,
+				value->val,
+				4);
+}
+
 #ifndef IN_POLICER_MINI
 sw_error_t
 hppe_in_acl_meter_crdt_tbl_get(
@@ -233,20 +247,6 @@ hppe_in_acl_meter_crdt_tbl_set(
 				index * IN_ACL_METER_CRDT_TBL_INC,
 				value->val,
 				2);
-}
-
-sw_error_t
-hppe_in_port_meter_cfg_tbl_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union in_port_meter_cfg_tbl_u *value)
-{
-	return hppe_reg_tbl_get(
-				dev_id,
-				INGRESS_POLICER_BASE_ADDR + IN_PORT_METER_CFG_TBL_ADDRESS + \
-				index * IN_PORT_METER_CFG_TBL_INC,
-				value->val,
-				4);
 }
 
 sw_error_t

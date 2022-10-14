@@ -185,6 +185,7 @@ adpt_hppe_port_policer_counter_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 adpt_hppe_port_compensation_byte_get(a_uint32_t dev_id, fal_port_t port_id,
@@ -209,7 +210,6 @@ adpt_hppe_port_compensation_byte_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return SW_OK;
 }
-#endif
 
 static sw_error_t
 __adpt_hppe_policer_rate_to_refresh(a_uint32_t rate,
@@ -271,7 +271,6 @@ __adpt_hppe_policer_burst_size_to_bucket_size(a_uint32_t burst_size,
 	return SW_OK;
 }
 
-#ifndef IN_POLICER_MINI
 static sw_error_t
 __adpt_hppe_policer_refresh_to_rate(a_uint32_t refresh,
 							a_uint32_t *rate,
@@ -321,7 +320,6 @@ __adpt_hppe_policer_bucket_size_to_burst_size(a_uint32_t bucket_size,
 
 	return SW_OK;
 }
-#endif
 
 static sw_error_t
 __adpt_hppe_policer_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
@@ -505,6 +503,7 @@ __adpt_hppe_policer_one_bucket_parameter_select(a_uint64_t c_rate,
 	return SW_OK;
 }
 #endif
+#endif
 
 sw_error_t
 adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
@@ -615,7 +614,6 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 #endif
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
@@ -817,7 +815,6 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 	return SW_OK;
 }
 
-#ifndef IN_POLICER_MINI
 sw_error_t
 adpt_hppe_port_policer_entry_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_policer_config_t *policer, fal_policer_action_t *action)
@@ -933,7 +930,6 @@ adpt_hppe_policer_time_slot_get(a_uint32_t dev_id, a_uint32_t *time_slot)
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_hppe_port_policer_entry_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -1158,6 +1154,7 @@ adpt_hppe_policer_global_counter_get(a_uint32_t dev_id,
 
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 adpt_hppe_policer_bypass_en_get(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
@@ -1181,8 +1178,6 @@ adpt_hppe_policer_bypass_en_get(a_uint32_t dev_id, fal_policer_frame_type_t fram
 
 	return SW_OK;
 }
-
-#endif
 
 sw_error_t
 adpt_hppe_policer_bypass_en_set(a_uint32_t dev_id, fal_policer_frame_type_t frame_type,
@@ -1264,7 +1259,6 @@ static void adpt_hppe_policer_func_unregister(a_uint32_t dev_id, adpt_api_t *p_a
 
 }
 
-
 sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -1285,6 +1279,23 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_policer_counter_get = adpt_hppe_port_policer_counter_get;
 	}
+	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_GLOBAL_COUNTER_GET))
+	{
+		p_adpt_api->adpt_policer_global_counter_get = adpt_hppe_policer_global_counter_get;
+	}
+#ifdef APPE
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_PRIORITY_REMAP_GET))
+		{
+			p_adpt_api->adpt_policer_priority_remap_get = adpt_appe_policer_priority_remap_get;
+		}
+		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_PRIORITY_REMAP_SET))
+		{
+			p_adpt_api->adpt_policer_priority_remap_set = adpt_appe_policer_priority_remap_set;
+		}
+	}
+#endif
+#endif
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_PORT_COMPENSATION_BYTE_GET))
 	{
 		p_adpt_api->adpt_port_compensation_byte_get = adpt_hppe_port_compensation_byte_get;
@@ -1297,7 +1308,6 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_acl_policer_entry_get = adpt_hppe_acl_policer_entry_get;
 	}
-#endif
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_PORT_POLICER_ENTRY_SET))
 	{
 		p_adpt_api->adpt_port_policer_entry_set = adpt_hppe_port_policer_entry_set;
@@ -1306,36 +1316,14 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_acl_policer_entry_set = adpt_hppe_acl_policer_entry_set;
 	}
-#ifndef IN_POLICER_MINI
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_TIME_SLOT_GET))
 	{
 		p_adpt_api->adpt_policer_time_slot_get = adpt_hppe_policer_time_slot_get;
-	}
-	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_GLOBAL_COUNTER_GET))
-	{
-		p_adpt_api->adpt_policer_global_counter_get = adpt_hppe_policer_global_counter_get;
 	}
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_BYPASS_EN_GET))
 	{
 		p_adpt_api->adpt_policer_bypass_en_get = adpt_hppe_policer_bypass_en_get;
 	}
-#ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
-		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_PRIORITY_REMAP_GET))
-		{
-			p_adpt_api->adpt_policer_priority_remap_get = adpt_appe_policer_priority_remap_get;
-		}
-		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_PRIORITY_REMAP_SET))
-		{
-			p_adpt_api->adpt_policer_priority_remap_set = adpt_appe_policer_priority_remap_set;
-		}
-		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_CTRL_GET))
-		{
-			p_adpt_api->adpt_policer_ctrl_get = adpt_appe_policer_ctrl_get;
-		}
-	}
-#endif
-#endif
 	if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_PORT_COMPENSATION_BYTE_SET))
 	{
 		p_adpt_api->adpt_port_compensation_byte_set = adpt_hppe_port_compensation_byte_set;
@@ -1350,6 +1338,10 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	}
 #ifdef APPE
 	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_CTRL_GET))
+		{
+			p_adpt_api->adpt_policer_ctrl_get = adpt_appe_policer_ctrl_get;
+		}
 		if(p_adpt_api->adpt_policer_func_bitmap & (1 << FUNC_ADPT_POLICER_CTRL_SET))
 		{
 			p_adpt_api->adpt_policer_ctrl_set = adpt_appe_policer_ctrl_set;

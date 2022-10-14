@@ -36,10 +36,10 @@ extern "C" {
 sw_error_t
 adpt_appe_policer_ctrl_set(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
-#ifndef IN_POLICER_MINI
 sw_error_t
 adpt_appe_policer_ctrl_get(a_uint32_t dev_id, fal_policer_ctrl_t *ctrl);
 
+#ifndef IN_POLICER_MINI
 sw_error_t
 adpt_appe_policer_priority_remap_get(a_uint32_t dev_id,
 	fal_policer_priority_t *priority, fal_policer_remap_t *remap);

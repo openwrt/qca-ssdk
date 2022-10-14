@@ -486,6 +486,52 @@ qca_mht_sku_switch_core_enabled(a_uint32_t dev_id)
 
 	return A_TRUE;
 }
+
+sw_error_t
+qca_mht_ethphy_icc_efuse_get(a_uint32_t dev_id, a_uint32_t mht_port_id,
+	a_uint32_t *icc_value)
+{
+	a_uint32_t data = 0, efuse_ver = 0;
+
+	switch(mht_port_id)
+	{
+		case SSDK_PHYSICAL_PORT1:
+			data = qca_mht_mii_read(dev_id,
+				QFPROM_RAW_CALIBRATION_ROW4_LSB_OFFSET);
+			*icc_value = (data & BITS(22, 5)) >> 22;
+			break;
+		case SSDK_PHYSICAL_PORT2:
+			data = qca_mht_mii_read(dev_id,
+				QFPROM_RAW_CALIBRATION_ROW7_LSB_OFFSET);
+			*icc_value = (data & BITS(27, 5)) >> 27;
+			break;
+		case SSDK_PHYSICAL_PORT3:
+			data = qca_mht_mii_read(dev_id,
+				QFPROM_RAW_CALIBRATION_ROW8_LSB_OFFSET);
+			*icc_value = (data & BITS(27, 5)) >> 27;
+			break;
+		case SSDK_PHYSICAL_PORT4:
+			data = qca_mht_mii_read(dev_id,
+				QFPROM_RAW_CALIBRATION_ROW6_MSB_OFFSET);
+			*icc_value = (data & BITS(18, 5)) >> 18;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+	data = qca_mht_mii_read(dev_id, QFPROM_RAW_PTE_ROW2_MSB_OFFSET);
+	efuse_ver = (data & BITS(16, 8)) >> 16;
+	if(efuse_ver != 1 && efuse_ver != 2)
+	{
+		if(*icc_value & BIT(4))
+			*icc_value &= ~BIT(4);
+		else
+			*icc_value |= BIT(4);
+	}
+	SSDK_DEBUG("mht port%d efuse version is %d, icc value is 0x%x\n",
+		mht_port_id, efuse_ver, *icc_value);
+
+	return SW_OK;
+}
 /**
  * @}
  */

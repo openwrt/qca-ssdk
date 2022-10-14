@@ -24,6 +24,57 @@
 #include "mht_interface_ctrl.h"
 #include "ssdk_mht_clk.h"
 
+static a_uint32_t
+qca8084_phy_icc[SSDK_PHYSICAL_PORT4+1];
+
+static sw_error_t
+qca8084_phy_icc_init(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t icc_value = 0, mht_port_id = 0;
+
+	rv = qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+	rv = qca_mht_ethphy_icc_efuse_get(dev_id, mht_port_id, &icc_value);
+	SW_RTN_ON_ERROR(rv);
+
+	qca8084_phy_icc[mht_port_id] = icc_value;
+	SSDK_DEBUG("dev_id %d, mht_port_id %d icc value is 0x%x\n",
+		dev_id, mht_port_id, icc_value);
+
+	return SW_OK;
+}
+
+static sw_error_t
+qca8084_phy_icc_fix_up(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_speed_t speed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t icc_value = 0, mht_port_id = 0;
+
+	rv = qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+	/*retrim icc value for link up 100M, and set orginal icc value for link down
+		and other speeds*/
+	if(speed == FAL_SPEED_100)
+	{
+		if(qca8084_phy_icc[mht_port_id] < (0x1f-3))
+			icc_value = qca8084_phy_icc[mht_port_id]+3;
+		else
+			icc_value = 0x1f;
+	}
+	else
+	{
+		icc_value = qca8084_phy_icc[mht_port_id];
+	}
+	SSDK_DEBUG("dev_id:%d mht_port_id:%d icc value is 0x%x\n", dev_id, mht_port_id, icc_value);
+	rv = qca808x_phy_modify_debug(dev_id, phy_addr, QCA8084_PHY_DEBUG_ANA_ICC,
+		QCA8084_PHY_DEBUG_ANA_ICC_MASK, icc_value);
+	aos_mdelay(10);
+
+	return rv;
+}
+
 sw_error_t
 qca8084_phy_ipg_config(a_uint32_t dev_id, a_uint32_t phy_id,
 	fal_port_speed_t speed)
@@ -621,6 +672,7 @@ qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 			phy_info->port_link_status[port_id] ? "link up" :"link down",
 			phy_status->link_status ? "link up" : "link down",
 			phy_status->speed);
+		qca8084_phy_icc_fix_up(dev_id, phy_addr, phy_status->speed);
 		_qca8084_phy_speed_fixup(dev_id, phy_addr, phy_status->link_status,
 			phy_info->port_mode[port_id], phy_status->speed);
 		phy_info->port_link_status[port_id] = phy_status->link_status;
@@ -673,6 +725,9 @@ qca8084_phy_hw_init(a_uint32_t dev_id, a_uint32_t phy_addr)
 	rv = qca808x_phy_mmd_write(dev_id, phy_addr, QCA8084_PHY_MMD1_NUM,
 		QCA8084_PHY_MMD1_MSE_THRESH_DEBUG_12,
 		QCA8084_PHY_MMD1_MSE_THRESH_ENERGY_DETECT);
+	SW_RTN_ON_ERROR(rv);
+	/*init icc value*/
+	rv = qca8084_phy_icc_init(dev_id, phy_addr);
 
 	return rv;
 }

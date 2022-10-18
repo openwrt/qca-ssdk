@@ -2,8 +2,6 @@
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
- *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -886,16 +884,17 @@ adpt_mp_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	if (port_lpi_status[dev_id] & PORT_LPI_ENABLE_STATUS) {
 		if (!(port_lpi_status[dev_id] & PORT_LPI_TASK_RUNNING)) {
-			if (!(port_lpi_status[dev_id] & PORT_LPI_TASK_START)) {
-				qca_mac_sw_sync_work_start(priv);
-				port_lpi_status[dev_id] |= PORT_LPI_TASK_START;
+			if (!(port_lpi_status[dev_id] & PORT_LPI_TASK_INIT)) {
+				qca_mac_sw_sync_work_init(priv);
+				ssdk_mac_sw_sync_work_start(dev_id);
+				port_lpi_status[dev_id] |= PORT_LPI_TASK_INIT;
 			} else {
-				qca_mac_sw_sync_work_resume(priv);
+				ssdk_mac_sw_sync_work_start(dev_id);
 			}
 			port_lpi_status[dev_id] |= PORT_LPI_TASK_RUNNING;
 		}
 	} else {
-		qca_mac_sw_sync_work_stop(priv);
+		ssdk_mac_sw_sync_work_stop(dev_id);
 		port_lpi_status[dev_id] &= ~PORT_LPI_TASK_RUNNING;
 	}
 

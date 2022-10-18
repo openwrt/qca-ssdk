@@ -2182,7 +2182,7 @@ _adpt_hppe_port_combo_prefer_medium_set(a_uint32_t dev_id,
 	SW_RTN_ON_NULL(priv);
 
 	mutex_lock(&priv->mac_sw_sync_lock);
-	qca_mac_sw_sync_work_stop(priv);
+	ssdk_mac_sw_sync_work_stop(dev_id);
 
 	rv = hsl_port_combo_phy_driver_update(dev_id, port_id, medium);
 	if (rv == SW_OK)
@@ -2196,7 +2196,7 @@ _adpt_hppe_port_combo_prefer_medium_set(a_uint32_t dev_id,
 		qca_mac_port_status_init(dev_id, port_id);
 	}
 
-	qca_mac_sw_sync_work_resume(priv);
+	ssdk_mac_sw_sync_work_start(dev_id);
 	mutex_unlock(&priv->mac_sw_sync_lock);
 	return SW_OK;
 }
@@ -2477,11 +2477,8 @@ adpt_hppe_port_interface_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 			      fal_port_interface_mode_t mode)
 {
 	sw_error_t rv = SW_OK;
-	struct qca_phy_priv *priv;
 
-	priv = ssdk_phy_priv_data_get(dev_id);
-	SW_RTN_ON_NULL(priv);
-	qca_mac_sw_sync_work_stop(priv);
+	ssdk_mac_sw_sync_work_stop(dev_id);
 
 	rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id, mode);
 
@@ -3610,7 +3607,7 @@ adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id)
 	rv = _adpt_hppe_port_interface_mode_apply(dev_id, A_TRUE);
 	mutex_unlock(&priv->mac_sw_sync_lock);
 
-	qca_mac_sw_sync_work_resume(priv);
+	ssdk_mac_sw_sync_work_start(dev_id);
 
 	return rv;
 }

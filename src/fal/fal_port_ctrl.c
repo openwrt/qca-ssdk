@@ -1563,21 +1563,21 @@ _fal_port_interface_mode_status_get (a_uint32_t dev_id, fal_port_t port_id, fal_
 }
 
 static sw_error_t
-_fal_port_counter_set (a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+_fal_debug_phycounter_set (a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
   return hsl_port_phy_counter_set(dev_id, port_id, enable);
 }
 
 
 static sw_error_t
-_fal_port_counter_get (a_uint32_t dev_id, fal_port_t port_id,
+_fal_debug_phycounter_get (a_uint32_t dev_id, fal_port_t port_id,
 		      a_bool_t * enable)
 {
   return hsl_port_phy_counter_get(dev_id, port_id, enable);
 }
 
 static sw_error_t
-_fal_port_counter_show (a_uint32_t dev_id, fal_port_t port_id, fal_port_counter_info_t * counter_info)
+_fal_debug_phycounter_show (a_uint32_t dev_id, fal_port_t port_id, fal_port_counter_info_t * counter_info)
 {
   return hsl_port_phy_counter_show(dev_id, port_id, counter_info);
 }
@@ -3571,7 +3571,7 @@ fal_debug_phycounter_set (a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable
   sw_error_t rv;
 
   FAL_API_LOCK;
-  rv = _fal_port_counter_set (dev_id, port_id, enable);
+  rv = _fal_debug_phycounter_set (dev_id, port_id, enable);
   FAL_API_UNLOCK;
   return rv;
 }
@@ -3589,7 +3589,7 @@ fal_debug_phycounter_get (a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enab
   sw_error_t rv;
 
   FAL_API_LOCK;
-  rv = _fal_port_counter_get (dev_id, port_id, enable);
+  rv = _fal_debug_phycounter_get (dev_id, port_id, enable);
   FAL_API_UNLOCK;
   return rv;
 }
@@ -3607,7 +3607,7 @@ fal_debug_phycounter_show (a_uint32_t dev_id, fal_port_t port_id, fal_port_count
   sw_error_t rv;
 
   FAL_API_LOCK;
-  rv = _fal_port_counter_show (dev_id, port_id, port_counter_info);
+  rv = _fal_debug_phycounter_show (dev_id, port_id, port_counter_info);
   FAL_API_UNLOCK;
   return rv;
 }

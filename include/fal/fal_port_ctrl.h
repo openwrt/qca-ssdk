@@ -473,6 +473,7 @@ typedef struct {
 	a_uint64_t tx_byte_cnt; /* tx byte counter */
 	a_uint32_t tx_drop_pkt_cnt; /* tx drop packet counter */
 	a_uint64_t tx_drop_byte_cnt; /* tx drop byte counter */
+	a_uint32_t buff_empty_drop; /* ingress buffer empty drop packet counter*/
 } fal_port_cnt_t;
 
 typedef struct {

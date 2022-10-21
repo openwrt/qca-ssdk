@@ -22,6 +22,8 @@
 #include "adpt_appe_portctrl.h"
 #include "hppe_portctrl_reg.h"
 #include "hppe_portctrl.h"
+#include "hppe_policer_reg.h"
+#include "hppe_policer.h"
 #include "appe_counter_reg.h"
 #include "appe_counter.h"
 #include "appe_portvlan_reg.h"
@@ -312,6 +314,42 @@ adpt_appe_port_cnt_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_
 	return rv;
 }
 
+static sw_error_t
+_adpt_appe_pport_rx_cnt_update(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt,
+										a_bool_t is_get)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t code_idx = 0;
+	union drop_cpu_cnt_tbl_u drop_cpu_cnt_tbl;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	if (!ADPT_IS_PPORT(port_id))
+		return SW_OUT_OF_RANGE;
+
+	/*
+	 *  update port rx drop counter by getting/resetting corresponding DROP_CODE_L2_EXP_MTU_FAIL entry
+	 * which recoreded in PORT_TX_DROP_CNT_TBL.
+	 */
+	code_idx = ADPT_GET_DROP_CODE_IDX(FAL_PORT_ID_VALUE(port_id), DROP_CODE_L2_EXP_MTU_FAIL);
+	aos_mem_zero(&drop_cpu_cnt_tbl, sizeof(union drop_cpu_cnt_tbl_u));
+
+	if (is_get) {
+		ADPT_NULL_POINT_CHECK(port_cnt);
+		rv = hppe_drop_cpu_cnt_tbl_get(dev_id, code_idx, &drop_cpu_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		port_cnt->rx_drop_pkt_cnt -= drop_cpu_cnt_tbl.bf.pkt_cnt;
+		port_cnt->rx_drop_byte_cnt -= (drop_cpu_cnt_tbl.bf.byte_cnt_0 |
+			((a_uint64_t)drop_cpu_cnt_tbl.bf.byte_cnt_1 << 32));
+	} else {
+		rv = hppe_drop_cpu_cnt_tbl_set(dev_id, code_idx, &drop_cpu_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+	}
+
+	return rv;
+}
+
 sw_error_t
 adpt_appe_port_rx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt)
 {
@@ -328,6 +366,9 @@ adpt_appe_port_rx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t 
 
 	if(ADPT_IS_PPORT(port_id))
 	{
+		rv = hppe_drop_cnt_drop_cnt_get(dev_id, port_value, &port_cnt->buff_empty_drop);
+		SW_RTN_ON_ERROR(rv);
+
 		rv = appe_phy_port_rx_cnt_tbl_get(dev_id, port_value, &phy_port_rx_cnt_tbl);
 		SW_RTN_ON_ERROR(rv);
 
@@ -335,12 +376,16 @@ adpt_appe_port_rx_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t 
 		port_cnt->rx_byte_cnt = ((a_uint64_t)phy_port_rx_cnt_tbl.bf.rx_byte_cnt_1 <<
 			SW_FIELD_OFFSET_IN_WORD(PHY_PORT_RX_CNT_TBL_RX_BYTE_CNT_OFFSET)) |
 			phy_port_rx_cnt_tbl.bf.rx_byte_cnt_0;
+
 		port_cnt->rx_drop_pkt_cnt = ((a_uint32_t)phy_port_rx_cnt_tbl.bf.rx_drop_pkt_cnt_1 <<
 			SW_FIELD_OFFSET_IN_WORD(PHY_PORT_RX_CNT_TBL_RX_DROP_PKT_CNT_OFFSET)) |
 			phy_port_rx_cnt_tbl.bf.rx_drop_pkt_cnt_0;
 		port_cnt->rx_drop_byte_cnt = ((a_uint64_t)phy_port_rx_cnt_tbl.bf.rx_drop_byte_cnt_1 <<
 			SW_FIELD_OFFSET_IN_WORD(PHY_PORT_RX_CNT_TBL_RX_DROP_BYTE_CNT_OFFSET)) |
 			phy_port_rx_cnt_tbl.bf.rx_drop_byte_cnt_0;
+
+		rv = _adpt_appe_pport_rx_cnt_update(dev_id, port_id, port_cnt, A_TRUE);
+		SW_RTN_ON_ERROR(rv);
 	}
 	else
 	{
@@ -377,7 +422,13 @@ adpt_appe_port_rx_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 
 	if(ADPT_IS_PPORT(port_id))
 	{
+		rv = hppe_drop_cnt_drop_cnt_set(dev_id, port_value, 0);
+		SW_RTN_ON_ERROR(rv);
+
 		rv = appe_phy_port_rx_cnt_tbl_set(dev_id, port_value, &phy_port_rx_cnt_tbl);
+		SW_RTN_ON_ERROR(rv);
+
+		rv = _adpt_appe_pport_rx_cnt_update(dev_id, port_id, NULL, A_FALSE);
 		SW_RTN_ON_ERROR(rv);
 	}
 

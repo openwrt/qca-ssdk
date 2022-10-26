@@ -2123,7 +2123,7 @@ parse_port_ringfcthresh(struct switch_val *val)
 
 	return rv;
 }
-
+#endif
 static int
 parse_port_ptfcthresh(struct switch_val *val)
 {
@@ -2153,7 +2153,7 @@ parse_port_ptfcthresh(struct switch_val *val)
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static int
 parse_port_ringfcen(struct switch_val *val)
 {
@@ -12151,9 +12151,13 @@ parse_port(const char *command_name, struct switch_val *val)
 		rv = parse_port_congedrop(val);
 	} else if(!strcmp(command_name, "RingFcThresh")) {
 		rv = parse_port_ringfcthresh(val);
-	} else if(!strcmp(command_name, "PtFcThresh")) {
+	}
+#endif
+	else if(!strcmp(command_name, "PtFcThresh")) {
 		rv = parse_port_ptfcthresh(val);
-	} else if(!strcmp(command_name, "RingUnion")) {
+	}
+#ifndef IN_PORTCONTROL_MINI
+	else if(!strcmp(command_name, "RingUnion")) {
 		rv = parse_port_ringunion(val);
 	} else if(!strcmp(command_name, "RingFcen")) {
 		rv = parse_port_ringfcen(val);

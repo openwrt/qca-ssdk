@@ -32,6 +32,7 @@
 #include "mht_port_ctrl.h"
 #include "mht_interface_ctrl.h"
 
+#ifndef IN_PORTCONTROL_MINI
 #define PORT0_MAX_VIRT_RING	8
 #define PORT5_MAX_VIRT_RING	16
 
@@ -258,7 +259,7 @@ _mht_ring_union_get(a_uint32_t dev_id, a_bool_t *enable)
 
 	return rv;
 }
-
+#endif
 static sw_error_t
 _mht_port_flowctrl_thresh_get(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint16_t *on, a_uint16_t *off)
@@ -297,7 +298,7 @@ _mht_port_flowctrl_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _mht_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status)
 {
@@ -340,7 +341,7 @@ _mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *
 
 	return rv;
 }
-
+#endif
 static sw_error_t
 _mht_port_flowctrl_forcemode_set(a_uint32_t dev_id, fal_port_t port_id,
 	a_bool_t enable)
@@ -795,6 +796,7 @@ _mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Set flow congestion drop on a particular port queue.
  * @param[in] dev_id device id
@@ -922,7 +924,7 @@ mht_ring_union_get(a_uint32_t dev_id, a_bool_t *en)
 	HSL_API_UNLOCK;
 	return rv;
 }
-
+#endif
 /**
  * @brief Get flow control(rx/tx/bp) threshold on a particular port.
  * @param[in] dev_id device id
@@ -962,7 +964,7 @@ mht_port_flowctrl_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
 	HSL_API_UNLOCK;
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Get port 0 & port5 ring flow control status.
  * @param[in] dev_id device id
@@ -996,7 +998,7 @@ mht_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *s
 	HSL_API_UNLOCK;
 	return rv;
 }
-
+#endif
 /**
  * @brief Set status of tx flow control on a particular port.
  * @param[in] dev_id device id

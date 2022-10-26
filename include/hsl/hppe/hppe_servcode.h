@@ -38,6 +38,7 @@ hppe_service_tbl_set(
 		a_uint32_t index,
 		union service_tbl_u *value);
 
+#if 0
 sw_error_t
 hppe_service_tbl_rx_counting_en_get(
 		a_uint32_t dev_id,
@@ -61,6 +62,7 @@ hppe_service_tbl_bypass_bitmap_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 sw_error_t
 hppe_in_l2_service_tbl_get(
@@ -74,6 +76,7 @@ hppe_in_l2_service_tbl_set(
 		a_uint32_t index,
 		union in_l2_service_tbl_u *value);
 
+#if 0
 sw_error_t
 hppe_in_l2_service_tbl_direction_get(
 		a_uint32_t dev_id,
@@ -146,7 +149,7 @@ hppe_in_l2_service_tbl_dst_port_id_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
-		sw_error_t
+sw_error_t
 hppe_eg_service_tbl_next_service_code_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -205,6 +208,7 @@ hppe_eg_service_tbl_hw_services_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
+#endif
 
 sw_error_t
 hppe_eg_service_tbl_set(

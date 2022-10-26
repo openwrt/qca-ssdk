@@ -54,6 +54,7 @@ hppe_service_tbl_set(
 				2);
 }
 
+#if 0
 sw_error_t
 hppe_service_tbl_rx_counting_en_get(
 		a_uint32_t dev_id,
@@ -115,6 +116,7 @@ hppe_service_tbl_bypass_bitmap_set(
 	ret = hppe_service_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_in_l2_service_tbl_get(
@@ -144,6 +146,7 @@ hppe_in_l2_service_tbl_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 hppe_in_l2_service_tbl_direction_get(
 		a_uint32_t dev_id,
@@ -329,6 +332,7 @@ hppe_in_l2_service_tbl_dst_port_id_set(
 	ret = hppe_in_l2_service_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_eg_service_tbl_get(
@@ -358,6 +362,7 @@ hppe_eg_service_tbl_set(
 				2);
 }
 
+#if 0
 sw_error_t
 hppe_eg_service_tbl_next_service_code_get(
 		a_uint32_t dev_id,
@@ -513,7 +518,6 @@ hppe_eg_service_tbl_hw_services_set(
 	return ret;
 }
 
-#if 0
 #if defined(MPPE)
 sw_error_t
 mppe_eg_service_tbl_ip_length_update_get(

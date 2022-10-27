@@ -785,6 +785,9 @@ hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,
 sw_error_t
 hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 	a_uint32_t port_id, fal_port_medium_t medium);
+sw_error_t
+hsl_port_phydev_get_status(a_uint32_t dev_id, a_uint32_t port_id,
+	struct port_phy_status *phy_status);
 /*qca808x_start*/
 sw_error_t
 hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable);

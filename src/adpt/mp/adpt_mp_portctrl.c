@@ -1019,7 +1019,7 @@ _adpt_mp_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(phy_status);
 
-	rv = hsl_port_phy_status_get(dev_id, port_id, phy_status);
+	rv = hsl_port_phydev_get_status(dev_id, port_id, phy_status);
 
 	return rv;
 }

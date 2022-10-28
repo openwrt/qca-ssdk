@@ -1155,6 +1155,57 @@ __adpt_hppe_uniphy_psgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	return rv;
 }
 
+#ifdef MPPE
+static sw_error_t
+_adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index,
+	a_uint32_t clk_rate)
+{
+	sw_error_t rv = SW_OK;
+	union uniphy_clkout_50m_ctrl_u clkout_50m_ctrl = {0};
+
+	SSDK_INFO("uniphy will output clock as %dHz\n", clk_rate);
+	rv = mppe_uniphy_clkout_50m_ctrl_get(dev_id, index, &clkout_50m_ctrl);
+	SW_RTN_ON_ERROR(rv);
+	if(clk_rate == UNIPHY_CLK_RATE_25M)
+	{
+		clkout_50m_ctrl.bf.clk_50m_div2_sel = 1;
+	}
+	else if(clk_rate == UNIPHY_CLK_RATE_50M)
+	{
+		clkout_50m_ctrl.bf.clk_50m_div2_sel = 0;
+	}
+	else
+	{
+		return SW_NOT_SUPPORTED;
+	}
+	rv = mppe_uniphy_clkout_50m_ctrl_set(dev_id, index, &clkout_50m_ctrl);
+
+	return rv;
+}
+
+static void
+adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
+{
+	a_uint32_t phy_id =0, port_id = 0;
+
+	/*when miami connect s17c or qca803x, need to reconfigure reference clock
+	as 25M*/
+	port_id = adpt_hppe_port_get_by_uniphy(dev_id, index, SSDK_UNIPHY_CHANNEL0);
+	if(ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE) &&
+		ssdk_port_force_speed_get(dev_id, port_id) == FAL_SPEED_1000)
+		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
+	phy_id = hsl_port_phyid_get(dev_id, port_id);
+	if (phy_id == QCA8030_PHY || phy_id == QCA8033_PHY || phy_id == QCA8035_PHY)
+	{
+		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
+		hsl_port_phy_gpio_reset(dev_id, port_id);
+		hsl_port_phy_hw_init(dev_id, port_id);
+	}
+
+	return;
+}
+#endif
+
 sw_error_t
 adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 {
@@ -1231,6 +1282,11 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 		ssdk_uniphy_raw_clock_set(index, UNIPHY_RX, clock);
 		ssdk_uniphy_raw_clock_set(index, UNIPHY_TX, clock);
 	}
+#ifdef MPPE
+	/*configure phy clock from uniphy*/
+	if (adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+		adpt_mppe_uniphy_clk_output_set(dev_id, index);
+#endif
 	return rv;
 }
 sw_error_t adpt_hppe_uniphy_init(a_uint32_t dev_id)

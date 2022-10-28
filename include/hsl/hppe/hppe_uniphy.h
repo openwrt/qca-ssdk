@@ -2741,5 +2741,18 @@ hppe_uniphy_pll_reset_ctrl_set(
 		a_uint32_t index,
 		union pll_power_on_and_reset_u *value);
 
+#ifdef MPPE
+sw_error_t
+mppe_uniphy_clkout_50m_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_clkout_50m_ctrl_u *value);
+
+sw_error_t
+mppe_uniphy_clkout_50m_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_clkout_50m_ctrl_u *value);
+#endif
 #endif
 

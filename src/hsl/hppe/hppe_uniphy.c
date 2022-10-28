@@ -6792,3 +6792,34 @@ hppe_uniphy_pll_reset_ctrl_set(
 				value->val);
 }
 
+#ifdef MPPE
+sw_error_t
+mppe_uniphy_clkout_50m_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_clkout_50m_ctrl_u *value)
+{
+	if (index >= UNIPHY_CLKOUT_50M_CTRL_NUM)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + UNIPHY_CLKOUT_50M_CTRL_ADDRESS,
+				index * UNIPHY_CLKOUT_50M_CTRL_INC,
+				&value->val);
+}
+
+sw_error_t
+mppe_uniphy_clkout_50m_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_clkout_50m_ctrl_u *value)
+{
+	if (index >= UNIPHY_CLKOUT_50M_CTRL_NUM)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_set(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR + UNIPHY_CLKOUT_50M_CTRL_ADDRESS,
+				index * UNIPHY_CLKOUT_50M_CTRL_INC,
+				value->val);
+}
+#endif

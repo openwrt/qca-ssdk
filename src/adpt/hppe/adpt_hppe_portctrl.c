@@ -81,6 +81,7 @@
 #define MAC_SPEED_1000M 2
 #define MAC_SPEED_10000M 3
 #define MAC_SPEED_2500M 4
+#define MAC_SPEED_5000M 5
 
 #define XGMAC_USXGMII_ENABLE 1
 #define XGMAC_USXGMII_CLEAR 0
@@ -199,6 +200,9 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 				break;
 			case MAC_SPEED_2500M:
 				phy_status->speed = FAL_SPEED_2500;
+				break;
+			case MAC_SPEED_5000M:
+				phy_status->speed = FAL_SPEED_5000;
 				break;
 			default:
 				phy_status->speed = FAL_SPEED_BUTT;
@@ -4758,9 +4762,21 @@ adpt_hppe_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	/* for those ports without PHY device should be sfp port or a internal port*/
 	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id)) {
 		if (port_id != SSDK_PHYSICAL_PORT0) {
-			rv = _adpt_phy_status_get_from_ppe(dev_id,
-				port_id, phy_status);
-			SW_RTN_ON_ERROR (rv);
+			fal_port_interface_mode_t mode = PORT_INTERFACE_MODE_MAX;
+			rv = adpt_hppe_port_interface_mode_get(dev_id, port_id,
+				&mode);
+			SW_RTN_ON_ERROR(rv);
+			if ((A_TRUE == hsl_port_is_sfp(dev_id, port_id)) &&
+				(mode == PORT_USXGMII)) {
+#if defined(IN_SFP_PHY)
+				rv = sfp_phy_port_status_get(dev_id, port_id, phy_status);
+				SW_RTN_ON_ERROR (rv);
+#endif
+			} else {
+				rv = _adpt_phy_status_get_from_ppe(dev_id,
+					port_id, phy_status);
+				SW_RTN_ON_ERROR (rv);
+			}
 		} else {
 			return SW_NOT_SUPPORTED;
 		}

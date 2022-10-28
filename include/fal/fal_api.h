@@ -2235,8 +2235,6 @@ extern "C" {
     SW_API_DEF(SW_API_QUEUE_FLUSH, fal_queue_flush), \
     SW_API_DEF(SW_API_UCAST_HASH_MAP_SET, fal_ucast_hash_map_set), \
     SW_API_DEF(SW_API_UCAST_HASH_MAP_GET, fal_ucast_hash_map_get), \
-    SW_API_DEF(SW_API_UCAST_DFLT_HASH_MAP_SET, fal_ucast_default_hash_set), \
-    SW_API_DEF(SW_API_UCAST_DFLT_HASH_MAP_GET, fal_ucast_default_hash_get), \
     SW_API_DEF(SW_API_AC_CTRL_SET, fal_ac_ctrl_set), \
     SW_API_DEF(SW_API_AC_CTRL_GET, fal_ac_ctrl_get), \
     SW_API_DEF(SW_API_AC_PRE_BUFFER_SET, fal_ac_prealloc_buffer_set), \
@@ -2253,12 +2251,8 @@ extern "C" {
     SW_API_DEF(SW_API_QUEUE_CNT_CTRL_SET, fal_queue_counter_ctrl_set), \
     SW_API_DEF(SW_API_QUEUE_CNT_GET, fal_queue_counter_get), \
     SW_API_DEF(SW_API_QUEUE_CNT_CLEANUP, fal_queue_counter_cleanup), \
-    SW_API_DEF(SW_API_QM_ENQUEUE_CTRL_SET, fal_qm_enqueue_ctrl_set), \
-    SW_API_DEF(SW_API_QM_ENQUEUE_CTRL_GET, fal_qm_enqueue_ctrl_get), \
     SW_API_DEF(SW_API_QM_SOURCE_PROFILE_SET, fal_qm_port_source_profile_set), \
-    SW_API_DEF(SW_API_QM_SOURCE_PROFILE_GET, fal_qm_port_source_profile_get), \
-    SW_API_DEF(SW_API_QM_ENQUEUE_CFG_GET, fal_qm_enqueue_config_get), \
-    SW_API_DEF(SW_API_QM_ENQUEUE_CFG_SET, fal_qm_enqueue_config_set),
+    SW_API_DEF(SW_API_QM_SOURCE_PROFILE_GET, fal_qm_port_source_profile_get),
 
 #define QM_API_PARAM \
     SW_API_DESC(SW_API_UCAST_QUEUE_BASE_PROFILE_SET) \
@@ -2268,8 +2262,6 @@ extern "C" {
     SW_API_DESC(SW_API_QUEUE_FLUSH) \
     SW_API_DESC(SW_API_UCAST_HASH_MAP_SET) \
     SW_API_DESC(SW_API_UCAST_HASH_MAP_GET) \
-    SW_API_DESC(SW_API_UCAST_DFLT_HASH_MAP_SET) \
-    SW_API_DESC(SW_API_UCAST_DFLT_HASH_MAP_GET) \
     SW_API_DESC(SW_API_AC_CTRL_SET) \
     SW_API_DESC(SW_API_AC_CTRL_GET) \
     SW_API_DESC(SW_API_AC_PRE_BUFFER_SET) \
@@ -2286,12 +2278,8 @@ extern "C" {
     SW_API_DESC(SW_API_QUEUE_CNT_CTRL_SET) \
     SW_API_DESC(SW_API_QUEUE_CNT_GET) \
     SW_API_DESC(SW_API_QUEUE_CNT_CLEANUP) \
-    SW_API_DESC(SW_API_QM_ENQUEUE_CTRL_SET) \
-    SW_API_DESC(SW_API_QM_ENQUEUE_CTRL_GET) \
     SW_API_DESC(SW_API_QM_SOURCE_PROFILE_SET) \
-    SW_API_DESC(SW_API_QM_SOURCE_PROFILE_GET) \
-    SW_API_DESC(SW_API_QM_ENQUEUE_CFG_GET) \
-    SW_API_DESC(SW_API_QM_ENQUEUE_CFG_SET)
+    SW_API_DESC(SW_API_QM_SOURCE_PROFILE_GET)
 #endif
 #else
 #define QM_API

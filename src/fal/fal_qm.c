@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+  *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_qm FAL_QM
@@ -58,6 +60,7 @@ _fal_ac_dynamic_threshold_get(
 	rv = p_api->adpt_ac_dynamic_threshold_get(dev_id, queue_id, cfg);
 	return rv;
 }
+
 sw_error_t
 _fal_ucast_queue_base_profile_get(
 		a_uint32_t dev_id,
@@ -110,6 +113,8 @@ _fal_ac_prealloc_buffer_set(
 	rv = p_api->adpt_ac_prealloc_buffer_set(dev_id, obj, num);
 	return rv;
 }
+
+#if !defined(IN_QM_MINI)
 sw_error_t
 _fal_ucast_default_hash_get(
 		a_uint32_t dev_id,
@@ -142,6 +147,8 @@ _fal_ucast_default_hash_set(
 	rv = p_api->adpt_ucast_default_hash_set(dev_id, hash_value);
 	return rv;
 }
+#endif
+
 sw_error_t
 _fal_ac_queue_group_get(
 		a_uint32_t dev_id,
@@ -525,6 +532,7 @@ _fal_queue_counter_get(
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 _fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable)
 {
@@ -586,6 +594,7 @@ _fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enabl
 	rv = p_api->adpt_qm_enqueue_ctrl_get(dev_id, queue_id, enable);
 	return rv;
 }
+#endif
 
 sw_error_t
 _fal_qm_port_source_profile_set(a_uint32_t dev_id, fal_port_t port, a_uint32_t src_profile)
@@ -686,6 +695,8 @@ fal_ac_prealloc_buffer_set(
 	FAL_API_UNLOCK;
 	return rv;
 }
+
+#if !defined(IN_QM_MINI)
 sw_error_t
 fal_ucast_default_hash_get(
 		a_uint32_t dev_id,
@@ -710,6 +721,8 @@ fal_ucast_default_hash_set(
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
+
 sw_error_t
 fal_ac_queue_group_get(
 		a_uint32_t dev_id,
@@ -1005,6 +1018,7 @@ fal_queue_counter_get(
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable)
 {
@@ -1026,6 +1040,7 @@ fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enable
 	FAL_API_UNLOCK;
 	return rv;
 }
+#endif
 
 sw_error_t
 fal_qm_port_source_profile_set(a_uint32_t dev_id, fal_port_t port, a_uint32_t src_profile)
@@ -1048,6 +1063,7 @@ fal_qm_port_source_profile_get(a_uint32_t dev_id, fal_port_t port, a_uint32_t *s
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 fal_qm_enqueue_config_set(a_uint32_t dev_id,
 		fal_enqueue_cfg_t *enqueue_cfg)
@@ -1071,10 +1087,7 @@ fal_qm_enqueue_config_get(a_uint32_t dev_id,
 	FAL_API_UNLOCK;
 	return rv;
 }
-
-EXPORT_SYMBOL(fal_qm_enqueue_config_set);
-
-EXPORT_SYMBOL(fal_qm_enqueue_config_get);
+#endif
 
 EXPORT_SYMBOL(fal_ac_ctrl_set);
 
@@ -1092,8 +1105,6 @@ EXPORT_SYMBOL(fal_ucast_queue_base_profile_set);
 
 EXPORT_SYMBOL(fal_queue_flush);
 
-EXPORT_SYMBOL(fal_qm_enqueue_ctrl_set);
-
 EXPORT_SYMBOL(fal_queue_counter_ctrl_set);
 
 EXPORT_SYMBOL(fal_ucast_priority_class_set);
@@ -1103,8 +1114,6 @@ EXPORT_SYMBOL(fal_ucast_hash_map_set);
 EXPORT_SYMBOL(fal_qm_port_source_profile_set);
 
 EXPORT_SYMBOL(fal_qm_port_source_profile_get);
-
-EXPORT_SYMBOL(fal_qm_enqueue_ctrl_get);
 
 EXPORT_SYMBOL(fal_ac_ctrl_get);
 
@@ -1138,6 +1147,19 @@ EXPORT_SYMBOL(fal_mcast_cpu_code_class_get);
 EXPORT_SYMBOL(fal_port_mcast_priority_class_set);
 
 EXPORT_SYMBOL(fal_port_mcast_priority_class_get);
+
+EXPORT_SYMBOL(fal_qm_enqueue_config_set);
+
+EXPORT_SYMBOL(fal_qm_enqueue_config_get);
+
+EXPORT_SYMBOL(fal_qm_enqueue_ctrl_set);
+
+EXPORT_SYMBOL(fal_qm_enqueue_ctrl_get);
+
+EXPORT_SYMBOL(fal_ucast_default_hash_set);
+
+EXPORT_SYMBOL(fal_ucast_default_hash_get);
+
 #endif
 
 /*insert flag for outter fal, don't remove it*/

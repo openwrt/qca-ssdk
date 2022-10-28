@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
  * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
@@ -271,6 +273,8 @@ adpt_hppe_ac_prealloc_buffer_set(
 	} else
 		return SW_FAIL;
 }
+
+#if !defined(IN_QM_MINI)
 sw_error_t
 adpt_hppe_ucast_default_hash_get(
 		a_uint32_t dev_id,
@@ -286,7 +290,7 @@ adpt_hppe_ucast_default_hash_get(
 	rv = hppe_ucast_default_hash_get(dev_id, &ucast_default_hash);
 	if( rv != SW_OK )
 		return rv;
-	
+
 	*hash_value = ucast_default_hash.bf.hash;
 	return SW_OK;
 }
@@ -307,6 +311,7 @@ adpt_hppe_ucast_default_hash_set(
 	
 	return rv;
 }
+#endif
 
 sw_error_t
 adpt_hppe_ac_queue_group_get(
@@ -1127,6 +1132,7 @@ adpt_hppe_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 	return hppe_eg_bridge_config_set(dev_id, &eg_bridge_config);
 }
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 adpt_hppe_qm_enqueue_ctrl_set(
 		a_uint32_t dev_id,
@@ -1162,6 +1168,7 @@ adpt_hppe_qm_enqueue_ctrl_get(
 
 	return SW_OK;
 }
+#endif
 
 static sw_error_t
 adpt_hppe_qm_port_source_profile_set(
@@ -1310,8 +1317,10 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 			adpt_hppe_ucast_queue_base_profile_set;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_FLUSH))
 		p_adpt_api->adpt_queue_flush = adpt_hppe_queue_flush;
+#if !defined(IN_QM_MINI)
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_ENQUEUE_CTRL_SET))
 		p_adpt_api->adpt_qm_enqueue_ctrl_set = adpt_hppe_qm_enqueue_ctrl_set;
+#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_HASH_MAP_SET))
 		p_adpt_api->adpt_ucast_hash_map_set = adpt_hppe_ucast_hash_map_set;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_AC_DYNAMIC_THRESHOLD_GET))
@@ -1330,11 +1339,11 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_mcast_cpu_code_class_get = adpt_hppe_mcast_cpu_code_class_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_MCAST_CPU_CODE_CLASS_SET))
 		p_adpt_api->adpt_mcast_cpu_code_class_set = adpt_hppe_mcast_cpu_code_class_set;
-#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_DEFAULT_HASH_GET))
 		p_adpt_api->adpt_ucast_default_hash_get = adpt_hppe_ucast_default_hash_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_DEFAULT_HASH_SET))
 		p_adpt_api->adpt_ucast_default_hash_set = adpt_hppe_ucast_default_hash_set;
+#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_AC_QUEUE_GROUP_GET))
 		p_adpt_api->adpt_ac_queue_group_get = adpt_hppe_ac_queue_group_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_AC_CTRL_GET))
@@ -1359,17 +1368,21 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_queue_counter_ctrl_get = adpt_hppe_queue_counter_ctrl_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_COUNTER_CTRL_SET))
 		p_adpt_api->adpt_queue_counter_ctrl_set = adpt_hppe_queue_counter_ctrl_set;
+#if !defined(IN_QM_MINI)
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_ENQUEUE_CTRL_GET))
 		p_adpt_api->adpt_qm_enqueue_ctrl_get = adpt_hppe_qm_enqueue_ctrl_get;
+#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_PORT_SRCPROFILE_GET))
 		p_adpt_api->adpt_qm_port_source_profile_get = adpt_hppe_qm_port_source_profile_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_PORT_SRCPROFILE_SET % 32)))
 		p_adpt_api->adpt_qm_port_source_profile_set = adpt_hppe_qm_port_source_profile_set;
 #if defined(APPE)
+#if !defined(IN_QM_MINI)
 	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_ENQUEUE_CFG_GET % 32)))
 		p_adpt_api->adpt_qm_enqueue_config_get = adpt_appe_qm_enqueue_config_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_ENQUEUE_CFG_SET % 32)))
 		p_adpt_api->adpt_qm_enqueue_config_set = adpt_appe_qm_enqueue_config_set;
+#endif
 #endif
 
 	return SW_OK;

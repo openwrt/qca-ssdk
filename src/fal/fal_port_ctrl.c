@@ -1144,6 +1144,8 @@ _fal_port_mdix_status_get (a_uint32_t dev_id, fal_port_t port_id,
   return rv;
 }
 /*qca808x_end*/
+#endif
+
 static sw_error_t
 _fal_port_combo_prefer_medium_set (a_uint32_t dev_id, fal_port_t port_id,
 				   fal_port_medium_t medium)
@@ -1190,6 +1192,7 @@ _fal_port_combo_prefer_medium_get (a_uint32_t dev_id, fal_port_t port_id,
   return rv;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _fal_port_combo_medium_status_get (a_uint32_t dev_id, fal_port_t port_id,
 				   fal_port_medium_t * medium)
@@ -3192,6 +3195,8 @@ fal_port_mdix_status_get (a_uint32_t dev_id, fal_port_t port_id,
   return rv;
 }
 /*qca808x_end*/
+#endif
+
 /**
  * @brief Set combo prefer medium  on a particular port.
  * @param[in] dev_id device id
@@ -3230,6 +3235,7 @@ fal_port_combo_prefer_medium_get (a_uint32_t dev_id, a_uint32_t port_id,
   return rv;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Get combo  medium  status on a particular port.
  * @param[in] dev_id device id
@@ -4100,8 +4106,6 @@ EXPORT_SYMBOL(fal_port_8023az_get);
 EXPORT_SYMBOL(fal_port_mdix_set);
 EXPORT_SYMBOL(fal_port_mdix_get);
 EXPORT_SYMBOL(fal_port_mdix_status_get);
-EXPORT_SYMBOL(fal_port_combo_prefer_medium_set);
-EXPORT_SYMBOL(fal_port_combo_prefer_medium_get);
 EXPORT_SYMBOL(fal_port_combo_medium_status_get);
 EXPORT_SYMBOL(fal_port_combo_fiber_mode_set);
 EXPORT_SYMBOL(fal_port_combo_fiber_mode_get);
@@ -4111,6 +4115,8 @@ EXPORT_SYMBOL(fal_port_remote_loopback_set);
 EXPORT_SYMBOL(fal_port_remote_loopback_get);
 EXPORT_SYMBOL(fal_port_reset);
 #endif
+EXPORT_SYMBOL(fal_port_combo_prefer_medium_set);
+EXPORT_SYMBOL(fal_port_combo_prefer_medium_get);
 EXPORT_SYMBOL(fal_port_power_off);
 EXPORT_SYMBOL(fal_port_power_on);
 #ifndef IN_PORTCONTROL_MINI

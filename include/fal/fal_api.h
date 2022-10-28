@@ -322,7 +322,9 @@ extern "C" {
     SW_API_DEF(SW_API_PT_SOURCE_FILTER_CONFIG_SET, fal_port_source_filter_config_set), \
     SW_API_DEF(SW_API_PT_PROMISC_MODE_SET, fal_port_promisc_mode_set), \
     SW_API_DEF(SW_API_PT_PROMISC_MODE_GET, fal_port_promisc_mode_get), \
-    SW_API_DEF(SW_API_PT_COMBO_LINK_STATUS_GET, fal_port_combo_link_status_get ),
+    SW_API_DEF(SW_API_PT_COMBO_LINK_STATUS_GET, fal_port_combo_link_status_get ), \
+    SW_API_DEF(SW_API_PT_COMBO_PREFER_MEDIUM_SET, fal_port_combo_prefer_medium_set), \
+    SW_API_DEF(SW_API_PT_COMBO_PREFER_MEDIUM_GET, fal_port_combo_prefer_medium_get),
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
     SW_API_DESC(SW_API_PT_DUPLEX_SET) \
@@ -368,7 +370,9 @@ extern "C" {
     SW_API_DESC(SW_API_PT_SOURCE_FILTER_CONFIG_SET) \
     SW_API_DESC(SW_API_PT_PROMISC_MODE_SET) \
     SW_API_DESC(SW_API_PT_PROMISC_MODE_GET) \
-    SW_API_DESC(SW_API_PT_COMBO_LINK_STATUS_GET)
+    SW_API_DESC(SW_API_PT_COMBO_LINK_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_COMBO_PREFER_MEDIUM_SET) \
+    SW_API_DESC(SW_API_PT_COMBO_PREFER_MEDIUM_GET)
 /*end of PORTCONTROL_API_PARAM*/
 #endif
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -137,6 +138,7 @@ appe_pppoe_session_ext2_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 appe_pppoe_session_session_id_get(
 		a_uint32_t dev_id,
@@ -570,3 +572,4 @@ appe_pppoe_session_ext2_tl_l3_if_index_set(
 	ret = appe_pppoe_session_ext2_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif

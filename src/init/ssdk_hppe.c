@@ -975,10 +975,22 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 				fal_ucast_priority_class_set(dev_id, FAL_QM_PROFILE_PO_ID,
 						pri, class);
+
 			} else {
 				fal_ucast_priority_class_set(dev_id, i, pri, class);
 			}
 
+		}
+
+		if (i == 0) {
+			a_uint32_t hash = 0;
+			/*
+			 * For CPU port, we need to initialize the hash map offset to 0 for the
+			 * PO profile.
+			 */
+			for (hash = 0; hash < FAL_QM_PROFILE_PO_RSS_HASH_MAX; hash++)
+				fal_ucast_hash_map_set(dev_id, FAL_QM_PROFILE_PO_ID,
+						hash, FAL_QM_PROFILE_PO_RSS_HASH_CLASS);
 		}
 	}
 

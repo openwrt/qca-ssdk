@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
  *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -66,7 +68,7 @@ appe_l2_vp_port_tbl_set(
 				value->val,
 				4);
 }
-
+#if 0
 sw_error_t
 appe_vp_lrn_limit_counter_lrn_cnt_get(
 		a_uint32_t dev_id,
@@ -452,7 +454,7 @@ appe_l2_vp_port_tbl_new_addr_fwd_cmd_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 appe_l2_vp_port_tbl_promisc_en_get(
 		a_uint32_t dev_id,
@@ -483,7 +485,7 @@ appe_l2_vp_port_tbl_promisc_en_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 appe_l2_vp_port_tbl_new_addr_lrn_en_get(
 		a_uint32_t dev_id,
@@ -576,7 +578,7 @@ appe_l2_vp_port_tbl_lrn_lmt_exceed_fwd_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 appe_l2_vp_port_tbl_port_isolation_bitmap_get(
 		a_uint32_t dev_id,
@@ -607,7 +609,7 @@ appe_l2_vp_port_tbl_port_isolation_bitmap_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 appe_l2_vp_port_tbl_eg_vlan_fltr_cmd_get(
 		a_uint32_t dev_id,
@@ -731,7 +733,7 @@ appe_l2_vp_port_tbl_vp_eg_data_valid_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 appe_l2_vp_port_tbl_dst_info_get(
 		a_uint32_t dev_id,
@@ -762,7 +764,7 @@ appe_l2_vp_port_tbl_dst_info_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 appe_l2_vp_port_tbl_lrn_lmt_cnt_get(
 		a_uint32_t dev_id,
@@ -886,7 +888,7 @@ appe_l2_vp_port_tbl_exception_fmt_ctrl_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 appe_l2_vp_port_tbl_app_ctrl_profile_get(
 		a_uint32_t dev_id,
@@ -919,7 +921,7 @@ appe_l2_vp_port_tbl_app_ctrl_profile_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 appe_l2_vp_port_tbl_mtu_check_type_get(
 		a_uint32_t dev_id,
@@ -950,7 +952,7 @@ appe_l2_vp_port_tbl_mtu_check_type_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 appe_l2_vp_port_tbl_invalid_vsi_forwarding_en_get(
 		a_uint32_t dev_id,
@@ -981,7 +983,7 @@ appe_l2_vp_port_tbl_invalid_vsi_forwarding_en_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 appe_l2_vp_port_tbl_physical_port_mtu_check_en_get(
 		a_uint32_t dev_id,
@@ -1012,7 +1014,7 @@ appe_l2_vp_port_tbl_physical_port_mtu_check_en_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#endif
 sw_error_t
 appe_l2_vp_port_tbl_physical_port_get(
 		a_uint32_t dev_id,
@@ -1043,7 +1045,7 @@ appe_l2_vp_port_tbl_physical_port_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-
+#if 0
 sw_error_t
 appe_l2_vp_port_tbl_eg_stag_fmt_get(
 		a_uint32_t dev_id,
@@ -1074,3 +1076,4 @@ appe_l2_vp_port_tbl_eg_stag_fmt_set(
 	ret = appe_l2_vp_port_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif

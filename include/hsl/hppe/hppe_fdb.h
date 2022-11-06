@@ -1,17 +1,20 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -27,7 +30,7 @@
 #define RFDB_TBL_MAX_ENTRY	32
 #define FDB_TBL_MAX_ENTRY	2048
 
-
+#if 0
 sw_error_t
 hppe_l2_dbg_addr_get(
 		a_uint32_t dev_id,
@@ -52,7 +55,7 @@ sw_error_t
 hppe_fdb_tbl_op_get(
 		a_uint32_t dev_id,
 		union fdb_tbl_op_u *value);
-
+#endif
 sw_error_t
 hppe_fdb_tbl_op_set(
 		a_uint32_t dev_id,
@@ -107,7 +110,7 @@ sw_error_t
 hppe_l2_global_conf_set(
 		a_uint32_t dev_id,
 		union l2_global_conf_u *value);
-
+#if 0
 sw_error_t
 hppe_l2_dbgcnt_cmd_get(
 		a_uint32_t dev_id,
@@ -137,7 +140,7 @@ sw_error_t
 hppe_l2_dbgcnt_wdata_set(
 		a_uint32_t dev_id,
 		union l2_dbgcnt_wdata_u *value);
-
+#endif
 sw_error_t
 hppe_fdb_tbl_rd_op_rslt_data0_get(
 		a_uint32_t dev_id,
@@ -275,7 +278,7 @@ hppe_rfdb_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union rfdb_tbl_u *value);
-
+#if 0
 sw_error_t
 hppe_fdb_tbl_get(
 		a_uint32_t dev_id,
@@ -577,7 +580,7 @@ sw_error_t
 hppe_l2_global_conf_age_ctrl_mode_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 #ifndef IN_FDB_MINI
 sw_error_t
 hppe_l2_global_conf_service_code_loop_get(
@@ -589,7 +592,7 @@ hppe_l2_global_conf_service_code_loop_set(
 		a_uint32_t dev_id,
 		unsigned int value);
 #endif
-
+#if 0
 sw_error_t
 hppe_l2_dbgcnt_cmd_type_get(
 		a_uint32_t dev_id,
@@ -741,7 +744,7 @@ hppe_port_lrn_limit_counter_lrn_cnt_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#endif
 sw_error_t
 hppe_rfdb_tbl_mac_addr_get(
 		a_uint32_t dev_id,
@@ -753,13 +756,13 @@ hppe_rfdb_tbl_mac_addr_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint64_t value);
-
+#if 0
 sw_error_t
 hppe_rfdb_tbl_valid_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t *value);
-
+#endif
 sw_error_t
 hppe_rfdb_tbl_valid_set(
 		a_uint32_t dev_id,

@@ -1,17 +1,20 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -22,7 +25,7 @@
 #include "hppe_reg_access.h"
 #include "hppe_fdb_reg.h"
 #include "hppe_fdb.h"
-#ifndef IN_FDB_MINI
+#if 0
 sw_error_t
 hppe_l2_dbg_addr_get(
 		a_uint32_t dev_id,
@@ -189,7 +192,7 @@ hppe_l2_global_conf_set(
 				IPE_L2_BASE_ADDR + L2_GLOBAL_CONF_ADDRESS,
 				value->val);
 }
-#ifndef IN_FDB_MINI
+#if 0
 sw_error_t
 hppe_l2_dbgcnt_cmd_get(
 		a_uint32_t dev_id,
@@ -550,7 +553,7 @@ hppe_rfdb_tbl_set(
 				value->val,
 				2);
 }
-#ifndef IN_FDB_MINI
+#if 0
 sw_error_t
 hppe_fdb_tbl_get(
 		a_uint32_t dev_id,
@@ -1355,7 +1358,8 @@ hppe_l2_global_conf_age_ctrl_mode_set(
 	ret = hppe_l2_global_conf_set(dev_id, &reg_val);
 	return ret;
 }
-
+#endif
+#ifndef IN_FDB_MINI
 sw_error_t
 hppe_l2_global_conf_service_code_loop_get(
 		a_uint32_t dev_id,
@@ -1384,7 +1388,8 @@ hppe_l2_global_conf_service_code_loop_set(
 	ret = hppe_l2_global_conf_set(dev_id, &reg_val);
 	return ret;
 }
-
+#endif
+#if 0
 sw_error_t
 hppe_l2_dbgcnt_cmd_type_get(
 		a_uint32_t dev_id,
@@ -1504,7 +1509,7 @@ hppe_port_bridge_ctrl_port_isolation_bitmap_set(
 	ret = hppe_port_bridge_ctrl_set(dev_id, index, &reg_val);
 	return ret;
 }
-#endif
+
 sw_error_t
 hppe_port_bridge_ctrl_station_move_lrn_en_get(
 		a_uint32_t dev_id,
@@ -1776,6 +1781,7 @@ hppe_port_lrn_limit_counter_lrn_cnt_set(
 	return SW_NOT_SUPPORTED;
 }
 #endif
+#endif
 sw_error_t
 hppe_rfdb_tbl_mac_addr_get(
 		a_uint32_t dev_id,
@@ -1808,7 +1814,7 @@ hppe_rfdb_tbl_mac_addr_set(
 	ret = hppe_rfdb_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
-#ifndef IN_FDB_MINI
+#if 0
 sw_error_t
 hppe_rfdb_tbl_valid_get(
 		a_uint32_t dev_id,

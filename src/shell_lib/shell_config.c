@@ -621,15 +621,15 @@ struct sub_cmd_des_t g_port_des[] =
 	{"autoNeg", "restart",   SW_API_PT_AN_RESTART, NULL},
 	{"autoNegenable", "set",   SW_API_PT_AN_ENABLE, NULL},
 	{"autoNegrestart", "set",   SW_API_PT_AN_RESTART, NULL},
-	#ifndef IN_PORTCONTROL_MINI
+#ifndef IN_PORTCONTROL_MINI
 	{"header", "set",   SW_API_PT_HDR_SET, NULL},
-	#endif
+#endif
 	{"txhdr", "set",   SW_API_PT_TXHDR_SET, NULL},
 	{"rxhdr", "set",   SW_API_PT_RXHDR_SET, NULL},
 	{"hdrtype", "set",   SW_API_HEADER_TYPE_SET, NULL},
 	{"poweroff", "set",   SW_API_PT_POWER_OFF, NULL},
 	{"poweron", "set",   SW_API_PT_POWER_ON, NULL},
-	#ifndef IN_PORTCONTROL_MINI
+#ifndef IN_PORTCONTROL_MINI
 	{"flowCtrl", "set",   SW_API_PT_FLOWCTRL_SET, NULL},
 	{"flowCtrlforcemode", "set",   SW_API_PT_FLOWCTRL_MODE_SET, NULL},
 	{"powersave", "set",   SW_API_PT_POWERSAVE_SET, NULL},
@@ -656,7 +656,9 @@ struct sub_cmd_des_t g_port_des[] =
 	{"interfaceMode", "set",   SW_API_PT_INTERFACE_MODE_SET, NULL},
 	{"InterfaceModeApply", "set",   SW_API_PT_INTERFACE_MODE_APPLY, NULL},
 	{"ringunion", "set",   SW_API_PT_RING_UNION_SET, NULL},
+#endif
 	{"ptfcthresh", "set",   SW_API_PT_FLOW_CTRL_THRES_SET, NULL},
+#ifndef IN_PORTCONTROL_MINI
 	{"ringfcen", "set",   SW_API_PT_RING_FLOW_CTRL_SET, NULL},
 #endif
 	{"mtu", "set",   SW_API_PT_MTU_SET, NULL},

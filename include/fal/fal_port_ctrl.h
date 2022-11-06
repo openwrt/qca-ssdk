@@ -883,6 +883,7 @@ fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
 		a_uint16_t *on_thres, a_uint16_t *off_thres);
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
 sw_error_t
@@ -893,6 +894,7 @@ sw_error_t
 fal_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
 sw_error_t
 fal_ring_flow_ctrl_config_set(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t status);
+#endif
 sw_error_t
 fal_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cfg_t *cnt_cfg);
 
@@ -904,12 +906,14 @@ fal_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *port_cnt
 
 sw_error_t
 fal_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id);
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_congestion_drop_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t queue_id, a_bool_t enable);
 sw_error_t
 fal_ring_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t ring_id,
 		a_uint16_t on_thres, a_uint16_t off_thres);
+#endif
 sw_error_t fal_port_combo_link_status_get (a_uint32_t dev_id,
 		fal_port_t port_id, fal_port_combo_link_status_t * status);
 /*qca808x_start*/

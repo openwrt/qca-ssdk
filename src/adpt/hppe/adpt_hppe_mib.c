@@ -72,8 +72,7 @@ adpt_ppe_mib_cpukeep_set(a_uint32_t dev_id, a_bool_t enable)
 	for (port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT6; port_id++)
 	{
 #ifdef CPPE
-		if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-			adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
+		if (adpt_ppe_type_get(dev_id) == CPPE_TYPE &&
 			port_id == SSDK_PHYSICAL_PORT6)
 		{
 			rv = adpt_cppe_lpbk_mib_cpukeep_set(dev_id, port_id, enable);
@@ -179,8 +178,7 @@ adpt_ppe_get_mib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mib_info);
 #ifdef CPPE
-	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
+	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE &&
 		port_id == SSDK_PHYSICAL_PORT6)
 	{
 		return adpt_cppe_lpbk_get_mib_info(dev_id, port_id, mib_info);
@@ -248,8 +246,7 @@ adpt_ppe_mib_status_set(a_uint32_t dev_id, a_bool_t enable)
 	memset(&mmc_control, 0, sizeof(mmc_control));
 	ADPT_DEV_ID_CHECK(dev_id);
 #ifdef CPPE
-	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION)
+	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE)
 	{
 		port_num = SSDK_PHYSICAL_PORT5;
 		rv = adpt_cppe_lpbk_mib_status_set(dev_id, SSDK_PHYSICAL_PORT6, enable);
@@ -315,8 +312,7 @@ sw_error_t
 adpt_ppe_mib_port_flush_counters(a_uint32_t dev_id, fal_port_t port_id)
 {
 #ifdef CPPE
-	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
+	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE &&
 		port_id == SSDK_PHYSICAL_PORT6)
 	{
 		return adpt_cppe_lpbk_mib_flush_counters(dev_id, port_id);
@@ -399,8 +395,7 @@ adpt_ppe_get_rx_mib_info(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(mib_info);
 #ifdef CPPE
-	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
+	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE &&
 		port_id == SSDK_PHYSICAL_PORT6)
 	{
 		return adpt_cppe_lpbk_get_mib_info(dev_id, port_id, mib_info);

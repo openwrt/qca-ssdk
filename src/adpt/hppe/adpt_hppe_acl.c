@@ -1606,8 +1606,7 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_REMARK_DSCP);
 		rule->dscp = hw_act->bf.dscp_tc;
 #if defined(CPPE) || defined(APPE)
-		if((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-			adpt_chip_revision_get(dev_id) == CPPE_REVISION) ||
+		if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
 			adpt_chip_type_get(dev_id) == CHIP_APPE)
 		{
 			rule->dscp_mask = hw_act->bf.dscp_tc_mask;
@@ -1660,8 +1659,7 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 #endif
 	}
 #if defined(CPPE) || defined(APPE)
-	if((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) ||
+	if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
 		adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rule->qos_res_prec = hw_act->bf.qos_res_prec;
@@ -3336,8 +3334,7 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 		hw_act->bf.dscp_tc_change_en = 1;
 		hw_act->bf.dscp_tc = rule->dscp;
 #if defined(CPPE) || defined(APPE)
-		if((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-			adpt_chip_revision_get(dev_id) == CPPE_REVISION) ||
+		if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
 			adpt_chip_type_get(dev_id) == CHIP_APPE)
 		{
 			hw_act->bf.dscp_tc_mask = rule->dscp_mask;
@@ -3391,8 +3388,7 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 #endif
 	}
 #if defined(CPPE) || defined(APPE)
-	if((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) ||
+	if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
 		adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		hw_act->bf.qos_res_prec = rule->qos_res_prec;

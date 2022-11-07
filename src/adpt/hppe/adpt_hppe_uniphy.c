@@ -732,12 +732,7 @@ __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	rv = __adpt_hppe_uniphy_calibrate(dev_id, uniphy_index);
 
 	/* configure gcc speed clock to 10g r mode*/
-	if (uniphy_index == SSDK_UNIPHY_INSTANCE1)
-		port_id = HPPE_UNIPHY1_PORT;
-	else if (uniphy_index == SSDK_UNIPHY_INSTANCE2)
-		port_id = HPPE_MUX_PORT2;
-	else if (uniphy_index == SSDK_UNIPHY_INSTANCE0)
-		port_id = SSDK_PHYSICAL_PORT1;
+	port_id = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index, SSDK_UNIPHY_CHANNEL0);
 	adpt_hppe_gcc_port_speed_clock_set(dev_id, port_id, FAL_SPEED_10000);
 
 	/* enable instance clock */
@@ -763,8 +758,7 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 
 	SSDK_DEBUG("uniphy %d is sgmiiplus mode\n", uniphy_index);
 #if defined(CPPE)
-	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION)
+	if ((adpt_ppe_type_get(dev_id) == CPPE_TYPE)
 		&& (uniphy_index == SSDK_UNIPHY_INSTANCE0)) {
 		SSDK_DEBUG("cypress uniphy %d is sgmiiplus mode\n", uniphy_index);
 		rv = __adpt_cppe_uniphy_mode_set(dev_id, uniphy_index,
@@ -851,7 +845,7 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 static sw_error_t
 __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_uint32_t channel)
 {
-	a_uint32_t i, max_port, mode, ssdk_port;
+	a_uint32_t i, max_port, ssdk_port;
 	sw_error_t rv = SW_OK;
 	a_bool_t force_port = 0;
 
@@ -864,8 +858,7 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 #if defined(CPPE)
 	if ((uniphy_index == SSDK_UNIPHY_INSTANCE0) &&
 		(channel == SSDK_UNIPHY_CHANNEL0)) {
-		if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-			adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
+		if (adpt_ppe_type_get(dev_id) == CPPE_TYPE) {
 			if (hsl_port_prop_check(dev_id, SSDK_PHYSICAL_PORT4,
 					HSL_PP_EXCL_CPU) == A_TRUE) {
 				SSDK_DEBUG("cypress uniphy %d is sgmii mode\n", uniphy_index);
@@ -904,8 +897,7 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	}
 
 #if defined(CPPE)
-	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
+	if ((adpt_ppe_type_get(dev_id) == CPPE_TYPE) &&
 		(uniphy_index == SSDK_UNIPHY_INSTANCE0)) {
 		SSDK_DEBUG("uniphy %d sgmii channel selection\n", uniphy_index);
 		rv = __adpt_cppe_uniphy_channel_selection_set(dev_id,
@@ -917,9 +909,8 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 
 	/* configure uniphy to Athr mode and sgmii mode */
 	hppe_uniphy_mode_ctrl_get(dev_id, uniphy_index, &uniphy_mode_ctrl);
-	mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
 
-	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,channel);
+	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index, channel);
 	if ((A_TRUE == hsl_port_is_sfp(dev_id, ssdk_port)) &&
 		(A_TRUE != ssdk_port_feature_get(dev_id, ssdk_port, PHY_F_SFP_SGMII))) {
 		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
@@ -1096,8 +1087,7 @@ __adpt_hppe_uniphy_psgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 
 	SSDK_DEBUG("uniphy %d is psgmii mode\n", uniphy_index);
 #if defined(CPPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
+	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE) {
 		phy_type = hsl_port_phyid_get(dev_id,
 				SSDK_PHYSICAL_PORT3);
 		if (phy_type == MALIBU2PORT_PHY) {
@@ -1120,8 +1110,7 @@ __adpt_hppe_uniphy_psgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	}
 
 #if defined(CPPE)
-	if ((adpt_chip_type_get(dev_id) == CHIP_HPPE &&
-		adpt_chip_revision_get(dev_id) == CPPE_REVISION) &&
+	if ((adpt_ppe_type_get(dev_id) == CPPE_TYPE) &&
 		(uniphy_index == SSDK_UNIPHY_INSTANCE0)) {
 		SSDK_INFO("uniphy %d psgmii channel selection\n", uniphy_index);
 		rv = __adpt_cppe_uniphy_channel_selection_set(dev_id,

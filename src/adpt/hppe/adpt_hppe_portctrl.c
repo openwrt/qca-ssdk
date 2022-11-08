@@ -2814,21 +2814,6 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id,
 			rv = adpt_hppe_port_mac_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
 		}
 	}
-	if ((port_type == PORT_GMAC_TYPE) ||(port_type == PORT_XGMAC_TYPE)) {
-		if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
-#if defined(APPE)
-			rv = _adpt_appe_port_mux_mac_set(dev_id, port_id, port_type);
-#endif
-		} else {
-			if (adpt_chip_revision_get(dev_id) == HPPE_REVISION) {
-			 	rv = _adpt_hppe_port_mux_mac_set(dev_id, port_id, port_type);
-			} else if (adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
-#if defined(CPPE)
-				rv = _adpt_cppe_port_mux_mac_set(dev_id, port_id, port_type);
-#endif
-			}
-		}
-	}
 	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
 		xgmac_port = SSDK_PHYSICAL_PORT1;
 	} else {
@@ -2849,6 +2834,19 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id,
 			return SW_NOT_SUPPORTED;
 		}
 		rv = adpt_hppe_port_interface_mode_switch_mac_reset(dev_id, port_id);
+	}
+	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
+#if defined(APPE)
+		rv = _adpt_appe_port_mux_mac_set(dev_id, port_id, port_type);
+#endif
+	} else {
+		if (adpt_chip_revision_get(dev_id) == HPPE_REVISION) {
+			rv = _adpt_hppe_port_mux_mac_set(dev_id, port_id, port_type);
+		} else if (adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
+#if defined(CPPE)
+			rv = _adpt_cppe_port_mux_mac_set(dev_id, port_id, port_type);
+#endif
+		}
 	}
 
 	return rv;
@@ -5533,6 +5531,7 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 			SSDK_DEBUG("Port %d change to link down status\n", port_id);
 			/* disable ppe port bridge txmac */
 			adpt_hppe_port_bridge_txmac_set(priv->device_id, port_id, A_FALSE);
+			aos_mdelay(10);
 			/* disable rx mac */
 			adpt_hppe_port_rxmac_status_set(priv->device_id, port_id, A_FALSE);
 			priv->port_old_link[port_id - 1] = phy_status.link_status;

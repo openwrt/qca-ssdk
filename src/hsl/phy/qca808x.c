@@ -522,6 +522,8 @@ static int qca808x_read_status(struct phy_device *phydev)
 	/*get the link partner ability*/
 	SW_RTN_ON_ERROR(qca808x_phy_get_partner_ability(dev_id, phy_id, &lp_adv));
 	qca808x_lp_adv_to_ethtool_adv(phydev, lp_adv);
+	/*get the link partner pause*/
+	phy_resolve_aneg_pause(phydev);
 
 	return 0;
 }

@@ -1038,7 +1038,7 @@ hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	return rv;
 }
 
-static sw_error_t
+sw_error_t
 hsl_port_phydev_get_status(a_uint32_t dev_id, a_uint32_t port_id,
 	struct port_phy_status *phy_status)
 {

@@ -372,6 +372,37 @@ qca808x_phy_id_check(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return A_FALSE;
 }
 
+static sw_error_t
+qca808x_phy_fifo_reset(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint16_t phy_data = 0;
+	a_uint32_t serdes_addr = 0;
+
+/*qca808x_end*/
+#ifdef MHT
+	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
+	{
+		rv = qca8084_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
+		return rv;
+	}
+#endif
+/*qca808x_start*/
+	/*qca808x serdes address is phy address+1*/
+	serdes_addr = phy_addr+1;
+	phy_data = qca808x_phy_mmd_read(dev_id, serdes_addr, QCA808X_PHY_MMD1_NUM,
+		QCA808X_PHY_MMD1_FIFO_REST_REG);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(enable)
+		phy_data &= ~(BIT(11));
+	else
+		phy_data |= BIT(11);
+	rv =  qca808x_phy_mmd_write(dev_id, serdes_addr, QCA808X_PHY_MMD1_NUM,
+		QCA808X_PHY_MMD1_FIFO_REST_REG, phy_data);
+
+	return rv;
+}
+
 /******************************************************************************
 *
 * qca808x_phy_get status
@@ -405,7 +436,7 @@ qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
 #endif
 /*qca808x_start*/
 		{
-
+			qca808x_phy_fifo_reset(dev_id, phy_id, A_TRUE);
 			if (qca808x_phy_2500caps(dev_id, phy_id) == A_TRUE) {
 				SW_RTN_ON_ERROR(
 					qca808x_phy_ms_random_seed_set (dev_id, phy_id));
@@ -469,8 +500,12 @@ qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
 	{
 		qca8084_phy_speed_fixup(dev_id, phy_id, phy_status);
 	}
+	else
 #endif
 /*qca808x_start*/
+	{
+		qca808x_phy_fifo_reset(dev_id, phy_id, A_FALSE);
+	}
 	return SW_OK;
 }
 
@@ -1335,16 +1370,10 @@ sw_error_t qca808x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 /*qca808x_end*/
 	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
 	SW_RTN_ON_ERROR(rv);
-#ifdef MHT
-	/*before autoneg restart, need to reset fifo to avoid garbage signal*/
-	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
-	{
-		rv = qca8084_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
-		SW_RTN_ON_ERROR(rv);
-	}
-#endif
 /*qca808x_start*/
-
+	/*before autoneg restart, need to reset fifo to avoid garbage signal*/
+	rv = qca808x_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
+	SW_RTN_ON_ERROR(rv);
 	phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_PHY_CONTROL);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 

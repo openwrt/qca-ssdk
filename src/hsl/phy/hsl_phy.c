@@ -534,7 +534,7 @@ qca_ssdk_phy_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr)
 		if (phy_info[dev_id]->phy_address[i] == phy_addr)
 			return i;
 	}
-	SSDK_ERROR("doesn't match port_id to specified phy_addr !\n");
+	SSDK_DEBUG("doesn't match port_id to specified phy_addr !\n");
 	return 0;
 }
 

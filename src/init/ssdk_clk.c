@@ -905,17 +905,16 @@ static void ssdk_cmnblk_init(enum cmnblk_clk_type mode)
 			return;
 	}
 
+	/* Select clock source */
 	writel(reg_val, gcc_pll_base + 0x4);
+
+	/* Soft reset to calibration clock */
 	reg_val = readl(gcc_pll_base);
-	reg_val = reg_val | 0x40;
+	reg_val &= ~BIT(6);
 	writel(reg_val, gcc_pll_base);
 	msleep(1);
-	reg_val = reg_val & (~0x40);
+	reg_val |= BIT(6);
 	writel(reg_val, gcc_pll_base);
-	msleep(1);
-	writel(0xbf, gcc_pll_base);
-	msleep(1);
-	writel(0xff, gcc_pll_base);
 	msleep(1);
 
 	iounmap(gcc_pll_base);

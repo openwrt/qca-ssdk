@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -55,9 +56,9 @@
 #define GMAC_DACTIVATE_FLOWCTRL_WITH_6KB     0x400800
 #define GMAC_DACTIVATE_FLOWCTRL_WITH_7KB     0x401000
 
-#define GMAC_HW_FLOWCTRL_DISABLE         0x0
-#define PORT_LPI_ENABLE_STATUS           0x3
-#define PORT_LPI_TASK_RUNNING            0x10000
-#define PORT_LPI_TASK_START              0x20000
+#define GMAC_HW_FLOWCTRL_DISABLE	0x0
+#define PORT_LPI_ENABLE_STATUS		0x3
+#define PORT_LPI_TASK_RUNNING		0x10000
+#define PORT_LPI_TASK_INIT		0x20000
 
 #endif

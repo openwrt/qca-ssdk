@@ -1654,12 +1654,8 @@ qca_mac_sw_sync_work_task(struct work_struct *work)
 }
 
 int
-qca_mac_sw_sync_work_start(struct qca_phy_priv *priv)
+qca_mac_sw_sync_work_init(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY)
-		&& (priv->version != QCA_VER_APPE))
-		return 0;
-
 	if ((priv->version == QCA_VER_HPPE) || (priv->version == QCA_VER_APPE)) {
 		qca_mac_sw_sync_port_status_init(priv->device_id);
 	}
@@ -1667,34 +1663,68 @@ qca_mac_sw_sync_work_start(struct qca_phy_priv *priv)
 	mutex_init(&priv->mac_sw_sync_lock);
 
 	INIT_DELAYED_WORK(&priv->mac_sw_sync_dwork,
-					qca_mac_sw_sync_work_task);
-	schedule_delayed_work(&priv->mac_sw_sync_dwork,
-					msecs_to_jiffies(QCA_MAC_SW_SYNC_WORK_DELAY));
+			qca_mac_sw_sync_work_task);
 
 	return 0;
 }
 
-void
-qca_mac_sw_sync_work_stop(struct qca_phy_priv *priv)
+static sw_error_t
+_ssdk_mac_sw_sync_chip_check(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY) &&
-			(priv->version != QCA_VER_APPE)) {
-		return;
+	sw_error_t rv = SW_OK;
+
+	switch (priv->version) {
+		case QCA_VER_HPPE:
+		case QCA_VER_SCOMPHY:
+		case QCA_VER_APPE:
+			break;
+		default:
+			SSDK_ERROR("Unsupported chip version %d\n", priv->version);
+			rv = SW_NOT_SUPPORTED;
 	}
-	cancel_delayed_work_sync(&priv->mac_sw_sync_dwork);
+
+	return rv;
 }
 
-void
-qca_mac_sw_sync_work_resume(struct qca_phy_priv *priv)
+sw_error_t
+ssdk_mac_sw_sync_work_stop(a_uint32_t dev_id)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_SCOMPHY) &&
-			(priv->version != QCA_VER_APPE)) {
-		return;
+	sw_error_t rv = SW_OK;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if (priv == NULL) {
+		SSDK_ERROR("device id %d: qca_phy_priv is NULL\n", dev_id);
+		return SW_BAD_VALUE;
 	}
+
+	rv = _ssdk_mac_sw_sync_chip_check(priv);
+	SW_RTN_ON_ERROR(rv);
+
+	cancel_delayed_work_sync(&priv->mac_sw_sync_dwork);
+
+	return rv;
+}
+EXPORT_SYMBOL(ssdk_mac_sw_sync_work_stop);
+
+sw_error_t
+ssdk_mac_sw_sync_work_start(a_uint32_t dev_id)
+{
+	sw_error_t rv = SW_OK;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if (priv == NULL) {
+		SSDK_ERROR("device id %d: qca_phy_priv is NULL\n", dev_id);
+		return SW_BAD_VALUE;
+	}
+
+	rv = _ssdk_mac_sw_sync_chip_check(priv);
+	SW_RTN_ON_ERROR(rv);
 
 	schedule_delayed_work(&priv->mac_sw_sync_dwork,
-					msecs_to_jiffies(QCA_MAC_SW_SYNC_WORK_DELAY));
+			msecs_to_jiffies(QCA_MAC_SW_SYNC_WORK_DELAY));
+	return rv;
 }
+EXPORT_SYMBOL(ssdk_mac_sw_sync_work_start);
 
 void
 qca_fdb_sw_sync_work_task(struct work_struct *work)
@@ -2101,27 +2131,26 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 #endif
 #endif
 #ifdef HPPE
-	if (priv->version == QCA_VER_HPPE ||
-			priv->version == QCA_VER_APPE) {
-		if(!ssdk_is_emulation(dev_id)) {
-			ret = qca_mac_sw_sync_work_start(priv);
-			if (ret != 0) {
-				SSDK_ERROR("qca_mac_sw_sync_work_start failed for chip 0x%02x%02x\n",
-						priv->version, priv->revision);
-				return ret;
-			}
-			ret = qca_fdb_sw_sync_work_init(priv);
-			if (ret != 0) {
-				SSDK_ERROR("qca_fdb_sw_sync_work_init failed for chip 0x%02x%02x\n",
-						priv->version, priv->revision);
-				return ret;
-			}
+	if (_ssdk_mac_sw_sync_chip_check(priv) != SW_OK)
+		return 0;
+
+	if (!ssdk_is_emulation(dev_id)) {
+		ret = qca_mac_sw_sync_work_init(priv);
+		if (ret != 0) {
+			SSDK_ERROR("qca_mac_sw_sync_work_init failed on chip 0x%02x%02x\n",
+					priv->version, priv->revision);
+			return ret;
+		}
+		ret = qca_fdb_sw_sync_work_init(priv);
+		if (ret != 0) {
+			SSDK_ERROR("qca_fdb_sw_sync_work_init failed on chip 0x%02x%02x\n",
+					priv->version, priv->revision);
+			return ret;
 		}
 	}
 #endif
 
 	return 0;
-
 }
 
 static int ssdk_switch_unregister(a_uint32_t dev_id)
@@ -2130,7 +2159,7 @@ static int ssdk_switch_unregister(a_uint32_t dev_id)
 	qm_err_check_work_stop(qca_phy_priv_global[dev_id]);
 #ifdef HPPE
 	if(!ssdk_is_emulation(dev_id)) {
-		qca_mac_sw_sync_work_stop(qca_phy_priv_global[dev_id]);
+		ssdk_mac_sw_sync_work_stop(dev_id);
 	}
 #endif
 #if defined(IN_SWCONFIG)

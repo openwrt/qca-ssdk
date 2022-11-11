@@ -51,6 +51,8 @@
 
 #define ADPT_APPE_POLICER_MAX           0x3ffff
 
+#define ADPT_1BIT_MAGNI_SCALE   1000    /*Improve accuracy rate*/
+
 #if defined(APPE)
 static a_uint32_t appe_policer_type[SW_MAX_NR_DEV][APPE_POLICER_ID_MAX + 1] = {0};
 #endif
@@ -222,7 +224,7 @@ __adpt_hppe_policer_rate_to_refresh(a_uint32_t rate,
 
 	if(hppe_policer_rate[meter_unit][token_unit].rate_1bit > 0)
 	{
-		temp_rate = ((a_uint64_t)rate) * 1000;
+		temp_rate = ((a_uint64_t)rate)*1000*ADPT_1BIT_MAGNI_SCALE;
 		do_div(temp_rate, hppe_policer_rate[meter_unit][token_unit].rate_1bit);
 		temp_refresh = temp_rate;
 	}
@@ -283,7 +285,7 @@ __adpt_hppe_policer_refresh_to_rate(a_uint32_t refresh,
 	if(hppe_policer_rate[meter_unit][token_unit].rate_1bit > 0)
 	{
 		temp_refresh = ((a_uint64_t)refresh) * hppe_policer_rate[meter_unit][token_unit].rate_1bit;
-		do_div(temp_refresh, 1000);
+		do_div(temp_refresh, 1000*ADPT_1BIT_MAGNI_SCALE);
 		temp_rate = temp_refresh;
 	}
 	else
@@ -342,8 +344,9 @@ __adpt_hppe_policer_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
 		do_div(temp1, temp2);
 		hppe_policer_rate[i][j].rate_max= temp1;
 
-		temp = temp1;
+		temp = temp1*ADPT_1BIT_MAGNI_SCALE;
 		do_div(temp, ADPT_HPPE_POLICER_REFRESH_MAX);
+		/*new temp is the original rate_1bit multiplied by a MAGNI_SCALE of 1000*/
 		hppe_policer_rate[i][j].rate_1bit = temp;
 
 	//	printk("hppe policer byte max_rate generating =%llu\n", hppe_policer_rate[i][j].rate_max);
@@ -360,8 +363,9 @@ __adpt_hppe_policer_max_rate(a_uint32_t dev_id, a_uint32_t time_slot)
 		do_div(temp1, temp2);
 		hppe_policer_rate[i][j].rate_max = temp1;
 
-		temp = temp1;
+		temp = temp1*ADPT_1BIT_MAGNI_SCALE;
 		do_div(temp, ADPT_HPPE_POLICER_REFRESH_MAX);
+		/*new temp is the original rate_1bit multiplied by a MAGNI_SCALE of 1000*/
 		hppe_policer_rate[i][j].rate_1bit = temp;
 
 	//	printk("policer frame hppe_max_rate generating =%llu\n", hppe_policer_rate[i][j].rate_max);

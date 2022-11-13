@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, 2019, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -20,6 +22,7 @@
 #ifndef HPPE_GLOBAL_REG_H
 #define HPPE_GLOBAL_REG_H
 
+#if 0
 /*[register] SWITCH_ID*/
 #define SWITCH_ID
 #define SWITCH_ID_ADDRESS 0x0
@@ -92,7 +95,7 @@ union clk_gating_ctrl_u {
 	a_uint32_t val;
 	struct clk_gating_ctrl bf;
 };
-
+#endif
 /*[register] PORT_MUX_CTRL*/
 #define PORT_MUX_CTRL
 #define PORT_MUX_CTRL_ADDRESS 0x10
@@ -153,7 +156,7 @@ union cppe_port_mux_ctrl_u {
 	a_uint32_t val;
 	struct cppe_port_mux_ctrl bf;
 };
-
+#if 0
 /*[register] MODULE_INI_DONE_INT*/
 #define MODULE_INI_DONE_INT
 #define MODULE_INI_DONE_INT_ADDRESS 0x20
@@ -631,7 +634,7 @@ union port_link_int_mask_u {
 	a_uint32_t val;
 	struct port_link_int_mask bf;
 };
-
+#endif
 /*[register] PORT_PHY_STATUS_0*/
 #define PORT_PHY_STATUS_0
 #define PORT_PHY_STATUS_0_ADDRESS 0x40
@@ -728,7 +731,7 @@ union port1_status_u {
 	a_uint32_t val;
 	struct port1_status bf;
 };
-
+#if 0
 /*[register] PORT2_STATUS*/
 #define PORT2_STATUS
 #define PORT2_STATUS_ADDRESS 0x54
@@ -982,7 +985,5 @@ union dbg_data_sel_u {
 	a_uint32_t val;
 	struct dbg_data_sel bf;
 };
-
-
-
+#endif
 #endif

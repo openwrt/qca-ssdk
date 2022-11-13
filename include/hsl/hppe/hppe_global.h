@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -19,7 +21,7 @@
  */
 #ifndef _HPPE_GLOBAL_H_
 #define _HPPE_GLOBAL_H_
-
+#if 0
 sw_error_t
 hppe_switch_id_get(
 		a_uint32_t dev_id,
@@ -49,7 +51,7 @@ sw_error_t
 hppe_clk_gating_ctrl_set(
 		a_uint32_t dev_id,
 		union clk_gating_ctrl_u *value);
-
+#endif
 sw_error_t
 hppe_port_mux_ctrl_get(
 		a_uint32_t dev_id,
@@ -69,7 +71,7 @@ sw_error_t
 cppe_port_mux_ctrl_set(
 		a_uint32_t dev_id,
 		union cppe_port_mux_ctrl_u *value);
-
+#if 0
 sw_error_t
 hppe_module_ini_done_int_get(
 		a_uint32_t dev_id,
@@ -129,22 +131,22 @@ sw_error_t
 hppe_port_link_int_mask_set(
 		a_uint32_t dev_id,
 		union port_link_int_mask_u *value);
-
+#endif
 sw_error_t
 hppe_port_phy_status_0_get(
 		a_uint32_t dev_id,
 		union port_phy_status_0_u *value);
-
+#if 0
 sw_error_t
 hppe_port_phy_status_0_set(
 		a_uint32_t dev_id,
 		union port_phy_status_0_u *value);
-
+#endif
 sw_error_t
 hppe_port_phy_status_1_get(
 		a_uint32_t dev_id,
 		union port_phy_status_1_u *value);
-
+#if 0
 sw_error_t
 hppe_port_phy_status_1_set(
 		a_uint32_t dev_id,
@@ -989,32 +991,32 @@ sw_error_t
 hppe_port_phy_status_0_port4_phy_status_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 sw_error_t
 hppe_port_phy_status_0_port2_phy_status_get(
 		a_uint32_t dev_id,
 		unsigned int *value);
-
+#if 0
 sw_error_t
 hppe_port_phy_status_0_port2_phy_status_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 sw_error_t
 hppe_port_phy_status_0_port1_phy_status_get(
 		a_uint32_t dev_id,
 		unsigned int *value);
-
+#if 0
 sw_error_t
 hppe_port_phy_status_0_port1_phy_status_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 sw_error_t
 hppe_port_phy_status_1_port6_phy_status_get(
 		a_uint32_t dev_id,
 		unsigned int *value);
-
+#if 0
 sw_error_t
 hppe_port_phy_status_1_port6_phy_status_set(
 		a_uint32_t dev_id,
@@ -1029,12 +1031,12 @@ sw_error_t
 hppe_port_phy_status_1_port5_0_phy_status_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 sw_error_t
 hppe_port_phy_status_1_port5_1_phy_status_get(
 		a_uint32_t dev_id,
 		unsigned int *value);
-
+#if 0
 sw_error_t
 hppe_port_phy_status_1_port5_1_phy_status_set(
 		a_uint32_t dev_id,
@@ -1199,6 +1201,6 @@ sw_error_t
 hppe_dbg_data_sel_dbg_data_sel_switch_set(
 		a_uint32_t dev_id,
 		unsigned int value);
-
+#endif
 #endif
 

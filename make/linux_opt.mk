@@ -299,7 +299,7 @@ ifeq (TRUE, $(DEBUG_ON))
   MODULE_CFLAG += -g
 endif
 
-MODULE_CFLAG += $(OPT_FLAG) -Wall -DVERSION=\"$(VERSION)\" -DBUILD_DATE=\"$(BUILD_DATE)\" -DOS=\"$(OS)\" -D"KBUILD_STR(s)=\#s" -D"KBUILD_MODNAME=KBUILD_STR(qca-ssdk)"
+MODULE_CFLAG += $(OPT_FLAG) -Wall -DVERSION=\"$(VERSION)\" -DBUILD_DATE=\"$(BUILD_DATE)\" -DOS=\"$(OS)\" -D"KBUILD_STR(s)=\#s"
 
 MODULE_INC += -I$(PRJ_PATH)/include \
                    -I$(PRJ_PATH)/include/common \
@@ -454,7 +454,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 		MODULE_CFLAG += -DKVER34
 		MODULE_CFLAG += -DKVER32
 	    MODULE_CFLAG += -DLNX26_22
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
                   -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
 	          -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/source/include \
@@ -477,7 +477,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
                 MODULE_CFLAG += -DKVER32
             MODULE_CFLAG += -DLNX26_22
 	    ifeq ($(ARCH), arm64)
-            MODULE_INC += -I$(SYS_PATH) \
+            SYS_INC += -I$(SYS_PATH) \
                   -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
                   -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/source \
@@ -496,13 +496,13 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(SYS_PATH)/source/include/uapi
 
 	      ifneq ($(wildcard $(SYS_PATH)/include/linux/kconfig.h),)
-	          MODULE_INC += -include $(SYS_PATH)/include/linux/kconfig.h
+	          SYS_INC += -include $(SYS_PATH)/include/linux/kconfig.h
 	      else
-	          MODULE_INC += -include $(KERNEL_SRC)/include/linux/kconfig.h
+	          SYS_INC += -include $(KERNEL_SRC)/include/linux/kconfig.h
 	      endif
 
 	    else ifeq ($(ARCH), arm)
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
               -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
 	      -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/7.5.0/include/ \
               -I$(TOOL_PATH)/../../lib/armv7a-vfp-neon-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/4.8.4/include/ \
@@ -526,13 +526,13 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(TOOL_PATH)/../../lib/arm-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/9.3.0/include/
 
 	      ifneq ($(wildcard $(SYS_PATH)/include/linux/kconfig.h),)
-	          MODULE_INC += -include $(SYS_PATH)/include/linux/kconfig.h
+	          SYS_INC += -include $(SYS_PATH)/include/linux/kconfig.h
 	      else
-	          MODULE_INC += -include $(KERNEL_SRC)/include/linux/kconfig.h
+	          SYS_INC += -include $(KERNEL_SRC)/include/linux/kconfig.h
 	      endif
 
             else
-            MODULE_INC += -I$(SYS_PATH) \
+            SYS_INC += -I$(SYS_PATH) \
               -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
               -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/source \
@@ -568,7 +568,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
             MODULE_CFLAG += -DLNX26_22
 	    ifeq ($(ARCH), arm64)
 	    KCONF_FILE = $(SYS_PATH)/source/include/linux/kconfig.h
-            MODULE_INC += -I$(SYS_PATH) \
+            SYS_INC += -I$(SYS_PATH) \
                   -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
                   -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/source/include \
@@ -585,7 +585,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(SYS_PATH)/source/arch/arm64/include/asm/mach \
 	      -include $(KCONF_FILE)
 	    else ifeq ($(ARCH), arm)
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
               -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
               -I$(TOOL_PATH)/../../lib/armv7a-vfp-neon-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/4.8.4/include/ \
               -I$(SYS_PATH)/include \
@@ -608,7 +608,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 		MODULE_CFLAG += -DKVER34
 		MODULE_CFLAG += -DKVER32
 	    MODULE_CFLAG += -DLNX26_22
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
                   -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
 		  -I$(TOOL_PATH)/../../lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/5.3.0/include/ \
 		  -I$(TOOL_PATH)/../../lib/armv7a-vfp-neon-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/4.8.4/include/ \
@@ -631,10 +631,10 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(EXT_PATH) \
               -I$(SYS_PATH)/source/arch/arm/include/asm/mach
 	ifneq ($(wildcard $(SYS_PATH)/include/linux/kconfig.h),)
-		MODULE_INC += \
+		SYS_INC += \
 			-include $(SYS_PATH)/include/linux/kconfig.h
 	else
-		MODULE_INC += \
+		SYS_INC += \
 			-include $(SYS_PATH)/source/include/linux/kconfig.h
 	endif
 
@@ -645,7 +645,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 		MODULE_CFLAG += -DKVER32
 	    MODULE_CFLAG += -DLNX26_22
 	    MODULE_CFLAG += -Werror
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
 	          -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/source/include \
               -I$(SYS_PATH)/source/arch/arm/mach-msm/include \
@@ -661,7 +661,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 	MODULE_CFLAG += -DKVER32
 	MODULE_CFLAG += -DLNX26_22
 	ifeq (mips, $(CPU))
-	  MODULE_INC += -I$(SYS_PATH) \
+	  SYS_INC += -I$(SYS_PATH) \
             -I$(SYS_PATH)/include \
             -I$(SYS_PATH)/arch/mips/include \
 	    -I$(SYS_PATH)/arch/mips/include/asm/mach-ar7240 \
@@ -682,7 +682,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
                      -O2 -fno-pic -pipe -mabi=32 -march=mips32r2 -DMODULE -mlong-calls -DEXPORT_SYMTAB
           endif
     else
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
               -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/arch/arm/include \
               -I$(SYS_PATH)/arch/arm/include/asm \
@@ -699,7 +699,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
         MODULE_CFLAG += -DKVER26
         MODULE_CFLAG += -DLNX26_22
         ifeq (mips, $(CPU))
-          MODULE_INC += -I$(SYS_PATH) \
+          SYS_INC += -I$(SYS_PATH) \
             -I$(SYS_PATH)/include \
             -I$(SYS_PATH)/arch/mips/include \
             -I$(SYS_PATH)/arch/mips/include/asm/mach-ar7240 \
@@ -712,7 +712,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
                      -O2 -fno-pic -pipe -mabi=32 -march=mips32r2 -DMODULE -mlong-calls -DEXPORT_SYMTAB
           endif
         else
-	    MODULE_INC += -I$(SYS_PATH) \
+	    SYS_INC += -I$(SYS_PATH) \
               -I$(SYS_PATH)/include \
               -I$(SYS_PATH)/arch/arm/include \
               -I$(SYS_PATH)/arch/arm/include/asm \
@@ -725,8 +725,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 
   endif
 
-  MODULE_CFLAG += -D__KERNEL__ -DKERNEL_MODULE $(CPU_CFLAG)
-
+  MODULE_CFLAG += -D__KERNEL__ -DKERNEL_MODULE 
 
 endif
 
@@ -758,4 +757,16 @@ else
 	MODULE_CFLAG +=  -mlittle-endian
 endif
 
-LOCAL_CFLAGS += $(MODULE_INC) $(MODULE_CFLAG) $(EXTRA_CFLAGS)
+LOCAL_CFLAGS += $(MODULE_INC) $(SYS_INC) $(MODULE_CFLAG) $(EXTRA_CFLAGS)
+
+####################################################################
+# 			cflags for SSDK-Style Makefile
+####################################################################
+LOCAL_CFLAGS += $(CPU_CFLAG) -D"KBUILD_MODNAME=KBUILD_STR(qca-ssdk)"
+
+####################################################################
+# 			cflags for LNX Modules-Style Makefile
+####################################################################
+LNX_LOCAL_CFLAGS += $(MODULE_INC) $(MODULE_CFLAG) ${EXTRA_INC}
+export LNX_LOCAL_CFLAGS
+

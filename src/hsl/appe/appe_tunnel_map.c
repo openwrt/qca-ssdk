@@ -138,6 +138,7 @@ appe_tl_map_lpm_act_set(
 				2);
 }
 
+#if 0
 sw_error_t
 appe_tl_map_lpm_counter_byte_cnt_get(
 		a_uint32_t dev_id,
@@ -670,6 +671,7 @@ appe_tl_map_lpm_tbl_ipv6_addr_set(
 	ret = appe_tl_map_lpm_tbl_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 appe_tl_map_lpm_tbl_valid_get(
@@ -702,6 +704,7 @@ appe_tl_map_lpm_tbl_valid_set(
 	return ret;
 }
 
+#if 0
 sw_error_t
 appe_tl_map_lpm_act_exp_profile_get(
 		a_uint32_t dev_id,
@@ -1136,7 +1139,6 @@ appe_tl_map_lpm_act_src_info_valid_set(
 	return ret;
 }
 
-#if 0
 #if defined(MPPE)
 sw_error_t
 mppe_tl_map_lpm_act_service_code_get(

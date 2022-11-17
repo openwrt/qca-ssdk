@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -120,6 +121,7 @@ appe_tpr_vxlan_gpe_prot_cfg_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 appe_udp_port_cfg_udp_type_get(
 		a_uint32_t dev_id,
@@ -243,6 +245,7 @@ appe_udp_port_cfg_port_value_set(
 	ret = appe_udp_port_cfg_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 appe_tpr_vxlan_cfg_udp_port_map_get(
@@ -302,6 +305,7 @@ appe_tpr_vxlan_gpe_cfg_udp_port_map_set(
 	return ret;
 }
 
+#if 0
 sw_error_t
 appe_tpr_vxlan_gpe_prot_cfg_ipv6_get(
 		a_uint32_t dev_id,
@@ -388,4 +392,4 @@ appe_tpr_vxlan_gpe_prot_cfg_ipv4_set(
 	ret = appe_tpr_vxlan_gpe_prot_cfg_set(dev_id, &reg_val);
 	return ret;
 }
-
+#endif

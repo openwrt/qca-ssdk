@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -333,6 +334,7 @@ appe_tpr_program_udf_action_set(
 				value->val);
 }
 
+#if 0
 sw_error_t
 appe_tpr_hdr_match_0_ip_ver_get(
 		a_uint32_t dev_id,
@@ -456,6 +458,7 @@ appe_tpr_hdr_match_2_mask_set(
 	ret = appe_tpr_hdr_match_2_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif
 
 sw_error_t
 appe_tpr_program_hdr_hdr_type_map_get(
@@ -488,6 +491,7 @@ appe_tpr_program_hdr_hdr_type_map_set(
 	return ret;
 }
 
+#if 0
 sw_error_t
 appe_tpr_program_result_len_unit_get(
 		a_uint32_t dev_id,
@@ -1355,3 +1359,4 @@ appe_tpr_program_udf_action_hdr_len_set(
 	ret = appe_tpr_program_udf_action_set(dev_id, index, &reg_val);
 	return ret;
 }
+#endif

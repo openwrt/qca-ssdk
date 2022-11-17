@@ -1220,7 +1220,7 @@ void qca808x_txtstamp(struct phy_device *phydev,
 						*reserved2 = ptp_info->embeded_ts.reserved2;
 						*correction = ptp_info->embeded_ts.correction;
 					}
-					/* fall down */
+					/* fall through */
 				case PTP_MSG_SYNC:
 					skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 					kfree_skb(skb);

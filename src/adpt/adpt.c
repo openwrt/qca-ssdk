@@ -405,6 +405,7 @@ sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
 			rv = adpt_appe_module_func_register(dev_id, module);
 #endif
 #if defined(HPPE)
+			/* fall through */
 		case CHIP_HPPE:
 			rv = adpt_hppe_module_func_register(dev_id, module);
 			break;
@@ -579,6 +580,7 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 #endif
 #endif
 #if defined(HPPE)
+			/* fall through */
 		case CHIP_HPPE:
 			if (g_adpt_api[dev_id] == NULL) {
 				g_adpt_api[dev_id] = aos_mem_alloc(sizeof(adpt_api_t));
@@ -809,6 +811,7 @@ sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 #endif
 #endif
 #if defined(HPPE)
+			/* fall through */
 		case CHIP_HPPE:
 			g_adpt_api[dev_id]->adpt_mirror_func_bitmap = 0;
 #if defined(IN_MIRROR)

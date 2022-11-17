@@ -1173,16 +1173,18 @@ adpt_mp_port_link_up_update(struct qca_phy_priv *priv,
 			port_id, A_TRUE);
 	SW_RTN_ON_ERROR (rv);
 
-	msleep(50);
+	msleep(10);
 
 	rv = adpt_mp_port_reset_set(priv->device_id, port_id);
 	SW_RTN_ON_ERROR (rv);
 	rv = adpt_mp_port_txmac_status_set(priv->device_id,
 			port_id, A_TRUE);
 	SW_RTN_ON_ERROR (rv);
+	msleep(10);
 	rv = adpt_mp_port_rxmac_status_set(priv->device_id,
 		port_id, A_TRUE);
 	SW_RTN_ON_ERROR (rv);
+	msleep(10);
 
 	return rv;
 }

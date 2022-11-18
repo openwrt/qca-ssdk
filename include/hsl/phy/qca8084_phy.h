@@ -70,9 +70,6 @@ typedef enum {
 }
 qca8084_adc_edge_t;
 
-void
-qca8084_phy_api_ops_init(hsl_phy_ops_t * hsl_phy_ops);
-
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 	fal_port_interface_mode_t interface_mode);

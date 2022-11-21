@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -24,6 +26,7 @@
 #include "hppe_portctrl_reg.h"
 #include "hppe_portctrl.h"
 #include "adpt.h"
+#include "adpt_hppe.h"
 
 #ifndef IN_BM_MINI
 sw_error_t
@@ -338,7 +341,7 @@ adpt_hppe_bm_port_counter_get(a_uint32_t dev_id, fal_port_t port,
 		return rv;
 	counter->drop_byte_counter = drop_stat.bf.bytes_0 | ((a_uint64_t)drop_stat.bf.bytes_1 << 32);
 	counter->drop_packet_counter = drop_stat.bf.pkts;
-	rv = hppe_drop_stat_get(dev_id, index + 15, &drop_stat);
+	rv = hppe_drop_stat_get(dev_id, index + PPE_BM_PORT_NUM, &drop_stat);
 	if( rv != SW_OK )
 		return rv;
 	counter->fc_drop_byte_counter = drop_stat.bf.bytes_0 | ((a_uint64_t)drop_stat.bf.bytes_1 << 32);

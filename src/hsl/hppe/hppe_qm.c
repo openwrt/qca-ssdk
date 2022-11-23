@@ -1123,7 +1123,6 @@ hppe_ac_grp_drop_state_tbl_set(
 				2);
 }
 
-#if !defined(IN_QM_MINI)
 sw_error_t
 hppe_oq_enq_opr_tbl_get(
 		a_uint32_t dev_id,
@@ -1151,7 +1150,6 @@ hppe_oq_enq_opr_tbl_set(
 				index * OQ_ENQ_OPR_TBL_INC,
 				value->val);
 }
-#endif
 
 sw_error_t
 hppe_oq_deq_opr_tbl_get(

@@ -532,7 +532,6 @@ _fal_queue_counter_get(
 	return rv;
 }
 
-#if !defined(IN_QM_MINI)
 sw_error_t
 _fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable)
 {
@@ -548,6 +547,7 @@ _fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable
 	return rv;
 }
 
+#if !defined(IN_QM_MINI)
 sw_error_t
 _fal_qm_enqueue_config_set(a_uint32_t dev_id,
 		fal_enqueue_cfg_t *enqueue_cfg)
@@ -579,6 +579,7 @@ _fal_qm_enqueue_config_get(a_uint32_t dev_id,
 	rv = p_api->adpt_qm_enqueue_config_get(dev_id, enqueue_cfg);
 	return rv;
 }
+#endif
 
 sw_error_t
 _fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enable)
@@ -594,7 +595,6 @@ _fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enabl
 	rv = p_api->adpt_qm_enqueue_ctrl_get(dev_id, queue_id, enable);
 	return rv;
 }
-#endif
 
 sw_error_t
 _fal_qm_port_source_profile_set(a_uint32_t dev_id, fal_port_t port, a_uint32_t src_profile)
@@ -1018,7 +1018,6 @@ fal_queue_counter_get(
 	return rv;
 }
 
-#if !defined(IN_QM_MINI)
 sw_error_t
 fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable)
 {
@@ -1040,7 +1039,6 @@ fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enable
 	FAL_API_UNLOCK;
 	return rv;
 }
-#endif
 
 sw_error_t
 fal_qm_port_source_profile_set(a_uint32_t dev_id, fal_port_t port, a_uint32_t src_profile)
@@ -1105,6 +1103,8 @@ EXPORT_SYMBOL(fal_ucast_queue_base_profile_set);
 
 EXPORT_SYMBOL(fal_queue_flush);
 
+EXPORT_SYMBOL(fal_qm_enqueue_ctrl_set);
+
 EXPORT_SYMBOL(fal_queue_counter_ctrl_set);
 
 EXPORT_SYMBOL(fal_ucast_priority_class_set);
@@ -1114,6 +1114,8 @@ EXPORT_SYMBOL(fal_ucast_hash_map_set);
 EXPORT_SYMBOL(fal_qm_port_source_profile_set);
 
 EXPORT_SYMBOL(fal_qm_port_source_profile_get);
+
+EXPORT_SYMBOL(fal_qm_enqueue_ctrl_get);
 
 EXPORT_SYMBOL(fal_ac_ctrl_get);
 
@@ -1151,10 +1153,6 @@ EXPORT_SYMBOL(fal_port_mcast_priority_class_get);
 EXPORT_SYMBOL(fal_qm_enqueue_config_set);
 
 EXPORT_SYMBOL(fal_qm_enqueue_config_get);
-
-EXPORT_SYMBOL(fal_qm_enqueue_ctrl_set);
-
-EXPORT_SYMBOL(fal_qm_enqueue_ctrl_get);
 
 EXPORT_SYMBOL(fal_ucast_default_hash_set);
 

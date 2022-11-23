@@ -561,7 +561,6 @@ hppe_ac_grp_drop_state_tbl_set(
 		a_uint32_t index,
 		union ac_grp_drop_state_tbl_u *value);
 
-#if !defined(IN_QM_MINI)
 sw_error_t
 hppe_oq_enq_opr_tbl_get(
 		a_uint32_t dev_id,
@@ -573,7 +572,6 @@ hppe_oq_enq_opr_tbl_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union oq_enq_opr_tbl_u *value);
-#endif
 
 sw_error_t
 hppe_oq_deq_opr_tbl_get(

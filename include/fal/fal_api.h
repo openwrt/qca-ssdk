@@ -2247,6 +2247,8 @@ extern "C" {
     SW_API_DEF(SW_API_QUEUE_CNT_CTRL_SET, fal_queue_counter_ctrl_set), \
     SW_API_DEF(SW_API_QUEUE_CNT_GET, fal_queue_counter_get), \
     SW_API_DEF(SW_API_QUEUE_CNT_CLEANUP, fal_queue_counter_cleanup), \
+    SW_API_DEF(SW_API_QM_ENQUEUE_CTRL_SET, fal_qm_enqueue_ctrl_set), \
+    SW_API_DEF(SW_API_QM_ENQUEUE_CTRL_GET, fal_qm_enqueue_ctrl_get), \
     SW_API_DEF(SW_API_QM_SOURCE_PROFILE_SET, fal_qm_port_source_profile_set), \
     SW_API_DEF(SW_API_QM_SOURCE_PROFILE_GET, fal_qm_port_source_profile_get),
 
@@ -2274,6 +2276,8 @@ extern "C" {
     SW_API_DESC(SW_API_QUEUE_CNT_CTRL_SET) \
     SW_API_DESC(SW_API_QUEUE_CNT_GET) \
     SW_API_DESC(SW_API_QUEUE_CNT_CLEANUP) \
+    SW_API_DESC(SW_API_QM_ENQUEUE_CTRL_SET) \
+    SW_API_DESC(SW_API_QM_ENQUEUE_CTRL_GET) \
     SW_API_DESC(SW_API_QM_SOURCE_PROFILE_SET) \
     SW_API_DESC(SW_API_QM_SOURCE_PROFILE_GET)
 #endif

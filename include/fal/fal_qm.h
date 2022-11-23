@@ -342,13 +342,11 @@ fal_queue_counter_get(a_uint32_t dev_id, a_uint32_t queue_id, fal_queue_stats_t 
 sw_error_t
 fal_queue_counter_cleanup(a_uint32_t dev_id, a_uint32_t queue_id);
 
-#if !defined(IN_QM_MINI)
 sw_error_t
 fal_qm_enqueue_ctrl_set(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t enable);
 
 sw_error_t
 fal_qm_enqueue_ctrl_get(a_uint32_t dev_id, a_uint32_t queue_id, a_bool_t *enable);
-#endif
 
 sw_error_t
 fal_qm_port_source_profile_set(

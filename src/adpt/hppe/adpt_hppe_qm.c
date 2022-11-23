@@ -1132,7 +1132,6 @@ adpt_hppe_queue_counter_ctrl_set(a_uint32_t dev_id, a_bool_t cnt_en)
 	return hppe_eg_bridge_config_set(dev_id, &eg_bridge_config);
 }
 
-#if !defined(IN_QM_MINI)
 sw_error_t
 adpt_hppe_qm_enqueue_ctrl_set(
 		a_uint32_t dev_id,
@@ -1168,7 +1167,6 @@ adpt_hppe_qm_enqueue_ctrl_get(
 
 	return SW_OK;
 }
-#endif
 
 static sw_error_t
 adpt_hppe_qm_port_source_profile_set(
@@ -1317,10 +1315,8 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 			adpt_hppe_ucast_queue_base_profile_set;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_FLUSH))
 		p_adpt_api->adpt_queue_flush = adpt_hppe_queue_flush;
-#if !defined(IN_QM_MINI)
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_ENQUEUE_CTRL_SET))
 		p_adpt_api->adpt_qm_enqueue_ctrl_set = adpt_hppe_qm_enqueue_ctrl_set;
-#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_UCAST_HASH_MAP_SET))
 		p_adpt_api->adpt_ucast_hash_map_set = adpt_hppe_ucast_hash_map_set;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_AC_DYNAMIC_THRESHOLD_GET))
@@ -1368,10 +1364,8 @@ sw_error_t adpt_hppe_qm_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_queue_counter_ctrl_get = adpt_hppe_queue_counter_ctrl_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QUEUE_COUNTER_CTRL_SET))
 		p_adpt_api->adpt_queue_counter_ctrl_set = adpt_hppe_queue_counter_ctrl_set;
-#if !defined(IN_QM_MINI)
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_ENQUEUE_CTRL_GET))
 		p_adpt_api->adpt_qm_enqueue_ctrl_get = adpt_hppe_qm_enqueue_ctrl_get;
-#endif
 	if (p_adpt_api->adpt_qm_func_bitmap[0] & (1 << FUNC_QM_PORT_SRCPROFILE_GET))
 		p_adpt_api->adpt_qm_port_source_profile_get = adpt_hppe_qm_port_source_profile_get;
 	if (p_adpt_api->adpt_qm_func_bitmap[1] & (1 << (FUNC_QM_PORT_SRCPROFILE_SET % 32)))

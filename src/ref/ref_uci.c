@@ -10705,7 +10705,6 @@ parse_qm_cnt(struct switch_val *val)
 	return rv;
 }
 
-#if !defined(IN_QM_MINI)
 static int
 parse_qm_enqueue(struct switch_val *val)
 {
@@ -10734,7 +10733,6 @@ parse_qm_enqueue(struct switch_val *val)
 
 	return rv;
 }
-#endif
 
 static int
 parse_qm_srcprofile(struct switch_val *val)
@@ -12888,10 +12886,8 @@ parse_qm(const char *command_name, struct switch_val *val)
 		rv = parse_qm_cntctrl(val);
 	} else if (!strcmp(command_name, "Cnt")) {
 		rv = parse_qm_cnt(val);
-#if !defined(IN_QM_MINI)
 	} else if (!strcmp(command_name, "Enqueue")) {
 		rv = parse_qm_enqueue(val);
-#endif
 	} else if (!strcmp(command_name, "Srcprofile")) {
 		rv = parse_qm_srcprofile(val);
 	}

@@ -551,16 +551,19 @@ static sw_error_t
 __adpt_hppe_uniphy_usxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
 	sw_error_t rv = SW_OK;
+	a_uint32_t ssdk_port = 0;
 
 	union uniphy_mode_ctrl_u uniphy_mode_ctrl;
 	union vr_xs_pcs_dig_ctrl1_u vr_xs_pcs_dig_ctrl1;
 	union vr_mii_an_ctrl_u vr_mii_an_ctrl;
 	union sr_mii_ctrl_u sr_mii_ctrl;
+	union uniphy_instance_link_detect_u uniphy_instance_link_detect;
 
 	memset(&uniphy_mode_ctrl, 0, sizeof(uniphy_mode_ctrl));
 	memset(&vr_xs_pcs_dig_ctrl1, 0, sizeof(vr_xs_pcs_dig_ctrl1));
 	memset(&vr_mii_an_ctrl, 0, sizeof(vr_mii_an_ctrl));
 	memset(&sr_mii_ctrl, 0, sizeof(sr_mii_ctrl));
+	memset(&uniphy_instance_link_detect, 0, sizeof(uniphy_instance_link_detect));
 	ADPT_DEV_ID_CHECK(dev_id);
 
 	hppe_uniphy_reg_set(dev_id, UNIPHY_MISC2_REG_OFFSET,
@@ -593,6 +596,16 @@ __adpt_hppe_uniphy_usxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	uniphy_mode_ctrl.bf.newaddedfromhere_xpcs_mode =
 		UNIPHY_XPCS_MODE_ENABLE;
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
+
+	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,
+		SSDK_UNIPHY_CHANNEL0);
+	if (A_FALSE == hsl_port_is_sfp(dev_id, ssdk_port)) {
+		hppe_uniphy_instance_link_detect_get(dev_id,
+			uniphy_index, &uniphy_instance_link_detect);
+		uniphy_instance_link_detect.bf.detect_los_from_sfp = 0;
+		hppe_uniphy_instance_link_detect_set(dev_id,
+			uniphy_index, &uniphy_instance_link_detect);
+	}
 
 	/* configure uniphy usxgmii gcc software reset */
 	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);

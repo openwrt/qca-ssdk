@@ -52,7 +52,7 @@ static struct mht_pinctrl_setting mht_pin_settings[] = {
     MHT_PIN_SETTING_MUX(18, MHT_PIN_FUNC_P2_LED_1),
     MHT_PIN_SETTING_MUX(19, MHT_PIN_FUNC_P3_LED_1),
     MHT_PIN_SETTING_MUX(20, MHT_PIN_FUNC_MDC_M),
-    MHT_PIN_SETTING_MUX(21, MHT_PIN_FUNC_MDC_M),
+    MHT_PIN_SETTING_MUX(21, MHT_PIN_FUNC_MDO_M),
 
     /*PINs default Config Setting*/
 #ifdef IN_PINCTRL_DEF_CONFIG
@@ -204,6 +204,32 @@ sw_error_t mht_gpio_pin_cfg_get_drvs(a_uint32_t dev_id, a_uint32_t pin, a_uint32
     MHT_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, DRV_STRENGTH,
                       (a_uint8_t *) (drvs), sizeof(a_uint32_t));
     SSDK_DEBUG("[%s]%d", __func__, pin);
+
+    return rv;
+}
+
+sw_error_t mht_gpio_pin_cfg_set_hihys(a_uint32_t dev_id, a_uint32_t pin, a_bool_t hihys_en)
+{
+    sw_error_t rv = SW_OK;
+
+    SSDK_DEBUG("pin:%d hihys_en:%d", pin, hihys_en);
+
+    MHT_REG_FIELD_SET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_HIHYS_EN,
+                      (a_uint8_t *) (&hihys_en), sizeof(a_uint32_t));
+
+    return rv;
+}
+
+sw_error_t mht_gpio_pin_cfg_get_hihys(a_uint32_t dev_id, a_uint32_t pin, a_bool_t *hihys_en)
+{
+    sw_error_t rv = SW_OK;
+    a_uint32_t data = 0;
+
+    MHT_REG_FIELD_GET(rv, dev_id, TLMM_GPIO_CFGN, pin, GPIO_HIHYS_EN,
+                      (a_uint8_t *) (&data), sizeof (a_uint32_t));
+    *hihys_en = data ? A_TRUE : A_FALSE;
+
+    SSDK_DEBUG("pin:%d hihys_en:%d", pin, *hihys_en);
 
     return rv;
 }

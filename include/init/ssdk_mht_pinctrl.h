@@ -308,6 +308,8 @@ sw_error_t mht_gpio_pin_cfg_set_drvs(a_uint32_t dev_id, a_uint32_t pin, a_uint32
 sw_error_t mht_gpio_pin_cfg_get_drvs(a_uint32_t dev_id, a_uint32_t pin, a_uint32_t *drvs);
 sw_error_t mht_gpio_pin_cfg_set_oe(a_uint32_t dev_id, a_uint32_t pin, a_bool_t oe);
 sw_error_t mht_gpio_pin_cfg_get_oe(a_uint32_t dev_id, a_uint32_t pin, a_bool_t *oe);
+sw_error_t mht_gpio_pin_cfg_set_hihys(a_uint32_t dev_id, a_uint32_t pin, a_bool_t hihys_en);
+sw_error_t mht_gpio_pin_cfg_get_hihys(a_uint32_t dev_id, a_uint32_t pin, a_bool_t *hihys);
 sw_error_t ssdk_mht_pinctrl_init(a_uint32_t dev_id);
 
 

@@ -532,6 +532,41 @@ qca_mht_ethphy_icc_efuse_get(a_uint32_t dev_id, a_uint32_t mht_port_id,
 
 	return SW_OK;
 }
+
+sw_error_t
+qca_mht_mdio_cfg(a_uint32_t dev_id, a_uint32_t div, a_uint32_t timer, a_uint32_t preamble_length)
+{
+	a_uint32_t mdio_ctrl0= 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	mdio_ctrl0 = qca_mht_mii_read(dev_id, MDIO_CTRL0_OFFSET);
+
+	/* Enable control timmer or not */
+	if (!timer)
+		mdio_ctrl0 &= ~BIT(MDIO_CTRL0_TIMER_EN_BOFFSET);
+	else
+		mdio_ctrl0 |= BIT(MDIO_CTRL0_TIMER_EN_BOFFSET);
+
+	/* Configure the MDIO frequency */
+	mdio_ctrl0 &= ~BITS(MDIO_CTRL0_DIV_FACTOR_BOFFSET, MDIO_CTRL0_DIV_FACTOR_BLEN);
+	mdio_ctrl0 |= (div << MDIO_CTRL0_DIV_FACTOR_BOFFSET) &
+		BITS(MDIO_CTRL0_DIV_FACTOR_BOFFSET, MDIO_CTRL0_DIV_FACTOR_BLEN);
+
+	/* Trigger MDIO transmission */
+	mdio_ctrl0 |= BIT(MDIO_CTRL0_TRIGGER_BOFFSET);
+
+	/* Configure the preamble length of MDIO frame */
+	mdio_ctrl0 |= (preamble_length << MDIO_CTRL0_PREAMBLE_BITS_BOFFSET) &
+		BITS(MDIO_CTRL0_PREAMBLE_BITS_BOFFSET, MDIO_CTRL0_PREAMBLE_BITS_BLEN);
+
+	qca_mht_mii_write(dev_id, MDIO_CTRL0_OFFSET, mdio_ctrl0);
+
+	/* Configure the timmer counter cycles(1/mdio_frequency)*/
+	qca_mht_mii_write(dev_id, MDIO_CTRL1_OFFSET, timer);
+
+	return SW_OK;
+}
 /**
  * @}
  */

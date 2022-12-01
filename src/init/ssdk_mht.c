@@ -169,6 +169,47 @@ static inline void qca_mht_switch_reset(a_uint32_t dev_id)
 	return;
 }
 
+/* Initialize the MDIO master for the backpressure feature */
+sw_error_t qca_mht_mdio_master_init(a_uint32_t dev_id)
+{
+#define MHT_GPIO_PIN_MDC		20
+#define MHT_GPIO_PIN_MDO		21
+#define MHT_MDIO_MASTER_FREQ_26M	3
+#define MHT_MDIO_MASTER_TIMER_CNT	0xc8
+#define MHT_MDIO_MASTER_PREAMBLE_LEN	4
+	sw_error_t ret = SW_OK;
+
+	ret = mht_gpio_pin_cfg_set_hihys(dev_id, MHT_GPIO_PIN_MDC, A_FALSE);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_cfg_set_hihys(dev_id, MHT_GPIO_PIN_MDO, A_FALSE);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_cfg_set_drvs(dev_id, MHT_GPIO_PIN_MDC,
+			MHT_TLMM_GPIO_CFGN_DRV_STRENGTH_2_MA);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_cfg_set_drvs(dev_id, MHT_GPIO_PIN_MDO,
+			MHT_TLMM_GPIO_CFGN_DRV_STRENGTH_2_MA);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_mux_set(dev_id, MHT_GPIO_PIN_MDC, MHT_PIN_FUNC_MDC_M);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_mux_set(dev_id, MHT_GPIO_PIN_MDO, MHT_PIN_FUNC_MDO_M);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_cfg_set_bias(dev_id, MHT_GPIO_PIN_MDC, PIN_CONFIG_BIAS_PULL_UP);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = mht_gpio_pin_cfg_set_bias(dev_id, MHT_GPIO_PIN_MDO, PIN_CONFIG_BIAS_PULL_UP);
+	SW_RTN_ON_ERROR(ret);
+
+	ret = qca_mht_mdio_cfg(dev_id, MHT_MDIO_MASTER_FREQ_26M,
+			MHT_MDIO_MASTER_TIMER_CNT, MHT_MDIO_MASTER_PREAMBLE_LEN);
+	return ret;
+}
+
 int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
 	int ret = 0;
@@ -200,6 +241,10 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 
 	ret = ssdk_mht_pinctrl_init(dev_id);
 	SW_RTN_ON_ERROR(ret);
+
+	ret = qca_mht_mdio_master_init(dev_id);
+	SW_RTN_ON_ERROR(ret);
+
 #ifdef IN_LED
 	ret = ssdk_led_init(dev_id, cfg);
 #endif

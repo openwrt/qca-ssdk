@@ -854,7 +854,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 					react_buf = 25;
 				} else {
 					prealloc_buf = 12;
-					react_buf = 24;
+					react_buf = 35;
 				}
 				break;
 			default:

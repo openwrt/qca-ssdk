@@ -1328,7 +1328,7 @@ static int qca808x_ptp_register(struct phy_device *phydev)
 	ptp_info->clock = clock;
 	clock->priv = priv;
 
-	SSDK_INFO("qca808x ptp clock registered\n");
+	SSDK_INFO("qca808x phydev %d ptp clock registered\n", phydev->mdio.addr);
 	return 0;
 }
 
@@ -1401,6 +1401,11 @@ static int qca808x_ptp_callback_init(struct device *dev, void *ptp_instance)
 	struct phy_device *phydev;
 
 	phydev = to_phy_device(dev);
+
+	/* phydev is null or phydev has been initialzed wiht ptp */
+	if (!phydev || phydev->priv)
+		return rv;
+
 	rv = qca808x_phy_probe(phydev);
 	if (rv)
 		return rv;
@@ -1442,8 +1447,12 @@ static int qca808x_ptp_callback_cleanup(struct device *dev, void *p)
 	struct phy_device *phydev;
 
 	phydev = to_phy_device(dev);
-	qca808x_phy_remove(phydev);
 
+	/* phydev is null or phydev has been removed wiht ptp */
+	if (!phydev || !phydev->priv)
+		return 0;
+
+	qca808x_phy_remove(phydev);
 	return 0;
 }
 

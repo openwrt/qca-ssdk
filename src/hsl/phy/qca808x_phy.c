@@ -35,7 +35,7 @@
 #include "qca8084_phy.h"
 #endif
 
-static a_bool_t phy_dev_drv_init_flag = A_FALSE;
+static a_bool_t qca808x_ssdk_phy_drv_registered = A_FALSE;
 static a_bool_t qca808x_std_phy_drv_registered = A_FALSE;
 /*qca808x_start*/
 static a_bool_t phy_ops_flag = A_FALSE;
@@ -2614,15 +2614,14 @@ int qca808x_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 	qca808x_phy_hw_init(dev_id, port_bmp);
 
 /*qca808x_end*/
-	if(phy_dev_drv_init_flag == A_FALSE)
+	for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++)
 	{
-		for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++)
-		{
-			if (port_bmp & (0x1 << port_id)) {
-				qca808x_phydev_init(dev_id, port_id);
-			}
+		if (port_bmp & (0x1 << port_id)) {
+			qca808x_phydev_init(dev_id, port_id);
 		}
+	}
 
+	if (qca808x_ssdk_phy_drv_registered == A_FALSE) {
 		drv = driver_find(QCA808X_PHY_DRIVER_NAME, &mdio_bus_type);
 		if (drv) {
 			/* qca808x phy driver is already registered */
@@ -2630,11 +2629,14 @@ int qca808x_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 			ret = qca808x_ptp_hook_init();
 #endif
 			qca808x_std_phy_drv_registered = A_TRUE;
-		} else
-			ret = qca808x_phy_driver_register();
-
-		phy_dev_drv_init_flag = A_TRUE;
+		}
 	}
+
+	if (qca808x_std_phy_drv_registered == A_FALSE) {
+		ret = qca808x_phy_driver_register();
+		qca808x_ssdk_phy_drv_registered = A_TRUE;
+	}
+
 /*qca808x_start*/
 	return ret;
 }
@@ -2644,13 +2646,17 @@ void qca808x_phy_exit(a_uint32_t dev_id, a_uint32_t port_bmp)
 /*qca808x_end*/
 	a_uint32_t port_id = 0;
 
+	if (qca808x_ssdk_phy_drv_registered == A_TRUE) {
+		qca808x_phy_driver_unregister();
+		qca808x_ssdk_phy_drv_registered = A_FALSE;
+	}
+
 	if (qca808x_std_phy_drv_registered == A_TRUE) {
 #if defined(IN_LINUX_STD_PTP)
 		qca808x_ptp_hook_cleanup();
 #endif
 		qca808x_std_phy_drv_registered = A_FALSE;
-	} else
-		qca808x_phy_driver_unregister();
+	}
 
 	for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++)
 	{

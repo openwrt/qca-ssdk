@@ -36,7 +36,7 @@ struct qca808x_phy_info* qca808x_phy_info_get(a_uint32_t phy_addr)
 		}
 	}
 
-	SSDK_ERROR("%s can't get the data for phy addr: %d\n", __func__, phy_addr);
+	SSDK_INFO("Can't get the data for phy addr: %d\n", phy_addr);
 	return NULL;
 }
 
@@ -605,8 +605,10 @@ int qca808x_phy_probe(struct phy_device *phydev)
 #else
 	priv->phy_info = qca808x_phy_info_get(phydev->mdio.addr);
 #endif
-	if(!priv->phy_info)
+	if(!priv->phy_info) {
+		kfree(priv);
 		return -ENXIO;
+	}
 	phydev->priv = priv;
 
 #if defined(IN_LINUX_STD_PTP)
@@ -624,6 +626,7 @@ void qca808x_phy_remove(struct phy_device *phydev)
 	qca808x_ptp_deinit(priv);
 #endif
 	kfree(priv);
+	phydev->priv = NULL;
 }
 
 struct phy_driver qca808x_phy_driver = {
@@ -685,6 +688,8 @@ void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 	pdata = kzalloc(sizeof(struct qca808x_phy_info), GFP_KERNEL);
 
 	if (!pdata) {
+		SSDK_ERROR("Allocate qca808x_phy_info for device id %d phy id 0x%x fail\n",
+				dev_id, qca_ssdk_port_to_phy_addr(dev_id, port_id));
 		return;
 	}
 	list_add_tail(&pdata->list, &g_qca808x_phy_list);

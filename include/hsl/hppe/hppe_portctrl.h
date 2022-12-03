@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -43,7 +45,12 @@
 #define IPR_BYTE_LOW_REG_REG_MAX_ENTRY	8
 #define IPR_BYTE_HIGH_REG_MAX_ENTRY	8
 #define DROP_CNT_MAX_ENTRY	8
+#if defined(MPPE)
+#define DROP_PKT_STAT_MAX_ENTRY	20
+#else
 #define DROP_PKT_STAT_MAX_ENTRY	30
+#endif
+
 #define PPE_CAPACITY_PORT_NUM	256
 #ifdef APPE
 #define LINK_OAM_CTRL_MAX_ENTRY	8

@@ -1042,6 +1042,9 @@ void ssdk_uniphy_port5_clock_source_set(void)
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	a_uint32_t id, mode, i;
 
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq53xx")) {
+		return;
+	}
 	mode = ssdk_dt_global_get_mac_mode(0, SSDK_UNIPHY_INSTANCE1);
 
 	for (i = UNIPHY_RX; i <= UNIPHY_TX; i++) {

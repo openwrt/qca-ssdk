@@ -2778,7 +2778,7 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id,
 	}
 	else if (port_type == PORT_XGMAC_TYPE)
 	{
-		if (port_id == HPPE_MUX_PORT1)
+		if (port_id == HPPE_UNIPHY1_PORT)
 			mode = mode1;
 		else if (port_id == HPPE_MUX_PORT2)
 			mode = mode2;
@@ -2786,14 +2786,6 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id,
 		else if (port_id >= SSDK_PHYSICAL_PORT1 && port_id <= SSDK_PHYSICAL_PORT4)
 		{
 			mode = mode0;
-#if defined(MPPE)
-			if (adpt_chip_type_get(dev_id) == CHIP_APPE &&
-				adpt_chip_revision_get(dev_id) == MPPE_REVISION &&
-				port_id == SSDK_PHYSICAL_PORT2)
-			{
-				mode = mode1;
-			}
-#endif
 		}
 #endif
 		else
@@ -3014,12 +3006,9 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 		default:
 			break;
 	}
-	if(port_id == SSDK_PHYSICAL_PORT5 || port_id == SSDK_PHYSICAL_PORT6 ||
-		(adpt_chip_type_get(dev_id) == CHIP_APPE &&
-		adpt_chip_revision_get(dev_id)== MPPE_REVISION &&
-		port_id == SSDK_PHYSICAL_PORT2))
+	if(port_id == HPPE_UNIPHY1_PORT || port_id == SSDK_PHYSICAL_PORT6)
 	{
-		if(port_id == SSDK_PHYSICAL_PORT5 || port_id == SSDK_PHYSICAL_PORT2)
+		if(port_id == HPPE_UNIPHY1_PORT)
 			mode_tmp = mode1;
 		else
 			mode_tmp = mode2;
@@ -3078,7 +3067,7 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 
-	for(port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT5; port_id++)
+	for(port_id = SSDK_PHYSICAL_PORT1; port_id <= HPPE_UNIPHY0_PORT_MAX; port_id++)
 	{
 		if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_EXCL_CPU))
 		{
@@ -3298,7 +3287,7 @@ _adpt_hppe_instance_mode_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
 			SW_RTN_ON_ERROR(rv);
 			break;
 		case SSDK_UNIPHY_INSTANCE1:
-			rv =_adpt_hppe_instance1_mode_get(dev_id, SSDK_PHYSICAL_PORT5,
+			rv =_adpt_hppe_instance1_mode_get(dev_id, HPPE_UNIPHY1_PORT,
 				interface_mode);
 			SW_RTN_ON_ERROR(rv);
 			break;
@@ -3463,8 +3452,8 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 	}
 	else if(mode_index == SSDK_UNIPHY_INSTANCE1)
 	{
-		port_id_from = SSDK_PHYSICAL_PORT5;
-		port_id_end = SSDK_PHYSICAL_PORT5;
+		port_id_from = HPPE_UNIPHY1_PORT;
+		port_id_end = HPPE_UNIPHY1_PORT;
 	}
 	else if(mode_index == SSDK_UNIPHY_INSTANCE2)
 	{
@@ -4927,7 +4916,7 @@ adpt_hppe_uniphy_usxgmii_port_reset(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	memset(&vr_mii_dig_ctrl1, 0, sizeof(vr_mii_dig_ctrl1));
 #endif
 
-	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == SSDK_PHYSICAL_PORT5) ||
+	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == HPPE_UNIPHY1_PORT) ||
 		(port_id == SSDK_PHYSICAL_PORT6)) {
 		hppe_vr_xs_pcs_dig_ctrl1_get(dev_id, uniphy_index,
 				&vr_xs_pcs_dig_ctrl1);
@@ -4974,7 +4963,7 @@ adpt_hppe_uniphy_port_adapter_reset(a_uint32_t dev_id, a_uint32_t port_id)
 	a_uint32_t channel_id = 0;
 #endif
 
-	if (port_id < HPPE_MUX_PORT1)
+	if (port_id < HPPE_UNIPHY1_PORT)
 	{
 		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 #if defined(CPPE)
@@ -4998,7 +4987,7 @@ adpt_hppe_uniphy_port_adapter_reset(a_uint32_t dev_id, a_uint32_t port_id)
 	}
 	else
 	{
-		if (port_id == HPPE_MUX_PORT1)
+		if (port_id == HPPE_UNIPHY1_PORT)
 		{
 			mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
 			mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
@@ -5143,7 +5132,7 @@ adpt_hppe_uniphy_speed_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_speed
 {
 	a_uint32_t uniphy_index = 0, mode = 0;
 
-	if (port_id == HPPE_MUX_PORT1)
+	if (port_id == HPPE_UNIPHY1_PORT)
 		uniphy_index = SSDK_UNIPHY_INSTANCE1;
 	else if (port_id == HPPE_MUX_PORT2)
 		uniphy_index = SSDK_UNIPHY_INSTANCE2;
@@ -5165,7 +5154,7 @@ adpt_hppe_uniphy_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, fal_port_dupl
 {
 	a_uint32_t uniphy_index = 0, mode = 0;
 
-	if (port_id == HPPE_MUX_PORT1)
+	if (port_id == HPPE_UNIPHY1_PORT)
 		uniphy_index = SSDK_UNIPHY_INSTANCE1;
 	else if (port_id == HPPE_MUX_PORT2)
 		uniphy_index = SSDK_UNIPHY_INSTANCE2;
@@ -5187,7 +5176,7 @@ adpt_hppe_uniphy_autoneg_status_check(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	a_uint32_t uniphy_index = 0, mode = 0;
 
-	if (port_id == HPPE_MUX_PORT1)
+	if (port_id == HPPE_UNIPHY1_PORT)
 		uniphy_index = SSDK_UNIPHY_INSTANCE1;
 	else if (port_id == HPPE_MUX_PORT2)
 		uniphy_index = SSDK_UNIPHY_INSTANCE2;
@@ -5302,7 +5291,7 @@ adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
 {
 	a_uint32_t  mode = 0, uniphy_index = 0, mode1 = 0;
 
-	if (port_id < HPPE_MUX_PORT1)
+	if (port_id < HPPE_UNIPHY1_PORT)
 	{
 #if defined(CPPE)
 		if (port_id == SSDK_PHYSICAL_PORT4) {
@@ -5343,7 +5332,7 @@ adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id, a_uint32_t port_id,
 				return;
 			}
 		}
-		if (port_id == HPPE_MUX_PORT1)
+		if (port_id == HPPE_UNIPHY1_PORT)
 			uniphy_index = SSDK_UNIPHY_INSTANCE1;
 		else
 			uniphy_index = SSDK_UNIPHY_INSTANCE2;
@@ -5369,7 +5358,7 @@ adpt_hppe_gcc_uniphy_clock_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t channel_id = 0;
 #endif
 
-	if (port_id < HPPE_MUX_PORT1)
+	if (port_id < HPPE_UNIPHY1_PORT)
 	{
 		uniphy_index = SSDK_UNIPHY_INSTANCE0;
 #if defined(CPPE)
@@ -5399,7 +5388,7 @@ adpt_hppe_gcc_uniphy_clock_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 				return;
 			}
 		}
-		if (port_id == HPPE_MUX_PORT1)
+		if (port_id == HPPE_UNIPHY1_PORT)
 			uniphy_index = SSDK_UNIPHY_INSTANCE1;
 		else
 			uniphy_index = SSDK_UNIPHY_INSTANCE2;

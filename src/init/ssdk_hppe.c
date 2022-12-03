@@ -1383,13 +1383,10 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 	fal_port_t port_id;
 	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
 	a_uint32_t index = 0, mode[3] = {mode0, mode1, mode2};
-	a_uint32_t chip_type = 0, chip_ver = 0;
+	adpt_ppe_type_t ppe_type = adpt_ppe_type_get(dev_id);
 
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 	SW_RTN_ON_NULL(p_api->adpt_port_mux_mac_type_set);
-
-	chip_type = adpt_chip_type_get(dev_id);
-	chip_ver = adpt_chip_revision_get(dev_id);
 
 	SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
 
@@ -1399,8 +1396,7 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode1);
 	SW_RTN_ON_ERROR(rv);
 
-	if ((chip_type == CHIP_APPE && chip_ver == APPE_REVISION) ||
-		(chip_type == CHIP_HPPE && chip_ver == HPPE_REVISION)) {
+	if ((ppe_type == HPPE_TYPE) || (ppe_type == APPE_TYPE)) {
 
 		rv = p_api->adpt_uniphy_mode_set(dev_id,
 				SSDK_UNIPHY_INSTANCE2, mode2);
@@ -1413,20 +1409,24 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 		}
 	}
 
-	if (chip_type == CHIP_APPE) {
-		if (chip_ver == MPPE_REVISION) {
-			port_max = SSDK_PHYSICAL_PORT3;
-			SSDK_INFO("mppe interface mode initialization\n");
-		} else {
+	switch (ppe_type) {
+		case HPPE_TYPE:
+			port_max = SSDK_PHYSICAL_PORT7;
+			break;
+		case CPPE_TYPE:
+			port_max = SSDK_PHYSICAL_PORT6;
+			break;
+		case APPE_TYPE:
 			port_max = SSDK_PHYSICAL_PORT7;
 			SSDK_INFO("appe interface mode initialization\n");
-		}
-	} else {
-		if(chip_ver == CPPE_REVISION) {
-			port_max = SSDK_PHYSICAL_PORT6;
-		} else {
-			port_max = SSDK_PHYSICAL_PORT7;
-		}
+			break;
+		case MPPE_TYPE:
+			port_max = SSDK_PHYSICAL_PORT3;
+			SSDK_INFO("mppe interface mode initialization\n");
+			break;
+		default:
+			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
+			break;
 	}
 	for(port_id = SSDK_PHYSICAL_PORT1; port_id < port_max; port_id++) {
 		rv = p_api->adpt_port_mux_mac_type_set(dev_id, port_id, mode0, mode1, mode2);

@@ -39,6 +39,13 @@ extern "C" {
 
 #define HPPE_MUX_PORT1                                     5
 #define HPPE_MUX_PORT2                                     6
+#if defined(MPPE)
+#define HPPE_UNIPHY1_PORT                                  SSDK_PHYSICAL_PORT2
+#define HPPE_UNIPHY0_PORT_MAX                              SSDK_PHYSICAL_PORT1
+#else
+#define HPPE_UNIPHY1_PORT                                  HPPE_MUX_PORT1
+#define HPPE_UNIPHY0_PORT_MAX                              HPPE_MUX_PORT1
+#endif
 
 #define HPPE_GCC_UNIPHY_PSGMII_SOFT_RESET                  0x3ff2
 #define HPPE_GCC_UNIPHY_USXGMII_SOFT_RESET                 0x36

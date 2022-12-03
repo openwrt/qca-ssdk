@@ -5027,6 +5027,49 @@ adpt_hppe_uniphy_port_adapter_reset(a_uint32_t dev_id, a_uint32_t port_id)
 }
 
 static void
+adpt_hppe_uniphy_usxgmii_mac_type_set(a_uint32_t dev_id, a_uint32_t port_id,
+		fal_port_speed_t speed)
+{
+	a_uint32_t uniphy_index = SSDK_MAX_UNIPHY_INSTANCE;
+	fal_port_interface_mode_t port_mode = PORT_INTERFACE_MODE_MAX;
+	union vr_mii_an_ctrl_u vr_mii_an_ctrl;
+
+	uniphy_index = hsl_port_to_uniphy(dev_id, port_id);
+	adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode);
+	memset(&vr_mii_an_ctrl, 0, sizeof(vr_mii_an_ctrl));
+
+#if defined(MPPE)
+	if (adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+	{
+		if (port_mode == PORT_USXGMII)
+		{
+			if (speed == FAL_SPEED_10)
+			{
+				/* sel gmac */
+				qca_hppe_port_mac_type_set(dev_id, port_id, PORT_GMAC_TYPE);
+				_adpt_appe_port_mux_mac_set(dev_id, port_id, PORT_GMAC_TYPE);
+				/* gmac use 4-bits MII width */
+				hppe_vr_mii_an_ctrl_get(dev_id, uniphy_index, &vr_mii_an_ctrl);
+				vr_mii_an_ctrl.bf.mii_ctrl = 0;
+				hppe_vr_mii_an_ctrl_set(dev_id, uniphy_index, &vr_mii_an_ctrl);
+			}
+			else
+			{
+				/* sel xgmac */
+				qca_hppe_port_mac_type_set(dev_id, port_id, PORT_XGMAC_TYPE);
+				_adpt_appe_port_mux_mac_set(dev_id, port_id, PORT_XGMAC_TYPE);
+				/* xgmac use 8-bits MII width */
+				hppe_vr_mii_an_ctrl_get(dev_id, uniphy_index, &vr_mii_an_ctrl);
+				vr_mii_an_ctrl.bf.mii_ctrl = 1;
+				hppe_vr_mii_an_ctrl_set(dev_id, uniphy_index, &vr_mii_an_ctrl);
+			}
+		}
+	}
+#endif
+	return;
+}
+
+static void
 adpt_hppe_uniphy_usxgmii_speed_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		a_uint32_t port_id, fal_port_speed_t speed)
 {
@@ -5555,6 +5598,9 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 				if ((a_uint32_t)phy_status.speed !=
 						priv->port_old_speed[port_id - 1])
 				{
+					/* configure 4bit-GMAC or 8bit-XGMAC for usxgmii mode */
+					adpt_hppe_uniphy_usxgmii_mac_type_set(priv->device_id,
+							port_id, phy_status.speed);
 					/* configure gcc speed clock according to current speed */
 					adpt_hppe_gcc_port_speed_clock_set(priv->device_id, port_id,
 							phy_status.speed);

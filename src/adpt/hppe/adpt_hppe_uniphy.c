@@ -325,14 +325,51 @@ __adpt_appe_gcc_uniphy_software_reset(a_uint32_t dev_id,
 }
 #endif
 
+#if defined(MPPE)
+void
+__adpt_mppe_gcc_uniphy_software_reset(a_uint32_t dev_id,
+		a_uint32_t uniphy_index)
+{
+	enum unphy_rst_type port_rx_rst_type, port_tx_rst_type;
+	enum unphy_rst_type sys_type;
+
+	if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
+		port_rx_rst_type = UNIPHY0_PORT1_RX_DISABLE_E;
+		port_tx_rst_type = UNIPHY0_PORT1_TX_DISABLE_E;
+		sys_type = UNIPHY0_SYS_RESET_E;
+	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
+		port_rx_rst_type = UNIPHY1_PORT5_RX_DISABLE_E;
+		port_tx_rst_type = UNIPHY1_PORT5_TX_DISABLE_E;
+		sys_type = UNIPHY1_SYS_RESET_E;
+	} else {
+		return;
+	}
+	ssdk_uniphy_reset(dev_id, sys_type, SSDK_RESET_ASSERT);
+	ssdk_uniphy_reset(dev_id, port_rx_rst_type, SSDK_RESET_ASSERT);
+	ssdk_uniphy_reset(dev_id, port_tx_rst_type, SSDK_RESET_ASSERT);
+	msleep(100);
+	ssdk_uniphy_reset(dev_id, sys_type, SSDK_RESET_DEASSERT);
+	ssdk_uniphy_reset(dev_id, port_rx_rst_type, SSDK_RESET_DEASSERT);
+	ssdk_uniphy_reset(dev_id, port_tx_rst_type, SSDK_RESET_DEASSERT);
+
+	return;
+}
+#endif
+
 void
 __adpt_ppe_gcc_uniphy_software_reset(a_uint32_t dev_id,
 		a_uint32_t uniphy_index)
 {
 	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
-#if defined(APPE)
-		__adpt_appe_gcc_uniphy_software_reset(dev_id, uniphy_index);
+		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
+#if defined(MPPE)
+			__adpt_mppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
 #endif
+		} else {
+#if defined(APPE)
+			__adpt_appe_gcc_uniphy_software_reset(dev_id, uniphy_index);
+#endif
+		}
 	} else if (adpt_chip_type_get(dev_id) == CHIP_HPPE) {
 		if (adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
 #if defined(CPPE)

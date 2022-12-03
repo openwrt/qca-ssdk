@@ -383,7 +383,7 @@ qca808x_phy_fifo_reset(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
 #ifdef MHT
 	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
 	{
-		rv = qca8084_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
+		rv = qca8084_phy_fifo_reset(dev_id, phy_addr, enable);
 		return rv;
 	}
 #endif
@@ -2488,31 +2488,21 @@ qca808x_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 
 	return rv;
 }
-/*qca808x_end*/
-#if defined(MHT)
-static a_bool_t
-qca808x_phy_has_qca8084(a_uint32_t dev_id, a_uint32_t port_bmp)
+
+static sw_error_t
+qca808x_phy_function_reset(a_uint32_t dev_id, a_uint32_t phy_id,
+	hsl_phy_function_reset_t phy_reset_type)
 {
-	a_uint32_t port_id = 0, phy_addr = 0, phy_id = 0;
+	sw_error_t rv = SW_OK;
 
-	for (port_id = SSDK_PHYSICAL_PORT0; port_id < SW_MAX_NR_PORT;
-		port_id ++)
-	{
-		if (port_bmp & (0x1 << port_id))
-		{
-			phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
-			qca808x_phy_get_phy_id(dev_id, phy_addr, &phy_id);
-			if (phy_id == QCA8084_PHY)
-			{
-				return A_TRUE;
-			}
-		}
-	}
+	rv = qca808x_phy_fifo_reset(dev_id, phy_id, A_TRUE);
+	SW_RTN_ON_ERROR(rv);
+	aos_mdelay(50);
+	rv = qca808x_phy_fifo_reset(dev_id, phy_id, A_FALSE);
 
-	return A_FALSE;
+	return rv;
 }
-#endif
-/*qca808x_start*/
+
 static sw_error_t qca808x_phy_api_ops_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 {
 	sw_error_t  ret = SW_OK;
@@ -2583,18 +2573,13 @@ static sw_error_t qca808x_phy_api_ops_init(a_uint32_t dev_id, a_uint32_t port_bm
 	qca808x_phy_api_ops->phy_eee_partner_adv_get = qca808x_phy_get_eee_partner_adv;
 	qca808x_phy_api_ops->phy_eee_cap_get = qca808x_phy_get_eee_cap;
 	qca808x_phy_api_ops->phy_eee_status_get = qca808x_phy_get_eee_status;
+	qca808x_phy_api_ops->phy_function_reset = qca808x_phy_function_reset;
 #ifdef IN_LED
 	qca808x_phy_led_api_ops_init(qca808x_phy_api_ops);
 #endif
 /*qca808x_end*/
 #if defined(IN_PTP)
 	qca808x_phy_ptp_api_ops_init(&qca808x_phy_api_ops->phy_ptp_ops);
-#endif
-#if defined(MHT)
-	if(qca808x_phy_has_qca8084(dev_id, port_bmp))
-	{
-		qca8084_phy_api_ops_init (qca808x_phy_api_ops);
-	}
 #endif
 /*qca808x_start*/
 	ret = hsl_phy_api_ops_register(QCA808X_PHY_CHIP, qca808x_phy_api_ops);

@@ -698,17 +698,6 @@ qca8084_phy_adc_edge_set(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return rv;
 }
 
-void
-qca8084_phy_api_ops_init(hsl_phy_ops_t * hsl_phy_ops)
-{
-	if(hsl_phy_ops == NULL)
-	{
-		SSDK_ERROR ("hsl_phy_ops is null\n");
-		return;
-	}
-	hsl_phy_ops->phy_function_reset = qca8084_phy_function_reset;
-}
-
 sw_error_t
 qca8084_phy_hw_init(a_uint32_t dev_id, a_uint32_t phy_addr)
 {

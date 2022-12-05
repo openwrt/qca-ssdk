@@ -440,7 +440,7 @@ qca_switch_init(a_uint32_t dev_id)
 #ifdef IN_MISC
 	fal_cpu_port_status_set(dev_id, A_TRUE);
 	/* setup MTU */
-	fal_frame_max_size_set(dev_id, 1518);
+	fal_frame_max_size_set(dev_id, 9216);
 #endif
 #ifdef IN_MIB
 	/* Enable MIB counters */
@@ -456,13 +456,13 @@ qca_switch_init(a_uint32_t dev_id)
 #endif
 
 	/*enable pppoe for dakota to support RSS*/
-	if (chip_type == CHIP_DESS) {
 #ifdef DESS
+	if (chip_type == CHIP_DESS) {
 #ifdef IN_PPPOE
 		fal_pppoe_status_set(dev_id, A_TRUE);
 #endif
-#endif
 	}
+#endif
 
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
 	flag = ssdk_ess_switch_flag_get(dev_id);
@@ -549,7 +549,6 @@ qca_switch_init(a_uint32_t dev_id)
 					fal_port_flowctrl_set(dev_id, i, A_FALSE);
 
 					if (i != 0 && i != 6) {
-						fal_port_flowctrl_set(dev_id, i, A_TRUE);
 						fal_port_flowctrl_forcemode_set(dev_id, i,
 								A_FALSE);
 					}
@@ -616,10 +615,10 @@ qca_switch_init(a_uint32_t dev_id)
 #if defined(IN_PORTCONTROL)
 					fal_port_txmac_status_set(dev_id, i, A_FALSE);
 					fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+					fal_port_flowctrl_set(dev_id, i, A_FALSE);
 #endif
 					if (cpu_bmp & BIT(i)) {
 #if defined(IN_PORTCONTROL)
-						fal_port_flowctrl_set(dev_id, i, A_FALSE);
 						fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
 						fal_header_type_set(dev_id,
 								A_TRUE, MHT_HEADER_TYPE_VAL);
@@ -646,7 +645,6 @@ qca_switch_init(a_uint32_t dev_id)
 						queue_hol_ctrl[5] = 64;
 					} else {
 #if defined(IN_PORTCONTROL)
-						fal_port_flowctrl_set(dev_id, i, A_TRUE);
 						fal_port_flowctrl_forcemode_set(dev_id, i,
 								A_FALSE);
 #endif

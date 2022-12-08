@@ -628,7 +628,8 @@ sw_error_t aquatia_phy_cdt_start(a_uint32_t dev_id, a_uint32_t phy_id)
 	rv  = aquantia_phy_reg_read(dev_id, phy_id, AQUANTIA_MMD_GLOBAL_REGISTERS,
 		AQUANTIA_GLOBAL_CDT_CONTROL, &phy_data);
 	SW_RTN_ON_ERROR(rv);
-	if(aq_phy_id == AQUANTIA_PHY_109 || aq_phy_id == AQUANTIA_PHY_113C_B0)
+	if(aq_phy_id == AQUANTIA_PHY_109 || aq_phy_id == AQUANTIA_PHY_113C_B0 ||
+		aq_phy_id == AQUANTIA_PHY_113C_B1)
 	{
 		phy_data |= AQUANTIA_PHY_CDT_MODE2;
 	}
@@ -2126,7 +2127,7 @@ aquantia_phy_hw_init(a_uint32_t dev_id,  a_uint32_t port_bmp)
 			/* config aq phy ACT and LINK led behavior*/
 			rv = aquantia_phy_get_phy_id (dev_id, phy_addr, &aq_phy_id);
 			SW_RTN_ON_ERROR(rv);
-			if(aq_phy_id == AQUANTIA_PHY_113C_B0)
+			if(aq_phy_id == AQUANTIA_PHY_113C_B0 || aq_phy_id == AQUANTIA_PHY_113C_B1)
 			{
 				rv = aquantia_phy_reg_write(dev_id, phy_addr,
 					AQUANTIA_MMD_GLOBAL_REGISTERS,

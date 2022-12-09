@@ -6112,6 +6112,45 @@ adpt_ppe_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 	return rv;
 }
 
+#ifndef IN_PORTCONTROL_MINI
+sw_error_t adpt_hppe_port_rx_buff_thresh_get(a_uint32_t dev_id,
+		a_uint32_t port, a_uint16_t *thresh)
+{
+	sw_error_t rv = SW_OK;
+	union rx_fifo_cfg_u rx_thresh;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(thresh);
+
+	memset(&rx_thresh, 0, sizeof(union rx_fifo_cfg_u));
+
+	rv = hppe_rx_fifo_cfg_get(dev_id, port, &rx_thresh);
+	SW_RTN_ON_ERROR(rv);
+
+	*thresh = rx_thresh.bf.rx_fifo_thres;
+	return rv;
+}
+#endif
+
+sw_error_t adpt_hppe_port_rx_buff_thresh_set(a_uint32_t dev_id,
+		a_uint32_t port, a_uint16_t thresh)
+{
+	sw_error_t rv = SW_OK;
+	union rx_fifo_cfg_u rx_thresh;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+
+	memset(&rx_thresh, 0, sizeof(union rx_fifo_cfg_u));
+
+	rv = hppe_rx_fifo_cfg_get(dev_id, port, &rx_thresh);
+	SW_RTN_ON_ERROR(rv);
+
+	rx_thresh.bf.rx_fifo_thres = thresh;
+
+	rv = hppe_rx_fifo_cfg_set(dev_id, port, &rx_thresh);
+	return rv;
+}
+
 void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -6208,7 +6247,9 @@ void adpt_hppe_port_ctrl_func_bitmap_init(a_uint32_t dev_id)
 		(1<< (FUNC_ADPT_PORT_MRU_MTU_SET% 32)) |
 		(1<< (FUNC_ADPT_PORT_MRU_MTU_GET% 32)) |
 		(1<< (FUNC_ADPT_PORT_TX_BUFF_THRESH_SET% 32)) |
-		(1<< (FUNC_ADPT_PORT_TX_BUFF_THRESH_GET% 32)));
+		(1<< (FUNC_ADPT_PORT_TX_BUFF_THRESH_GET% 32)) |
+		(1<< (FUNC_ADPT_PORT_RX_BUFF_THRESH_SET% 32)) |
+		(1<< (FUNC_ADPT_PORT_RX_BUFF_THRESH_GET% 32)));
 
 	return;
 
@@ -6302,6 +6343,8 @@ static void adpt_hppe_port_ctrl_func_unregister(a_uint32_t dev_id, adpt_api_t *p
 	p_adpt_api->adpt_port_mru_mtu_get = NULL;
 	p_adpt_api->adpt_port_tx_buff_thresh_set = NULL;
 	p_adpt_api->adpt_port_tx_buff_thresh_get = NULL;
+	p_adpt_api->adpt_port_rx_buff_thresh_set = NULL;
+	p_adpt_api->adpt_port_rx_buff_thresh_get = NULL;
 
 	return;
 
@@ -6721,6 +6764,20 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_mru_mtu_get = adpt_ppe_port_mru_mtu_get;
 	}
+	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_RX_BUFF_THRESH_SET % 32)))
+	{
+		p_adpt_api->adpt_port_rx_buff_thresh_set =
+			adpt_hppe_port_rx_buff_thresh_set;
+	}
+#ifndef IN_PORTCONTROL_MINI
+	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
+			(1 << (FUNC_ADPT_PORT_RX_BUFF_THRESH_GET % 32)))
+	{
+		p_adpt_api->adpt_port_rx_buff_thresh_get =
+			adpt_hppe_port_rx_buff_thresh_get;
+	}
+#endif
 	return SW_OK;
 }
 

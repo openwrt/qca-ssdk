@@ -403,6 +403,8 @@ enum
 	FUNC_ADPT_PORT_MRU_MTU_GET,
 	FUNC_ADPT_PORT_TX_BUFF_THRESH_SET,
 	FUNC_ADPT_PORT_TX_BUFF_THRESH_GET,
+	FUNC_ADPT_PORT_RX_BUFF_THRESH_SET,
+	FUNC_ADPT_PORT_RX_BUFF_THRESH_GET,
 };
 
 typedef enum {
@@ -883,7 +885,11 @@ fal_port_flow_ctrl_thres_set(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
 		a_uint16_t *on_thres, a_uint16_t *off_thres);
+sw_error_t
+fal_port_rx_fifo_thres_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint16_t thres);
 #ifndef IN_PORTCONTROL_MINI
+sw_error_t
+fal_port_rx_fifo_thres_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint16_t *thres);
 sw_error_t
 fal_ring_flow_ctrl_status_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status);
 sw_error_t

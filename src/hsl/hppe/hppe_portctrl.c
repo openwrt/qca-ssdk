@@ -407,7 +407,6 @@ hppe_tdm_ctrl_set(
 				NSS_PRX_CSR_BASE_ADDR + TDM_CTRL_ADDRESS,
 				value->val);
 }
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_rx_fifo_cfg_get(
 		a_uint32_t dev_id,
@@ -436,6 +435,7 @@ hppe_rx_fifo_cfg_set(
 				value->val);
 }
 
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_tdm_cfg_get(
 		a_uint32_t dev_id,

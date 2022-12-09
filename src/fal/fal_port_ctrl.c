@@ -2097,7 +2097,40 @@ _fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
 
 	return rv;
 }
+
+sw_error_t
+_fal_port_rx_fifo_thres_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint16_t thres)
+{
+	sw_error_t rv = SW_OK;
+	adpt_api_t *p_adpt_api = NULL;
+
+	p_adpt_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_adpt_api);
+
+	if (NULL == p_adpt_api->adpt_port_rx_buff_thresh_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_adpt_api->adpt_port_rx_buff_thresh_set(dev_id, port_id, thres);
+	return rv;
+}
+
 #ifndef IN_PORTCONTROL_MINI
+sw_error_t
+_fal_port_rx_fifo_thres_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint16_t *thres)
+{
+	sw_error_t rv = SW_OK;
+	adpt_api_t *p_adpt_api = NULL;
+
+	p_adpt_api = adpt_api_ptr_get(dev_id);
+	SW_RTN_ON_NULL(p_adpt_api);
+
+	if (NULL == p_adpt_api->adpt_port_rx_buff_thresh_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_adpt_api->adpt_port_rx_buff_thresh_get(dev_id, port_id, thres);
+	return rv;
+}
+
 sw_error_t
 _fal_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
 {
@@ -3956,7 +3989,30 @@ fal_port_flow_ctrl_thres_get(a_uint32_t dev_id, a_uint32_t port_id,
     FAL_API_UNLOCK;
     return rv;
 }
+
+sw_error_t
+fal_port_rx_fifo_thres_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint16_t thres)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_port_rx_fifo_thres_set(dev_id, port_id, thres);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
 #ifndef IN_PORTCONTROL_MINI
+sw_error_t
+fal_port_rx_fifo_thres_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint16_t *thres)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_port_rx_fifo_thres_get(dev_id, port_id, thres);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
 sw_error_t
 fal_ring_flow_ctrl_config_get(a_uint32_t dev_id, a_uint32_t ring_id, a_bool_t *status)
 {
@@ -4071,7 +4127,9 @@ EXPORT_SYMBOL(fal_port_autoneg_adv_get);
 EXPORT_SYMBOL(fal_port_flowctrl_set);
 EXPORT_SYMBOL(fal_port_flow_ctrl_thres_set);
 EXPORT_SYMBOL(fal_port_flow_ctrl_thres_get);
+EXPORT_SYMBOL(fal_port_rx_fifo_thres_set);
 #ifndef IN_PORTCONTROL_MINI
+EXPORT_SYMBOL(fal_port_rx_fifo_thres_get);
 EXPORT_SYMBOL(fal_port_flowctrl_get);
 EXPORT_SYMBOL(fal_port_powersave_set);
 EXPORT_SYMBOL(fal_port_powersave_get);

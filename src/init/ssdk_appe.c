@@ -351,22 +351,24 @@ fal_port_tdm_tick_cfg_t mppe_port_tdm0_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_FALSE, FAL_PORT_TDB_DIR_INGRESS, 0},
 };
 
 fal_port_scheduler_cfg_t mppe_port_scheduler0_tbl[] = {
@@ -486,9 +488,19 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 	fal_port_cnt_cfg_t init_cnt_cfg;
 
 #if defined(MPPE)
-	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION)
-	{
+	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
 		port_max = SSDK_PHYSICAL_PORT3;
+
+		for(i = SSDK_PHYSICAL_PORT0; i < port_max; i++) {
+			/* PTX buffer threshold need to be updated to 3 on MPPE
+			 * for fixing tunnel perfomance issue where MAPT inbound case,
+			 * only the buffer size >= 48 can be transmitted out.
+			 */
+			fal_port_flow_ctrl_thres_set(dev_id, i, 3, 3);
+
+			/* Fix 147B line rate on physical port1 */
+			fal_port_rx_fifo_thres_set(dev_id, i, 7);
+		}
 	}
 #endif
 	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
@@ -502,15 +514,6 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 			fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
 		}
 		qca_hppe_port_mac_type_set(dev_id, i, mac_type_org);
-#if defined(MPPE)
-		if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
-			/* PTX buffer threshold need to be updated to 3 on MPPE
-			 * for fixing tunnel perfomance issue where MAPT inbound case,
-			 * only the buffer size >= 48 can be transmitted out.
-			 */
-			fal_port_flow_ctrl_thres_set(dev_id, i, 3, 3);
-		}
-#endif
 	}
 
 	aos_mem_zero(&init_cnt_cfg, sizeof(init_cnt_cfg));

@@ -96,7 +96,7 @@ _adpt_appe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
 	rv = appe_port_mux_ctrl_set(dev_id, &appe_port_mux_ctrl);
 	SW_RTN_ON_ERROR (rv);
 
-	SSDK_INFO("appe port %d mac type is %d\n", port_id, port_type);
+	SSDK_DEBUG("appe port %d mac type is %d\n", port_id, port_type);
 
 	return rv;
 }

@@ -456,6 +456,8 @@ static void ssdk_ppe_uniphy_clock_init(ssdk_chip_type chip_ver,
 
 	for (i = 0; i < ARRAY_SIZE(ppe_clk_ids); i++) {
 		uniphy_port_clks[i] = of_clk_get_by_name(clock_node, ppe_clk_ids[i]);
+		if (IS_ERR(uniphy_port_clks[i]))
+			continue;
 		if (i != PORT5_RX_SRC_E && i != PORT5_TX_SRC_E)
 			ssdk_uniphy_clock_enable(0, i, A_TRUE);
 	}

@@ -499,7 +499,8 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 			fal_port_flow_ctrl_thres_set(dev_id, i, 3, 3);
 
 			/* Fix 147B line rate on physical port1 */
-			fal_port_rx_fifo_thres_set(dev_id, i, 7);
+			if (i != SSDK_PHYSICAL_PORT0)
+				fal_port_rx_fifo_thres_set(dev_id, i, 7);
 		}
 	}
 #endif

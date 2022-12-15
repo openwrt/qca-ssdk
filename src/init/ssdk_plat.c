@@ -901,6 +901,27 @@ struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id)
 	return qca_phy_priv_global[dev_id]->miibus;
 }
 
+sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq)
+{
+	struct mii_bus *bus = NULL;
+	struct qca_mdio_data *mdio_priv = NULL;
+
+	bus = ssdk_miibus_get_by_device(dev_id);
+	if (!bus) {
+		SSDK_ERROR("Can't get MDIO bus of device id %d\n", dev_id);
+		return SW_BAD_PTR;
+	}
+
+	mdio_priv = bus->priv;
+	if (!mdio_priv) {
+		SSDK_ERROR("MDIO bus private data is NULL\n");
+		return SW_BAD_PTR;
+	}
+
+	*freq = mdio_priv->clk_div;
+	return SW_OK;
+}
+
 sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq)
 {
 	struct mii_bus *bus = NULL;

@@ -1677,7 +1677,7 @@ _ssdk_mac_sw_sync_chip_check(struct qca_phy_priv *priv)
 		case QCA_VER_APPE:
 			break;
 		default:
-			SSDK_ERROR("Unsupported chip version %d\n", priv->version);
+			SSDK_DEBUG("Unsupported chip version %d\n", priv->version);
 			rv = SW_NOT_SUPPORTED;
 	}
 
@@ -2129,8 +2129,11 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 #endif
 #endif
 #ifdef HPPE
-	if (_ssdk_mac_sw_sync_chip_check(priv) != SW_OK)
+	if (_ssdk_mac_sw_sync_chip_check(priv) != SW_OK) {
+		SSDK_INFO("mac_sw_sync is not enabled on chip 0x%02x%02x\n",
+			priv->version, priv->revision);
 		return 0;
+	}
 
 	if (!ssdk_is_emulation(dev_id)) {
 		ret = qca_mac_sw_sync_work_init(priv);

@@ -1229,7 +1229,7 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 	a_uint32_t mht_port_id = 0;
 	/* clock type mask value for 6 manhattan ports */
 	a_uint8_t clk_mask[SSDK_PHYSICAL_PORT5 + 1] = {0};
-	static a_bool_t gcc_common_clk_init = A_FALSE;
+	static a_uint32_t gcc_common_clk_init_bmp = 0;
 	a_bool_t switch_flag = A_FALSE;
 	mht_clk_parent_t uniphy_index = MHT_P_UNIPHY0_RX;
 
@@ -1276,9 +1276,9 @@ void ssdk_mht_gcc_clock_init(a_uint32_t dev_id, mht_work_mode_t clk_mode, a_uint
 			return;
 	}
 
-	if (!gcc_common_clk_init) {
+	if (!(gcc_common_clk_init_bmp & BIT(dev_id))) {
 		ssdk_mht_gcc_common_clk_parent_enable(dev_id, clk_mode);
-		gcc_common_clk_init = A_TRUE;
+		gcc_common_clk_init_bmp |= BIT(dev_id);
 
 		/* Initialize the uniphy raw clock, if the port4 is in bypass mode, the uniphy0
 		 * raw clock need to be dynamically updated between UQXGMII_SPEED_2500M_CLK and

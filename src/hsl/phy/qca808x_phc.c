@@ -1328,7 +1328,7 @@ static int qca808x_ptp_register(struct phy_device *phydev)
 	ptp_info->clock = clock;
 	clock->priv = priv;
 
-	SSDK_INFO("qca808x phydev %d ptp clock registered\n", phydev->mdio.addr);
+	SSDK_INFO("qca808x phydev %s ptp clock registered\n", phydev_name(phydev));
 	return 0;
 }
 

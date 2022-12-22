@@ -31,6 +31,118 @@
 #endif
 
 #if defined(IN_BM) && defined(IN_QOS)
+#if defined(MPPE)
+fal_port_tdm_tick_cfg_t ppe_port_tdm0_tbl[] = {
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
+	{A_FALSE, FAL_PORT_TDB_DIR_INGRESS, 0},
+};
+
+fal_port_scheduler_cfg_t ppe_port_scheduler0_tbl[] = {
+	{0x0, 0x2, 0, 0x0, 0},
+	{0x0, 0x1, 2, 0x0, 0},
+	{0x0, 0x0, 1, 0x0, 0},
+	{0x0, 0x0, 2, 0x0, 0},
+	{0x0, 0x1, 0, 0x0, 0},
+	{0x0, 0x2, 1, 0x0, 0},
+	{0x0, 0x0, 2, 0x0, 0},
+	{0x0, 0x0, 1, 0x0, 0},
+	{0x0, 0x0, 2, 0x0, 0},
+	{0x0, 0x0, 1, 0x0, 0},
+};
+#else
+
+fal_port_scheduler_cfg_t ppe_port_scheduler0_tbl[] = {
+	{0x9E, 0xF, 6, 0x0, 1},
+	{0x9E, 0xF, 5, 0x0, 0},
+	{0x5F, 6, 7, 0x0, 0},
+	{0x3E, 5, 6, 0x0, 1},
+	{0x9E, 7, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0xD7, 6, 3, 0x0, 0},
+	{0xB6, 5, 6, 0x0, 1},
+	{0x9E, 3, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0xDB, 6, 2, 0x0, 0},
+	{0xBA, 5, 6, 0x0, 1},
+	{0x9E, 2, 5, 0x0, 0},
+	{0x5F, 6, 7, 0x0, 0},
+	{0x3E, 5, 6, 0x0, 1},
+	{0x9E, 7, 5, 0x0, 0},
+	{0xCF, 6, 4, 0x0, 0},
+	{0xAE, 5, 6, 0x0, 1},
+	{0x9E, 4, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0xDD, 6, 1, 0x0, 0},
+	{0xBC, 5, 6, 0x0, 1},
+	{0x9E, 1, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0x5F, 6, 7, 0x0, 0},
+	{0x3E, 5, 6, 0x0, 1},
+	{0x9E, 7, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0xDB, 6, 2, 0x0, 0},
+	{0xBA, 5, 6, 0x0, 1},
+	{0x9E, 2, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0xD7, 6, 3, 0x0, 0},
+	{0xB6, 5, 6, 0x0, 1},
+	{0x9E, 3, 5, 0x0, 0},
+	{0x5F, 6, 7, 0x0, 0},
+	{0x3E, 5, 6, 0x0, 1},
+	{0x9E, 7, 5, 0x0, 0},
+	{0xDD, 6, 1, 0x0, 0},
+	{0xBC, 5, 6, 0x0, 1},
+	{0x9E, 1, 5, 0x0, 0},
+	{0xDE, 6, 0, 0x0, 0},
+	{0xBE, 5, 6, 0x0, 0},
+	{0x9F, 0, 5, 0x0, 0},
+	{0xCF, 6, 4, 0x0, 0},
+	{0xAE, 5, 6, 0x0, 1},
+	{0x9E, 4, 5, 0x0, 0},
+};
+
 fal_port_scheduler_cfg_t appe_port_scheduler1_tbl[] = {
 	{0x1E, 0, 6, 0x0, 0},
 	{0x1F, 7, 5, 0x0, 0},
@@ -93,7 +205,7 @@ fal_port_scheduler_cfg_t appe_port_scheduler1_tbl[] = {
 	{0x0F, 4, 7, 0x5, 1},
 };
 
-fal_port_tdm_tick_cfg_t appe_port_tdm0_tbl[] = {
+fal_port_tdm_tick_cfg_t ppe_port_tdm0_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 6},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 4},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 5},
@@ -107,7 +219,7 @@ fal_port_tdm_tick_cfg_t appe_port_tdm0_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 6},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 7},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 5},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 5},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 6},
@@ -334,55 +446,6 @@ fal_port_tdm_tick_cfg_t appe_port_tdm1_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS,  1},
 };
-
-#if defined(MPPE)
-fal_port_tdm_tick_cfg_t mppe_port_tdm0_tbl[] = {
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
-	{A_FALSE, FAL_PORT_TDB_DIR_INGRESS, 0},
-};
-
-fal_port_scheduler_cfg_t mppe_port_scheduler0_tbl[] = {
-	{0x0, 0x2, 0, 0x0, 0},
-	{0x0, 0x1, 2, 0x0, 0},
-	{0x0, 0x0, 1, 0x0, 0},
-	{0x0, 0x0, 2, 0x0, 0},
-	{0x0, 0x1, 0, 0x0, 0},
-	{0x0, 0x2, 1, 0x0, 0},
-	{0x0, 0x0, 2, 0x0, 0},
-	{0x0, 0x0, 1, 0x0, 0},
-	{0x0, 0x0, 2, 0x0, 0},
-	{0x0, 0x0, 1, 0x0, 0},
-};
 #endif
 
 static sw_error_t
@@ -395,9 +458,7 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 	fal_port_scheduler_cfg_t *scheduler_cfg = NULL;
 	fal_port_tdm_tick_cfg_t *bm_cfg = NULL;
 	a_uint8_t tm_tick_mode, bm_tick_mode;
-#if defined(MPPE)
 	a_uint32_t chip_revision = adpt_chip_revision_get(dev_id);
-#endif
 
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 	SW_RTN_ON_NULL(p_api->adpt_port_scheduler_cfg_set);
@@ -406,30 +467,45 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 	tm_tick_mode = ssdk_tm_tick_mode_get(dev_id);
 	bm_tick_mode = ssdk_bm_tick_mode_get(dev_id);
 
-	if ((tm_tick_mode != 0x0) && (tm_tick_mode != 0x1)) {
-		SSDK_ERROR("appe invalid scheduler tdm mode!\n");
+	if (tm_tick_mode > 1) {
+		SSDK_ERROR("appe invalid tm tdm mode %d!\n", tm_tick_mode);
 		return SW_BAD_VALUE;
 	}
 
 #if defined(MPPE)
 	if (chip_revision == MPPE_REVISION) {
 		if (tm_tick_mode == 0) {
-			num = sizeof(mppe_port_scheduler0_tbl) / sizeof(fal_port_scheduler_cfg_t);
-			scheduler_cfg = mppe_port_scheduler0_tbl;
+			num = ARRAY_SIZE(ppe_port_scheduler0_tbl);
+			scheduler_cfg = ppe_port_scheduler0_tbl;
 			SSDK_INFO("mppe scheduler tdm mode = %d, num = %d\n", tm_tick_mode, num);
 		} else {
 			SSDK_ERROR("mppe invalid tdm mode %d\n", tm_tick_mode);
 			return SW_BAD_VALUE;
 		}
-	} else
-#endif
-	{
-		if (tm_tick_mode == 0x1) {
-			num = sizeof(appe_port_scheduler1_tbl) / sizeof(fal_port_scheduler_cfg_t);
-			scheduler_cfg = appe_port_scheduler1_tbl;
+	}
+#else
+	if (chip_revision == APPE_REVISION) {
+		switch (tm_tick_mode) {
+			case 0:
+				/*
+				 * For 1x4G + 2x10G, port5 has the same high performance as
+				 * port6.
+				 */
+				num = ARRAY_SIZE(ppe_port_scheduler0_tbl);
+				scheduler_cfg = ppe_port_scheduler0_tbl;
+				break;
+			case 1:
+				/* For 4x2.5G involved */
+				num = ARRAY_SIZE(appe_port_scheduler1_tbl);
+				scheduler_cfg = appe_port_scheduler1_tbl;
+				break;
+			default:
+				SSDK_ERROR("appe invalid scheduler tdm mode %d\n", tm_tick_mode);
+				return SW_BAD_VALUE;
 		}
 		SSDK_INFO("appe scheduler tdm mode =%d\n", tm_tick_mode);
 	}
+#endif
 
 	if (scheduler_cfg != NULL) {
 		for (i = 0; i < num; i++) {
@@ -444,28 +520,34 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 #if defined(MPPE)
 	if (chip_revision == MPPE_REVISION) {
 		if (bm_tick_mode == 0) {
-			bm_cfg = mppe_port_tdm0_tbl;
-			num = sizeof(mppe_port_tdm0_tbl) / sizeof(fal_port_tdm_tick_cfg_t);
+			bm_cfg = ppe_port_tdm0_tbl;
+			num = ARRAY_SIZE(ppe_port_tdm0_tbl);
 			SSDK_INFO("mppe bm mode = %d setup num= %d\n", bm_tick_mode, num);
 		} else {
 			SSDK_ERROR("mppe invalid BM tick mode %d\n", bm_tick_mode);
 			return SW_BAD_VALUE;
 		}
-	} else
-#endif
-	{
-		if (bm_tick_mode == 0) {
-			num = sizeof(appe_port_tdm0_tbl) / sizeof(fal_port_tdm_tick_cfg_t);
-			bm_cfg = appe_port_tdm0_tbl;
-		} else if (bm_tick_mode == 1) {
-			num = sizeof(appe_port_tdm1_tbl) / sizeof(fal_port_tdm_tick_cfg_t);
-			bm_cfg = appe_port_tdm1_tbl;
-		} else {
-			return SW_BAD_VALUE;
+	}
+#else
+	if (chip_revision == APPE_REVISION) {
+		switch (bm_tick_mode) {
+			case 0:
+				/* For 4x1G + 2x10G unified BM config */
+				num = ARRAY_SIZE(ppe_port_tdm0_tbl);
+				bm_cfg = ppe_port_tdm0_tbl;
+				break;
+			case 1:
+				/* For 4x2.5G involved */
+				num = ARRAY_SIZE(appe_port_tdm1_tbl);
+				bm_cfg = appe_port_tdm1_tbl;
+				break;
+			default:
+				SSDK_ERROR("Ivalid bm_tick_mode %d\n", bm_tick_mode);
+				return SW_BAD_VALUE;
 		}
-
 		SSDK_INFO("appe tdm setup num=%d\n", num);
 	}
+#endif
 
 	for (i = 0; i < num; i++) {
 		p_api->adpt_port_tdm_tick_cfg_set(dev_id, i, &bm_cfg[i]);

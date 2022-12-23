@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,6 +20,10 @@
 #include "ssdk_plat.h"
 #include "qca808x_phy.h"
 #include "qca808x_led.h"
+#ifdef MHT
+#include "ssdk_mht_pinctrl.h"
+#include "mht_sec_ctrl.h"
+#endif
 
 static sw_error_t
 _qca808x_phy_led_active_set(a_uint32_t dev_id, a_uint32_t phy_id,
@@ -182,6 +187,52 @@ qca808x_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t phy_id,
 * qca808x_phy_led_source_pattern_set
 *
 */
+#ifdef MHT
+#define QCA8084_LED_FUNC(lend_func, mht_port_id, source_id) \
+{                                                           \
+    if(mht_port_id == SSDK_PHYSICAL_PORT1)                  \
+        lend_func = MHT_PIN_FUNC_P0_LED_##source_id;        \
+    else if(mht_port_id == SSDK_PHYSICAL_PORT2)             \
+        lend_func = MHT_PIN_FUNC_P1_LED_##source_id;        \
+    else if(mht_port_id == SSDK_PHYSICAL_PORT3)             \
+        lend_func = MHT_PIN_FUNC_P2_LED_##source_id;        \
+    else                                                    \
+        lend_func = MHT_PIN_FUNC_P3_LED_##source_id;        \
+}
+
+static sw_error_t
+qca8084_phy_led_ctrl_source_pin_cfg(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mht_port_id = 0, led_start_pin = 0, led_pin = 0, led_func = 0;
+
+	/*get the led pin and led func for mht port*/
+	rv = qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
+	SW_RTN_ON_ERROR(rv);
+	if(source_id == QCA808X_PHY_LED_SOURCE0)
+	{
+		led_start_pin = 2;
+		QCA8084_LED_FUNC(led_func, mht_port_id, 0)
+	}
+	else if(source_id == QCA808X_PHY_LED_SOURCE1)
+	{
+		led_start_pin = 16;
+		QCA8084_LED_FUNC(led_func, mht_port_id, 1)
+	}
+	else
+	{
+		led_start_pin = 6;
+		QCA8084_LED_FUNC(led_func, mht_port_id, 2)
+	}
+	led_pin = led_start_pin + (mht_port_id - SSDK_PHYSICAL_PORT1);
+	SSDK_DEBUG("mht port:%d, led_pin:%d, led_func:%d", mht_port_id,
+		led_pin, led_func);
+	rv = mht_gpio_pin_mux_set(dev_id, led_pin, led_func);
+
+	return rv;
+}
+#endif
 sw_error_t
 qca808x_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t phy_id,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
@@ -216,8 +267,15 @@ qca808x_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t phy_id,
 	}
 	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
 		led_mmd_addr, led_map);
-
-	return rv;
+	SW_RTN_ON_ERROR(rv);
+#ifdef MHT
+	if(qca808x_phy_id_check(dev_id, phy_id, QCA8084_PHY))
+	{
+		rv = qca8084_phy_led_ctrl_source_pin_cfg(dev_id, phy_id, source_id);
+		SW_RTN_ON_ERROR(rv);
+	}
+#endif
+	return SW_OK;
 }
 /******************************************************************************
 *

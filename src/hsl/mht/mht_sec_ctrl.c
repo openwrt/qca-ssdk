@@ -446,13 +446,14 @@ qca_mht_mem_ctrl_set(a_uint32_t dev_id, a_uint32_t dvs_value, a_uint32_t acc_val
 a_bool_t
 qca_mht_sku_check(a_uint32_t dev_id, a_uint32_t mht_sku)
 {
-	a_uint32_t data = 0, sku_value = 0;
+	a_uint32_t data = 0, sku_value = 0, freq = 0;
 
+	ssdk_miibus_freq_get(dev_id, &freq);
 	/*fuse register need use lower mdio clock to read*/
 	ssdk_miibus_freq_set(dev_id, 0xff);
 	data = qca_mht_mii_read(dev_id, QFPROM_RAW_PTE_ROW0_LSB_OFFSET);
 	/*after read fuse, need recovery the mdio clock*/
-	ssdk_miibus_freq_set(dev_id, 0xf);
+	ssdk_miibus_freq_set(dev_id, freq);
 
 	sku_value = data & MHT_SKU_MASK;
 	SSDK_DEBUG("MHT SKU is 0x%x\n", sku_value);

@@ -457,6 +457,7 @@ struct mii_bus *
 ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
 
 sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq);
+sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq);
 
 int ssdk_sysfs_init (void);
 void ssdk_sysfs_exit (void);

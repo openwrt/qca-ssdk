@@ -121,7 +121,7 @@ _adpt_hppe_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 	ADPT_DEV_ID_CHECK(dev_id);
 
 	/* force port which connect s17c or other device chip*/
-	force_port = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+	force_port = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);
 	if (force_port == A_TRUE) {
 		SSDK_DEBUG("port_id %d is a force port!\n", port_id);
 		return A_FALSE;
@@ -2952,7 +2952,7 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 				}
 				else if(mode0 == PORT_WRAPPER_SGMII_PLUS)
 				{
-					if (ssdk_port_feature_get(dev_id, port_id, PHY_F_QGMAC)) {
+					if (hsl_port_feature_get(dev_id, port_id, PHY_F_QGMAC)) {
 						qca_hppe_port_mac_type_set(dev_id, port_id,
 							PORT_GMAC_TYPE);
 					} else {
@@ -3043,7 +3043,7 @@ adpt_hppe_port_mux_mac_type_set(a_uint32_t dev_id, fal_port_t port_id,
 				}
 				break;
 			case PORT_WRAPPER_SGMII_PLUS:
-				if (ssdk_port_feature_get(dev_id, port_id, PHY_F_QGMAC)) {
+				if (hsl_port_feature_get(dev_id, port_id, PHY_F_QGMAC)) {
 					qca_hppe_port_mac_type_set(dev_id, port_id,
 							PORT_GMAC_TYPE);
 				} else {
@@ -3329,7 +3329,6 @@ _adpt_hppe_port_phyaddr_update(a_uint32_t dev_id, a_uint32_t port_id,
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t phy_addr = 0, mode0 = PORT_WRAPPER_MAX;
-	ssdk_port_phyinfo *port_phyinfo = NULL;
 
 	if(port_id != SSDK_PHYSICAL_PORT5)
 	{
@@ -3337,16 +3336,8 @@ _adpt_hppe_port_phyaddr_update(a_uint32_t dev_id, a_uint32_t port_id,
 	}
 	if(mode == PORT_WRAPPER_10GBASE_R)
 	{
-		port_phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
-		if (!port_phyinfo)
-		{
-			SSDK_ERROR("port_phyinfo of port%d is null\n", port_id);
-			return SW_FAIL;
-		}
-		phy_addr = port_phyinfo->phy_addr;
-		qca_ssdk_phy_address_set(dev_id, port_id, phy_addr);
-		hsl_port_phy_access_type_set(dev_id, port_id, PHY_I2C_ACCESS);
-		SSDK_DEBUG("port %x phy_addr is %x\n", port_id, phy_addr);
+		/*SFP port no need to update phy address*/
+		hsl_port_feature_set(dev_id, port_id, PHY_F_SFP | PHY_F_I2C);
 	}
 	else
 	{
@@ -3358,7 +3349,7 @@ _adpt_hppe_port_phyaddr_update(a_uint32_t dev_id, a_uint32_t port_id,
 			SW_RTN_ON_ERROR (rv);
 			phy_addr++;
 			qca_ssdk_phy_address_set(dev_id, port_id, phy_addr);
-			hsl_port_phy_access_type_set(dev_id, port_id, PHY_MDIO_ACCESS);
+			hsl_port_feature_clear(dev_id, port_id, PHY_F_SFP | PHY_F_I2C);
 			SSDK_DEBUG("port %x phy_addr is %x\n", port_id, phy_addr);
 		}
 	}
@@ -3850,7 +3841,7 @@ adpt_hppe_port_interface_mode_status_get(a_uint32_t dev_id, fal_port_t port_id,
 	{
 		return SW_BAD_PARAM;
 	}
-	if (A_TRUE == ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE))
+	if (A_TRUE == hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE))
 	{
 		return adpt_hppe_port_interface_mode_get(dev_id, port_id, mode);
 	}

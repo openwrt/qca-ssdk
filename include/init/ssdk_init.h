@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -203,7 +203,7 @@ enum ssdk_port_wrapper_cfg {
 		led_ctrl_pattern_t led_pattern;
 
 	} led_source_cfg_t;
-
+/*qca808x_start*/
 enum {
 	QCA_PHY_F_CLAUSE45_BIT,
 	QCA_PHY_F_COMBO_BIT,
@@ -216,7 +216,7 @@ enum {
 	QCA_PHY_F_SFP_SGMII_BIT,
 	QCA_PHY_FEATURE_MAX
 };
-/*qca808x_start*/
+
 #define phy_features_t     a_uint16_t
 #define __PHY_F_BIT(bit)    ((phy_features_t)1 << (bit))
 #define _PHY_F(name)       __PHY_F_BIT(QCA_PHY_F_##name##_BIT)

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, 2017-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -556,14 +556,18 @@ typedef struct {
 
 typedef struct {
 	a_uint32_t phy_address[SW_MAX_NR_PORT];
+	a_uint8_t port_force_duplex[SW_MAX_NR_PORT];
+	a_uint32_t port_force_speed[SW_MAX_NR_PORT];
+	phy_features_t phy_features[SW_MAX_NR_PORT];
+	struct mii_bus *miibus[SW_MAX_NR_PORT];
 	a_uint32_t phy_type[SW_MAX_NR_PORT];
+#if defined(IN_PHY_I2C_MODE)
 	/* fake mdio address is used to register the phy device,
-	 * when the phy is not accessed by the MDIO bus.
+	 * when the phy is not accessed by the MDIO bus, and is
+	 for i2c qca808x PHY only
 	 * */
 	a_uint32_t phy_mdio_fake_address[SW_MAX_NR_PORT];
-	a_uint8_t phy_access_type[SW_MAX_NR_PORT];
-	a_bool_t phy_c45[SW_MAX_NR_PORT];
-	a_bool_t phy_combo[SW_MAX_NR_PORT];
+#endif
 	a_uint32_t phy_reset_gpio[SW_MAX_NR_PORT];
 	phy_dac_t phy_dac[SW_MAX_NR_PORT];
 	a_bool_t port_link_status[SW_MAX_NR_PORT];
@@ -651,6 +655,7 @@ hsl_phyid_get(a_uint32_t dev_id, a_uint32_t port_id, ssdk_init_cfg *cfg);
 a_uint32_t
 qca_ssdk_port_to_phy_addr(a_uint32_t dev_id, a_uint32_t port_id);
 /*qca808x_end*/
+#if defined(IN_PHY_I2C_MODE)
 a_uint32_t
 qca_ssdk_port_to_phy_mdio_fake_addr(a_uint32_t dev_id, a_uint32_t port_id);
 
@@ -659,6 +664,7 @@ qca_ssdk_phy_mdio_fake_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr);
 
 void qca_ssdk_phy_mdio_fake_address_set(a_uint32_t dev_id, a_uint32_t i,
 				a_uint32_t value);
+#endif
 /*qca808x_start*/
 void qca_ssdk_port_bmp_set(a_uint32_t dev_id, a_uint32_t value);
 
@@ -804,6 +810,26 @@ hsl_port_phy_autoadv_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t autoadv);
 sw_error_t
 hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id);
+a_uint32_t
+hsl_port_force_speed_get(a_uint32_t dev_id, a_uint32_t port_id);
+void
+hsl_port_force_speed_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t speed);
+a_uint8_t
+hsl_port_force_duplex_get(a_uint32_t dev_id, a_uint32_t port_id);
+void
+hsl_port_force_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint8_t duplex);
+struct mii_bus*
+hsl_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id);
+void
+hsl_port_miibus_set(a_uint32_t dev_id, a_uint32_t port_id, struct mii_bus* mii_bus);
+struct mii_bus*
+hsl_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
+a_bool_t
+hsl_port_feature_get(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
+sw_error_t
+hsl_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
+sw_error_t
+hsl_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

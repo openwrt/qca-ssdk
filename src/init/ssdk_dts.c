@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -171,82 +171,6 @@ a_uint32_t ssdk_inner_bmp_get(a_uint32_t dev_id)
 	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
 
 	return cfg->port_cfg.inner_bmp;
-}
-
-ssdk_port_phyinfo* ssdk_port_phyinfo_get(a_uint32_t dev_id, a_uint32_t port_id)
-{
-	a_uint32_t i;
-	ssdk_port_phyinfo *phyinfo_tmp = NULL;
-	ssdk_dt_cfg *cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
-
-	for (i = 0; i < cfg->phyinfo_num; i++) {
-		if (port_id == cfg->port_phyinfo[i].port_id) {
-			phyinfo_tmp = &cfg->port_phyinfo[i];
-			break;
-		} else if (!(cfg->port_phyinfo[i].phy_features & PHY_F_INIT) &&
-				phyinfo_tmp == NULL) {
-			phyinfo_tmp = &cfg->port_phyinfo[i];
-		}
-	}
-
-	return phyinfo_tmp;
-}
-
-a_bool_t ssdk_port_feature_get(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
-{
-	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
-	if (phyinfo && (phyinfo->phy_features & feature)) {
-		return A_TRUE;
-	}
-	return A_FALSE;
-}
-
-sw_error_t
-ssdk_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
-{
-	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
-	if (phyinfo)
-	{
-		phyinfo->phy_features |= feature;
-		return SW_OK;
-	}
-	return SW_FAIL;
-}
-
-sw_error_t
-ssdk_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
-{
-	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
-	if (phyinfo)
-	{
-		phyinfo->phy_features &= ~feature;
-		return SW_OK;
-	}
-	return SW_FAIL;
-}
-
-a_uint32_t ssdk_port_force_speed_get(a_uint32_t dev_id, a_uint32_t port_id)
-{
-	ssdk_port_phyinfo *phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
-	if (phyinfo && (phyinfo->phy_features & PHY_F_FORCE)) {
-		return phyinfo->port_speed;
-	}
-	return FAL_SPEED_BUTT;
-}
-
-struct mii_bus *
-ssdk_dts_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
-{
-	a_uint32_t i;
-	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
-
-	for (i = 0; i < cfg->phyinfo_num; i++) {
-		if (phy_addr == cfg->port_phyinfo[i].phy_addr ||
-			phy_addr == cfg->port_phyinfo[i].phy_addr+1)
-			return cfg->port_phyinfo[i].miibus;
-	}
-
-	return NULL;
 }
 
 hsl_reg_mode ssdk_switch_reg_access_mode_get(a_uint32_t dev_id)
@@ -640,20 +564,23 @@ static void ssdk_dt_parse_scheduler_cfg(a_uint32_t dev_id, struct device_node *s
 static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint32_t dev_id,
 		ssdk_init_cfg *cfg)
 {
-	struct device_node *phy_info_node, *port_node;
-
-	ssdk_port_phyinfo *port_phyinfo;
-	a_uint8_t forced_duplex;
-	a_uint32_t port_id, phy_addr, phy_i2c_addr, forced_speed, len;
-	const __be32 *paddr;
-	a_bool_t phy_c45, phy_combo, phy_i2c, phy_forced;
+	struct device_node *phy_info_node = NULL, *port_node = NULL;
+	a_uint32_t port_id = 0, phy_addr = 0, forced_speed = 0,
+		forced_duplex = 0, len = 0;
+	const __be32 *paddr = NULL;
+	a_bool_t phy_c45 = A_FALSE, phy_combo = A_FALSE;
+#if defined(IN_PHY_I2C_MODE)
+	a_uint32_t phy_i2c_addr = 0;
+	a_bool_t phy_i2c = A_FALSE;
+#endif
 	const char *mac_type = NULL, *media_type = NULL;
 	sw_error_t rv = SW_OK;
-	struct device_node *mdio_node;
+	struct device_node *mdio_node = NULL;
 	int phy_reset_gpio = 0, sfp_rx_los_pin = 0, sfp_tx_dis_pin = 0,
 		sfp_mod_present_pin = 0, sfp_medium_pin = 0;
 	phy_dac_t phy_dac = {0};
 	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+	phy_features_t phy_features = 0;
 
 	phy_info_node = of_get_child_by_name(switch_node, "qcom,port_phyinfo");
 	if (!phy_info_node) {
@@ -664,38 +591,18 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 	for_each_available_child_of_node(phy_info_node, port_node) {
 		if (of_property_read_u32(port_node, "port_id", &port_id))
 			return SW_BAD_VALUE;
-
-		/* initialize phy_addr in case of undefined dts field */
-		phy_addr = 0xff;
-		of_property_read_u32(port_node, "phy_address", &phy_addr);
-
 		if (!cfg->port_cfg.wan_bmp) {
 			cfg->port_cfg.wan_bmp = BIT(port_id);
 		} else {
 			cfg->port_cfg.lan_bmp |= BIT(port_id);
 		}
 
-		if (!of_property_read_u32(port_node, "forced-speed", &forced_speed) &&
-			!of_property_read_u8(port_node, "forced-duplex", &forced_duplex)) {
-			phy_forced = A_TRUE;
-		} else {
-			phy_forced = A_FALSE;
-		}
-		paddr = of_get_property(port_node, "phy_dac", &len);
-		if(paddr)
-		{
-			phy_dac.mdac = be32_to_cpup(paddr);
-			phy_dac.edac = be32_to_cpup(paddr+1);
-			hsl_port_phy_dac_set(dev_id, port_id, phy_dac);
-		}
-
-		phy_c45 = of_property_read_bool(port_node,
-				"ethernet-phy-ieee802.3-c45");
-		phy_combo = of_property_read_bool(port_node,
-				"ethernet-phy-combo");
-		mdio_node = of_parse_phandle(port_node, "mdiobus", 0);
+		/* initialize phy_addr in case of undefined dts field */
+		phy_addr = 0xff;
+		phy_features = 0;
+		of_property_read_u32(port_node, "phy_address", &phy_addr);
+#if defined(IN_PHY_I2C_MODE)
 		phy_i2c = of_property_read_bool(port_node, "phy-i2c-mode");
-
 		if (phy_i2c) {
 			SSDK_INFO("[PORT %d] phy-i2c-mode\n", port_id);
 			hsl_port_phy_access_type_set(dev_id, port_id, PHY_I2C_ACCESS);
@@ -708,106 +615,106 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 			/* phy_address is the mdio addr,
 			 * which is a fake mdio addr in i2c mode */
 			qca_ssdk_phy_mdio_fake_address_set(dev_id, port_id, phy_addr);
-		} else {
+		} else
+#endif
+		{
 			hsl_phy_address_init(dev_id, port_id, phy_addr);
 		}
 
-		hsl_port_phy_combo_capability_set(dev_id, port_id, phy_combo);
+		if (!of_property_read_u32(port_node, "forced-speed", &forced_speed) &&
+			!of_property_read_u32(port_node, "forced-duplex", &forced_duplex)) {
+			hsl_port_force_speed_set(dev_id, port_id, forced_speed);
+			hsl_port_force_duplex_set(dev_id, port_id, (a_uint8_t)forced_duplex);
+		}
+
+		paddr = of_get_property(port_node, "phy_dac", &len);
+		if(paddr)
+		{
+			phy_dac.mdac = be32_to_cpup(paddr);
+			phy_dac.edac = be32_to_cpup(paddr+1);
+			hsl_port_phy_dac_set(dev_id, port_id, phy_dac);
+		}
+
+		phy_c45 = of_property_read_bool(port_node, "ethernet-phy-ieee802.3-c45");
 		hsl_port_phy_c45_capability_set(dev_id, port_id, phy_c45);
+		phy_combo = of_property_read_bool(port_node, "ethernet-phy-combo");
+		hsl_port_phy_combo_capability_set(dev_id, port_id, phy_combo);
 
-		port_phyinfo = ssdk_port_phyinfo_get(dev_id, port_id);
-		if (port_phyinfo) {
-			port_phyinfo->port_id = port_id;
-			port_phyinfo->phy_addr = phy_addr;
-			if (phy_c45) {
-				port_phyinfo->phy_features |= PHY_F_CLAUSE45;
+		if (!of_property_read_string(port_node, "port_mac_sel", &mac_type))
+		{
+			SSDK_INFO("[PORT %d] port_mac_sel = %s\n", port_id, mac_type);
+			if (!strncmp("QGMAC_PORT", mac_type, 10)) {
+				phy_features |= PHY_F_QGMAC;
 			}
-
-			if (phy_combo) {
-				port_phyinfo->phy_features |= PHY_F_COMBO;
+			else if (!strncmp("XGMAC_PORT", mac_type, 10)) {
+				phy_features |= PHY_F_XGMAC;
 			}
+		}
 
-			if (phy_i2c) {
-				port_phyinfo->phy_features |= PHY_F_I2C;
+		if (!of_property_read_string(port_node, "media-type", &media_type)) {
+			if (!strncmp("sfp", media_type, strlen(media_type))) {
+				phy_features |= PHY_F_SFP;
+				SSDK_INFO("[PORT %d] media type is %s\n", port_id, media_type);
+			} else if (!strncmp("sfp_sgmii", media_type, strlen(media_type))) {
+				phy_features |= (PHY_F_SFP | PHY_F_SFP_SGMII);
+				SSDK_INFO("[PORT %d] media type sfp support sfp_sgmii\n", port_id);
 			}
-
-			if (phy_forced) {
-				port_phyinfo->phy_features |= PHY_F_FORCE;
-				port_phyinfo->port_speed = forced_speed;
-				port_phyinfo->port_duplex = forced_duplex;
-			}
-
-			if (!of_property_read_string(port_node, "port_mac_sel", &mac_type))
-			{
-				SSDK_INFO("[PORT %d] port_mac_sel = %s\n", port_id, mac_type);
-				if (!strncmp("QGMAC_PORT", mac_type, 10)) {
-					port_phyinfo->phy_features |= PHY_F_QGMAC;
-				}
-				else if (!strncmp("XGMAC_PORT", mac_type, 10)) {
-					port_phyinfo->phy_features |= PHY_F_XGMAC;
-				}
-			}
-
-			if (!of_property_read_string(port_node, "media-type", &media_type)) {
-				if (!strncmp("sfp", media_type, strlen(media_type))) {
-					port_phyinfo->phy_features |= PHY_F_SFP;
-					SSDK_INFO("[PORT %d] media type is %s\n", port_id, media_type);
-				} else if (!strncmp("sfp_sgmii", media_type, strlen(media_type))) {
-					port_phyinfo->phy_features |= PHY_F_SFP;
-					port_phyinfo->phy_features |= PHY_F_SFP_SGMII;
-					SSDK_INFO("[PORT %d] media type sfp support sfp_sgmii\n", port_id);
-				}
-			}
-
-			port_phyinfo->phy_features |= PHY_F_INIT;
-
-			if (mdio_node)
-			{
-				port_phyinfo->miibus = of_mdio_find_bus(mdio_node);
-				phy_reset_gpio = of_get_named_gpio(mdio_node, "phy-reset-gpio",
-					SSDK_PHY_RESET_GPIO_INDEX);
-				if(phy_reset_gpio > 0)
-				{
-					SSDK_INFO("port%d's phy-reset-gpio is GPIO%d\n", port_id,
-						phy_reset_gpio);
-					hsl_port_phy_reset_gpio_set(dev_id, port_id,
-						(a_uint32_t)phy_reset_gpio);
-				}
-			}
-			/*get related PINs for SFP port*/
-			if(priv)
-			{
-				sfp_rx_los_pin = of_get_named_gpio(port_node, "sfp_rx_los_pin", 0);
-				if(sfp_rx_los_pin > 0)
-				{
-					SSDK_INFO("port%d sfp_rx_los_pin is GPIO%d\n", port_id,
-						sfp_rx_los_pin);
-					priv->sfp_rx_los_pin[port_id] = sfp_rx_los_pin;
-				}
-				sfp_tx_dis_pin = of_get_named_gpio(port_node, "sfp_tx_dis_pin", 0);
-				if(sfp_tx_dis_pin > 0)
-				{
-					SSDK_INFO("port%d sfp_tx_dis_pin is GPIO%d\n", port_id,
-						sfp_tx_dis_pin);
-					priv->sfp_tx_dis_pin[port_id] = sfp_tx_dis_pin;
-				}
-				sfp_mod_present_pin = of_get_named_gpio(port_node,
-					"sfp_mod_present_pin", 0);
-				if(sfp_mod_present_pin > 0)
-				{
-					SSDK_INFO("port%d sfp_mod_present_pin is GPIO%d\n", port_id,
-						sfp_mod_present_pin);
-					priv->sfp_mod_present_pin[port_id] = sfp_mod_present_pin;
-				}
-				sfp_medium_pin = of_get_named_gpio(port_node, "sfp_medium_pin", 0);
-				if(sfp_medium_pin > 0)
-				{
-					SSDK_INFO("port%d sfp_medium_pin is GPIO%d\n", port_id,
-						sfp_medium_pin);
-					priv->sfp_medium_pin[port_id] = sfp_medium_pin;
+			if(phy_features & PHY_F_SFP) {
+				/*get related PINs for SFP port*/
+				if(priv) {
+					sfp_rx_los_pin = of_get_named_gpio(port_node,
+						"sfp_rx_los_pin", 0);
+					if(sfp_rx_los_pin > 0)
+					{
+						SSDK_INFO("port%d sfp_rx_los_pin is GPIO%d\n",
+							port_id, sfp_rx_los_pin);
+						priv->sfp_rx_los_pin[port_id] = sfp_rx_los_pin;
+					}
+					sfp_tx_dis_pin = of_get_named_gpio(port_node,
+						"sfp_tx_dis_pin", 0);
+					if(sfp_tx_dis_pin > 0)
+					{
+						SSDK_INFO("port%d sfp_tx_dis_pin is GPIO%d\n",
+							port_id, sfp_tx_dis_pin);
+						priv->sfp_tx_dis_pin[port_id] = sfp_tx_dis_pin;
+					}
+					sfp_mod_present_pin = of_get_named_gpio(port_node,
+						"sfp_mod_present_pin", 0);
+					if(sfp_mod_present_pin > 0)
+					{
+						SSDK_INFO("port%d sfp_mod_present_pin is GPIO%d\n",
+							port_id, sfp_mod_present_pin);
+						priv->sfp_mod_present_pin[port_id] =
+							sfp_mod_present_pin;
+					}
+					sfp_medium_pin = of_get_named_gpio(port_node,
+						"sfp_medium_pin", 0);
+					if(sfp_medium_pin > 0)
+					{
+						SSDK_INFO("port%d sfp_medium_pin is GPIO%d\n",
+							port_id, sfp_medium_pin);
+						priv->sfp_medium_pin[port_id] = sfp_medium_pin;
+					}
 				}
 			}
 		}
+		hsl_port_feature_set(dev_id, port_id, phy_features | PHY_F_INIT);
+
+		mdio_node = of_parse_phandle(port_node, "mdiobus", 0);
+		if (mdio_node)
+		{
+			hsl_port_miibus_set(dev_id, port_id, of_mdio_find_bus(mdio_node));
+			phy_reset_gpio = of_get_named_gpio(mdio_node, "phy-reset-gpio",
+				SSDK_PHY_RESET_GPIO_INDEX);
+			if(phy_reset_gpio > 0)
+			{
+				SSDK_INFO("port%d's phy-reset-gpio is GPIO%d\n", port_id,
+					phy_reset_gpio);
+				hsl_port_phy_reset_gpio_set(dev_id, port_id,
+					(a_uint32_t)phy_reset_gpio);
+			}
+		}
+
 	}
 
 	return rv;
@@ -818,10 +725,10 @@ static void ssdk_dt_parse_mdio(a_uint32_t dev_id, struct device_node *switch_nod
 {
 	struct device_node *mdio_node = NULL;
 	struct device_node *child = NULL;
-	ssdk_port_phyinfo *port_phyinfo;
 	a_uint32_t len = 0, i = 1;
 	const __be32 *phy_addr;
 	const __be32 *c45_phy;
+	phy_features_t phy_features = 0;
 
 	/* prefer to get phy info from ess-switch node */
 	if (SW_OK == ssdk_dt_parse_phy_info(switch_node, dev_id, cfg))
@@ -844,20 +751,8 @@ static void ssdk_dt_parse_mdio(a_uint32_t dev_id, struct device_node *switch_nod
 			if (c45_phy) {
 				hsl_port_phy_c45_capability_set(dev_id, i, A_TRUE);
 			}
-
-			port_phyinfo = ssdk_port_phyinfo_get(dev_id, i);
-			if (port_phyinfo) {
-				port_phyinfo->port_id = i;
-				if (phy_addr) {
-					port_phyinfo->phy_addr = be32_to_cpup(phy_addr);
-				}
-				if (c45_phy) {
-					port_phyinfo->phy_features |= PHY_F_CLAUSE45;
-				}
-
-				port_phyinfo->phy_features |= PHY_F_INIT;
-			}
-
+			phy_features |= PHY_F_INIT;
+			hsl_port_feature_set(dev_id, i, phy_features);
 			if (!cfg->port_cfg.wan_bmp) {
 				cfg->port_cfg.wan_bmp = BIT(i);
 			} else {
@@ -1300,53 +1195,13 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 
 	return SW_OK;
 }
-
-static a_uint32_t ssdk_get_switch_port_nums(a_uint32_t dev_id)
-{
-	struct device_node *child, *mdio_np, *port_np, *switch_np, *switch_instance;
-	a_uint32_t port_count = 0, switch_id = 0;
-
-	switch_instance = of_find_node_by_name(NULL, "ess-instance");
-	if (switch_instance) { /* multi ess-switch */
-		for_each_available_child_of_node(switch_instance, switch_np) {
-			if (of_property_read_u32(switch_np, "device_id", &switch_id) < 0) {
-				switch_id = 0;
-			}
-			if (switch_id == dev_id) {
-				port_np = of_find_node_by_name(switch_np, "qcom,port_phyinfo");
-				if (port_np) {
-					for_each_available_child_of_node(port_np, child)
-						port_count++;
-					break;
-				}
-			}
-		}
-	} else { /* single ess-switch */
-		switch_np = of_find_node_by_name(NULL, "ess-switch");
-		if (switch_np && dev_id == 0) {
-			port_np = of_find_node_by_name(switch_np, "qcom,port_phyinfo");
-			if (port_np) {
-				for_each_available_child_of_node(port_np, child)
-					port_count++;
-			} else {
-				mdio_np = of_find_node_by_name(NULL, "mdio");
-				if (mdio_np) {
-					for_each_available_child_of_node(mdio_np, child)
-						port_count++;
-				}
-			}
-		}
-	}
-
-	return port_count;
-}
 #endif
 #endif
 
 int ssdk_switch_device_num_init(void)
 {
 	struct device_node *switch_instance = NULL;
-	a_uint32_t len = 0, port_n = 0;
+	a_uint32_t len = 0;
 	const __be32 *num_devices;
 	a_uint32_t dev_num = 1, dev_id = 0;
 
@@ -1368,22 +1223,6 @@ int ssdk_switch_device_num_init(void)
 		if (ssdk_dt_global.ssdk_dt_switch_nodes[dev_id] == NULL) {
 			return -ENOMEM;
 		}
-
-#ifndef BOARD_AR71XX
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-		port_n = ssdk_get_switch_port_nums(dev_id);
-#endif
-#endif
-		if (!port_n) {
-			port_n = SW_MAX_NR_PORT;
-		}
-		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port_phyinfo = kzalloc(port_n *
-				sizeof(ssdk_port_phyinfo), GFP_KERNEL);
-		if (!ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port_phyinfo) {
-			return -ENOMEM;
-		}
-		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->phyinfo_num = port_n;
-
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->switch_reg_access_mode = HSL_REG_MDIO;
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->psgmii_reg_access_mode = HSL_REG_MDIO;
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->ess_switch_flag = A_FALSE;
@@ -1400,11 +1239,6 @@ void ssdk_switch_device_num_exit(void)
 	a_uint32_t dev_id = 0;
 
 	for (dev_id = 0; dev_id < ssdk_dt_global.num_devices; dev_id++) {
-		if (ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port_phyinfo) {
-			kfree(ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port_phyinfo);
-			ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port_phyinfo = NULL;
-		}
-
 		if (ssdk_dt_global.ssdk_dt_switch_nodes[dev_id])
 			kfree(ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]);
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id] = NULL;

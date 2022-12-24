@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -116,7 +116,7 @@
 #ifdef IN_LINUX_STD_PTP
 #include "hsl_ptp.h"
 #endif
-
+#include "hsl_port_prop.h"
 /*qca808x_start*/
 
 extern struct qca_phy_priv **qca_phy_priv_global;
@@ -409,7 +409,7 @@ ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
 /*qca808x_end*/
 #ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-	bus = ssdk_dts_miibus_get(dev_id, phy_addr);
+	bus = hsl_phy_miibus_get(dev_id, phy_addr);
 #endif
 #endif
 /*qca808x_start*/
@@ -1211,29 +1211,32 @@ static const a_int8_t *qca_phy_feature_str[QCA_PHY_FEATURE_MAX] = {
 	"PHY_XGMAC",
 	"PHY_I2C",
 	"PHY_INIT",
-	"PHY_FORCE"
+	"PHY_FORCE",
+	"PHY_SFP",
+	"PHY_SFP_SGMII",
 };
 
 void ssdk_dts_phyinfo_dump(a_uint32_t dev_id)
 {
 	a_uint32_t i, j;
-	ssdk_port_phyinfo *port_phyinfo;
+	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
 
 	printk("=====================port phyinfo========================\n");
 	printk("portid     phy_addr     features\n");
 
+	if(!phy_info)
+		return;
 	for (i = 0; i <= SSDK_MAX_PORT_NUM; i++) {
-		port_phyinfo = ssdk_port_phyinfo_get(dev_id, i);
-		if (port_phyinfo) {
-			printk("%6d%13d%*s", port_phyinfo->port_id,
-					port_phyinfo->phy_addr, 5, "");
+		if (A_TRUE == hsl_port_prop_check(dev_id, i, HSL_PP_PHY)) {
+			printk("%6d%13d%*s", i,
+					phy_info->phy_address[i], 5, "");
 			for (j = 0; j < QCA_PHY_FEATURE_MAX; j++) {
-				if (port_phyinfo->phy_features & BIT(j) && BIT(j) != PHY_F_INIT) {
+				if (phy_info->phy_features[i] & BIT(j) && BIT(j) != PHY_F_INIT) {
 					printk(KERN_CONT "%s ", qca_phy_feature_str[j]);
 					if (BIT(j) == PHY_F_FORCE) {
 						printk(KERN_CONT "(speed: %d, duplex: %s) ",
-								port_phyinfo->port_speed,
-								port_phyinfo->port_duplex > 0 ?
+								phy_info->port_force_speed[i],
+								phy_info->port_force_duplex[i] > 0 ?
 								"full" : "half");
 					}
 				}

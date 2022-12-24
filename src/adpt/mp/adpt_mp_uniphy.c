@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -189,7 +189,7 @@ adpt_mp_uniphy_mode_ctrl_set(a_uint32_t dev_id,
 	rv = hppe_uniphy_channel0_input_output_4_get(dev_id, uniphy_index,
 		&uniphy_force_ctrl);
 	SW_RTN_ON_ERROR (rv);
-	if (ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
+	if (hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE))
 	{
 		uniphy_force_ctrl.bf.newaddedfromhere_ch0_force_speed_25m =
 			UNIPHY_FORCE_SPEED_ENABLE;
@@ -214,7 +214,7 @@ adpt_mp_uniphy_mode_ctrl_set(a_uint32_t dev_id,
 		uniphy_mode_ctrl.bf.newaddedfromhere_sgplus_mode =
 			UNIPHY_SGMIIPLUS_MODE_DISABLE;
 		if ((A_TRUE == hsl_port_is_sfp(dev_id, SSDK_PHYSICAL_PORT2)) &&
-			(A_TRUE != ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2,
+			(A_TRUE != hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2,
 				PHY_F_SFP_SGMII))) {
 				uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
 					UNIPHY_1000BASE_X_MODE;
@@ -280,8 +280,8 @@ _adpt_mp_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 
 	/*when MP connect s17c or qca803x, need to reconfigure reference clock
 	as 25M for port 2*/
-	force_port = ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE);
-	force_speed = ssdk_port_force_speed_get(dev_id, SSDK_PHYSICAL_PORT2);
+	force_port = hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE);
+	force_speed = hsl_port_force_speed_get(dev_id, SSDK_PHYSICAL_PORT2);
 
 	if ((force_port) && (force_speed == FAL_SPEED_1000))
 	{
@@ -395,7 +395,7 @@ adpt_mp_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 		_adpt_mp_uniphy_clk_output_set(dev_id, index);
 
 		/*port2 is connected with PHY, need gpio reset*/
-		if(!ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE) &&
+		if(!hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE) &&
 			!hsl_port_is_sfp(dev_id, SSDK_PHYSICAL_PORT2))
 		{
 			hsl_port_phy_gpio_reset(dev_id, SSDK_PHYSICAL_PORT2);

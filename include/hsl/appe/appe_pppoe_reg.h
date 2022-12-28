@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,6 +16,9 @@
  */
 
 
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "appe_pppoe_reg_be.h"
+#else
 /**
  * @defgroup
  * @{
@@ -188,4 +192,5 @@ union pppoe_session_ext2_u {
 	struct pppoe_session_ext2 bf;
 };
 
+#endif
 #endif

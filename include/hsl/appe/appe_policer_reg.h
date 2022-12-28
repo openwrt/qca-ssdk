@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,6 +14,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "appe_policer_reg_be.h"
+#else
 
 #ifndef APPE_POLICER_REG_H
 #define APPE_POLICER_REG_H
@@ -88,4 +93,5 @@ union dscp_remap_tbl_u {
 	struct dscp_remap_tbl bf;
 };
 
+#endif
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,6 +19,9 @@
  * @defgroup
  * @{
  */
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "mppe_servcode_reg_be.h"
+#else
 #ifndef MPPE_SERVCODE_REG_H
 #define MPPE_SERVCODE_REG_H
 
@@ -50,4 +53,5 @@ union tl_vp_service_code_gen_u {
 	a_uint32_t val;
 	struct tl_vp_service_code_gen bf;
 };
+#endif
 #endif

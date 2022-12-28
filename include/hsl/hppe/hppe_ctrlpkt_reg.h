@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -12,6 +14,9 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "hppe_ctrlpkt_reg_be.h"
+#else
 #ifndef HPPE_CTRLPKT_REG_H
 #define HPPE_CTRLPKT_REG_H
 
@@ -183,5 +188,6 @@ union l2_cpu_code_ctrl_u {
 	a_uint32_t val;
 	struct l2_cpu_code_ctrl bf;
 };
+#endif
 #endif
 #endif

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,6 +20,9 @@
  * @defgroup
  * @{
  */
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "appe_acl_reg_be.h"
+#else
 #ifndef APPE_ACL_REG_H
 #define APPE_ACL_REG_H
 
@@ -897,4 +900,5 @@ union pre_ipo_action_u {
 	struct pre_ipo_action bf;
 };
 
+#endif
 #endif

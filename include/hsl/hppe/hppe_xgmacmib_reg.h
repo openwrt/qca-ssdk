@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -13,6 +15,9 @@
  */
 
 
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "hppe_xgmacmib_reg_be.h"
+#else
 /**
  * @defgroup
  * @{
@@ -1951,6 +1956,5 @@ union rx_discard_octet_count_good_bad_high_u {
 	struct rx_discard_octet_count_good_bad_high bf;
 };
 
-
-
+#endif
 #endif

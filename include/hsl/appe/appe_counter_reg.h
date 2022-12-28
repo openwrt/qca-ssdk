@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,6 +14,10 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "appe_counter_reg_be.h"
+#else
 
 #ifndef APPE_COUNTER_REG_H
 #define APPE_COUNTER_REG_H
@@ -126,4 +131,5 @@ union port_vp_rx_cnt_mode_tbl_u {
 	struct port_vp_rx_cnt_mode_tbl bf;
 };
 
+#endif
 #endif

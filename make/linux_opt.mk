@@ -752,4 +752,10 @@ ifneq (TRUE, $(KERNEL_MODE))
   endif
 endif
 
+ifeq ($(CONFIG_CPU_BIG_ENDIAN), y)
+	MODULE_CFLAG +=  -mbig-endian
+else
+	MODULE_CFLAG +=  -mlittle-endian
+endif
+
 LOCAL_CFLAGS += $(MODULE_INC) $(MODULE_CFLAG) $(EXTRA_CFLAGS)

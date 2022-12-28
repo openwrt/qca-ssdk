@@ -77,6 +77,9 @@ extern "C" {
 		sd_reg_mii_mdio_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 				a_uint8_t value[], a_uint32_t value_len);
 
+	sw_error_t
+		sd_mii_update(a_uint32_t dev_id, ssdk_init_cfg *cfg);
+
 	/*qca808x_start*/
 	sw_error_t sd_init(a_uint32_t dev_id, ssdk_init_cfg * cfg);
 

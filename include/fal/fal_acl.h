@@ -256,6 +256,8 @@ enum{
 	/*new add for IPQ95xx*/
 	FAL_ACL_BYPASS_FAKE_MAC_DROP,
 	FAL_ACL_BYPASS_TUNL_CONTEXT,
+	/*new add for IPQ53xx*/
+	FAL_ACL_BYPASS_FLOW_POLICER,
 };
 
 

@@ -337,6 +337,18 @@ sd_reg_mii_mdio_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 	return SW_OK;
 }
 
+sw_error_t
+sd_mii_update(a_uint32_t dev_id, ssdk_init_cfg *cfg)
+{
+	if (NULL != cfg->reg_func.mii_reg_set)
+		ssdk_mii_reg_set = cfg->reg_func.mii_reg_set;
+
+	if (NULL != cfg->reg_func.mii_reg_get)
+		ssdk_mii_reg_get = cfg->reg_func.mii_reg_get;
+
+	return SW_OK;
+}
+
 /*qca808x_start*/
 sw_error_t
 sd_init(a_uint32_t dev_id, ssdk_init_cfg * cfg)

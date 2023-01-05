@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -24,6 +26,9 @@
 #include "hsl_port_prop.h"
 #include "isisc_trunk.h"
 #include "isisc_reg.h"
+#if defined(MHT)
+#include "mht_reg.h"
+#endif
 
 #define ISISC_MAX_TRUNK_ID    3
 
@@ -195,76 +200,131 @@ _isisc_trunk_group_sw_get(a_uint32_t dev_id, a_uint32_t trunk_id,
 static sw_error_t
 _isisc_trunk_hash_mode_set(a_uint32_t dev_id, a_uint32_t hash_mode)
 {
-    sw_error_t rv;
-    a_uint32_t data = 0;
+	sw_error_t rv;
+	a_uint32_t data = 0;
 
-    if (FAL_TRUNK_HASH_KEY_DA & hash_mode)
-    {
-        SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, DA_EN, 1, data);
-    }
+	if (FAL_TRUNK_HASH_KEY_DA & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, DA_EN, 1, data);
+	}
 
-    if (FAL_TRUNK_HASH_KEY_SA & hash_mode)
-    {
-        SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, SA_EN, 1, data);
-    }
+	if (FAL_TRUNK_HASH_KEY_SA & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, SA_EN, 1, data);
+	}
 
-    if (FAL_TRUNK_HASH_KEY_DIP & hash_mode)
-    {
-        SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, DIP_EN, 1, data);
-    }
+	if (FAL_TRUNK_HASH_KEY_DIP & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, DIP_EN, 1, data);
+	}
 
-    if (FAL_TRUNK_HASH_KEY_SIP & hash_mode)
-    {
-        SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, SIP_EN, 1, data);
-    }
+	if (FAL_TRUNK_HASH_KEY_SIP & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(TRUNK_HASH_MODE, SIP_EN, 1, data);
+	}
 
-    HSL_REG_ENTRY_SET(rv, dev_id, TRUNK_HASH_MODE, 0,
-                      (a_uint8_t *) (&data), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	HSL_REG_ENTRY_SET(rv, dev_id, TRUNK_HASH_MODE, 0,
+			(a_uint8_t *) (&data), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    isisc_trunk_regs[ISISC_TRUNK_HASH_EN] = data;
-
-    return rv;
+	isisc_trunk_regs[ISISC_TRUNK_HASH_EN] = data;
+	return rv;
 }
 
 static sw_error_t
 _isisc_trunk_hash_mode_get(a_uint32_t dev_id, a_uint32_t * hash_mode)
 {
-    sw_error_t rv;
-    a_uint32_t reg = 0, data = 0;
+	sw_error_t rv;
+	a_uint32_t reg = 0, data = 0;
 
-    HSL_REG_ENTRY_GET(rv, dev_id, TRUNK_HASH_MODE, 0,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	*hash_mode = 0;
+	HSL_REG_ENTRY_GET(rv, dev_id, TRUNK_HASH_MODE, 0,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    *hash_mode = 0;
+	SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, DA_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_DA;
 
-    SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, DA_EN, data, reg);
-    if (data)
-    {
-        *hash_mode |= FAL_TRUNK_HASH_KEY_DA;
-    }
+	SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, SA_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_SA;
 
-    SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, SA_EN, data, reg);
-    if (data)
-    {
-        *hash_mode |= FAL_TRUNK_HASH_KEY_SA;
-    }
+	SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, DIP_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_DIP;
 
-    SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, DIP_EN, data, reg);
-    if (data)
-    {
-        *hash_mode |= FAL_TRUNK_HASH_KEY_DIP;
-    }
+	SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, SIP_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_SIP;
 
-    SW_GET_FIELD_BY_REG(TRUNK_HASH_MODE, SIP_EN, data, reg);
-    if (data)
-    {
-        *hash_mode |= FAL_TRUNK_HASH_KEY_SIP;
-    }
-
-    return SW_OK;
+	return SW_OK;
 }
+
+#if defined(MHT)
+static sw_error_t
+_mht_trunk_hash_mode_set(a_uint32_t dev_id, a_uint32_t hash_mode)
+{
+	sw_error_t rv;
+	a_uint32_t data = 0;
+
+	if (FAL_TRUNK_HASH_KEY_DA & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(MHT_TRUNK_HASH_MODE, DA_EN, 1, data);
+	}
+
+	if (FAL_TRUNK_HASH_KEY_SA & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(MHT_TRUNK_HASH_MODE, SA_EN, 1, data);
+	}
+
+	if (FAL_TRUNK_HASH_KEY_DIP & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(MHT_TRUNK_HASH_MODE, DIP_EN, 1, data);
+	}
+
+	if (FAL_TRUNK_HASH_KEY_SIP & hash_mode)
+	{
+		SW_SET_REG_BY_FIELD(MHT_TRUNK_HASH_MODE, SIP_EN, 1, data);
+	}
+
+	HSL_REG_ENTRY_SET(rv, dev_id, MHT_TRUNK_HASH_MODE, 0,
+			(a_uint8_t *) (&data), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	isisc_trunk_regs[ISISC_TRUNK_HASH_EN] = data;
+	return rv;
+}
+static sw_error_t
+_mht_trunk_hash_mode_get(a_uint32_t dev_id, a_uint32_t * hash_mode)
+{
+	sw_error_t rv;
+	a_uint32_t reg = 0, data = 0;
+
+	*hash_mode = 0;
+	HSL_REG_ENTRY_GET(rv, dev_id, MHT_TRUNK_HASH_MODE, 0,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	SW_GET_FIELD_BY_REG(MHT_TRUNK_HASH_MODE, DIP_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_DIP;
+
+	SW_GET_FIELD_BY_REG(MHT_TRUNK_HASH_MODE, SIP_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_SIP;
+
+	SW_GET_FIELD_BY_REG(MHT_TRUNK_HASH_MODE, DA_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_DA;
+
+	SW_GET_FIELD_BY_REG(MHT_TRUNK_HASH_MODE, SA_EN, data, reg);
+	if (data)
+		*hash_mode |= FAL_TRUNK_HASH_KEY_SA;
+
+	return SW_OK;
+}
+#endif
 
 #define BYTE_B2R(x, mask) ((x) ^ (mask))
 #define BYTE_B1C(x) ((((((x&0x55)+((x&0xaa)>>1))&0x33)+((((x&0x55)+((x&0xaa)>>1))&0xcc)>>2))&0x0f)+((((((x&0x55)+((x&0xaa)>>1))&0x33)+((((x&0x55)+((x&0xaa)>>1))&0xcc)>>2))&0xf0)>>4))
@@ -583,7 +643,12 @@ isisc_trunk_hash_mode_set(a_uint32_t dev_id, a_uint32_t hash_mode)
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_trunk_hash_mode_set(dev_id, hash_mode);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_trunk_hash_mode_set(dev_id, hash_mode);
+    else
+#endif
+	    rv = _isisc_trunk_hash_mode_set(dev_id, hash_mode);
     HSL_API_UNLOCK;
     return rv;
 }
@@ -600,7 +665,12 @@ isisc_trunk_hash_mode_get(a_uint32_t dev_id, a_uint32_t * hash_mode)
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_trunk_hash_mode_get(dev_id, hash_mode);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_trunk_hash_mode_get(dev_id, hash_mode);
+    else
+#endif
+	    rv = _isisc_trunk_hash_mode_get(dev_id, hash_mode);
     HSL_API_UNLOCK;
     return rv;
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -781,7 +781,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
 	fal_bm_dynamic_cfg_t cfg;
-	a_uint16_t group_buf = 0, share_ceiling = 0;
+	a_uint16_t group_buf = 0, share_ceiling = 0, phyport_share_ceiling = 0;
 	adpt_ppe_type_t chip_type = adpt_ppe_type_get(dev_id);
 
 	for (i = 0; i <  PPE_BM_PORT_NUM; i++) {
@@ -798,18 +798,22 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 		case HPPE_TYPE:
 			group_buf = 1400;
 			share_ceiling = 250;
+			phyport_share_ceiling = 250;
 			break;
 		case CPPE_TYPE:
 			group_buf = 1024;
 			share_ceiling = 216;
+			phyport_share_ceiling = 216;
 			break;
 		case APPE_TYPE:
 			group_buf = 1400;
 			share_ceiling = 250;
+			phyport_share_ceiling = 250;
 			break;
 		case MPPE_TYPE:
-			group_buf = 248;
-			share_ceiling = 20;
+			group_buf = 240;
+			share_ceiling = 30;
+			phyport_share_ceiling = 48;
 			break;
 		default:
 			SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
@@ -850,11 +854,11 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 				break;
 			case MPPE_TYPE:
 				if (i < PPE_BM_PHY_PORT_OFFSET) {
-					prealloc_buf = 10;
-					react_buf = 25;
+					prealloc_buf = 12;
+					react_buf = 40;
 				} else {
 					prealloc_buf = 12;
-					react_buf = 35;
+					react_buf = 80;
 				}
 				break;
 			default:
@@ -867,17 +871,21 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 
 	memset(&cfg, 0, sizeof(cfg));
 	if (chip_type == MPPE_TYPE) {
-		cfg.resume_min_thresh = 15;
-		cfg.resume_off = 6;
-		cfg.weight= 5;
+		cfg.resume_min_thresh = 20;
+		cfg.resume_off = 5;
+		cfg.weight= 7;
 	} else {
 		cfg.resume_min_thresh = 0;
 		cfg.resume_off = 36;
 		cfg.weight= 4;
 	}
-	cfg.shared_ceiling = share_ceiling;
 
 	for (i = 0; i < PPE_BM_PORT_NUM; i++) {
+		if (i < PPE_BM_PHY_PORT_OFFSET)
+			cfg.shared_ceiling = share_ceiling;
+		else
+			cfg.shared_ceiling = phyport_share_ceiling;
+
 		fal_bm_port_dynamic_thresh_set(dev_id, i, &cfg);
 	}
 
@@ -901,7 +909,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	fal_ac_static_threshold_t sthresh_cfg;
 	a_uint32_t qbase = 0;
 	a_uint32_t chip_ver = 0;
-	a_uint16_t total_buf = 0, ceiling = 0, green_max = 0;
+	a_uint16_t total_buf = 0, ceiling = 0, green_max = 0, weight = 0, resume_offset = 0;
 	a_uint32_t max_pri_supported, pri, class;
 	adpt_ppe_type_t chip_type = adpt_ppe_type_get(dev_id);
 
@@ -1076,17 +1084,23 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 		case APPE_TYPE:
 			total_buf = 2000;
 			ceiling = 400;
+			weight = 4;
+			resume_offset = 36;
 			green_max = 250;
 			break;
 		case CPPE_TYPE:
 			total_buf = 1506;
 			ceiling = 216;
+			weight = 4;
+			resume_offset = 36;
 			green_max = 144;
 			break;
 		case MPPE_TYPE:
 			total_buf = 500;
-			ceiling = 100;
-			green_max = 100;
+			ceiling = 50;
+			weight = 5;
+			resume_offset = 18;
+			green_max = 50;
 			break;
 		default:
 			SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
@@ -1098,16 +1112,16 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 	fal_ac_group_buffer_set(dev_id, 0, &group_buff);
 
 	memset(&dthresh_cfg, 0, sizeof(dthresh_cfg));
-	dthresh_cfg.shared_weight = 4;
+	dthresh_cfg.shared_weight = weight;
 	dthresh_cfg.ceiling = ceiling;
-	dthresh_cfg.green_resume_off = 36;
+	dthresh_cfg.green_resume_off = resume_offset;
 	for (i = 0; i < SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i++) {
 		fal_ac_dynamic_threshold_set(dev_id, i, &dthresh_cfg);
 	}
 
 	memset(&sthresh_cfg, 0, sizeof(sthresh_cfg));
 	sthresh_cfg.green_max = green_max;
-	sthresh_cfg.green_resume_off = 36;
+	sthresh_cfg.green_resume_off = resume_offset;
 	for (i = SSDK_L0SCHEDULER_UCASTQ_CFG_MAX; i < SSDK_L0SCHEDULER_CFG_MAX; i++) {
 		obj.type = FAL_AC_QUEUE;
 		obj.obj_id = i;

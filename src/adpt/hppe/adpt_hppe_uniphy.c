@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -720,11 +720,16 @@ __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 		UNIPHY_XPCS_MODE_ENABLE;
 
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
-
-	hppe_uniphy_instance_link_detect_get(dev_id, uniphy_index, &uniphy_instance_link_detect);
-	uniphy_instance_link_detect.bf.detect_los_from_sfp = UNIPHY_10GR_LINK_LOSS;
-	hppe_uniphy_instance_link_detect_set(dev_id, uniphy_index, &uniphy_instance_link_detect);
-
+#ifdef MPPE
+	if (!(adpt_ppe_type_get(dev_id) == MPPE_TYPE && uniphy_index == SSDK_UNIPHY_INSTANCE0))
+#endif
+	{
+		hppe_uniphy_instance_link_detect_get(dev_id, uniphy_index,
+			&uniphy_instance_link_detect);
+		uniphy_instance_link_detect.bf.detect_los_from_sfp = UNIPHY_10GR_LINK_LOSS;
+		hppe_uniphy_instance_link_detect_set(dev_id, uniphy_index,
+			&uniphy_instance_link_detect);
+	}
 	/* configure uniphy gcc software reset */
 	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
 

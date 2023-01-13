@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017, 2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,6 +15,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "hppe_uniphy_reg_be.h"
+#else
 /**
  * @defgroup
  * @{
@@ -1929,5 +1932,6 @@ union uniphy_clkout_50m_ctrl_u {
 	a_uint32_t val;
 	struct uniphy_clkout_50m_ctrl bf;
 };
+#endif
 #endif
 #endif

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -17,6 +19,9 @@
  * @defgroup
  * @{
  */
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "hppe_policer_reg_be.h"
+#else
 #ifndef HPPE_POLICER_REG_H
 #define HPPE_POLICER_REG_H
 
@@ -879,7 +884,5 @@ union vlan_dev_cnt_tbl_u {
 	a_uint32_t val[3];
 	struct vlan_dev_cnt_tbl bf;
 };
-
-
-
+#endif
 #endif

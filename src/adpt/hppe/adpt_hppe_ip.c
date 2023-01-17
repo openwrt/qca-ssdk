@@ -3,16 +3,17 @@
  *
  * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
@@ -307,7 +308,7 @@ adpt_hppe_ip_port_intf_get(a_uint32_t dev_id, fal_port_t port_id, fal_intf_id_t 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(id);
 
-	rv = hppe_l3_vp_port_tbl_get(dev_id, port_id, &l3_vp_port_tbl);
+	rv = hppe_l3_vp_port_tbl_get(dev_id, FAL_PORT_ID_VALUE(port_id), &l3_vp_port_tbl);
 	if( rv != SW_OK )
 		return rv;
 
@@ -370,12 +371,12 @@ adpt_hppe_ip_port_intf_set(a_uint32_t dev_id, fal_port_t port_id, fal_intf_id_t 
 	memset(&l3_vp_port_tbl, 0, sizeof(l3_vp_port_tbl));
 	ADPT_DEV_ID_CHECK(dev_id);
 
-	hppe_l3_vp_port_tbl_get(dev_id, port_id, &l3_vp_port_tbl);
+	hppe_l3_vp_port_tbl_get(dev_id, FAL_PORT_ID_VALUE(port_id), &l3_vp_port_tbl);
 
 	l3_vp_port_tbl.bf.l3_if_valid = id->l3_if_valid;
 	l3_vp_port_tbl.bf.l3_if_index = id->l3_if_index;
 	
-	return hppe_l3_vp_port_tbl_set(dev_id, port_id, &l3_vp_port_tbl);
+	return hppe_l3_vp_port_tbl_set(dev_id, FAL_PORT_ID_VALUE(port_id), &l3_vp_port_tbl);
 }
 
 sw_error_t

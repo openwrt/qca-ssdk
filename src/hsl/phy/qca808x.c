@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -340,7 +340,7 @@ static a_uint32_t qca808x_negtiation_cap_get(struct phy_device *phydev)
 
 static int qca808x_config_aneg(struct phy_device *phydev)
 {
-	a_uint32_t advertise = 0;
+	a_uint32_t advertise = 0, advertise_old = 0;
 	a_uint16_t phy_data = 0;
 	int err = 0;
 	a_uint32_t dev_id = 0, phy_id = 0;
@@ -380,8 +380,13 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 		if(!(advertise & ~(FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE))) {
 			return SW_BAD_VALUE;
 		}
-		err |= qca808x_phy_set_autoneg_adv(dev_id, phy_id, advertise);
-		err |= qca808x_phy_restart_autoneg(dev_id, phy_id);
+		err |= qca808x_phy_get_autoneg_adv(dev_id, phy_id, &advertise_old);
+		SSDK_DEBUG("advertise:0x%x, advertise_old:0x%x\n", advertise, advertise_old);
+		if(advertise != advertise_old)
+		{
+			err |= qca808x_phy_set_autoneg_adv(dev_id, phy_id, advertise);
+			err |= qca808x_phy_restart_autoneg(dev_id, phy_id);
+		}
 	}
 
 	return err;

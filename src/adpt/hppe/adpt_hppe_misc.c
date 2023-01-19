@@ -1040,8 +1040,8 @@ adpt_hppe_debug_drop_cpu_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 static void
 adpt_appe_debug_vp_rx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
-	a_uint64_t rx_value;
-	a_uint32_t rx_pkt;
+	a_uint64_t rx_value = 0;
+	a_uint32_t rx_pkt = 0;
 	int i, tags, sign;
 
 	sign = tags = 0;
@@ -1073,8 +1073,8 @@ adpt_appe_debug_vp_rx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 static void
 adpt_appe_debug_vp_rx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
-	a_uint64_t rx_value;
-	a_uint32_t rx_pkt;
+	a_uint64_t rx_value = 0;
+	a_uint32_t rx_pkt = 0;
 	int i, tags, sign;
 
 	sign = tags = 0;
@@ -1106,8 +1106,8 @@ adpt_appe_debug_vp_rx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 static void
 adpt_appe_debug_port_rx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
-	a_uint64_t rx_value;
-	a_uint32_t rx_pkt;
+	a_uint64_t rx_value = 0;
+	a_uint32_t rx_pkt = 0;
 	int i, tags, sign;
 
 	sign = tags = 0;
@@ -1139,8 +1139,8 @@ adpt_appe_debug_port_rx_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 static void
 adpt_appe_debug_port_rx_drop_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 {
-	a_uint64_t rx_value;
-	a_uint32_t rx_pkt;
+	a_uint64_t rx_value = 0;
+	a_uint32_t rx_pkt = 0;
 	int i, tags, sign;
 
 	sign = tags = 0;

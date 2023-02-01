@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -802,7 +804,7 @@ adpt_hppe_fdb_iterate(a_uint32_t dev_id, a_uint32_t * iterator, fal_fdb_entry_t 
 	*iterator = entry_index + 1;
 	return SW_OK;
 }
-#ifndef IN_FDB_MINI
+
 sw_error_t
 adpt_hppe_fdb_age_time_set(a_uint32_t dev_id, a_uint32_t * time)
 {
@@ -837,7 +839,7 @@ adpt_hppe_fdb_age_time_get(a_uint32_t dev_id, a_uint32_t * time)
 
 	return SW_OK;
 }
-#endif
+
 sw_error_t
 adpt_hppe_fdb_extend_first(a_uint32_t dev_id, fal_fdb_op_t * option,
                          fal_fdb_entry_t * entry)
@@ -1612,12 +1614,10 @@ sw_error_t adpt_hppe_fdb_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_fdb_find = adpt_hppe_fdb_find;
 	if (p_adpt_api->adpt_fdb_func_bitmap[0] & (1 << FUNC_FDB_ENTRY_GETNEXT_BYINDEX))
 		p_adpt_api->adpt_fdb_iterate = adpt_hppe_fdb_iterate;
-#ifndef IN_FDB_MINI
 	if (p_adpt_api->adpt_fdb_func_bitmap[0] & (1 << FUNC_FDB_AGING_TIME_SET))
 		p_adpt_api->adpt_fdb_age_time_set = adpt_hppe_fdb_age_time_set;
 	if (p_adpt_api->adpt_fdb_func_bitmap[0] & (1 << FUNC_FDB_AGING_TIME_GET))
 		p_adpt_api->adpt_fdb_age_time_get = adpt_hppe_fdb_age_time_get;
-#endif
 	if (p_adpt_api->adpt_fdb_func_bitmap[0] & (1 << FUNC_FDB_ENTRY_EXTEND_GETFIRST))
 		p_adpt_api->adpt_fdb_extend_first = adpt_hppe_fdb_extend_first;
 	if (p_adpt_api->adpt_fdb_func_bitmap[0] & (1 << FUNC_FDB_ENTRY_EXTEND_GETNEXT))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -55,7 +55,7 @@ typedef enum {
 	(BITS(MEM_CTRL_DVS_SA_RELAX_BOFFSET, MEM_CTRL_DVS_SA_RELAX_BLEN+1))
 
 #define MHT_MEM_CTRL_DVS_PHY_MODE \
-	(BIT(MEM_CTRL_DVS_SA_RELAX_BOFFSET) | BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET))
+	BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET)
 #define MHT_MEM_CTRL_DVS_SWITCH_MODE \
 	BIT(MEM_CTRL_DVS_RAWA_ASSERT_BOFFSET)
 

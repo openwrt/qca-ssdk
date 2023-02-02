@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -568,8 +568,6 @@ _isisc_port_autoneg_adv_get(a_uint32_t dev_id, fal_port_t port_id,
     return SW_OK;
 }
 
-
-#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _isisc_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id,
                         a_bool_t * enable)
@@ -600,7 +598,6 @@ _isisc_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id,
     return SW_OK;
 }
 
-
 static sw_error_t
 _isisc_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
                                   a_bool_t * enable)
@@ -630,6 +627,7 @@ _isisc_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
     return SW_OK;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _isisc_port_powersave_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
@@ -2109,7 +2107,6 @@ isisc_port_autoneg_adv_get(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Get flow control status on a particular port.
  * @param[in] dev_id device id
@@ -2147,6 +2144,7 @@ isisc_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Set powersaving status on a particular port.
  * @param[in] dev_id device id
@@ -2891,10 +2889,8 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
             p_api->port_speed_get = isisc_port_speed_get;
             p_api->port_duplex_set = isisc_port_duplex_set;
             p_api->port_speed_set = isisc_port_speed_set;
-#ifndef IN_PORTCONTROL_MINI
             p_api->port_flowctrl_get = isisc_port_flowctrl_get;
             p_api->port_flowctrl_forcemode_get = isisc_port_flowctrl_forcemode_get;
-#endif
         }
 #if defined(MHT)
         else if (chip_type == CHIP_MHT) {
@@ -2908,10 +2904,8 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
             p_api->port_speed_get = mht_port_speed_get;
             p_api->port_duplex_set = mht_port_duplex_set;
             p_api->port_speed_set = mht_port_speed_set;
-#ifndef IN_PORTCONTROL_MINI
             p_api->port_flowctrl_get = mht_port_flowctrl_get;
             p_api->port_flowctrl_forcemode_get = mht_port_flowctrl_forcemode_get;
-#endif
         }
 #endif
         p_api->port_autoneg_enable = isisc_port_autoneg_enable;

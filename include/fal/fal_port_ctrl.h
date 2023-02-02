@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -567,11 +567,10 @@ fal_port_hdr_status_get(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id,
 				  a_bool_t enable);
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id,
 				  a_bool_t * enable);
-
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_mac_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
 				 a_bool_t enable);
@@ -584,12 +583,10 @@ sw_error_t
 fal_port_flowctrl_forcemode_set(a_uint32_t dev_id,
 					    fal_port_t port_id,
 					    a_bool_t enable);
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_flowctrl_forcemode_get(a_uint32_t dev_id,
 					    fal_port_t port_id,
 					    a_bool_t * enable);
-#endif
 sw_error_t
 fal_port_rxhdr_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 				    fal_port_header_mode_t mode);

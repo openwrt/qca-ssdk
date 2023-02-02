@@ -285,7 +285,9 @@ extern "C" {
     SW_API_DEF(SW_API_PT_AN_RESTART, fal_port_autoneg_restart), \
     SW_API_DEF(SW_API_PT_AN_ADV_SET, fal_port_autoneg_adv_set), \
     SW_API_DEF(SW_API_PT_FLOWCTRL_SET, fal_port_flowctrl_set), \
+    SW_API_DEF(SW_API_PT_FLOWCTRL_GET, fal_port_flowctrl_get), \
     SW_API_DEF(SW_API_PT_FLOWCTRL_MODE_SET, fal_port_flowctrl_forcemode_set), \
+    SW_API_DEF(SW_API_PT_FLOWCTRL_MODE_GET, fal_port_flowctrl_forcemode_get), \
     SW_API_DEF(SW_API_PT_LINK_MODE_SET, fal_port_link_forcemode_set), \
     SW_API_DEF(SW_API_PT_TXHDR_SET, fal_port_txhdr_mode_set), \
     SW_API_DEF(SW_API_PT_RXHDR_SET, fal_port_rxhdr_mode_set), \
@@ -294,8 +296,10 @@ extern "C" {
     SW_API_DEF(SW_API_RXMAC_STATUS_SET, fal_port_rxmac_status_set), \
     SW_API_DEF(SW_API_PT_POWER_OFF, fal_port_power_off), \
     SW_API_DEF(SW_API_PT_POWER_ON, fal_port_power_on), \
-    SW_API_DEF(SW_API_TXFC_STATUS_SET, fal_port_txfc_status_set), \
-    SW_API_DEF(SW_API_RXFC_STATUS_SET, fal_port_rxfc_status_set), \
+    SW_API_DEF(SW_API_TXFC_STATUS_SET, fal_port_txfc_status_set),   \
+    SW_API_DEF(SW_API_TXFC_STATUS_GET, fal_port_txfc_status_get),   \
+    SW_API_DEF(SW_API_RXFC_STATUS_SET, fal_port_rxfc_status_set),   \
+    SW_API_DEF(SW_API_RXFC_STATUS_GET, fal_port_rxfc_status_get),   \
     SW_API_DEF(SW_API_PT_FLOW_CTRL_THRES_SET, fal_port_flow_ctrl_thres_set), \
     SW_API_DEF(SW_API_PT_FLOW_CTRL_THRES_GET, fal_port_flow_ctrl_thres_get), \
     SW_API_DEF(SW_API_PT_SWITCH_PORT_LOOPBACK_SET, fal_switch_port_loopback_set),  \
@@ -329,7 +333,9 @@ extern "C" {
     SW_API_DESC(SW_API_PT_AN_RESTART) \
     SW_API_DESC(SW_API_PT_AN_ADV_SET) \
     SW_API_DESC(SW_API_PT_FLOWCTRL_SET) \
+    SW_API_DESC(SW_API_PT_FLOWCTRL_GET) \
     SW_API_DESC(SW_API_PT_FLOWCTRL_MODE_SET) \
+    SW_API_DESC(SW_API_PT_FLOWCTRL_MODE_GET) \
     SW_API_DESC(SW_API_PT_LINK_MODE_SET) \
     SW_API_DESC(SW_API_PT_TXHDR_SET) \
     SW_API_DESC(SW_API_PT_RXHDR_SET) \
@@ -339,7 +345,9 @@ extern "C" {
     SW_API_DESC(SW_API_PT_POWER_OFF) \
     SW_API_DESC(SW_API_PT_POWER_ON) \
     SW_API_DESC(SW_API_TXFC_STATUS_SET) \
+    SW_API_DESC(SW_API_TXFC_STATUS_GET) \
     SW_API_DESC(SW_API_RXFC_STATUS_SET) \
+    SW_API_DESC(SW_API_RXFC_STATUS_GET) \
     SW_API_DESC(SW_API_PT_FLOW_CTRL_THRES_SET) \
     SW_API_DESC(SW_API_PT_FLOW_CTRL_THRES_GET) \
     SW_API_DESC(SW_API_PT_SWITCH_PORT_LOOPBACK_SET)  \

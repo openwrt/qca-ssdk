@@ -2267,6 +2267,30 @@ adpt_hppe_port_combo_prefer_medium_set(a_uint32_t dev_id,
 
 }
 
+sw_error_t
+adpt_hppe_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id,
+				  a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_bool_t txfc_enable, rxfc_enable;
+
+#if defined(CPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_HPPE &&
+		adpt_chip_revision_get(dev_id) == CPPE_REVISION &&
+		port_id == SSDK_PHYSICAL_PORT6) {
+		return adpt_cppe_switch_port_loopback_flowctrl_get(dev_id,
+				port_id, enable);
+	}
+#endif
+	rv = adpt_hppe_port_txfc_status_get(dev_id, port_id,  &txfc_enable);
+	rv |= adpt_hppe_port_rxfc_status_get(dev_id, port_id,  &rxfc_enable);
+	if(rv != SW_OK)
+		return rv;
+	*enable = txfc_enable & rxfc_enable;
+
+	return SW_OK;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_counter_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -2423,31 +2447,6 @@ adpt_hppe_port_magic_frame_mac_get(a_uint32_t dev_id, fal_port_t port_id,
 
 }
 
-sw_error_t
-adpt_hppe_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id,
-				  a_bool_t * enable)
-{
-	sw_error_t rv = SW_OK;
-	a_bool_t txfc_enable, rxfc_enable;
-
-#if defined(CPPE)
-	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE &&
-		port_id == SSDK_PHYSICAL_PORT6) {
-		return adpt_cppe_switch_port_loopback_flowctrl_get(dev_id,
-				port_id, enable);
-	}
-#endif
-	rv = adpt_hppe_port_txfc_status_get(dev_id, port_id,  &txfc_enable);
-	rv |= adpt_hppe_port_rxfc_status_get(dev_id, port_id,  &rxfc_enable);
-	if(rv != SW_OK)
-		return rv;
-	*enable = txfc_enable & rxfc_enable;
-
-	return SW_OK;
-}
-#endif
-
-#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_counter_get(a_uint32_t dev_id, fal_port_t port_id,
 		   a_bool_t * enable)
@@ -6480,11 +6479,11 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_magic_frame_mac_get = adpt_hppe_port_magic_frame_mac_get;
 	}
+#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] & (1 <<  (FUNC_ADPT_PORT_FLOWCTRL_GET % 32)))
 	{
 		p_adpt_api->adpt_port_flowctrl_get = adpt_hppe_port_flowctrl_get;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[1] &
 		(1 <<  (FUNC_ADPT_PORT_RXMAC_STATUS_SET % 32)))
 	{
@@ -6613,14 +6612,12 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		p_adpt_api->adpt_port_flowctrl_forcemode_set =
 			adpt_hppe_port_flowctrl_forcemode_set;
 	}
-#ifndef IN_PORTCONTROL_MINI
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
 		(1 <<  (FUNC_ADPT_PORT_FLOWCTRL_FORCEMODE_GET% 32)))
 	{
 		p_adpt_api->adpt_port_flowctrl_forcemode_get =
 			adpt_hppe_port_flowctrl_forcemode_get;
 	}
-#endif
 	p_adpt_api->adpt_port_source_filter_config_get = adpt_ppe_port_source_filter_config_get;
 	p_adpt_api->adpt_port_source_filter_config_set = adpt_ppe_port_source_filter_config_set;
 	p_adpt_api->adpt_port_mux_mac_type_set = adpt_hppe_port_mux_mac_type_set;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -752,7 +752,6 @@ _mht_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _mht_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
 {
@@ -773,7 +772,6 @@ _mht_port_flowctrl_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
 
 	return rv;
 }
-#endif
 
 static sw_error_t
 _mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
@@ -1257,7 +1255,6 @@ mht_port_speed_get(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
-#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Get flow control status on a particular port.
  * @param[in] dev_id device id
@@ -1294,7 +1291,6 @@ mht_port_flowctrl_forcemode_get(a_uint32_t dev_id, fal_port_t port_id,
 	HSL_API_UNLOCK;
 	return rv;
 }
-#endif
 
 static sw_error_t
 mht_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)

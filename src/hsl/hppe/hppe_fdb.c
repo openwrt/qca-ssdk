@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -148,6 +148,7 @@ hppe_fdb_tbl_rd_op_rslt_set(
 {
 	return SW_NOT_SUPPORTED;
 }
+#endif
 
 sw_error_t
 hppe_age_timer_get(
@@ -170,7 +171,7 @@ hppe_age_timer_set(
 				IPE_L2_BASE_ADDR + AGE_TIMER_ADDRESS,
 				value->val);
 }
-#endif
+
 sw_error_t
 hppe_l2_global_conf_get(
 		a_uint32_t dev_id,

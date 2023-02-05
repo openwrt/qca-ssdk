@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2015-2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_fdb FAL_FDB
@@ -25,8 +27,6 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 
-
-#ifndef IN_FDB_MINI
 static sw_error_t
 _fal_fdb_entry_add(a_uint32_t dev_id, const fal_fdb_entry_t * entry)
 {
@@ -50,7 +50,6 @@ _fal_fdb_entry_add(a_uint32_t dev_id, const fal_fdb_entry_t * entry)
     rv = p_api->fdb_add(dev_id, entry);
     return rv;
 }
-#endif
 
 static sw_error_t
 _fal_fdb_entry_flush(a_uint32_t dev_id, a_uint32_t flag)
@@ -387,7 +386,7 @@ _fal_fdb_vlan_ivl_svl_get(a_uint32_t dev_id, fal_fdb_smode* smode)
     rv = p_api->vlan_ivl_svl_get(dev_id, smode);
     return rv;
 }
-
+#endif
 static sw_error_t
 _fal_fdb_aging_time_set(a_uint32_t dev_id, a_uint32_t * time)
 {
@@ -412,7 +411,6 @@ _fal_fdb_aging_time_set(a_uint32_t dev_id, a_uint32_t * time)
     return rv;
 }
 
-
 static sw_error_t
 _fal_fdb_aging_time_get(a_uint32_t dev_id, a_uint32_t * time)
 {
@@ -436,7 +434,6 @@ _fal_fdb_aging_time_get(a_uint32_t dev_id, a_uint32_t * time)
     rv = p_api->age_time_get(dev_id, time);
     return rv;
 }
-#endif
 
 static sw_error_t
 _fal_fdb_entry_getnext_byindex(a_uint32_t dev_id, a_uint32_t * iterator, fal_fdb_entry_t * entry)
@@ -959,7 +956,7 @@ _fal_fdb_entry_del_byfid(a_uint32_t dev_id, a_uint16_t fid, a_uint32_t flag)
     rv = p_api->adpt_fdb_del_by_fid(dev_id, fid, flag);
     return rv;
 }
-#ifndef IN_FDB_MINI
+
 /*insert flag for inner fal, don't remove it*/
 
 /**
@@ -978,7 +975,6 @@ fal_fdb_entry_add(a_uint32_t dev_id, const fal_fdb_entry_t * entry)
     FAL_API_UNLOCK;
     return rv;
 }
-#endif
 
 /**
  * @brief Delete all Fdb entries
@@ -1287,10 +1283,7 @@ fal_fdb_vlan_ivl_svl_get(a_uint32_t dev_id, fal_fdb_smode* smode)
     FAL_API_UNLOCK;
     return rv;
 }
-
-
-
-
+#endif
 /**
  * @brief Set dynamic address aging time on a particular device.
  * @details   Comments:
@@ -1328,7 +1321,6 @@ fal_fdb_aging_time_get(a_uint32_t dev_id, a_uint32_t * time)
     FAL_API_UNLOCK;
     return rv;
 }
-#endif
 
 /**
  * @brief Iterate all fdb entries on a particular device.
@@ -1828,11 +1820,7 @@ fal_fdb_entry_del_byfid(a_uint32_t dev_id, a_uint16_t fid, a_uint32_t flag)
     return rv;
 }
 
-#ifndef IN_FDB_MINI
-
     EXPORT_SYMBOL(fal_fdb_entry_add);
-
-#endif
 
     EXPORT_SYMBOL(fal_fdb_entry_del_byport);
 
@@ -1888,10 +1876,13 @@ fal_fdb_entry_del_byfid(a_uint32_t dev_id, a_uint16_t fid, a_uint32_t flag)
 
     EXPORT_SYMBOL(fal_fdb_aging_ctrl_get);
 
+#endif
+
     EXPORT_SYMBOL(fal_fdb_aging_time_set);
 
     EXPORT_SYMBOL(fal_fdb_aging_time_get);
 
+#ifndef IN_FDB_MINI
     EXPORT_SYMBOL(fal_fdb_entry_update_byport);
 #endif
     EXPORT_SYMBOL(fal_port_fdb_learn_limit_set);

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, 2015, 2017-2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -4101,7 +4101,6 @@ parse_vlan_learnsts(struct switch_val *val)
 #endif
 
 #ifdef IN_FDB
-#ifndef IN_FDB_MINI
 static int
 parse_fdb_entry(struct switch_val *val)
 {
@@ -4157,7 +4156,7 @@ parse_fdb_entry(struct switch_val *val)
 	}
 	return rv;
 }
-
+#ifndef IN_FDB_MINI
 static int
 parse_fdb_resventry(struct switch_val *val)
 {
@@ -4259,7 +4258,7 @@ parse_fdb_agectrl(struct switch_val *val)
 
 	return rv;
 }
-
+#endif
 static int
 parse_fdb_agetime(struct switch_val *val)
 {
@@ -4285,7 +4284,7 @@ parse_fdb_agetime(struct switch_val *val)
 
 	return rv;
 }
-
+#ifndef IN_FDB_MINI
 static int
 parse_fdb_vlansmode(struct switch_val *val)
 {
@@ -12355,13 +12354,21 @@ parse_fdb(const char *command_name, struct switch_val *val)
 	#ifndef IN_FDB_MINI
 	else if(!strcmp(command_name, "Resventry")) {
 		rv = parse_fdb_resventry(val);
-	} else if(!strcmp(command_name, "Entry")) {
+	}
+	#endif
+	else if(!strcmp(command_name, "Entry")) {
 		rv = parse_fdb_entry(val);
-	} else if(!strcmp(command_name, "AgeCtrl")) {
+	}
+	#ifndef IN_FDB_MINI
+	else if(!strcmp(command_name, "AgeCtrl")) {
 		rv = parse_fdb_agectrl(val);
-	} else if(!strcmp(command_name, "AgeTime")) {
+	}
+	#endif
+	else if(!strcmp(command_name, "AgeTime")) {
 		rv = parse_fdb_agetime(val);
-	} else if(!strcmp(command_name, "Vlansmode")) {
+	}
+	#ifndef IN_FDB_MINI
+	else if(!strcmp(command_name, "Vlansmode")) {
 		rv = parse_fdb_vlansmode(val);
 	} else if(!strcmp(command_name, "Ptlearnlimit")) {
 		rv = parse_fdb_ptlearnlimit(val);

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -763,14 +763,14 @@ struct sub_cmd_des_t g_portvlan_des[] =
 #ifdef IN_FDB
 struct sub_cmd_des_t g_fdb_des[] =
 {
-#ifndef IN_FDB_MINI
 	{"entry", "set",   SW_API_FDB_ADD, NULL},
-#endif
 	{"portLearn", "set",   SW_API_FDB_PT_LEARN_SET, NULL},
 #ifndef IN_FDB_MINI
 	{"ageCtrl", "set",   SW_API_FDB_AGE_CTRL_SET, NULL},
 	{"vlansmode", "set",   SW_API_FDB_VLAN_IVL_SVL_SET, NULL},
+#endif
 	{"ageTime", "set",   SW_API_FDB_AGE_TIME_SET, NULL},
+#ifndef IN_FDB_MINI
 	{"ptlearnlimit", "set",   SW_API_PT_FDB_LEARN_LIMIT_SET, NULL},
 	{"ptlearnexceedcmd", "set",   SW_API_PT_FDB_LEARN_EXCEED_CMD_SET, NULL},
 	{"learnlimit", "set",   SW_API_FDB_LEARN_LIMIT_SET, NULL},

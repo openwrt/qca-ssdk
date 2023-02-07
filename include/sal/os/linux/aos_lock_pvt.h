@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -18,9 +20,11 @@
 
 #include <linux/interrupt.h>
 #include <linux/spinlock.h>
+#include <linux/mutex.h>
 
 
 typedef spinlock_t aos_lock_pvt_t;
+typedef struct mutex aos_mutex_lock_pvt_t;
 
 
 #define __aos_lock_init(lock)  spin_lock_init(lock)
@@ -38,6 +42,12 @@ typedef spinlock_t aos_lock_pvt_t;
 #define __aos_irq_save(flags) local_irq_save(flags)
 
 #define __aos_irq_restore(flags) local_irq_restore(flags)
+
+#define __aos_mutex_lock_init(lock)  mutex_init(lock)
+
+#define __aos_mutex_lock(lock) mutex_lock(lock)
+
+#define __aos_mutex_unlock(lock) mutex_unlock(lock)
 
 #ifndef KVER32
 #define __aos_default_unlock SPIN_LOCK_UNLOCKED

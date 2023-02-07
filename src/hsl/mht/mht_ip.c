@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021,2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -54,7 +54,7 @@
 #define MHT_IP4_HOST_ROUTE_TBL0_ADDR                 0x5b000
 #define MHT_IP6_HOST_ROUTE_TBL0_ADDR                 0x5b100
 
-extern aos_lock_t mht_nat_lock;
+extern aos_mutex_lock_t mht_nat_lock;
 static a_uint32_t mht_mac_snap[SW_MAX_NR_DEV] = { 0 };
 static fal_intf_mac_entry_t mht_intf_snap[SW_MAX_NR_DEV][MHT_INTF_MAC_ADDR_NUM];
 
@@ -569,26 +569,26 @@ _mht_ip_host_add(a_uint32_t dev_id, fal_host_entry_t * entry)
 	rv = _mht_host_sw_to_hw(dev_id, entry, reg);
 	SW_RTN_ON_ERROR(rv);
 
-	aos_lock_bh(&mht_nat_lock);
+	aos_mutex_lock(&mht_nat_lock);
 	rv = _mht_host_down_to_hw(dev_id, reg);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
 	rv = _mht_host_entry_commit(dev_id, MHT_ENTRY_ARP, MHT_HOST_ENTRY_ADD);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
 	HSL_REG_ENTRY_GET(rv, dev_id, HOST_ENTRY7, 0, (a_uint8_t *) (&reg[7]),
 			sizeof (a_uint32_t));
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
-	aos_unlock_bh(&mht_nat_lock);
+	aos_mutex_unlock(&mht_nat_lock);
 	SW_GET_FIELD_BY_REG(HOST_ENTRY7, TBL_IDX, entry->entry_id, reg[7]);
 
 	return SW_OK;
@@ -649,15 +649,15 @@ _mht_ip_host_del(a_uint32_t dev_id, a_uint32_t del_mode,
 		SW_SET_REG_BY_FIELD(HOST_ENTRY7, SPEC_STATUS, 1, reg[7]);
 		SW_SET_REG_BY_FIELD(HOST_ENTRY6, AGE_FLAG, entry->status, reg[6]);
 	}
-	aos_lock_bh(&mht_nat_lock);
+	aos_mutex_lock(&mht_nat_lock);
 	rv = _mht_host_down_to_hw(dev_id, reg);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
 	rv = _mht_host_entry_commit(dev_id, MHT_ENTRY_ARP, op);
-	aos_unlock_bh(&mht_nat_lock);
+	aos_mutex_unlock(&mht_nat_lock);
 
 	return rv;
 }
@@ -691,23 +691,23 @@ _mht_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 		reg[3] = entry->ip6_addr.ul[0];
 		SW_SET_REG_BY_FIELD(HOST_ENTRY6, IP_VER, 1, reg[6]);
 	}
-	aos_lock_bh(&mht_nat_lock);
+	aos_mutex_lock(&mht_nat_lock);
 	rv = _mht_host_down_to_hw(dev_id, reg);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
 	rv = _mht_host_entry_commit(dev_id, MHT_ENTRY_ARP,
 			MHT_HOST_ENTRY_SEARCH);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
 	rv = _mht_host_up_to_sw(dev_id, reg);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
@@ -715,19 +715,19 @@ _mht_ip_host_get(a_uint32_t dev_id, a_uint32_t get_mode,
 
 	rv = _mht_host_hw_to_sw(dev_id, reg, entry);
 	if (rv != SW_OK) {
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return rv;
 	}
 
 	if (!(entry->status))
 	{
-		aos_unlock_bh(&mht_nat_lock);
+		aos_mutex_unlock(&mht_nat_lock);
 		return SW_NOT_FOUND;
 	}
 
 	HSL_REG_ENTRY_GET(rv, dev_id, HOST_ENTRY7, 0, (a_uint8_t *) (&reg[7]),
 			sizeof (a_uint32_t));
-	aos_unlock_bh(&mht_nat_lock);
+	aos_mutex_unlock(&mht_nat_lock);
 	SW_RTN_ON_ERROR(rv);
 
 	SW_GET_FIELD_BY_REG(HOST_ENTRY7, TBL_IDX, entry->entry_id, reg[7]);

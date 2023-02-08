@@ -342,7 +342,7 @@ union mac_packet_filter_u {
 	a_uint32_t val;
 	struct mac_packet_filter bf;
 };
-#if 0
+
 /*[register] MAC_WATCHDOG_TIMEOUT*/
 #define MAC_WATCHDOG_TIMEOUT
 #define MAC_WATCHDOG_TIMEOUT_ADDRESS 0xc
@@ -373,6 +373,7 @@ union mac_watchdog_timeout_u {
 	struct mac_watchdog_timeout bf;
 };
 
+#if 0
 /*[register] MAC_VLAN_TAG*/
 #define MAC_VLAN_TAG
 #define MAC_VLAN_TAG_ADDRESS 0x50

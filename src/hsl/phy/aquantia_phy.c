@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -725,6 +725,7 @@ a_bool_t aquantia_autoneg_done(a_uint32_t dev_id, a_uint32_t phy_id)
 
 	return A_TRUE;
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
@@ -785,6 +786,7 @@ aquantia_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	return rv;
 }
+#endif
 #endif
 /******************************************************************************
 *

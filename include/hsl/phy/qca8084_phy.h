@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -116,3 +116,6 @@ qca8084_phy_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct port_phy_status *phy_status);
 sw_error_t
 qca8084_phy_fifo_reset(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
+sw_error_t
+qca8084_phy_fixup_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *ability);

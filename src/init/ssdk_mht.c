@@ -76,27 +76,17 @@ _qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_mac_config_t mac_config = {0};
 	a_bool_t force_en = A_FALSE;
 	fal_port_speed_t force_speed = FAL_SPEED_BUTT;
-	fal_port_duplex_t force_duplex = FAL_DUPLEX_BUTT;
 	mht_work_mode_t work_mode = MHT_SWITCH_MODE;
 	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
 
+	/* The clock parent need to be configured before initializing
+	 * the interface mode.*/
+	qca_mht_work_mode_get(dev_id, &work_mode);
+	ssdk_mht_gcc_port_clk_parent_set(dev_id, work_mode, port_id);
+
 	force_en = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);
-	if (force_en == A_TRUE) {
+	if(force_en)
 		force_speed = hsl_port_force_speed_get(dev_id, port_id);
-
-		rv = fal_port_speed_set(dev_id, port_id, force_speed);
-		SW_RTN_ON_ERROR(rv);
-
-		force_duplex = hsl_port_force_duplex_get(dev_id, port_id);
-		rv = fal_port_duplex_set(dev_id, port_id, force_duplex);
-		SW_RTN_ON_ERROR(rv);
-
-		/* The clock parent need to be configured before initializing
-		 * the interface mode. */
-		qca_mht_work_mode_get(dev_id, &work_mode);
-		ssdk_mht_gcc_port_clk_parent_set(dev_id, work_mode, port_id);
-	}
-
 	if(mac_mode == PORT_WRAPPER_SGMII_PLUS) {
 		mac_config.mac_mode = FAL_MAC_MODE_SGMII_PLUS;
 		phy_info->port_mode[port_id] = PORT_SGMII_PLUS;
@@ -133,20 +123,7 @@ qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0,
 	rv = _qca_mht_interface_mode_init(dev_id, SSDK_PHYSICAL_PORT5, mac_mode1);
 	SW_RTN_ON_ERROR(rv);
 
-	if (A_TRUE == hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT0, PHY_F_FORCE)) {
-		rv = fal_port_txmac_status_set(dev_id, SSDK_PHYSICAL_PORT0, A_TRUE);
-		SW_RTN_ON_ERROR(rv);
-		rv = fal_port_rxmac_status_set(dev_id, SSDK_PHYSICAL_PORT0, A_TRUE);
-		SW_RTN_ON_ERROR(rv);
-	}
-
-	if (A_TRUE == hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT5, PHY_F_FORCE)) {
-		rv = fal_port_txmac_status_set(dev_id, SSDK_PHYSICAL_PORT5, A_TRUE);
-		SW_RTN_ON_ERROR(rv);
-		rv = fal_port_rxmac_status_set(dev_id, SSDK_PHYSICAL_PORT5, A_TRUE);
-	}
-
-	return rv;
+	return SW_OK;
 }
 
 static inline void qca_mht_switch_reset(a_uint32_t dev_id)
@@ -211,6 +188,44 @@ sw_error_t qca_mht_mdio_master_init(a_uint32_t dev_id)
 			MHT_MDIO_MASTER_TIMER_CNT, MHT_MDIO_MASTER_PREAMBLE_LEN);
 	return ret;
 }
+#ifdef IN_PORTCONTROL
+static sw_error_t
+qca_mht_portctrl_hw_init(a_uint32_t dev_id)
+{
+	sw_error_t rv = SW_OK;
+	fal_port_speed_t force_speed = FAL_SPEED_BUTT;
+	fal_port_duplex_t force_duplex = FAL_DUPLEX_BUTT;
+	a_uint32_t i = 0, port_max = SSDK_PHYSICAL_PORT6;
+
+	for(i = SSDK_PHYSICAL_PORT0; i < port_max; i++)
+	{
+		if(hsl_port_feature_get(dev_id, i, PHY_F_FORCE) == A_TRUE)
+		{
+			force_speed = hsl_port_force_speed_get(dev_id, i);
+			rv = fal_port_speed_set(dev_id, i, force_speed);
+			SW_RTN_ON_ERROR(rv);
+
+			force_duplex = hsl_port_force_duplex_get(dev_id, i);
+			rv = fal_port_duplex_set(dev_id, i, force_duplex);
+			SW_RTN_ON_ERROR(rv);
+
+			rv = fal_port_txmac_status_set(dev_id, i, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+			rv = fal_port_rxmac_status_set(dev_id, i, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+		}
+		else
+		{
+			rv = fal_port_txmac_status_set(dev_id, i, A_FALSE);
+			SW_RTN_ON_ERROR(rv);
+			rv = fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+			SW_RTN_ON_ERROR(rv);
+		}
+	}
+
+	return SW_OK;
+}
+#endif
 
 int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 {
@@ -228,14 +243,15 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	ret = qca_mht_work_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
 	SW_RTN_ON_ERROR(ret);
 
+	ret = qca_mht_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
+	SW_RTN_ON_ERROR(ret);
+
 	ret = qca_switch_init(dev_id);
 	SW_RTN_ON_ERROR(ret);
 
 #ifdef IN_PORTVLAN
 	ssdk_portvlan_init(dev_id);
 #endif
-	ret = qca_mht_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
-	SW_RTN_ON_ERROR(ret);
 
 	port_bmp = ssdk_cpu_bmp_get(dev_id) | ssdk_wan_bmp_get(dev_id) | ssdk_lan_bmp_get(dev_id);
 	qca_mht_work_mode_get(dev_id, &work_mode);
@@ -249,6 +265,11 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 
 #ifdef IN_LED
 	ret = ssdk_led_init(dev_id, cfg);
+	SW_RTN_ON_ERROR(ret);
+#endif
+
+#ifdef IN_PORTCONTROL
+	ret = qca_mht_portctrl_hw_init(dev_id);
 #endif
 
 	return ret;

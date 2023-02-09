@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018, 2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -653,6 +653,9 @@ qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id);
 a_bool_t
 qca808x_phy_id_check(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t phy_id);
+sw_error_t
+qca808x_phy_get_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *ability);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

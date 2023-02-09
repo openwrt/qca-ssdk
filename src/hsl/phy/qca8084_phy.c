@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -719,4 +719,42 @@ qca8084_phy_hw_init(a_uint32_t dev_id, a_uint32_t phy_addr)
 	rv = qca8084_phy_icc_init(dev_id, phy_addr);
 
 	return rv;
+}
+
+sw_error_t
+qca8084_phy_fixup_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *ability)
+{
+	a_uint32_t mht_port_id = 0;
+	a_uint16_t phy_data = 0;
+	a_bool_t half_support = A_TRUE;
+	sw_error_t rv = SW_OK;
+
+	/*In PHY mode, half duplex is not supported because the USXG doesn't support
+		half duplex because of large latency*/
+	if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_1, MHT_UNIPHY_UQXGMII))
+		half_support = A_FALSE;
+	/*In bypass mode, half duplex is not supported for mht port 4 because of the
+		new clock structure, PHY3 has extra two FIFOs which lead to large latency*/
+	if(mht_uniphy_mode_check(dev_id, MHT_UNIPHY_SGMII_0, MHT_UNIPHY_PHY))
+	{
+		qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
+		if(mht_port_id == SSDK_PHYSICAL_PORT4)
+			half_support = A_FALSE;
+	}
+
+	if(!half_support)
+	{
+		*ability &= ~(FAL_PHY_ADV_10T_HD | FAL_PHY_ADV_100TX_HD);
+		phy_data = qca808x_phy_reg_read(dev_id, phy_addr, QCA808X_AUTONEG_ADVERT);
+		if(phy_data & (QCA808X_ADVERTISE_10HALF | QCA808X_ADVERTISE_100HALF))
+		{
+			phy_data &= ~(QCA808X_ADVERTISE_10HALF | QCA808X_ADVERTISE_100HALF);
+			rv = qca808x_phy_reg_write(dev_id, phy_addr, QCA808X_AUTONEG_ADVERT,
+				phy_data);
+			SW_RTN_ON_ERROR(rv);
+		}
+	}
+
+	return SW_OK;
 }

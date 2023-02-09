@@ -79,13 +79,16 @@ struct port_phy_status
 #define FAL_PHY_ADV_10T_FD      0x02
 #define FAL_PHY_ADV_100TX_HD    0x04
 #define FAL_PHY_ADV_100TX_FD    0x08
-//#define FAL_PHY_ADV_1000T_HD    0x100
+#define FAL_PHY_ADV_PAUSE       0x10
+#define FAL_PHY_ADV_ASY_PAUSE   0x20
+#define FAL_PHY_ADV_AUTONEG     0x40
+//#define FAL_PHY_ADV_1000T_HD  0x100
 #define FAL_PHY_ADV_1000T_FD    0x200
-#define FAL_PHY_ADV_1000BX_HD    0x400
-#define FAL_PHY_ADV_1000BX_FD    0x800
+#define FAL_PHY_ADV_1000BX_HD   0x400
+#define FAL_PHY_ADV_1000BX_FD   0x800
 #define FAL_PHY_ADV_2500T_FD    0x1000
 #define FAL_PHY_ADV_5000T_FD    0x2000
-#define FAL_PHY_ADV_10000T_FD    0x4000
+#define FAL_PHY_ADV_10000T_FD   0x4000
 #define FAL_PHY_ADV_10G_R_FD    0x8000
 
 #define FAL_DEFAULT_MAX_FRAME_SIZE 0x5ee
@@ -104,8 +107,6 @@ struct port_phy_status
 #define FAL_PHY_ADV_XGE_SPEED_ALL   \
 		(FAL_PHY_ADV_2500T_FD | FAL_PHY_ADV_5000T_FD | FAL_PHY_ADV_10000T_FD)
 
-#define FAL_PHY_ADV_PAUSE       0x10
-#define FAL_PHY_ADV_ASY_PAUSE   0x20
 #define FAL_PHY_FE_ADV_ALL         \
     (FAL_PHY_ADV_FE_SPEED_ALL | FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE)
 #define FAL_PHY_GE_ADV_ALL         \
@@ -114,34 +115,6 @@ struct port_phy_status
 #define FAL_PHY_COMBO_ADV_ALL         \
     (FAL_PHY_ADV_BX_SPEED_ALL | FAL_PHY_ADV_GE_SPEED_ALL | FAL_PHY_ADV_XGE_SPEED_ALL|\
 FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE)
-
-//phy capablity
-#define FAL_PHY_AUTONEG_CAPS   0x01
-#define FAL_PHY_100T2_HD_CAPS  0x02
-#define FAL_PHY_100T2_FD_CAPS  0x04
-#define FAL_PHY_10T_HD_CAPS    0x08
-#define FAL_PHY_10T_FD_CAPS    0x10
-#define FAL_PHY_100X_HD_CAPS   0x20
-#define FAL_PHY_100X_FD_CAPS   0x40
-#define FAL_PHY_100T4_CAPS     0x80
-//#define FAL_PHY_1000T_HD_CAPS  0x100
-#define FAL_PHY_1000T_FD_CAPS  0x200
-//#define FAL_PHY_1000X_HD_CAPS  0x400
-#define FAL_PHY_1000X_FD_CAPS  0x800
-
-//phy partner capablity
-#define FAL_PHY_PART_10T_HD   0x1
-#define FAL_PHY_PART_10T_FD   0x2
-#define FAL_PHY_PART_100TX_HD 0x4
-#define FAL_PHY_PART_100TX_FD 0x8
-//#define FAL_PHY_PART_1000T_HD 0x10
-#define FAL_PHY_PART_1000T_FD 0x20
-#define FAL_PHY_PART_2500T_FD 0x40
-#define FAL_PHY_PART_5000T_FD 0x80
-#define FAL_PHY_PART_10000T_FD 0x100
-#define FAL_PHY_PART_AUTONEG   0x200
-#define FAL_PHY_PART_PAUSE     0x400
-#define FAL_PHY_PART_ASY_PAUSE 0x800
 
 //phy interrupt flag
 #define FAL_PHY_INTR_SPEED_CHANGE         0x1

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1264,6 +1264,7 @@ sw_error_t malibu_phy_poweron(a_uint32_t dev_id, a_uint32_t phy_id)
 
 	return SW_OK;
 }
+#if 0
 #ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
@@ -1366,6 +1367,7 @@ malibu_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	return SW_OK;
 }
+#endif
 #endif
 /******************************************************************************
 *

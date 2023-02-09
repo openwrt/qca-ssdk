@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -384,7 +386,7 @@ f2_phy_poweron(a_uint32_t dev_id, a_uint32_t phy_id)
 
     return SW_OK;
 }
-
+#if 0
 /******************************************************************************
 *
 * f2_phy_get_ability - get the phy ability
@@ -458,7 +460,7 @@ f2_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
 
     return SW_OK;
 }
-
+#endif
 /******************************************************************************
 *
 * f2_phy_status - test to see if the specified phy link is alive

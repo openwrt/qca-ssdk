@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017, 2019, The Linux Foundation. All rights reserved.
  *
-  * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+  * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -811,6 +811,7 @@ sw_error_t qca803x_phy_enable_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 	return rv;
 }
 #ifndef IN_PORTCONTROL_MINI
+#if 0
 /******************************************************************************
 *
 * qca803x_phy_get_ability - get the phy ability
@@ -911,7 +912,7 @@ qca803x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	return SW_OK;
 }
-
+#endif
 /******************************************************************************
 *
 * qca803x_phy_reset_done - reset the phy

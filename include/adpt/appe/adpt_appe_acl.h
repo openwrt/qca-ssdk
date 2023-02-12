@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -38,6 +38,61 @@ extern "C" {
 #define ADPT_ACL_APPE_EXT_UDF0_RULE 17
 #define ADPT_ACL_APPE_EXT_UDF1_RULE 18
 
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+typedef struct{
+	a_uint32_t  tunnel_info:32;
+
+	a_uint32_t  reserved1:12;
+	a_uint32_t  l3_packet_type:3;
+	a_uint32_t  l3_fragment:1;
+	a_uint32_t  reserved0:7;
+	a_uint32_t  tunnel_inner_type:2;
+	a_uint32_t  tunnel_decap_en:1;
+	a_uint32_t  tunnel_type:5;
+	a_uint32_t  tunnel_info_valid:1;
+}ADPT_APPE_ACL_TUNNEL_RULE;
+
+typedef struct{
+	a_uint32_t  tunnel_info_mask:32;
+
+	a_uint32_t  reserved1:12;
+	a_uint32_t  l3_packet_type_mask:3;
+	a_uint32_t  l3_fragment_mask:1;
+	a_uint32_t  reserved0:7;
+	a_uint32_t  tunnel_inner_type_mask:2;
+	a_uint32_t  tunnel_decap_en_mask:1;
+	a_uint32_t  tunnel_type_mask:5;
+	a_uint32_t  tunnel_info_valid_mask:1;
+}ADPT_APPE_ACL_TUNNEL_RULE_MASK;
+
+typedef struct{
+	a_uint32_t udf1:16;
+	a_uint32_t udf0:16;
+
+	a_uint32_t reserved1:11;
+	a_uint32_t is_ip:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t udfprofile_valid:1;
+	a_uint32_t udf1_valid:1;
+	a_uint32_t udf0_valid:1;
+	a_uint32_t reserved:13;
+	a_uint32_t udfprofile:3;
+}ADPT_APPE_ACL_EXT_UDF_RULE;
+
+typedef struct{
+	a_uint32_t udf1_mask:16;
+	a_uint32_t udf0_mask:16;
+
+	a_uint32_t reserved1:11;
+	a_uint32_t is_ip:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t udfprofile_valid:1;
+	a_uint32_t udf1_valid:1;
+	a_uint32_t udf0_valid:1;
+	a_uint32_t reserved:13;
+	a_uint32_t udfprofile_mask:3;
+}ADPT_APPE_ACL_EXT_UDF_RULE_MASK;
+#else
 typedef struct{
 	a_uint32_t  tunnel_info:32;
 	a_uint32_t  tunnel_info_valid:1;
@@ -85,6 +140,7 @@ typedef struct{
 	a_uint32_t is_ipv6:1;
 	a_uint32_t is_ip:1;
 }ADPT_APPE_ACL_EXT_UDF_RULE_MASK;
+#endif
 
 sw_error_t
 _adpt_appe_acl_ext_set(a_uint32_t dev_id, fal_acl_rule_t * rule,

@@ -44,7 +44,7 @@
 struct service_tbl {
 	a_uint32_t  bypass_bitmap:32;
 	a_uint32_t  _reserved0:31;
-        a_uint32_t  rx_counting_en:1;
+	a_uint32_t  rx_counting_en:1;
 };
 
 union service_tbl_u {
@@ -96,11 +96,11 @@ union service_tbl_u {
 
 struct in_l2_service_tbl {
 	a_uint32_t  tx_cnt_en:1;
-        a_uint32_t  rx_cnt_en:1;
-        a_uint32_t  bypass_bitmap:24;
-        a_uint32_t  direction:1;
-        a_uint32_t  dst_port_id:4;
-        a_uint32_t  dst_port_id_valid:1;
+	a_uint32_t  rx_cnt_en:1;
+	a_uint32_t  bypass_bitmap:24;
+	a_uint32_t  direction:1;
+	a_uint32_t  dst_port_id:4;
+	a_uint32_t  dst_port_id_valid:1;
 };
 
 union in_l2_service_tbl_u {
@@ -179,6 +179,8 @@ union in_l2_service_tbl_u {
 #endif
 
 struct eg_service_tbl {
+	a_uint32_t  field_update_action:32;
+
 #if defined(MPPE)
 	a_uint32_t  _reserved0:2;
 	a_uint32_t  ath_port_bitmap:7;
@@ -190,11 +192,10 @@ struct eg_service_tbl {
 #else
 	a_uint32_t  _reserved0:16;
 #endif
-        a_uint32_t  tx_counting_en:1;
-        a_uint32_t  offset_sel:1;
-        a_uint32_t  hw_services:6;
-        a_uint32_t  next_service_code:8;
-	a_uint32_t  field_update_action:32;
+	a_uint32_t  tx_counting_en:1;
+	a_uint32_t  offset_sel:1;
+	a_uint32_t  hw_services:6;
+	a_uint32_t  next_service_code:8;
 };
 
 union eg_service_tbl_u {

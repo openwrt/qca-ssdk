@@ -301,14 +301,14 @@ union uniphy_channel0_input_output_4_u {
 	#define UNIPHY_CHANNEL0_INPUT_OUTPUT_6_NEWADDEDFROMHERE_CH0_LINK_DEFAULT                0
 
 struct uniphy_channel0_input_output_6 {
-	a_uint32_t  newaddedfromhere_ch0_receive_pause_en:1;
-	a_uint32_t  newaddedfromhere_ch0_transmit_pause_en:1;
-	a_uint32_t  newaddedfromhere_ch0_asym_pause:1;
-	a_uint32_t  newaddedfromhere_ch0_pause:1;
-	a_uint32_t  newaddedfromhere_ch0_speed_mode:2;
-	a_uint32_t  newaddedfromhere_ch0_duplex_mode:1;
-	a_uint32_t  newaddedfromhere_ch0_link:1;
 	a_uint32_t  _reserved0:24;
+	a_uint32_t  newaddedfromhere_ch0_link:1;
+	a_uint32_t  newaddedfromhere_ch0_duplex_mode:1;
+	a_uint32_t  newaddedfromhere_ch0_speed_mode:2;
+	a_uint32_t  newaddedfromhere_ch0_pause:1;
+	a_uint32_t  newaddedfromhere_ch0_asym_pause:1;
+	a_uint32_t  newaddedfromhere_ch0_transmit_pause_en:1;
+	a_uint32_t  newaddedfromhere_ch0_receive_pause_en:1;
 };
 
 union uniphy_channel0_input_output_6_u {

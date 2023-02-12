@@ -195,13 +195,16 @@ union ipr_udf_profile_offset_u {
 #endif
 struct eg_ipo_ext_tbl {
 #if defined(MPPE)
-	a_uint32_t  _reserved0:28;
-	a_uint32_t  cookie_pri:4;
 	a_uint32_t  cookie:16;
 #else
 	a_uint32_t  _reserved0:16;
 #endif
 	a_uint32_t  policy_id:16;
+
+#if defined(MPPE)
+	a_uint32_t  _reserved0:28;
+	a_uint32_t  cookie_pri:4;
+#endif
 };
 
 union eg_ipo_ext_tbl_u {
@@ -276,11 +279,8 @@ union eg_ipo_ext_tbl_u {
 	#define PRE_IPO_RULE_REG_INNER_OUTER_SEL_DEFAULT 0x0
 
 struct pre_ipo_rule_reg {
-	a_uint32_t  _reserved0:14;
-	a_uint32_t  inner_outer_sel:1;
-	a_uint32_t  res_chain:1;
-	a_uint32_t  pri:9;
-	a_uint32_t  src_1:7;
+	a_uint32_t  rule_field_0:32;
+
 	a_uint32_t  src_0:1;
 	a_uint32_t  src_type:3;
 	a_uint32_t  rule_type:5;
@@ -288,8 +288,14 @@ struct pre_ipo_rule_reg {
 	a_uint32_t  range_en:1;
 	a_uint32_t  fake_mac_header:1;
 	a_uint32_t  rule_field_1:20;
-	a_uint32_t  rule_field_0:32;
+
+	a_uint32_t  _reserved0:14;
+	a_uint32_t  inner_outer_sel:1;
+	a_uint32_t  res_chain:1;
+	a_uint32_t  pri:9;
+	a_uint32_t  src_1:7;
 };
+
 
 union pre_ipo_rule_reg_u {
 	a_uint32_t val[3];
@@ -314,9 +320,9 @@ union pre_ipo_rule_reg_u {
 	#define PRE_IPO_MASK_REG_MASKFIELD_DEFAULT 0x0
 
 struct pre_ipo_mask_reg {
+	a_uint32_t  maskfield_0:32;
 	a_uint32_t  _reserved0:11;
 	a_uint32_t  maskfield_1:21;
-	a_uint32_t  maskfield_0:32;
 };
 
 union pre_ipo_mask_reg_u {
@@ -584,10 +590,10 @@ union pre_ipo_glb_bypass_counter_u {
 	#define PRE_IPO_CNT_TBL_HIT_BYTE_CNT_DEFAULT 0x0
 
 struct pre_ipo_cnt_tbl {
+	a_uint32_t  hit_pkt_cnt:32;
+	a_uint32_t  hit_byte_cnt_0:32;
 	a_uint32_t  _reserved0:24;
 	a_uint32_t  hit_byte_cnt_1:8;
-	a_uint32_t  hit_byte_cnt_0:32;
-	a_uint32_t  hit_pkt_cnt:32;
 };
 
 union pre_ipo_cnt_tbl_u {
@@ -868,7 +874,6 @@ struct pre_ipo_action {
 	a_uint32_t  ctag_dei:1;
 	a_uint32_t  ctag_dei_change_en:1;
 	a_uint32_t  ctag_pcp_1:1;
-	
 
 	a_uint32_t  cascade_data_0:3;
 	a_uint32_t  cascade_en:1;
@@ -879,9 +884,7 @@ struct pre_ipo_action {
 	a_uint32_t  syn_toggle:1;
 	a_uint32_t  service_code_1:7;
 
-
 	a_uint32_t  vpn_id_0:5;
-
 	a_uint32_t  vpn_type:1;
 	a_uint32_t  vpn_valid:1;
 	a_uint32_t  l4_port:16;

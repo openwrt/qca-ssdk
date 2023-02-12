@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -92,8 +92,246 @@ typedef struct{
 	a_uint8_t free_hw_entry_count;
 }ADPT_HPPE_ACL_HW_LIST;
 
+#if defined(APPE)
+#define VLAN_RULE_SPCP_0_LEN 1
+#define VLAN_RULE_SPCP_MASK_0_LEN 1
+#endif
+
+#if defined(CONFIG_CPU_BIG_ENDIAN)
 typedef struct{
-	a_uint8_t mac[6];
+	a_uint32_t mac_addr_0:32;
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_fake_mac_header:1;
+	a_uint32_t is_snap:1;
+	a_uint32_t is_ethernet:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t is_ip:1;
+	a_uint32_t mac_addr_1:16;
+}ADPT_HPPE_ACL_MAC_RULE;
+typedef struct{
+	a_uint32_t mac_addr_mask_0:32;
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_fake_mac_header_mask:1;
+	a_uint32_t is_snap_mask:1;
+	a_uint32_t is_ethernet_mask:1;
+	a_uint32_t is_ipv6_mask:1;
+	a_uint32_t is_ip_mask:1;
+	a_uint32_t mac_addr_mask_1:16;
+}ADPT_HPPE_ACL_MAC_RULE_MASK;
+
+typedef struct{
+#if defined(APPE)
+	a_uint32_t spcp_0:1;
+#endif
+	a_uint32_t svid:12;
+	a_uint32_t cdei:1;
+	a_uint32_t cpcp:3;
+#if defined(APPE)
+	a_uint32_t reserved:3;
+#else
+	a_uint32_t reserved:4;
+#endif
+	a_uint32_t cvid:12;/*it is min cvid when range is enable*/
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_fake_mac_header:1;
+	a_uint32_t is_snap:1;
+	a_uint32_t is_ethernet:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t is_ip:1;
+	a_uint32_t vsi_valid:1;
+#if defined(APPE)
+	a_uint32_t vsi:6;
+#else
+	a_uint32_t vsi:5;
+#endif
+	a_uint32_t stag_fmt:3;
+	a_uint32_t ctag_fmt:3;
+	a_uint32_t sdei:1;
+#if defined(APPE)
+	a_uint32_t spcp_1:2;
+#else
+	a_uint32_t spcp:3;
+#endif
+}ADPT_HPPE_ACL_VLAN_RULE;
+
+typedef struct{
+#if defined(APPE)
+	a_uint32_t spcp_mask_0:1;
+#endif
+	a_uint32_t svid_mask:12;
+	a_uint32_t cdei_mask:1;
+	a_uint32_t cpcp_mask:3;
+#if defined(APPE)
+	a_uint32_t reserved:3;
+#else
+	a_uint32_t reserved:4;
+#endif
+	a_uint32_t cvid_mask:12;/*it is max cvid when range is enable*/
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_fake_mac_header_mask:1;
+	a_uint32_t is_snap_mask:1;
+	a_uint32_t is_ethernet_mask:1;
+	a_uint32_t is_ipv6_mask:1;
+	a_uint32_t is_ip_mask:1;
+	a_uint32_t vsi_valid_mask:1;
+#if defined(APPE)
+	a_uint32_t vsi_mask:6;
+#else
+	a_uint32_t vsi_mask:5;
+#endif
+	a_uint32_t stag_fmt_mask:3;
+	a_uint32_t ctag_fmt_mask:3;
+	a_uint32_t sdei_mask:1;
+#if defined(APPE)
+	a_uint32_t spcp_mask_1:2;
+#else
+	a_uint32_t spcp_mask:3;
+#endif
+}ADPT_HPPE_ACL_VLAN_RULE_MASK;
+
+typedef struct{
+	a_uint32_t l2prot:16;
+	a_uint32_t reserved:4;
+	a_uint32_t svid:12;/*it is min svid when range is enable*/
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_fake_mac_header:1;
+	a_uint32_t is_snap:1;
+	a_uint32_t is_ethernet:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t is_ip:1;
+	a_uint32_t pppoe_sessionid:16;
+}ADPT_HPPE_ACL_L2MISC_RULE;
+
+typedef struct{
+	a_uint32_t l2prot_mask:16;
+	a_uint32_t reserved:4;
+	a_uint32_t svid_mask:12;/*it is max svid when range is enable*/
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_fake_mac_header_mask:1;
+	a_uint32_t is_snap_mask:1;
+	a_uint32_t is_ethernet_mask:1;
+	a_uint32_t is_ipv6_mask:1;
+	a_uint32_t is_ip_mask:1;
+	a_uint32_t pppoe_sessionid_mask:16;
+}ADPT_HPPE_ACL_L2MISC_RULE_MASK;
+
+typedef struct{
+	a_uint32_t ip_0:16;
+	a_uint32_t l4_port:16;/*it is min dport when range is enable*/
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_ip:1;
+	a_uint32_t l3_packet_type:3;
+	a_uint32_t l3_fragment:1;
+	a_uint32_t ip_1:16;
+}ADPT_HPPE_ACL_IPV4_RULE;
+
+typedef struct{
+	a_uint32_t ip_mask_0:16;
+	a_uint32_t l4_port_mask:16;/*it is min dport when range is enable*/
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_ip_mask:1;
+	a_uint32_t l3_packet_type_mask:3;
+	a_uint32_t l3_fragment_mask:1;
+	a_uint32_t ip_mask_1:16;
+}ADPT_HPPE_ACL_IPV4_RULE_MASK;
+
+typedef struct{
+	a_uint32_t udf1:16;
+	a_uint32_t udf0:16;
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_ip:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t udf2_valid:1;
+	a_uint32_t udf1_valid:1;
+	a_uint32_t udf0_valid:1;
+	a_uint32_t udf2:16;
+}ADPT_HPPE_ACL_UDF_RULE;
+
+typedef struct{
+	a_uint32_t udf1_mask:16;
+	a_uint32_t udf0_mask:16;
+
+	a_uint32_t _reserved0:11;
+	a_uint32_t is_ip:1;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t udf2_valid:1;
+	a_uint32_t udf1_valid:1;
+	a_uint32_t udf0_valid:1;
+	a_uint32_t udf2_mask:16;
+}ADPT_HPPE_ACL_UDF_RULE_MASK;
+
+typedef struct{
+	a_uint32_t ip_ext_1:16;
+	a_uint32_t ip_port:16; /*it is port when DIP_2_RULE or SIP_2_RULE*/
+
+	a_uint32_t _reserved0:12;
+	a_uint32_t l3_packet_type:3;
+	a_uint32_t l3_fragment:1;
+	a_uint32_t ip_ext_2:16;
+}ADPT_HPPE_ACL_IPV6_RULE;
+
+typedef struct{
+	a_uint32_t ip_ext_1_mask:16;
+	a_uint32_t ip_port_mask:16; /*it is port when DIP_2_RULE or SIP_2_RULE*/
+
+	a_uint32_t _reserved0:12;
+	a_uint32_t l3_packet_type_mask:3;
+	a_uint32_t l3_fragment_mask:1;
+	a_uint32_t ip_ext_2_mask:16;
+}ADPT_HPPE_ACL_IPV6_RULE_MASK;
+
+typedef struct{
+	a_uint32_t l3_dscp_tc:8;
+	a_uint32_t l3_prot:8; /*ipv4 protocol or ipv6 next header*/
+	a_uint32_t l3_length:16;/*it is min length when range is enable*/
+
+	a_uint32_t reserved1:14;
+	a_uint32_t is_ipv6:1;
+	a_uint32_t l3_fragment:1;
+	a_uint32_t reserved0:1;
+	a_uint32_t other_header:1;
+	a_uint32_t fragment_header:1;
+	a_uint32_t mobility_header:1;
+	a_uint32_t esp_header:1;
+	a_uint32_t ah_header:1;
+	a_uint32_t l3_ttl:2; /*ipv4 ttl, ipv6 hop limit*/
+	a_uint32_t ipv4_option_state:1;
+	a_uint32_t tcp_flags:6;
+	a_uint32_t first_fragment:1;
+}ADPT_HPPE_ACL_IPMISC_RULE;
+
+typedef struct{
+	a_uint32_t l3_dscp_tc_mask:8;
+	a_uint32_t l3_prot_mask:8; /*ipv4 protocol or ipv6 next header*/
+	a_uint32_t l3_length_mask:16;/*it is max length when range is enable*/
+
+	a_uint32_t reserved1:14;
+	a_uint32_t is_ipv6_mask:1;
+	a_uint32_t l3_fragment_mask:1;
+	a_uint32_t reserved0:1;
+	a_uint32_t other_header_mask:1;
+	a_uint32_t fragment_header_mask:1;
+	a_uint32_t mobility_header_mask:1;
+	a_uint32_t esp_header_mask:1;
+	a_uint32_t ah_header_mask:1;
+	a_uint32_t l3_ttl_mask:2; /*ipv4 ttl, ipv6 hop limit*/
+	a_uint32_t ipv4_option_state_mask:1;
+	a_uint32_t tcp_flags_mask:6;
+	a_uint32_t first_fragment_mask:1;
+}ADPT_HPPE_ACL_IPMISC_RULE_MASK;
+#else
+typedef struct{
+	a_uint32_t  mac_addr_0:32;
+	a_uint32_t  mac_addr_1:16;
 	a_uint32_t is_ip:1;
 	a_uint32_t is_ipv6:1;
 	a_uint32_t is_ethernet:1;
@@ -101,7 +339,8 @@ typedef struct{
 	a_uint32_t is_fake_mac_header:1;
 }ADPT_HPPE_ACL_MAC_RULE;
 typedef struct{
-	a_uint8_t mac_mask[6];
+	a_uint32_t  mac_addr_mask_0:32;
+	a_uint32_t  mac_addr_mask_1:16;
 	a_uint32_t is_ip_mask:1;
 	a_uint32_t is_ipv6_mask:1;
 	a_uint32_t is_ethernet_mask:1;
@@ -109,88 +348,71 @@ typedef struct{
 	a_uint32_t is_fake_mac_header_mask:1;
 }ADPT_HPPE_ACL_MAC_RULE_MASK;
 
-#if defined(APPE)
-#define VLAN_RULE_SPCP_0_LEN 1
-#define VLAN_RULE_SPCP_MASK_0_LEN 1
-
-typedef struct{
-        a_uint32_t cvid:12;/*it is min cvid when range is enable*/
-        a_uint32_t reserved:3;
-        a_uint32_t cpcp:3;
-        a_uint32_t cdei:1;
-        a_uint32_t svid:12;
-        a_uint32_t spcp_0:1;
-        a_uint32_t spcp_1:2;
-        a_uint32_t sdei:1;
-        a_uint32_t ctag_fmt:3;
-        a_uint32_t stag_fmt:3;
-        a_uint32_t vsi:6;
-        a_uint32_t vsi_valid:1;
-        a_uint32_t is_ip:1;
-        a_uint32_t is_ipv6:1;
-        a_uint32_t is_ethernet:1;
-        a_uint32_t is_snap:1;
-        a_uint32_t is_fake_mac_header:1;
-}ADPT_HPPE_ACL_VLAN_RULE;
-
-typedef struct{
-        a_uint32_t cvid_mask:12;/*it is max cvid when range is enable*/
-        a_uint32_t reserved:3;
-        a_uint32_t cpcp_mask:3;
-        a_uint32_t cdei_mask:1;
-        a_uint32_t svid_mask:12;
-        a_uint32_t spcp_mask_0:1;
-        a_uint32_t spcp_mask_1:2;
-        a_uint32_t sdei_mask:1;
-        a_uint32_t ctag_fmt_mask:3;
-        a_uint32_t stag_fmt_mask:3;
-        a_uint32_t vsi_mask:6;
-        a_uint32_t vsi_valid_mask:1;
-        a_uint32_t is_ip_mask:1;
-        a_uint32_t is_ipv6_mask:1;
-        a_uint32_t is_ethernet_mask:1;
-        a_uint32_t is_snap_mask:1;
-        a_uint32_t is_fake_mac_header_mask:1;
-}ADPT_HPPE_ACL_VLAN_RULE_MASK;
-#else
 typedef struct{
 	a_uint32_t cvid:12;/*it is min cvid when range is enable*/
+#if defined(APPE)
+	a_uint32_t reserved:3;
+#else
 	a_uint32_t reserved:4;
+#endif
 	a_uint32_t cpcp:3;
 	a_uint32_t cdei:1;
 	a_uint32_t svid:12;
+#if defined(APPE)
+	a_uint32_t spcp_0:1;
+	a_uint32_t spcp_1:2;
+#else
 	a_uint32_t spcp:3;
+#endif
 	a_uint32_t sdei:1;
 	a_uint32_t ctag_fmt:3;
 	a_uint32_t stag_fmt:3;
+#if defined(APPE)
+	a_uint32_t vsi:6;
+#else
 	a_uint32_t vsi:5;
+#endif
 	a_uint32_t vsi_valid:1;
 	a_uint32_t is_ip:1;
 	a_uint32_t is_ipv6:1;
 	a_uint32_t is_ethernet:1;
 	a_uint32_t is_snap:1;
 	a_uint32_t is_fake_mac_header:1;
+	a_uint32_t _reserved0:11;
 }ADPT_HPPE_ACL_VLAN_RULE;
 
 typedef struct{
 	a_uint32_t cvid_mask:12;/*it is max cvid when range is enable*/
+#if defined(APPE)
+	a_uint32_t reserved:3;
+#else
 	a_uint32_t reserved:4;
+#endif
 	a_uint32_t cpcp_mask:3;
 	a_uint32_t cdei_mask:1;
 	a_uint32_t svid_mask:12;
+#if defined(APPE)
+	a_uint32_t spcp_mask_0:1;
+	a_uint32_t spcp_mask_1:2;
+#else
 	a_uint32_t spcp_mask:3;
+#endif
 	a_uint32_t sdei_mask:1;
 	a_uint32_t ctag_fmt_mask:3;
 	a_uint32_t stag_fmt_mask:3;
+#if defined(APPE)
+	a_uint32_t vsi_mask:6;
+#else
 	a_uint32_t vsi_mask:5;
+#endif
 	a_uint32_t vsi_valid_mask:1;
 	a_uint32_t is_ip_mask:1;
 	a_uint32_t is_ipv6_mask:1;
 	a_uint32_t is_ethernet_mask:1;
 	a_uint32_t is_snap_mask:1;
 	a_uint32_t is_fake_mac_header_mask:1;
+	a_uint32_t _reserved0:11;
 }ADPT_HPPE_ACL_VLAN_RULE_MASK;
-#endif
 
 typedef struct{
 	a_uint32_t svid:12;/*it is min svid when range is enable*/
@@ -258,7 +480,6 @@ typedef struct{
 	a_uint32_t is_ip:1;
 }ADPT_HPPE_ACL_UDF_RULE_MASK;
 
-
 typedef struct{
 	a_uint32_t ip_port:16; /*it is port when DIP_2_RULE or SIP_2_RULE*/
 	a_uint32_t ip_ext_1:16;
@@ -314,6 +535,7 @@ typedef struct{
 	a_uint32_t is_ipv6_mask:1;
 	a_uint32_t reserved1:3;
 }ADPT_HPPE_ACL_IPMISC_RULE_MASK;
+#endif
 
 static ADPT_HPPE_ACL_SW_LIST_HEAD g_acl_sw_list[SW_MAX_NR_DEV];
 #if defined(APPE)
@@ -750,33 +972,35 @@ sw_error_t _adpt_hppe_acl_mac_rule_hw_2_sw(a_uint32_t is_mac_da,
 {
 	if(is_mac_da)
 	{
-		rule->dest_mac_val.uc[0] = macrule->mac[5];
-		rule->dest_mac_val.uc[1] = macrule->mac[4];
-		rule->dest_mac_val.uc[2] = macrule->mac[3];
-		rule->dest_mac_val.uc[3] = macrule->mac[2];
-		rule->dest_mac_val.uc[4] = macrule->mac[1];
-		rule->dest_mac_val.uc[5] = macrule->mac[0];
-		rule->dest_mac_mask.uc[0] = macrule_mask->mac_mask[5];
-		rule->dest_mac_mask.uc[1] = macrule_mask->mac_mask[4];
-		rule->dest_mac_mask.uc[2] = macrule_mask->mac_mask[3];
-		rule->dest_mac_mask.uc[3] = macrule_mask->mac_mask[2];
-		rule->dest_mac_mask.uc[4] = macrule_mask->mac_mask[1];
-		rule->dest_mac_mask.uc[5] = macrule_mask->mac_mask[0];
+		rule->dest_mac_val.uc[5] = macrule->mac_addr_0;
+		rule->dest_mac_val.uc[4] = macrule->mac_addr_0 >> 8;
+		rule->dest_mac_val.uc[3] = macrule->mac_addr_0 >> 16;
+		rule->dest_mac_val.uc[2] = macrule->mac_addr_0 >> 24;
+		rule->dest_mac_val.uc[1] = macrule->mac_addr_1;
+		rule->dest_mac_val.uc[0] = macrule->mac_addr_1 >> 8;
+
+		rule->dest_mac_mask.uc[5] = macrule_mask->mac_addr_mask_0;
+		rule->dest_mac_mask.uc[4] = macrule_mask->mac_addr_mask_0 >> 8;
+		rule->dest_mac_mask.uc[3] = macrule_mask->mac_addr_mask_0 >> 16;
+		rule->dest_mac_mask.uc[2] = macrule_mask->mac_addr_mask_0 >> 24;
+		rule->dest_mac_mask.uc[1] = macrule_mask->mac_addr_mask_1;
+		rule->dest_mac_mask.uc[0] = macrule_mask->mac_addr_mask_1 >> 8;
 	}
 	else
 	{
-		rule->src_mac_val.uc[0] = macrule->mac[5];
-		rule->src_mac_val.uc[1] = macrule->mac[4];
-		rule->src_mac_val.uc[2] = macrule->mac[3];
-		rule->src_mac_val.uc[3] = macrule->mac[2];
-		rule->src_mac_val.uc[4] = macrule->mac[1];
-		rule->src_mac_val.uc[5] = macrule->mac[0];
-		rule->src_mac_mask.uc[0] = macrule_mask->mac_mask[5];
-		rule->src_mac_mask.uc[1] = macrule_mask->mac_mask[4];
-		rule->src_mac_mask.uc[2] = macrule_mask->mac_mask[3];
-		rule->src_mac_mask.uc[3] = macrule_mask->mac_mask[2];
-		rule->src_mac_mask.uc[4] = macrule_mask->mac_mask[1];
-		rule->src_mac_mask.uc[5] = macrule_mask->mac_mask[0];
+		rule->src_mac_val.uc[5] = macrule->mac_addr_0;
+		rule->src_mac_val.uc[4] = macrule->mac_addr_0 >> 8;
+		rule->src_mac_val.uc[3] = macrule->mac_addr_0 >> 16;
+		rule->src_mac_val.uc[2] = macrule->mac_addr_0 >> 24;
+		rule->src_mac_val.uc[1] = macrule->mac_addr_1;
+		rule->src_mac_val.uc[0] = macrule->mac_addr_1 >> 8;
+
+		rule->src_mac_mask.uc[5] = macrule_mask->mac_addr_mask_0;
+		rule->src_mac_mask.uc[4] = macrule_mask->mac_addr_mask_0 >> 8;
+		rule->src_mac_mask.uc[3] = macrule_mask->mac_addr_mask_0 >> 16;
+		rule->src_mac_mask.uc[2] = macrule_mask->mac_addr_mask_0 >> 24;
+		rule->src_mac_mask.uc[1] = macrule_mask->mac_addr_mask_1;
+		rule->src_mac_mask.uc[0] = macrule_mask->mac_addr_mask_1 >> 8;
 	}
 	if(A_FALSE == _adpt_acl_zero_addr(rule->dest_mac_mask))
 	{
@@ -2433,36 +2657,38 @@ sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_m
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_DA))
 		{
-			macrule->mac[5] = rule->dest_mac_val.uc[0];
-			macrule->mac[4] = rule->dest_mac_val.uc[1];
-			macrule->mac[3] = rule->dest_mac_val.uc[2];
-			macrule->mac[2] = rule->dest_mac_val.uc[3];
-			macrule->mac[1] = rule->dest_mac_val.uc[4];
-			macrule->mac[0] = rule->dest_mac_val.uc[5];
-			macrule_mask->mac_mask[5] = rule->dest_mac_mask.uc[0];
-			macrule_mask->mac_mask[4] = rule->dest_mac_mask.uc[1];
-			macrule_mask->mac_mask[3] = rule->dest_mac_mask.uc[2];
-			macrule_mask->mac_mask[2] = rule->dest_mac_mask.uc[3];
-			macrule_mask->mac_mask[1] = rule->dest_mac_mask.uc[4];
-			macrule_mask->mac_mask[0] = rule->dest_mac_mask.uc[5];
+			macrule->mac_addr_0 = rule->dest_mac_val.uc[5] | \
+							rule->dest_mac_val.uc[4] << 8 | \
+							rule->dest_mac_val.uc[3] << 16 | \
+							rule->dest_mac_val.uc[2] << 24;
+			macrule->mac_addr_1 = rule->dest_mac_val.uc[1] | \
+							rule->dest_mac_val.uc[0] << 8;
+
+			macrule_mask->mac_addr_mask_0 = rule->dest_mac_mask.uc[5] | \
+							rule->dest_mac_mask.uc[4] << 8 | \
+							rule->dest_mac_mask.uc[3] << 16 | \
+							rule->dest_mac_mask.uc[2] << 24;
+			macrule_mask->mac_addr_mask_1 = rule->dest_mac_mask.uc[1] | \
+							rule->dest_mac_mask.uc[0] << 8;
 		}
 	}
 	else
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_SA))
 		{
-			macrule->mac[5] = rule->src_mac_val.uc[0];
-			macrule->mac[4] = rule->src_mac_val.uc[1];
-			macrule->mac[3] = rule->src_mac_val.uc[2];
-			macrule->mac[2] = rule->src_mac_val.uc[3];
-			macrule->mac[1] = rule->src_mac_val.uc[4];
-			macrule->mac[0] = rule->src_mac_val.uc[5];
-			macrule_mask->mac_mask[5] = rule->src_mac_mask.uc[0];
-			macrule_mask->mac_mask[4] = rule->src_mac_mask.uc[1];
-			macrule_mask->mac_mask[3] = rule->src_mac_mask.uc[2];
-			macrule_mask->mac_mask[2] = rule->src_mac_mask.uc[3];
-			macrule_mask->mac_mask[1] = rule->src_mac_mask.uc[4];
-			macrule_mask->mac_mask[0] = rule->src_mac_mask.uc[5];
+			macrule->mac_addr_0 = rule->src_mac_val.uc[5] | \
+							rule->src_mac_val.uc[4] << 8 | \
+							rule->src_mac_val.uc[3] << 16 | \
+							rule->src_mac_val.uc[2] << 24;
+			macrule->mac_addr_1 = rule->src_mac_val.uc[1] | \
+							rule->src_mac_val.uc[0] << 8;
+
+			macrule_mask->mac_addr_mask_0 = rule->src_mac_mask.uc[5] | \
+							rule->src_mac_mask.uc[4] << 8 | \
+							rule->src_mac_mask.uc[3] << 16 | \
+							rule->src_mac_mask.uc[2] << 24;
+			macrule_mask->mac_addr_mask_1 = rule->src_mac_mask.uc[1] | \
+							rule->src_mac_mask.uc[0] << 8;
 		}
 	}
 

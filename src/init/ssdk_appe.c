@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -351,7 +351,7 @@ fal_port_tdm_tick_cfg_t mppe_port_tdm0_tbl[] = {
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 0},
-	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 0},
+	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 1},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 1},
 	{A_TRUE, FAL_PORT_TDB_DIR_INGRESS, 2},
 	{A_TRUE, FAL_PORT_TDB_DIR_EGRESS, 2},
@@ -379,8 +379,8 @@ fal_port_scheduler_cfg_t mppe_port_scheduler0_tbl[] = {
 	{0x0, 0x1, 0, 0x0, 0},
 	{0x0, 0x2, 1, 0x0, 0},
 	{0x0, 0x0, 2, 0x0, 0},
-	{0x0, 0x1, 0, 0x0, 0},
-	{0x0, 0x1, 2, 0x0, 0},
+	{0x0, 0x0, 1, 0x0, 0},
+	{0x0, 0x0, 2, 0x0, 0},
 	{0x0, 0x0, 1, 0x0, 0},
 };
 #endif

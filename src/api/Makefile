@@ -1,4 +1,4 @@
-LOC_DIR=src/sal
+LOC_DIR=src/api
 LIB=API
 
 include $(PRJ_PATH)/make/config.mk

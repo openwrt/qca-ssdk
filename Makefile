@@ -12,6 +12,9 @@ include ./make/$(OS)_opt.mk
 SUB_DIR=$(patsubst %/, %, $(dir $(wildcard src/*/Makefile)))
 SUB_LIB=$(subst src/, , $(SUB_DIR))
 
+####################################################################
+# 			SSDK-Style Makefile
+####################################################################
 all: $(BIN_DIR) kslib
 	mkdir -p ./temp/;cd ./temp;cp ../build/bin/ssdk_ks_km.a ./;ar -x ssdk_ks_km.a; cp ../ko_Makefile ./Makefile;
 	make -C $(SYS_PATH) M=$(PRJ_PATH)/temp/ CROSS_COMPILE=$(TOOLPREFIX) modules
@@ -19,6 +22,18 @@ all: $(BIN_DIR) kslib
 	cp temp/*.ko build/bin;
 	rm -Rf ./temp/*.o ./temp/*.ko ./temp/*.a
 	@echo "---Build [SSDK-$(VERSION)] at $(BUILD_DATE) finished."
+
+####################################################################
+# 			LNX Modules-Style Makefile
+####################################################################
+modules: $(BIN_DIR) kslib_c
+	cp Makefile.modules ./Makefile;
+	make -C $(SYS_PATH) M=$(PRJ_PATH)/ $(LNX_MAKEOPTS) modules
+	cp *.ko build/bin;
+	@echo "---Build [SSDK-$(VERSION)] at $(BUILD_DATE) finished."
+
+kslib_c:
+	$(foreach i, $(SUB_LIB), $(MAKE) MODULE_TYPE=KSLIB -C src/$i src_list_loop || exit 1;)
 
 kslib:kslib_o
 	$(AR) -r $(BIN_DIR)/$(KS_MOD)_$(RUNMODE).a $(wildcard $(BLD_DIR)/KSLIB/*.o)

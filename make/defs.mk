@@ -7,6 +7,7 @@ ifeq (,$(findstring $(LIB), $(COMPONENTS)))
 endif
 
 SRC_FILE=$(addprefix $(PRJ_PATH)/$(LOC_DIR)/, $(SRC_LIST))
+LOC_SRC_FILE=$(addprefix $(LOC_DIR)/, $(SRC_LIST))
 
 OBJ_LIST=$(SRC_LIST:.c=.o)
 OBJ_FILE=$(addprefix $(DST_DIR)/, $(OBJ_LIST))

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -2468,7 +2470,7 @@ isisc_nat_init(a_uint32_t dev_id)
 	p_api->flow_get = mht_flow_get;
 	p_api->flow_next = mht_flow_next;
 	p_api->flow_counter_bind = mht_flow_counter_bind;
-	aos_lock_init(&mht_nat_lock);
+	aos_mutex_lock_init(&mht_nat_lock);
 #endif
     }
 #endif

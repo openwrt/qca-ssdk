@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012,2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -20,6 +22,7 @@
 
 
 typedef aos_lock_pvt_t aos_lock_t;
+typedef aos_mutex_lock_pvt_t aos_mutex_lock_t;
 
 
 #define aos_lock_init(lock)  __aos_lock_init(lock)
@@ -40,6 +43,12 @@ typedef aos_lock_pvt_t aos_lock_t;
 
 #define aos_irq_restore(flags) __aos_irq_restore(flags)
 
+
+#define aos_mutex_lock_init(lock)  __aos_mutex_lock_init(lock)
+
+#define aos_mutex_lock(lock) __aos_mutex_lock(lock)
+
+#define aos_mutex_unlock(lock) __aos_mutex_unlock(lock)
 
 #define aos_default_unlock  __aos_default_unlock
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021,2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,7 +23,7 @@ extern "C" {
 #endif                          /* __cplusplus */
 
 #include "fal_nat.h"
-extern aos_lock_t mht_nat_lock;
+extern aos_mutex_lock_t mht_nat_lock;
 
 sw_error_t
 mht_flow_add(a_uint32_t dev_id, fal_napt_entry_t * napt_entry);

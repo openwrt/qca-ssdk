@@ -15,36 +15,34 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_servcode_reg_be.h"
-#else
+
 /**
  * @defgroup
  * @{
  */
-#ifndef APPE_SERVCODE_REG_H
-#define APPE_SERVCODE_REG_H
+#ifndef APPE_GENEVE_REG_H
+#define APPE_GENEVE_REG_H
 
-/*[table] TL_SERVICE_TBL*/
-#define TL_SERVICE_TBL
-#define TL_SERVICE_TBL_ADDRESS 0x6000
-#define TL_SERVICE_TBL_NUM     256
-#define TL_SERVICE_TBL_INC     0x4
-#define TL_SERVICE_TBL_TYPE    REG_TYPE_RW
-#define TL_SERVICE_TBL_DEFAULT 0x0
-	/*[field] BYPASS_BITMAP*/
-	#define TL_SERVICE_TBL_BYPASS_BITMAP
-	#define TL_SERVICE_TBL_BYPASS_BITMAP_OFFSET  0
-	#define TL_SERVICE_TBL_BYPASS_BITMAP_LEN     32
-	#define TL_SERVICE_TBL_BYPASS_BITMAP_DEFAULT 0x0
+/*[register] TPR_GENEVE_CFG*/
+#define TPR_GENEVE_CFG
+#define TPR_GENEVE_CFG_ADDRESS 0x4a8
+#define TPR_GENEVE_CFG_NUM     1
+#define TPR_GENEVE_CFG_INC     0x4
+#define TPR_GENEVE_CFG_TYPE    REG_TYPE_RW
+#define TPR_GENEVE_CFG_DEFAULT 0x0
+        /*[field] UDP_PORT_MAP*/
+        #define TPR_GENEVE_CFG_UDP_PORT_MAP
+        #define TPR_GENEVE_CFG_UDP_PORT_MAP_OFFSET  0
+        #define TPR_GENEVE_CFG_UDP_PORT_MAP_LEN     6
+        #define TPR_GENEVE_CFG_UDP_PORT_MAP_DEFAULT 0x0
 
-struct tl_service_tbl {
-	a_uint32_t  bypass_bitmap:32;
+struct tpr_geneve_cfg {
+        a_uint32_t  _reserved0:26;
+        a_uint32_t  udp_port_map:6;
 };
 
-union tl_service_tbl_u {
-	a_uint32_t val;
-	struct tl_service_tbl bf;
+union tpr_geneve_cfg_u {
+        a_uint32_t val;
+        struct tpr_geneve_cfg bf;
 };
-#endif
 #endif

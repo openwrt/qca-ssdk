@@ -43,9 +43,10 @@
 
 struct my_mac_tbl {
 	a_uint32_t  mac_da_0:32;
-	a_uint32_t  mac_da_1:16;
-	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0:15;
+	a_uint32_t  valid:1;
+	a_uint32_t  mac_da_1:16;
 };
 
 union my_mac_tbl_u {
@@ -97,13 +98,13 @@ union my_mac_tbl_u {
 	#define L3_VSI_L2_IPV6_MC_MODE_DEFAULT 0x0
 
 struct l3_vsi {
-	a_uint32_t  l3_if_valid:1;
-	a_uint32_t  l3_if_index:8;
-	a_uint32_t  l2_ipv4_mc_en:1;
-	a_uint32_t  l2_ipv4_mc_mode:1;
-	a_uint32_t  l2_ipv6_mc_en:1;
-	a_uint32_t  l2_ipv6_mc_mode:1;
 	a_uint32_t  _reserved0:19;
+	a_uint32_t  l2_ipv6_mc_mode:1;
+	a_uint32_t  l2_ipv6_mc_en:1;
+	a_uint32_t  l2_ipv4_mc_mode:1;
+	a_uint32_t  l2_ipv4_mc_en:1;
+	a_uint32_t  l3_if_index:8;
+	a_uint32_t  l3_if_valid:1;
 };
 
 union l3_vsi_u {
@@ -245,30 +246,30 @@ union l3_vsi_u {
 	#define L3_VSI_EXT_IP_ND_SRC_UNK_CMD_DEFAULT 0x0
 
 struct l3_vsi_ext {
-	a_uint32_t  ipv4_sg_en:1;
-	a_uint32_t  ipv4_sg_vio_cmd:2;
-	a_uint32_t  ipv4_sg_port_en:1;
-	a_uint32_t  ipv4_sg_svlan_en:1;
-	a_uint32_t  ipv4_sg_cvlan_en:1;
-	a_uint32_t  ipv4_src_unk_cmd:2;
-	a_uint32_t  ipv6_sg_en:1;
-	a_uint32_t  ipv6_sg_vio_cmd:2;
-	a_uint32_t  ipv6_sg_port_en:1;
-	a_uint32_t  ipv6_sg_svlan_en:1;
-	a_uint32_t  ipv6_sg_cvlan_en:1;
-	a_uint32_t  ipv6_src_unk_cmd:2;
-	a_uint32_t  ip_arp_sg_en:1;
-	a_uint32_t  ip_arp_sg_vio_cmd:2;
-	a_uint32_t  ip_arp_sg_port_en:1;
-	a_uint32_t  ip_arp_sg_svlan_en:1;
-	a_uint32_t  ip_arp_sg_cvlan_en:1;
-	a_uint32_t  ip_arp_src_unk_cmd:2;
-	a_uint32_t  ip_nd_sg_en:1;
-	a_uint32_t  ip_nd_sg_vio_cmd:2;
-	a_uint32_t  ip_nd_sg_port_en:1;
-	a_uint32_t  ip_nd_sg_svlan_en:1;
-	a_uint32_t  ip_nd_sg_cvlan_en:1;
 	a_uint32_t  ip_nd_src_unk_cmd:2;
+	a_uint32_t  ip_nd_sg_cvlan_en:1;
+	a_uint32_t  ip_nd_sg_svlan_en:1;
+	a_uint32_t  ip_nd_sg_port_en:1;
+	a_uint32_t  ip_nd_sg_vio_cmd:2;
+	a_uint32_t  ip_nd_sg_en:1;
+	a_uint32_t  ip_arp_src_unk_cmd:2;
+	a_uint32_t  ip_arp_sg_cvlan_en:1;
+	a_uint32_t  ip_arp_sg_svlan_en:1;
+	a_uint32_t  ip_arp_sg_port_en:1;
+	a_uint32_t  ip_arp_sg_vio_cmd:2;
+	a_uint32_t  ip_arp_sg_en:1;
+	a_uint32_t  ipv6_src_unk_cmd:2;
+	a_uint32_t  ipv6_sg_cvlan_en:1;
+	a_uint32_t  ipv6_sg_svlan_en:1;
+	a_uint32_t  ipv6_sg_port_en:1;
+	a_uint32_t  ipv6_sg_vio_cmd:2;
+	a_uint32_t  ipv6_sg_en:1;
+	a_uint32_t  ipv4_src_unk_cmd:2;
+	a_uint32_t  ipv4_sg_cvlan_en:1;
+	a_uint32_t  ipv4_sg_svlan_en:1;
+	a_uint32_t  ipv4_sg_port_en:1;
+	a_uint32_t  ipv4_sg_vio_cmd:2;
+	a_uint32_t  ipv4_sg_en:1;
 };
 
 union l3_vsi_ext_u {
@@ -332,9 +333,9 @@ union network_route_ip_u {
 	#define NETWORK_ROUTE_IP_EXT_ENTRY_TYPE_DEFAULT 0x0
 
 struct network_route_ip_ext {
-	a_uint32_t  valid:1;
-	a_uint32_t  entry_type:1;
 	a_uint32_t  _reserved0:30;
+	a_uint32_t  entry_type:1;
+	a_uint32_t  valid:1;
 };
 
 union network_route_ip_ext_u {
@@ -370,10 +371,10 @@ union network_route_ip_ext_u {
 	#define NETWORK_ROUTE_ACTION_LAN_WAN_DEFAULT 0x0
 
 struct network_route_action {
-	a_uint32_t  fwd_cmd:2;
-	a_uint32_t  dst_info:14;
-	a_uint32_t  lan_wan:1;
 	a_uint32_t  _reserved0:15;
+	a_uint32_t  lan_wan:1;
+	a_uint32_t  dst_info:14;
+	a_uint32_t  fwd_cmd:2;
 };
 
 union network_route_action_u {
@@ -490,26 +491,26 @@ union network_route_action_u {
 	#define L3_ROUTE_CTRL_PPPOE_MULTICAST_DE_ACCE_DEFAULT 0x0
 
 struct l3_route_ctrl {
-	a_uint32_t  ip_mru_check_fail:2;
-	a_uint32_t  ip_mru_check_fail_de_acce:1;
-	a_uint32_t  ip_mtu_fail:2;
-	a_uint32_t  ip_mtu_fail_de_acce:1;
-	a_uint32_t  ip_mtu_df_fail:2;
-	a_uint32_t  ip_mtu_df_fail_de_acce:1;
-	a_uint32_t  ip_prefix_bc_cmd:2;
-	a_uint32_t  ip_prefix_bc_de_acce:1;
-	a_uint32_t  flow_src_if_check_cmd:2;
-	a_uint32_t  flow_src_if_check_de_acce:1;
-	a_uint32_t  flow_service_code_loop:2;
-	a_uint32_t  flow_service_code_loop_de_acce:1;
-	a_uint32_t  flow_de_acce_cmd:2;
-	a_uint32_t  flow_sync_mismatch_cmd:2;
-	a_uint32_t  flow_sync_mismatch_de_acce:1;
-	a_uint32_t  icmp_rdt_cmd:2;
-	a_uint32_t  icmp_rdt_de_acce:1;
-	a_uint32_t  pppoe_multicast_cmd:2;
-	a_uint32_t  pppoe_multicast_de_acce:1;
 	a_uint32_t  _reserved0:3;
+	a_uint32_t  pppoe_multicast_de_acce:1;
+	a_uint32_t  pppoe_multicast_cmd:2;
+	a_uint32_t  icmp_rdt_de_acce:1;
+	a_uint32_t  icmp_rdt_cmd:2;
+	a_uint32_t  flow_sync_mismatch_de_acce:1;
+	a_uint32_t  flow_sync_mismatch_cmd:2;
+	a_uint32_t  flow_de_acce_cmd:2;
+	a_uint32_t  flow_service_code_loop_de_acce:1;
+	a_uint32_t  flow_service_code_loop:2;
+	a_uint32_t  flow_src_if_check_de_acce:1;
+	a_uint32_t  flow_src_if_check_cmd:2;
+	a_uint32_t  ip_prefix_bc_de_acce:1;
+	a_uint32_t  ip_prefix_bc_cmd:2;
+	a_uint32_t  ip_mtu_df_fail_de_acce:1;
+	a_uint32_t  ip_mtu_df_fail:2;
+	a_uint32_t  ip_mtu_fail_de_acce:1;
+	a_uint32_t  ip_mtu_fail:2;
+	a_uint32_t  ip_mru_check_fail_de_acce:1;
+	a_uint32_t  ip_mru_check_fail:2;
 };
 
 union l3_route_ctrl_u {
@@ -593,23 +594,24 @@ union l3_route_ctrl_u {
 
 
 struct l3_route_ctrl_ext {
-	a_uint32_t  ip_route_mismatch:2;
-	a_uint32_t  flow_service_code_loop_en:1;
-	a_uint32_t  host_hash_mode_0:2;
-	a_uint32_t  host_hash_mode_1:2;
-	a_uint32_t  l3_flow_copy_escape:1;
 #if defined (APPE)
-	a_uint32_t  flow_pmtu_fail:2;
-	a_uint32_t  flow_pmtu_fail_de_acce:1;
-	a_uint32_t  flow_pmtu_df_fail:2;
-	a_uint32_t  flow_pmtu_df_fail_de_acce:1;
-	a_uint32_t  l2_vpn_en:1;
-	a_uint32_t  l3_vpn_en:1;
-	a_uint32_t  ip_route_fail_no_eth:2;
 	a_uint32_t  _reserved0:14;
+	a_uint32_t  ip_route_fail_no_eth:2;
+	a_uint32_t  l3_vpn_en:1;
+	a_uint32_t  l2_vpn_en:1;
+	a_uint32_t  flow_pmtu_df_fail_de_acce:1;
+	a_uint32_t  flow_pmtu_df_fail:2;
+	a_uint32_t  flow_pmtu_fail_de_acce:1;
+	a_uint32_t  flow_pmtu_fail:2;
 #else
 	a_uint32_t  _reserved0:24;
 #endif
+
+	a_uint32_t  l3_flow_copy_escape:1;
+	a_uint32_t  host_hash_mode_1:2;
+	a_uint32_t  host_hash_mode_0:2;
+	a_uint32_t  flow_service_code_loop_en:1;
+	a_uint32_t  ip_route_mismatch:2;
 };
 
 union l3_route_ctrl_ext_u {
@@ -670,15 +672,15 @@ union l3_route_ctrl_ext_u {
 	#define HOST_TBL_OP_BUSY_DEFAULT 0x0
 
 struct host_tbl_op {
-	a_uint32_t  cmd_id:4;
-	a_uint32_t  byp_rslt_en:1;
-	a_uint32_t  op_type:3;
-	a_uint32_t  hash_block_bitmap:2;
-	a_uint32_t  op_mode:1;
-	a_uint32_t  entry_index:13;
-	a_uint32_t  op_result:1;
-	a_uint32_t  busy:1;
 	a_uint32_t  _reserved0:6;
+	a_uint32_t  busy:1;
+	a_uint32_t  op_result:1;
+	a_uint32_t  entry_index:13;
+	a_uint32_t  op_mode:1;
+	a_uint32_t  hash_block_bitmap:2;
+	a_uint32_t  op_type:3;
+	a_uint32_t  byp_rslt_en:1;
+	a_uint32_t  cmd_id:4;
 };
 
 union host_tbl_op_u {
@@ -745,11 +747,11 @@ union host_tbl_op_data_u {
 	#define HOST_TBL_OP_RSLT_VALID_CNT_DEFAULT 0x0
 
 struct host_tbl_op_rslt {
-	a_uint32_t  cmd_id:4;
-	a_uint32_t  op_rslt:1;
-	a_uint32_t  entry_index:13;
-	a_uint32_t  valid_cnt:4;
 	a_uint32_t  _reserved0:10;
+	a_uint32_t  valid_cnt:4;
+	a_uint32_t  entry_index:13;
+	a_uint32_t  op_rslt:1;
+	a_uint32_t  cmd_id:4;
 };
 
 union host_tbl_op_rslt_u {
@@ -810,15 +812,15 @@ union host_tbl_op_rslt_u {
 	#define HOST_TBL_RD_OP_BUSY_DEFAULT 0x0
 
 struct host_tbl_rd_op {
-	a_uint32_t  cmd_id:4;
-	a_uint32_t  byp_rslt_en:1;
-	a_uint32_t  op_type:3;
-	a_uint32_t  hash_block_bitmap:2;
-	a_uint32_t  op_mode:1;
-	a_uint32_t  entry_index:13;
-	a_uint32_t  op_result:1;
-	a_uint32_t  busy:1;
 	a_uint32_t  _reserved0:6;
+	a_uint32_t  busy:1;
+	a_uint32_t  op_result:1;
+	a_uint32_t  entry_index:13;
+	a_uint32_t  op_mode:1;
+	a_uint32_t  hash_block_bitmap:2;
+	a_uint32_t  op_type:3;
+	a_uint32_t  byp_rslt_en:1;
+	a_uint32_t  cmd_id:4;
 };
 
 union host_tbl_rd_op_u {
@@ -885,11 +887,11 @@ union host_tbl_rd_op_data_u {
 	#define HOST_TBL_RD_OP_RSLT_VALID_CNT_DEFAULT 0x0
 
 struct host_tbl_rd_op_rslt {
-	a_uint32_t  cmd_id:4;
-	a_uint32_t  op_rslt:1;
-	a_uint32_t  entry_index:13;
-	a_uint32_t  valid_cnt:4;
 	a_uint32_t  _reserved0:10;
+	a_uint32_t  valid_cnt:4;
+	a_uint32_t  entry_index:13;
+	a_uint32_t  op_rslt:1;
+	a_uint32_t  cmd_id:4;
 };
 
 union host_tbl_rd_op_rslt_u {
@@ -959,15 +961,15 @@ union host_tbl_rd_rslt_data_u {
 #endif
 
 struct l3_dbg_cmd {
-	a_uint32_t  addr:8;
 #if defined(APPE)
-	a_uint32_t  dbg_bus_bit_select:8;
-	a_uint32_t  type:2;
 	a_uint32_t  _reserved0:14;
-#else
 	a_uint32_t  type:2;
+	a_uint32_t  dbg_bus_bit_select:8;
+#else
 	a_uint32_t  _reserved0:22;
+	a_uint32_t  type:2;
 #endif
+	a_uint32_t  addr:8;
 };
 
 union l3_dbg_cmd_u {
@@ -1073,9 +1075,9 @@ union in_pub_ip_addr_tbl_u {
 	#define L3_DBG_LOCK0_MSG_CNT_DEFAULT 0x0
 
 struct l3_dbg_lock0 {
-	a_uint32_t  disable_input:4;
-	a_uint32_t  msg_cnt:16;
 	a_uint32_t  _reserved0:12;
+	a_uint32_t  msg_cnt:16;
+	a_uint32_t  disable_input:4;
 };
 
 union l3_dbg_lock0_u {
@@ -1112,10 +1114,10 @@ union l3_dbg_lock0_u {
 	#define L3_DBG_LOCK1_FLOW_TBL_OP_RRSLT_CNT_DEFAULT 0x0
 
 struct l3_dbg_lock1 {
-	a_uint32_t  flow_tbl_op_cmd_cnt:8;
-	a_uint32_t  host_tbl_op_cmd_cnt:8;
-	a_uint32_t  flow_tbl_op_wrslt_cnt:8;
 	a_uint32_t  flow_tbl_op_rrslt_cnt:8;
+	a_uint32_t  flow_tbl_op_wrslt_cnt:8;
+	a_uint32_t  host_tbl_op_cmd_cnt:8;
+	a_uint32_t  flow_tbl_op_cmd_cnt:8;
 };
 
 union l3_dbg_lock1_u {
@@ -1142,9 +1144,9 @@ union l3_dbg_lock1_u {
 	#define L3_DBG_LOCK2_HOST_TBL_OP_RRSLT_CNT_DEFAULT 0x0
 
 struct l3_dbg_lock2 {
-	a_uint32_t  host_tbl_op_wrslt_cnt:8;
-	a_uint32_t  host_tbl_op_rrslt_cnt:8;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  host_tbl_op_rrslt_cnt:8;
+	a_uint32_t  host_tbl_op_wrslt_cnt:8;
 };
 
 union l3_dbg_lock2_u {
@@ -1201,14 +1203,14 @@ union l3_dbg_lock2_u {
 	#define L3_TBL_OP_FIFO_CNT_HOST_RRSLT_VALID_CNT_DEFAULT 0x0
 
 struct l3_tbl_op_fifo_cnt {
-	a_uint32_t  flow_wcmd_valid_slot:4;
-	a_uint32_t  flow_rcmd_valid_slot:4;
-	a_uint32_t  flow_wrslt_valid_cnt:4;
-	a_uint32_t  flow_rrslt_valid_cnt:4;
-	a_uint32_t  host_wcmd_valid_slot:4;
-	a_uint32_t  host_rcmd_valid_slot:4;
-	a_uint32_t  host_wrslt_valid_cnt:4;
 	a_uint32_t  host_rrslt_valid_cnt:4;
+	a_uint32_t  host_wrslt_valid_cnt:4;
+	a_uint32_t  host_rcmd_valid_slot:4;
+	a_uint32_t  host_wcmd_valid_slot:4;
+	a_uint32_t  flow_rrslt_valid_cnt:4;
+	a_uint32_t  flow_wrslt_valid_cnt:4;
+	a_uint32_t  flow_rcmd_valid_slot:4;
+	a_uint32_t  flow_wcmd_valid_slot:4;
 };
 
 union l3_tbl_op_fifo_cnt_u {
@@ -1556,25 +1558,38 @@ union l3_vp_port_tbl_u {
 #endif
 
 struct in_l3_if_tbl {
-	a_uint32_t  mru:14;
-	a_uint32_t  mtu:14;
-	a_uint32_t  ttl_dec_bypass:1;
-	a_uint32_t  ipv4_uc_route_en:1;
-	a_uint32_t  ipv6_uc_route_en:1;
-	a_uint32_t  icmp_trigger_en:1;
-	a_uint32_t  ttl_exceed_cmd:2;
-	a_uint32_t  ttl_exceed_de_acce:1;
-	a_uint32_t  mac_bitmap:8;
-	a_uint32_t  pppoe_en:1;
 #if defined(APPE)
-	a_uint32_t  dmac_check_dis:1;
-	a_uint32_t  vpn_id:5;
+	a_uint32_t  icmp_trigger_en:1;
+	a_uint32_t  ipv6_uc_route_en:1;
+	a_uint32_t  ipv4_uc_route_en:1;
+	a_uint32_t  ttl_dec_bypass:1;
+	a_uint32_t  mtu:14;
+	a_uint32_t  mru:14;
+
 	a_uint32_t  mru_ipv6:14;
-	a_uint32_t  mtu_ipv6:14;
-	a_uint32_t  udp_csm0_cmd:2;
+	a_uint32_t  vpn_id:5;
+	a_uint32_t  dmac_check_dis:1;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  mac_bitmap:8;
+	a_uint32_t  ttl_exceed_de_acce:1;
+	a_uint32_t  ttl_exceed_cmd:2;
+
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  udp_csm0_cmd:2;
+	a_uint32_t  mtu_ipv6:14;
 #else
+	a_uint32_t  icmp_trigger_en:1;
+	a_uint32_t  ipv6_uc_route_en:1;
+	a_uint32_t  ipv4_uc_route_en:1;
+	a_uint32_t  ttl_dec_bypass:1;
+	a_uint32_t  mtu:14;
+	a_uint32_t  mru:14;
+
 	a_uint32_t  _reserved0:20;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  mac_bitmap:8;
+	a_uint32_t  ttl_exceed_de_acce:1;
+	a_uint32_t  ttl_exceed_cmd:2;
 #endif
 };
 
@@ -1645,31 +1660,36 @@ union in_l3_if_tbl_u {
 	#define HOST_IPV6_MCAST_TBL_GIPV6_ADDR_DEFAULT 0x0
 
 struct host_ipv6_mcast_tbl {
-	a_uint32_t  valid:1;
-	a_uint32_t  key_type:2;
-	a_uint32_t  fwd_cmd:2;
-	a_uint32_t  syn_toggle:1;
-	a_uint32_t  dst_info:14;
-	a_uint32_t  lan_wan:1;
 #if defined(APPE)
-	a_uint32_t  vsi:6;
 	a_uint32_t  _reserved0_0:5;
+	a_uint32_t  vsi:6;
 #else
-	a_uint32_t  vsi:5;
 	a_uint32_t  _reserved0_0:6;
+	a_uint32_t  vsi:5;
 #endif
-	a_uint32_t  _reserved0_1:12;
+	a_uint32_t  lan_wan:1;
+	a_uint32_t  dst_info:14;
+	a_uint32_t  syn_toggle:1;
+	a_uint32_t  fwd_cmd:2;
+	a_uint32_t  key_type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  sipv6_addr_0:20;
+	a_uint32_t  _reserved0_1:12;
+
 	a_uint32_t  sipv6_addr_1:32;
 	a_uint32_t  sipv6_addr_2:32;
 	a_uint32_t  sipv6_addr_3:32;
-	a_uint32_t  sipv6_addr_4:12;
+
 	a_uint32_t  gipv6_addr_0:20;
+	a_uint32_t  sipv6_addr_4:12;
+
 	a_uint32_t  gipv6_addr_1:32;
 	a_uint32_t  gipv6_addr_2:32;
 	a_uint32_t  gipv6_addr_3:32;
-	a_uint32_t  gipv6_addr_4:12;
+
 	a_uint32_t  _reserved1:20;
+	a_uint32_t  gipv6_addr_4:12;
 };
 
 union host_ipv6_mcast_tbl_u {
@@ -1743,32 +1763,46 @@ union host_ipv6_mcast_tbl_u {
 	#define HOST_IPV4_MCAST_TBL_GIP_ADDR_DEFAULT 0x0
 
 struct host_ipv4_mcast_tbl {
-	a_uint32_t  valid:1;
-	a_uint32_t  key_type:2;
-	a_uint32_t  fwd_cmd:2;
-	a_uint32_t  syn_toggle:1;
-	a_uint32_t  dst_info:14;
-	a_uint32_t  lan_wan:1;
 #if defined(APPE)
-	a_uint32_t  vsi:6;
 	a_uint32_t  _reserved0_0:5;
+	a_uint32_t  vsi:6;
+	a_uint32_t  lan_wan:1;
+	a_uint32_t  dst_info:14;
+	a_uint32_t  syn_toggle:1;
+	a_uint32_t  fwd_cmd:2;
+	a_uint32_t  key_type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0_1:32;
-	a_uint32_t  _reserved0_2:22;
+
 	a_uint32_t  sip_addr_0:10;
-	a_uint32_t  sip_addr_1:22;
+	a_uint32_t  _reserved0_2:22;
+
 	a_uint32_t  gip_addr_0:10;
-	a_uint32_t  gip_addr_1:22;
+	a_uint32_t  sip_addr_1:22;
+
 	a_uint32_t  _reserved1:10;
+	a_uint32_t  gip_addr_1:22;
 #else
-	a_uint32_t  vsi:5;
 	a_uint32_t  _reserved0_0:6;
+	a_uint32_t  vsi:5;
+	a_uint32_t  lan_wan:1;
+	a_uint32_t  dst_info:14;
+	a_uint32_t  syn_toggle:1;
+	a_uint32_t  fwd_cmd:2;
+	a_uint32_t  key_type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0_1:32;
-	a_uint32_t  _reserved0_2:21;
+
 	a_uint32_t  sip_addr_0:11;
-	a_uint32_t  sip_addr_1:21;
+	a_uint32_t  _reserved0_2:21;
+
 	a_uint32_t  gip_addr_0:11;
-	a_uint32_t  gip_addr_1:21;
+	a_uint32_t  sip_addr_1:21;
+
 	a_uint32_t  _reserved1:11;
+	a_uint32_t  gip_addr_1:21;
 #endif
 };
 
@@ -1825,13 +1859,14 @@ union host_ipv4_mcast_tbl_u {
 	#define HOST_TBL_IP_ADDR_DEFAULT 0x0
 
 struct host_tbl {
-	a_uint32_t  valid:1;
-	a_uint32_t  key_type:2;
-	a_uint32_t  fwd_cmd:2;
-	a_uint32_t  syn_toggle:1;
-	a_uint32_t  dst_info:14;
-	a_uint32_t  lan_wan:1;
 	a_uint32_t  _reserved0:11;
+	a_uint32_t  lan_wan:1;
+	a_uint32_t  dst_info:14;
+	a_uint32_t  syn_toggle:1;
+	a_uint32_t  fwd_cmd:2;
+	a_uint32_t  key_type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  ip_addr:32;
 	a_uint32_t  _reserved1:32;
 };
@@ -1885,19 +1920,21 @@ union host_tbl_u {
 	#define HOST_IPV6_TBL_IPV6_ADDR_DEFAULT 0x0
 
 struct host_ipv6_tbl {
-	a_uint32_t  valid:1;
-	a_uint32_t  key_type:2;
-	a_uint32_t  fwd_cmd:2;
-	a_uint32_t  syn_toggle:1;
-	a_uint32_t  dst_info:14;
-	a_uint32_t  lan_wan:1;
-	a_uint32_t  _reserved0:1;
 	a_uint32_t  ipv6_addr_0:10;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  lan_wan:1;
+	a_uint32_t  dst_info:14;
+	a_uint32_t  syn_toggle:1;
+	a_uint32_t  fwd_cmd:2;
+	a_uint32_t  key_type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  ipv6_addr_1:32;
 	a_uint32_t  ipv6_addr_2:32;
 	a_uint32_t  ipv6_addr_3:32;
-	a_uint32_t  ipv6_addr_4:22;
+
 	a_uint32_t  _reserved1:10;
+	a_uint32_t  ipv6_addr_4:22;
 };
 
 union host_ipv6_tbl_u {
@@ -1986,37 +2023,47 @@ union host_ipv6_tbl_u {
 	#define IN_NEXTHOP_TBL_IP_ADDR_DNAT_DEFAULT 0x0
 
 struct in_nexthop_tbl_1 {
-	a_uint32_t  type:1;
 #if defined(APPE)
-	a_uint32_t  vsi:6;
-	a_uint32_t  _reserved0:2;
-#else
-	a_uint32_t  vsi:5;
-	a_uint32_t  _reserved0:3;
-#endif
-	a_uint32_t  post_l3_if:8;
-	a_uint32_t  ip_to_me:1;
-	a_uint32_t  stag_fmt:1;
-	a_uint32_t  svid:12;
 	a_uint32_t  ctag_fmt:1;
-	a_uint32_t  cvid:12;
-	a_uint32_t  ip_pub_addr_index:4;
+	a_uint32_t  svid:12;
+	a_uint32_t  stag_fmt:1;
+	a_uint32_t  ip_to_me:1;
+	a_uint32_t  post_l3_if:8;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  vsi:6;
+	a_uint32_t  type:1;
+#else
+	a_uint32_t  ctag_fmt:1;
+	a_uint32_t  svid:12;
+	a_uint32_t  stag_fmt:1;
+	a_uint32_t  ip_to_me:1;
+	a_uint32_t  post_l3_if:8;
+	a_uint32_t  _reserved0:3;
+	a_uint32_t  vsi:5;
+	a_uint32_t  type:1;
+#endif
+
 	a_uint32_t  mac_addr_0:16;
+	a_uint32_t  ip_pub_addr_index:4;
+	a_uint32_t  cvid:12;
+
 	a_uint32_t  mac_addr_1:32;
 	a_uint32_t  ip_addr_dnat:32;
 };
 
 struct in_nexthop_tbl_0 {
-	a_uint32_t  type:1;
-	a_uint32_t  port:8;
-	a_uint32_t  post_l3_if:8;
-	a_uint32_t  ip_to_me:1;
-	a_uint32_t  stag_fmt:1;
-	a_uint32_t  svid:12;
 	a_uint32_t  ctag_fmt:1;
-	a_uint32_t  cvid:12;
-	a_uint32_t  ip_pub_addr_index:4;
+	a_uint32_t  svid:12;
+	a_uint32_t  stag_fmt:1;
+	a_uint32_t  ip_to_me:1;
+	a_uint32_t  post_l3_if:8;
+	a_uint32_t  port:8;
+	a_uint32_t  type:1;
+
 	a_uint32_t  mac_addr_0:16;
+	a_uint32_t  ip_pub_addr_index:4;
+	a_uint32_t  cvid:12;
+
 	a_uint32_t  mac_addr_1:32;
 	a_uint32_t  ip_addr_dnat:32;
 };
@@ -2066,15 +2113,18 @@ union in_nexthop_tbl_u {
 
 struct eg_l3_if_tbl {
 	a_uint32_t  mac_addr_0:32;
-	a_uint32_t  mac_addr_1:16;
+
 	a_uint32_t  session_id:16;
-	a_uint32_t  pppoe_en:1;
+	a_uint32_t  mac_addr_1:16;
+
 #if defined(APPE)
-	a_uint32_t  tunnel_valid:1;
-	a_uint32_t  tunnel_id:7;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  tunnel_id:7;
+	a_uint32_t  tunnel_valid:1;
+	a_uint32_t  pppoe_en:1;
 #else
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  pppoe_en:1;
 #endif
 };
 
@@ -2114,12 +2164,15 @@ union eg_l3_if_tbl_u {
 struct rt_interface_cnt_tbl {
 	a_uint32_t  pkt_cnt:32;
 	a_uint32_t  byte_cnt_0:32;
-	a_uint32_t  byte_cnt_1:8;
+
 	a_uint32_t  drop_pkt_cnt_0:24;
-	a_uint32_t  drop_pkt_cnt_1:8;
+	a_uint32_t  byte_cnt_1:8;
+
 	a_uint32_t  drop_byte_cnt_0:24;
-	a_uint32_t  drop_byte_cnt_1:16;
+	a_uint32_t  drop_pkt_cnt_1:8;
+
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  drop_byte_cnt_1:16;
 };
 
 union rt_interface_cnt_tbl_u {

@@ -15,9 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_vxlan_reg_be.h"
-#else
+
 /**
  * @defgroup
  * @{
@@ -54,11 +52,11 @@
 	#define UDP_PORT_CFG_PORT_TYPE_DEFAULT 0x1
 
 struct udp_port_cfg {
-	a_uint32_t  port_value:16;
-	a_uint32_t  ip_ver:2;
-	a_uint32_t  udp_type:2;
-	a_uint32_t  port_type:2;
 	a_uint32_t  _reserved0:10;
+	a_uint32_t  port_type:2;
+	a_uint32_t  udp_type:2;
+	a_uint32_t  ip_ver:2;
+	a_uint32_t  port_value:16;
 };
 
 union udp_port_cfg_u {
@@ -80,8 +78,8 @@ union udp_port_cfg_u {
 	#define TPR_VXLAN_CFG_UDP_PORT_MAP_DEFAULT 0x0
 
 struct tpr_vxlan_cfg {
-	a_uint32_t  udp_port_map:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  udp_port_map:6;
 };
 
 union tpr_vxlan_cfg_u {
@@ -103,8 +101,8 @@ union tpr_vxlan_cfg_u {
 	#define TPR_VXLAN_GPE_CFG_UDP_PORT_MAP_DEFAULT 0x0
 
 struct tpr_vxlan_gpe_cfg {
-	a_uint32_t  udp_port_map:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  udp_port_map:6;
 };
 
 union tpr_vxlan_gpe_cfg_u {
@@ -136,10 +134,10 @@ union tpr_vxlan_gpe_cfg_u {
 	#define TPR_VXLAN_GPE_PROT_CFG_ETHERNET_DEFAULT 0x3
 
 struct tpr_vxlan_gpe_prot_cfg {
-	a_uint32_t  ipv4:8;
-	a_uint32_t  ipv6:8;
-	a_uint32_t  ethernet:8;
 	a_uint32_t  _reserved0:8;
+	a_uint32_t  ethernet:8;
+	a_uint32_t  ipv6:8;
+	a_uint32_t  ipv4:8;
 };
 
 union tpr_vxlan_gpe_prot_cfg_u {
@@ -148,4 +146,4 @@ union tpr_vxlan_gpe_prot_cfg_u {
 };
 
 #endif
-#endif
+

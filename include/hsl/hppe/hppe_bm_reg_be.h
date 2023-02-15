@@ -1057,22 +1057,22 @@ union rcm_u {
 	#define DM_PKT_DATA_DEFAULT 0x0
 
 struct dm {
-	a_uint32_t  pkt_data_15:32;
-	a_uint32_t  pkt_data_14:32;
-	a_uint32_t  pkt_data_13:32;
-	a_uint32_t  pkt_data_12:32;
-	a_uint32_t  pkt_data_11:32;
-	a_uint32_t  pkt_data_10:32;
-	a_uint32_t  pkt_data_9:32;
-	a_uint32_t  pkt_data_8:32;
-	a_uint32_t  pkt_data_7:32;
-	a_uint32_t  pkt_data_6:32;
-	a_uint32_t  pkt_data_5:32;
-	a_uint32_t  pkt_data_4:32;
-	a_uint32_t  pkt_data_3:32;
-	a_uint32_t  pkt_data_2:32;
-	a_uint32_t  pkt_data_1:32;
 	a_uint32_t  pkt_data_0:32;
+	a_uint32_t  pkt_data_1:32;
+	a_uint32_t  pkt_data_2:32;
+	a_uint32_t  pkt_data_3:32;
+	a_uint32_t  pkt_data_4:32;
+	a_uint32_t  pkt_data_5:32;
+	a_uint32_t  pkt_data_6:32;
+	a_uint32_t  pkt_data_7:32;
+	a_uint32_t  pkt_data_8:32;
+	a_uint32_t  pkt_data_9:32;
+	a_uint32_t  pkt_data_10:32;
+	a_uint32_t  pkt_data_11:32;
+	a_uint32_t  pkt_data_12:32;
+	a_uint32_t  pkt_data_13:32;
+	a_uint32_t  pkt_data_14:32;
+	a_uint32_t  pkt_data_15:32;
 };
 
 union dm_u {

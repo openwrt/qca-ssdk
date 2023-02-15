@@ -307,6 +307,15 @@ union vlan_port_vp_tbl_u {
 #endif
 
 struct eg_vp_tbl {
+	a_uint32_t  vsi_tag_mode_en:1;
+	a_uint32_t  port_eg_vlan_stag_mode:2;
+	a_uint32_t  port_eg_vlan_ctag_mode:2;
+	a_uint32_t  port_vlan_type:1;
+	a_uint32_t  port_def_cvid_en:1;
+	a_uint32_t  port_def_cvid:12;
+	a_uint32_t  port_def_svid_en:1;
+	a_uint32_t  port_def_svid:12;
+
 #if defined(MPPE)
 	a_uint32_t  _reserved0:29;
 	a_uint32_t  ath_hdr_from_cpu:1;
@@ -326,14 +335,6 @@ struct eg_vp_tbl {
 	a_uint32_t  tx_counting_en:1;
 	a_uint32_t  port_eg_dei_prop_cmd:1;
 	a_uint32_t  port_eg_pcp_prop_cmd:1;
-	a_uint32_t  vsi_tag_mode_en:1;
-	a_uint32_t  port_eg_vlan_stag_mode:2;
-	a_uint32_t  port_eg_vlan_ctag_mode:2;
-	a_uint32_t  port_vlan_type:1;
-	a_uint32_t  port_def_cvid_en:1;
-	a_uint32_t  port_def_cvid:12;
-	a_uint32_t  port_def_svid_en:1;
-	a_uint32_t  port_def_svid:12;
 };
 
 union eg_vp_tbl_u {
@@ -433,8 +434,8 @@ union tpr_vlan_tpid_u {
 	#define VP_ISOL_TBL_VP_PROFILE_MAP_DEFAULT 0x0
 
 struct vp_isol_tbl {
-	a_uint32_t  vp_profile_map_1:32;
 	a_uint32_t  vp_profile_map_0:32;
+	a_uint32_t  vp_profile_map_1:32;
 };
 
 union vp_isol_tbl_u {

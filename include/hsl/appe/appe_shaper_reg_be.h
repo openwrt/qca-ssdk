@@ -14,9 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_shaper_reg_be.h"
-#else
+
 #ifndef APPE_SHAPER_REG_H
 #define APPE_SHAPER_REG_H
 
@@ -34,8 +32,8 @@
 	#define MIN_MAX_MODE_CFG_MIN_MAX_MODE_DEFAULT 0x0
 
 struct min_max_mode_cfg {
-	a_uint32_t  min_max_mode:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  min_max_mode:1;
 };
 
 union min_max_mode_cfg_u {
@@ -106,10 +104,10 @@ union eco_reserve_1_u {
 	#define SHP_CFG_L0_L0_SHP_LL_HEAD_DEFAULT 0x0
 
 struct shp_cfg_l0 {
-	a_uint32_t  l0_shp_ll_tail:9;
-	a_uint32_t  _reserved0:7;
-	a_uint32_t  l0_shp_ll_head:9;
 	a_uint32_t  _reserved1:7;
+	a_uint32_t  l0_shp_ll_head:9;
+	a_uint32_t  _reserved0:7;
+	a_uint32_t  l0_shp_ll_tail:9;
 };
 
 union shp_cfg_l0_u {
@@ -136,10 +134,10 @@ union shp_cfg_l0_u {
 	#define SHP_CFG_L1_L1_SHP_LL_HEAD_DEFAULT 0x0
 
 struct shp_cfg_l1 {
-	a_uint32_t  l1_shp_ll_tail:6;
-	a_uint32_t  _reserved0:10;
-	a_uint32_t  l1_shp_ll_head:6;
 	a_uint32_t  _reserved1:10;
+	a_uint32_t  l1_shp_ll_head:6;
+	a_uint32_t  _reserved0:10;
+	a_uint32_t  l1_shp_ll_tail:6;
 };
 
 union shp_cfg_l1_u {
@@ -147,5 +145,4 @@ union shp_cfg_l1_u {
 	struct shp_cfg_l1 bf;
 };
 
-#endif
 #endif

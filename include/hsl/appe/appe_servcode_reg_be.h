@@ -15,9 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_servcode_reg_be.h"
-#else
+
 /**
  * @defgroup
  * @{
@@ -46,5 +44,4 @@ union tl_service_tbl_u {
 	a_uint32_t val;
 	struct tl_service_tbl bf;
 };
-#endif
 #endif

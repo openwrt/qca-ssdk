@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +15,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
+#if defined(CONFIG_CPU_BIG_ENDIAN)
+#include "appe_geneve_reg_be.h"
+#else
 /**
  * @defgroup
  * @{
@@ -44,4 +47,5 @@ union tpr_geneve_cfg_u {
         a_uint32_t val;
         struct tpr_geneve_cfg bf;
 };
+#endif
 #endif

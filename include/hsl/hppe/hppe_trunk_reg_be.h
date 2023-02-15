@@ -14,10 +14,6 @@
  */
 
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "hppe_trunk_reg_be.h"
-#else
-
 /**
  * @defgroup
  * @{
@@ -89,18 +85,18 @@
 	#define TRUNK_HASH_FIELD_REG_UDF3_INCL_DEFAULT 0x0
 
 struct trunk_hash_field_reg {
-	a_uint32_t  src_port_incl:1;
-	a_uint32_t  mac_da_incl:1;
-	a_uint32_t  mac_sa_incl:1;
-	a_uint32_t  src_ip_incl:1;
-	a_uint32_t  dst_ip_incl:1;
-	a_uint32_t  l4_src_port_incl:1;
-	a_uint32_t  l4_dst_port_incl:1;
-	a_uint32_t  udf0_incl:1;
-	a_uint32_t  udf1_incl:1;
-	a_uint32_t  udf2_incl:1;
-	a_uint32_t  udf3_incl:1;
 	a_uint32_t  _reserved0:21;
+	a_uint32_t  udf3_incl:1;
+	a_uint32_t  udf2_incl:1;
+	a_uint32_t  udf1_incl:1;
+	a_uint32_t  udf0_incl:1;
+	a_uint32_t  l4_dst_port_incl:1;
+	a_uint32_t  l4_src_port_incl:1;
+	a_uint32_t  dst_ip_incl:1;
+	a_uint32_t  src_ip_incl:1;
+	a_uint32_t  mac_sa_incl:1;
+	a_uint32_t  mac_da_incl:1;
+	a_uint32_t  src_port_incl:1;
 };
 
 union trunk_hash_field_reg_u {
@@ -122,8 +118,8 @@ union trunk_hash_field_reg_u {
 	#define TRUNK_FILTER_MEM_BITMAP_DEFAULT 0x0
 
 struct trunk_filter {
-	a_uint32_t  mem_bitmap:8;
 	a_uint32_t  _reserved0:24;
+	a_uint32_t  mem_bitmap:8;
 };
 
 union trunk_filter_u {
@@ -180,22 +176,22 @@ union trunk_filter_u {
 	#define TRUNK_MEMBER_MEMBER_7_PORT_ID_DEFAULT 0x0
 
 struct trunk_member {
-	a_uint32_t  member_0_port_id:3;
-	a_uint32_t  _reserved0:1;
-	a_uint32_t  member_1_port_id:3;
-	a_uint32_t  _reserved1:1;
-	a_uint32_t  member_2_port_id:3;
-	a_uint32_t  _reserved2:1;
-	a_uint32_t  member_3_port_id:3;
-	a_uint32_t  _reserved3:1;
-	a_uint32_t  member_4_port_id:3;
-	a_uint32_t  _reserved4:1;
-	a_uint32_t  member_5_port_id:3;
-	a_uint32_t  _reserved5:1;
-	a_uint32_t  member_6_port_id:3;
-	a_uint32_t  _reserved6:1;
-	a_uint32_t  member_7_port_id:3;
 	a_uint32_t  _reserved7:1;
+	a_uint32_t  member_7_port_id:3;
+	a_uint32_t  _reserved6:1;
+	a_uint32_t  member_6_port_id:3;
+	a_uint32_t  _reserved5:1;
+	a_uint32_t  member_5_port_id:3;
+	a_uint32_t  _reserved4:1;
+	a_uint32_t  member_4_port_id:3;
+	a_uint32_t  _reserved3:1;
+	a_uint32_t  member_3_port_id:3;
+	a_uint32_t  _reserved2:1;
+	a_uint32_t  member_2_port_id:3;
+	a_uint32_t  _reserved1:1;
+	a_uint32_t  member_1_port_id:3;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  member_0_port_id:3;
 };
 
 union trunk_member_u {
@@ -222,9 +218,9 @@ union trunk_member_u {
 	#define PORT_TRUNK_ID_TRUNK_ID_DEFAULT 0x0
 
 struct port_trunk_id {
-	a_uint32_t  trunk_en:1;
-	a_uint32_t  trunk_id:1;
 	a_uint32_t  _reserved0:30;
+	a_uint32_t  trunk_id:1;
+	a_uint32_t  trunk_en:1;
 };
 
 union port_trunk_id_u {
@@ -232,5 +228,4 @@ union port_trunk_id_u {
 	struct port_trunk_id bf;
 };
 
-#endif
 #endif

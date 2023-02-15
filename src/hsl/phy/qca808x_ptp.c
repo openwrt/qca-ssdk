@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -382,7 +382,11 @@ qca808x_phy_ptp_rtc_sync_get(a_uint32_t dev_id, a_uint32_t phy_id,
 	rv = qca_mht_port_id_get(dev_id, phy_id, &mht_port_id);
 	SW_RTN_ON_ERROR(rv);
 
-	*src_id = g_rtc_src_id[mht_port_id - 1];
+	if (mht_port_id >= SSDK_PHYSICAL_PORT1 && mht_port_id <= SSDK_PHYSICAL_PORT4)
+		*src_id = g_rtc_src_id[mht_port_id - 1];
+	else
+		return SW_OUT_OF_RANGE;
+
 	if (*src_id == RTC_SRC_INVALID_ID) {
 		*src_type = FAL_PTP_RTC_SRC_DIS;
 		return rv;

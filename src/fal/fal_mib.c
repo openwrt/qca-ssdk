@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -287,10 +289,14 @@ fal_mib_counter_alloc(a_uint32_t dev_id, a_uint64_t **p_mibcounter)
 	return SW_OK;
 }
 
-static void _fal_rx_mib_update(a_uint32_t dev_id, fal_port_t port_id,
+static void _fal_rx_mib_update(a_uint32_t dev_id, fal_port_t port_value,
                  fal_mib_info_t * mib_Info)
 {
+	a_uint32_t port_id = FAL_PORT_ID_VALUE(port_value);
 	if(NULL == g_mibcounter[dev_id])
+		return;
+
+	if (port_id >= SW_MAX_NR_PORT)
 		return;
 
 	g_mibcounter[dev_id][port_id].RxBroad += mib_Info->RxBroad;
@@ -324,10 +330,14 @@ static void _fal_rx_mib_update(a_uint32_t dev_id, fal_port_t port_id,
 	return;
 }
 
-static void _fal_tx_mib_update(a_uint32_t dev_id, fal_port_t port_id,
+static void _fal_tx_mib_update(a_uint32_t dev_id, fal_port_t port_value,
                  fal_mib_info_t * mib_Info)
 {
+	a_uint32_t port_id = FAL_PORT_ID_VALUE(port_value);
 	if(NULL == g_mibcounter[dev_id])
+		return;
+
+	if (port_id >= SW_MAX_NR_PORT)
 		return;
 
 	g_mibcounter[dev_id][port_id].TxBroad += mib_Info->TxBroad;

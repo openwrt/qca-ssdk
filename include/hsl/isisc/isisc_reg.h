@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021,2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -698,11 +698,7 @@ extern "C" {
 #define GBL_INT_STATUS1_NR_E           1
 
 #define LINK_CHG_INT_S
-#if defined(MHT)
-#define GBL_INT_STATUS1_LINK_CHG_INT_S_BOFFSET 0
-#else
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_BOFFSET 1
-#endif
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_BLEN        7
 #define GBL_INT_STATUS1_LINK_CHG_INT_S_FLAG    HSL_RW
 
@@ -710,9 +706,6 @@ extern "C" {
 #define GBL_INT_STATUS1_PHY_INT_S_BOFFSET         15
 #define GBL_INT_STATUS1_PHY_INT_S_BLEN            1
 #define GBL_INT_STATUS1_PHY_INT_S_FLAG            HSL_RO
-
-
-
 
     /* Global Interrupt Mask Register1 */
 #define GBL_INT_MASK1
@@ -723,11 +716,7 @@ extern "C" {
 #define GBL_INT_MASK1_NR_E           1
 
 #define LINK_CHG_INT_M
-#if defined(MHT)
-#define GBL_INT_MASK1_LINK_CHG_INT_M_BOFFSET 0
-#else
 #define GBL_INT_MASK1_LINK_CHG_INT_M_BOFFSET 1
-#endif
 #define GBL_INT_MASK1_LINK_CHG_INT_M_BLEN        7
 #define GBL_INT_MASK1_LINK_CHG_INT_M_FLAG    HSL_RW
 
@@ -735,8 +724,6 @@ extern "C" {
 #define GBL_INT_MASK1_PHY_INT_M_BOFFSET           15
 #define GBL_INT_MASK1_PHY_INT_M_BLEN              1
 #define GBL_INT_MASK1_PHY_INT_M_FLAG              HSL_RO
-
-
 
 
     /* Module Enable Register */
@@ -1268,17 +1255,6 @@ extern "C" {
 #define TRUNK_HASH_MODE_E_OFFSET             0x4
 #define TRUNK_HASH_MODE_NR_E                 1
 
-#if defined(MHT)
-#define DIP_EN
-#define TRUNK_HASH_MODE_DIP_EN_BOFFSET       3
-#define TRUNK_HASH_MODE_DIP_EN_BLEN          1
-#define TRUNK_HASH_MODE_DIP_EN_FLAG          HSL_RW
-
-#define SIP_EN
-#define TRUNK_HASH_MODE_SIP_EN_BOFFSET       2
-#define TRUNK_HASH_MODE_SIP_EN_BLEN          1
-#define TRUNK_HASH_MODE_SIP_EN_FLAG          HSL_RW
-#else
 #define SIP_EN
 #define TRUNK_HASH_MODE_SIP_EN_BOFFSET       3
 #define TRUNK_HASH_MODE_SIP_EN_BLEN          1
@@ -1288,7 +1264,6 @@ extern "C" {
 #define TRUNK_HASH_MODE_DIP_EN_BOFFSET       2
 #define TRUNK_HASH_MODE_DIP_EN_BLEN          1
 #define TRUNK_HASH_MODE_DIP_EN_FLAG          HSL_RW
-#endif
 
 #define SA_EN
 #define TRUNK_HASH_MODE_SA_EN_BOFFSET        1
@@ -1299,8 +1274,6 @@ extern "C" {
 #define TRUNK_HASH_MODE_DA_EN_BOFFSET        0
 #define TRUNK_HASH_MODE_DA_EN_BLEN           1
 #define TRUNK_HASH_MODE_DA_EN_FLAG           HSL_RW
-
-
 
 
     /* Vlan Table Function0 Register */
@@ -2527,34 +2500,6 @@ extern "C" {
 #define PORT_HOL_CTL0_E_OFFSET       0x0008
 #define PORT_HOL_CTL0_NR_E           7
 
-#if defined(MHT)
-#define PORT_DESC_NR
-#define PORT_HOL_CTL0_PORT_DESC_NR_BOFFSET           24
-#define PORT_HOL_CTL0_PORT_DESC_NR_BLEN              8
-#define PORT_HOL_CTL0_PORT_DESC_NR_FLAG              HSL_RW
-
-#define QUEUE3_DESC_NR
-#define PORT_HOL_CTL0_QUEUE3_DESC_NR_BOFFSET         18
-#define PORT_HOL_CTL0_QUEUE3_DESC_NR_BLEN            6
-#define PORT_HOL_CTL0_QUEUE3_DESC_NR_FLAG            HSL_RW
-
-#define QUEUE2_DESC_NR
-#define PORT_HOL_CTL0_QUEUE2_DESC_NR_BOFFSET         12
-#define PORT_HOL_CTL0_QUEUE2_DESC_NR_BLEN            6
-#define PORT_HOL_CTL0_QUEUE2_DESC_NR_FLAG            HSL_RW
-
-#define QUEUE1_DESC_NR
-#define PORT_HOL_CTL0_QUEUE1_DESC_NR_BOFFSET         6
-#define PORT_HOL_CTL0_QUEUE1_DESC_NR_BLEN            6
-#define PORT_HOL_CTL0_QUEUE1_DESC_NR_FLAG            HSL_RW
-
-#define QUEUE0_DESC_NR
-#define PORT_HOL_CTL0_QUEUE0_DESC_NR_BOFFSET         0
-#define PORT_HOL_CTL0_QUEUE0_DESC_NR_BLEN            6
-#define PORT_HOL_CTL0_QUEUE0_DESC_NR_FLAG            HSL_RW
-
-#else
-
 #define PORT_DESC_NR
 #define PORT_HOL_CTL0_PORT_DESC_NR_BOFFSET           24
 #define PORT_HOL_CTL0_PORT_DESC_NR_BLEN              6
@@ -2590,7 +2535,6 @@ extern "C" {
 #define PORT_HOL_CTL0_QUEUE0_DESC_NR_BLEN            4
 #define PORT_HOL_CTL0_QUEUE0_DESC_NR_FLAG            HSL_RW
 
-#endif
 
     /* Port HOL CTL1 Register */
 #define PORT_HOL_CTL1
@@ -2598,18 +2542,6 @@ extern "C" {
 #define PORT_HOL_CTL1_E_LENGTH       4
 #define PORT_HOL_CTL1_E_OFFSET       0x0008
 #define PORT_HOL_CTL1_NR_E           7
-
-#if defined(MHT)
-#define QUEUE5_DESC_NR
-#define PORT_HOL_CTL1_QUEUE5_DESC_NR_BOFFSET         26
-#define PORT_HOL_CTL1_QUEUE5_DESC_NR_BLEN            6
-#define PORT_HOL_CTL1_QUEUE5_DESC_NR_FLAG            HSL_RW
-
-#define QUEUE4_DESC_NR
-#define PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET         20
-#define PORT_HOL_CTL1_QUEUE4_DESC_NR_BLEN            6
-#define PORT_HOL_CTL1_QUEUE4_DESC_NR_FLAG            HSL_RW
-#endif
 
 #define EG_MIRROR_EN
 #define PORT_HOL_CTL1_EG_MIRROR_EN_BOFFSET           16
@@ -2633,12 +2565,9 @@ extern "C" {
 
 #define PORT_IN_DESC_EN
 #define PORT_HOL_CTL1_PORT_IN_DESC_EN_BOFFSET        0
-#if defined(MHT)
-#define PORT_HOL_CTL1_PORT_IN_DESC_EN_BLEN           6
-#else
 #define PORT_HOL_CTL1_PORT_IN_DESC_EN_BLEN           4
-#endif
 #define PORT_HOL_CTL1_PORT_IN_DESC_EN_FLAG           HSL_RW
+
 
     /* PORT FLOW CTRL THRESHOLD REGISTER  */
 #define PORT_FLOW_CTRL_THRESHOLD
@@ -2649,20 +2578,12 @@ extern "C" {
 
 #define XON_THRES
 #define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_BOFFSET	16
-#if defined(MHT)
-#define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_BLEN		10
-#else
 #define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_BLEN		8
-#endif
 #define PORT_FLOW_CTRL_THRESHOLD_XON_THRES_FLAG		HSL_RW
 
 #define XOFF_THRES
 #define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_BOFFSET	0
-#if defined(MHT)
-#define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_BLEN	10
-#else
 #define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_BLEN	8
-#endif
 #define PORT_FLOW_CTRL_THRESHOLD_XOFF_THRES_FLAG	HSL_RW
 
     /* FX100 CTRL  Register */

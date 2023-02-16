@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2017, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1173,8 +1173,16 @@ _isisc_intr_mask_mac_linkchg_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t
         return SW_BAD_PARAM;
     }
 
-    HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_MASK1, 0, LINK_CHG_INT_M,
-                      (a_uint8_t *) (&data), sizeof (a_uint32_t));
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+	    HSL_REG_FIELD_GET(rv, dev_id, MHT_GBL_INT_MASK1, 0, LINK_CHG_INT_M,
+			    (a_uint8_t *) (&data), sizeof (a_uint32_t));
+    } else
+#endif
+    {
+	    HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_MASK1, 0, LINK_CHG_INT_M,
+			    (a_uint8_t *) (&data), sizeof (a_uint32_t));
+    }
     SW_RTN_ON_ERROR(rv);
 
     if (A_FALSE == enable)
@@ -1190,8 +1198,16 @@ _isisc_intr_mask_mac_linkchg_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t
         return SW_BAD_PARAM;
     }
 
-    HSL_REG_FIELD_SET(rv, dev_id, GBL_INT_MASK1, 0, LINK_CHG_INT_M,
-                      (a_uint8_t *) (&data), sizeof (a_uint32_t));
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+	    HSL_REG_FIELD_SET(rv, dev_id, MHT_GBL_INT_MASK1, 0, LINK_CHG_INT_M,
+			    (a_uint8_t *) (&data), sizeof (a_uint32_t));
+    } else
+#endif
+    {
+	    HSL_REG_FIELD_SET(rv, dev_id, GBL_INT_MASK1, 0, LINK_CHG_INT_M,
+			    (a_uint8_t *) (&data), sizeof (a_uint32_t));
+    }
 
     return rv;
 }
@@ -1210,8 +1226,16 @@ _isisc_intr_mask_mac_linkchg_get(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t
         return SW_BAD_PARAM;
     }
 
-    HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_MASK1, 0, LINK_CHG_INT_M,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+	    HSL_REG_FIELD_GET(rv, dev_id, MHT_GBL_INT_MASK1, 0, LINK_CHG_INT_M,
+			    (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    } else
+#endif
+    {
+	    HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_MASK1, 0, LINK_CHG_INT_M,
+			    (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    }
     SW_RTN_ON_ERROR(rv);
 
     field = reg & (0x1 << port_id);
@@ -1227,38 +1251,73 @@ _isisc_intr_mask_mac_linkchg_get(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t
     return SW_OK;
 }
 
+#if defined(MHT)
+static sw_error_t
+_mht_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t* port_bitmap)
+{
+	sw_error_t rv;
+	a_uint32_t reg = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	HSL_REG_FIELD_GET(rv, dev_id, MHT_GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+
+	*port_bitmap = reg;
+
+	return rv;
+
+}
+
+static sw_error_t
+_mht_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
+{
+	sw_error_t rv;
+	a_uint32_t reg;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	HSL_REG_FIELD_GET(rv, dev_id, MHT_GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+
+	HSL_REG_FIELD_SET(rv, dev_id, MHT_GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
+
+	return rv;
+
+}
+#endif
 
 static sw_error_t
 _isisc_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t* port_bitmap)
 {
-    sw_error_t rv;
-    a_uint32_t reg = 0;
+	sw_error_t rv;
+	a_uint32_t reg = 0;
 
-    HSL_DEV_ID_CHECK(dev_id);
+	HSL_DEV_ID_CHECK(dev_id);
+	HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
 
-    HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    *port_bitmap = reg;
+	*port_bitmap = reg;
 
-    return rv;
+	return rv;
 
 }
 
 static sw_error_t
 _isisc_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
 {
-    sw_error_t rv;
-    a_uint32_t reg;
+	sw_error_t rv;
+	a_uint32_t reg;
 
-    HSL_DEV_ID_CHECK(dev_id);
+	HSL_DEV_ID_CHECK(dev_id);
 
-    HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+	HSL_REG_FIELD_GET(rv, dev_id, GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
 
-    HSL_REG_FIELD_SET(rv, dev_id, GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+	HSL_REG_FIELD_SET(rv, dev_id, GBL_INT_STATUS1, 0, LINK_CHG_INT_S,
+			(a_uint8_t *) (&reg), sizeof (a_uint32_t));
 
-    return rv;
+	return rv;
 
 }
 
@@ -2053,7 +2112,12 @@ isisc_intr_status_mac_linkchg_get(a_uint32_t dev_id, fal_pbmp_t* port_bitmap)
     sw_error_t rv;
 
     FAL_API_LOCK;
-    rv = _isisc_intr_status_mac_linkchg_get(dev_id, port_bitmap);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_intr_status_mac_linkchg_get(dev_id, port_bitmap);
+    else
+#endif
+	    rv = _isisc_intr_status_mac_linkchg_get(dev_id, port_bitmap);
     FAL_API_UNLOCK;
     return rv;
 }
@@ -2069,7 +2133,12 @@ isisc_intr_status_mac_linkchg_clear(a_uint32_t dev_id)
     sw_error_t rv;
 
     FAL_API_LOCK;
-    rv = _isisc_intr_status_mac_linkchg_clear(dev_id);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_intr_status_mac_linkchg_clear(dev_id);
+    else
+#endif
+	    rv = _isisc_intr_status_mac_linkchg_clear(dev_id);
     FAL_API_UNLOCK;
     return rv;
 }

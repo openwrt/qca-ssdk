@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,18 +26,19 @@
 #include "hsl_port_prop.h"
 #include "isisc_qos.h"
 #include "isisc_reg.h"
-
 #if defined(MHT)
+#include "mht_reg.h"
+
 #define MHT_PHYPORT_QUEUE_MAX	4
 #define MHT_QUEUE_BUFFER_LEN	6
-#define ISISC_QOS_QUEUE_TX_BUFFER_MAX 504
-#define ISISC_QOS_PORT_TX_BUFFER_MAX  2040
-#define ISISC_QOS_PORT_RX_BUFFER_MAX  504
-#else
+#define MHT_QOS_QUEUE_TX_BUFFER_MAX 504
+#define MHT_QOS_PORT_TX_BUFFER_MAX  2040
+#define MHT_QOS_PORT_RX_BUFFER_MAX  504
+#endif
+
 #define ISISC_QOS_QUEUE_TX_BUFFER_MAX 120
 #define ISISC_QOS_PORT_TX_BUFFER_MAX  504
 #define ISISC_QOS_PORT_RX_BUFFER_MAX  120
-#endif
 #define ISISC_QOS_REACT_BUFFER_MAX    64
 
 #define ISISC_QOS_HOL_STEP       8
@@ -245,25 +246,42 @@ _isisc_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     return SW_OK;
 }
 
+#if defined(MHT)
+static sw_error_t
+_mht_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
+                             a_uint32_t * number)
+{
+	a_uint32_t val = 0;
+	sw_error_t rv;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+		return SW_BAD_PARAM;
+
+	HSL_REG_FIELD_GET(rv, dev_id, MHT_PORT_HOL_CTL0, port_id, PORT_DESC_NR,
+			(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	*number = val << ISISC_QOS_HOL_MOD;
+	return SW_OK;
+}
+#endif
 
 static sw_error_t
 _isisc_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
                              a_uint32_t * number)
 {
-    a_uint32_t val = 0;
-    sw_error_t rv;
+	a_uint32_t val = 0;
+	sw_error_t rv;
 
-    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
-    {
-        return SW_BAD_PARAM;
-    }
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+		return SW_BAD_PARAM;
 
-    HSL_REG_FIELD_GET(rv, dev_id, PORT_HOL_CTL0, port_id, PORT_DESC_NR,
-                      (a_uint8_t *) (&val), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	HSL_REG_FIELD_GET(rv, dev_id, PORT_HOL_CTL0, port_id, PORT_DESC_NR,
+			(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    *number = val << ISISC_QOS_HOL_MOD;
-    return SW_OK;
+	*number = val << ISISC_QOS_HOL_MOD;
+	return SW_OK;
 }
 #endif
 
@@ -279,8 +297,16 @@ _isisc_qos_port_rx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
         return SW_BAD_PARAM;
     }
 
-    HSL_REG_FIELD_GET(rv, dev_id, PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
-                      (a_uint8_t *) (&val), sizeof (a_uint32_t));
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+	    HSL_REG_FIELD_GET(rv, dev_id, MHT_PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
+			    (a_uint8_t *) (&val), sizeof (a_uint32_t));
+    } else
+#endif
+    {
+	    HSL_REG_FIELD_GET(rv, dev_id, PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
+			    (a_uint8_t *) (&val), sizeof (a_uint32_t));
+    }
     SW_RTN_ON_ERROR(rv);
 
     *number = val << ISISC_QOS_HOL_MOD;
@@ -341,7 +367,7 @@ _mht_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
 		return SW_BAD_PARAM;
 	}
 
-	if (ISISC_QOS_QUEUE_TX_BUFFER_MAX < *number)
+	if (MHT_QOS_QUEUE_TX_BUFFER_MAX < *number)
 	{
 		return SW_BAD_PARAM;
 	}
@@ -353,26 +379,26 @@ _mht_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
 	*number = val << ISISC_QOS_HOL_MOD;
 
 	if (queue_id >= MHT_PHYPORT_QUEUE_MAX) {
-		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL1, port_id,
+		HSL_REG_ENTRY_GET(rv, dev_id, MHT_PORT_HOL_CTL1, port_id,
 				(a_uint8_t *)(&data), sizeof(a_uint32_t));
 		SW_RTN_ON_ERROR(rv);
 
-		data &= (~(0x3f << (PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
+		data &= (~(0x3f << (MHT_PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
 				(queue_id - MHT_PHYPORT_QUEUE_MAX) * MHT_QUEUE_BUFFER_LEN)));
-		data |= (val << (PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
+		data |= (val << (MHT_PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
 				(queue_id - MHT_PHYPORT_QUEUE_MAX) * MHT_QUEUE_BUFFER_LEN));
 
-		HSL_REG_ENTRY_SET(rv, dev_id, PORT_HOL_CTL1, port_id, (a_uint8_t *) (&data),
+		HSL_REG_ENTRY_SET(rv, dev_id, MHT_PORT_HOL_CTL1, port_id, (a_uint8_t *) (&data),
 				sizeof (a_uint32_t));
 	} else {
-		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
+		HSL_REG_ENTRY_GET(rv, dev_id, MHT_PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
 				sizeof (a_uint32_t));
 		SW_RTN_ON_ERROR(rv);
 
 		data &= (~(0x3f << (queue_id * MHT_QUEUE_BUFFER_LEN)));
 		data |= (val << (queue_id * MHT_QUEUE_BUFFER_LEN));
 
-		HSL_REG_ENTRY_SET(rv, dev_id, PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
+		HSL_REG_ENTRY_SET(rv, dev_id, MHT_PORT_HOL_CTL0, port_id, (a_uint8_t *) (&data),
 				sizeof (a_uint32_t));
 	}
 
@@ -416,73 +442,108 @@ _isisc_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
     return rv;
 }
 
+#if defined(MHT)
+static sw_error_t
+_mht_qos_port_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
+                             a_uint32_t * number)
+{
+	a_uint32_t val = 0;
+	sw_error_t rv;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+		return SW_BAD_PARAM;
+
+	if (MHT_QOS_PORT_TX_BUFFER_MAX < *number)
+		return SW_BAD_PARAM;
+
+	val = *number / ISISC_QOS_HOL_STEP;
+	*number = val << ISISC_QOS_HOL_MOD;
+
+	HSL_REG_FIELD_SET(rv, dev_id, MHT_PORT_HOL_CTL0, port_id, PORT_DESC_NR,
+			(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	return rv;
+}
+#endif
+
 static sw_error_t
 _isisc_qos_port_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
                              a_uint32_t * number)
 {
-    a_uint32_t val = 0;
-    sw_error_t rv;
+	a_uint32_t val = 0;
+	sw_error_t rv;
 
-    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
-    {
-        return SW_BAD_PARAM;
-    }
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+		return SW_BAD_PARAM;
 
-    if (ISISC_QOS_PORT_TX_BUFFER_MAX < *number)
-    {
-        return SW_BAD_PARAM;
-    }
 
-    val = *number / ISISC_QOS_HOL_STEP;
-    *number = val << ISISC_QOS_HOL_MOD;
-    HSL_REG_FIELD_SET(rv, dev_id, PORT_HOL_CTL0, port_id, PORT_DESC_NR,
-                      (a_uint8_t *) (&val), sizeof (a_uint32_t));
-    return rv;
+	if (ISISC_QOS_PORT_TX_BUFFER_MAX < *number)
+		return SW_BAD_PARAM;
+
+	val = *number / ISISC_QOS_HOL_STEP;
+	*number = val << ISISC_QOS_HOL_MOD;
+
+	HSL_REG_FIELD_SET(rv, dev_id, PORT_HOL_CTL0, port_id, PORT_DESC_NR,
+			(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	return rv;
 }
 
 static sw_error_t
 _isisc_qos_port_rx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
                              a_uint32_t * number, a_uint32_t * react_num)
 {
-    a_uint32_t val = 0;
-    sw_error_t rv;
+	a_uint32_t val = 0, buffer_max = ISISC_QOS_PORT_RX_BUFFER_MAX;
+	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
+	sw_error_t rv;
 
-    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
-    {
-        return SW_BAD_PARAM;
-    }
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
 
-    if (ISISC_QOS_PORT_RX_BUFFER_MAX < *number)
-    {
-        return SW_BAD_PARAM;
-    }
+	chip_type = hsl_get_current_chip_type(dev_id);
+#if defined(MHT)
+	if (chip_type == CHIP_MHT)
+		buffer_max = MHT_QOS_PORT_RX_BUFFER_MAX;
+#endif
 
-    val = *number / ISISC_QOS_HOL_STEP;
-    *number = val << ISISC_QOS_HOL_MOD;
-    HSL_REG_FIELD_SET(rv, dev_id, PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
-                      (a_uint8_t *) (&val), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	if (buffer_max < *number)
+		return SW_BAD_PARAM;
 
-    HSL_REG_ENTRY_GET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t*)(&val),
-        sizeof(a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
-    if(*react_num < ISISC_QOS_REACT_BUFFER_MAX)
-    {
-        SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_EN, 0x1, val);
-        SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_CNT, *react_num, val);
-    }
-    else if(*react_num == ISISC_QOS_REACT_BUFFER_MAX)
-    {
-        SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_EN, 0, val);
-    }
-    else
-    {
-        return SW_OUT_OF_RANGE;
-    }
-    HSL_REG_ENTRY_SET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t *) (&val),
-        sizeof (a_uint32_t));
+	val = *number / ISISC_QOS_HOL_STEP;
+	*number = val << ISISC_QOS_HOL_MOD;
 
-    return rv;
+#if defined(MHT)
+	if (chip_type == CHIP_MHT) {
+		HSL_REG_FIELD_SET(rv, dev_id, MHT_PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
+				(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	} else
+#endif
+	{
+		HSL_REG_FIELD_SET(rv, dev_id, PORT_HOL_CTL1, port_id, PORT_IN_DESC_EN,
+				(a_uint8_t *) (&val), sizeof (a_uint32_t));
+	}
+	SW_RTN_ON_ERROR(rv);
+
+	HSL_REG_ENTRY_GET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t*)(&val), sizeof(a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	if(*react_num < ISISC_QOS_REACT_BUFFER_MAX)
+	{
+		SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_EN, 0x1, val);
+		SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_CNT, *react_num, val);
+	}
+	else if(*react_num == ISISC_QOS_REACT_BUFFER_MAX)
+	{
+		SW_SET_REG_BY_FIELD(QM_CTRL_REG, FLOW_DROP_EN, 0, val);
+	}
+	else
+	{
+		return SW_OUT_OF_RANGE;
+	}
+	HSL_REG_ENTRY_SET(rv, dev_id, QM_CTRL_REG, 0, (a_uint8_t *) (&val),
+			sizeof (a_uint32_t));
+
+	return rv;
 }
 
 static sw_error_t
@@ -1054,35 +1115,77 @@ HSL_LOCAL sw_error_t
 _isisc_port_static_thresh_get(a_uint32_t dev_id, fal_port_t port_id,
                                 fal_bm_static_cfg_t *cfg)
 {
-    sw_error_t rv;
-    a_uint32_t reg_value, xon_value, xoff_value;
+	sw_error_t rv;
+	a_uint32_t reg_value, xon_value, xoff_value;
 
-    HSL_REG_ENTRY_GET(rv, dev_id, PORT_FLOW_CTRL_THRESHOLD, port_id,
-                      (a_uint8_t *) (&reg_value), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
+	HSL_REG_ENTRY_GET(rv, dev_id, PORT_FLOW_CTRL_THRESHOLD, port_id,
+			(a_uint8_t *) (&reg_value), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
 
-    SW_GET_FIELD_BY_REG(PORT_FLOW_CTRL_THRESHOLD, XON_THRES, xon_value, reg_value);
-    SW_GET_FIELD_BY_REG(PORT_FLOW_CTRL_THRESHOLD, XOFF_THRES, xoff_value, reg_value);
-    cfg->max_thresh = xoff_value;
-    cfg->resume_off = xoff_value - xon_value;
+	SW_GET_FIELD_BY_REG(PORT_FLOW_CTRL_THRESHOLD, XON_THRES, xon_value, reg_value);
+	SW_GET_FIELD_BY_REG(PORT_FLOW_CTRL_THRESHOLD, XOFF_THRES, xoff_value, reg_value);
 
-    return SW_OK;
+	cfg->max_thresh = xoff_value;
+	cfg->resume_off = xoff_value - xon_value;
+
+	return SW_OK;
 }
+
+#if defined(MHT)
+HSL_LOCAL sw_error_t
+_mht_port_static_thresh_get(a_uint32_t dev_id, fal_port_t port_id,
+                                fal_bm_static_cfg_t *cfg)
+{
+	sw_error_t rv;
+	a_uint32_t reg_value, xon_value, xoff_value;
+
+	HSL_REG_ENTRY_GET(rv, dev_id, MHT_PORT_FLOW_CTRL_THRESHOLD, port_id,
+			(a_uint8_t *) (&reg_value), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	SW_GET_FIELD_BY_REG(MHT_PORT_FLOW_CTRL_THRESHOLD, XON_THRES, xon_value, reg_value);
+	SW_GET_FIELD_BY_REG(MHT_PORT_FLOW_CTRL_THRESHOLD, XOFF_THRES, xoff_value, reg_value);
+	cfg->max_thresh = xoff_value;
+	cfg->resume_off = xoff_value - xon_value;
+
+	return SW_OK;
+}
+
+HSL_LOCAL sw_error_t
+_mht_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
+                                fal_bm_static_cfg_t *cfg)
+{
+	sw_error_t rv;
+	a_uint32_t reg_value = 0;
+
+	SW_SET_REG_BY_FIELD(MHT_PORT_FLOW_CTRL_THRESHOLD, XON_THRES,
+			cfg->max_thresh - cfg->resume_off, reg_value);
+	SW_SET_REG_BY_FIELD(MHT_PORT_FLOW_CTRL_THRESHOLD, XOFF_THRES,
+			cfg->max_thresh, reg_value);
+
+	HSL_REG_ENTRY_SET(rv, dev_id, MHT_PORT_FLOW_CTRL_THRESHOLD, port_id,
+			(a_uint8_t *)(&reg_value), sizeof(a_uint32_t));
+
+	return SW_OK;
+}
+#endif
 
 HSL_LOCAL sw_error_t
 _isisc_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
                                 fal_bm_static_cfg_t *cfg)
 {
-    sw_error_t rv;
-    a_uint32_t reg_value = 0;
+	sw_error_t rv;
+	a_uint32_t reg_value = 0;
 
-    SW_SET_REG_BY_FIELD(PORT_FLOW_CTRL_THRESHOLD, XON_THRES, cfg->max_thresh - cfg->resume_off, reg_value);
-    SW_SET_REG_BY_FIELD(PORT_FLOW_CTRL_THRESHOLD, XOFF_THRES, cfg->max_thresh, reg_value);
+	SW_SET_REG_BY_FIELD(PORT_FLOW_CTRL_THRESHOLD, XON_THRES,
+			cfg->max_thresh - cfg->resume_off, reg_value);
+	SW_SET_REG_BY_FIELD(PORT_FLOW_CTRL_THRESHOLD, XOFF_THRES,
+			cfg->max_thresh, reg_value);
 
-    HSL_REG_ENTRY_SET(rv, dev_id, PORT_FLOW_CTRL_THRESHOLD, port_id,
-                      (a_uint8_t *) (&reg_value), sizeof (a_uint32_t));
+	HSL_REG_ENTRY_SET(rv, dev_id, PORT_FLOW_CTRL_THRESHOLD, port_id,
+			(a_uint8_t *)(&reg_value), sizeof(a_uint32_t));
 
-    return SW_OK;
+	return SW_OK;
 }
 
 #if defined(MHT)
@@ -1102,13 +1205,13 @@ _mht_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
 	SW_RTN_ON_ERROR(rv);
 
 	if (queue_id >= MHT_PHYPORT_QUEUE_MAX) {
-		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL1, port_id,
+		HSL_REG_ENTRY_GET(rv, dev_id, MHT_PORT_HOL_CTL1, port_id,
 				(a_uint8_t *)(&data), sizeof(a_uint32_t));
 		SW_RTN_ON_ERROR(rv);
-		val = (data >> (PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
+		val = (data >> (MHT_PORT_HOL_CTL1_QUEUE4_DESC_NR_BOFFSET +
 				(queue_id - MHT_PHYPORT_QUEUE_MAX) * MHT_QUEUE_BUFFER_LEN)) & 0x3f;
 	} else {
-		HSL_REG_ENTRY_GET(rv, dev_id, PORT_HOL_CTL0, port_id,
+		HSL_REG_ENTRY_GET(rv, dev_id, MHT_PORT_HOL_CTL0, port_id,
 				(a_uint8_t *)(&data), sizeof(a_uint32_t));
 		SW_RTN_ON_ERROR(rv);
 		val = (data >> (queue_id * MHT_QUEUE_BUFFER_LEN)) & 0x3f;
@@ -1241,12 +1344,10 @@ isisc_qos_queue_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
                              fal_queue_t queue_id, a_uint32_t * number)
 {
 	sw_error_t rv;
-	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
 
 	HSL_API_LOCK;
-	chip_type = hsl_get_current_chip_type(dev_id);
 #if defined(MHT)
-	if (chip_type == CHIP_MHT)
+	if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
 		rv = _mht_qos_queue_tx_buf_nr_get(dev_id, port_id, queue_id, number);
 	else
 #endif
@@ -1272,7 +1373,12 @@ isisc_qos_port_tx_buf_nr_get(a_uint32_t dev_id, fal_port_t port_id,
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_qos_port_tx_buf_nr_get(dev_id, port_id, number);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_qos_port_tx_buf_nr_get(dev_id, port_id, number);
+    else
+#endif
+	    rv = _isisc_qos_port_tx_buf_nr_get(dev_id, port_id, number);
     HSL_API_UNLOCK;
     return rv;
 }
@@ -1333,12 +1439,10 @@ isisc_qos_queue_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
                              fal_queue_t queue_id, a_uint32_t * number)
 {
 	sw_error_t rv;
-	ssdk_chip_type chip_type = CHIP_UNSPECIFIED;
 
 	HSL_API_LOCK;
-	chip_type = hsl_get_current_chip_type(dev_id);
 #if defined(MHT)
-	if (chip_type == CHIP_MHT)
+	if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
 		rv = _mht_qos_queue_tx_buf_nr_set(dev_id, port_id, queue_id, number);
 	else
 #endif
@@ -1365,7 +1469,12 @@ isisc_qos_port_tx_buf_nr_set(a_uint32_t dev_id, fal_port_t port_id,
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_qos_port_tx_buf_nr_set(dev_id, port_id, number);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_qos_port_tx_buf_nr_set(dev_id, port_id, number);
+    else
+#endif
+	    rv = _isisc_qos_port_tx_buf_nr_set(dev_id, port_id, number);
     HSL_API_UNLOCK;
     return rv;
 }
@@ -1725,7 +1834,12 @@ isisc_port_static_thresh_get(a_uint32_t dev_id, fal_port_t port_id,
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_port_static_thresh_get(dev_id, port_id, cfg);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_port_static_thresh_get(dev_id, port_id, cfg);
+    else
+#endif
+	    rv = _isisc_port_static_thresh_get(dev_id, port_id, cfg);
     HSL_API_UNLOCK;
     return rv;
 }
@@ -1744,7 +1858,12 @@ isisc_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port_id,
     sw_error_t rv;
 
     HSL_API_LOCK;
-    rv = _isisc_port_static_thresh_set(dev_id, port_id, cfg);
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	    rv = _mht_port_static_thresh_set(dev_id, port_id, cfg);
+    else
+#endif
+	    rv = _isisc_port_static_thresh_set(dev_id, port_id, cfg);
     HSL_API_UNLOCK;
     return rv;
 }

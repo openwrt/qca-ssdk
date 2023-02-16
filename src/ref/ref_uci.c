@@ -9967,6 +9967,13 @@ static const char *flow_host[] = {
 	"wifi_qos_en",
 	"wifi_qos",
 #endif
+#if defined(MPPE)
+	"qos_type",
+	"bridge_nexthop_valid",
+	"bridge_nexthop",
+	"policer_valid",
+	"policer_index",
+#endif
 	"ipentry_id",
 	"entry_flags",
 	"entry_status",

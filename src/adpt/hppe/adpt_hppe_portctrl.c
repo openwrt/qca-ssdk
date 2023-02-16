@@ -96,6 +96,8 @@
 #define PASS_CONTROL_PACKET 0x2
 #define XGMAC_PAUSE_TIME	0xffff
 #define CARRIER_SENSE_SIGNAL_FROM_MAC        0x0
+#define XGMAC_PWE_ENABLE	0x1
+#define XGMAC_WTO_LIMIT_13K	0xb
 
 #define PHY_PORT_TO_BM_PORT(port)	(port + 7)
 #define GMAC_IPG_CHECK          0xc
@@ -346,12 +348,14 @@ _adpt_xgmac_port_max_frame_size_set(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t max_frame)
 {
 	sw_error_t rv = SW_OK;
+	a_uint32_t index = HPPE_TO_XGMAC_PORT_ID(port_id);
 
-	a_uint32_t index  = HPPE_TO_XGMAC_PORT_ID(port_id);
 	rv |= hppe_mac_tx_configuration_jd_set(dev_id, index, (a_uint32_t)A_TRUE);
 	rv |= hppe_mac_rx_configuration_gpsl_set(dev_id, index, max_frame);
-	rv |= hppe_mac_rx_configuration_wd_set(dev_id, index, 1);
-	rv |= hppe_mac_rx_configuration_gmpslce_set(dev_id, index, 1);
+	rv |= hppe_mac_rx_configuration_wd_set(dev_id, index, (a_uint32_t)A_FALSE);
+	rv |= hppe_mac_rx_configuration_gmpslce_set(dev_id, index, (a_uint32_t)A_TRUE);
+	rv |= hppe_mac_watchdog_timeout_wto_set(dev_id, index, XGMAC_WTO_LIMIT_13K);
+	rv |= hppe_mac_watchdog_timeout_pwe_set(dev_id, index, XGMAC_PWE_ENABLE);
 	rv |= adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id, port_id);
 
 	return rv;
@@ -657,8 +661,14 @@ adpt_hppe_port_xgmac_reconfig(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t rxfc_status = 0, txfc_status = 0;
+	a_uint32_t index = HPPE_TO_XGMAC_PORT_ID(port_id);
 
 	rv = adpt_hppe_port_xgmac_promiscuous_mode_set(dev_id, port_id);
+	SW_RTN_ON_ERROR(rv);
+
+	rv = hppe_mac_watchdog_timeout_wto_set(dev_id, index, XGMAC_WTO_LIMIT_13K);
+	SW_RTN_ON_ERROR(rv);
+	rv = hppe_mac_watchdog_timeout_pwe_set(dev_id, index, XGMAC_PWE_ENABLE);
 	SW_RTN_ON_ERROR(rv);
 
 	rv = _adpt_xgmac_port_rxfc_status_get(dev_id, port_id, &rxfc_status);

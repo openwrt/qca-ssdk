@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -108,8 +108,6 @@ hppe_mac_packet_filter_set(
 				index * MAC_PACKET_FILTER_INC,
 				value->val);
 }
-#if 0
-#ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
 hppe_mac_watchdog_timeout_get(
@@ -139,6 +137,8 @@ hppe_mac_watchdog_timeout_set(
 				value->val);
 }
 
+#if 0
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 hppe_mac_vlan_tag_get(
 		a_uint32_t dev_id,
@@ -1923,8 +1923,6 @@ hppe_mac_packet_filter_ra_set(
 	return ret;
 }
 #if 0
-#ifndef IN_PORTCONTROL_MINI
-
 sw_error_t
 hppe_mac_packet_filter_ipfe_get(
 		a_uint32_t dev_id,
@@ -2000,6 +1998,7 @@ hppe_mac_watchdog_timeout_pwe_get(
 	*value = reg_val.bf.pwe;
 	return ret;
 }
+#endif
 
 sw_error_t
 hppe_mac_watchdog_timeout_pwe_set(
@@ -2019,20 +2018,6 @@ hppe_mac_watchdog_timeout_pwe_set(
 }
 
 sw_error_t
-hppe_mac_watchdog_timeout_wto_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		a_uint32_t *value)
-{
-	union mac_watchdog_timeout_u reg_val;
-	sw_error_t ret = SW_OK;
-
-	ret = hppe_mac_watchdog_timeout_get(dev_id, index, &reg_val);
-	*value = reg_val.bf.wto;
-	return ret;
-}
-
-sw_error_t
 hppe_mac_watchdog_timeout_wto_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -2046,6 +2031,20 @@ hppe_mac_watchdog_timeout_wto_set(
 		return ret;
 	reg_val.bf.wto = value;
 	ret = hppe_mac_watchdog_timeout_set(dev_id, index, &reg_val);
+	return ret;
+}
+#if 0
+sw_error_t
+hppe_mac_watchdog_timeout_wto_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value)
+{
+	union mac_watchdog_timeout_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_mac_watchdog_timeout_get(dev_id, index, &reg_val);
+	*value = reg_val.bf.wto;
 	return ret;
 }
 
@@ -6089,5 +6088,4 @@ hppe_mmc_transmit_interrupt_enable_txmcgbfie_set(
 {
 	return SW_NOT_SUPPORTED;
 }
-#endif
 #endif

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, 2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -103,7 +103,7 @@ hppe_mac_packet_filter_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union mac_packet_filter_u *value);
-#if 0
+
 sw_error_t
 hppe_mac_watchdog_timeout_get(
 		a_uint32_t dev_id,
@@ -116,6 +116,7 @@ hppe_mac_watchdog_timeout_set(
 		a_uint32_t index,
 		union mac_watchdog_timeout_u *value);
 
+#if 0
 sw_error_t
 hppe_mac_vlan_tag_get(
 		a_uint32_t dev_id,
@@ -855,23 +856,24 @@ hppe_mac_watchdog_timeout_pwe_get(
 		a_uint32_t *value);
 
 sw_error_t
+hppe_mac_watchdog_timeout_wto_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		a_uint32_t *value);
+#endif
+
+sw_error_t
 hppe_mac_watchdog_timeout_pwe_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
 
 sw_error_t
-hppe_mac_watchdog_timeout_wto_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		a_uint32_t *value);
-
-sw_error_t
 hppe_mac_watchdog_timeout_wto_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		a_uint32_t value);
-
+#if 0
 sw_error_t
 hppe_mac_vlan_tag_eivls_get(
 		a_uint32_t dev_id,

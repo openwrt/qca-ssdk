@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -615,7 +615,11 @@ qca_switch_init(a_uint32_t dev_id)
 #if defined(IN_PORTCONTROL)
 					fal_port_txmac_status_set(dev_id, i, A_FALSE);
 					fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+#if defined(MPPE)
+					fal_port_flowctrl_set(dev_id, i, A_TRUE);
+#else
 					fal_port_flowctrl_set(dev_id, i, A_FALSE);
+#endif
 #endif
 					if (cpu_bmp & BIT(i)) {
 #if defined(IN_PORTCONTROL)

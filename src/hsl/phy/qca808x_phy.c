@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018, 2020-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -233,19 +233,24 @@ sw_error_t
 qca808x_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint32_t mask, a_uint32_t value)
 {
-	sw_error_t rv = SW_OK;
 	a_uint16_t phy_data = 0, new_phy_data = 0;
+	struct mii_bus *bus = NULL;
+	a_uint32_t reg_id_c45 = QCA808X_REG_C45_ADDRESS(mmd_num, mmd_reg);
 
-	phy_data = qca808x_phy_mmd_read (dev_id, phy_addr, mmd_num, mmd_reg);
-	PHY_RTN_ON_READ_ERROR(phy_data);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	if (!bus)
+		return SW_NOT_SUPPORTED;
+
+	mutex_lock(&bus->mdio_lock);
+	phy_data = __mdiobus_read(bus, phy_addr, reg_id_c45);
+	if(phy_data == PHY_INVALID_DATA)
+	{
+		mutex_unlock(&bus->mdio_lock);
+		return SW_READ_ERROR;
+	}
 	new_phy_data = (phy_data & ~mask) | value;
-	rv = qca808x_phy_mmd_write (dev_id, phy_addr, mmd_num, mmd_reg,
-		new_phy_data);
-	SW_RTN_ON_ERROR(rv);
-	/*check the mmd register value*/
-	phy_data = qca808x_phy_mmd_read (dev_id, phy_addr, mmd_num, mmd_reg);
-	SSDK_DEBUG ("phy_addr:0x%x, mmd_num:0x%x, mmd_reg:0x%x, phy_data:0x%x",
-		phy_addr, mmd_num, mmd_reg, phy_data);
+	__mdiobus_write(bus, phy_addr, reg_id_c45, new_phy_data);
+	mutex_unlock(&bus->mdio_lock);
 
 	return SW_OK;
 }

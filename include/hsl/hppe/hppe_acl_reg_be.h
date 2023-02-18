@@ -316,18 +316,20 @@ union udf_ctrl_reg_u {
 
 struct ipo_rule_reg {
 	a_uint32_t  rule_field_0:32;
-	a_uint32_t  rule_field_1:20;
-	a_uint32_t  fake_mac_header:1;
-	a_uint32_t  range_en:1;
-	a_uint32_t  inverse_en:1;
-	a_uint32_t  rule_type:5;
-	a_uint32_t  src_type:3;
+
 	a_uint32_t  src_0:1;
-	a_uint32_t  src_1:7;
-	a_uint32_t  pri:9;
-	a_uint32_t  res_chain:1;
-	a_uint32_t  post_routing_en:1;
+	a_uint32_t  src_type:3;
+	a_uint32_t  rule_type:5;
+	a_uint32_t  inverse_en:1;
+	a_uint32_t  range_en:1;
+	a_uint32_t  fake_mac_header:1;
+	a_uint32_t  rule_field_1:20;
+
 	a_uint32_t  _reserved0:14;
+	a_uint32_t  post_routing_en:1;
+	a_uint32_t  res_chain:1;
+	a_uint32_t  pri:9;
+	a_uint32_t  src_1:7;
 };
 #else
 /*[table] IPO_RULE_REG*/
@@ -914,33 +916,17 @@ union ipo_cnt_tbl_u {
 #endif
 
 struct ipo_action {
-#if defined(MPPE)
-	a_uint32_t _reserved0:31;
-	a_uint32_t metadata_pri_1:1;
-	a_uint32_t metadata_pri_0:3;
-#else
-	a_uint32_t  _reserved0:3;
-#endif
-        a_uint32_t  qos_res_prec:3;
-        a_uint32_t  dscp_tc_mask:8;
-        a_uint32_t  metadata_en:1;
-        a_uint32_t  cpu_code:8;
-        a_uint32_t  cpu_code_en:1;
-        a_uint32_t  syn_toggle:1;
-        a_uint32_t  service_code_1:7;
-	a_uint32_t  service_code_0:1;
-	a_uint32_t  service_code_en:1;
-	a_uint32_t  qid:8;
-	a_uint32_t  qid_en:1;
-        a_uint32_t  policer_index:9;
-        a_uint32_t  policer_en:1;
-        a_uint32_t  int_dp:2;
-        a_uint32_t  int_dp_change_en:1;
-        a_uint32_t  enqueue_pri:4;
-        a_uint32_t  enqueue_pri_change_en:1;
-        a_uint32_t  ctag_dei:1;
-        a_uint32_t  ctag_dei_change_en:1;
-        a_uint32_t  ctag_pcp_1:1;
+	a_uint32_t  bypass_bitmap_0:14;
+	a_uint32_t  mirror_en:1;
+	a_uint32_t  dest_info:14;
+	a_uint32_t  fwd_cmd:2;
+	a_uint32_t  dest_info_change_en:1;
+
+	a_uint32_t  svid:12;
+	a_uint32_t  stag_fmt:1;
+	a_uint32_t  svid_change_en:1;
+	a_uint32_t  bypass_bitmap_1:18;
+
 	a_uint32_t  ctag_pcp_0:2;
 	a_uint32_t  ctag_pcp_change_en:1;
 	a_uint32_t  stag_dei:1;
@@ -952,15 +938,38 @@ struct ipo_action {
 	a_uint32_t  cvid:12;
 	a_uint32_t  ctag_fmt:1;
 	a_uint32_t  cvid_change_en:1;
-	a_uint32_t  svid:12;
-	a_uint32_t  stag_fmt:1;
-	a_uint32_t  svid_change_en:1;
-	a_uint32_t  bypass_bitmap_1:18;
-	a_uint32_t  bypass_bitmap_0:14;
-	a_uint32_t  mirror_en:1;
-	a_uint32_t  dest_info:14;
-	a_uint32_t  fwd_cmd:2;
-	a_uint32_t  dest_info_change_en:1;
+
+	a_uint32_t  service_code_0:1;
+	a_uint32_t  service_code_en:1;
+	a_uint32_t  qid:8;
+	a_uint32_t  qid_en:1;
+	a_uint32_t  policer_index:9;
+	a_uint32_t  policer_en:1;
+	a_uint32_t  int_dp:2;
+	a_uint32_t  int_dp_change_en:1;
+	a_uint32_t  enqueue_pri:4;
+	a_uint32_t  enqueue_pri_change_en:1;
+	a_uint32_t  ctag_dei:1;
+	a_uint32_t  ctag_dei_change_en:1;
+	a_uint32_t  ctag_pcp_1:1;
+
+#if defined(MPPE)
+	a_uint32_t metadata_pri_0:3;
+#else
+	a_uint32_t  _reserved0:3;
+#endif
+	a_uint32_t  qos_res_prec:3;
+	a_uint32_t  dscp_tc_mask:8;
+	a_uint32_t  metadata_en:1;
+	a_uint32_t  cpu_code:8;
+	a_uint32_t  cpu_code_en:1;
+	a_uint32_t  syn_toggle:1;
+	a_uint32_t  service_code_1:7;
+
+#if defined(MPPE)
+	a_uint32_t _reserved0:31;
+	a_uint32_t metadata_pri_1:1;
+#endif
 };
 
 union ipo_action_u {

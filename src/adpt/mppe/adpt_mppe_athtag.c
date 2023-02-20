@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,6 +25,11 @@
 #include "mppe_athtag.h"
 #include "appe_portvlan_reg.h"
 #include "appe_portvlan.h"
+#include "hsl.h"
+#include "hsl_dev.h"
+#if defined(MHT)
+#include "ssdk_mht.h"
+#endif
 
 sw_error_t
 adpt_mppe_athtag_pri_mapping_set(a_uint32_t dev_id,
@@ -98,101 +103,6 @@ static a_uint32_t _adpt_mppe_athtag_bit_index(a_uint32_t bits)
 		}
 	}
 	return 0xff;
-}
-
-sw_error_t
-adpt_mppe_athtag_port_mapping_set(a_uint32_t dev_id,
-		fal_direction_t direction, fal_athtag_port_mapping_t * port_mapping)
-{
-	union prx_port_to_vp_mapping_u prx_port_to_vp_map = {0};
-	union eg_vp_tbl_u eg_vp_tbl = {0};
-	a_uint32_t port_id = 0;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	if (direction == FAL_DIR_INGRESS || direction == FAL_DIR_BOTH)
-	{
-		for (port_id = 0; port_id < PRX_PORT_TO_VP_MAPPING_MAX_ENTRY; port_id++)
-		{
-			if (!SW_IS_PBMP_MEMBER(port_mapping->ath_port, port_id))
-				continue;
-			SW_RTN_ON_ERROR(mppe_prx_port_to_vp_mapping_get(dev_id,
-						port_id, &prx_port_to_vp_map));
-			prx_port_to_vp_map.bf.prx_port_vp =
-						FAL_PORT_ID_VALUE(port_mapping->int_port);
-			SW_RTN_ON_ERROR(mppe_prx_port_to_vp_mapping_set(dev_id,
-						port_id, &prx_port_to_vp_map));
-		}
-	}
-	if (direction == FAL_DIR_EGRESS || direction == FAL_DIR_BOTH)
-	{
-		SW_RTN_ON_ERROR(appe_egress_vp_tbl_get(dev_id,
-					FAL_PORT_ID_VALUE(port_mapping->int_port), &eg_vp_tbl));
-
-		if (eg_vp_tbl.bf.ath_hdr_ver == 2)
-		{
-			/*for version2 the ath_port_bitmap in eg_vp_tbl is the port bitmap*/
-			eg_vp_tbl.bf.ath_port_bitmap_0 = port_mapping->ath_port & 0x3f;
-			eg_vp_tbl.bf.ath_port_bitmap_1 = (port_mapping->ath_port >>6) & 0x1;
-		}
-		else
-		{
-			/*get the first port id in the port bitmap*/
-			port_id = _adpt_mppe_athtag_bit_index(port_mapping->ath_port);
-			/*for version3 the ath_port_bitmap in eg_vp_tbl is the port id*/
-			eg_vp_tbl.bf.ath_port_bitmap_0 = port_id & 0x3f;
-			eg_vp_tbl.bf.ath_port_bitmap_1 = (port_id >>6) & 0x1;
-		}
-		SW_RTN_ON_ERROR(appe_egress_vp_tbl_set(dev_id,
-					FAL_PORT_ID_VALUE(port_mapping->int_port), &eg_vp_tbl));
-	}
-	return SW_OK;
-}
-
-sw_error_t
-adpt_mppe_athtag_port_mapping_get(a_uint32_t dev_id,
-		fal_direction_t direction, fal_athtag_port_mapping_t * port_mapping)
-{
-	union prx_port_to_vp_mapping_u prx_port_to_vp_map = {0};
-	union eg_vp_tbl_u eg_vp_tbl = {0};
-	a_uint32_t port_id = 0;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(port_mapping);
-
-	if (direction == FAL_DIR_INGRESS)
-	{
-		/*get the first port id in the port bitmap*/
-		port_id = _adpt_mppe_athtag_bit_index(port_mapping->ath_port);
-		SW_RTN_ON_ERROR(mppe_prx_port_to_vp_mapping_get(dev_id,
-					port_id, &prx_port_to_vp_map));
-		port_mapping->int_port = prx_port_to_vp_map.bf.prx_port_vp;
-	}
-	else if (direction == FAL_DIR_EGRESS)
-	{
-		SW_RTN_ON_ERROR(appe_egress_vp_tbl_get(dev_id,
-					FAL_PORT_ID_VALUE(port_mapping->int_port), &eg_vp_tbl));
-
-		if (eg_vp_tbl.bf.ath_hdr_ver == 2)
-		{
-			/*for version2 the ath_port_bitmap in eg_vp_tbl is the port bitmap*/
-			port_mapping->ath_port =
-			(eg_vp_tbl.bf.ath_port_bitmap_1 << 6) | eg_vp_tbl.bf.ath_port_bitmap_0;
-		}
-		else
-		{
-			/*for version3 the ath_port_bitmap in eg_vp_tbl is the port id*/
-			port_mapping->ath_port =
-			BIT((eg_vp_tbl.bf.ath_port_bitmap_1 << 6) | eg_vp_tbl.bf.ath_port_bitmap_0);
-		}
-	}
-	else
-	{
-		SSDK_ERROR("not support direction %d\n", direction);
-		return SW_NOT_SUPPORTED;
-	}
-
-	return SW_OK;
 }
 
 sw_error_t
@@ -291,6 +201,155 @@ adpt_mppe_port_athtag_tx_get(a_uint32_t dev_id,
 	else if (eg_vp_tbl.bf.ath_hdr_ver == 3)
 	{
 		cfg->version = FAL_ATHTAG_VER3;
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+_adpt_mppe_athtag_slave_switch_set (a_uint32_t dev_id, a_uint32_t ath_port)
+{
+#if defined(MHT)
+	a_uint32_t port_id = 0;
+	if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+	{
+		fal_port_txhdr_mode_set(dev_id, SSDK_PHYSICAL_PORT0, FAL_ALL_TYPE_FRAME_EN);
+		if ((ath_port & (ath_port -1)) == 0)
+		{
+			/* single port mapping configurations */
+			port_id = _adpt_mppe_athtag_bit_index(ath_port);
+			fal_port_unk_uc_filter_set(dev_id, port_id, A_TRUE);
+			fal_port_unk_mc_filter_set(dev_id, port_id, A_TRUE);
+			fal_port_bc_filter_set(dev_id, port_id, A_TRUE);
+		}
+	}
+#endif
+	return SW_OK;
+}
+
+sw_error_t
+adpt_mppe_athtag_port_mapping_set(a_uint32_t dev_id,
+		fal_direction_t direction, fal_athtag_port_mapping_t * port_mapping)
+{
+	union prx_port_to_vp_mapping_u prx_port_to_vp_map = {0};
+	union eg_vp_tbl_u eg_vp_tbl = {0};
+	a_uint32_t port_id = 0;
+	fal_athtag_rx_cfg_t rx_cfg = {0};
+	fal_athtag_tx_cfg_t tx_cfg = {0};
+	adpt_api_t *p_api = NULL;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+	SW_RTN_ON_NULL(p_api->adpt_port_bridge_txmac_set);
+
+	if (direction == FAL_DIR_INGRESS || direction == FAL_DIR_BOTH)
+	{
+		/* enable rx athtag for mppe port1 */
+		rx_cfg.athtag_en = A_TRUE;
+		rx_cfg.athtag_type = MHT_HEADER_TYPE_VAL;
+		adpt_mppe_port_athtag_rx_set(dev_id, SSDK_PHYSICAL_PORT1, &rx_cfg);
+
+		/* ingress port mapping */
+		for (port_id = 0; port_id < PRX_PORT_TO_VP_MAPPING_MAX_ENTRY; port_id++)
+		{
+			if (!SW_IS_PBMP_MEMBER(port_mapping->ath_port, port_id))
+				continue;
+			SW_RTN_ON_ERROR(mppe_prx_port_to_vp_mapping_get(dev_id,
+						port_id, &prx_port_to_vp_map));
+			prx_port_to_vp_map.bf.prx_port_vp =
+						FAL_PORT_ID_VALUE(port_mapping->int_port);
+			SW_RTN_ON_ERROR(mppe_prx_port_to_vp_mapping_set(dev_id,
+						port_id, &prx_port_to_vp_map));
+		}
+	}
+	if (direction == FAL_DIR_EGRESS || direction == FAL_DIR_BOTH)
+	{
+		/* enable tx athtag for int_port */
+		if (port_mapping->ath_port & (port_mapping->ath_port -1))
+			tx_cfg.version = FAL_ATHTAG_VER2;
+		else
+			tx_cfg.version = FAL_ATHTAG_VER3;
+		tx_cfg.athtag_en = A_TRUE;
+#if defined(MHT)
+		tx_cfg.athtag_type = MHT_HEADER_TYPE_VAL;
+#endif
+		tx_cfg.action = FAL_ATHTAG_ACTION_DISABLE_LEARN;
+		tx_cfg.bypass_fwd_en = A_TRUE;
+		tx_cfg.field_disable = A_FALSE;
+		adpt_mppe_port_athtag_tx_set(dev_id, port_mapping->int_port, &tx_cfg);
+
+		/* egress port mapping */
+		SW_RTN_ON_ERROR(appe_egress_vp_tbl_get(dev_id,
+					FAL_PORT_ID_VALUE(port_mapping->int_port), &eg_vp_tbl));
+
+		if (eg_vp_tbl.bf.ath_hdr_ver == 2)
+		{
+			/*for version2 the ath_port_bitmap in eg_vp_tbl is the port bitmap*/
+			eg_vp_tbl.bf.ath_port_bitmap_0 = port_mapping->ath_port & 0x3f;
+			eg_vp_tbl.bf.ath_port_bitmap_1 = (port_mapping->ath_port >>6) & 0x1;
+		}
+		else
+		{
+			/*get the first port id in the port bitmap*/
+			port_id = _adpt_mppe_athtag_bit_index(port_mapping->ath_port);
+			/*for version3 the ath_port_bitmap in eg_vp_tbl is the port id*/
+			eg_vp_tbl.bf.ath_port_bitmap_0 = port_id & 0x3f;
+			eg_vp_tbl.bf.ath_port_bitmap_1 = (port_id >>6) & 0x1;
+		}
+		SW_RTN_ON_ERROR(appe_egress_vp_tbl_set(dev_id,
+					FAL_PORT_ID_VALUE(port_mapping->int_port), &eg_vp_tbl));
+
+		/* enable txmac_en for int_port */
+		p_api->adpt_port_bridge_txmac_set(dev_id, port_mapping->int_port, A_TRUE);
+	}
+
+	/* slave switch athtag configuration */
+	_adpt_mppe_athtag_slave_switch_set (dev_id + 1, port_mapping->ath_port);
+
+	return SW_OK;
+}
+
+sw_error_t
+adpt_mppe_athtag_port_mapping_get(a_uint32_t dev_id,
+		fal_direction_t direction, fal_athtag_port_mapping_t * port_mapping)
+{
+	union prx_port_to_vp_mapping_u prx_port_to_vp_map = {0};
+	union eg_vp_tbl_u eg_vp_tbl = {0};
+	a_uint32_t port_id = 0;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(port_mapping);
+
+	if (direction == FAL_DIR_INGRESS)
+	{
+		/*get the first port id in the port bitmap*/
+		port_id = _adpt_mppe_athtag_bit_index(port_mapping->ath_port);
+		SW_RTN_ON_ERROR(mppe_prx_port_to_vp_mapping_get(dev_id,
+					port_id, &prx_port_to_vp_map));
+		port_mapping->int_port = prx_port_to_vp_map.bf.prx_port_vp;
+	}
+	else if (direction == FAL_DIR_EGRESS)
+	{
+		SW_RTN_ON_ERROR(appe_egress_vp_tbl_get(dev_id,
+					FAL_PORT_ID_VALUE(port_mapping->int_port), &eg_vp_tbl));
+
+		if (eg_vp_tbl.bf.ath_hdr_ver == 2)
+		{
+			/*for version2 the ath_port_bitmap in eg_vp_tbl is the port bitmap*/
+			port_mapping->ath_port =
+			(eg_vp_tbl.bf.ath_port_bitmap_1 << 6) | eg_vp_tbl.bf.ath_port_bitmap_0;
+		}
+		else
+		{
+			/*for version3 the ath_port_bitmap in eg_vp_tbl is the port id*/
+			port_mapping->ath_port =
+			BIT((eg_vp_tbl.bf.ath_port_bitmap_1 << 6) | eg_vp_tbl.bf.ath_port_bitmap_0);
+		}
+	}
+	else
+	{
+		SSDK_ERROR("not support direction %d\n", direction);
+		return SW_NOT_SUPPORTED;
 	}
 
 	return SW_OK;

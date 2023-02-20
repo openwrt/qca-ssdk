@@ -1163,7 +1163,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 sw_error_t
 qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 {
-	a_uint32_t i = 0;
+	a_uint32_t i = 0, port_id = 0;
 	fal_qos_scheduler_cfg_t cfg;
 	fal_queue_bmp_t queue_bmp;
 	fal_qos_group_t group_sel;
@@ -1175,7 +1175,16 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 	/* L1 shceduler */
 	for (i = 0; i < SSDK_L1SCHEDULER_CFG_MAX; i++) {
 		if (dt_cfg->l1cfg[i].valid) {
-			cfg.sp_id = dt_cfg->l1cfg[i].port_id;
+			port_id = dt_cfg->l1cfg[i].port_id;
+#if defined(IN_ATHTAG)
+#if defined(MPPE)
+			if (port_id >= SSDK_PHYSICAL_PORT3 &&
+				port_id <= SSDK_PHYSICAL_PORT6) {
+				port_id = SSDK_PHYSICAL_PORT1;
+			}
+#endif
+#endif
+			cfg.sp_id = port_id;
 			cfg.c_pri = dt_cfg->l1cfg[i].cpri;
 			cfg.e_pri = dt_cfg->l1cfg[i].epri;
 			cfg.c_drr_id = dt_cfg->l1cfg[i].cdrr_id;
@@ -1183,13 +1192,22 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 			cfg.c_drr_wt = 1;
 			cfg.e_drr_wt = 1;
 			fal_queue_scheduler_set(dev_id, i, 1,
-					dt_cfg->l1cfg[i].port_id, &cfg);
+					port_id, &cfg);
 		}
 	}
 
 	/* L0 shceduler */
 	for (i = 0; i < SSDK_L0SCHEDULER_CFG_MAX; i++) {
 		if (dt_cfg->l0cfg[i].valid) {
+			port_id = dt_cfg->l0cfg[i].port_id;
+#if defined(IN_ATHTAG)
+#if defined(MPPE)
+			if (port_id >= SSDK_PHYSICAL_PORT3 &&
+				port_id <= SSDK_PHYSICAL_PORT6) {
+				port_id = SSDK_PHYSICAL_PORT1;
+			}
+#endif
+#endif
 			cfg.sp_id = dt_cfg->l0cfg[i].sp_id;
 			cfg.c_pri = dt_cfg->l0cfg[i].cpri;
 			cfg.e_pri = dt_cfg->l0cfg[i].epri;
@@ -1198,7 +1216,7 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 			cfg.c_drr_wt = 1;
 			cfg.e_drr_wt = 1;
 			fal_queue_scheduler_set(dev_id, i,
-					0, dt_cfg->l0cfg[i].port_id, &cfg);
+					0, port_id, &cfg);
 		}
 	}
 

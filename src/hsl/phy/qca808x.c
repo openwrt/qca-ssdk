@@ -36,7 +36,6 @@ struct qca808x_phy_info* qca808x_phy_info_get(a_uint32_t phy_addr)
 		}
 	}
 
-	SSDK_INFO("Can't get the data for phy addr: %d\n", phy_addr);
 	return NULL;
 }
 
@@ -581,9 +580,13 @@ int qca808x_phy_probe(struct phy_device *phydev)
 #else
 	priv->phy_info = qca808x_phy_info_get(phydev->mdio.addr);
 #endif
+	/*for switch ports, the phys may also be probed here, but
+	* failed because switch phys are init on another device, so
+	* return ok for the case.
+	*/
 	if(!priv->phy_info) {
 		kfree(priv);
-		return -ENXIO;
+		return 0;
 	}
 	phydev->priv = priv;
 
@@ -592,6 +595,24 @@ int qca808x_phy_probe(struct phy_device *phydev)
 #endif
 
 	return err;
+}
+
+int qca808x_match_phy_device(struct phy_device *phydev)
+{
+	a_uint32_t phy_id = 0;
+	struct device_driver *drv = NULL;
+
+	phy_id = phydev->phy_id;
+	if(phy_id == QCA8084_PHY)
+		return true;
+	else if(phy_id == QCA8081_PHY_V1_1)
+	{
+		drv = driver_find(QCA808X_PHY_DRIVER_NAME, &mdio_bus_type);
+		if(!drv)
+			return true;
+	}
+
+	return false;
 }
 
 void qca808x_phy_remove(struct phy_device *phydev)
@@ -608,7 +629,7 @@ void qca808x_phy_remove(struct phy_device *phydev)
 struct phy_driver qca808x_phy_driver = {
 	.phy_id		= QCA8081_PHY_V1_1,
 	.phy_id_mask    = 0xffffff00,
-	.name		= QCA808X_PHY_DRIVER_NAME,
+	.name		= QCA808X_SSDK_PHY_DRIVER_NAME,
 	.features	= PHY_GBIT_FEATURES,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 	.flags		= PHY_HAS_INTERRUPT,
@@ -640,6 +661,7 @@ struct phy_driver qca808x_phy_driver = {
 #else
 	.driver		= { .owner = THIS_MODULE },
 #endif
+	.match_phy_device = qca808x_match_phy_device,
 };
 
 a_int32_t qca808x_phy_driver_register(void)

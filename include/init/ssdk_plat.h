@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2012, 2014-2015, 2017-2020, The Linux Foundation. All rights reserved.
- *
  * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -330,6 +330,7 @@ struct qca_phy_priv {
 	struct mii_bus *miibus;
 /*qca808x_end*/
 	u64 *mib_counters;
+	a_uint32_t mib_loop_cnt;
 	/* dump buf */
 	a_uint8_t  buf[2048];
 	a_uint32_t link_polling_required;

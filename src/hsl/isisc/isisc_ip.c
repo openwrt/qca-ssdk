@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -63,7 +65,7 @@
 #define ISISC_IP_COUTER_ADDR                     0x2b000
 
 static a_uint32_t isisc_mac_snap[SW_MAX_NR_DEV] = { 0 };
-static fal_intf_mac_entry_t isisc_intf_snap[SW_MAX_NR_DEV][ISISC_INTF_MAC_ADDR_NUM];
+static fal_intf_mac_entry_t isisc_intf_snap[SW_MAX_NR_DEV][ISISC_INTF_MAC_ADDR_NUM] = {0};
 
 static void
 _isisc_ip_pt_learn_save(a_uint32_t dev_id, a_uint32_t * status)

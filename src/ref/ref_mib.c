@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "sw.h"
@@ -479,39 +482,37 @@ qca_ar8327_sw_get_port_mib(struct switch_dev *dev,
 #endif
 
 int
-_qca_ar8327_sw_capture_port_tx_counter(struct qca_phy_priv *priv, int port)
+_qca_ar8327_sw_capture_port_tx_counter(a_uint32_t dev_id, int port)
 {
     fal_mib_info_t  mib_Info;
 
     memset(&mib_Info, 0, sizeof(fal_mib_info_t));
-    fal_get_tx_mib_info(priv->device_id, port, &mib_Info);
+    fal_get_tx_mib_info(dev_id, port, &mib_Info);
 
     return 0;
 }
 
 int
-_qca_ar8327_sw_capture_port_rx_counter(struct qca_phy_priv *priv, int port)
+_qca_ar8327_sw_capture_port_rx_counter(a_uint32_t dev_id, int port)
 {
     fal_mib_info_t  mib_Info;
 
     memset(&mib_Info, 0, sizeof(fal_mib_info_t));
-    fal_get_rx_mib_info(priv->device_id, port, &mib_Info);
+    fal_get_rx_mib_info(dev_id, port, &mib_Info);
     return 0;
 }
 
 void
 qca_ar8327_sw_mib_task(struct qca_phy_priv *priv)
 {
-	static int loop = 0;
-
 	mutex_lock(&priv->reg_mutex);
-	if ((loop % 2) == 0)
-		_qca_ar8327_sw_capture_port_rx_counter(priv, loop/2);
+	if ((priv->mib_loop_cnt % 2) == 0)
+		_qca_ar8327_sw_capture_port_rx_counter(priv->device_id, priv->mib_loop_cnt/2);
 	else
-		_qca_ar8327_sw_capture_port_tx_counter(priv, loop/2);
+		_qca_ar8327_sw_capture_port_tx_counter(priv->device_id, priv->mib_loop_cnt/2);
 
-	if(++loop == (2 * (priv->ports))) {
-		loop = 0;
+	if(++priv->mib_loop_cnt == (2 * (priv->ports))) {
+		priv->mib_loop_cnt = 0;
 	}
 
 	mutex_unlock(&priv->reg_mutex);

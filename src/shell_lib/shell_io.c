@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2013, 2015-2017, 2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1050,7 +1050,7 @@ sw_error_t __cmd_data_check_range(char *info, char *defval, char *usage,
         }
     } while (talk_mode && (SW_OK != ret));
 
-    return SW_OK;
+    return ret;
 }
 
 sw_error_t __cmd_data_check_boolean(char *info, char *defval, char *usage,
@@ -4999,7 +4999,7 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         }
         else
         {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+            rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
 
 	     pEntry->cvid = (a_uint16_t)tmp;
         }
@@ -5021,7 +5021,7 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         }
         else
         {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+            rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
 
 	     pEntry->svid = (a_uint16_t)tmp;
         }
@@ -5355,7 +5355,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, &(pEntry->s_vid), sizeof (a_uint32_t));
+			rv = cmd_data_check_integer(cmd, &(pEntry->s_vid), 0xfff, 0x0);
 		}
 
 	}
@@ -5506,7 +5506,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, &(pEntry->c_vid), sizeof (a_uint32_t));
+			rv = cmd_data_check_integer(cmd, &(pEntry->c_vid), 0xfff, 0x0);
 		}
 
 	}
@@ -5830,6 +5830,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 {
 	char *cmd = NULL;
 	sw_error_t rv;
+	a_uint32_t tmp = 0;
 	fal_vlan_trans_adv_action_t *pEntry = (fal_vlan_trans_adv_action_t *)val;
 
 	memset(pEntry, 0, sizeof(fal_vlan_trans_adv_action_t));
@@ -5891,7 +5892,9 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->svid_xlt), sizeof (a_uint32_t));
+			rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
+			if (SW_OK == rv)
+				pEntry->svid_xlt = tmp;
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5931,7 +5934,9 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		}
 		else
 		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->cvid_xlt), sizeof (a_uint32_t));
+			rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
+			if (SW_OK == rv)
+				pEntry->cvid_xlt = tmp;
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6436,10 +6441,9 @@ cmd_data_check_vlan_translation(char *info, fal_vlan_trans_entry_t *val, a_uint3
 
     memset(&entry, 0, sizeof (fal_vlan_trans_entry_t));
 
-    rv = __cmd_data_check_complex("ovid", "1",
+    rv = __cmd_data_check_range("ovid", "1",
                         "usage: the range is 0 -- 4095\n",
-                        (param_check_t)cmd_data_check_uint32, &entry.o_vid,
-                        sizeof (a_uint32_t));
+                        (param_check_range_t)cmd_data_check_integer, &entry.o_vid, 0xfff, 0x0);
     if (rv)
         return rv;
 
@@ -6464,17 +6468,15 @@ cmd_data_check_vlan_translation(char *info, fal_vlan_trans_entry_t *val, a_uint3
     if (rv)
         return rv;
 
-    rv = __cmd_data_check_complex("svid ", "1",
+    rv = __cmd_data_check_range("svid", "1",
                         "usage: the range is 0 -- 4095\n",
-                        (param_check_t)cmd_data_check_uint32, &entry.s_vid,
-                        sizeof (a_uint32_t));
+                        (param_check_range_t)cmd_data_check_integer, &entry.s_vid, 0xfff, 0x0);
     if (rv)
         return rv;
 
-    rv = __cmd_data_check_complex("cvid ", "1",
+    rv = __cmd_data_check_range("cvid", "1",
                         "usage: the range is 0 -- 4095\n",
-                        (param_check_t)cmd_data_check_uint32, &entry.c_vid,
-                        sizeof (a_uint32_t));
+                    (param_check_range_t)cmd_data_check_integer, &entry.c_vid, 0xfff, 0x0);
     if (rv)
         return rv;
 

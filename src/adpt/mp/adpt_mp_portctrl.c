@@ -48,7 +48,7 @@ _adpt_mp_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 	ADPT_DEV_ID_CHECK(dev_id);
 
 	/* force port which connect s17c or other device chip*/
-	if (ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE | PHY_F_SFP)) {
+	if (hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE | PHY_F_SFP)) {
 		SSDK_DEBUG("port_id %d did not connect PHY!\n", port_id);
 		return A_FALSE;
 	} else {
@@ -597,7 +597,7 @@ adpt_mp_port_mac_speed_set(a_uint32_t dev_id, a_uint32_t port_id,
 	rv = mp_mac_configuration_set(dev_id, gmac_id, &configuration);
 	SW_RTN_ON_ERROR(rv);
 
-	force_port = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+	force_port = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);
 	/* enable force port configuration */
 	if (force_port == A_TRUE) {
 		rv = _adpt_mp_port_gcc_speed_clock_set(dev_id,
@@ -978,7 +978,7 @@ adpt_mp_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)
 	a_uint32_t uniphy_mode_new = PORT_WRAPPER_MAX;
 	a_bool_t force_port;
 
-	force_port = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+	force_port = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);
 	if ((port_id == SSDK_PHYSICAL_PORT1) || (force_port == A_TRUE)) {
 		return SW_OK;
 	}
@@ -1279,13 +1279,13 @@ adpt_mp_port_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 
 	if(_adpt_mp_port_phy_connected(dev_id, port_id) == A_FALSE)
 	{
-		if(ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE))
+		if(hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE))
 		{
 			rv = adpt_mp_port_mac_status_get(dev_id, port_id, phy_status);
 			SW_RTN_ON_ERROR (rv);
 		}
 #ifdef IN_SFP_PHY
-		else if(ssdk_port_feature_get(dev_id, port_id, PHY_F_SFP))
+		else if(hsl_port_feature_get(dev_id, port_id, PHY_F_SFP))
 		{
 			rv = sfp_port_status_get_from_uniphy(dev_id, port_id, phy_status);
 			SW_RTN_ON_ERROR (rv);

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, 2017-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -165,7 +165,7 @@ a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 	a_bool_t sfp_port = 0;
 	a_uint32_t mode1, mode2;
 
-	sfp_port = ssdk_port_feature_get(dev_id, port_id, PHY_F_SFP);
+	sfp_port = hsl_port_feature_get(dev_id, port_id, PHY_F_SFP);
 	if (sfp_port == A_TRUE) {
 		return A_TRUE;
 	}
@@ -192,7 +192,7 @@ a_bool_t hsl_port_is_sfp(a_uint32_t dev_id, a_uint32_t port_id)
 a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
 {
 	a_uint32_t cpu_bmp = ssdk_cpu_bmp_get(dev_id);
-	a_bool_t is_fport = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+	a_bool_t is_fport = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);
 
 	if (A_FALSE == hsl_port_validity_check(dev_id, port_id))
 		return A_FALSE;
@@ -218,7 +218,7 @@ a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 		return SFP_PHY;
 	}
 /*qca808x_start*/
-	if (phy_info[dev_id]->phy_c45[port_id] == A_TRUE){
+	if (phy_info[dev_id]->phy_features[port_id] & PHY_F_CLAUSE45){
 		reg_pad = BIT(30) | BIT(16);
 	}
 
@@ -355,7 +355,7 @@ int ssdk_phy_driver_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 		if (port_bmp[dev_id] & (0x1 << i))
 		{
 /*qca808x_end*/
-			if(ssdk_port_feature_get(dev_id, i, PHY_F_FORCE)) {
+			if(hsl_port_feature_get(dev_id, i, PHY_F_FORCE)) {
 				continue;
 			}
 /*qca808x_start*/
@@ -405,8 +405,10 @@ static int qca_ssdk_qca808x_phy_info_init(a_uint32_t dev_id)
 		phy_info[dev_id]->phy_address[port_id] =
 			qca808x_phy_info[port_index].phy_address;
 		/*qca808x access mode, 1:i2c, 0:mdio*/
-		phy_info[dev_id]->phy_access_type[port_id] =
-			qca808x_phy_info[port_index].phy_access_type;
+		if(qca808x_phy_info[port_index].phy_access_type == PHY_I2C_ACCESS)
+			hsl_port_feature_set(dev_id, port_id, PHY_F_I2C);
+		else
+			hsl_port_feature_clear(dev_id, port_id, PHY_F_I2C);
 	}
 	qca_ssdk_port_bmp_set(dev_id, port_bmp);
 
@@ -490,6 +492,7 @@ qca_ssdk_phy_address_set(a_uint32_t dev_id, a_uint32_t port_id,
 	 return;
 }
 
+#if defined(IN_PHY_I2C_MODE)
 a_uint32_t
 qca_ssdk_port_to_phy_mdio_fake_addr(a_uint32_t dev_id, a_uint32_t port_id)
 {
@@ -517,6 +520,7 @@ qca_ssdk_phy_mdio_fake_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_mdio_fake_
 	SSDK_ERROR("doesn't match port_id to specified phy_mdio_fake_addr !\n");
 	return 0;
 }
+#endif
 /*qca808x_start*/
 a_uint32_t
 qca_ssdk_port_to_phy_addr(a_uint32_t dev_id, a_uint32_t port_id)
@@ -544,7 +548,7 @@ hsl_port_phy_combo_capability_get(a_uint32_t dev_id, a_uint32_t port_id)
 	if (dev_id >= SW_MAX_NR_DEV)
 		return A_FALSE;
 
-	return phy_info[dev_id]->phy_combo[port_id];
+	return hsl_port_feature_get(dev_id, port_id, PHY_F_COMBO);
 }
 
 void
@@ -553,8 +557,10 @@ hsl_port_phy_combo_capability_set(a_uint32_t dev_id, a_uint32_t port_id,
 {
 	if (dev_id >= SW_MAX_NR_DEV)
 		return;
-
-	phy_info[dev_id]->phy_combo[port_id] = enable;
+	if(enable)
+		hsl_port_feature_set(dev_id, port_id, PHY_F_COMBO);
+	else
+		hsl_port_feature_clear(dev_id, port_id, PHY_F_COMBO);
 
 	return;
 }
@@ -564,8 +570,10 @@ hsl_port_phy_access_type_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	if (dev_id >= SW_MAX_NR_DEV)
 		return 0;
+	if(hsl_port_feature_get(dev_id, port_id, PHY_F_I2C))
+		return PHY_I2C_ACCESS;
 
-	return phy_info[dev_id]->phy_access_type[port_id];
+	return PHY_MDIO_ACCESS;
 }
 
 void
@@ -575,7 +583,10 @@ hsl_port_phy_access_type_set(a_uint32_t dev_id, a_uint32_t port_id,
 	if (dev_id >= SW_MAX_NR_DEV)
 		return;
 
-	phy_info[dev_id]->phy_access_type[port_id] = access_type;
+	if(access_type == PHY_I2C_ACCESS)
+		hsl_port_feature_set(dev_id, port_id, PHY_F_I2C);
+	else
+		hsl_port_feature_clear(dev_id, port_id, PHY_F_I2C);
 
 	return;
 }
@@ -584,7 +595,10 @@ void
 hsl_port_phy_c45_capability_set(a_uint32_t dev_id, a_uint32_t port_id,
 		a_bool_t enable)
 {
-	phy_info[dev_id]->phy_c45[port_id] = enable;
+	if(enable)
+		hsl_port_feature_set(dev_id, port_id, PHY_F_CLAUSE45);
+	else
+		hsl_port_feature_clear(dev_id, port_id, PHY_F_CLAUSE45);
 
 	return;
 }
@@ -1611,7 +1625,7 @@ hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 	/*update ssdk port phy info*/
 	if (medium == PHY_MEDIUM_FIBER)
 	{
-		ssdk_port_feature_set(dev_id, port_id, PHY_F_SFP);
+		hsl_port_feature_set(dev_id, port_id, PHY_F_SFP);
 		phy_info[dev_id]->phy_type[port_id] = SFP_PHY_CHIP;
 #if defined(IN_SFP_PHY)
 		/*register sfp phy driver*/
@@ -1622,7 +1636,7 @@ hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 	}
 	else
 	{
-		ssdk_port_feature_clear(dev_id, port_id, PHY_F_SFP);
+		hsl_port_feature_clear(dev_id, port_id, PHY_F_SFP);
 		phy_info[dev_id]->phy_type[port_id] =
 			phy_info[dev_id]->combo_phy_type[port_id];
 #if defined(IN_SFP_PHY)
@@ -1677,3 +1691,100 @@ hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 
 	return SW_OK;
 }
+
+a_uint32_t
+hsl_port_force_speed_get(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	return phy_info[dev_id]->port_force_speed[port_id];
+}
+
+void
+hsl_port_force_speed_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t speed)
+{
+	hsl_port_feature_set(dev_id, port_id, PHY_F_FORCE);
+	phy_info[dev_id]->port_force_speed[port_id] = speed;
+
+	return;
+}
+
+a_uint8_t
+hsl_port_force_duplex_get(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	return phy_info[dev_id]->port_force_duplex[port_id];
+}
+
+void
+hsl_port_force_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint8_t duplex)
+{
+	hsl_port_feature_set(dev_id, port_id, PHY_F_FORCE);
+	phy_info[dev_id]->port_force_duplex[port_id] = duplex;
+
+	return;
+}
+
+struct mii_bus*
+hsl_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	return phy_info[dev_id]->miibus[port_id];
+}
+
+void
+hsl_port_miibus_set(a_uint32_t dev_id, a_uint32_t port_id, struct mii_bus* mii_bus)
+{
+	phy_info[dev_id]->miibus[port_id] = mii_bus;
+}
+
+struct mii_bus*
+hsl_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	a_int32_t port_id = 0;
+
+	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+	return phy_info[dev_id]->miibus[port_id];
+}
+/*qca808x_start*/
+/*
+ * @brief Get feature on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] feature port feature, can be one or more features,
+ * will return true when one feature is true
+ * @return True or False
+ */
+a_bool_t
+hsl_port_feature_get(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
+{
+	if (phy_info[dev_id]->phy_features[port_id] & feature) {
+		return A_TRUE;
+	}
+	return A_FALSE;
+}
+/*
+ * @brief Set feature on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] feature port feature, can be one or more features
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
+{
+	phy_info[dev_id]->phy_features[port_id] |= feature;
+
+	return SW_OK;
+}
+/*
+ * @brief Clear feature on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] feature port feature, can be one or more features
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature)
+{
+	phy_info[dev_id]->phy_features[port_id] &= ~feature;
+
+	return SW_OK;
+}
+/*qca808x_end*/

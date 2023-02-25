@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -73,16 +73,6 @@ typedef struct {
 
 typedef struct
 {
-	a_uint8_t port_id;
-	a_uint8_t phy_addr;
-	a_uint8_t port_duplex;
-	a_uint32_t port_speed;
-	phy_features_t phy_features;
-	struct mii_bus *miibus;
-} ssdk_port_phyinfo;
-
-typedef struct
-{
 	a_uint32_t switchreg_base_addr;
 	a_uint32_t switchreg_size;
 	a_uint32_t psgmiireg_base_addr;
@@ -94,8 +84,6 @@ typedef struct
 	struct clk *ess_clk;
 	struct clk *cmnblk_clk;
 	ssdk_port_cfg   port_cfg;
-	a_uint32_t phyinfo_num;
-	ssdk_port_phyinfo *port_phyinfo;
 	a_uint32_t      mac_mode;
 	a_uint32_t      mac_mode1;
 	a_uint32_t      mac_mode2;
@@ -157,15 +145,6 @@ a_uint32_t ssdk_wan_bmp_get(a_uint32_t dev_id);
 sw_error_t ssdk_lan_bmp_set(a_uint32_t dev_id, a_uint32_t lan_bmp);
 sw_error_t ssdk_wan_bmp_set(a_uint32_t dev_id, a_uint32_t wan_bmp);
 a_uint32_t ssdk_inner_bmp_get(a_uint32_t dev_id);
-ssdk_port_phyinfo* ssdk_port_phyinfo_get(a_uint32_t dev_id, a_uint32_t port_id);
-a_bool_t ssdk_port_feature_get(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
-sw_error_t
-ssdk_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
-sw_error_t
-ssdk_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
-a_uint32_t ssdk_port_force_speed_get(a_uint32_t dev_id, a_uint32_t port_id);
-struct mii_bus *
-ssdk_dts_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
 hsl_reg_mode ssdk_switch_reg_access_mode_get(a_uint32_t dev_id);
 void ssdk_switch_reg_map_info_get(a_uint32_t dev_id, ssdk_reg_map_info *info);
 a_uint32_t ssdk_switch_pcie_base_get(a_uint32_t dev_id);

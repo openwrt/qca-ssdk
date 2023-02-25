@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -36,7 +36,7 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 	memset(&port_eee_cfg, 0, sizeof(fal_port_eee_cfg_t));
 
 	for (i = SSDK_PHYSICAL_PORT1; i <= SSDK_PHYSICAL_PORT2; i++) {
-		force_port = ssdk_port_feature_get(dev_id, i,
+		force_port = hsl_port_feature_get(dev_id, i,
 			PHY_F_FORCE);
 		if (force_port == A_FALSE) {
 			fal_port_txmac_status_set (dev_id, i, A_FALSE);
@@ -70,7 +70,8 @@ qca_mp_interface_mode_init(a_uint32_t dev_id)
 	adpt_api_t *p_api;
 	a_uint32_t i = 0, mode = 0;
 	a_bool_t force_port;
-	a_uint32_t force_speed = 0;
+	fal_port_speed_t force_speed = FAL_SPEED_BUTT;
+	fal_port_duplex_t force_duplex = FAL_FULL_DUPLEX;
 
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 	SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
@@ -89,9 +90,10 @@ qca_mp_interface_mode_init(a_uint32_t dev_id)
 			ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0) ==
 			PORT_WRAPPER_MAX)
 			continue;
-		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
+		force_port = hsl_port_feature_get(dev_id, i, PHY_F_FORCE);
 		if (force_port == A_TRUE) {
-			force_speed = ssdk_port_force_speed_get(dev_id, i);
+			force_duplex = hsl_port_force_duplex_get(dev_id, i);
+			force_speed = hsl_port_force_speed_get(dev_id, i);
 			rv = p_api->adpt_port_mac_speed_set(dev_id,
 				i, force_speed);
 		} else {
@@ -99,7 +101,7 @@ qca_mp_interface_mode_init(a_uint32_t dev_id)
 				i, FAL_SPEED_1000);
 		}
 		SW_RTN_ON_ERROR(rv);
-		rv = p_api->adpt_port_mac_duplex_set(dev_id, i, FAL_FULL_DUPLEX);
+		rv = p_api->adpt_port_mac_duplex_set(dev_id, i, force_duplex);
 		SW_RTN_ON_ERROR(rv);
 	}
 

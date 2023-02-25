@@ -50,7 +50,7 @@ sw_error_t qca_hppe_fdb_hw_init(a_uint32_t dev_id)
 		}
 		fal_portvlan_member_update(dev_id, port, 0x7f);
 		if (port == SSDK_PHYSICAL_PORT0 || port == SSDK_PHYSICAL_PORT7 ||
-		(ssdk_port_feature_get(dev_id, port, PHY_F_FORCE) == A_TRUE)) {
+		(hsl_port_feature_get(dev_id, port, PHY_F_FORCE) == A_TRUE)) {
 			p_api->adpt_port_bridge_txmac_set(dev_id, port, A_TRUE);
 		} else {
 			p_api->adpt_port_bridge_txmac_set(dev_id, port, A_FALSE);
@@ -169,7 +169,7 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 		qca_hppe_port_mac_type_set(dev_id, i, PORT_GMAC_TYPE);
 		fal_port_txmac_status_set (dev_id, i, A_FALSE);
 		fal_port_rxmac_status_set (dev_id, i, A_FALSE);
-		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
+		force_port = hsl_port_feature_get(dev_id, i, PHY_F_FORCE);
 		if(force_port)
 		{
 			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
@@ -187,13 +187,13 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 		qca_hppe_port_mac_type_set(dev_id, i, PORT_XGMAC_TYPE);
 		fal_port_txmac_status_set (dev_id, i, A_FALSE);
 		fal_port_rxmac_status_set (dev_id, i, A_FALSE);
-		force_port = ssdk_port_feature_get(dev_id, i, PHY_F_FORCE);
+		force_port = hsl_port_feature_get(dev_id, i, PHY_F_FORCE);
 		if(force_port)
 		{
 			fal_port_rxfc_status_set(dev_id, i, A_FALSE);
 			fal_port_txfc_status_set(dev_id, i, A_FALSE);
 		}
-		sfp_port = ssdk_port_feature_get(dev_id, i, PHY_F_SFP);
+		sfp_port = hsl_port_feature_get(dev_id, i, PHY_F_SFP);
 		if(sfp_port)
 		{
 			fal_port_rxfc_status_set(dev_id, i, A_TRUE);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -75,18 +75,20 @@ _qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t port_id,
 	sw_error_t rv = SW_OK;
 	fal_mac_config_t mac_config = {0};
 	a_bool_t force_en = A_FALSE;
-	a_uint32_t force_speed = FAL_SPEED_BUTT;
+	fal_port_speed_t force_speed = FAL_SPEED_BUTT;
+	fal_port_duplex_t force_duplex = FAL_DUPLEX_BUTT;
 	mht_work_mode_t work_mode = MHT_SWITCH_MODE;
 	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
 
-	force_en = ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE);
+	force_en = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);
 	if (force_en == A_TRUE) {
-		force_speed = ssdk_port_force_speed_get(dev_id, port_id);
+		force_speed = hsl_port_force_speed_get(dev_id, port_id);
 
 		rv = fal_port_speed_set(dev_id, port_id, force_speed);
 		SW_RTN_ON_ERROR(rv);
 
-		rv = fal_port_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
+		force_duplex = hsl_port_force_duplex_get(dev_id, port_id);
+		rv = fal_port_duplex_set(dev_id, port_id, force_duplex);
 		SW_RTN_ON_ERROR(rv);
 
 		/* The clock parent need to be configured before initializing
@@ -131,14 +133,14 @@ qca_mht_interface_mode_init(a_uint32_t dev_id, a_uint32_t mac_mode0,
 	rv = _qca_mht_interface_mode_init(dev_id, SSDK_PHYSICAL_PORT5, mac_mode1);
 	SW_RTN_ON_ERROR(rv);
 
-	if (A_TRUE == ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT0, PHY_F_FORCE)) {
+	if (A_TRUE == hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT0, PHY_F_FORCE)) {
 		rv = fal_port_txmac_status_set(dev_id, SSDK_PHYSICAL_PORT0, A_TRUE);
 		SW_RTN_ON_ERROR(rv);
 		rv = fal_port_rxmac_status_set(dev_id, SSDK_PHYSICAL_PORT0, A_TRUE);
 		SW_RTN_ON_ERROR(rv);
 	}
 
-	if (A_TRUE == ssdk_port_feature_get(dev_id, SSDK_PHYSICAL_PORT5, PHY_F_FORCE)) {
+	if (A_TRUE == hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT5, PHY_F_FORCE)) {
 		rv = fal_port_txmac_status_set(dev_id, SSDK_PHYSICAL_PORT5, A_TRUE);
 		SW_RTN_ON_ERROR(rv);
 		rv = fal_port_rxmac_status_set(dev_id, SSDK_PHYSICAL_PORT5, A_TRUE);

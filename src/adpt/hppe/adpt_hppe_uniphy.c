@@ -917,7 +917,7 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 
 	ssdk_port = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index, channel);
 	if ((A_TRUE == hsl_port_is_sfp(dev_id, ssdk_port)) &&
-		(A_TRUE != ssdk_port_feature_get(dev_id, ssdk_port, PHY_F_SFP_SGMII))) {
+		(A_TRUE != hsl_port_feature_get(dev_id, ssdk_port, PHY_F_SFP_SGMII))) {
 		uniphy_mode_ctrl.bf.newaddedfromhere_ch0_mode_ctrl_25m =
 			UNIPHY_1000BASE_X_MODE;
 		SSDK_DEBUG("port_id %d is a fiber port!\n", ssdk_port);
@@ -973,7 +973,7 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	}
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
 
-	force_port = ssdk_port_feature_get(dev_id,
+	force_port = hsl_port_feature_get(dev_id,
 		ssdk_port, PHY_F_FORCE);
 	if (force_port == A_TRUE) {
 		rv = hppe_uniphy_channel0_force_speed_mode_set(dev_id,
@@ -1196,8 +1196,8 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 	/*when miami connect s17c or qca803x, need to reconfigure reference clock
 	as 25M*/
 	port_id = adpt_hppe_port_get_by_uniphy(dev_id, index, SSDK_UNIPHY_CHANNEL0);
-	if(ssdk_port_feature_get(dev_id, port_id, PHY_F_FORCE) &&
-		ssdk_port_force_speed_get(dev_id, port_id) == FAL_SPEED_1000)
+	if(hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE) &&
+		hsl_port_force_speed_get(dev_id, port_id) == FAL_SPEED_1000)
 		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
 	phy_id = hsl_port_phyid_get(dev_id, port_id);
 	if (phy_id == QCA8030_PHY || phy_id == QCA8033_PHY || phy_id == QCA8035_PHY)

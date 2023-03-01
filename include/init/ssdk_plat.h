@@ -452,11 +452,8 @@ qca_uniphy_reg_write(a_uint32_t dev_id, a_uint32_t uniphy_index,
 sw_error_t
 qca_uniphy_reg_read(a_uint32_t dev_id, a_uint32_t uniphy_index,
 				a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len);
-
-struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id);
 /*qca808x_start*/
-struct mii_bus *
-ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
+struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id);
 /*qca808x_end*/
 sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq);
 sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq);

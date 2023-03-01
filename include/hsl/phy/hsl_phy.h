@@ -810,6 +810,7 @@ hsl_port_phy_autoadv_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t autoadv);
 sw_error_t
 hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id);
+/*qca808x_end*/
 a_uint32_t
 hsl_port_force_speed_get(a_uint32_t dev_id, a_uint32_t port_id);
 void
@@ -818,6 +819,7 @@ a_uint8_t
 hsl_port_force_duplex_get(a_uint32_t dev_id, a_uint32_t port_id);
 void
 hsl_port_force_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint8_t duplex);
+/*qca808x_start*/
 struct mii_bus*
 hsl_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id);
 void

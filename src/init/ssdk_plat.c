@@ -73,6 +73,7 @@
 #include <drivers/net/ethernet/atheros/ag71xx/ag71xx.h>
 #endif
 #include "ssdk_plat.h"
+#include "hsl_phy.h"
 /*qca808x_end*/
 #include "ssdk_clk.h"
 #include "ref_vlan.h"
@@ -85,9 +86,6 @@
 #ifdef BOARD_AR71XX
 #include "ssdk_uci.h"
 #endif
-
-#include "hsl_phy.h"
-
 #ifdef IN_IP
 #if defined (CONFIG_NF_FLOW_COOKIE)
 #include "fal_flowcookie.h"
@@ -402,23 +400,6 @@ phy_addr_validation_check(a_uint32_t phy_addr)
 		return A_TRUE;
 }
 
-struct mii_bus *
-ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
-{
-	struct mii_bus *bus = NULL;
-/*qca808x_end*/
-#ifndef BOARD_AR71XX
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
-#endif
-#endif
-/*qca808x_start*/
-	if (!bus)
-		bus = qca_phy_priv_global[dev_id]->miibus;
-
-	return bus;
-}
-
 sw_error_t
 qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
                            a_uint32_t reg, a_uint16_t* data)
@@ -430,7 +411,7 @@ qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_BAD_PARAM;
 	}
 
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	bus = hsl_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return SW_NOT_SUPPORTED;
 
@@ -452,7 +433,7 @@ qca_ar8327_phy_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_BAD_PARAM;
 	}
 
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	bus = hsl_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return SW_NOT_SUPPORTED;
 
@@ -474,7 +455,7 @@ qca_ar8327_phy_dbg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return;
 	}
 
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	bus = hsl_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return;
 
@@ -495,7 +476,7 @@ qca_ar8327_phy_dbg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return;
 	}
 
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	bus = hsl_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return;
 
@@ -517,7 +498,7 @@ qca_ar8327_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return;
 	}
 
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	bus = hsl_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return;
 
@@ -895,12 +876,12 @@ static int miibus_get(a_uint32_t dev_id)
 	return 0;
 }
 #endif
-
+/*qca808x_start*/
 struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id)
 {
 	return qca_phy_priv_global[dev_id]->miibus;
 }
-
+/*qca808x_end*/
 sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq)
 {
 	struct mii_bus *bus = NULL;

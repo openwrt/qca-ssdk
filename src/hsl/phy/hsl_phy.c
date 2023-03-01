@@ -773,7 +773,7 @@ hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 {
 	a_uint32_t pdev_addr;
 	const char *pdev_name;
-	struct mii_bus *miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
+	struct mii_bus *miibus = hsl_phy_miibus_get(dev_id, phy_addr);
 
 	SW_RTN_ON_NULL(phydev);
 #if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
@@ -1722,10 +1722,17 @@ hsl_port_force_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint8_t duple
 	return;
 }
 
+/*qca808x_start*/
 struct mii_bus*
 hsl_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
-	return phy_info[dev_id]->miibus[port_id];
+	struct mii_bus *miibus = NULL;
+
+	miibus = phy_info[dev_id]->miibus[port_id];
+	if (!miibus)
+		miibus = ssdk_miibus_get_by_device(dev_id);
+
+	return miibus;
 }
 
 void
@@ -1740,9 +1747,9 @@ hsl_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
 	a_int32_t port_id = 0;
 
 	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
-	return phy_info[dev_id]->miibus[port_id];
+	return hsl_port_miibus_get(dev_id, port_id);
 }
-/*qca808x_start*/
+
 /*
  * @brief Get feature on a particular port.
  * @param[in] dev_id device id

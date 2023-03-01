@@ -797,23 +797,15 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 	switch (chip_type) {
 		case HPPE_TYPE:
 			group_buf = 1400;
-			share_ceiling = 250;
-			phyport_share_ceiling = 250;
 			break;
 		case CPPE_TYPE:
 			group_buf = 1024;
-			share_ceiling = 216;
-			phyport_share_ceiling = 216;
 			break;
 		case APPE_TYPE:
-			group_buf = 1400;
-			share_ceiling = 250;
-			phyport_share_ceiling = 250;
+			group_buf = 1550;
 			break;
 		case MPPE_TYPE:
 			group_buf = 240;
-			share_ceiling = 30;
-			phyport_share_ceiling = 48;
 			break;
 		default:
 			SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
@@ -869,18 +861,50 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 		fal_bm_port_reserved_buffer_set(dev_id, i, prealloc_buf, react_buf);
 	}
 
+	/* set dynamic threshold */
 	memset(&cfg, 0, sizeof(cfg));
-	if (chip_type == MPPE_TYPE) {
-		cfg.resume_min_thresh = 20;
-		cfg.resume_off = 5;
-		cfg.weight= 7;
-	} else {
-		cfg.resume_min_thresh = 0;
-		cfg.resume_off = 36;
-		cfg.weight= 4;
-	}
-
 	for (i = 0; i < PPE_BM_PORT_NUM; i++) {
+		switch (chip_type) {
+			case HPPE_TYPE:
+				share_ceiling = 250;
+				phyport_share_ceiling = 250;
+				cfg.resume_min_thresh = 0;
+				cfg.resume_off = 36;
+				cfg.weight= 4;
+				break;
+			case CPPE_TYPE:
+				share_ceiling = 216;
+				phyport_share_ceiling = 216;
+				cfg.resume_min_thresh = 0;
+				cfg.resume_off = 36;
+				cfg.weight= 4;
+				break;
+			case APPE_TYPE:
+				if (i == PPE_BM_PORT_MIN) {
+					share_ceiling = 1146;
+					cfg.resume_min_thresh = 0;
+					cfg.resume_off = 8;
+					cfg.weight= 7;
+				} else {
+					share_ceiling = 250;
+					phyport_share_ceiling = 250;
+					cfg.resume_min_thresh = 0;
+					cfg.resume_off = 36;
+					cfg.weight= 4;
+				}
+				break;
+			case MPPE_TYPE:
+				share_ceiling = 30;
+				phyport_share_ceiling = 48;
+				cfg.resume_min_thresh = 20;
+				cfg.resume_off = 5;
+				cfg.weight= 7;
+				break;
+			default:
+				SSDK_ERROR("Unsupported chip type: %d\n", chip_type);
+				return SW_OUT_OF_RANGE;
+		}
+
 		if (i < PPE_BM_PHY_PORT_OFFSET)
 			cfg.shared_ceiling = share_ceiling;
 		else

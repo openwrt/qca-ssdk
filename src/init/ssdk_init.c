@@ -1693,12 +1693,12 @@ ssdk_mac_sw_sync_work_stop(a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+	SW_RTN_ON_NULL(priv);
 
-	if (priv == NULL) {
-		SSDK_ERROR("device id %d: qca_phy_priv is NULL\n", dev_id);
-		return SW_BAD_VALUE;
+	if (ssdk_is_emulation(priv->device_id))
+	{
+		return SW_NOT_SUPPORTED;
 	}
-
 	rv = _ssdk_mac_sw_sync_chip_check(priv);
 	SW_RTN_ON_ERROR(rv);
 
@@ -1712,11 +1712,21 @@ sw_error_t
 ssdk_mac_sw_sync_work_start(a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
+	a_uint32_t port_id = 0;
 	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+	SW_RTN_ON_NULL(priv);
 
-	if (priv == NULL) {
-		SSDK_ERROR("device id %d: qca_phy_priv is NULL\n", dev_id);
-		return SW_BAD_VALUE;
+	if (ssdk_is_emulation(priv->device_id))
+	{
+		for (port_id = SSDK_PHYSICAL_PORT1; port_id < SSDK_PHYSICAL_PORT7; port_id++)
+		{ /* enable mac for rumi ports */
+			if (SW_IS_PBMP_MEMBER(qca_ssdk_port_bmp_get(dev_id), port_id))
+			{
+				fal_port_txmac_status_set(dev_id, port_id, A_TRUE);
+				fal_port_rxmac_status_set(dev_id, port_id, A_TRUE);
+			}
+		}
+		return SW_NOT_SUPPORTED;
 	}
 
 	rv = _ssdk_mac_sw_sync_chip_check(priv);

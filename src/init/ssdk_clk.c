@@ -871,7 +871,7 @@ static void ssdk_cmnblk_init(enum cmnblk_clk_type mode)
 		return;
 	}
 
-	gcc_pll_base = ioremap_nocache(CMN_BLK_ADDR, CMN_BLK_SIZE);
+	gcc_pll_base = ioremap(CMN_BLK_ADDR, CMN_BLK_SIZE);
 	if (!gcc_pll_base) {
 		SSDK_ERROR("Failed to map gcc pll address!\n");
 		return;

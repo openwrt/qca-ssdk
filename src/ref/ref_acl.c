@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -229,7 +229,11 @@ _ref_acl_mac_entry_create_rule(a_uint32_t dev_id,
 		eth_dev = dev_get_by_name(&init_net, entry->ifname);
 		if (eth_dev)
 		{
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+			// TODO: replace with corresponding ver
+#else
 			br_fdb_delete_by_netdev(eth_dev, entry->src_mac.uc, 0);
+#endif
 			dev_put(eth_dev);
 		}
 	}

@@ -316,7 +316,11 @@ qca808x_phy_ms_random_seed_set(a_uint32_t dev_id, a_uint32_t phy_id)
 	phy_data = qca808x_phy_debug_read(dev_id, phy_id,
 		QCA808X_DEBUG_LOCAL_SEED);
 	phy_data &= ~(QCA808X_MASTER_SLAVE_SEED_CFG);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+	phy_data |= (get_random_u32()%QCA808X_MASTER_SLAVE_SEED_RANGE) << 2;
+#else
 	phy_data |= (prandom_u32()%QCA808X_MASTER_SLAVE_SEED_RANGE) << 2;
+#endif
 	SSDK_DEBUG("QCA808X_DEBUG_LOCAL_SEED:%x\n", phy_data);
 	rv = qca808x_phy_debug_write(dev_id, phy_id,
 		QCA808X_DEBUG_LOCAL_SEED, phy_data);

@@ -875,7 +875,11 @@ static void ssdk_dt_parse_intf_mac(void)
 {
 	struct device_node *dp_node = NULL;
 	a_uint32_t dp = 0;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 13, 0))
 	a_uint8_t *maddr = NULL;
+#else
+	char maddr[6] = {0};
+#endif
 	char dp_name[8] = {0};
 
 	for (dp = 1; dp <= SSDK_MAX_NR_ETH; dp++) {
@@ -884,11 +888,15 @@ static void ssdk_dt_parse_intf_mac(void)
 		if (!dp_node) {
 			continue;
 		}
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 13, 0))
 		maddr = (a_uint8_t *)of_get_mac_address(dp_node);
+#endif
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 		if (maddr && is_valid_ether_addr(maddr)) {
-#else
+#elif (LINUX_VERSION_CODE < KERNEL_VERSION(5, 13, 0))
 		if (!IS_ERR(maddr) && is_valid_ether_addr(maddr)) {
+#else
+		if (!of_get_mac_address(dp_node, maddr) && is_valid_ether_addr(maddr)) {
 #endif
 			ssdk_dt_global.num_intf_mac++;
 			ether_addr_copy(ssdk_dt_global.intf_mac[dp-1].uc, maddr);

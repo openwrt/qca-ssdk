@@ -53,6 +53,7 @@
 #include "sw.h"
 #include "ssdk_plat.h"
 #include "hsl_port_prop.h"
+#include <linux/netdevice.h>
 
 phy_info_t *phy_info[SW_MAX_NR_DEV] = {0};
 a_uint32_t port_bmp[SW_MAX_NR_DEV] = {0};

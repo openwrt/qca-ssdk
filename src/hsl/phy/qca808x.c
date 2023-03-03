@@ -187,6 +187,26 @@ static int qca808x_config_init(struct phy_device *phydev)
 	return ret;
 }
 
+static int qca808x_ack_interrupt(struct phy_device *phydev)
+{
+	int err;
+	a_uint32_t dev_id = 0, phy_id = 0;
+	qca808x_priv *priv = phydev->priv;
+	const struct qca808x_phy_info *pdata = priv->phy_info;
+
+	if (!pdata) {
+		return SW_FAIL;
+	}
+
+	dev_id = pdata->dev_id;
+	phy_id = pdata->phy_addr;
+
+	err = qca808x_phy_reg_read(dev_id, phy_id,
+			QCA808X_PHY_INTR_STATUS);
+
+	return (err < 0) ? err : 0;
+}
+
 static int qca808x_config_intr(struct phy_device *phydev)
 {
 	int err;
@@ -206,35 +226,25 @@ static int qca808x_config_intr(struct phy_device *phydev)
 			QCA808X_PHY_INTR_MASK);
 
 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0))
+		err = qca808x_ack_interrupt(phydev);
+		if (err < 0)
+			return err;
+#endif
 		err = qca808x_phy_reg_write(dev_id, phy_id,
 				QCA808X_PHY_INTR_MASK,
 				phy_data | QCA808X_INTR_INIT);
 	} else {
 		err = qca808x_phy_reg_write(dev_id, phy_id,
 				QCA808X_PHY_INTR_MASK, 0);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0))
+		if (err)
+			return err;
+		err = qca808x_ack_interrupt(phydev);
+#endif
 	}
 
 	return err;
-}
-
-static int qca808x_ack_interrupt(struct phy_device *phydev)
-{
-	int err;
-	a_uint32_t dev_id = 0, phy_id = 0;
-	qca808x_priv *priv = phydev->priv;
-	const struct qca808x_phy_info *pdata = priv->phy_info;
-
-	if (!pdata) {
-		return SW_FAIL;
-	}
-
-	dev_id = pdata->dev_id;
-	phy_id = pdata->phy_addr;
-
-	err = qca808x_phy_reg_read(dev_id, phy_id,
-			QCA808X_PHY_INTR_STATUS);
-
-	return (err < 0) ? err : 0;
 }
 
 /* switch linux negtiation capability to fal avariable */
@@ -638,7 +648,9 @@ struct phy_driver qca808x_phy_driver = {
 	.config_intr	= qca808x_config_intr,
 	.config_aneg	= qca808x_config_aneg,
 	.aneg_done	= qca808x_aneg_done,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0))
 	.ack_interrupt	= qca808x_ack_interrupt,
+#endif
 	.read_status	= qca808x_read_status,
 	.suspend	= qca808x_suspend,
 	.resume		= qca808x_resume,

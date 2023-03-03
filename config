@@ -24,6 +24,9 @@ ifeq ($(KVER),$(filter 5.4%,$(KVER)))
 	OS_VER=5_4
 endif
 
+ifeq ($(KVER),$(filter 6.1%,$(KVER)))
+	OS_VER=6_1
+endif
 ifeq ($(KVER), 3.4.0)
 	OS_VER=3_4
 endif

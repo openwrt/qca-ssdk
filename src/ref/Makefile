@@ -4,7 +4,8 @@ LIB=REF
 include $(PRJ_PATH)/make/config.mk
 
 SRC_LIST_TMP=ref_uci.c
-SRC_SW_LIST=ref_misc.c ref_uci.c
+#SRC_SW_LIST=ref_misc.c ref_uci.c
+SRC_SW_LIST=ref_misc.c ref_uci.c ref_athtag.c ref_vport.c ref_mapt.c ref_tunnel.c
 
 ifeq (TRUE, $(IN_FDB))
 	SRC_LIST_TMP += ref_fdb.c

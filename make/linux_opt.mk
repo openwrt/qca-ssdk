@@ -502,6 +502,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 	      endif
 
 	    else ifeq ($(ARCH), arm)
+	    GCC_VERSION ?= $(shell echo "$(CONFIG_GCC_VERSION)" | sed 's/\([0-9]\)\([0-9]\)\([0-9]\)\([0-9]\)\([0-9]\)/\1.\3.\5/')
 	    SYS_INC += -I$(SYS_PATH) \
               -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
 	      -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/7.5.0/include/ \
@@ -522,8 +523,8 @@ ifeq (KSLIB, $(MODULE_TYPE))
               -I$(SYS_PATH)/include/uapi \
               -I$(SYS_PATH)/arch/arm/include/uapi \
               -I$(SYS_PATH)/source/arch/arm/include/asm/mach \
-              -I$(TOOL_PATH)/../../lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/9.3.0/include/ \
-              -I$(TOOL_PATH)/../../lib/arm-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/9.3.0/include/
+              -I$(TOOL_PATH)/../../lib/arm-poky-linux-gnueabi/gcc/arm-poky-linux-gnueabi/$(GCC_VERSION)/include/ \
+              -I$(TOOL_PATH)/../../lib/arm-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/$(GCC_VERSION)/include/
 
 	      ifneq ($(wildcard $(SYS_PATH)/include/linux/kconfig.h),)
 	          SYS_INC += -include $(SYS_PATH)/include/linux/kconfig.h

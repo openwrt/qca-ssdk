@@ -166,7 +166,11 @@ union pc_dbg_data_reg_u {
 /*[table] IN_ACL_METER_CFG_TBL*/
 #define IN_ACL_METER_CFG_TBL
 #define IN_ACL_METER_CFG_TBL_ADDRESS 0x4000
+#ifdef MPPE
+#define IN_ACL_METER_CFG_TBL_NUM     128
+#else
 #define IN_ACL_METER_CFG_TBL_NUM     512
+#endif
 #ifdef APPE
 #define IN_ACL_METER_CFG_TBL_INC     0x20
 #else

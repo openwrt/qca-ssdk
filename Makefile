@@ -29,7 +29,9 @@ all: $(BIN_DIR) kslib
 modules: $(BIN_DIR) kslib_c
 	mkdir -p ./temp/;cp * ./temp -a;cd ./temp;cp ../Makefile.modules ./Makefile;
 	make -C $(SYS_PATH) M=$(PRJ_PATH)/temp $(LNX_MAKEOPTS) modules
+	cp $(PRJ_PATH)/temp/Module.symvers $(PRJ_PATH)/Module.symvers;
 	cp temp/*.ko build/bin;
+	rm -Rf ./temp/*.o ./temp/*.ko ./temp/*.a
 	@echo "---Build [SSDK-$(VERSION)] at $(BUILD_DATE) finished."
 
 kslib_c:

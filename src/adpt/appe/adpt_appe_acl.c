@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -78,6 +78,7 @@ sw_error_t
 _adpt_appe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id,
 		a_uint32_t rule_nr, fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
+	a_uint32_t udf_rule_type_map = 0;
 	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
 				rule->field_flg[0], rule->field_flg[1]);
 
@@ -87,27 +88,27 @@ _adpt_appe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id,
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) ||
 			FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF3))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
 		}
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0) ||
 			(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) &&
 				rule->udf1_op == FAL_ACL_FIELD_MASK))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF0_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF0_RULE);
 		}
-		if(*rule_type_map == 0)
+		if(udf_rule_type_map == 0)
 		{
-			*rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF0_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF0_RULE);
 		}
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) &&
 			rule->udf1_op != FAL_ACL_FIELD_MASK)
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
-			if(FAL_FLG_TST(*rule_type_map, (1<<ADPT_ACL_APPE_EXT_UDF0_RULE)) &&
-				FAL_FLG_TST(*rule_type_map, (1<<ADPT_ACL_APPE_EXT_UDF1_RULE)) &&
+			udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
+			if(FAL_FLG_TST(udf_rule_type_map, (1<<ADPT_ACL_APPE_EXT_UDF0_RULE)) &&
+				FAL_FLG_TST(udf_rule_type_map, (1<<ADPT_ACL_APPE_EXT_UDF1_RULE)) &&
 				rule->udf2_op == FAL_ACL_FIELD_MASK)
 			{
-				*rule_type_map &= ~(1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
+				udf_rule_type_map &= ~(1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
 			}
 		}
 	}
@@ -116,44 +117,45 @@ _adpt_appe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id,
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
 		}
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF3))
 		{
 			if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) &&
 				rule->udf2_op != FAL_ACL_FIELD_MASK)
 			{
-				*rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
+				udf_rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
 			}
 			else
 			{
-				*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
+				udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
 			}
 		}
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) &&
 			rule->udf1_op != FAL_ACL_FIELD_MASK)
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
 		}
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) &&
 			rule->udf2_op != FAL_ACL_FIELD_MASK)
 		{
-			*rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_APPE_EXT_UDF1_RULE);
 			if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) &&
 				rule->udf1_op == FAL_ACL_FIELD_MASK)
 			{
-				*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
+				udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
 			}
 		}
-		if(*rule_type_map == 0)
+		if(udf_rule_type_map == 0)
 		{
 			if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) ||
 				FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
 			{
-				*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
+				udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
 			}
 		}
 	}
+	*rule_type_map |= udf_rule_type_map;
 	SSDK_DEBUG("rule_type_map = 0x%x\n", *rule_type_map);
 
 	return SW_OK;

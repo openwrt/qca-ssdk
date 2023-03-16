@@ -1733,7 +1733,7 @@ sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(a_uint32_t is_win1, ADPT_HPPE_ACL_UDF
 	}
 	if(udfrule_mask->is_ipv6)
 	{
-		udfrule->is_ipv6= rule->is_ipv6_val;
+		rule->is_ipv6_val = udfrule->is_ipv6;
 		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV6);
 	}
 	return SW_OK;
@@ -2619,32 +2619,33 @@ static sw_error_t
 _adpt_hppe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
+	a_uint32_t udf_rule_type_map = 0;
 	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
 				rule->field_flg[0], rule->field_flg[1]);
 
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
+		udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF3))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
+		udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) &&
 		rule->udf1_op != FAL_ACL_FIELD_MASK)
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
+		udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF1_RULE);
 	}
 
-	if(*rule_type_map == 0)
+	if(udf_rule_type_map == 0)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) ||
 			FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
+			udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
 		}
 	}
-
+	*rule_type_map |= udf_rule_type_map;
 	SSDK_DEBUG("rule_type_map = 0x%x\n", *rule_type_map);
 
 	return SW_OK;

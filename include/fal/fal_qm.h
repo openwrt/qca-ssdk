@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -31,6 +31,7 @@ extern "C" {
 
 #define FAL_QM_PROFILE_COMMON_ID	0
 #define FAL_QM_PROFILE_PO_ID		15
+#define FAL_QM_PROFILE_CPU_CODE_ID	14
 #define FAL_QM_PROFILE_PO_RSS_HASH_MAX		256
 #define FAL_QM_PROFILE_PO_RSS_HASH_CLASS	0
 

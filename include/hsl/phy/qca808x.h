@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -27,6 +27,7 @@
 #include "qca808x_phy.h"
 
 #define QCA808X_PHY_DRIVER_NAME	"QCA808X ethernet"
+#define QCA808X_SSDK_PHY_DRIVER_NAME	"QCA808X SSDK ethernet"
 
 #if defined(IN_LINUX_STD_PTP)
 #include <linux/ptp_clock_kernel.h>

@@ -688,7 +688,6 @@ __adpt_hppe_uniphy_usxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 static sw_error_t
 __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
-	a_uint32_t port_id = 0;
 	sw_error_t rv = SW_OK;
 
 	union uniphy_mode_ctrl_u uniphy_mode_ctrl;
@@ -735,10 +734,6 @@ __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 
 	/* wait uniphy calibration done */
 	rv = __adpt_hppe_uniphy_calibrate(dev_id, uniphy_index);
-
-	/* configure gcc speed clock to 10g r mode*/
-	port_id = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index, SSDK_UNIPHY_CHANNEL0);
-	adpt_hppe_gcc_port_speed_clock_set(dev_id, port_id, FAL_SPEED_10000);
 
 	/* enable instance clock */
 	qca_gcc_uniphy_port_clock_set(dev_id, uniphy_index,

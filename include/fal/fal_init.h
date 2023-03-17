@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -84,6 +84,7 @@ typedef struct
 	a_uint32_t queue_caps;
 	a_uint32_t service_code_caps;
 	a_uint32_t pppoe_session_caps;
+	a_uint32_t policer_caps;
 } fal_ppe_tbl_caps_t;
 
 /*qca808x_start*/

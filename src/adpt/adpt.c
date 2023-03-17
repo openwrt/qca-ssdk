@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -28,6 +28,7 @@
 #include "hppe_portctrl.h"
 #include "hppe_qm_reg.h"
 #include "hppe_qm.h"
+#include "hppe_policer_reg.h"
 #if defined(APPE)
 #include "appe_pppoe_reg.h"
 #else
@@ -516,6 +517,7 @@ sw_error_t adpt_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capa
 		ppe_capacity->queue_caps = PPE_CAPACITY_QUEUES_NUM;
 		ppe_capacity->service_code_caps = SERVICE_TBL_NUM;
 		ppe_capacity->pppoe_session_caps = PPPOE_SESSION_NUM;
+		ppe_capacity->policer_caps = IN_ACL_METER_CFG_TBL_NUM;
 	}
 
 	return SW_OK;

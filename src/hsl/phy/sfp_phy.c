@@ -310,7 +310,7 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
 	{
 		addr = qca_ssdk_port_to_phy_addr(dev_id, port);
 	}
-	bus = ssdk_phy_miibus_get(dev_id, addr);
+	bus = hsl_phy_miibus_get(dev_id, addr);
 	phydev = phy_device_create(bus, addr, phy_id, false, NULL);
 	if (IS_ERR(phydev) || phydev == NULL) {
 		SSDK_ERROR("Failed to create phy device!\n");

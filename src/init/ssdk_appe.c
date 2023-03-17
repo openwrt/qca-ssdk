@@ -592,13 +592,8 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 			qca_hppe_port_mac_type_set(dev_id, i, mac_type);
 			fal_port_txmac_status_set(dev_id, i, A_FALSE);
 			fal_port_rxmac_status_set(dev_id, i, A_FALSE);
-			if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
-				fal_port_rxfc_status_set(dev_id, i, A_TRUE);
-				fal_port_txfc_status_set(dev_id, i, A_TRUE);
-			} else {
-				fal_port_rxfc_status_set(dev_id, i, A_FALSE);
-				fal_port_txfc_status_set(dev_id, i, A_FALSE);
-			}
+			fal_port_rxfc_status_set(dev_id, i, A_TRUE);
+			fal_port_txfc_status_set(dev_id, i, A_TRUE);
 			fal_port_max_frame_size_set(dev_id, i, SSDK_MAX_FRAME_SIZE);
 		}
 		qca_hppe_port_mac_type_set(dev_id, i, mac_type_org);

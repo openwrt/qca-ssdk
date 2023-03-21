@@ -600,15 +600,13 @@ int qca808x_phy_probe(struct phy_device *phydev)
 int qca808x_match_phy_device(struct phy_device *phydev)
 {
 	a_uint32_t phy_id = 0;
-	struct device_driver *drv = NULL;
 
 	phy_id = phydev->phy_id;
 	if(phy_id == QCA8084_PHY)
 		return true;
 	else if(phy_id == QCA8081_PHY_V1_1)
 	{
-		drv = driver_find(QCA808X_PHY_DRIVER_NAME, &mdio_bus_type);
-		if(!drv)
+		if(phydev->drv == NULL)
 			return true;
 	}
 

@@ -656,6 +656,8 @@ qca808x_phy_id_check(a_uint32_t dev_id, a_uint32_t phy_addr,
 sw_error_t
 qca808x_phy_get_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t *ability);
+a_uint32_t
+qca808x_phy_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

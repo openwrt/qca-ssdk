@@ -45,6 +45,19 @@ static struct mutex qca808x_reg_lock;
 #define QCA808X_REG_LOCK		mutex_lock(&qca808x_reg_lock)
 #define QCA808X_REG_UNLOCK		mutex_unlock(&qca808x_reg_lock)
 
+a_uint32_t
+qca808x_phy_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	a_uint32_t port_id = 0;
+
+	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+	if(port_id == SSDK_PHYSICAL_PORT0)
+	{
+		port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr - 1);
+	}
+
+	return port_id;
+}
 /******************************************************************************
 *
 * qca808x_phy_mii_read - mii register read
@@ -57,7 +70,7 @@ qca808x_phy_reg_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_id)
 	sw_error_t rv = SW_OK;
 	a_uint16_t phy_data = 0;
 #if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_id);
+	a_uint32_t port_id = qca808x_phy_addr_to_port(dev_id, phy_id);
 	a_uint8_t phy_access_type = hsl_port_phy_access_type_get(dev_id, port_id);
 
 	if (phy_access_type == PHY_I2C_ACCESS) {
@@ -88,7 +101,7 @@ qca808x_phy_reg_write(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_id,
 {
 	sw_error_t rv;
 #if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_id);
+	a_uint32_t port_id = qca808x_phy_addr_to_port(dev_id, phy_id);
 	a_uint8_t phy_access_type = hsl_port_phy_access_type_get(dev_id, port_id);
 
 	if (phy_access_type == PHY_I2C_ACCESS) {
@@ -180,7 +193,7 @@ qca808x_phy_mmd_write(a_uint32_t dev_id, a_uint32_t phy_id,
 	sw_error_t rv;
 	a_uint32_t reg_id_c45 = QCA808X_REG_C45_ADDRESS(mmd_num, reg_id);
 #if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_id);
+	a_uint32_t port_id = qca808x_phy_addr_to_port(dev_id, phy_id);
 	a_uint8_t phy_access_type = hsl_port_phy_access_type_get(dev_id, port_id);
 
 	if (phy_access_type == PHY_I2C_ACCESS) {
@@ -209,7 +222,7 @@ qca808x_phy_mmd_read(a_uint32_t dev_id, a_uint32_t phy_id,
 	a_uint16_t phy_data = 0;
 	a_uint32_t reg_id_c45 = QCA808X_REG_C45_ADDRESS(mmd_num, reg_id);
 #if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_id);
+	a_uint32_t port_id = qca808x_phy_addr_to_port(dev_id, phy_id);
 	a_uint8_t phy_access_type = hsl_port_phy_access_type_get(dev_id, port_id);
 
 	if (phy_access_type == PHY_I2C_ACCESS) {
@@ -647,7 +660,7 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 			if (speed == FAL_SPEED_2500) {
 				if(!qca808x_phy_2500caps(dev_id, phy_addr))
 					return SW_NOT_SUPPORTED;
-				rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_addr,
+				rv = qca808x_phy_set_autoneg_adv(dev_id, phy_addr,
 					FAL_PHY_ADV_2500T_FD);
 				PHY_RTN_ON_ERROR(rv);
 			} else {

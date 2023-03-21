@@ -320,6 +320,12 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
 	phy_device_register(phydev);
 
 	phydev->priv = priv;
+#if defined(IN_PHY_I2C_MODE)
+	if (hsl_port_phy_access_type_get(dev_id, port) == PHY_I2C_ACCESS) {
+		if(phydev->drv)
+			phy_driver_unregister(phydev->drv);
+	}
+#endif
 #endif
 	return 0;
 }

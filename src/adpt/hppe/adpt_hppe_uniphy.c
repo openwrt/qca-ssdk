@@ -1206,6 +1206,40 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 }
 #endif
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
+a_bool_t
+adpt_hppe_uniphy_check(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
+{
+	adpt_ppe_type_t ppe_type = adpt_ppe_type_get(dev_id);
+
+	if (ppe_type == APPE_TYPE) {
+		if (((index == SSDK_UNIPHY_INSTANCE1)
+			&& (cpu_is_uniphy1_enabled() == A_FALSE)) ||
+			((index == SSDK_UNIPHY_INSTANCE2)
+			&& (cpu_is_uniphy2_enabled() == A_FALSE))) {
+			return A_FALSE;
+		}
+	} else if (ppe_type == MPPE_TYPE) {
+#ifdef MPPE
+		if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_UDXGMII)) {
+			return A_FALSE;
+		}
+		if ((cpu_is_ipq5312() == A_TRUE) || (cpu_is_ipq5302() == A_TRUE)) {
+			if ((mode == PORT_WRAPPER_10GBASE_R)
+				|| (mode == PORT_WRAPPER_USXGMII)) {
+				return A_FALSE;
+			}
+		}
+#endif
+	} else if ((ppe_type == HPPE_TYPE) || (ppe_type == CPPE_TYPE)) {
+		if ((mode == PORT_WRAPPER_UQXGMII) || (mode == PORT_WRAPPER_UDXGMII)) {
+			return A_FALSE;
+		}
+	}
+	return A_TRUE;
+}
+#endif
+
 sw_error_t
 adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 {
@@ -1218,11 +1252,9 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 	}
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
-	if (((index == SSDK_UNIPHY_INSTANCE1)
-		&& (cpu_is_uniphy1_enabled() == A_FALSE)) ||
-		((index == SSDK_UNIPHY_INSTANCE2)
-		&& (cpu_is_uniphy2_enabled() == A_FALSE))) {
-		SSDK_INFO("ssdk doesn't support uniphy:%d on platform\n", index);
+	if (adpt_hppe_uniphy_check(dev_id, index, mode) == A_FALSE) {
+		SSDK_INFO("ssdk doesn't support mode:%d in uniphy:%d on platform!\n",
+			mode, index);
 		return SW_OK;
 	}
 #endif

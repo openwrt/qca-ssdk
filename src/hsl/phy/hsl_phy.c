@@ -543,6 +543,17 @@ qca_ssdk_phy_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr)
 	return 0;
 }
 
+a_uint32_t
+qca_ssdk_phydev_to_port(a_uint32_t dev_id, struct phy_device *phydev)
+{
+	a_uint32_t miibus_id = 0, phy_addr_e = 0;
+
+	miibus_id = ssdk_miibus_index_get(dev_id, phydev->mdio.bus);
+	phy_addr_e = TO_PHY_ADDR_E(phydev->mdio.addr, miibus_id);
+
+	return qca_ssdk_phy_addr_to_port(dev_id, phy_addr_e);
+}
+
 a_bool_t
 hsl_port_phy_combo_capability_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
@@ -774,9 +785,10 @@ hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 {
 	a_uint32_t pdev_addr;
 	const char *pdev_name;
-	struct mii_bus *miibus = hsl_phy_miibus_get(dev_id, phy_addr);
+	struct mii_bus *miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
 
 	SW_RTN_ON_NULL(phydev);
+	SW_RTN_ON_NULL(miibus);
 #if (LINUX_VERSION_CODE < KERNEL_VERSION (5, 0, 0))
 	*phydev = miibus->phy_map[phy_addr];
 	if(*phydev == NULL)
@@ -787,6 +799,7 @@ hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	pdev_addr = (*phydev)->addr;
 	pdev_name = dev_name(&((*phydev)->dev));
 #else
+	phy_addr = TO_PHY_ADDR(phy_addr);
 	*phydev = mdiobus_get_phy(miibus, phy_addr);
 	if(*phydev == NULL)
 	{
@@ -1724,33 +1737,6 @@ hsl_port_force_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint8_t duple
 }
 
 /*qca808x_start*/
-struct mii_bus*
-hsl_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id)
-{
-	struct mii_bus *miibus = NULL;
-
-	miibus = phy_info[dev_id]->miibus[port_id];
-	if (!miibus)
-		miibus = ssdk_miibus_get_by_device(dev_id);
-
-	return miibus;
-}
-
-void
-hsl_port_miibus_set(a_uint32_t dev_id, a_uint32_t port_id, struct mii_bus* mii_bus)
-{
-	phy_info[dev_id]->miibus[port_id] = mii_bus;
-}
-
-struct mii_bus*
-hsl_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr)
-{
-	a_int32_t port_id = 0;
-
-	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
-	return hsl_port_miibus_get(dev_id, port_id);
-}
-
 /*
  * @brief Get feature on a particular port.
  * @param[in] dev_id device id

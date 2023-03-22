@@ -215,19 +215,13 @@ a_uint32_t
 ssdk_ifname_to_port(a_uint32_t dev_id, const char *ifname)
 {
 	struct net_device *eth_dev = NULL;
-	a_uint32_t phy_addr = 0;
 	eth_dev = dev_get_by_name(&init_net, ifname);
 	if (!eth_dev || !eth_dev->phydev)
 	{
 		return 0;
 	}
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-	phy_addr = eth_dev->phydev->mdio.addr;
-#else
-	phy_addr = eth_dev->phydev->addr;
-#endif
 	dev_put(eth_dev);
-	return qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
+	return qca_ssdk_phydev_to_port(dev_id, eth_dev->phydev);
 }
 
 char *
@@ -3726,14 +3720,8 @@ static int ssdk_dev_event(struct notifier_block *this, unsigned long event, void
 					return NOTIFY_DONE;
 				}
 				if (dev->phydev != NULL) {
-					int addr;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-					addr = dev->phydev->mdio.addr;
-#else
-					addr = dev->phydev->addr;
-#endif
-					port_id = qca_ssdk_phy_addr_to_port(priv->device_id,
-						addr);
+					port_id = qca_ssdk_phydev_to_port(priv->device_id,
+						dev->phydev);
 					rv = p_api->adpt_port_netdev_notify_set(priv, port_id);
 					if (rv) {
 						SSDK_ERROR("netdev change notify failed\n");

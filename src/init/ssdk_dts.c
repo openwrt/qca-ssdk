@@ -35,6 +35,9 @@
 #if defined(MHT)
 #include "mht_sec_ctrl.h"
 #endif
+#include <linux/of.h>
+#include <linux/of_mdio.h>
+#include <linux/of_platform.h>
 
 static ssdk_dt_global_t ssdk_dt_global = {0};
 #ifdef HPPE
@@ -566,7 +569,7 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 {
 	struct device_node *phy_info_node = NULL, *port_node = NULL;
 	a_uint32_t port_id = 0, phy_addr = 0, forced_speed = 0,
-		forced_duplex = 0, len = 0;
+		forced_duplex = 0, len = 0, miibus_index = 0;
 	const __be32 *paddr = NULL;
 	a_bool_t phy_c45 = A_FALSE, phy_combo = A_FALSE;
 #if defined(IN_PHY_I2C_MODE)
@@ -598,6 +601,20 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 		}
 
 		/* initialize phy_addr in case of undefined dts field */
+		mdio_node = of_parse_phandle(port_node, "mdiobus", 0);
+		if (mdio_node)
+		{
+			ssdk_miibus_add(dev_id, of_mdio_find_bus(mdio_node), &miibus_index);
+			phy_reset_gpio = of_get_named_gpio(mdio_node, "phy-reset-gpio",
+				SSDK_PHY_RESET_GPIO_INDEX);
+			if(phy_reset_gpio > 0)
+			{
+				SSDK_INFO("port%d's phy-reset-gpio is GPIO%d\n", port_id,
+					phy_reset_gpio);
+				hsl_port_phy_reset_gpio_set(dev_id, port_id,
+					(a_uint32_t)phy_reset_gpio);
+			}
+		}
 		phy_addr = 0xff;
 		phy_features = 0;
 		of_property_read_u32(port_node, "phy_address", &phy_addr);
@@ -618,7 +635,8 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 		} else
 #endif
 		{
-			hsl_phy_address_init(dev_id, port_id, phy_addr);
+			hsl_phy_address_init(dev_id, port_id,
+				TO_PHY_ADDR_E(phy_addr, miibus_index));
 		}
 
 		if (!of_property_read_u32(port_node, "forced-speed", &forced_speed) &&
@@ -699,23 +717,62 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 			}
 		}
 		hsl_port_feature_set(dev_id, port_id, phy_features | PHY_F_INIT);
-
-		mdio_node = of_parse_phandle(port_node, "mdiobus", 0);
-		if (mdio_node)
-		{
-			hsl_port_miibus_set(dev_id, port_id, of_mdio_find_bus(mdio_node));
-			phy_reset_gpio = of_get_named_gpio(mdio_node, "phy-reset-gpio",
-				SSDK_PHY_RESET_GPIO_INDEX);
-			if(phy_reset_gpio > 0)
-			{
-				SSDK_INFO("port%d's phy-reset-gpio is GPIO%d\n", port_id,
-					phy_reset_gpio);
-				hsl_port_phy_reset_gpio_set(dev_id, port_id,
-					(a_uint32_t)phy_reset_gpio);
-			}
-		}
-
 	}
+
+	return rv;
+}
+
+static sw_error_t
+ssdk_dt_parse_default_mdio_bus(struct device_node *switch_node, a_uint32_t dev_id)
+{
+	struct device_node *mdio_node = NULL;
+	struct platform_device *mdio_plat = NULL;
+	hsl_reg_mode reg_mode = HSL_REG_LOCAL_BUS;
+	a_uint32_t miibus_index = 0;
+	sw_error_t rv = SW_OK;
+
+	if (switch_node) {
+		mdio_node = of_parse_phandle(switch_node, "mdio-bus", 0);
+		if (mdio_node) {
+			return ssdk_miibus_add(dev_id, of_mdio_find_bus(mdio_node),
+				&miibus_index);
+		}
+	}
+	reg_mode=ssdk_switch_reg_access_mode_get(dev_id);
+	if (reg_mode == HSL_REG_LOCAL_BUS) {
+		mdio_node = of_find_compatible_node(NULL, NULL, "qcom,ipq40xx-mdio");
+		if (!mdio_node)
+			mdio_node = of_find_compatible_node(NULL, NULL, "qcom,qca-mdio");
+	} else
+		mdio_node = of_find_compatible_node(NULL, NULL, "virtual,mdio-gpio");
+
+	if (!mdio_node) {
+		SSDK_ERROR("No MDIO node found in DTS!\n");
+		return SW_NOT_FOUND;
+	}
+
+	mdio_plat = of_find_device_by_node(mdio_node);
+	if (!mdio_plat) {
+		SSDK_ERROR("cannot find platform device from mdio node\n");
+		return SW_NOT_FOUND;
+	}
+
+	if(reg_mode == HSL_REG_LOCAL_BUS) {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+		rv = ssdk_miibus_add(dev_id, dev_get_drvdata(&mdio_plat->dev), &miibus_index);
+#else
+		struct qca_mdio_data *mdio_data = NULL;
+		mdio_data = dev_get_drvdata(&mdio_plat->dev);
+		if (!mdio_data) {
+			SSDK_ERROR("cannot get mdio_data reference from device data\n");
+			return SW_NOT_FOUND;
+		}
+		rv = ssdk_miibus_add(dev_id, mdio_data->mii_bus, &miibus_index);
+#endif
+	}
+	else
+		rv = ssdk_miibus_add(dev_id, dev_get_drvdata(&mdio_plat->dev),
+			&miibus_index);
 
 	return rv;
 }
@@ -730,6 +787,13 @@ static void ssdk_dt_parse_mdio(a_uint32_t dev_id, struct device_node *switch_nod
 	const __be32 *c45_phy;
 	phy_features_t phy_features = 0;
 
+	/*parse the mdio bus*/
+	if(!ssdk_is_emulation(dev_id)) {
+		if (SW_OK != ssdk_dt_parse_default_mdio_bus(switch_node, dev_id)) {
+			SSDK_ERROR("mdio bus parse failed!\n");
+			return;
+		}
+	}
 	/* prefer to get phy info from ess-switch node */
 	if (SW_OK == ssdk_dt_parse_phy_info(switch_node, dev_id, cfg))
 		return;

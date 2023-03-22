@@ -57,21 +57,6 @@
 #include <malibu_phy.h>
 #endif
 /*qca808x_start*/
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,1,0))
-#include <linux/of.h>
-#include <linux/of_mdio.h>
-#include <linux/of_platform.h>
-#elif defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-#include <linux/of.h>
-#include <linux/of_mdio.h>
-#include <drivers/leds/leds-ipq40xx.h>
-#include <linux/of_platform.h>
-#include <linux/reset.h>
-#else
-#include <linux/ar8216_platform.h>
-#include <drivers/net/phy/ar8216.h>
-#include <drivers/net/ethernet/atheros/ag71xx/ag71xx.h>
-#endif
 #include "ssdk_plat.h"
 #include "hsl_phy.h"
 /*qca808x_end*/
@@ -83,9 +68,6 @@
 #include "ref_misc.h"
 #include "ref_uci.h"
 #include "shell.h"
-#ifdef BOARD_AR71XX
-#include "ssdk_uci.h"
-#endif
 #ifdef IN_IP
 #if defined (CONFIG_NF_FLOW_COOKIE)
 #include "fal_flowcookie.h"
@@ -123,10 +105,6 @@ extern struct qca_phy_priv **qca_phy_priv_global;
 #ifdef BOARD_IPQ806X
 #define PLATFORM_MDIO_BUS_NAME		"mdio-gpio"
 #endif
-
-#ifdef BOARD_AR71XX
-#define PLATFORM_MDIO_BUS_NAME		"ag71xx-mdio"
-#endif
 /*qca808x_start*/
 #define MDIO_BUS_0					0
 #define MDIO_BUS_1					1
@@ -149,31 +127,6 @@ static int ssdk_dev_id = 0;
 /*qca808x_start*/
 a_uint32_t ssdk_log_level = SSDK_LOG_LEVEL_DEFAULT;
 /*qca808x_end*/
-
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-struct ag71xx_mdio {
-	struct mii_bus		*mii_bus;
-	int			mii_irq[PHY_MAX_ADDR];
-	void __iomem		*mdio_base;
-};
-#endif
-
-#ifdef BOARD_AR71XX
-static uint32_t switch_chip_id_adjuest(a_uint32_t dev_id)
-{
-	uint32_t chip_version = 0;
-	chip_version = (qca_ar8216_mii_read(dev_id, 0)&0xff00)>>8;
-	if((chip_version !=0) && (chip_version !=0xff))
-		return 0;
-
-	switch_chip_id = SHIVA_CHIP_ID;
-	switch_chip_reg = SHIVA_CHIP_REG;
-
-	chip_version = (qca_ar8216_mii_read(dev_id, 0)&0xff00)>>8;
-	printk("chip_version:0x%x\n", chip_version);
-	return 1;
-}
-#endif
 
 static inline void
 mht_split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page,
@@ -198,7 +151,7 @@ qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg)
 	uint16_t r1, r2, page, switch_phy_id;
 	uint16_t lo, hi;
 
-	bus = qca_phy_priv_global[dev_id]->miibus;
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
 
 	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
 	mutex_lock(&bus->mdio_lock);
@@ -217,7 +170,7 @@ qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	uint16_t r1, r2, page, switch_phy_id;
 	uint16_t lo, hi;
 
-	bus = qca_phy_priv_global[dev_id]->miibus;
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
 
 	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
 	lo = val & 0xffff;
@@ -318,7 +271,7 @@ qca_ar8216_mii_read(a_uint32_t dev_id, a_uint32_t reg)
 	uint16_t r1, r2, page;
 	uint16_t lo, hi;
 
-	bus = qca_phy_priv_global[dev_id]->miibus;
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
 
 	split_addr((uint32_t) reg, &r1, &r2, &page);
 	mutex_lock(&bus->mdio_lock);
@@ -339,7 +292,7 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	uint16_t lo, hi;
 	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
-	bus = qca_phy_priv_global[dev_id]->miibus;
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
 
 	split_addr((a_uint32_t) reg, &r1, &r2, &r3);
 	lo = val & 0xffff;
@@ -393,8 +346,10 @@ void qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 a_bool_t
 phy_addr_validation_check(a_uint32_t phy_addr)
 {
-
-	if ((phy_addr > SSDK_PHY_BCAST_ID) || (phy_addr < SSDK_PHY_MIN_ID))
+	if(TO_MIIBUS_INDEX(phy_addr) >= SSDK_MII_BUS_MAX)
+		return A_FALSE;
+	if ((TO_PHY_ADDR(phy_addr) > SSDK_PHY_BCAST_ID) ||
+		(TO_PHY_ADDR(phy_addr) < SSDK_PHY_MIN_ID))
 		return A_FALSE;
 	else
 		return A_TRUE;
@@ -411,10 +366,10 @@ qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_BAD_PARAM;
 	}
 
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return SW_NOT_SUPPORTED;
-
+	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
 	*data = __mdiobus_read(bus, phy_addr, reg);
 	mutex_unlock(&bus->mdio_lock);
@@ -433,10 +388,10 @@ qca_ar8327_phy_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_BAD_PARAM;
 	}
 
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return SW_NOT_SUPPORTED;
-
+	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
 	__mdiobus_write(bus, phy_addr, reg, data);
 	mutex_unlock(&bus->mdio_lock);
@@ -455,10 +410,10 @@ qca_ar8327_phy_dbg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return;
 	}
 
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return;
-
+	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
 	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
 	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_DATA, dbg_data);
@@ -476,10 +431,10 @@ qca_ar8327_phy_dbg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return;
 	}
 
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return;
-
+	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
 	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
 	*dbg_data = __mdiobus_read(bus, phy_addr, QCA_MII_DBG_DATA);
@@ -498,10 +453,10 @@ qca_ar8327_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return;
 	}
 
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return;
-
+	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
 	__mdiobus_write(bus, phy_addr, QCA_MII_MMD_ADDR, addr);
 	__mdiobus_write(bus, phy_addr, QCA_MII_MMD_DATA, data);
@@ -724,174 +679,74 @@ qca_uniphy_reg_write(a_uint32_t dev_id, a_uint32_t uniphy_index,
 #endif
 	return 0;
 }
-#ifndef BOARD_AR71XX
 /*qca808x_start*/
-static int miibus_get(a_uint32_t dev_id)
+struct mii_bus *ssdk_miibus_get(a_uint32_t dev_id, a_uint32_t index)
 {
-/*qca808x_end*/
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-/*qca808x_start*/
-	struct device_node *mdio_node = NULL;
-	struct device_node *switch_node = NULL;
-	struct platform_device *mdio_plat = NULL;
-	struct qca_phy_priv *priv;
-	hsl_reg_mode reg_mode = HSL_REG_LOCAL_BUS;
-	priv = qca_phy_priv_global[dev_id];
-	switch_node = qca_phy_priv_global[dev_id]->of_node;
-	if (switch_node) {
-		mdio_node = of_parse_phandle(switch_node, "mdio-bus", 0);
-		if (mdio_node) {
-			priv->miibus = of_mdio_find_bus(mdio_node);
-			return 0;
-		}
-	}
-/*qca808x_end*/
-	reg_mode=ssdk_switch_reg_access_mode_get(dev_id);
-/*qca808x_start*/
-	if (reg_mode == HSL_REG_LOCAL_BUS) {
-		mdio_node = of_find_compatible_node(NULL, NULL, "qcom,ipq40xx-mdio");
-		if (!mdio_node)
-			mdio_node = of_find_compatible_node(NULL, NULL, "qcom,qca-mdio");
-	} else
-		mdio_node = of_find_compatible_node(NULL, NULL, "virtual,mdio-gpio");
+	return qca_phy_priv_global[dev_id]->miibus[index];
+}
 
-	if (!mdio_node) {
-		SSDK_ERROR("No MDIO node found in DTS!\n");
-		return 1;
-	}
+struct mii_bus *ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr_e)
+{
+	a_uint32_t index = 0;
 
-	mdio_plat = of_find_device_by_node(mdio_node);
-	if (!mdio_plat) {
-		SSDK_ERROR("cannot find platform device from mdio node\n");
-		return 1;
-	}
+	index = TO_MIIBUS_INDEX(phy_addr_e);
+	if(index >= SSDK_MII_INVALID_BUS_ID)
+		return NULL;
 
-	if(reg_mode == HSL_REG_LOCAL_BUS)
+	return ssdk_miibus_get(dev_id, index);
+}
+
+struct mii_bus *ssdk_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	a_uint32_t phy_addr_e = 0;
+
+	phy_addr_e = qca_ssdk_port_to_phy_addr(dev_id, port_id);
+
+	return ssdk_phy_miibus_get(dev_id, phy_addr_e);
+}
+
+sw_error_t ssdk_miibus_add(a_uint32_t dev_id, struct mii_bus *miibus,
+	a_uint32_t *index)
+{
+	a_uint32_t i = 0;
+
+	if(!miibus)
+		return SW_BAD_PTR;
+
+	for(i = 0; i < SSDK_MII_BUS_MAX; i++)
 	{
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
-		priv->miibus = dev_get_drvdata(&mdio_plat->dev);
-#else
-		struct qca_mdio_data *mdio_data = NULL;
-		mdio_data = dev_get_drvdata(&mdio_plat->dev);
-		if (!mdio_data) {
-			SSDK_ERROR("cannot get mdio_data reference from device data\n");
-			return 1;
+		if(qca_phy_priv_global[dev_id]->miibus[i] == miibus ||
+			qca_phy_priv_global[dev_id]->miibus[i] == NULL)
+		{
+			*index = i;
+			qca_phy_priv_global[dev_id]->miibus[i] = miibus;
+			return SW_OK;
 		}
-		priv->miibus = mdio_data->mii_bus;
-#endif
-	}
-	else
-		priv->miibus = dev_get_drvdata(&mdio_plat->dev);
-
-	if (!priv->miibus) {
-		SSDK_ERROR("cannot get mii bus reference from device data\n");
-		return 1;
-	}
-/*qca808x_end*/
-#else
-	struct device *miidev;
-	char busid[MII_BUS_ID_SIZE];
-	struct qca_phy_priv *priv;
-
-	priv = qca_phy_priv_global[dev_id];
-	snprintf(busid, MII_BUS_ID_SIZE, "%s.%d",
-		PLATFORM_MDIO_BUS_NAME, PLATFORM_MDIO_BUS_NUM);
-
-	miidev = bus_find_device_by_name(&platform_bus_type, NULL, busid);
-	if (!miidev) {
-		SSDK_ERROR("Failed to get miidev\n");
-		return 1;
 	}
 
-	priv->miibus = dev_get_drvdata(miidev);
-
-	if(!priv->miibus){
-		SSDK_ERROR("mdio bus '%s' get FAIL\n", busid);
-		return 1;
-	}
-#endif
-/*qca808x_start*/
-	return 0;
+	return SW_OUT_OF_RANGE;
 }
-/*qca808x_end*/
-#else
-static int miibus_get(a_uint32_t dev_id)
+
+a_uint32_t ssdk_miibus_index_get(a_uint32_t dev_id, struct mii_bus *miibus)
 {
-	struct ag71xx_mdio *am;
-	struct qca_phy_priv *priv = qca_phy_priv_global[dev_id];
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
-	struct device_node *mdio_node = NULL;
-	struct platform_device *mdio_plat = NULL;
+	a_uint32_t index = 0;
 
-	mdio_node = of_find_compatible_node(NULL, NULL, "qca,ag71xx-mdio");
-	if (!mdio_node) {
-		SSDK_ERROR("No MDIO node found in DTS!\n");
-		return 1;
-	}
-	mdio_plat = of_find_device_by_node(mdio_node);
-	if (!mdio_plat) {
-		SSDK_ERROR("cannot find platform device from mdio node\n");
-		return 1;
-	}
-	am = dev_get_drvdata(&mdio_plat->dev);
-	if (!am) {
-                	SSDK_ERROR("cannot get mdio_data reference from device data\n");
-                	return 1;
-	}
-	priv->miibus = am->mii_bus;
-
-	switch_chip_id_adjuest(dev_id);
-#else
-	struct device *miidev;
-	char busid[MII_BUS_ID_SIZE];
-
-	snprintf(busid, MII_BUS_ID_SIZE, "%s.%d",
-		PLATFORM_MDIO_BUS_NAME, PLATFORM_MDIO_BUS_NUM);
-
-	miidev = bus_find_device_by_name(&platform_bus_type, NULL, busid);
-	if (!miidev) {
-		SSDK_ERROR("Failed to get miidev!\n");
-		return 1;
-	}
-	am = dev_get_drvdata(miidev);
-	priv->miibus = am->mii_bus;
-
-	if(switch_chip_id_adjuest(dev_id)) {
-		snprintf(busid, MII_BUS_ID_SIZE, "%s.%d",
-		PLATFORM_MDIO_BUS_NAME, MDIO_BUS_1);
-
-		miidev = bus_find_device_by_name(&platform_bus_type, NULL, busid);
-		if (!miidev) {
-			SSDK_ERROR("Failed get mii bus\n");
-			return 1;
-		}
-
-		am = dev_get_drvdata(miidev);
-		priv->miibus = am->mii_bus;
-		SSDK_INFO("chip_version:0x%x\n", (qca_ar8216_mii_read(dev_id, 0)&0xff00)>>8);
+	for(index = 0; index < SSDK_MII_BUS_MAX; index++)
+	{
+		if(qca_phy_priv_global[dev_id]->miibus[index] == miibus)
+			return index;
 	}
 
-	if(!miidev){
-		SSDK_ERROR("mdio bus '%s' get FAIL\n", busid);
-		return 1;
-	}
-#endif
-
-	return 0;
-}
-#endif
-/*qca808x_start*/
-struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id)
-{
-	return qca_phy_priv_global[dev_id]->miibus;
+	return SSDK_MII_INVALID_BUS_ID;
 }
 /*qca808x_end*/
-sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq)
+sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t index,
+	a_uint32_t *freq)
 {
 	struct mii_bus *bus = NULL;
 	struct qca_mdio_data *mdio_priv = NULL;
 
-	bus = ssdk_miibus_get_by_device(dev_id);
+	bus = ssdk_miibus_get(dev_id, index);
 	if (!bus) {
 		SSDK_ERROR("Can't get MDIO bus of device id %d\n", dev_id);
 		return SW_BAD_PTR;
@@ -907,12 +762,13 @@ sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq)
 	return SW_OK;
 }
 
-sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq)
+sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t index,
+	a_uint32_t freq)
 {
 	struct mii_bus *bus = NULL;
 	struct qca_mdio_data *mdio_priv = NULL;
 
-	bus = ssdk_miibus_get_by_device(dev_id);
+	bus = ssdk_miibus_get(dev_id, index);
 	if (!bus) {
 		SSDK_ERROR("Can't get MDIO bus of device id %d\n", dev_id);
 		return SW_BAD_PTR;
@@ -1706,13 +1562,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 /*qca808x_start*/
 	SSDK_INFO("ssdk_plat_init start\n");
 /*qca808x_end*/
-
-	if(!ssdk_is_emulation(dev_id)){
-/*qca808x_start*/
-		if(miibus_get(dev_id))
-			return -ENODEV;
-/*qca808x_end*/
-	}
 #ifdef IN_UNIPHY
 	reg_mode = ssdk_uniphy_reg_access_mode_get(dev_id);
 	if(reg_mode == HSL_REG_LOCAL_BUS) {

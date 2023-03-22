@@ -249,7 +249,7 @@ qca808x_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct mii_bus *bus = NULL;
 	a_uint32_t reg_id_c45 = QCA808X_REG_C45_ADDRESS(mmd_num, mmd_reg);
 
-	bus = hsl_phy_miibus_get(dev_id, phy_addr);
+	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
 	if (!bus)
 		return SW_NOT_SUPPORTED;
 

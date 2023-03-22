@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -448,12 +448,12 @@ qca_mht_sku_check(a_uint32_t dev_id, a_uint32_t mht_sku)
 {
 	a_uint32_t data = 0, sku_value = 0, freq = 0;
 
-	ssdk_miibus_freq_get(dev_id, &freq);
+	ssdk_miibus_freq_get(dev_id, SSDK_MII_DEFAULT_BUS_ID, &freq);
 	/*fuse register need use lower mdio clock to read*/
-	ssdk_miibus_freq_set(dev_id, 0xff);
+	ssdk_miibus_freq_set(dev_id, SSDK_MII_DEFAULT_BUS_ID, 0xff);
 	data = qca_mht_mii_read(dev_id, QFPROM_RAW_PTE_ROW0_LSB_OFFSET);
 	/*after read fuse, need recovery the mdio clock*/
-	ssdk_miibus_freq_set(dev_id, freq);
+	ssdk_miibus_freq_set(dev_id, SSDK_MII_DEFAULT_BUS_ID, freq);
 
 	sku_value = data & MHT_SKU_MASK;
 	SSDK_DEBUG("MHT SKU is 0x%x\n", sku_value);

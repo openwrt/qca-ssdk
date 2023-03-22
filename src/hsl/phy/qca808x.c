@@ -39,6 +39,23 @@ struct qca808x_phy_info* qca808x_phy_info_get(a_uint32_t phy_addr)
 	return NULL;
 }
 
+static struct qca808x_phy_info* qca808x_phy_info_get_by_phydev(
+	struct phy_device *phydev)
+{
+	struct qca808x_phy_info *pdata = NULL;
+	a_uint32_t miibus_index = 0;
+
+	list_for_each_entry(pdata, &g_qca808x_phy_list, list) {
+		if (phydev->mdio.addr == pdata->phydev_addr) {
+			miibus_index = TO_MIIBUS_INDEX(pdata->phy_addr);
+			if(ssdk_miibus_get(pdata->dev_id, miibus_index) == phydev->mdio.bus)
+				return pdata;
+		}
+	}
+
+	return NULL;
+}
+
 static a_bool_t qca808x_sfp_present(struct phy_device *phydev)
 {
 	qca808x_priv *priv = phydev->priv;
@@ -585,11 +602,8 @@ int qca808x_phy_probe(struct phy_device *phydev)
 	}
 
 	priv->phydev = phydev;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0))
-	priv->phy_info = qca808x_phy_info_get(phydev->addr);
-#else
-	priv->phy_info = qca808x_phy_info_get(phydev->mdio.addr);
-#endif
+
+	priv->phy_info = qca808x_phy_info_get_by_phydev(phydev);
 	/*for switch ports, the phys may also be probed here, but
 	* failed because switch phys are init on another device, so
 	* return ok for the case.
@@ -706,7 +720,7 @@ void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 	pdata->dev_id = dev_id;
 	/* the phy address may be the i2c slave addr or mdio addr */
 	pdata->phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
-	pdata->phydev_addr = pdata->phy_addr;
+	pdata->phydev_addr = TO_PHY_ADDR(pdata->phy_addr);
 #if defined(IN_PHY_I2C_MODE)
 	/* in i2c mode, need to register a fake phy device
 	 * before the phy driver register */

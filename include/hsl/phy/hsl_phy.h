@@ -559,7 +559,6 @@ typedef struct {
 	a_uint8_t port_force_duplex[SW_MAX_NR_PORT];
 	a_uint32_t port_force_speed[SW_MAX_NR_PORT];
 	phy_features_t phy_features[SW_MAX_NR_PORT];
-	struct mii_bus *miibus[SW_MAX_NR_PORT];
 	a_uint32_t phy_type[SW_MAX_NR_PORT];
 #if defined(IN_PHY_I2C_MODE)
 	/* fake mdio address is used to register the phy device,
@@ -618,8 +617,8 @@ typedef struct {
 #define PHY_MDIO_ACCESS         0
 #define PHY_I2C_ACCESS          1
 
-#define INVALID_PHY_ADDR        0xff
-#define MAX_PHY_ADDR            0x1f
+#define INVALID_PHY_ADDR        0xfff
+#define MAX_PHY_ADDR            0xf1f
 #define QCA8072_PHY_NUM         0x2
 
 #define PHY_INVALID_DATA 0xffff
@@ -629,6 +628,10 @@ typedef struct {
 
 #define PHY_RTN_ON_ERROR(rv) \
     do { if (rv != SW_OK) return(rv); } while(0);
+
+#define TO_PHY_ADDR_E(phy_addr, miibus_index) (phy_addr | (miibus_index << 8))
+#define TO_PHY_ADDR(phy_addr_e) (phy_addr_e & 0x1f)
+#define TO_MIIBUS_INDEX(phy_addr_e) (phy_addr_e >> 8 & 0xf)
 
 sw_error_t
 hsl_phy_api_ops_register(phy_type_t phy_type, hsl_phy_ops_t * phy_api_ops);
@@ -676,6 +679,8 @@ a_uint32_t qca_ssdk_phy_type_port_bmp_get(a_uint32_t dev_id,
 a_uint32_t
 qca_ssdk_phy_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr);
 /*qca808x_end*/
+a_uint32_t
+qca_ssdk_phydev_to_port(a_uint32_t dev_id, struct phy_device *phydev);
 void
 hsl_port_phy_c45_capability_set(a_uint32_t dev_id, a_uint32_t port_id,
 			a_bool_t enable);
@@ -820,12 +825,6 @@ hsl_port_force_duplex_get(a_uint32_t dev_id, a_uint32_t port_id);
 void
 hsl_port_force_duplex_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint8_t duplex);
 /*qca808x_start*/
-struct mii_bus*
-hsl_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id);
-void
-hsl_port_miibus_set(a_uint32_t dev_id, a_uint32_t port_id, struct mii_bus* mii_bus);
-struct mii_bus*
-hsl_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
 a_bool_t
 hsl_port_feature_get(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
 sw_error_t

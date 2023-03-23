@@ -734,7 +734,6 @@ static int miibus_get(a_uint32_t dev_id)
 	struct device_node *mdio_node = NULL;
 	struct device_node *switch_node = NULL;
 	struct platform_device *mdio_plat = NULL;
-	struct qca_mdio_data *mdio_data = NULL;
 	struct qca_phy_priv *priv;
 	hsl_reg_mode reg_mode = HSL_REG_LOCAL_BUS;
 	priv = qca_phy_priv_global[dev_id];
@@ -769,12 +768,17 @@ static int miibus_get(a_uint32_t dev_id)
 
 	if(reg_mode == HSL_REG_LOCAL_BUS)
 	{
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+		priv->miibus = dev_get_drvdata(&mdio_plat->dev);
+#else
+		struct qca_mdio_data *mdio_data = NULL;
 		mdio_data = dev_get_drvdata(&mdio_plat->dev);
 		if (!mdio_data) {
 			SSDK_ERROR("cannot get mdio_data reference from device data\n");
 			return 1;
 		}
 		priv->miibus = mdio_data->mii_bus;
+#endif
 	}
 	else
 		priv->miibus = dev_get_drvdata(&mdio_plat->dev);

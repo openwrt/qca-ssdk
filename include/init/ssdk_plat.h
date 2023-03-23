@@ -22,7 +22,9 @@
 #include "sw.h"
 /*qca808x_end*/
 #include <linux/kconfig.h>
+/*qca808x_start*/
 #include <linux/version.h>
+/*qca808x_end*/
 #include <linux/kernel.h>
 #include <linux/module.h>
 #if defined(IN_SWCONFIG)
@@ -357,6 +359,16 @@ struct qca_phy_priv {
 /*qca808x_start*/
 };
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+#define ETH_LDO_RDY_CNT		3
+struct qca_mdio_data{
+	void __iomem	*membase;
+	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
+	int clk_div;
+	struct gpio_descs *reset_gpios;
+	struct clk *clk[];
+};
+#else
 struct qca_mdio_data {
 	struct mii_bus *mii_bus;
 	struct clk *mdio_clk;
@@ -364,6 +376,7 @@ struct qca_mdio_data {
 	int phy_irq[PHY_MAX_ADDR];
 	int clk_div;
 };
+#endif
 
 #if defined(IN_SWCONFIG)
 #define qca_phy_priv_get(_dev) \

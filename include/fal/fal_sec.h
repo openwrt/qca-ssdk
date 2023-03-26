@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2016-2018, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -46,7 +46,7 @@ extern "C" {
 #define FAL_SEC_EXP_IPV4_DATA_INCOMPLETE             9
 #define FAL_SEC_EXP_IPV4_FRAG                        10
 #define FAL_SEC_EXP_IPV4_PING_OF_DEATH               11
-#define FAL_SEC_EXP_IPV4_SNALL_TTL                   12
+#define FAL_SEC_EXP_IPV4_SMALL_TTL                   12
 #define FAL_SEC_EXP_IPV4_UNK_IP_PROT                 13
 #define FAL_SEC_EXP_IPV4_CHECKSUM_ERR                14
 #define FAL_SEC_EXP_IPV4_INV_SIP                     15

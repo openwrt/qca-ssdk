@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -128,14 +128,20 @@ adpt_hppe_ucast_queue_base_profile_get(
 	ADPT_NULL_POINT_CHECK(profile);
 
 	if (queue_dest ->service_code_en) {
+		if (queue_dest->service_code >= SSDK_MAX_SERVICE_CODE_NUM)
+			return SW_OUT_OF_RANGE;
+
 		index = SERVICE_CODE_QUEUE_OFFSET + (queue_dest->src_profile << 8) \
 				+ queue_dest->service_code;
 	} else if (queue_dest ->cpu_code_en) {
+		if (queue_dest->cpu_code >= SSDK_MAX_CPU_CODE_NUM)
+			return SW_OUT_OF_RANGE;
+
 		index = CPU_CODE_QUEUE_OFFSET + (queue_dest->src_profile << 8) \
 				+ queue_dest->cpu_code;
 	} else {
 		index = VP_PORT_QUEUE_OFFSET + (queue_dest->src_profile << 8) \
-				+ queue_dest->dst_port;
+				+ FAL_PORT_ID_VALUE(queue_dest->dst_port);
 	}
 
 	rv = hppe_ucast_queue_map_tbl_get(dev_id, index, &ucast_queue_map_tbl);
@@ -160,6 +166,7 @@ adpt_hppe_port_mcast_priority_class_get(
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(queue_class);
+	port = FAL_PORT_ID_VALUE(port);
 
 
 	if (port == 0){
@@ -434,6 +441,7 @@ adpt_hppe_port_mcast_priority_class_set(
 	union mcast_priority_map0_u mcast_priority_map0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
+	port = FAL_PORT_ID_VALUE(port);
 
 	mcast_priority_map0.bf.class = queue_class;
 	
@@ -769,7 +777,7 @@ adpt_hppe_queue_flush(
 		flush_cfg.bf.flush_all_queues = 0;
 		flush_cfg.bf.flush_qid = queue_id;
 	}
-	flush_cfg.bf.flush_dst_port = port;
+	flush_cfg.bf.flush_dst_port = FAL_PORT_ID_VALUE(port);
 	flush_cfg.bf.flush_busy = 1;
 	
 	hppe_flush_cfg_set(dev_id, &flush_cfg);
@@ -932,14 +940,20 @@ adpt_hppe_ucast_queue_base_profile_set(
 	ADPT_NULL_POINT_CHECK(queue_dest);
 
 	if (queue_dest ->service_code_en) {
+		if (queue_dest->service_code >= SSDK_MAX_SERVICE_CODE_NUM)
+			return SW_OUT_OF_RANGE;
+
 		index = SERVICE_CODE_QUEUE_OFFSET + (queue_dest->src_profile << 8) \
 				+ queue_dest->service_code;
 	} else if (queue_dest ->cpu_code_en) {
+		if (queue_dest->cpu_code >= SSDK_MAX_CPU_CODE_NUM)
+			return SW_OUT_OF_RANGE;
+
 		index = CPU_CODE_QUEUE_OFFSET + (queue_dest->src_profile << 8) \
 				+ queue_dest->cpu_code;
 	} else {
 		index = VP_PORT_QUEUE_OFFSET + (queue_dest->src_profile << 8) \
-				+ queue_dest->dst_port;
+				+ FAL_PORT_ID_VALUE(queue_dest->dst_port);
 	}
 
 	ucast_queue_map_tbl.bf.queue_id = queue_base;

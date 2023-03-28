@@ -568,7 +568,7 @@ static int qca808x_soft_reset(struct phy_device *phydev)
 
 static void qca808x_link_change_notify(struct phy_device *phydev)
 {
-#if defined(IN_LINUX_STD_PTP)
+#if defined(IN_LINUX_STD_PTP) && (LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0))
 	qca808x_ptp_change_notify(phydev);
 #endif
 }
@@ -659,12 +659,14 @@ struct phy_driver qca808x_phy_driver = {
 	.link_change_notify     = qca808x_link_change_notify,
 #endif
 #if defined(IN_LINUX_STD_PTP)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0))
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	.ts_info	= qca808x_ts_info,
 #endif
 	.hwtstamp	= qca808x_hwtstamp,
 	.rxtstamp	= qca808x_rxtstamp,
 	.txtstamp	= qca808x_txtstamp,
+#endif
 #endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
 	.mdiodrv.driver		= { .owner = THIS_MODULE },

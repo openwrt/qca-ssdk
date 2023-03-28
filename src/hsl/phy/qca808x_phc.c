@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -467,7 +467,11 @@ static void rx_timestamp_work(struct work_struct *work)
 					break;
 			}
 		}
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+		netif_rx(skb);
+#else
 		netif_rx_ni(skb);
+#endif
 	}
 
 	if (!skb_queue_empty(&ptp_data->rx_queue))
@@ -504,7 +508,9 @@ static void qca808x_gps_second_sync(struct qca808x_phy_info *pdata, a_int32_t *b
 static void gps_seconds_sync_thread(struct qca808x_phy_info *pdata)
 {
 	struct file *filp;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,1,0))
 	mm_segment_t fs;
+#endif
 	a_uint32_t nread;
 	char buff[128];
 	char *dev ="/dev/ttyMSM0";
@@ -520,8 +526,10 @@ static void gps_seconds_sync_thread(struct qca808x_phy_info *pdata)
 		return;
 	}
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,1,0))
 	fs=get_fs();
 	set_fs(KERNEL_DS);
+#endif
 	while(1)
 	{
 		memset(data, 0, sizeof(data));
@@ -571,7 +579,9 @@ static void gps_seconds_sync_thread(struct qca808x_phy_info *pdata)
 	}
 
 gps_time_sync_exit:
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,1,0))
 	set_fs(fs);
+#endif
 	filp_close(filp, NULL);
 }
 
@@ -857,12 +867,18 @@ static int qca808x_ptp_verify(struct ptp_clock_info *ptp, unsigned int pin,
 }
 #endif
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+void qca808x_ptp_change_notify(struct mii_timestamper *mii_ts, struct phy_device *phydev)
+{
+	qca808x_priv *priv = container_of(mii_ts, qca808x_priv, mii_ts);
+#else
 void qca808x_ptp_change_notify(struct phy_device *phydev)
 {
+	qca808x_priv *priv = phydev->priv;
+#endif
 	fal_ptp_reference_clock_t ptp_ref_clock = FAL_REF_CLOCK_EXTERNAL;
 	fal_ptp_time_t ptp_cycle_time = {0};
 	a_uint32_t nanoseconds = 0;
-	qca808x_priv *priv = phydev->priv;
 	struct qca808x_phy_info *pdata = priv->phy_info;
 
 	if (!pdata) {
@@ -901,14 +917,20 @@ void qca808x_ptp_change_notify(struct phy_device *phydev)
 	}
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+int qca808x_hwtstamp(struct mii_timestamper *mii_ts, struct ifreq *ifr)
+{
+	qca808x_priv *priv = container_of(mii_ts, qca808x_priv, mii_ts);
+#else
 int qca808x_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 {
+	qca808x_priv *priv = phydev->priv;
+#endif
 	struct hwtstamp_config cfg;
 	a_uint32_t gm_mode = 0;
 	fal_ptp_reference_clock_t ref_clock = FAL_REF_CLOCK_LOCAL;
 	sw_error_t ret = SW_OK;
 	fal_ptp_config_t ptp_config = {0};
-	qca808x_priv *priv = phydev->priv;
 	struct qca808x_phy_info *pdata = priv->phy_info;
 	struct qca808x_ptp_info *ptp_info = &priv->ptp_info;
 	struct qca808x_ptp_clock *clock = ptp_info->clock;
@@ -1010,9 +1032,15 @@ int qca808x_hwtstamp(struct phy_device *phydev, struct ifreq *ifr)
 	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
 }
 
-bool qca808x_rxtstamp(struct phy_device *phydev,
-			     struct sk_buff *nskb, int type)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+bool qca808x_rxtstamp(struct mii_timestamper *mii_ts, struct sk_buff *nskb, int type)
 {
+	qca808x_priv *priv = container_of(mii_ts, qca808x_priv, mii_ts);
+#else
+bool qca808x_rxtstamp(struct phy_device *phydev, struct sk_buff *nskb, int type)
+{
+	qca808x_priv *priv = phydev->priv;
+#endif
 	struct skb_shared_hwtstamps *shhwtstamps = NULL;
 	struct timespec64 ts = {0};
 	a_bool_t ingress_trig_flag = A_FALSE;
@@ -1026,7 +1054,6 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 	a_uint8_t *ptp_header;
 	a_uint8_t embed_val, pkt_type;
 	qca808x_ptp_cb *ptp_cb = (qca808x_ptp_cb *)nskb->cb;
-	qca808x_priv *priv = phydev->priv;
 	struct qca808x_phy_info *pdata = priv->phy_info;
 	struct qca808x_ptp_info *ptp_info = &priv->ptp_info;
 	hsl_ptp_event_pkt_stat_t *pkt_stat = priv->ptp_event_stat;
@@ -1148,14 +1175,24 @@ bool qca808x_rxtstamp(struct phy_device *phydev,
 			pkt_type, PTP_PKT_SEQID_MATCHED);
 
 	shhwtstamps->hwtstamp = ns_to_ktime(ns);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+	netif_rx(nskb);
+#else
 	netif_rx_ni(nskb);
+#endif
 
 	return true;
 }
 
-void qca808x_txtstamp(struct phy_device *phydev,
-			     struct sk_buff *org_skb, int type)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+void qca808x_txtstamp(struct mii_timestamper *mii_ts, struct sk_buff *org_skb, int type)
 {
+	qca808x_priv *priv = container_of(mii_ts, qca808x_priv, mii_ts);
+#else
+void qca808x_txtstamp(struct phy_device *phydev, struct sk_buff *org_skb, int type)
+{
+	qca808x_priv *priv = phydev->priv;
+#endif
 	a_uint8_t msg_type;
 	struct sk_buff *skb;
 	qca808x_ptp_cb *ptp_cb;
@@ -1165,7 +1202,6 @@ void qca808x_txtstamp(struct phy_device *phydev,
 	a_uint8_t *reserved0, *reserved1;
 	a_uint16_t *seqid;
 	a_int32_t ptp_class;
-	qca808x_priv *priv = phydev->priv;
 	struct qca808x_ptp_info *ptp_info = &priv->ptp_info;
 	hsl_ptp_event_pkt_stat_t *pkt_stat = priv->ptp_event_stat;
 
@@ -1247,10 +1283,17 @@ void qca808x_txtstamp(struct phy_device *phydev,
 }
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+int qca808x_ts_info(struct mii_timestamper *mii_ts,
+		struct ethtool_ts_info *info)
+{
+	qca808x_priv *priv = container_of(mii_ts, qca808x_priv, mii_ts);
+#else
 int qca808x_ts_info(struct phy_device *phydev,
 		struct ethtool_ts_info *info)
 {
 	qca808x_priv *priv = phydev->priv;
+#endif
 	struct qca808x_ptp_info *ptp_info = &priv->ptp_info;
 	struct qca808x_ptp_clock *clock = ptp_info->clock;
 
@@ -1355,6 +1398,15 @@ int qca808x_ptp_init(qca808x_priv *priv)
 		return -1;
 	}
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+	priv->mii_ts.rxtstamp = qca808x_rxtstamp;
+	priv->mii_ts.txtstamp = qca808x_txtstamp;
+	priv->mii_ts.hwtstamp = qca808x_hwtstamp;
+	priv->mii_ts.ts_info  = qca808x_ts_info;
+	priv->mii_ts.link_state = qca808x_ptp_change_notify;
+
+	priv->phydev->mii_ts = &priv->mii_ts;
+#endif
 	ptp_info = &priv->ptp_info;
 	pdata = priv->phy_info;
 	INIT_DELAYED_WORK(&ptp_info->tx_ts_work, tx_timestamp_work);
@@ -1426,6 +1478,7 @@ int qca808x_ptp_hook_init(void)
 	drv = driver_find(QCA808X_PHY_DRIVER_NAME, &mdio_bus_type);
 	if (drv) {
 		phydrv = to_phy_driver(drv);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,1,0))
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 		phydrv->link_change_notify = qca808x_ptp_change_notify;
 		phydrv->ts_info = qca808x_ts_info;
@@ -1433,6 +1486,7 @@ int qca808x_ptp_hook_init(void)
 		phydrv->hwtstamp = qca808x_hwtstamp;
 		phydrv->rxtstamp = qca808x_rxtstamp;
 		phydrv->txtstamp = qca808x_txtstamp;
+#endif
 		rv = driver_for_each_device(drv, NULL, &ptp_instance, qca808x_ptp_callback_init);
 	}
 
@@ -1466,6 +1520,7 @@ void qca808x_ptp_hook_cleanup(void)
 	if (drv) {
 		rv = driver_for_each_device(drv, NULL, NULL, qca808x_ptp_callback_cleanup);
 		phydrv = to_phy_driver(drv);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,1,0))
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 		phydrv->link_change_notify = NULL;
 		phydrv->ts_info = NULL;
@@ -1473,6 +1528,7 @@ void qca808x_ptp_hook_cleanup(void)
 		phydrv->hwtstamp = NULL;
 		phydrv->rxtstamp = NULL;
 		phydrv->txtstamp = NULL;
+#endif
 	}
 
 	return;

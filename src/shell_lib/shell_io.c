@@ -13613,6 +13613,7 @@ cmd_data_check_ac_ctrl(char *cmd_str, void * val, a_uint32_t size)
     sw_error_t rv;
     fal_ac_ctrl_t entry;
 
+    aos_mem_zero(&entry, sizeof(fal_ac_ctrl_t));
     do
     {
         cmd = get_sub_cmd("ac_en", "yes");

@@ -199,6 +199,8 @@ sfp_read_status(struct phy_device *pdev)
 	addr = pdev->addr;
 #endif
 	port = qca_ssdk_phy_addr_to_port(priv->device_id, addr);
+	if(port == 0)
+		return -ENXIO;
 #ifdef MP
 	phy_info = hsl_phy_info_get(priv->device_id);
 	if(!phy_info)

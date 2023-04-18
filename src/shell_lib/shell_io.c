@@ -37,13 +37,7 @@ static int talk_mode = 1;
         cmd = get_sub_cmd(info, defval);\
         SW_RTN_ON_NULL_PARAM(cmd);\
         \
-        if (!strncasecmp(cmd, "quit", 4)) {\
-            return SW_BAD_VALUE;\
-        } else if (!strncasecmp(cmd, "help", 4)) {\
-            ret = SW_BAD_VALUE;\
-        } else {\
-            ret = chk_func param; \
-        }\
+        ret = chk_func param; \
     } while (talk_mode && (SW_OK != ret));\
 }
 
@@ -996,19 +990,6 @@ cmd_data_type_find(sw_data_type_e type)
     return NULL;
 }
 
-sw_error_t __cmd_data_check_quit_help(char *cmd, char *usage)
-{
-    sw_error_t ret = SW_OK;
-
-    if (!strncasecmp(cmd, "quit", 4)) {
-        return SW_ABORTED;
-    } else if (!strncasecmp(cmd, "help", 4)) {
-        ret = SW_BAD_VALUE;
-    }
-
-    return ret;
-}
-
 sw_error_t __cmd_data_check_complex(char *info, char *defval, char *usage,
 				param_check_t chk_func, void *arg_val,
 				a_uint32_t size)
@@ -1020,12 +1001,7 @@ sw_error_t __cmd_data_check_complex(char *info, char *defval, char *usage,
         cmd = get_sub_cmd(info, defval);
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        ret = __cmd_data_check_quit_help(cmd, usage);
-        if (ret == SW_ABORTED)
-            return ret;
-        else if (ret == SW_OK) {
-            ret = chk_func(cmd, arg_val, size);
-        }
+        ret = chk_func(cmd, arg_val, size);
     } while (talk_mode && (SW_OK != ret));
 
     return SW_OK;
@@ -1042,12 +1018,7 @@ sw_error_t __cmd_data_check_range(char *info, char *defval, char *usage,
         cmd = get_sub_cmd(info, defval);
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        ret = __cmd_data_check_quit_help(cmd, usage);
-        if (ret == SW_ABORTED)
-            return ret;
-        else if (ret == SW_OK) {
-            ret = chk_func(cmd, arg_val, max_val, min_val);
-        }
+        ret = chk_func(cmd, arg_val, max_val, min_val);
     } while (talk_mode && (SW_OK != ret));
 
     return ret;
@@ -1063,13 +1034,8 @@ sw_error_t __cmd_data_check_boolean(char *info, char *defval, char *usage,
     do {
         cmd = get_sub_cmd(info, defval);
         SW_RTN_ON_NULL_PARAM(cmd);
-
-        ret = __cmd_data_check_quit_help(cmd, usage);
-        if (ret == SW_ABORTED)
-            return ret;
-        else if (ret == SW_OK) {
-            ret = chk_func(cmd, def, val, size);
-        }
+        
+		ret = chk_func(cmd, def, val, size);
     } while (talk_mode && (SW_OK != ret));
 
     return SW_OK;
@@ -1247,20 +1213,8 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eee_enable", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(cfg.enable),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(cfg.enable),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
     do
@@ -1268,18 +1222,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eee_capability", "0xffff");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.capability), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.capability), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1288,18 +1231,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("lpi_sleep_timer", "256");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.lpi_sleep_timer), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.lpi_sleep_timer), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1308,18 +1240,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("advertisement", "0xffff");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.advertisement), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.advertisement), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1329,18 +1250,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("lpi_tx_enable", "1");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.lpi_tx_enable), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.lpi_tx_enable), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1349,18 +1259,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eee_status", "0xffff");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.eee_status), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.eee_status), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1369,18 +1268,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("lpi_wakeup_timer", "32");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.lpi_wakeup_timer), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.lpi_wakeup_timer), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1389,18 +1277,7 @@ cmd_data_check_port_eee_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("link_partner_advertisement", "0xffff");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.link_partner_advertisement), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.link_partner_advertisement), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1423,21 +1300,9 @@ cmd_data_check_switch_port_loopback_config(char *cmd_str, void * val,
         cmd = get_sub_cmd("loopback_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(cfg.enable),
-                                        sizeof (a_bool_t));
-            SW_RTN_ON_ERROR(rv);
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(cfg.enable),
+                                    sizeof (a_bool_t));
+        SW_RTN_ON_ERROR(rv);
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1446,21 +1311,9 @@ cmd_data_check_switch_port_loopback_config(char *cmd_str, void * val,
         cmd = get_sub_cmd("crc_stripped_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(cfg.crc_stripped),
-                                        sizeof (a_bool_t));
-            SW_RTN_ON_ERROR(rv);
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(cfg.crc_stripped),
+                                    sizeof (a_bool_t));
+        SW_RTN_ON_ERROR(rv);
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1469,19 +1322,8 @@ cmd_data_check_switch_port_loopback_config(char *cmd_str, void * val,
         cmd = get_sub_cmd("loopback_rate", "1-0x12c");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(cfg.loopback_rate), sizeof (a_uint32_t));
-            SW_RTN_ON_ERROR(rv);
-        }
+        rv = cmd_data_check_uint32(cmd, &(cfg.loopback_rate), sizeof (a_uint32_t));
+        SW_RTN_ON_ERROR(rv);
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1625,20 +1467,9 @@ cmd_data_check_src_filter_config(char *cmd_str, a_uint32_t *arg_val, a_uint32_t 
 		cmd = get_sub_cmd("src_filter_enable", "enable");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_enable(cmd, &(src_filter_config.src_filter_enable),
-					sizeof (a_bool_t));
-			SW_RTN_ON_ERROR(rv);
-		}
+		rv = cmd_data_check_enable(cmd, &(src_filter_config.src_filter_enable),
+				sizeof (a_bool_t));
+		SW_RTN_ON_ERROR(rv);
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -1647,19 +1478,8 @@ cmd_data_check_src_filter_config(char *cmd_str, a_uint32_t *arg_val, a_uint32_t 
 		cmd = get_sub_cmd("srcfilter_mode", "virtual_port");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			cmd_data_check_source_filter_mode(cmd, &(src_filter_config.src_filter_mode),
-				sizeof(a_uint32_t));
-		}
+		cmd_data_check_source_filter_mode(cmd, &(src_filter_config.src_filter_mode),
+			sizeof(a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -1682,18 +1502,7 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu_size", "1514");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.mtu_size), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.mtu_size), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1702,18 +1511,7 @@ cmd_data_check_mtu_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.action), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.action), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
     *(fal_mtu_ctrl_t *)val = entry;
@@ -1768,18 +1566,7 @@ cmd_data_check_mru_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mru_size", "1514");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.mru_size), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.mru_size), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -1788,18 +1575,7 @@ cmd_data_check_mru_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mru_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.action), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.action), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -2107,19 +1883,8 @@ cmd_data_check_port_group(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pcp_group", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pcp_group),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pcp_group),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2129,19 +1894,8 @@ cmd_data_check_port_group(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dscp_group", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.dscp_group),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.dscp_group),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2151,19 +1905,8 @@ cmd_data_check_port_group(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("flow_group", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.flow_group),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.flow_group),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2189,19 +1932,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pcp_pri_prece", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pcp_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pcp_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2211,19 +1943,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dscp_pri_prece", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.dscp_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.dscp_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2233,19 +1954,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("preheader_pri_prece", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.preheader_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.preheader_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2255,19 +1965,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("flow_pri_prece", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.flow_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.flow_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2277,19 +1976,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("acl_pri_prece", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.acl_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.acl_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2299,19 +1987,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("post_acl_pri_prece", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.post_acl_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.post_acl_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2321,19 +1998,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pcp_pri_force", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pcp_pri_force),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pcp_pri_force),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2343,19 +2009,8 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dscp_pri_force", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dscp_pri_force),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dscp_pri_force),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2365,34 +2020,18 @@ cmd_data_check_port_pri(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("pre_acl_outer_pri_prece", "0");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_uint8(cmd, &tmp, sizeof(a_uint32_t));
-		    if (SW_OK == rv)
-			    entry.pre_acl_outer_pri = tmp;
-	    }
+	    rv = cmd_data_check_uint8(cmd, &tmp, sizeof(a_uint32_t));
+	    if (SW_OK == rv)
+		    entry.pre_acl_outer_pri = tmp;
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("pre_acl_inner_pri_prece", "0");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_uint8(cmd, &tmp, sizeof(a_uint32_t));
-		    if (SW_OK == rv)
-			    entry.pre_acl_inner_pri = tmp;
-	    }
+	    rv = cmd_data_check_uint8(cmd, &tmp, sizeof(a_uint32_t));
+	    if (SW_OK == rv)
+		    entry.pre_acl_inner_pri = tmp;
     } while (talk_mode && (SW_OK != rv));
 #endif
 
@@ -2414,19 +2053,8 @@ cmd_data_check_port_remark(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pcp_change_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pcp_change_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pcp_change_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2436,19 +2064,8 @@ cmd_data_check_port_remark(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dei_change_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dei_chage_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dei_chage_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2458,19 +2075,8 @@ cmd_data_check_port_remark(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dscp_change_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dscp_change_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dscp_change_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2493,19 +2099,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_pcp", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_pcp),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_pcp),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2515,19 +2110,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_dei", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_dei),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_dei),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2537,19 +2121,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_pri", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2559,19 +2132,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_dscp", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_dscp),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_dscp),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2581,19 +2143,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_dp", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_dp),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.internal_dp),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2603,19 +2154,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dscp_mask", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.dscp_mask),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.dscp_mask),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2625,19 +2165,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dscp_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dscp_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dscp_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2647,19 +2176,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pcp_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pcp_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pcp_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2669,19 +2187,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dei_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dei_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dei_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2691,19 +2198,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pri_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pri_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.pri_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2713,19 +2209,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dp_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dp_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.dp_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2735,19 +2220,8 @@ cmd_data_check_cosmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("qos_prec", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.qos_prec),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.qos_prec),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2770,19 +2244,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("sp_id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.sp_id),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.sp_id),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2792,19 +2255,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("e_pri", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.e_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.e_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2814,19 +2266,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("c_pri", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.c_pri),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.c_pri),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2836,19 +2277,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("e_drr_id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.e_drr_id),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.e_drr_id),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2858,19 +2288,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("c_drr_id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.c_drr_id),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.c_drr_id),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2880,19 +2299,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("e_drr_wt", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.e_drr_wt),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.e_drr_wt),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2902,19 +2310,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("c_drr_wt", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.c_drr_wt),
-                                       sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.c_drr_wt),
+                                   sizeof (a_uint16_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2924,19 +2321,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("c_drr_ut", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.c_drr_unit),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.c_drr_unit),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2946,19 +2332,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("e_drr_ut", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.e_drr_unit),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.e_drr_unit),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -2968,19 +2343,8 @@ cmd_data_check_queue_scheduler(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("drr_frame_mode", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.drr_frame_mode),
-                                       sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.drr_frame_mode),
+                                   sizeof (a_uint32_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -3004,19 +2368,8 @@ cmd_data_check_ring_queue(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("bmp", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.bmp[i]),
-                                       sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.bmp[i]),
+                                   sizeof (a_uint32_t));
 
     }
     while ((talk_mode && (SW_OK != rv)) || (++i < 10));
@@ -3588,19 +2941,8 @@ cmd_data_check_maclimit_ctrl(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("enable", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &maclimit_ctrl.enable,
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &maclimit_ctrl.enable,
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -3609,19 +2951,8 @@ cmd_data_check_maclimit_ctrl(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("limit num", "2048");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &maclimit_ctrl.limit_num,
-                                        sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &maclimit_ctrl.limit_num,
+                                    sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -3630,19 +2961,8 @@ cmd_data_check_maclimit_ctrl(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &maclimit_ctrl.action,
-                                        sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &maclimit_ctrl.action,
+                                    sizeof (fal_fwd_cmd_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -4435,18 +3755,7 @@ cmd_data_check_global_qinqmode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0x0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get ingress mode */
@@ -4455,18 +3764,7 @@ cmd_data_check_global_qinqmode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ingress_qinq_mode", "ctag");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_qinq_mode(cmd, &(pEntry->ingress_mode), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_qinq_mode(cmd, &(pEntry->ingress_mode), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get egress mode */
@@ -4475,32 +3773,15 @@ cmd_data_check_global_qinqmode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("egress_qinq_mode", "ctag");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_qinq_mode(cmd, &(pEntry->egress_mode), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_qinq_mode(cmd, &(pEntry->egress_mode), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("untouched_for_cpucode", "enable");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    } else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    } else {
-		    rv = cmd_data_check_enable(cmd, &(pEntry->untouched_for_cpucode),
-				    sizeof(a_bool_t));
-	    }
+	    rv = cmd_data_check_enable(cmd, &(pEntry->untouched_for_cpucode),
+			    sizeof(a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     return SW_OK;
@@ -4521,18 +3802,7 @@ cmd_data_check_port_qinqmode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0x0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get ingress mode */
@@ -4541,18 +3811,7 @@ cmd_data_check_port_qinqmode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ingress_qinq_role", "edge");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_qinq_role(cmd, &(pEntry->ingress_port_role), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_qinq_role(cmd, &(pEntry->ingress_port_role), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get egress mode */
@@ -4561,18 +3820,7 @@ cmd_data_check_port_qinqmode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("egress_qinq_role", "edge");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_qinq_role(cmd, &(pEntry->egress_port_role), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_qinq_role(cmd, &(pEntry->egress_port_role), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
@@ -4581,19 +3829,8 @@ cmd_data_check_port_qinqmode(char *info, void *val, a_uint32_t size)
 	    cmd = get_sub_cmd("tunnel_qinq_role", "edge");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_qinq_role(cmd,
-				    &(pEntry->tunnel_port_role), sizeof(a_uint32_t));
-	    }
+	    rv = cmd_data_check_qinq_role(cmd,
+			    &(pEntry->tunnel_port_role), sizeof(a_uint32_t));
     } while (talk_mode && (SW_OK != rv));
 #if defined(MPPE)
 	cmd_data_check_element("tunnel_ingress_port_select", "tnl_decap_src_vp",
@@ -4622,18 +3859,7 @@ cmd_data_check_tpid(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0x0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get ctpid */
@@ -4642,20 +3868,9 @@ cmd_data_check_tpid(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ctagtpid", "0x8100");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->ctpid = (a_uint16_t)tmp;
-        }
+     pEntry->ctpid = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get stpid */
@@ -4664,20 +3879,9 @@ cmd_data_check_tpid(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("stagtpid", "0x88a8");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->stpid = (a_uint16_t)tmp;
-        }
+     pEntry->stpid = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
@@ -4685,40 +3889,18 @@ cmd_data_check_tpid(char *info, void *val, a_uint32_t size)
 	    cmd = get_sub_cmd("tunnel_ctagtpid", "0x8100");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
-		    if (rv == SW_OK)
-			    pEntry->tunnel_ctpid = (a_uint16_t)tmp;
-	    }
+	    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+	    if (rv == SW_OK)
+		    pEntry->tunnel_ctpid = (a_uint16_t)tmp;
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("tunnel_stagtpid", "0x88a8");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
-		    if (rv == SW_OK)
-			    pEntry->tunnel_stpid = (a_uint16_t)tmp;
-	    }
+	    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+	    if (rv == SW_OK)
+		    pEntry->tunnel_stpid = (a_uint16_t)tmp;
     } while (talk_mode && (SW_OK != rv));
 #endif
 
@@ -4740,18 +3922,7 @@ cmd_data_check_ingress_filter(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("membership_filter_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_enable(cmd, &(pEntry->membership_filter), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_enable(cmd, &(pEntry->membership_filter), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get tag filter */
@@ -4760,18 +3931,7 @@ cmd_data_check_ingress_filter(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("tagged_filter_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_enable(cmd, &(pEntry->tagged_filter), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_enable(cmd, &(pEntry->tagged_filter), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get untag filter */
@@ -4780,18 +3940,7 @@ cmd_data_check_ingress_filter(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("untagged_filter_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_enable(cmd, &(pEntry->untagged_filter), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_enable(cmd, &(pEntry->untagged_filter), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get priority tag filter */
@@ -4800,18 +3949,7 @@ cmd_data_check_ingress_filter(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("priority_tagged_filter_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_enable(cmd, &(pEntry->priority_filter), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_enable(cmd, &(pEntry->priority_filter), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
 #if defined(APPE)
@@ -4819,57 +3957,24 @@ cmd_data_check_ingress_filter(char *info, void *val, a_uint32_t size)
 	    cmd = get_sub_cmd("ctag_tagged_filter_en", "disable");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_tagged_filter),
-				    sizeof(a_uint32_t));
-	    }
+	    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_tagged_filter),
+			    sizeof(a_uint32_t));
     } while(talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ctag_untagged_filter_en", "disable");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_untagged_filter),
-				    sizeof(a_uint32_t));
-	    }
+	    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_untagged_filter),
+			    sizeof(a_uint32_t));
     } while(talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ctag_priority_tagged_filter_en", "disable");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_priority_filter),
-				    sizeof(a_uint32_t));
-	    }
+	    rv = cmd_data_check_enable(cmd, &(pEntry->ctag_priority_filter),
+			    sizeof(a_uint32_t));
     } while(talk_mode && (SW_OK != rv));
 #endif
 
@@ -4917,18 +4022,7 @@ cmd_data_check_port_default_vid_en(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_ctag_vid_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_enable(cmd, &(pEntry->default_cvid_en), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_enable(cmd, &(pEntry->default_cvid_en), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     do
@@ -4936,18 +4030,7 @@ cmd_data_check_port_default_vid_en(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_stag_vid_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_enable(cmd, &(pEntry->default_svid_en), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_enable(cmd, &(pEntry->default_svid_en), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     return SW_OK;
@@ -4969,18 +4052,7 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0x0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get cvid */
@@ -4989,20 +4061,9 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_ctag_vid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
+        rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
 
-	     pEntry->cvid = (a_uint16_t)tmp;
-        }
+     pEntry->cvid = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get svid */
@@ -5011,20 +4072,9 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_stag_vid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
+        rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
 
-	     pEntry->svid = (a_uint16_t)tmp;
-        }
+     pEntry->svid = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get cpri */
@@ -5033,20 +4083,9 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_ctag_pri", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->cpri = (a_uint16_t)tmp;
-        }
+     pEntry->cpri = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get spri */
@@ -5055,20 +4094,9 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_stag_pri", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->spri = (a_uint16_t)tmp;
-        }
+     pEntry->spri = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get cdei */
@@ -5077,20 +4105,9 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_ctag_dei", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->cdei = (a_uint16_t)tmp;
-        }
+     pEntry->cdei = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get sdei */
@@ -5099,20 +4116,9 @@ cmd_data_check_port_vlan_tag(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("default_stag_dei", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->sdei = (a_uint16_t)tmp;
-        }
+     pEntry->sdei = (a_uint16_t)tmp;
     }while (talk_mode && (SW_OK != rv));
 
     return SW_OK;
@@ -5133,18 +4139,7 @@ cmd_data_check_tag_propagation(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0x0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get vid propagation */
@@ -5153,18 +4148,7 @@ cmd_data_check_tag_propagation(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("vid_propagation_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_vlan_propagation(cmd, (a_uint32_t *) & (pEntry->vid_propagation), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_vlan_propagation(cmd, (a_uint32_t *) & (pEntry->vid_propagation), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get pri propagation */
@@ -5173,18 +4157,7 @@ cmd_data_check_tag_propagation(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("pri_propagation_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_vlan_propagation(cmd, (a_uint32_t *) & (pEntry->pri_propagation), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_vlan_propagation(cmd, (a_uint32_t *) & (pEntry->pri_propagation), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get dei propagation */
@@ -5193,18 +4166,7 @@ cmd_data_check_tag_propagation(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("dei_propagation_en", "disable");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_vlan_propagation(cmd, (a_uint32_t *) & (pEntry->dei_propagation), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_vlan_propagation(cmd, (a_uint32_t *) & (pEntry->dei_propagation), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     return SW_OK;
@@ -5225,18 +4187,7 @@ cmd_data_check_egress_mode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0x0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->mask), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get ctag mode */
@@ -5245,18 +4196,7 @@ cmd_data_check_egress_mode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ctag_egress_vlan_mode", "unmodified");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_egmode(cmd, (a_uint32_t *) & (pEntry->ctag_mode), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_egmode(cmd, (a_uint32_t *) & (pEntry->ctag_mode), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get stag mode */
@@ -5265,18 +4205,7 @@ cmd_data_check_egress_mode(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("stag_egress_vlan_mode", "unmodified");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_egmode(cmd, (a_uint32_t *) & (pEntry->stag_mode), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_egmode(cmd, (a_uint32_t *) & (pEntry->stag_mode), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     return SW_OK;
@@ -5299,18 +4228,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("stagformat", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_tagged), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_tagged), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5319,21 +4237,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("svid_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->s_vid_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->s_vid_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5343,20 +4248,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("svid", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_integer(cmd, &(pEntry->s_vid), 0xfff, 0x0);
-		}
+		rv = cmd_data_check_integer(cmd, &(pEntry->s_vid), 0xfff, 0x0);
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5366,19 +4258,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("spcp_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->s_pcp_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->s_pcp_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5388,18 +4269,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("spcp", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_pcp), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_pcp), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5408,19 +4278,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("sdei_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->s_dei_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->s_dei_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5430,18 +4289,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("sdei", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_dei), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_dei), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5450,18 +4298,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("ctagformat", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_tagged), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_tagged), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5470,21 +4307,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("cvid_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->c_vid_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->c_vid_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5494,20 +4318,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("cvid", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_integer(cmd, &(pEntry->c_vid), 0xfff, 0x0);
-		}
+		rv = cmd_data_check_integer(cmd, &(pEntry->c_vid), 0xfff, 0x0);
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5517,19 +4328,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("cpcp_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->c_pcp_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->c_pcp_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5539,18 +4339,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("cpcp", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_pcp), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_pcp), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5559,19 +4348,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("cdei_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->c_dei_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->c_dei_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5581,18 +4359,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("cdei", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_dei), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_dei), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5601,19 +4368,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("frame_type_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->frmtype_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->frmtype_enable),
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5622,18 +4378,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("frametype", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(pEntry->frmtype), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(pEntry->frmtype), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5642,19 +4387,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("protocol_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_enable),
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5663,19 +4397,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("protocol", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->protocol), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->protocol), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5684,19 +4406,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("vsivalid", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->vsi_valid),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->vsi_valid),
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5705,19 +4416,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("vsi_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->vsi_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->vsi_enable),
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5726,18 +4426,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("vsi", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(pEntry->vsi), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(pEntry->vsi), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5747,19 +4436,8 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("vni_resv_enable", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->vni_resv_enable,
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->vni_resv_enable,
+				sizeof (a_bool_t));
 	} while (talk_mode && (SW_OK != rv));
 
 	do
@@ -5767,20 +4445,9 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("vni_resv_type", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_integer(cmd, &tmp, 0x1, 0x0);
-			if (SW_OK == rv)
-				pEntry->vni_resv_type = tmp;
-		}
+		rv = cmd_data_check_integer(cmd, &tmp, 0x1, 0x0);
+		if (SW_OK == rv)
+			pEntry->vni_resv_type = tmp;
 	} while (talk_mode && (SW_OK != rv));
 
 	do
@@ -5788,20 +4455,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("vni_resv", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &pEntry->vni_resv, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &pEntry->vni_resv, sizeof (a_uint32_t));
 
 	} while (talk_mode && (SW_OK != rv));
 #endif
@@ -5840,19 +4494,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("swap_svid_cvid", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->swap_svid_cvid),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->swap_svid_cvid),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5862,18 +4505,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("svid_translation_cmd", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(pEntry->svid_xlt_cmd), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(pEntry->svid_xlt_cmd), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5882,20 +4514,9 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("svidtranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
-			if (SW_OK == rv)
-				pEntry->svid_xlt = tmp;
-		}
+		rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
+		if (SW_OK == rv)
+			pEntry->svid_xlt = tmp;
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5904,18 +4525,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("cvid_translation_cmd", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(pEntry->cvid_xlt_cmd), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(pEntry->cvid_xlt_cmd), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5924,20 +4534,9 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("cvidtranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
-			if (SW_OK == rv)
-				pEntry->cvid_xlt = tmp;
-		}
+		rv = cmd_data_check_integer(cmd, &tmp, 0xfff, 0x0);
+		if (SW_OK == rv)
+			pEntry->cvid_xlt = tmp;
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -5946,19 +4545,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("swap_spcp_cpcp", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->swap_spcp_cpcp),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->swap_spcp_cpcp),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5968,19 +4556,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("spcp_translation_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->spcp_xlt_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->spcp_xlt_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -5990,18 +4567,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("spcptranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->spcp_xlt), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->spcp_xlt), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6010,19 +4576,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("cpcp_translation_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->cpcp_xlt_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->cpcp_xlt_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6032,18 +4587,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("cpcptranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->cpcp_xlt), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->cpcp_xlt), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6052,19 +4596,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("swap_sdei_cdei", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->swap_sdei_cdei),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->swap_sdei_cdei),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6074,19 +4607,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("sdei_translation_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->sdei_xlt_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->sdei_xlt_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6096,18 +4618,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("sdeitranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->sdei_xlt), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->sdei_xlt), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6116,19 +4627,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("cdei_translation_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->cdei_xlt_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->cdei_xlt_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6138,18 +4638,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("cdeitranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->cdei_xlt), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->cdei_xlt), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6158,19 +4647,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("counter_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->counter_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->counter_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6180,18 +4658,7 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("counter_id", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->counter_id), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->counter_id), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6200,19 +4667,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("vsi_translation_en", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->vsi_xlt_enable),
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &(pEntry->vsi_xlt_enable),
+				sizeof (a_bool_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6222,19 +4678,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("vsitranslation", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd,
-					(a_uint32_t *)&(pEntry->vsi_xlt), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd,
+				(a_uint32_t *)&(pEntry->vsi_xlt), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6244,19 +4689,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("src_info_enable", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->src_info_enable,
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->src_info_enable,
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6265,19 +4699,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("src_info_type", "vp");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_srctype(cmd, 0, &pEntry->src_info_type,
-					sizeof(a_uint8_t));
-		}
+		rv = cmd_data_check_srctype(cmd, 0, &pEntry->src_info_type,
+				sizeof(a_uint8_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6286,21 +4709,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("src_info", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &pEntry->src_info,
-					sizeof(a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &pEntry->src_info,
+				sizeof(a_uint32_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6310,19 +4720,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("vni_resv_enable", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->vni_resv_enable,
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &pEntry->vni_resv_enable,
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -6331,21 +4730,8 @@ cmd_data_check_port_vlan_translation_adv_action(char *info, void *val, a_uint32_
 		cmd = get_sub_cmd("vni_resv", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &pEntry->vni_resv,
-					sizeof(a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &pEntry->vni_resv,
+				sizeof(a_uint32_t));
 
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -6369,36 +4755,21 @@ cmd_data_check_isol_ctrl(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
 		cmd = get_sub_cmd("isol_en", "n");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4)) {
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4)) {
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.enable),
+				sizeof(a_bool_t));
+		if (SW_OK != rv)
 			rv = SW_BAD_VALUE;
-		}
-		else {
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.enable),
-					sizeof(a_bool_t));
-			if (SW_OK != rv)
-				rv = SW_BAD_VALUE;
-		}
 	} while(talk_mode && (SW_OK != rv));
 
 	do {
 		cmd = get_sub_cmd("group_id", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4)) {
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4)) {
+		rv = cmd_data_check_uint8(cmd, &tmp, sizeof(tmp));
+		if (SW_OK != rv)
 			rv = SW_BAD_VALUE;
-		} else {
-			rv = cmd_data_check_uint8(cmd, &tmp, sizeof(tmp));
-			if (SW_OK != rv)
-				rv = SW_BAD_VALUE;
-			else
-				entry.group_id = tmp;
-		}
+		else
+			entry.group_id = tmp;
 	} while(talk_mode && (SW_OK != rv));
 
 	*(fal_portvlan_isol_ctrl_t *)arg_val = entry;
@@ -8152,21 +6523,10 @@ cmd_data_check_l3_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("small_ip4ttl", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (a_uint32_t));
-            if (!rv)
-                entry.small_ip4ttl = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (a_uint32_t));
+        if (!rv)
+            entry.small_ip4ttl = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8176,21 +6536,10 @@ cmd_data_check_l3_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("small_ip6hoplimit", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (a_uint32_t));
-            if (!rv)
-                entry.small_ip6hoplimit = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (a_uint32_t));
+        if (!rv)
+            entry.small_ip6hoplimit = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8216,20 +6565,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags0", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[0] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[0] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8239,20 +6577,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask0", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[0] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[0] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8262,20 +6589,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags1", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[1] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[1] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8285,20 +6601,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask1", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[1] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[1] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8308,20 +6613,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags2", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[2] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[2] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8331,20 +6625,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask2", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[2] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[2] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8354,20 +6637,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags3", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[3] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[3] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8377,20 +6649,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask3", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[3] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[3] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8400,20 +6661,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags4", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[4] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[4] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8423,20 +6673,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask4", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[4] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[4] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8446,20 +6685,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags5", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[5] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[5] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8469,20 +6697,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask5", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[5]= tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[5]= tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8492,20 +6709,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags6", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[6] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[6] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8515,20 +6721,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask6", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[6] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[6] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8538,20 +6733,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags7", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags[7] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags[7] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8561,20 +6745,9 @@ cmd_data_check_l4_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcp_flags_mask7", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (tmp));
-	entry.tcp_flags_mask[7] = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (tmp));
+entry.tcp_flags_mask[7] = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8599,19 +6772,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("excep_cmd", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8621,19 +6783,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("deacclr_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.deacclr_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.deacclr_en),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8643,19 +6794,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l3route_only_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l3route_only_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l3route_only_en),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8665,19 +6805,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l2fwd_only_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l2fwd_only_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l2fwd_only_en),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8687,19 +6816,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l2flow_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l2flow_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l2flow_en),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8709,19 +6827,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l3flow_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l3flow_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l3flow_en),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8731,19 +6838,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("multicast_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.multicast_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.multicast_en),
+                                   sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -8753,19 +6849,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l2flow_type", "flow_aware");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-           return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-           rv = SW_BAD_VALUE;
-        }
-        else
-        {
-           rv = cmd_data_check_attr("flow_excep_type", cmd,
-                                     &entry.l2flow_type, sizeof(entry.l2flow_type));
-        }
+       rv = cmd_data_check_attr("flow_excep_type", cmd,
+                                 &entry.l2flow_type, sizeof(entry.l2flow_type));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -8774,19 +6859,8 @@ cmd_data_check_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l3flow_type", "flow_aware");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-           return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-           rv = SW_BAD_VALUE;
-        }
-        else
-        {
-           rv = cmd_data_check_attr("flow_excep_type", cmd,
-                                     &entry.l3flow_type, sizeof(entry.l3flow_type));
-        }
+       rv = cmd_data_check_attr("flow_excep_type", cmd,
+                                 &entry.l3flow_type, sizeof(entry.l3flow_type));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -8810,19 +6884,8 @@ cmd_data_check_l2_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("excep_cmd", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8848,19 +6911,8 @@ cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("excep_cmd", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.cmd),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8870,19 +6922,8 @@ cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("deacclr_en", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.deacclr_en),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.deacclr_en),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8896,19 +6937,8 @@ cmd_data_check_tunnel_exp_ctrl(char *cmd_str, void * val, a_uint32_t size)
             cmd = get_sub_cmd(Idstr, "0");
             SW_RTN_ON_NULL_PARAM(cmd);
 
-            if (!strncasecmp(cmd, "quit", 4))
-            {
-                return SW_BAD_VALUE;
-            }
-            else if (!strncasecmp(cmd, "help", 4))
-            {
-                rv = SW_BAD_VALUE;
-            }
-            else
-            {
-                rv = cmd_data_check_uint8(cmd, &(entry.profile_exp_en[i]),
-                                           sizeof (a_uint8_t));
-            }
+            rv = cmd_data_check_uint8(cmd, &(entry.profile_exp_en[i]),
+                                       sizeof (a_uint8_t));
         }
         while (talk_mode && (SW_OK != rv));
     }
@@ -8933,19 +6963,8 @@ cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("entry_valid", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &entry.entry_valid,
-                                           sizeof (a_bool_t));
-       }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &entry.entry_valid,
+                                       sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -8954,20 +6973,9 @@ cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("equal", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &tmpbool, sizeof(tmpbool));
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &tmpbool, sizeof(tmpbool));
 
-            entry.comp_mode = !tmpbool;
-       }
+        entry.comp_mode = !tmpbool;
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -8976,20 +6984,9 @@ cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tunnel_header_type", "vxlan");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_attr("tunnel_overlay_type", cmd,
-                                                   &tmpdata, sizeof(tmpdata));
-            entry.hdr_type = tmpdata & 0x3;
-        }
+        rv = cmd_data_check_attr("tunnel_overlay_type", cmd,
+                                               &tmpdata, sizeof(tmpdata));
+        entry.hdr_type = tmpdata & 0x3;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -8999,20 +6996,9 @@ cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("flags", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmpdata,
-                                       sizeof (tmpdata));
-            entry.flags = tmpdata&0xffff;
-        }
+        rv = cmd_data_check_uint16(cmd, &tmpdata,
+                                   sizeof (tmpdata));
+        entry.flags = tmpdata&0xffff;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9022,20 +7008,9 @@ cmd_data_check_tunnel_flags_parser(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mask", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmpdata,
-                                       sizeof (tmpdata));
-            entry.mask = tmpdata&0xffff;
-        }
+        rv = cmd_data_check_uint16(cmd, &tmpdata,
+                                   sizeof (tmpdata));
+        entry.mask = tmpdata&0xffff;
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9156,18 +7131,7 @@ cmd_data_check_default_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("entry valid", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.valid), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.valid), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9176,18 +7140,7 @@ cmd_data_check_default_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("vrf id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.vrf_id), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.vrf_id), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9196,18 +7149,7 @@ cmd_data_check_default_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ip version", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.ip_version), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.ip_version), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9216,19 +7158,7 @@ cmd_data_check_default_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("route type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.droute_type), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.droute_type), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9237,19 +7167,7 @@ cmd_data_check_default_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("index", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.index), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.index), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9271,18 +7189,7 @@ cmd_data_check_host_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("entry valid", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.valid), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.valid), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9291,18 +7198,7 @@ cmd_data_check_host_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("vrf id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.vrf_id), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.vrf_id), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9311,18 +7207,7 @@ cmd_data_check_host_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ip version", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.ip_version), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.ip_version), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9354,18 +7239,7 @@ cmd_data_check_host_route_entry(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("prefix_length", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &(entry.prefix_length), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint16(cmd, &(entry.prefix_length), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9588,19 +7462,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mru_fail_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.mru_fail_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.mru_fail_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9610,19 +7473,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mru_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.mru_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.mru_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9632,19 +7484,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu_fail_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.mtu_fail_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.mtu_fail_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9654,19 +7495,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.mtu_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.mtu_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9676,19 +7506,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu_nonfrag_fail_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.mtu_nonfrag_fail_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.mtu_nonfrag_fail_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9698,19 +7517,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu_nonfrag_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.mtu_df_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.mtu_df_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9720,19 +7528,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("prefix_bc_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.prefix_bc_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.prefix_bc_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9742,19 +7539,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("prefix_bc_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.prefix_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.prefix_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9764,19 +7550,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("icmp_rdt_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.icmp_rdt_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.icmp_rdt_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9786,19 +7561,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("icmp_rdt_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.icmp_rdt_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.icmp_rdt_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9808,21 +7572,10 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("hash_mode_0", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (a_uint32_t));
-            if (!rv)
-                entry.hash_mode_0 = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (a_uint32_t));
+        if (!rv)
+            entry.hash_mode_0 = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9832,21 +7585,10 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("hash_mode_1", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (a_uint32_t));
-            if (!rv)
-                entry.hash_mode_1 = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (a_uint32_t));
+        if (!rv)
+            entry.hash_mode_1 = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -9856,16 +7598,8 @@ cmd_data_check_ip_global(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("route_fail_no_eth_action", "forward");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_maccmd(cmd, &(entry.rt_fail_no_eth_action),
-				    sizeof (fal_fwd_cmd_t));
-	    }
+	    rv = cmd_data_check_maccmd(cmd, &(entry.rt_fail_no_eth_action),
+			    sizeof (fal_fwd_cmd_t));
     } while (talk_mode && (SW_OK != rv));
 #endif
 
@@ -9888,18 +7622,7 @@ cmd_data_check_ip_mcmode(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_mc_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.l2_ipv4_mc_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.l2_ipv4_mc_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9908,18 +7631,7 @@ cmd_data_check_ip_mcmode(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_igmpv3_mode", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l2_ipv4_mc_mode), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l2_ipv4_mc_mode), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9928,18 +7640,7 @@ cmd_data_check_ip_mcmode(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_mc_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.l2_ipv6_mc_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.l2_ipv6_mc_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9948,18 +7649,7 @@ cmd_data_check_ip_mcmode(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_mldv2_mode", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l2_ipv6_mc_mode), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l2_ipv6_mc_mode), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -9981,18 +7671,7 @@ cmd_data_check_ip_portmac(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("entry_valid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.valid), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.valid), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10040,18 +7719,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_sg_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10060,19 +7728,8 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_sg_violation_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_sg_vio_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_sg_vio_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -10082,18 +7739,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_sg_port_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_port_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_port_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10102,18 +7748,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_sg_svlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_svlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_svlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10122,18 +7757,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_sg_cvlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_cvlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_sg_cvlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10142,19 +7766,8 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_src_unk_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_src_unk_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_src_unk_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -10164,18 +7777,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_sg_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10184,19 +7786,8 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_sg_violation_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ipv6_sg_vio_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ipv6_sg_vio_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -10206,18 +7797,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_sg_port_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_port_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_port_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10226,18 +7806,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_sg_svlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_svlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_svlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10246,18 +7815,7 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_sg_cvlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_cvlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_sg_cvlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10266,19 +7824,8 @@ cmd_data_check_ip_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_src_unk_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ipv6_src_unk_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ipv6_src_unk_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -10301,18 +7848,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.type), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.type), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10322,18 +7858,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
 		        cmd = get_sub_cmd("vsi", "0");
 		        SW_RTN_ON_NULL_PARAM(cmd);
 
-		        if (!strncasecmp(cmd, "quit", 4))
-		        {
-		            return SW_BAD_VALUE;
-		        }
-		        else if (!strncasecmp(cmd, "help", 4))
-		        {
-		            rv = SW_BAD_VALUE;
-		        }
-		        else
-		        {
-		            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.vsi), sizeof (a_uint8_t));
-		        }
+	            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.vsi), sizeof (a_uint8_t));
     		}
     		while (talk_mode && (SW_OK != rv));
     } else {
@@ -10342,18 +7867,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
 		        cmd = get_sub_cmd("port", "0");
 		        SW_RTN_ON_NULL_PARAM(cmd);
 
-		        if (!strncasecmp(cmd, "quit", 4))
-		        {
-		            return SW_BAD_VALUE;
-		        }
-		        else if (!strncasecmp(cmd, "help", 4))
-		        {
-		            rv = SW_BAD_VALUE;
-		        }
-		        else
-		        {
-		            rv = cmd_data_check_uint8(cmd, &(entry.port), sizeof (a_uint8_t));
-		        }
+	            rv = cmd_data_check_uint8(cmd, &(entry.port), sizeof (a_uint8_t));
     		}
     		while (talk_mode && (SW_OK != rv));
     }
@@ -10363,18 +7877,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("if_index", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.if_index), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.if_index), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10383,18 +7886,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ip_to_me_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.ip_to_me_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.ip_to_me_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10403,18 +7895,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pub_ip_index", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pub_ip_index), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pub_ip_index), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10423,18 +7904,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("stag_fmt", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.stag_fmt), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.stag_fmt), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10443,18 +7913,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("svid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.svid), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.svid), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10463,18 +7922,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ctag_fmt", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.ctag_fmt), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.ctag_fmt), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10483,18 +7931,7 @@ cmd_data_check_nexthop(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cvid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.cvid), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.cvid), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10531,18 +7968,7 @@ cmd_data_check_vsi_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l3_if_valid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.l3_if_valid), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.l3_if_valid), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10551,18 +7977,7 @@ cmd_data_check_vsi_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("l3_if_index", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.l3_if_index), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.l3_if_index), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10587,18 +8002,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mru", "0x5dc");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.mru), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.mru), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10607,18 +8011,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mtu", "0x5dc");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.mtu), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.mtu), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10627,18 +8020,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ttl_dec_bypass_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.ttl_dec_bypass_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.ttl_dec_bypass_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10647,18 +8029,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv4_uc_route_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_uc_route_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_uc_route_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10667,18 +8038,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ipv6_uc_route_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_uc_route_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv6_uc_route_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10687,18 +8047,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("icmp_trigger_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.icmp_trigger_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.icmp_trigger_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10707,19 +8056,8 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ttl_exceed_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ttl_exceed_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ttl_exceed_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -10729,18 +8067,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ttl_exceed_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.ttl_exceed_deacclr_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.ttl_exceed_deacclr_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10749,18 +8076,7 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("mac_addr_bitmap", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.mac_addr_bitmap), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.mac_addr_bitmap), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10776,50 +8092,26 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("dmac_check_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_confirm(cmd, A_FALSE,
-				    &(entry.dmac_check_en), sizeof(a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_FALSE,
+			    &(entry.dmac_check_en), sizeof(a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ipv6_mru", "0x5dc");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
-		    if (SW_OK == rv)
-			    entry.ip6_mru = tmp;
-	    }
+	    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+	    if (SW_OK == rv)
+		    entry.ip6_mru = tmp;
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ipv6_mtu", "0x5dc");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
-		    if (SW_OK == rv)
-			    entry.ip6_mtu = tmp;
-	    }
+	    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+	    if (SW_OK == rv)
+		    entry.ip6_mtu = tmp;
     } while (talk_mode && (SW_OK != rv));
 
     cmd_data_check_element("udp_zero_csum_action", "forward",
@@ -10832,17 +8124,9 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("vpn_id", "0");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
-		    if (SW_OK == rv)
-			    entry.vpn_id = tmp;
-	    }
+	    rv = cmd_data_check_uint16(cmd, &tmp, sizeof(a_uint32_t));
+	    if (SW_OK == rv)
+		    entry.vpn_id = tmp;
     } while (talk_mode && (SW_OK != rv));
 #endif
 
@@ -10865,18 +8149,7 @@ cmd_data_check_network_route(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.type), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.type), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10932,19 +8205,8 @@ cmd_data_check_network_route(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -10954,18 +8216,7 @@ cmd_data_check_network_route(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dst_info", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.dst_info), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.dst_info), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -10974,18 +8225,7 @@ cmd_data_check_network_route(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("lan_wan", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.lan_wan), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.lan_wan), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11008,18 +8248,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("arp_sg_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11028,19 +8257,8 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("arp_sg_violation_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_arp_sg_vio_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_arp_sg_vio_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11050,18 +8268,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("arp_sg_port_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_port_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_port_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11070,18 +8277,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("arp_sg_svlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_svlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_svlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11090,18 +8286,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("arp_sg_cvlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_cvlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ipv4_arp_sg_cvlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11110,19 +8295,8 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("arp_sg_unk_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_arp_src_unk_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ipv4_arp_src_unk_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11132,18 +8306,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("nd_sg_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11152,19 +8315,8 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("nd_sg_violation_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ip_nd_sg_vio_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ip_nd_sg_vio_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11174,18 +8326,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("nd_sg_port_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_port_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_port_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11194,18 +8335,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("nd_sg_svlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_svlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_svlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11214,18 +8344,7 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("nd_sg_cvlan_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_cvlan_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ip_nd_sg_cvlan_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11234,19 +8353,8 @@ cmd_data_check_arp_sg(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("nd_sg_unk_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.ip_nd_src_unk_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.ip_nd_src_unk_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11493,19 +8601,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("src_intf_check_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.src_if_check_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.src_if_check_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11515,19 +8612,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("src_intf_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.src_if_check_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.src_if_check_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11537,19 +8623,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("service_loop_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.service_loop_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.service_loop_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11559,19 +8634,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("service_loop_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.service_loop_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.service_loop_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11581,19 +8645,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("service_loop_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.service_loop_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.service_loop_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11603,19 +8656,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("flow_deacclr_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.flow_deacclr_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.flow_deacclr_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11625,19 +8667,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("sync_mismatch_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.sync_mismatch_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.sync_mismatch_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11647,19 +8678,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("sync_mismatch_deacclr_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.sync_mismatch_deacclr_en),
-                                       sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.sync_mismatch_deacclr_en),
+                                   sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11669,21 +8689,10 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("hash_mode_0", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (a_uint32_t));
-            if (!rv)
-                 entry.hash_mode_0 = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (a_uint32_t));
+        if (!rv)
+             entry.hash_mode_0 = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11693,21 +8702,10 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("hash_mode_1", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp,
-                                       sizeof (a_uint32_t));
-            if (!rv)
-                entry.hash_mode_1 = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp,
+                                   sizeof (a_uint32_t));
+        if (!rv)
+            entry.hash_mode_1 = tmp;
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11718,19 +8716,8 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("flow_mismatch_copy_escape_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.flow_mismatch_copy_escape_en),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.flow_mismatch_copy_escape_en),
+			    sizeof (a_bool_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -11741,100 +8728,52 @@ cmd_data_check_flow_global(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("ptmu_fail_action", "forward");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_maccmd(cmd, &(entry.ptmu_fail_action),
-				    sizeof (fal_fwd_cmd_t));
-	    }
+	    rv = cmd_data_check_maccmd(cmd, &(entry.ptmu_fail_action),
+			    sizeof (fal_fwd_cmd_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ptmu_fail_deacclr_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_confirm(cmd, A_FALSE,
-				    &(entry.ptmu_fail_deacclr_en),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_FALSE,
+			    &(entry.ptmu_fail_deacclr_en),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ptmu_fail_df_action", "forward");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_maccmd(cmd, &(entry.ptmu_fail_df_action),
-				    sizeof (fal_fwd_cmd_t));
-	    }
+	    rv = cmd_data_check_maccmd(cmd, &(entry.ptmu_fail_df_action),
+			    sizeof (fal_fwd_cmd_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("ptmu_fail_df_deacclr_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_confirm(cmd, A_FALSE,
-				    &(entry.ptmu_fail_df_deacclr_en),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_FALSE,
+			    &(entry.ptmu_fail_df_deacclr_en),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("l2_vpn_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_confirm(cmd, A_FALSE,
-				    &(entry.l2_vpn_en),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_FALSE,
+			    &(entry.l2_vpn_en),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("l3_vpn_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_confirm(cmd, A_FALSE,
-				    &(entry.l3_vpn_en),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_FALSE,
+			    &(entry.l3_vpn_en),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 #endif
 
@@ -11868,18 +8807,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("entry_id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.entry_id), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.entry_id), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11888,18 +8816,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("entry_type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.entry_type), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.entry_type), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11908,18 +8825,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("host_addr_type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.host_addr_type), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.host_addr_type), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11928,18 +8834,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("host_addr_index", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.host_addr_index), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.host_addr_index), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11948,18 +8843,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("protocol", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.protocol), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.protocol), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11968,18 +8852,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("age", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.age), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.age), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -11988,18 +8861,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("src_intf_valid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.src_intf_valid), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.src_intf_valid), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12008,18 +8870,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("src_intf_index", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.src_intf_index), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.src_intf_index), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12028,18 +8879,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("fwd_type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.fwd_type), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.fwd_type), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12049,18 +8889,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("snat_nexthop", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.snat_nexthop), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.snat_nexthop), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12069,18 +8898,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("snat_srcport", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.snat_srcport), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.snat_srcport), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12089,18 +8907,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dnat_nexthop", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.dnat_nexthop), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.dnat_nexthop), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12109,18 +8916,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dnat_dstport", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.dnat_dstport), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.dnat_dstport), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12129,18 +8925,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("route_nexthop", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.route_nexthop), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.route_nexthop), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12149,18 +8934,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("port_valid", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &(entry.port_valid), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, &(entry.port_valid), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12169,18 +8943,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("route_port", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.route_port), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.route_port), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12189,18 +8952,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("bridge_port", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.bridge_port), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.bridge_port), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12209,18 +8961,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("deacclr", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.deacclr_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.deacclr_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12229,18 +8970,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("copy tocpu", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.copy_tocpu_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.copy_tocpu_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12249,18 +8979,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("syn toggle", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.syn_toggle), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.syn_toggle), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12269,18 +8988,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("pri profile", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pri_profile), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.pri_profile), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12289,18 +8997,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("sevice code", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.sevice_code), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.sevice_code), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12309,18 +9006,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ip type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.ip_type), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.ip_type), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12329,18 +9015,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("src port", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.src_port), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.src_port), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12349,18 +9024,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dst port", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.dst_port), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.dst_port), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12386,18 +9050,7 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tree id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(flow_qos->tree_id), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(flow_qos->tree_id), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12406,142 +9059,60 @@ cmd_data_check_flow(char *cmd_str, void * val, a_uint32_t size)
 	    cmd = get_sub_cmd("pmtu_check_l3", "yes");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.pmtu_check_l3), sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.pmtu_check_l3), sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("pmtu", "0x5dc");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_uint32(cmd, &(entry.pmtu), sizeof (a_uint32_t));
-	    }
+	    rv = cmd_data_check_uint32(cmd, &(entry.pmtu), sizeof (a_uint32_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("vpn_id", "0");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_uint32(cmd, &(entry.vpn_id), sizeof (a_uint32_t));
-	    }
+	    rv = cmd_data_check_uint32(cmd, &(entry.vpn_id), sizeof (a_uint32_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("bridge_vlan_format_valid", "yes");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.vlan_fmt_valid),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.vlan_fmt_valid),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("bridge_svlan_format", "yes");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.svlan_fmt),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.svlan_fmt),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("bridge_cvlan_format", "yes");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4))
-	    {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4))
-	    {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else
-	    {
-		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.cvlan_fmt),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.cvlan_fmt),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("wifi_qos_en", "no");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_confirm(cmd, A_TRUE, &(flow_qos->wifi_qos_en),
-				    sizeof (a_bool_t));
-	    }
+	    rv = cmd_data_check_confirm(cmd, A_TRUE, &(flow_qos->wifi_qos_en),
+			    sizeof (a_bool_t));
     } while (talk_mode && (SW_OK != rv));
 
     do {
 	    cmd = get_sub_cmd("wifi_qos", "0");
 	    SW_RTN_ON_NULL_PARAM(cmd);
 
-	    if (!strncasecmp(cmd, "quit", 4)) {
-		    return SW_BAD_VALUE;
-	    }
-	    else if (!strncasecmp(cmd, "help", 4)) {
-		    rv = SW_BAD_VALUE;
-	    }
-	    else {
-		    rv = cmd_data_check_uint32(cmd, &(flow_qos->wifi_qos), sizeof(a_uint32_t));
-	    }
+	    rv = cmd_data_check_uint32(cmd, &(flow_qos->wifi_qos), sizeof(a_uint32_t));
     } while (talk_mode && (SW_OK != rv));
 #endif
 #if defined(MPPE)
@@ -12592,19 +9163,8 @@ cmd_data_check_flow_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("miss_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, (fal_fwd_cmd_t *)&(entry.miss_action),
-                                       sizeof (fal_fwd_cmd_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, (fal_fwd_cmd_t *)&(entry.miss_action),
+                                   sizeof (fal_fwd_cmd_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12614,18 +9174,7 @@ cmd_data_check_flow_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("frag_bypass_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.frag_bypass_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.frag_bypass_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12634,18 +9183,7 @@ cmd_data_check_flow_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tcpspec_bypass_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.tcp_spec_bypass_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.tcp_spec_bypass_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12654,18 +9192,7 @@ cmd_data_check_flow_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("all_bypass_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.all_bypass_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.all_bypass_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12674,20 +9201,9 @@ cmd_data_check_flow_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("key_sel", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
-            if (!rv)
-                entry.key_sel = tmp;
-        }
+        rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+        if (!rv)
+            entry.key_sel = tmp;
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12710,20 +9226,9 @@ cmd_data_check_flow_age(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("age_time", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof (a_uint32_t));
-            if (!rv)
-                entry.age_time = tmp;
-        }
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof (a_uint32_t));
+        if (!rv)
+            entry.age_time = tmp;
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12732,20 +9237,9 @@ cmd_data_check_flow_age(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("age_unit", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof (a_uint32_t));
-            if (!rv)
-                entry.unit = tmp;
-        }
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof (a_uint32_t));
+        if (!rv)
+            entry.unit = tmp;
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12785,19 +9279,8 @@ cmd_data_check_bm_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("max_thresh", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.max_thresh),
-                                       sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.max_thresh),
+                                   sizeof (a_uint16_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12807,19 +9290,8 @@ cmd_data_check_bm_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.resume_off),
-                                       sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.resume_off),
+                                   sizeof (a_uint16_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12842,19 +9314,8 @@ cmd_data_check_bm_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("weight", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.weight),
-                                       sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.weight),
+                                   sizeof (a_uint8_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12864,19 +9325,8 @@ cmd_data_check_bm_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("shared_ceiling", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.shared_ceiling),
-                                       sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.shared_ceiling),
+                                   sizeof (a_uint16_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12886,19 +9336,8 @@ cmd_data_check_bm_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.resume_off),
-                                       sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.resume_off),
+                                   sizeof (a_uint16_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12908,19 +9347,8 @@ cmd_data_check_bm_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("resume_min_thresh", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.resume_min_thresh),
-                                       sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.resume_min_thresh),
+                                   sizeof (a_uint16_t));
 
     }
     while (talk_mode && (SW_OK != rv));
@@ -12945,18 +9373,7 @@ cmd_data_check_u_qmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("src_profile", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.src_profile), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.src_profile), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12965,18 +9382,7 @@ cmd_data_check_u_qmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("service_code_en", "no");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.service_code_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.service_code_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -12985,18 +9391,7 @@ cmd_data_check_u_qmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("service_code", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.service_code), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.service_code), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13005,18 +9400,7 @@ cmd_data_check_u_qmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cpu_code_en", "no");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.cpu_code_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.cpu_code_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13025,18 +9409,7 @@ cmd_data_check_u_qmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cpu_code", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.cpu_code), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.cpu_code), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13045,18 +9418,7 @@ cmd_data_check_u_qmap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("dst_port", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.dst_port), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.dst_port), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13078,18 +9440,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("color_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.color_enable), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.color_enable), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13099,18 +9450,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("wred_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.wred_enable), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.wred_enable), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13119,18 +9459,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("green_max", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_max), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_max), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13139,18 +9468,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("green_min_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_min_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_min_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13159,18 +9477,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yel_max_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_max_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_max_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13179,18 +9486,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yel_min_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_min_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_min_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13199,18 +9495,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_max_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_max_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_max_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13219,18 +9504,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_min_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_min_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_min_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13239,18 +9513,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("green_resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_resume_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_resume_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13259,18 +9522,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yel_resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_resume_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_resume_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13279,18 +9531,7 @@ cmd_data_check_ac_static_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_resume_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_resume_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13313,18 +9554,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("color_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.color_enable), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.color_enable), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13334,18 +9564,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("wred_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.wred_enable), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.wred_enable), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13354,18 +9573,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("shared_weight", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.shared_weight), sizeof (a_uint8_t));
-        }
+        rv = cmd_data_check_uint8(cmd, (a_uint32_t *)&(entry.shared_weight), sizeof (a_uint8_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13374,18 +9582,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("green_min_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_min_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_min_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13394,18 +9591,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yel_max_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_max_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_max_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13414,18 +9600,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yel_min_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_min_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_min_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13434,18 +9609,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_max_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_max_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_max_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13454,18 +9618,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_min_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_min_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_min_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13474,18 +9627,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("green_resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_resume_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.green_resume_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13494,18 +9636,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yel_resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_resume_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.yel_resume_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13514,18 +9645,7 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_resume_off", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_resume_off), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.red_resume_off), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13534,20 +9654,9 @@ cmd_data_check_ac_dynamic_thresh(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ceiling", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, &tmp, sizeof (a_uint32_t));
-            if (!rv)
-                entry.ceiling = tmp;
-        }
+        rv = cmd_data_check_uint16(cmd, &tmp, sizeof (a_uint32_t));
+        if (!rv)
+            entry.ceiling = tmp;
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13567,18 +9676,7 @@ cmd_data_check_ac_group_buff(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("prealloc_buffer", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.prealloc_buffer), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.prealloc_buffer), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13587,18 +9685,7 @@ cmd_data_check_ac_group_buff(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("total_buffer", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.total_buffer), sizeof (a_uint16_t));
-        }
+        rv = cmd_data_check_uint16(cmd, (a_uint32_t *)&(entry.total_buffer), sizeof (a_uint16_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13619,18 +9706,7 @@ cmd_data_check_ac_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ac_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ac_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ac_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13639,18 +9715,7 @@ cmd_data_check_ac_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ac_fc_en", "yes");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ac_fc_en), sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_TRUE, &(entry.ac_fc_en), sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13670,18 +9735,7 @@ cmd_data_check_ac_obj(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("obj_type", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.type), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.type), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13690,18 +9744,7 @@ cmd_data_check_ac_obj(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("obj_id", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.obj_id), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.obj_id), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13721,13 +9764,7 @@ cmd_data_check_queue_config(char *cmd_str, char *config_name, a_uint32_t *arg_va
 		}
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4)) {
-			return SW_BAD_VALUE;
-		} else if (!strncasecmp(cmd, "help", 4)) {
-			rv = SW_BAD_VALUE;
-		} else {
-			rv = cmd_data_check_uint32(cmd, arg_val, sizeof(a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, arg_val, sizeof(a_uint32_t));
 	} while (talk_mode && (SW_OK != rv));
 
 	return rv;
@@ -13781,20 +9818,8 @@ cmd_data_check_port_shaper_token_config(char *cmd_str, void * val, a_uint32_t si
         cmd = get_sub_cmd("ctoken_negative_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_token_number_negative_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_token_number_negative_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13803,18 +9828,7 @@ cmd_data_check_port_shaper_token_config(char *cmd_str, void * val, a_uint32_t si
         cmd = get_sub_cmd("ctoken_number", "0-0x3FFFFFFF");
 	SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.c_token_number), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.c_token_number), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13837,20 +9851,8 @@ cmd_data_check_shaper_token_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ctoken_negative_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_token_number_negative_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_token_number_negative_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13859,18 +9861,7 @@ cmd_data_check_shaper_token_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ctoken_number", "0-0x3FFFFFFF");
 	SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.c_token_number), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.c_token_number), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13879,20 +9870,8 @@ cmd_data_check_shaper_token_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("etoken_negative_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.e_token_number_negative_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.e_token_number_negative_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13902,18 +9881,7 @@ cmd_data_check_shaper_token_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("etoken_number", "0-0x3FFFFFFF");
 	SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.e_token_number), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.e_token_number), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13936,18 +9904,7 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_unit", "0-1");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13956,20 +9913,8 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cshaper_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_shaper_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_shaper_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13978,18 +9923,7 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cir", "0");
 	SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -13998,18 +9932,7 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cbs", "0");
 	SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14018,18 +9941,7 @@ cmd_data_check_port_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("shaper_frame_mode", "0-2");
 	SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.shaper_frame_mode), sizeof (fal_shaper_frame_mode_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.shaper_frame_mode), sizeof (fal_shaper_frame_mode_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14058,20 +9970,8 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("couple_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.couple_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.couple_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14080,18 +9980,7 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_unit", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14100,20 +9989,8 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cshaper_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_shaper_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.c_shaper_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14122,18 +9999,7 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cir", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14141,19 +10007,8 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("cir_max", "0");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14163,18 +10018,7 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cbs", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14183,20 +10027,8 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eshaper_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.e_shaper_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.e_shaper_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14205,18 +10037,7 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eir", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.eir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.eir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14224,19 +10045,8 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("eir_max", "0");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14246,18 +10056,7 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ebs", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.ebs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.ebs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14265,59 +10064,26 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("next_ptr", "0");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
     do
     {
         cmd = get_sub_cmd("grp_end", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
     do
     {
         cmd = get_sub_cmd("grp_couple_enable", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14327,18 +10093,7 @@ cmd_data_check_shaper_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("shaper_frame_mode", "0-2");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.shaper_frame_mode), sizeof (fal_shaper_frame_mode_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.shaper_frame_mode), sizeof (fal_shaper_frame_mode_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14361,18 +10116,7 @@ cmd_data_check_queue_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("head", "0-299");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.head), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.head), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14381,18 +10125,7 @@ cmd_data_check_queue_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tail", "0-299");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.tail), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.tail), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14414,18 +10147,7 @@ cmd_data_check_flow_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("head", "0-63");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.head), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.head), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14434,18 +10156,7 @@ cmd_data_check_flow_shaper_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tail", "0-63");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.tail), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.tail), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14477,20 +10188,8 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.meter_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.meter_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14498,19 +10197,8 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("vp_policer_index", "0-511");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.vp_meter_index), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.vp_meter_index), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14520,20 +10208,8 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("couple_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.couple_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.couple_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14542,18 +10218,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("color_mode", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.color_mode), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.color_mode), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14562,18 +10227,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("frame_type", "0-0x1f");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.frame_type), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.frame_type), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14582,18 +10236,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_mode", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_mode), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.meter_mode), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14603,18 +10246,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_unit", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14623,18 +10255,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cir", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14642,19 +10263,8 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("cir_max", "0");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14664,18 +10274,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cbs", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14684,18 +10283,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eir", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.eir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.eir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14703,19 +10291,8 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("eir_max", "0");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14725,18 +10302,7 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ebs", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.ebs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.ebs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14744,60 +10310,26 @@ cmd_data_check_port_policer_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("next_ptr", "0");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
     do
     {
         cmd = get_sub_cmd("grp_end", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
     do
     {
         cmd = get_sub_cmd("grp_couple_enable", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -14827,20 +10359,8 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.meter_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.meter_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14849,20 +10369,8 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("couple_enable", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.couple_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.couple_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14871,18 +10379,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("color_mode", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.color_mode), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.color_mode), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14891,18 +10388,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_mode", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_mode), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.meter_mode), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14912,18 +10398,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("meter_unit", "0-1");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.meter_unit), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14932,18 +10407,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cir", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14953,18 +10417,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
 		cmd = get_sub_cmd("cir_max", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(entry.cir_max), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 #endif
@@ -14974,18 +10427,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("cbs", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.cbs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -14994,18 +10436,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("eir", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.eir), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.eir), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15015,18 +10446,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
 		cmd = get_sub_cmd("eir_max", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(entry.eir_max), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 #endif
@@ -15036,18 +10456,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("ebs", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.ebs), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.ebs), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15057,18 +10466,7 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
 		cmd = get_sub_cmd("next_ptr", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &(entry.next_ptr), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15077,19 +10475,8 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
 		cmd = get_sub_cmd("grp_end", "no");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
-				sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_end),
+			sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15098,19 +10485,8 @@ cmd_data_check_acl_policer_config(char *cmd_str, void * val, a_uint32_t size)
 		cmd = get_sub_cmd("grp_couple_enable", "no");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-	    }
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
-				sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.grp_couple_en),
+			sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 #endif
@@ -15133,19 +10509,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_priority_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_priority_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_priority_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15154,19 +10519,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_drop_priority_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_drop_priority_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_drop_priority_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15176,19 +10530,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_pcp_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_pcp_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_pcp_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15197,19 +10540,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_dei_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_dei_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_dei_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15217,40 +10549,18 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("yellow_dscp_remark", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_dscp_en),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_dscp_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
     do
     {
         cmd = get_sub_cmd("yellow_remap", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_remap_en),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.yellow_remap_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -15260,18 +10570,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_priority", "0-15");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.yellow_priority), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.yellow_priority), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15280,18 +10579,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_drop_priority", "0-3");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.yellow_drop_priority), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.yellow_drop_priority), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15300,18 +10588,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_pcp", "0-7");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.yellow_pcp), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.yellow_pcp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15320,18 +10597,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("yellow_dei", "0-1");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.yellow_dei), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.yellow_dei), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15339,19 +10605,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("yellow_dscp", "0-63");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.yellow_dscp), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.yellow_dscp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -15360,18 +10615,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_action", "drop");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(entry.red_action), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(entry.red_action), sizeof(a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15380,20 +10624,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_priority_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_priority_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_priority_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15402,20 +10634,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_drop_priority_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_drop_priority_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_drop_priority_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15424,19 +10644,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_pcp_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_pcp_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_pcp_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15445,19 +10654,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_dei_remark", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_dei_en),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_dei_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15465,39 +10663,17 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("red_dscp_remark", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_dscp_en),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_dscp_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
     do
     {
         cmd = get_sub_cmd("red_remap", "no");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_remap_en),
-                                        sizeof (a_bool_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(entry.red_remap_en),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -15507,18 +10683,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_priority", "0-15");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.red_priority), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.red_priority), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15527,18 +10692,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_drop_priority", "0-3");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.red_drop_priority), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.red_drop_priority), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15547,18 +10701,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_pcp", "0-7");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.red_pcp), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.red_pcp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15567,18 +10710,7 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("red_dei", "0-1");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.red_dei), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.red_dei), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15586,19 +10718,8 @@ cmd_data_check_policer_cmd_config(char *cmd_str, void * val, a_uint32_t size)
     do
     {
         cmd = get_sub_cmd("red_dscp", "0-63");
-        SW_RTN_ON_NULL_PARAM(cmd);
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.red_dscp), sizeof (a_uint32_t));
-        }
+SW_RTN_ON_NULL_PARAM(cmd);
+        rv = cmd_data_check_uint32(cmd, &(entry.red_dscp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -15623,18 +10744,7 @@ cmd_data_check_policer_remap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("remap_dscp", "0-63");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.dscp), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.dscp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15643,18 +10753,7 @@ cmd_data_check_policer_remap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("remap_pcp", "0-7");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.pcp), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.pcp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15664,18 +10763,7 @@ cmd_data_check_policer_remap(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("remap_dei", "0-1");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.dei), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.dei), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15697,18 +10785,7 @@ cmd_data_check_policer_priority(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_pri", "0-15");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.internal_pri), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.internal_pri), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15717,18 +10794,7 @@ cmd_data_check_policer_priority(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("internal_dp", "0-3");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.internal_dp), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.internal_dp), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15756,18 +10822,7 @@ cmd_data_check_policer_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("head", "0-511");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.head), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.head), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15776,18 +10831,7 @@ cmd_data_check_policer_ctrl(char *cmd_str, void * val, a_uint32_t size)
         cmd = get_sub_cmd("tail", "0-511");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(entry.tail), sizeof (a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(entry.tail), sizeof (a_uint32_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -15812,19 +10856,8 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("dest_port_valid", "yes");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_TRUE, &entry.dest_port_valid,
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_TRUE, &entry.dest_port_valid,
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15833,18 +10866,7 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("dest_port_id", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.dest_port_id, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.dest_port_id, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15853,19 +10875,8 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("bypass_bitmap[0]", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd,
-				&entry.bypass_bitmap[0], sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd,
+			&entry.bypass_bitmap[0], sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15874,19 +10885,8 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("bypass_bitmap[1]", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd,
-				&entry.bypass_bitmap[1], sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd,
+			&entry.bypass_bitmap[1], sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15895,19 +10895,8 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("bypass_bitmap[2]", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd,
-				&entry.bypass_bitmap[2], sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd,
+			&entry.bypass_bitmap[2], sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 #ifdef APPE
@@ -15916,19 +10905,8 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("bypass_bitmap[3]", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd,
-				&entry.bypass_bitmap[3], sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd,
+			&entry.bypass_bitmap[3], sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 #endif
@@ -15937,18 +10915,7 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("direction", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.direction, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.direction, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15957,18 +10924,7 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("field_update_bitmap", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.field_update_bitmap, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.field_update_bitmap, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15977,18 +10933,7 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("next_service_code", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.next_service_code, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.next_service_code, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -15997,18 +10942,7 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hw_services", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.hw_services, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.hw_services, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16017,18 +10951,7 @@ cmd_data_check_servcode_config(char *info, fal_servcode_config_t *val, a_uint32_
 		cmd = get_sub_cmd("offset_sel", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.offset_sel, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.offset_sel, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16134,18 +11057,7 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_mask", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.hash_mask, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.hash_mask, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16154,19 +11066,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_fragment_mode", "no");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_confirm(cmd, A_FALSE, &entry.hash_fragment_mode,
-					sizeof (a_bool_t));
-		}
+		rv = cmd_data_check_confirm(cmd, A_FALSE, &entry.hash_fragment_mode,
+				sizeof (a_bool_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16175,18 +11076,7 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_seed", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint32(cmd, &entry.hash_seed, sizeof (a_uint32_t));
-		}
+		rv = cmd_data_check_uint32(cmd, &entry.hash_seed, sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16195,19 +11085,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_sip_mix", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8_array(cmd, &entry.hash_sip_mix[0],
-						sizeof (entry.hash_sip_mix));
-		}
+		rv = cmd_data_check_uint8_array(cmd, &entry.hash_sip_mix[0],
+					sizeof (entry.hash_sip_mix));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16216,19 +11095,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_dip_mix", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8_array(cmd, &entry.hash_dip_mix[0],
-						sizeof (entry.hash_dip_mix));
-		}
+		rv = cmd_data_check_uint8_array(cmd, &entry.hash_dip_mix[0],
+					sizeof (entry.hash_dip_mix));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16237,21 +11105,10 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_protocol_mix", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
+		rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+		if (SW_OK == rv)
 		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
-			if (SW_OK == rv)
-			{
-				entry.hash_protocol_mix = tmp;
-			}
+			entry.hash_protocol_mix = tmp;
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16261,21 +11118,10 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_sport_mix", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
+		rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+		if (SW_OK == rv)
 		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
-			if (SW_OK == rv)
-			{
-				entry.hash_sport_mix = tmp;
-			}
+			entry.hash_sport_mix = tmp;
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16285,21 +11131,10 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_dport_mix", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
+		rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
+		if (SW_OK == rv)
 		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8(cmd, &tmp, sizeof (a_uint32_t));
-			if (SW_OK == rv)
-			{
-				entry.hash_dport_mix = tmp;
-			}
+			entry.hash_dport_mix = tmp;
 		}
 	}
 	while (talk_mode && (SW_OK != rv));
@@ -16309,19 +11144,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_fin_inner", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8_array(cmd, &entry.hash_fin_inner[0],
-						sizeof (entry.hash_fin_inner));
-		}
+		rv = cmd_data_check_uint8_array(cmd, &entry.hash_fin_inner[0],
+					sizeof (entry.hash_fin_inner));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16330,19 +11154,8 @@ cmd_data_check_rss_hash_config(char *info, fal_rss_hash_config_t *val, a_uint32_
 		cmd = get_sub_cmd("hash_fin_outer", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4))
-		{
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4))
-		{
-			rv = SW_BAD_VALUE;
-		}
-		else
-		{
-			rv = cmd_data_check_uint8_array(cmd, &entry.hash_fin_outer[0],
-						sizeof (entry.hash_fin_outer));
-		}
+		rv = cmd_data_check_uint8_array(cmd, &entry.hash_fin_outer[0],
+					sizeof (entry.hash_fin_outer));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -16366,18 +11179,7 @@ cmd_data_check_mirr_analy_cfg(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("analysis_port", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->port_id), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->port_id), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     do
@@ -16385,18 +11187,7 @@ cmd_data_check_mirr_analy_cfg(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("analysis_priority", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &(pEntry->priority), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_uint32(cmd, &(pEntry->priority), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     return SW_OK;
@@ -16447,20 +11238,9 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("port_bitmap", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint32(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->port_map = tmp;
-        }
+     pEntry->port_map = tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get ethernet type profile */
@@ -16469,20 +11249,9 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ethtype_profile_bitmap", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint32(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->ethtype_profile_bitmap = tmp;
-        }
+     pEntry->ethtype_profile_bitmap = tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get rfdb profile */
@@ -16491,20 +11260,9 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("rfdb_profile_bitmap", "0");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_uint32(cmd, &tmp, sizeof(a_uint32_t));
+        rv = cmd_data_check_uint32(cmd, &tmp, sizeof(a_uint32_t));
 
-	     pEntry->rfdb_profile_bitmap= tmp;
-        }
+     pEntry->rfdb_profile_bitmap= tmp;
     }while (talk_mode && (SW_OK != rv));
 
     /* get mgt_eapol */
@@ -16513,19 +11271,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("eapol_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_eapol),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_eapol),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16535,19 +11282,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("pppoe_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_pppoe),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_pppoe),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16557,19 +11293,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("igmp_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_igmp),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_igmp),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16579,19 +11304,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("arp_request_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_arp_req),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_arp_req),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16601,19 +11315,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("arp_response_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_arp_rep),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_arp_rep),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16623,19 +11326,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("dhcp4_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_dhcp4),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_dhcp4),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16645,19 +11337,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("dhcp6_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_dhcp6),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_dhcp6),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 #if defined (APPE)
@@ -16667,19 +11348,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("8023ah_oam_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_8023ah_oam),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_8023ah_oam),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 #endif
@@ -16689,19 +11359,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("mld_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_mld),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_mld),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16712,19 +11371,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ip6ns_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_ns),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_ns),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16734,19 +11382,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ip6na_en", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_na),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->protocol_types.mgt_na),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16756,18 +11393,7 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ctrlpkt_profile_action", "forward");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_maccmd(cmd, &(pEntry->action.action), sizeof(a_uint32_t));
-        }
+        rv = cmd_data_check_maccmd(cmd, &(pEntry->action.action), sizeof(a_uint32_t));
     }while (talk_mode && (SW_OK != rv));
 
     /* get sg_byp */
@@ -16776,19 +11402,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("sourceguard_bypass", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.sg_bypass),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.sg_bypass),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16798,19 +11413,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("l2filter_bypass", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.l2_filter_bypass),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.l2_filter_bypass),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16820,19 +11424,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ingress_stp_bypass", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.in_stp_bypass),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.in_stp_bypass),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -16842,19 +11435,8 @@ cmd_data_check_ctrlpkt_appprofile(char *info, void *val, a_uint32_t size)
         cmd = get_sub_cmd("ingress_vlan_filter_bypass", "no");
         SW_RTN_ON_NULL_PARAM(cmd);
 
-        if (!strncasecmp(cmd, "quit", 4))
-        {
-            return SW_BAD_VALUE;
-        }
-        else if (!strncasecmp(cmd, "help", 4))
-        {
-            rv = SW_BAD_VALUE;
-        }
-        else
-        {
-            rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.in_vlan_fltr_bypass),
-                                        sizeof (a_bool_t));
-        }
+        rv = cmd_data_check_confirm(cmd, A_FALSE, &(pEntry->action.in_vlan_fltr_bypass),
+                                    sizeof (a_bool_t));
     }
     while (talk_mode && (SW_OK != rv));
 
@@ -18241,13 +12823,7 @@ cmd_data_check_tunnel_encap_entry(char *cmd_str, fal_tunnel_encap_cfg_t *arg_val
 		cmd = get_sub_cmd("eg_header_data", "0x0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4)) {
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4)) {
-			rv = SW_BAD_VALUE;
-		}
-		else if (strspn(cmd, "1234567890abcdefABCDEFXx") != strlen(cmd) ||
+		if (strspn(cmd, "1234567890abcdefABCDEFXx") != strlen(cmd) ||
 				(strlen(cmd) -2) > 2 * FAL_TUNNEL_ENCAP_HEADER_MAX_LEN) {
 			rv = SW_BAD_VALUE;
 		}
@@ -18890,16 +13466,8 @@ cmd_data_check_mapt_decap_entry(char *cmd_str, void *arg_val, a_uint32_t size)
 		cmd = get_sub_cmd("src_info_type", "vp");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		if (!strncasecmp(cmd, "quit", 4)) {
-			return SW_BAD_VALUE;
-		}
-		else if (!strncasecmp(cmd, "help", 4)) {
-			rv = SW_BAD_VALUE;
-		}
-		else {
-			rv = cmd_data_check_srctype(cmd, 0, &entry.src_info_type,
-					sizeof(a_uint8_t));
-		}
+		rv = cmd_data_check_srctype(cmd, 0, &entry.src_info_type,
+				sizeof(a_uint8_t));
 	} while (talk_mode && (SW_OK != rv));
 
 	cmd_data_check_element("src_info", "0",

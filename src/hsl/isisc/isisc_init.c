@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2016-2017, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 
@@ -48,6 +51,8 @@
 #include "isisc_reg.h"
 #include "isisc_init.h"
 #include "f1_phy.h"
+#include "hsl_phy.h"
+#include "ssdk_dts.h"
 
 static ssdk_init_cfg * isisc_cfg[SW_MAX_NR_DEV] = { 0 };
 a_uint32_t isisc_nat_global_status = 0;
@@ -64,7 +69,12 @@ isisc_portproperty_init(a_uint32_t dev_id, hsl_init_mode mode)
 {
     hsl_port_prop_t p_type;
     hsl_dev_t *pdev = NULL;
-    fal_port_t port_id;
+    fal_port_t port_id = 0;
+    a_uint32_t phy_pbmp = 0, cpu_pbmp = 0, pbmp = 0;
+
+    phy_pbmp = qca_ssdk_port_bmp_get(dev_id);
+    cpu_pbmp = ssdk_cpu_bmp_get(dev_id);
+    pbmp = phy_pbmp | cpu_pbmp;
 
     pdev = hsl_dev_ptr_get(dev_id);
     if (pdev == NULL)
@@ -73,6 +83,9 @@ isisc_portproperty_init(a_uint32_t dev_id, hsl_init_mode mode)
     /* for port property set, SSDK should not generate some limitations */
     for (port_id = 0; port_id < pdev->nr_ports; port_id++)
     {
+        if(!(pbmp & (1 << port_id)))
+            continue;
+
         hsl_port_prop_portmap_set(dev_id, port_id);
 
         for (p_type = HSL_PP_PHY; p_type < HSL_PP_BUTT; p_type++)
@@ -87,8 +100,7 @@ isisc_portproperty_init(a_uint32_t dev_id, hsl_init_mode mode)
             {
                 case HSL_PP_PHY:
                     /* Only port0/port6 without PHY device */
-                    if ((port_id != pdev->cpu_port_nr)
-                            && (port_id != pdev->nr_ports - 1))
+                    if(phy_pbmp & (1 << port_id))
                     {
                         SW_RTN_ON_ERROR(hsl_port_prop_set(dev_id, port_id, p_type));
                     }
@@ -104,7 +116,7 @@ isisc_portproperty_init(a_uint32_t dev_id, hsl_init_mode mode)
                     /* exclude cpu port and wan port in some cases */
                     /* which port is wan port, we are no meaning but port0 is
                        always CPU port */
-                    if (port_id != pdev->cpu_port_nr)
+                    if (!(cpu_pbmp & (1 << port_id)))
                     {
                         SW_RTN_ON_ERROR(hsl_port_prop_set(dev_id, port_id, p_type));
                     }

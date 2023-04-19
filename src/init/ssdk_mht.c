@@ -32,6 +32,7 @@
 #include "mht_port_ctrl.h"
 #include "ref_port_ctrl.h"
 #include "mht_interface_ctrl.h"
+#include "hsl_port_prop.h"
 #ifdef IN_LED
 #include "ssdk_led.h"
 #endif
@@ -199,6 +200,8 @@ qca_mht_portctrl_hw_init(a_uint32_t dev_id)
 
 	for(i = SSDK_PHYSICAL_PORT0; i < port_max; i++)
 	{
+		if (A_FALSE == hsl_port_prop_check (dev_id, i, HSL_PP_INCL_CPU))
+			continue;
 		if(hsl_port_feature_get(dev_id, i, PHY_F_FORCE) == A_TRUE)
 		{
 			force_speed = hsl_port_force_speed_get(dev_id, i);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -91,61 +91,12 @@ mht_reset(a_uint32_t dev_id)
 }
 
 sw_error_t
-mht_portproperty_init(a_uint32_t dev_id, hsl_init_mode mode)
-{
-	sw_error_t rv;
-	hsl_port_prop_t p_type;
-	hsl_dev_t *pdev = NULL;
-	fal_port_t port_id;
-	a_uint32_t phy_bmp = qca_ssdk_port_bmp_get(dev_id);
-	a_uint32_t cpu_bmp = ssdk_cpu_bmp_get(dev_id);
-
-
-	pdev = hsl_dev_ptr_get(dev_id);
-	if (pdev == NULL)
-		return SW_NOT_INITIALIZED;
-
-	port_id = 0;
-	while (phy_bmp) {
-		if (phy_bmp & 1) {
-			rv = hsl_port_prop_portmap_set(dev_id, port_id);
-			SW_RTN_ON_ERROR(rv);
-
-			for (p_type = HSL_PP_PHY; p_type <= HSL_PP_EXCL_CPU; p_type++) {
-				rv = hsl_port_prop_set(dev_id, port_id, p_type);
-				SW_RTN_ON_ERROR(rv);
-			}
-		}
-		phy_bmp >>= 1;
-		port_id++;
-	}
-
-	port_id = 0;
-	while (cpu_bmp) {
-		if (cpu_bmp & 1) {
-			rv = hsl_port_prop_portmap_set(dev_id, port_id);
-			SW_RTN_ON_ERROR(rv);
-
-			rv = hsl_port_prop_set(dev_id, port_id, HSL_PP_CPU);
-			SW_RTN_ON_ERROR(rv);
-		}
-		cpu_bmp >>= 1;
-		port_id++;
-	}
-
-	return SW_OK;
-}
-
-sw_error_t
 mht_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 {
 	sw_error_t rv;
 	hsl_api_t *p_api;
 
 	rv = isisc_init(dev_id, cfg);
-	SW_RTN_ON_ERROR(rv);
-
-	rv = mht_portproperty_init(dev_id, cfg->cpu_mode);
 	SW_RTN_ON_ERROR(rv);
 
 	p_api = hsl_api_ptr_get(dev_id);

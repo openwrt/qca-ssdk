@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015, 2017-2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -2614,9 +2614,13 @@ typedef sw_error_t
     sw_error_t hsl_api_init (a_uint32_t dev_id);
 
 #if defined(SW_API_LOCK) && (!defined(HSL_STANDALONG))
-  extern aos_lock_t sw_hsl_api_lock;
-#define FAL_API_LOCK    aos_lock(&sw_hsl_api_lock)
-#define FAL_API_UNLOCK  aos_unlock(&sw_hsl_api_lock)
+extern aos_mutex_lock_t sw_hsl_api_lock;
+#define FAL_API_LOCK \
+{ \
+	while(!mutex_trylock(&sw_hsl_api_lock)) \
+		udelay(1); \
+}
+#define FAL_API_UNLOCK  aos_mutex_unlock(&sw_hsl_api_lock)
 #else
 #define FAL_API_LOCK
 #define FAL_API_UNLOCK

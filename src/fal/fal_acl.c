@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2016-2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +13,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_acl FAL_ACL
@@ -939,7 +940,7 @@ fal_acl_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
     sw_error_t rv = SW_OK;
 
     FAL_API_LOCK;
-    rv = _fal_acl_udf_profile_cfg_set(dev_id, profile_id, udf_idx, udf_type, offset)
+    rv = _fal_acl_udf_profile_cfg_set(dev_id, profile_id, udf_idx, udf_type, offset);
     FAL_API_UNLOCK;
     return rv;
 }
@@ -960,7 +961,7 @@ fal_acl_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
     sw_error_t rv = SW_OK;
 
     FAL_API_LOCK;
-    rv = _fal_acl_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset)
+    rv = _fal_acl_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset);
     FAL_API_UNLOCK;
     return rv;
 }
@@ -980,7 +981,7 @@ fal_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
     sw_error_t rv = SW_OK;
 
     FAL_API_LOCK;
-    rv = _fal_acl_vpgroup_set(dev_id, vport_id, vport_type, vpgroup_id)
+    rv = _fal_acl_vpgroup_set(dev_id, vport_id, vport_type, vpgroup_id);
     FAL_API_UNLOCK;
     return rv;
 }
@@ -1000,7 +1001,7 @@ fal_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
     sw_error_t rv = SW_OK;
 
     FAL_API_LOCK;
-    rv = _fal_acl_vpgroup_get(dev_id, vport_id, vport_type, vpgroup_id)
+    rv = _fal_acl_vpgroup_get(dev_id, vport_id, vport_type, vpgroup_id);
     FAL_API_UNLOCK;
     return rv;
 }

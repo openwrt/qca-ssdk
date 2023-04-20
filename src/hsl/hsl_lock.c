@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -12,19 +14,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-
 #include "sw.h"
 
-#ifdef KVER32
-aos_lock_t sw_hsl_api_lock;
-#else
-aos_lock_t sw_hsl_api_lock = aos_default_unlock;
-#endif
+aos_mutex_lock_t sw_hsl_api_lock;
 
 sw_error_t
 hsl_api_lock_init(void)
 {
-    aos_lock_init(&sw_hsl_api_lock);
+    aos_mutex_lock_init(&sw_hsl_api_lock);
     return SW_OK;
 }

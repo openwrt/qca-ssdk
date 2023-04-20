@@ -87,6 +87,9 @@ typedef struct {
 	/*the statistics array records the counter of
 	 * rx and tx ptp event packet */
 	hsl_ptp_event_pkt_stat_t ptp_event_stat[FAL_TX_DIRECTION + 1];
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+	struct mii_timestamper mii_ts;
+#endif
 #endif
 } qca808x_priv;
 
@@ -99,12 +102,20 @@ struct qca808x_ptp_clock{
 };
 
 struct qca808x_phy_info* qca808x_phy_info_get(a_uint32_t phy_addr);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+void qca808x_ptp_change_notify(struct mii_timestamper *mii_ts, struct phy_device *phydev);
+int qca808x_hwtstamp(struct mii_timestamper *mii_ts, struct ifreq *ifr);
+bool qca808x_rxtstamp(struct mii_timestamper *mii_ts, struct sk_buff *skb, int type);
+void qca808x_txtstamp(struct mii_timestamper *mii_ts, struct sk_buff *skb, int type);
+int qca808x_ts_info(struct mii_timestamper *mii_ts, struct ethtool_ts_info *info);
+#else
 void qca808x_ptp_change_notify(struct phy_device *phydev);
 int qca808x_hwtstamp(struct phy_device *phydev, struct ifreq *ifr);
 bool qca808x_rxtstamp(struct phy_device *phydev, struct sk_buff *skb, int type);
 void qca808x_txtstamp(struct phy_device *phydev, struct sk_buff *skb, int type);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 int qca808x_ts_info(struct phy_device *phydev, struct ethtool_ts_info *info);
+#endif
 #endif
 sw_error_t qca808x_ptp_config_init(struct phy_device *phydev);
 int qca808x_ptp_init(qca808x_priv *priv);

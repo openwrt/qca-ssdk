@@ -23,6 +23,7 @@
 #include "ref_vsi.h"
 #include "ssdk_clk.h"
 #include "hsl_phy.h"
+#include <linux/in.h>
 
 #if defined(IN_VSI)
 sw_error_t qca_hppe_vsi_hw_init(a_uint32_t dev_id)

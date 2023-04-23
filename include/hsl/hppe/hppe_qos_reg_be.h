@@ -83,8 +83,8 @@ union min_max_mode_cfg_u {
 	#define TM_DBG_ADDR_DBG_ADDR_DEFAULT 0x0
 
 struct tm_dbg_addr {
-	a_uint32_t  dbg_addr:8;
 	a_uint32_t  _reserved0:24;
+	a_uint32_t  dbg_addr:8;
 };
 
 union tm_dbg_addr_u {
@@ -334,16 +334,17 @@ union l0_flow_port_map_tbl_u {
 	#define L0_C_DRR_HEAD_TBL_ACTIVE_MAX_N_DEFAULT 0x0
 
 struct l0_c_drr_head_tbl {
-	a_uint32_t  backup_tail:9;
-	a_uint32_t  backup_head:9;
-	a_uint32_t  backup_vld:1;
-	a_uint32_t  backup_max_n:5;
 	a_uint32_t  active_tail_0:8;
-	a_uint32_t  active_tail_1:1;
-	a_uint32_t  active_head:9;
-	a_uint32_t  active_vld:1;
-	a_uint32_t  active_max_n:5;
+	a_uint32_t  backup_max_n:5;
+	a_uint32_t  backup_vld:1;
+	a_uint32_t  backup_head:9;
+	a_uint32_t  backup_tail:9;
+
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  active_max_n:5;
+	a_uint32_t  active_vld:1;
+	a_uint32_t  active_head:9;
+	a_uint32_t  active_tail_1:1;
 };
 
 union l0_c_drr_head_tbl_u {
@@ -400,16 +401,17 @@ union l0_c_drr_head_tbl_u {
 	#define L0_E_DRR_HEAD_TBL_ACTIVE_MAX_N_DEFAULT 0x0
 
 struct l0_e_drr_head_tbl {
-	a_uint32_t  backup_tail:9;
-	a_uint32_t  backup_head:9;
-	a_uint32_t  backup_vld:1;
-	a_uint32_t  backup_max_n:5;
 	a_uint32_t  active_tail_0:8;
-	a_uint32_t  active_tail_1:1;
-	a_uint32_t  active_head:9;
-	a_uint32_t  active_vld:1;
-	a_uint32_t  active_max_n:5;
+	a_uint32_t  backup_max_n:5;
+	a_uint32_t  backup_vld:1;
+	a_uint32_t  backup_head:9;
+	a_uint32_t  backup_tail:9;
+
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  active_max_n:5;
+	a_uint32_t  active_vld:1;
+	a_uint32_t  active_head:9;
+	a_uint32_t  active_tail_1:1;
 };
 
 union l0_e_drr_head_tbl_u {
@@ -446,12 +448,13 @@ union l0_e_drr_head_tbl_u {
 	#define L0_DRR_CREDIT_TBL_E_DRR_CREDIT_NEG_DEFAULT 0x0
 
 struct l0_drr_credit_tbl {
-	a_uint32_t  _reserved0:14;
-	a_uint32_t  e_drr_credit_neg:1;
-	a_uint32_t  e_drr_credit_1:17;
 	a_uint32_t  e_drr_credit_0:7;
 	a_uint32_t  c_drr_credit_neg:1;
 	a_uint32_t  c_drr_credit:24;
+
+	a_uint32_t  _reserved0:14;
+	a_uint32_t  e_drr_credit_neg:1;
+	a_uint32_t  e_drr_credit_1:17;
 };
 
 union l0_drr_credit_tbl_u {
@@ -473,8 +476,8 @@ union l0_drr_credit_tbl_u {
 	#define L0_C_DRR_LL_TBL_NEXT_PTR_DEFAULT 0x0
 
 struct l0_c_drr_ll_tbl {
-	a_uint32_t  next_ptr:9;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  next_ptr:9;
 };
 
 union l0_c_drr_ll_tbl_u {
@@ -496,8 +499,8 @@ union l0_c_drr_ll_tbl_u {
 	#define L0_C_DRR_REVERSE_LL_TBL_PRE_PTR_DEFAULT 0x0
 
 struct l0_c_drr_reverse_ll_tbl {
-	a_uint32_t  pre_ptr:9;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  pre_ptr:9;
 };
 
 union l0_c_drr_reverse_ll_tbl_u {
@@ -519,8 +522,8 @@ union l0_c_drr_reverse_ll_tbl_u {
 	#define L0_E_DRR_LL_TBL_NEXT_PTR_DEFAULT 0x0
 
 struct l0_e_drr_ll_tbl {
-	a_uint32_t  next_ptr:9;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  next_ptr:9;
 };
 
 union l0_e_drr_ll_tbl_u {
@@ -542,8 +545,8 @@ union l0_e_drr_ll_tbl_u {
 	#define L0_E_DRR_REVERSE_LL_TBL_PRE_PTR_DEFAULT 0x0
 
 struct l0_e_drr_reverse_ll_tbl {
-	a_uint32_t  pre_ptr:9;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  pre_ptr:9;
 };
 
 union l0_e_drr_reverse_ll_tbl_u {
@@ -574,8 +577,8 @@ struct l0_sp_entry_tbl {
 	a_uint32_t  entry_path_id_1:32;
 	a_uint32_t  entry_path_id_2:32;
 	a_uint32_t  entry_path_id_3:32;
-	a_uint32_t  entry_path_id_4:16;
 	a_uint32_t  entry_vld:16;
+	a_uint32_t  entry_path_id_4:16;
 };
 
 union l0_sp_entry_tbl_u {
@@ -598,8 +601,8 @@ union l0_sp_entry_tbl_u {
 	#define L0_ENS_Q_LL_TBL_NEXT_PTR_DEFAULT 0x0
 
 struct l0_ens_q_ll_tbl {
-	a_uint32_t  next_ptr:9;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  next_ptr:9;
 };
 
 union l0_ens_q_ll_tbl_u {
@@ -631,10 +634,10 @@ union l0_ens_q_ll_tbl_u {
 	#define L0_ENS_Q_HEAD_TBL_VLD_DEFAULT 0x0
 
 struct l0_ens_q_head_tbl {
-	a_uint32_t  tail:9;
-	a_uint32_t  head:9;
-	a_uint32_t  vld:1;
 	a_uint32_t  _reserved0:13;
+	a_uint32_t  vld:1;
+	a_uint32_t  head:9;
+	a_uint32_t  tail:9;
 };
 
 union l0_ens_q_head_tbl_u {
@@ -666,10 +669,10 @@ union l0_ens_q_head_tbl_u {
 	#define L0_ENS_Q_ENTRY_TBL_ENTRY_ENS_IN_Q_DEFAULT 0x0
 
 struct l0_ens_q_entry_tbl {
-	a_uint32_t  entry_ens_type:2;
-	a_uint32_t  entry_ens_vld:1;
-	a_uint32_t  entry_ens_in_q:1;
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  entry_ens_in_q:1;
+	a_uint32_t  entry_ens_vld:1;
+	a_uint32_t  entry_ens_type:2;
 };
 
 union l0_ens_q_entry_tbl_u {
@@ -701,10 +704,10 @@ union l0_ens_q_entry_tbl_u {
 	#define L0_FLOW_STATUS_TBL_EN_EDRR_DEFAULT 0x0
 
 struct l0_flow_status_tbl {
-	a_uint32_t  en_level:1;
-	a_uint32_t  en_cdrr:1;
-	a_uint32_t  en_edrr:1;
 	a_uint32_t  _reserved0:29;
+	a_uint32_t  en_edrr:1;
+	a_uint32_t  en_cdrr:1;
+	a_uint32_t  en_level:1;
 };
 
 union l0_flow_status_tbl_u {
@@ -742,8 +745,8 @@ struct ring_q_map_tbl {
 	a_uint32_t  queue_bitmap_6:32;
 	a_uint32_t  queue_bitmap_7:32;
 	a_uint32_t  queue_bitmap_8:32;
-	a_uint32_t  queue_bitmap_9:12;
 	a_uint32_t  _reserved0:20;
+	a_uint32_t  queue_bitmap_9:12;
 };
 
 union ring_q_map_tbl_u {
@@ -765,8 +768,8 @@ union ring_q_map_tbl_u {
 	#define RFC_BLOCK_TBL_RFC_BLOCK_DEFAULT 0x0
 
 struct rfc_block_tbl {
-	a_uint32_t  rfc_block:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  rfc_block:1;
 };
 
 union rfc_block_tbl_u {
@@ -998,16 +1001,17 @@ union l1_flow_port_map_tbl_u {
 	#define L1_C_DRR_HEAD_TBL_ACTIVE_MAX_N_DEFAULT 0x0
 
 struct l1_c_drr_head_tbl {
-	a_uint32_t  backup_tail:6;
-	a_uint32_t  backup_head:6;
-	a_uint32_t  backup_vld:1;
-	a_uint32_t  backup_max_n:5;
-	a_uint32_t  active_tail:6;
-	a_uint32_t  active_head:6;
-	a_uint32_t  active_vld:1;
 	a_uint32_t  active_max_n_0:1;
-	a_uint32_t  active_max_n_1:4;
+	a_uint32_t  active_vld:1;
+	a_uint32_t  active_head:6;
+	a_uint32_t  active_tail:6;
+	a_uint32_t  backup_max_n:5;
+	a_uint32_t  backup_vld:1;
+	a_uint32_t  backup_head:6;
+	a_uint32_t  backup_tail:6;
+
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  active_max_n_1:4;
 };
 
 union l1_c_drr_head_tbl_u {
@@ -1064,16 +1068,17 @@ union l1_c_drr_head_tbl_u {
 	#define L1_E_DRR_HEAD_TBL_ACTIVE_MAX_N_DEFAULT 0x0
 
 struct l1_e_drr_head_tbl {
-	a_uint32_t  backup_tail:6;
-	a_uint32_t  backup_head:6;
-	a_uint32_t  backup_vld:1;
-	a_uint32_t  backup_max_n:5;
-	a_uint32_t  active_tail:6;
-	a_uint32_t  active_head:6;
-	a_uint32_t  active_vld:1;
 	a_uint32_t  active_max_n_0:1;
-	a_uint32_t  active_max_n_1:4;
+	a_uint32_t  active_vld:1;
+	a_uint32_t  active_head:6;
+	a_uint32_t  active_tail:6;
+	a_uint32_t  backup_max_n:5;
+	a_uint32_t  backup_vld:1;
+	a_uint32_t  backup_head:6;
+	a_uint32_t  backup_tail:6;
+
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  active_max_n_1:4;
 };
 
 union l1_e_drr_head_tbl_u {
@@ -1110,12 +1115,13 @@ union l1_e_drr_head_tbl_u {
 	#define L1_DRR_CREDIT_TBL_E_DRR_CREDIT_NEG_DEFAULT 0x0
 
 struct l1_drr_credit_tbl {
-	a_uint32_t  _reserved0:14;
-	a_uint32_t  e_drr_credit_neg:1;
-	a_uint32_t  e_drr_credit_1:17;
 	a_uint32_t  e_drr_credit_0:7;
 	a_uint32_t  c_drr_credit_neg:1;
 	a_uint32_t  c_drr_credit:24;
+
+	a_uint32_t  _reserved0:14;
+	a_uint32_t  e_drr_credit_neg:1;
+	a_uint32_t  e_drr_credit_1:17;
 };
 
 union l1_drr_credit_tbl_u {
@@ -1137,8 +1143,8 @@ union l1_drr_credit_tbl_u {
 	#define L1_C_DRR_LL_TBL_NEXT_PTR_DEFAULT 0x0
 
 struct l1_c_drr_ll_tbl {
-	a_uint32_t  next_ptr:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  next_ptr:6;
 };
 
 union l1_c_drr_ll_tbl_u {
@@ -1160,8 +1166,8 @@ union l1_c_drr_ll_tbl_u {
 	#define L1_C_DRR_REVERSE_LL_TBL_PRE_PTR_DEFAULT 0x0
 
 struct l1_c_drr_reverse_ll_tbl {
-	a_uint32_t  pre_ptr:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  pre_ptr:6;
 };
 
 union l1_c_drr_reverse_ll_tbl_u {
@@ -1183,8 +1189,8 @@ union l1_c_drr_reverse_ll_tbl_u {
 	#define L1_E_DRR_LL_TBL_NEXT_PTR_DEFAULT 0x0
 
 struct l1_e_drr_ll_tbl {
-	a_uint32_t  next_ptr:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  next_ptr:6;
 };
 
 union l1_e_drr_ll_tbl_u {
@@ -1206,8 +1212,8 @@ union l1_e_drr_ll_tbl_u {
 	#define L1_E_DRR_REVERSE_LL_TBL_PRE_PTR_DEFAULT 0x0
 
 struct l1_e_drr_reverse_ll_tbl {
-	a_uint32_t  pre_ptr:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  pre_ptr:6;
 };
 
 union l1_e_drr_reverse_ll_tbl_u {
@@ -1229,8 +1235,8 @@ union l1_e_drr_reverse_ll_tbl_u {
 	#define L1_A_FLOW_ENTRY_TBL_ENTRY_PATH_ID_DEFAULT 0x0
 
 struct l1_a_flow_entry_tbl {
-	a_uint32_t  entry_path_id:10;
 	a_uint32_t  _reserved0:22;
+	a_uint32_t  entry_path_id:10;
 };
 
 union l1_a_flow_entry_tbl_u {
@@ -1252,8 +1258,8 @@ union l1_a_flow_entry_tbl_u {
 	#define L1_B_FLOW_ENTRY_TBL_ENTRY_PATH_ID_DEFAULT 0x0
 
 struct l1_b_flow_entry_tbl {
-	a_uint32_t  entry_path_id:10;
 	a_uint32_t  _reserved0:22;
+	a_uint32_t  entry_path_id:10;
 };
 
 union l1_b_flow_entry_tbl_u {
@@ -1288,8 +1294,8 @@ struct l1_sp_entry_tbl {
 	a_uint32_t  entry_path_id_5:32;
 	a_uint32_t  entry_path_id_6:32;
 	a_uint32_t  entry_path_id_7:32;
-	a_uint32_t  entry_vld:16;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  entry_vld:16;
 };
 
 union l1_sp_entry_tbl_u {
@@ -1312,8 +1318,8 @@ union l1_sp_entry_tbl_u {
 	#define L1_ENS_Q_LL_TBL_NEXT_PTR_DEFAULT 0x0
 
 struct l1_ens_q_ll_tbl {
-	a_uint32_t  next_ptr:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  next_ptr:6;
 };
 
 union l1_ens_q_ll_tbl_u {
@@ -1345,10 +1351,10 @@ union l1_ens_q_ll_tbl_u {
 	#define L1_ENS_Q_HEAD_TBL_VLD_DEFAULT 0x0
 
 struct l1_ens_q_head_tbl {
-	a_uint32_t  tail:6;
-	a_uint32_t  head:6;
-	a_uint32_t  vld:1;
 	a_uint32_t  _reserved0:19;
+	a_uint32_t  vld:1;
+	a_uint32_t  head:6;
+	a_uint32_t  tail:6;
 };
 
 union l1_ens_q_head_tbl_u {
@@ -1380,10 +1386,10 @@ union l1_ens_q_head_tbl_u {
 	#define L1_ENS_Q_ENTRY_TBL_ENTRY_ENS_IN_Q_DEFAULT 0x0
 
 struct l1_ens_q_entry_tbl {
-	a_uint32_t  entry_ens_type:2;
-	a_uint32_t  entry_ens_vld:1;
-	a_uint32_t  entry_ens_in_q:1;
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  entry_ens_in_q:1;
+	a_uint32_t  entry_ens_vld:1;
+	a_uint32_t  entry_ens_type:2;
 };
 
 union l1_ens_q_entry_tbl_u {
@@ -1415,10 +1421,10 @@ union l1_ens_q_entry_tbl_u {
 	#define L1_FLOW_STATUS_TBL_EN_EDRR_DEFAULT 0x0
 
 struct l1_flow_status_tbl {
-	a_uint32_t  en_level:1;
-	a_uint32_t  en_cdrr:1;
-	a_uint32_t  en_edrr:1;
 	a_uint32_t  _reserved0:29;
+	a_uint32_t  en_edrr:1;
+	a_uint32_t  en_cdrr:1;
+	a_uint32_t  en_level:1;
 };
 
 union l1_flow_status_tbl_u {

@@ -14,9 +14,6 @@
  */
 
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "hppe_shaper_reg_be.h"
-#else
 /**
  * @defgroup
  * @{
@@ -38,8 +35,8 @@
 	#define SHP_SLOT_CFG_L0_L0_SHP_SLOT_TIME_DEFAULT 0x12c
 
 struct shp_slot_cfg_l0 {
-	a_uint32_t  l0_shp_slot_time:12;
 	a_uint32_t  _reserved0:20;
+	a_uint32_t  l0_shp_slot_time:12;
 };
 
 union shp_slot_cfg_l0_u {
@@ -61,8 +58,8 @@ union shp_slot_cfg_l0_u {
 	#define SHP_SLOT_CFG_L1_L1_SHP_SLOT_TIME_DEFAULT 0x40
 
 struct shp_slot_cfg_l1 {
-	a_uint32_t  l1_shp_slot_time:12;
 	a_uint32_t  _reserved0:20;
+	a_uint32_t  l1_shp_slot_time:12;
 };
 
 union shp_slot_cfg_l1_u {
@@ -84,8 +81,8 @@ union shp_slot_cfg_l1_u {
 	#define SHP_SLOT_CFG_PORT_PORT_SHP_SLOT_TIME_DEFAULT 0x8
 
 struct shp_slot_cfg_port {
-	a_uint32_t  port_shp_slot_time:12;
 	a_uint32_t  _reserved0:20;
+	a_uint32_t  port_shp_slot_time:12;
 };
 
 union shp_slot_cfg_port_u {
@@ -122,12 +119,12 @@ union shp_slot_cfg_port_u {
 	#define L0_SHP_CREDIT_TBL_E_SHAPER_CREDIT_NEG_DEFAULT 0x0
 
 struct l0_shp_credit_tbl {
-	a_uint32_t  c_shaper_credit:30;
-	a_uint32_t  c_shaper_credit_neg:1;
 	a_uint32_t  e_shaper_credit_0:1;
-	a_uint32_t  e_shaper_credit_1:29;
-	a_uint32_t  e_shaper_credit_neg:1;
+	a_uint32_t  c_shaper_credit_neg:1;
+	a_uint32_t  c_shaper_credit:30;
 	a_uint32_t  _reserved0:2;
+	a_uint32_t  e_shaper_credit_neg:1;
+	a_uint32_t  e_shaper_credit_1:29;
 };
 
 union l0_shp_credit_tbl_u {
@@ -216,25 +213,33 @@ union l0_shp_credit_tbl_u {
 #endif
 
 struct l0_shp_cfg_tbl {
-	a_uint32_t  cir:18;
 	a_uint32_t  cbs:14;
-	a_uint32_t  eir:18;
+	a_uint32_t  cir:18;
+
 	a_uint32_t  ebs:14;
-	a_uint32_t  token_unit:3;
-	a_uint32_t  meter_unit:1;
-	a_uint32_t  c_shaper_enable:1;
-	a_uint32_t  e_shaper_enable:1;
-	a_uint32_t  cf:1;
+	a_uint32_t  eir:18;
+
 #ifdef APPE
-	a_uint32_t  grp_cf:1;
-	a_uint32_t  grp_end:1;
-	a_uint32_t  shp_refresh_nxt_ptr:9;
-	a_uint32_t  cir_max_0:14;
-	a_uint32_t  cir_max_1:4;
-	a_uint32_t  eir_max:18;
-	a_uint32_t  _reserved0:10;
+	a_uint32_t	cir_max_0:14;
+	a_uint32_t	shp_refresh_nxt_ptr:9;
+	a_uint32_t	grp_end:1;
+	a_uint32_t	grp_cf:1;
+	a_uint32_t  cf:1;
+	a_uint32_t  e_shaper_enable:1;
+	a_uint32_t  c_shaper_enable:1;
+	a_uint32_t  meter_unit:1;
+	a_uint32_t  token_unit:3;
+
+	a_uint32_t	_reserved0:10;
+	a_uint32_t	eir_max:18;
+	a_uint32_t	cir_max_1:4;
 #else
 	a_uint32_t  _reserved0:25;
+	a_uint32_t  cf:1;
+	a_uint32_t  e_shaper_enable:1;
+	a_uint32_t  c_shaper_enable:1;
+	a_uint32_t  meter_unit:1;
+	a_uint32_t  token_unit:3;
 #endif
 };
 
@@ -316,20 +321,20 @@ union l0_shp_cfg_tbl_u {
 	#define L0_COMP_TBL_E_DRR_COMPENSATE_PKT_CNT_DEFAULT 0x0
 
 struct l0_comp_tbl {
-	a_uint32_t  c_shaper_compensate_byte_cnt:18;
-	a_uint32_t  c_shaper_compensate_byte_neg:1;
-	a_uint32_t  c_shaper_compensate_pkt_cnt:4;
 	a_uint32_t  c_drr_compensate_byte_cnt_0:9;
-	a_uint32_t  c_drr_compensate_byte_cnt_1:9;
-	a_uint32_t  c_drr_compensate_byte_neg:1;
-	a_uint32_t  c_drr_compensate_pkt_cnt:4;
+	a_uint32_t  c_shaper_compensate_pkt_cnt:4;
+	a_uint32_t  c_shaper_compensate_byte_neg:1;
+	a_uint32_t  c_shaper_compensate_byte_cnt:18;
 	a_uint32_t  e_shaper_compensate_byte_cnt:18;
-	a_uint32_t  e_shaper_compensate_byte_neg:1;
-	a_uint32_t  e_shaper_compensate_pkt_cnt:4;
-	a_uint32_t  e_drr_compensate_byte_cnt:18;
-	a_uint32_t  e_drr_compensate_byte_neg:1;
-	a_uint32_t  e_drr_compensate_pkt_cnt:4;
+	a_uint32_t  c_drr_compensate_pkt_cnt:4;
+	a_uint32_t  c_drr_compensate_byte_neg:1;
+	a_uint32_t  c_drr_compensate_byte_cnt_1:9;
 	a_uint32_t  _reserved0:4;
+	a_uint32_t  e_drr_compensate_pkt_cnt:4;
+	a_uint32_t  e_drr_compensate_byte_neg:1;
+	a_uint32_t  e_drr_compensate_byte_cnt:18;
+	a_uint32_t  e_shaper_compensate_pkt_cnt:4;
+	a_uint32_t  e_shaper_compensate_byte_neg:1;
 };
 
 union l0_comp_tbl_u {
@@ -356,9 +361,9 @@ union l0_comp_tbl_u {
 	#define L0_COMP_CFG_TBL_DRR_METER_LEN_DEFAULT 0x0
 
 struct l0_comp_cfg_tbl {
-	a_uint32_t  shaper_meter_len:2;
-	a_uint32_t  drr_meter_len:2;
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  drr_meter_len:2;
+	a_uint32_t  shaper_meter_len:2;
 };
 
 union l0_comp_cfg_tbl_u {
@@ -395,12 +400,12 @@ union l0_comp_cfg_tbl_u {
 	#define L1_SHP_CREDIT_TBL_E_SHAPER_CREDIT_NEG_DEFAULT 0x0
 
 struct l1_shp_credit_tbl {
-	a_uint32_t  c_shaper_credit:30;
-	a_uint32_t  c_shaper_credit_neg:1;
 	a_uint32_t  e_shaper_credit_0:1;
-	a_uint32_t  e_shaper_credit_1:29;
-	a_uint32_t  e_shaper_credit_neg:1;
+	a_uint32_t  c_shaper_credit_neg:1;
+	a_uint32_t  c_shaper_credit:30;
 	a_uint32_t  _reserved0:2;
+	a_uint32_t  e_shaper_credit_neg:1;
+	a_uint32_t  e_shaper_credit_1:29;
 };
 
 union l1_shp_credit_tbl_u {
@@ -489,25 +494,33 @@ union l1_shp_credit_tbl_u {
 #endif
 
 struct l1_shp_cfg_tbl {
-	a_uint32_t  cir:18;
 	a_uint32_t  cbs:14;
-	a_uint32_t  eir:18;
+	a_uint32_t  cir:18;
+
 	a_uint32_t  ebs:14;
-	a_uint32_t  token_unit:3;
-	a_uint32_t  meter_unit:1;
-	a_uint32_t  c_shaper_enable:1;
-	a_uint32_t  e_shaper_enable:1;
-	a_uint32_t  cf:1;
+	a_uint32_t  eir:18;
+
 #ifdef APPE
-	a_uint32_t  grp_cf:1;
-	a_uint32_t  grp_end:1;
-	a_uint32_t  shp_refresh_nxt_ptr:6;
-	a_uint32_t  cir_max_0:17;
-	a_uint32_t  cir_max_1:1;
-	a_uint32_t  eir_max:18;
-	a_uint32_t  _reserved0:13;
+	a_uint32_t	cir_max_0:17;
+	a_uint32_t	shp_refresh_nxt_ptr:6;
+	a_uint32_t	grp_end:1;
+	a_uint32_t	grp_cf:1;
+	a_uint32_t  cf:1;
+	a_uint32_t  e_shaper_enable:1;
+	a_uint32_t  c_shaper_enable:1;
+	a_uint32_t  meter_unit:1;
+	a_uint32_t  token_unit:3;
+
+	a_uint32_t	_reserved0:13;
+	a_uint32_t	eir_max:18;
+	a_uint32_t	cir_max_1:1;
 #else
-	a_uint32_t  _reserved0:25;
+	a_uint32_t	_reserved0:25;
+	a_uint32_t  cf:1;
+	a_uint32_t  e_shaper_enable:1;
+	a_uint32_t  c_shaper_enable:1;
+	a_uint32_t  meter_unit:1;
+	a_uint32_t  token_unit:3;
 #endif
 };
 
@@ -589,20 +602,22 @@ union l1_shp_cfg_tbl_u {
 	#define L1_COMP_TBL_E_DRR_COMPENSATE_PKT_CNT_DEFAULT 0x0
 
 struct l1_comp_tbl {
-	a_uint32_t  c_shaper_compensate_byte_cnt:18;
-	a_uint32_t  c_shaper_compensate_byte_neg:1;
-	a_uint32_t  c_shaper_compensate_pkt_cnt:4;
 	a_uint32_t  c_drr_compensate_byte_cnt_0:9;
-	a_uint32_t  c_drr_compensate_byte_cnt_1:9;
-	a_uint32_t  c_drr_compensate_byte_neg:1;
-	a_uint32_t  c_drr_compensate_pkt_cnt:4;
+	a_uint32_t  c_shaper_compensate_pkt_cnt:4;
+	a_uint32_t  c_shaper_compensate_byte_neg:1;
+	a_uint32_t  c_shaper_compensate_byte_cnt:18;
+
 	a_uint32_t  e_shaper_compensate_byte_cnt:18;
-	a_uint32_t  e_shaper_compensate_byte_neg:1;
-	a_uint32_t  e_shaper_compensate_pkt_cnt:4;
-	a_uint32_t  e_drr_compensate_byte_cnt:18;
-	a_uint32_t  e_drr_compensate_byte_neg:1;
-	a_uint32_t  e_drr_compensate_pkt_cnt:4;
+	a_uint32_t  c_drr_compensate_pkt_cnt:4;
+	a_uint32_t  c_drr_compensate_byte_neg:1;
+	a_uint32_t  c_drr_compensate_byte_cnt_1:9;
+
 	a_uint32_t  _reserved0:4;
+	a_uint32_t  e_drr_compensate_pkt_cnt:4;
+	a_uint32_t  e_drr_compensate_byte_neg:1;
+	a_uint32_t  e_drr_compensate_byte_cnt:18;
+	a_uint32_t  e_shaper_compensate_pkt_cnt:4;
+	a_uint32_t  e_shaper_compensate_byte_neg:1;
 };
 
 union l1_comp_tbl_u {
@@ -629,9 +644,9 @@ union l1_comp_tbl_u {
 	#define L1_COMP_CFG_TBL_DRR_METER_LEN_DEFAULT 0x0
 
 struct l1_comp_cfg_tbl {
-	a_uint32_t  shaper_meter_len:2;
-	a_uint32_t  drr_meter_len:2;
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  drr_meter_len:2;
+	a_uint32_t  shaper_meter_len:2;
 };
 
 union l1_comp_cfg_tbl_u {
@@ -653,8 +668,8 @@ union l1_comp_cfg_tbl_u {
 	#define PSCH_SHP_SIGN_TBL_SHAPER_CREDIT_NEG_DEFAULT 0x0
 
 struct psch_shp_sign_tbl {
-	a_uint32_t  shaper_credit_neg:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  shaper_credit_neg:1;
 };
 
 union psch_shp_sign_tbl_u {
@@ -676,8 +691,8 @@ union psch_shp_sign_tbl_u {
 	#define PSCH_SHP_CREDIT_TBL_SHAPER_CREDIT_DEFAULT 0x0
 
 struct psch_shp_credit_tbl {
-	a_uint32_t  shaper_credit:30;
 	a_uint32_t  _reserved0:2;
+	a_uint32_t  shaper_credit:30;
 };
 
 union psch_shp_credit_tbl_u {
@@ -719,12 +734,13 @@ union psch_shp_credit_tbl_u {
 	#define PSCH_SHP_CFG_TBL_SHAPER_ENABLE_DEFAULT 0x0
 
 struct psch_shp_cfg_tbl {
-	a_uint32_t  cir:18;
 	a_uint32_t  cbs:14;
-	a_uint32_t  token_unit:3;
-	a_uint32_t  meter_unit:1;
-	a_uint32_t  shaper_enable:1;
+	a_uint32_t  cir:18;
+
 	a_uint32_t  _reserved0:27;
+	a_uint32_t  shaper_enable:1;
+	a_uint32_t  meter_unit:1;
+	a_uint32_t  token_unit:3;
 };
 
 union psch_shp_cfg_tbl_u {
@@ -756,10 +772,10 @@ union psch_shp_cfg_tbl_u {
 	#define PSCH_COMP_TBL_SHAPER_COMPENSATE_PKT_CNT_DEFAULT 0x0
 
 struct psch_comp_tbl {
-	a_uint32_t  shaper_compensate_byte_cnt:18;
-	a_uint32_t  shaper_compensate_byte_neg:1;
-	a_uint32_t  shaper_compensate_pkt_cnt:4;
 	a_uint32_t  _reserved0:9;
+	a_uint32_t  shaper_compensate_pkt_cnt:4;
+	a_uint32_t  shaper_compensate_byte_neg:1;
+	a_uint32_t  shaper_compensate_byte_cnt:18;
 };
 
 union psch_comp_tbl_u {
@@ -781,8 +797,8 @@ union psch_comp_tbl_u {
 	#define PSCH_COMP_CFG_TBL_SHAPER_METER_LEN_DEFAULT 0x0
 
 struct psch_comp_cfg_tbl {
-	a_uint32_t  shaper_meter_len:2;
 	a_uint32_t  _reserved0:30;
+	a_uint32_t  shaper_meter_len:2;
 };
 
 union psch_comp_cfg_tbl_u {
@@ -804,8 +820,8 @@ union psch_comp_cfg_tbl_u {
 	#define IPG_PRE_LEN_CFG_IPG_PRE_LEN_DEFAULT 0x0
 
 struct ipg_pre_len_cfg {
-	a_uint32_t  ipg_pre_len:5;
 	a_uint32_t  _reserved0:27;
+	a_uint32_t  ipg_pre_len:5;
 };
 
 union ipg_pre_len_cfg_u {
@@ -813,5 +829,4 @@ union ipg_pre_len_cfg_u {
 	struct ipg_pre_len_cfg bf;
 };
 
-#endif
 #endif

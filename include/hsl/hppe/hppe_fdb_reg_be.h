@@ -825,16 +825,18 @@ union rfdb_tbl_u {
 
 struct fdb_tbl {
 	a_uint32_t  mac_addr_0:32;
-	a_uint32_t  mac_addr_1:16;
-	a_uint32_t  entry_valid:1;
-	a_uint32_t  lookup_valid:1;
-	a_uint32_t  vsi:6;
+
 	a_uint32_t  dst_info_0:8;
-	a_uint32_t  dst_info_1:6;
-	a_uint32_t  sa_cmd:2;
-	a_uint32_t  da_cmd:2;
-	a_uint32_t  hit_age:2;
+	a_uint32_t  vsi:6;
+	a_uint32_t  lookup_valid:1;
+	a_uint32_t  entry_valid:1;
+	a_uint32_t  mac_addr_1:16;
+
 	a_uint32_t  _reserved0:20;
+	a_uint32_t  hit_age:2;
+	a_uint32_t  da_cmd:2;
+	a_uint32_t  sa_cmd:2;
+	a_uint32_t  dst_info_1:6;
 };
 #else
 	/*[field] VSI*/

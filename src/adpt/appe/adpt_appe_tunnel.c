@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1783,6 +1783,7 @@ adpt_appe_tunnel_encap_entry_add(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	union eg_xlat_tun_ctrl_u eg_xlat_tun_ctrl;
 	union eg_header_data_u eg_header_data;
+	a_uint32_t idx = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(tunnel_encap_cfg);
@@ -1833,6 +1834,10 @@ adpt_appe_tunnel_encap_entry_add(a_uint32_t dev_id,
 
 	aos_mem_copy(eg_header_data.val, tunnel_encap_cfg->pkt_header.pkt_header_data,
 			sizeof(union eg_header_data_u));
+	/* fix big endian issue */
+	for (idx = 0; idx < ARRAY_SIZE(eg_header_data.val); idx++) {
+		le32_to_cpus(&eg_header_data.val[idx]);
+	}
 
 	rv = appe_eg_xlat_tun_ctrl_set(dev_id, tunnel_id, &eg_xlat_tun_ctrl);
 	SW_RTN_ON_ERROR(rv);
@@ -1872,6 +1877,7 @@ adpt_appe_tunnel_encap_entry_get(a_uint32_t dev_id,
 	sw_error_t rv = SW_OK;
 	union eg_xlat_tun_ctrl_u eg_xlat_tun_ctrl;
 	union eg_header_data_u eg_header_data;
+	a_uint32_t idx = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(tunnel_encap_cfg);
@@ -1920,6 +1926,10 @@ adpt_appe_tunnel_encap_entry_get(a_uint32_t dev_id,
 	tunnel_encap_cfg->mapt_udp_csm0_keep = eg_xlat_tun_ctrl.bf.mapt_udp_csm0_dis;
 #endif
 
+	/* fix big endian issue */
+	for (idx = 0; idx < ARRAY_SIZE(eg_header_data.val); idx++) {
+		cpu_to_le32s(&eg_header_data.val[idx]);
+	}
 	aos_mem_copy(tunnel_encap_cfg->pkt_header.pkt_header_data, eg_header_data.val,
 			sizeof(union eg_header_data_u));
 

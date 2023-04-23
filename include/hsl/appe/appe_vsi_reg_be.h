@@ -15,9 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_vsi_reg_be.h"
-#else
 #ifndef APPE_VSI_REG_H
 #define APPE_VSI_REG_H
 
@@ -88,14 +85,13 @@ struct vsi_remap_tbl {
 	a_uint32_t  member_port_bitmap_5:32;
 	a_uint32_t  member_port_bitmap_6:32;
 	a_uint32_t  member_port_bitmap_7:32;
-	a_uint32_t  vsi_remap_en:1;
-	a_uint32_t  br_vsi:6;
 	a_uint32_t  _reserved0:25;
+	a_uint32_t  br_vsi:6;
+	a_uint32_t  vsi_remap_en:1;
 };
 
 union vsi_remap_tbl_u {
 	a_uint32_t val[9];
 	struct vsi_remap_tbl bf;
 };
-#endif
 #endif

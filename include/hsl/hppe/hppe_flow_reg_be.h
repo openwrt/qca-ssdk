@@ -688,11 +688,11 @@ union flow_host_tbl_rd_op_data_u {
 	#define IN_FLOW_TBL_RD_OP_RSLT_VALID_CNT_DEFAULT 0x0
 
 struct in_flow_tbl_rd_op_rslt {
-	a_uint32_t  cmd_id:4;
-	a_uint32_t  op_rslt:1;
-	a_uint32_t  flow_entry_index:12;
-	a_uint32_t  valid_cnt:4;
 	a_uint32_t  _reserved0:11;
+	a_uint32_t  valid_cnt:4;
+	a_uint32_t  flow_entry_index:12;
+	a_uint32_t  op_rslt:1;
+	a_uint32_t  cmd_id:4;
 };
 
 union in_flow_tbl_rd_op_rslt_u {
@@ -2135,9 +2135,9 @@ struct in_flow_ipv6_3tuple_tbl_0 {
 	a_uint32_t  port_vp2:8;
 
 #if defined(APPE)
-	a_uint32_t  vpn_id:8;
-	a_uint32_t  pmtu_check_type:1;
 	a_uint32_t  pmtu_0:11;
+	a_uint32_t  pmtu_check_type:1;
+	a_uint32_t  vpn_id:8;
         a_uint32_t  service_code:8;
         a_uint32_t  pri_profile_1:4;
 

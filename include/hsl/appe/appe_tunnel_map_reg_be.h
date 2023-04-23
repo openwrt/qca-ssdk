@@ -15,9 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_tunnel_map_reg_be.h"
-#else
+
 /**
  * @defgroup
  * @{
@@ -46,8 +44,8 @@
 struct tl_map_lpm_counter {
 	a_uint32_t  pkt_cnt:32;
 	a_uint32_t  byte_cnt_0:32;
-	a_uint32_t  byte_cnt_1:8;
 	a_uint32_t  _reserved0:24;
+	a_uint32_t  byte_cnt_1:8;
 };
 
 union tl_map_lpm_counter_u {
@@ -130,20 +128,20 @@ union tl_map_lpm_counter_u {
 
 struct tl_map_rule_tbl {
 	a_uint32_t  src1:32;
-	a_uint32_t  src2:2;
-	a_uint32_t  start2_suffix:7;
-	a_uint32_t  width2_suffix:5;
-	a_uint32_t  pos2_suffix:5;
-	a_uint32_t  src2_valid:1;
-	a_uint32_t  start2_psid:7;
-	a_uint32_t  width2_psid:4;
 	a_uint32_t  src3_0:1;
-	a_uint32_t  src3_1:1;
-	a_uint32_t  start3_psid:4;
-	a_uint32_t  width3_psid:4;
-	a_uint32_t  src3_valid:1;
-	a_uint32_t  check_en:1;
+	a_uint32_t  width2_psid:4;
+	a_uint32_t  start2_psid:7;
+	a_uint32_t  src2_valid:1;
+	a_uint32_t  pos2_suffix:5;
+	a_uint32_t  width2_suffix:5;
+	a_uint32_t  start2_suffix:7;
+	a_uint32_t  src2:2;
 	a_uint32_t  _reserved0:21;
+	a_uint32_t  check_en:1;
+	a_uint32_t  src3_valid:1;
+	a_uint32_t  width3_psid:4;
+	a_uint32_t  start3_psid:4;
+	a_uint32_t  src3_1:1;
 };
 
 union tl_map_rule_tbl_u {
@@ -179,9 +177,9 @@ struct tl_map_lpm_tbl {
 	a_uint32_t  ipv6_addr_1:32;
 	a_uint32_t  ipv6_addr_2:32;
 	a_uint32_t  ipv6_addr_3:32;
-	a_uint32_t  prefix_len:8;
-	a_uint32_t  valid:1;
 	a_uint32_t  _reserved0:23;
+	a_uint32_t  valid:1;
+	a_uint32_t  prefix_len:8;
 };
 
 union tl_map_lpm_tbl_u {
@@ -280,32 +278,31 @@ union tl_map_lpm_tbl_u {
 #endif
 
 struct tl_map_lpm_act {
-	a_uint32_t  map_rule_id:5;
-	a_uint32_t  ip_to_me:1;
-	a_uint32_t  svlan_fmt:1;
-	a_uint32_t  svlan_id:12;
-	a_uint32_t  cvlan_fmt:1;
 	a_uint32_t  cvlan_id:12;
-	a_uint32_t  svlan_check_en:1;
-	a_uint32_t  cvlan_check_en:1;
-	a_uint32_t  tl_l3_if_check_en:1;
-	a_uint32_t  tl_l3_if:7;
-	a_uint32_t  src_info_valid:1;
-	a_uint32_t  src_info_type:1;
-	a_uint32_t  src_info:8;
-	a_uint32_t  exp_profile:2;
+	a_uint32_t  cvlan_fmt:1;
+	a_uint32_t  svlan_id:12;
+	a_uint32_t  svlan_fmt:1;
+	a_uint32_t  ip_to_me:1;
+	a_uint32_t  map_rule_id:5;
 #if defined(MPPE)
-	a_uint32_t  service_code:8;
-	a_uint32_t  service_code_en:1;
 	a_uint32_t  _reserved0:1;
+	a_uint32_t  service_code_en:1;
+	a_uint32_t  service_code:8;
 #else
 	a_uint32_t  _reserved0:10;
 #endif
+	a_uint32_t  exp_profile:2;
+	a_uint32_t  src_info:8;
+	a_uint32_t  src_info_type:1;
+	a_uint32_t  src_info_valid:1;
+	a_uint32_t  tl_l3_if:7;
+	a_uint32_t  tl_l3_if_check_en:1;
+	a_uint32_t  cvlan_check_en:1;
+	a_uint32_t  svlan_check_en:1;
 };
 
 union tl_map_lpm_act_u {
 	a_uint32_t val[2];
 	struct tl_map_lpm_act bf;
 };
-#endif
 #endif

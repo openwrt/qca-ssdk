@@ -790,16 +790,18 @@ sw_error_t
 adpt_hppe_egress_tpid_get(a_uint32_t dev_id, fal_tpid_t *tpid)
 {
 	sw_error_t rtn = SW_OK;
+	a_uint32_t tmp = 0;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(tpid);
 
-	rtn = hppe_eg_vlan_tpid_ctpid_get(dev_id,
-			(a_uint32_t *)&tpid->ctpid);
+	rtn = hppe_eg_vlan_tpid_ctpid_get(dev_id, &tmp);
 	SW_RTN_ON_ERROR(rtn);
+	tpid->ctpid = tmp;
 
-	rtn = hppe_eg_vlan_tpid_stpid_get(dev_id,
-			(a_uint32_t *)&tpid->stpid);
+	rtn = hppe_eg_vlan_tpid_stpid_get(dev_id, &tmp);
+	SW_RTN_ON_ERROR(rtn);
+	tpid->stpid = tmp;
 
 	return rtn;
 }
@@ -1693,37 +1695,38 @@ adpt_hppe_port_default_vlantag_get(a_uint32_t dev_id,
 		} else
 #endif
 		if (ADPT_IS_PPORT(port_id)) {
-			rtn = hppe_port_def_vid_port_def_cvid_en_get(dev_id, port_value,
-					(a_uint32_t *)&default_vid_en->default_cvid_en);
+			a_uint32_t tmp = 0;
+			rtn = hppe_port_def_vid_port_def_cvid_en_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_vid_en->default_cvid_en = tmp;
 
-			rtn = hppe_port_def_vid_port_def_svid_en_get(dev_id, port_value,
-					(a_uint32_t *)&default_vid_en->default_svid_en);
+			rtn = hppe_port_def_vid_port_def_svid_en_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_vid_en->default_svid_en = tmp;
 
-			rtn = hppe_port_def_vid_port_def_cvid_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->cvid);
+			rtn = hppe_port_def_vid_port_def_cvid_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->cvid = tmp;
 
-			rtn = hppe_port_def_vid_port_def_svid_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->svid);
+			rtn = hppe_port_def_vid_port_def_svid_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->svid = tmp;
 
-			rtn = hppe_port_def_pcp_port_def_cpcp_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->cpri);
+			rtn = hppe_port_def_pcp_port_def_cpcp_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->cpri = tmp;
 
-			rtn = hppe_port_def_pcp_port_def_spcp_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->spri);
+			rtn = hppe_port_def_pcp_port_def_spcp_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->spri = tmp;
 
-			rtn = hppe_port_def_pcp_port_def_cdei_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->cdei);
+			rtn = hppe_port_def_pcp_port_def_cdei_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->cdei = tmp;
 
-			rtn = hppe_port_def_pcp_port_def_sdei_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->sdei);
+			rtn = hppe_port_def_pcp_port_def_sdei_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->sdei = tmp;
 		}
 	}
 	else if (direction == FAL_PORT_VLAN_EGRESS) {
@@ -1742,22 +1745,23 @@ adpt_hppe_port_default_vlantag_get(a_uint32_t dev_id,
 		} else
 #endif
 		if (ADPT_IS_PPORT(port_id)) {
+			a_uint32_t tmp = 0;
 
-			rtn = hppe_port_eg_def_vid_port_def_cvid_en_get(dev_id, port_value,
-					(a_uint32_t *)&default_vid_en->default_cvid_en);
+			rtn = hppe_port_eg_def_vid_port_def_cvid_en_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_vid_en->default_cvid_en = tmp;
 
-			rtn = hppe_port_eg_def_vid_port_def_svid_en_get(dev_id, port_value,
-					(a_uint32_t *)&default_vid_en->default_svid_en);
+			rtn = hppe_port_eg_def_vid_port_def_svid_en_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_vid_en->default_svid_en = tmp;
 
-			rtn = hppe_port_eg_def_vid_port_def_cvid_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->cvid);
+			rtn = hppe_port_eg_def_vid_port_def_cvid_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->cvid = tmp;
 
-			rtn = hppe_port_eg_def_vid_port_def_svid_get(dev_id, port_value,
-					(a_uint32_t *)&default_tag->svid);
+			rtn = hppe_port_eg_def_vid_port_def_svid_get(dev_id, port_value, &tmp);
 			SW_RTN_ON_ERROR(rtn);
+			default_tag->svid = tmp;
 		}
 	}
 	else

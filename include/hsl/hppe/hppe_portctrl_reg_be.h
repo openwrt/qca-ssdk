@@ -113,9 +113,9 @@ union mac_speed_u {
 	#define GOL_MAC_ADDR0_MAC_ADDR_BYTE5_DEFAULT 0x0
 
 struct gol_mac_addr0 {
-	a_uint32_t  mac_addr_byte4:8;
-	a_uint32_t  mac_addr_byte5:8;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  mac_addr_byte5:8;
+	a_uint32_t  mac_addr_byte4:8;
 };
 
 union gol_mac_addr0_u {
@@ -152,10 +152,10 @@ union gol_mac_addr0_u {
 	#define GOL_MAC_ADDR1_MAC_ADDR_BYTE0_DEFAULT 0x0
 
 struct gol_mac_addr1 {
-	a_uint32_t  mac_addr_byte3:8;
-	a_uint32_t  mac_addr_byte2:8;
-	a_uint32_t  mac_addr_byte1:8;
 	a_uint32_t  mac_addr_byte0:8;
+	a_uint32_t  mac_addr_byte1:8;
+	a_uint32_t  mac_addr_byte2:8;
+	a_uint32_t  mac_addr_byte3:8;
 };
 
 union gol_mac_addr1_u {
@@ -455,14 +455,14 @@ union mac_ctrl2_u {
 	#define MAC_DBG_CTRL_EDXSDFR_TRANSMIT_EN_DEFAULT 0x1
 
 struct mac_dbg_ctrl {
-	a_uint32_t  ipgr1:7;
-	a_uint32_t  _reserved0:1;
-	a_uint32_t  hihg_ipg:8;
-	a_uint32_t  _reserved1:4;
-	a_uint32_t  mac_ipg_ctrl:4;
-	a_uint32_t  _reserved2:6;
-	a_uint32_t  mac_len_ctrl:1;
 	a_uint32_t  edxsdfr_transmit_en:1;
+	a_uint32_t  mac_len_ctrl:1;
+	a_uint32_t  _reserved2:6;
+	a_uint32_t  mac_ipg_ctrl:4;
+	a_uint32_t  _reserved1:4;
+	a_uint32_t  hihg_ipg:8;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  ipgr1:7;
 };
 
 union mac_dbg_ctrl_u {
@@ -1270,8 +1270,8 @@ union ipr_byte_high_reg_u {
 	#define LINK_OAM_CTRL_LOOPBACK_STATE_DEFAULT 0x0
 
 struct link_oam_ctrl {
-	a_uint32_t  loopback_state:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  loopback_state:1;
 };
 
 union link_oam_ctrl_u {

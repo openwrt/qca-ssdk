@@ -178,8 +178,8 @@ union app_ctrl_u {
 	#define L2_CPU_CODE_CTRL_EXCEPTION_FMT_CTRL_EN_DEFAULT 0x0
 
 struct l2_cpu_code_ctrl {
-	a_uint32_t  exception_fmt_ctrl_en:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  exception_fmt_ctrl_en:1;
 };
 
 union l2_cpu_code_ctrl_u {

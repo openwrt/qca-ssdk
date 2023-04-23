@@ -15,9 +15,6 @@
  */
 
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "hppe_mirror_reg_be.h"
-#else
 /**
  * @defgroup
  * @{
@@ -44,10 +41,10 @@
 	#define MIRROR_ANALYZER_EG_ANALYZER_PORT_DEFAULT 0x0
 
 struct mirror_analyzer {
-	a_uint32_t  in_analyzer_port:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  eg_analyzer_port:6;
 	a_uint32_t  _reserved1:18;
+	a_uint32_t  eg_analyzer_port:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  in_analyzer_port:6;
 };
 
 union mirror_analyzer_u {
@@ -74,9 +71,9 @@ union mirror_analyzer_u {
 	#define PORT_MIRROR_EG_MIRR_EN_DEFAULT 0x0
 
 struct port_mirror {
-	a_uint32_t  in_mirr_en:1;
-	a_uint32_t  eg_mirr_en:1;
 	a_uint32_t  _reserved0:30;
+	a_uint32_t  eg_mirr_en:1;
+	a_uint32_t  in_mirr_en:1;
 };
 
 union port_mirror_u {
@@ -86,5 +83,3 @@ union port_mirror_u {
 
 
 #endif
-#endif
-

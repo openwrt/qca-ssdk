@@ -77,8 +77,8 @@ union port_parsing_reg_u {
 	#define EDMA_VLAN_TPID_REG_CTAG_TPID_DEFAULT 0x8100
 
 struct edma_vlan_tpid_reg {
-	a_uint32_t  stag_tpid:16;
 	a_uint32_t  ctag_tpid:16;
+	a_uint32_t  stag_tpid:16;
 };
 
 union edma_vlan_tpid_reg_u {
@@ -534,96 +534,105 @@ union eco_reserve_u {
 
 #if defined(APPE)
 struct xlt_rule_tbl_2 {
-	a_uint32_t  valid:1;
-	a_uint32_t  vp_profile:8;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
-	a_uint32_t  skey_vid:12;
-	a_uint32_t  skey_pcp_incl:1;
-	a_uint32_t  skey_pcp:3;
-	a_uint32_t  skey_dei_incl:1;
-	a_uint32_t  skey_dei:1;
 	a_uint32_t  ckey_fmt_0:1;
-	a_uint32_t  ckey_fmt_1:2;
-	a_uint32_t  ckey_vid_incl:1;
-	a_uint32_t  ckey_vid:12;
-	a_uint32_t  ckey_pcp_incl:1;
-	a_uint32_t  ckey_pcp:3;
-	a_uint32_t  ckey_dei_incl:1;
-	a_uint32_t  ckey_dei:1;
-	a_uint32_t  frm_type_incl:1;
-	a_uint32_t  frm_type:2;
-	a_uint32_t  prot_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  vp_profile:8;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  prot_value_0:7;
-	a_uint32_t  prot_value_1:9;
-	a_uint32_t  port_type:2;
-	a_uint32_t  vni_resv_incl:1;
-	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  prot_incl:1;
+	a_uint32_t  frm_type:2;
+	a_uint32_t  frm_type_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt_1:2;
+
 	a_uint32_t  vni_resv_0:19;
-	a_uint32_t  vni_resv_1:13;
+	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  vni_resv_incl:1;
+	a_uint32_t  port_type:2;
+	a_uint32_t  prot_value_1:9;
+
 	a_uint32_t  _reserved0:19;
+	a_uint32_t  vni_resv_1:13;
 };
 
 struct xlt_rule_tbl_1 {
-	a_uint32_t  valid:1;
-	a_uint32_t  port_vp_id:8;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
-	a_uint32_t  skey_vid:12;
-	a_uint32_t  skey_pcp_incl:1;
-	a_uint32_t  skey_pcp:3;
-	a_uint32_t  skey_dei_incl:1;
-	a_uint32_t  skey_dei:1;
 	a_uint32_t  ckey_fmt_0:1;
-	a_uint32_t  ckey_fmt_1:2;
-	a_uint32_t  ckey_vid_incl:1;
-	a_uint32_t  ckey_vid:12;
-	a_uint32_t  ckey_pcp_incl:1;
-	a_uint32_t  ckey_pcp:3;
-	a_uint32_t  ckey_dei_incl:1;
-	a_uint32_t  ckey_dei:1;
-	a_uint32_t  frm_type_incl:1;
-	a_uint32_t  frm_type:2;
-	a_uint32_t  prot_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  port_vp_id:8;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  prot_value_0:7;
-	a_uint32_t  prot_value_1:9;
-	a_uint32_t  port_type:2;
-	a_uint32_t  vni_resv_incl:1;
-	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  prot_incl:1;
+	a_uint32_t  frm_type:2;
+	a_uint32_t  frm_type_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt_1:2;
+
 	a_uint32_t  vni_resv_0:19;
-	a_uint32_t  vni_resv_1:13;
+	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  vni_resv_incl:1;
+	a_uint32_t  port_type:2;
+	a_uint32_t  prot_value_1:9;
+
 	a_uint32_t  _reserved0:19;
+	a_uint32_t  vni_resv_1:13;
 };
 
 struct xlt_rule_tbl {
-	a_uint32_t  valid:1;
-	a_uint32_t  port_bitmap:8;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
-	a_uint32_t  skey_vid:12;
-	a_uint32_t  skey_pcp_incl:1;
-	a_uint32_t  skey_pcp:3;
-	a_uint32_t  skey_dei_incl:1;
-	a_uint32_t  skey_dei:1;
 	a_uint32_t  ckey_fmt_0:1;
-	a_uint32_t  ckey_fmt_1:2;
-	a_uint32_t  ckey_vid_incl:1;
-	a_uint32_t  ckey_vid:12;
-	a_uint32_t  ckey_pcp_incl:1;
-	a_uint32_t  ckey_pcp:3;
-	a_uint32_t  ckey_dei_incl:1;
-	a_uint32_t  ckey_dei:1;
-	a_uint32_t  frm_type_incl:1;
-	a_uint32_t  frm_type:2;
-	a_uint32_t  prot_incl:1;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  prot_value_0:7;
-	a_uint32_t  prot_value_1:9;
-	a_uint32_t  port_type:2;
-	a_uint32_t  vni_resv_incl:1;
-	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  prot_incl:1;
+	a_uint32_t  frm_type:2;
+	a_uint32_t  frm_type_incl:1;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt_1:2;
+
 	a_uint32_t  vni_resv_0:19;
-	a_uint32_t  vni_resv_1:13;
+	a_uint32_t  vni_resv_type:1;
+	a_uint32_t  vni_resv_incl:1;
+	a_uint32_t  port_type:2;
+	a_uint32_t  prot_value_1:9;
+
 	a_uint32_t  _reserved0:19;
+	a_uint32_t  vni_resv_1:13;
 };
 
 union xlt_rule_tbl_u {
@@ -975,28 +984,29 @@ union xlt_action_tbl_u {
 	#define EG_VLAN_XLT_RULE_PORT_TYPE_DEFAULT 0x0
 
 struct eg_vlan_xlt_rule {
-	a_uint32_t  valid:1;
-	a_uint32_t  port_bitmap:8;
-	a_uint32_t  vsi_incl:1;
-	a_uint32_t  vsi:6;
-	a_uint32_t  vsi_valid:1;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
 	a_uint32_t  skey_vid_0:11;
-	a_uint32_t  skey_vid_1:1;
-	a_uint32_t  skey_pcp_incl:1;
-	a_uint32_t  skey_pcp:3;
-	a_uint32_t  skey_dei_incl:1;
-	a_uint32_t  skey_dei:1;
-	a_uint32_t  ckey_fmt:3;
-	a_uint32_t  ckey_vid_incl:1;
-	a_uint32_t  ckey_vid:12;
-	a_uint32_t  ckey_pcp_incl:1;
-	a_uint32_t  ckey_pcp:3;
-	a_uint32_t  ckey_dei_incl:1;
-	a_uint32_t  ckey_dei:1;
-	a_uint32_t  port_type:2;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  vsi_valid:1;
+	a_uint32_t  vsi:6;
+	a_uint32_t  vsi_incl:1;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0:1;
+	a_uint32_t  port_type:2;
+	a_uint32_t  ckey_dei:1;
+	a_uint32_t  ckey_dei_incl:1;
+	a_uint32_t  ckey_pcp:3;
+	a_uint32_t  ckey_pcp_incl:1;
+	a_uint32_t  ckey_vid:12;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  skey_dei:1;
+	a_uint32_t  skey_dei_incl:1;
+	a_uint32_t  skey_pcp:3;
+	a_uint32_t  skey_pcp_incl:1;
+	a_uint32_t  skey_vid_1:1;
 };
 
 union eg_vlan_xlt_rule_u {
@@ -1307,8 +1317,8 @@ union port_eg_vlan_u {
 	#define EG_VLAN_TPID_CTPID_DEFAULT 0x8100
 
 struct eg_vlan_tpid {
-        a_uint32_t  stpid:16;
 	a_uint32_t  ctpid:16;
+    a_uint32_t  stpid:16;
 };
 
 union eg_vlan_tpid_u {

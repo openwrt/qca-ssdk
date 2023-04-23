@@ -535,28 +535,28 @@ union mcast_priority_map7_u {
 	#define AGG_PROFILE_CNT_EN_GLOBAL_EN_DEFAULT 0x0
 
 struct agg_profile_cnt_en {
-	a_uint32_t  uq_en_0:1;
-	a_uint32_t  uq_en_1:1;
-	a_uint32_t  uq_en_2:1;
-	a_uint32_t  uq_en_3:1;
-	a_uint32_t  uq_en_4:1;
-	a_uint32_t  uq_en_5:1;
-	a_uint32_t  uq_en_6:1;
-	a_uint32_t  uq_en_7:1;
-	a_uint32_t  mq_p0_en:1;
-	a_uint32_t  mq_p1_en:1;
-	a_uint32_t  mq_p2_en:1;
-	a_uint32_t  mq_p3_en:1;
-	a_uint32_t  mq_p4_en:1;
-	a_uint32_t  mq_p5_en:1;
-	a_uint32_t  mq_p6_en:1;
-	a_uint32_t  mq_p7_en:1;
-	a_uint32_t  grp_0_en:1;
-	a_uint32_t  grp_1_en:1;
-	a_uint32_t  grp_2_en:1;
-	a_uint32_t  grp_3_en:1;
-	a_uint32_t  _reserved0:11;
 	a_uint32_t  global_en:1;
+	a_uint32_t  _reserved0:11;
+	a_uint32_t  grp_3_en:1;
+	a_uint32_t  grp_2_en:1;
+	a_uint32_t  grp_1_en:1;
+	a_uint32_t  grp_0_en:1;
+	a_uint32_t  mq_p7_en:1;
+	a_uint32_t  mq_p6_en:1;
+	a_uint32_t  mq_p5_en:1;
+	a_uint32_t  mq_p4_en:1;
+	a_uint32_t  mq_p3_en:1;
+	a_uint32_t  mq_p2_en:1;
+	a_uint32_t  mq_p1_en:1;
+	a_uint32_t  mq_p0_en:1;
+	a_uint32_t  uq_en_7:1;
+	a_uint32_t  uq_en_6:1;
+	a_uint32_t  uq_en_5:1;
+	a_uint32_t  uq_en_4:1;
+	a_uint32_t  uq_en_3:1;
+	a_uint32_t  uq_en_2:1;
+	a_uint32_t  uq_en_1:1;
+	a_uint32_t  uq_en_0:1;
 };
 
 union agg_profile_cnt_en_u {
@@ -578,8 +578,8 @@ union agg_profile_cnt_en_u {
 	#define UQ_AGG_PROFILE_CFG_TH_CFG_DEFAULT 0x0
 
 struct uq_agg_profile_cfg {
-	a_uint32_t  th_cfg:11;
 	a_uint32_t  _reserved0:21;
+	a_uint32_t  th_cfg:11;
 };
 
 union uq_agg_profile_cfg_u {
@@ -601,8 +601,8 @@ union uq_agg_profile_cfg_u {
 	#define MQ_AGG_PROFILE_CFG_TH_CFG_DEFAULT 0x0
 
 struct mq_agg_profile_cfg {
-	a_uint32_t  th_cfg:11;
 	a_uint32_t  _reserved0:21;
+	a_uint32_t  th_cfg:11;
 };
 
 union mq_agg_profile_cfg_u {
@@ -624,8 +624,8 @@ union mq_agg_profile_cfg_u {
 	#define GRP_AGG_PROFILE_CFG_TH_CFG_DEFAULT 0x0
 
 struct grp_agg_profile_cfg {
-	a_uint32_t  th_cfg:11;
 	a_uint32_t  _reserved0:21;
+	a_uint32_t  th_cfg:11;
 };
 
 union grp_agg_profile_cfg_u {
@@ -879,8 +879,8 @@ union mcast_queue_map_tbl_u {
 	#define AC_MSEQ_TBL_AC_MSEQ_DEFAULT 0x0
 
 struct ac_mseq_tbl {
-	a_uint32_t  ac_mseq:15;
 	a_uint32_t  _reserved0:17;
+	a_uint32_t  ac_mseq:15;
 };
 
 union ac_mseq_tbl_u {
@@ -1485,10 +1485,10 @@ union oq_deq_opr_tbl_u {
 	#define OQ_HEAD_UNI_TBL_HEAD_DEFAULT 0x0
 
 struct oq_head_uni_tbl {
-	a_uint32_t  empty:1;
-	a_uint32_t  tail:11;
-	a_uint32_t  head:11;
 	a_uint32_t  _reserved0:9;
+	a_uint32_t  head:11;
+	a_uint32_t  tail:11;
+	a_uint32_t  empty:1;
 };
 
 union oq_head_uni_tbl_u {
@@ -1535,13 +1535,13 @@ union oq_head_uni_tbl_u {
 	#define OQ_HEAD_MUL_TBL_HEAD_DEFAULT 0x0
 
 struct oq_head_mul_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  empty:1;
-	a_uint32_t  tail:11;
-	a_uint32_t  head:11;
 	a_uint32_t  _reserved0:6;
+	a_uint32_t  head:11;
+	a_uint32_t  tail:11;
+	a_uint32_t  empty:1;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_head_mul_tbl_u {
@@ -1563,8 +1563,8 @@ union oq_head_mul_tbl_u {
 	#define OQ_LL_UNI_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_uni_tbl {
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:21;
+	a_uint32_t  next_pointer:11;
 };
 
 union oq_ll_uni_tbl_u {
@@ -1601,11 +1601,11 @@ union oq_ll_uni_tbl_u {
 	#define OQ_LL_MUL_P0_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p0_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p0_tbl_u {
@@ -1642,11 +1642,11 @@ union oq_ll_mul_p0_tbl_u {
 	#define OQ_LL_MUL_P1_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p1_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p1_tbl_u {
@@ -1683,11 +1683,11 @@ union oq_ll_mul_p1_tbl_u {
 	#define OQ_LL_MUL_P2_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p2_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p2_tbl_u {
@@ -1724,11 +1724,11 @@ union oq_ll_mul_p2_tbl_u {
 	#define OQ_LL_MUL_P3_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p3_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p3_tbl_u {
@@ -1765,11 +1765,11 @@ union oq_ll_mul_p3_tbl_u {
 	#define OQ_LL_MUL_P4_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p4_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p4_tbl_u {
@@ -1806,11 +1806,11 @@ union oq_ll_mul_p4_tbl_u {
 	#define OQ_LL_MUL_P5_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p5_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p5_tbl_u {
@@ -1847,11 +1847,11 @@ union oq_ll_mul_p5_tbl_u {
 	#define OQ_LL_MUL_P6_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p6_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p6_tbl_u {
@@ -1888,11 +1888,11 @@ union oq_ll_mul_p6_tbl_u {
 	#define OQ_LL_MUL_P7_TBL_NEXT_POINTER_DEFAULT 0x0
 
 struct oq_ll_mul_p7_tbl {
-	a_uint32_t  normal_fwd:1;
-	a_uint32_t  egress_mirr:1;
-	a_uint32_t  ingress_mirr:1;
-	a_uint32_t  next_pointer:11;
 	a_uint32_t  _reserved0:18;
+	a_uint32_t  next_pointer:11;
+	a_uint32_t  ingress_mirr:1;
+	a_uint32_t  egress_mirr:1;
+	a_uint32_t  normal_fwd:1;
 };
 
 union oq_ll_mul_p7_tbl_u {
@@ -2254,167 +2254,191 @@ union oq_ll_mul_p7_tbl_u {
 	#define PKT_DESP_TBL_FC_EN_DEFAULT 0x0
 
 struct pkt_desp_tbl_0 {
-	a_uint32_t  org_src_port_vp:12;
-	a_uint32_t  src_port_vp:12;
 	a_uint32_t  packet_length_0:8;
-	a_uint32_t  packet_length_1:6;
-	a_uint32_t  ts_dir:1;
-	a_uint32_t  tx_ts_en:1;
-	a_uint32_t  tx_os_correction_en:1;
-	a_uint32_t  tx_ptp_tag:10;
+	a_uint32_t  src_port_vp:12;
+	a_uint32_t  org_src_port_vp:12;
+
 	a_uint32_t  _reserved0_0:13;
-	a_uint32_t  _reserved0_1:16;
-	a_uint32_t  int_pri:4;
-	a_uint32_t  int_dp:2;
-	a_uint32_t  cpu_code:8;
+	a_uint32_t  tx_ptp_tag:10;
+	a_uint32_t  tx_os_correction_en:1;
+	a_uint32_t  tx_ts_en:1;
+	a_uint32_t  ts_dir:1;
+	a_uint32_t  packet_length_1:6;
+
 	a_uint32_t  service_code_0:2;
-	a_uint32_t  service_code_1:6;
-	a_uint32_t  dst_l3_if:8;
+	a_uint32_t  cpu_code:8;
+	a_uint32_t  int_dp:2;
+	a_uint32_t  int_pri:4;
+	a_uint32_t  _reserved0_1:16;
+
 	a_uint32_t  mac_da_0:18;
-	a_uint32_t  mac_da_1:30;
-	a_uint32_t  route_flag:1;
+	a_uint32_t  dst_l3_if:8;
+	a_uint32_t  service_code_1:6;
+
 	a_uint32_t  pppoe_strip_flag:1;
-	a_uint32_t  nat_action:3;
-	a_uint32_t  napt_port:16;
+	a_uint32_t  route_flag:1;
+	a_uint32_t  mac_da_1:30;
+
 	a_uint32_t  napt_addr_0:13;
-	a_uint32_t  napt_addr_1:19;
-	a_uint32_t  dscp_update:1;
-	a_uint32_t  dscp:8;
-	a_uint32_t  ttl_update:1;
+	a_uint32_t  napt_port:16;
+	a_uint32_t  nat_action:3;
+
 	a_uint32_t  ttl_0:3;
-	a_uint32_t  ttl_1:5;
-	a_uint32_t  stag_flag:1;
-	a_uint32_t  ctag_flag:1;
-	a_uint32_t  snap_flag:1;
-	a_uint32_t  pppoe_flag:1;
-	a_uint32_t  int_stag_fmt:1;
-	a_uint32_t  int_ctag_fmt:1;
-	a_uint32_t  int_svid:12;
+	a_uint32_t  ttl_update:1;
+	a_uint32_t  dscp:8;
+	a_uint32_t  dscp_update:1;
+	a_uint32_t  napt_addr_1:19;
+
 	a_uint32_t  int_cvid_0:9;
-	a_uint32_t  int_cvid_1:3;
-	a_uint32_t  int_spcp:3;
-	a_uint32_t  int_cpcp:3;
-	a_uint32_t  int_sdei:1;
-	a_uint32_t  int_cdei:1;
-	a_uint32_t  vsi:5;
-	a_uint32_t  l3_offset:8;
-	a_uint32_t  l3_type:2;
+	a_uint32_t  int_svid:12;
+	a_uint32_t  int_ctag_fmt:1;
+	a_uint32_t  int_stag_fmt:1;
+	a_uint32_t  pppoe_flag:1;
+	a_uint32_t  snap_flag:1;
+	a_uint32_t  ctag_flag:1;
+	a_uint32_t  stag_flag:1;
+	a_uint32_t  ttl_1:5;
+
 	a_uint32_t  l4_offset_0:6;
-	a_uint32_t  l4_offset_1:2;
-	a_uint32_t  l4_type:3;
-	a_uint32_t  next_header:8;
-	a_uint32_t  eg_vlan_tag_fmt_bypass_en:1;
-	a_uint32_t  eg_vlan_xlt_bypass_en:1;
-	a_uint32_t  pkt_l2_edit_bypass:1;
-	a_uint32_t  pkt_l3_edit_bypass:1;
-	a_uint32_t  acl_index_toggle:1;
-	a_uint32_t  acl_index_valid:1;
-	a_uint32_t  acl_index:9;
-	a_uint32_t  ip_addr_index_type:1;
-	a_uint32_t  ip_addr_index_toggle:1;
-	a_uint32_t  ip_addr_index_valid:1;
+	a_uint32_t  l3_type:2;
+	a_uint32_t  l3_offset:8;
+	a_uint32_t  vsi:5;
+	a_uint32_t  int_cdei:1;
+	a_uint32_t  int_sdei:1;
+	a_uint32_t  int_cpcp:3;
+	a_uint32_t  int_spcp:3;
+	a_uint32_t  int_cvid_1:3;
+
 	a_uint32_t  ip_addr_index_0:1;
-	a_uint32_t  ip_addr_index_1:12;
-	a_uint32_t  chg_port_vp:12;
-	a_uint32_t  hash_flag:3;
+	a_uint32_t  ip_addr_index_valid:1;
+	a_uint32_t  ip_addr_index_toggle:1;
+	a_uint32_t  ip_addr_index_type:1;
+	a_uint32_t  acl_index:9;
+	a_uint32_t  acl_index_valid:1;
+	a_uint32_t  acl_index_toggle:1;
+	a_uint32_t  pkt_l3_edit_bypass:1;
+	a_uint32_t  pkt_l2_edit_bypass:1;
+	a_uint32_t  eg_vlan_xlt_bypass_en:1;
+	a_uint32_t  eg_vlan_tag_fmt_bypass_en:1;
+	a_uint32_t  next_header:8;
+	a_uint32_t  l4_type:3;
+	a_uint32_t  l4_offset_1:2;
+
 	a_uint32_t  hash_value_0:5;
-	a_uint32_t  hash_value_1:16;
-	a_uint32_t  copy_cpu_flag:1;
-	a_uint32_t  src_pn:4;
-	a_uint32_t  rx_ptp_type:4;
-	a_uint32_t  fake_l2_prot:1;
-	a_uint32_t  fake_mac_header:1;
-	a_uint32_t  vsi_valid:1;
-	a_uint32_t  vp_tx_cnt_en:1;
+	a_uint32_t  hash_flag:3;
+	a_uint32_t  chg_port_vp:12;
+	a_uint32_t  ip_addr_index_1:12;
+
 	a_uint32_t  rsv0_0:3;
-	a_uint32_t  rsv0_1:4;
-	a_uint32_t  ac_group_bitmap:4;
-	a_uint32_t  one_enq_flag:1;
-	a_uint32_t  edma_vp:3;
-	a_uint32_t  fc_grp_id:3;
-	a_uint32_t  fc_en:1;
+	a_uint32_t  vp_tx_cnt_en:1;
+	a_uint32_t  vsi_valid:1;
+	a_uint32_t  fake_mac_header:1;
+	a_uint32_t  fake_l2_prot:1;
+	a_uint32_t  rx_ptp_type:4;
+	a_uint32_t  src_pn:4;
+	a_uint32_t  copy_cpu_flag:1;
+	a_uint32_t  hash_value_1:16;
+
 	a_uint32_t  _reserved1:16;
+	a_uint32_t  fc_en:1;
+	a_uint32_t  fc_grp_id:3;
+	a_uint32_t  edma_vp:3;
+	a_uint32_t  one_enq_flag:1;
+	a_uint32_t  ac_group_bitmap:4;
+	a_uint32_t  rsv0_1:4;
 };
 
 struct pkt_desp_tbl_1 {
-	a_uint32_t  org_src_port_vp:12;
-	a_uint32_t  src_port_vp:12;
 	a_uint32_t  packet_length_0:8;
-	a_uint32_t  packet_length_1:6;
-	a_uint32_t  ts_dir:1;
-	a_uint32_t  rx_ts_valid:1;
+	a_uint32_t  src_port_vp:12;
+	a_uint32_t  org_src_port_vp:12;
+
 	a_uint32_t  rx_ts_0:24;
-	a_uint32_t  rx_ts_1:16;
-	a_uint32_t  int_pri:4;
-	a_uint32_t  int_dp:2;
-	a_uint32_t  cpu_code:8;
+	a_uint32_t  rx_ts_valid:1;
+	a_uint32_t  ts_dir:1;
+	a_uint32_t  packet_length_1:6;
+
 	a_uint32_t  service_code_0:2;
-	a_uint32_t  service_code_1:6;
-	a_uint32_t  dst_l3_if:8;
+	a_uint32_t  cpu_code:8;
+	a_uint32_t  int_dp:2;
+	a_uint32_t  int_pri:4;
+	a_uint32_t  rx_ts_1:16;
+
 	a_uint32_t  mac_da_0:18;
-	a_uint32_t  mac_da_1:30;
-	a_uint32_t  route_flag:1;
+	a_uint32_t  dst_l3_if:8;
+	a_uint32_t  service_code_1:6;
+
 	a_uint32_t  pppoe_strip_flag:1;
-	a_uint32_t  nat_action:3;
-	a_uint32_t  napt_port:16;
+	a_uint32_t  route_flag:1;
+	a_uint32_t  mac_da_1:30;
+
 	a_uint32_t  napt_addr_0:13;
-	a_uint32_t  napt_addr_1:19;
-	a_uint32_t  dscp_update:1;
-	a_uint32_t  dscp:8;
-	a_uint32_t  ttl_update:1;
+	a_uint32_t  napt_port:16;
+	a_uint32_t  nat_action:3;
+
 	a_uint32_t  ttl_0:3;
-	a_uint32_t  ttl_1:5;
-	a_uint32_t  stag_flag:1;
-	a_uint32_t  ctag_flag:1;
-	a_uint32_t  snap_flag:1;
-	a_uint32_t  pppoe_flag:1;
-	a_uint32_t  int_stag_fmt:1;
-	a_uint32_t  int_ctag_fmt:1;
-	a_uint32_t  int_svid:12;
+	a_uint32_t  ttl_update:1;
+	a_uint32_t  dscp:8;
+	a_uint32_t  dscp_update:1;
+	a_uint32_t  napt_addr_1:19;
+
 	a_uint32_t  int_cvid_0:9;
-	a_uint32_t  int_cvid_1:3;
-	a_uint32_t  int_spcp:3;
-	a_uint32_t  int_cpcp:3;
-	a_uint32_t  int_sdei:1;
-	a_uint32_t  int_cdei:1;
-	a_uint32_t  vsi:5;
-	a_uint32_t  l3_offset:8;
-	a_uint32_t  l3_type:2;
+	a_uint32_t  int_svid:12;
+	a_uint32_t  int_ctag_fmt:1;
+	a_uint32_t  int_stag_fmt:1;
+	a_uint32_t  pppoe_flag:1;
+	a_uint32_t  snap_flag:1;
+	a_uint32_t  ctag_flag:1;
+	a_uint32_t  stag_flag:1;
+	a_uint32_t  ttl_1:5;
+
 	a_uint32_t  l4_offset_0:6;
-	a_uint32_t  l4_offset_1:2;
-	a_uint32_t  l4_type:3;
-	a_uint32_t  next_header:8;
-	a_uint32_t  eg_vlan_tag_fmt_bypass_en:1;
-	a_uint32_t  eg_vlan_xlt_bypass_en:1;
-	a_uint32_t  pkt_l2_edit_bypass:1;
-	a_uint32_t  pkt_l3_edit_bypass:1;
-	a_uint32_t  acl_index_toggle:1;
-	a_uint32_t  acl_index_valid:1;
-	a_uint32_t  acl_index:9;
-	a_uint32_t  ip_addr_index_type:1;
-	a_uint32_t  ip_addr_index_toggle:1;
-	a_uint32_t  ip_addr_index_valid:1;
+	a_uint32_t  l3_type:2;
+	a_uint32_t  l3_offset:8;
+	a_uint32_t  vsi:5;
+	a_uint32_t  int_cdei:1;
+	a_uint32_t  int_sdei:1;
+	a_uint32_t  int_cpcp:3;
+	a_uint32_t  int_spcp:3;
+	a_uint32_t  int_cvid_1:3;
+
 	a_uint32_t  ip_addr_index_0:1;
-	a_uint32_t  ip_addr_index_1:12;
-	a_uint32_t  chg_port_vp:12;
-	a_uint32_t  hash_flag:3;
+	a_uint32_t  ip_addr_index_valid:1;
+	a_uint32_t  ip_addr_index_toggle:1;
+	a_uint32_t  ip_addr_index_type:1;
+	a_uint32_t  acl_index:9;
+	a_uint32_t  acl_index_valid:1;
+	a_uint32_t  acl_index_toggle:1;
+	a_uint32_t  pkt_l3_edit_bypass:1;
+	a_uint32_t  pkt_l2_edit_bypass:1;
+	a_uint32_t  eg_vlan_xlt_bypass_en:1;
+	a_uint32_t  eg_vlan_tag_fmt_bypass_en:1;
+	a_uint32_t  next_header:8;
+	a_uint32_t  l4_type:3;
+	a_uint32_t  l4_offset_1:2;
+
 	a_uint32_t  hash_value_0:5;
-	a_uint32_t  hash_value_1:16;
-	a_uint32_t  copy_cpu_flag:1;
-	a_uint32_t  src_pn:4;
-	a_uint32_t  rx_ptp_type:4;
-	a_uint32_t  fake_l2_prot:1;
-	a_uint32_t  fake_mac_header:1;
-	a_uint32_t  vsi_valid:1;
-	a_uint32_t  vp_tx_cnt_en:1;
+	a_uint32_t  hash_flag:3;
+	a_uint32_t  chg_port_vp:12;
+	a_uint32_t  ip_addr_index_1:12;
+
 	a_uint32_t  rsv0_0:3;
-	a_uint32_t  rsv0_1:4;
-	a_uint32_t  ac_group_bitmap:4;
-	a_uint32_t  one_enq_flag:1;
-	a_uint32_t  edma_vp:3;
-	a_uint32_t  fc_grp_id:3;
-	a_uint32_t  fc_en:1;
+	a_uint32_t  vp_tx_cnt_en:1;
+	a_uint32_t  vsi_valid:1;
+	a_uint32_t  fake_mac_header:1;
+	a_uint32_t  fake_l2_prot:1;
+	a_uint32_t  rx_ptp_type:4;
+	a_uint32_t  src_pn:4;
+	a_uint32_t  copy_cpu_flag:1;
+	a_uint32_t  hash_value_1:16;
+
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  fc_en:1;
+	a_uint32_t  fc_grp_id:3;
+	a_uint32_t  edma_vp:3;
+	a_uint32_t  one_enq_flag:1;
+	a_uint32_t  ac_group_bitmap:4;
+	a_uint32_t  rsv0_1:4;
 };
 
 union pkt_desp_tbl_u {
@@ -2712,9 +2736,9 @@ union mul_p7_drop_cnt_tbl_u {
 	#define UQ_AGG_PROFILE_MAP_ENABLE_DEFAULT 0x0
 
 struct uq_agg_profile_map {
-	a_uint32_t  qid_2_agg_id:3;
-	a_uint32_t  enable:1;
 	a_uint32_t  _reserved0:28;
+	a_uint32_t  enable:1;
+	a_uint32_t  qid_2_agg_id:3;
 };
 
 union uq_agg_profile_map_u {

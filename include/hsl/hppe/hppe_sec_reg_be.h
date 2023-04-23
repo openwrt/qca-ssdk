@@ -14,9 +14,6 @@
  */
 
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "hppe_sec_reg_be.h"
-#else
 /**
  * @defgroup
  * @{
@@ -48,9 +45,9 @@
 	#define L3_EXCEPTION_CMD_DE_ACCE_DEFAULT 0x0
 
 struct l3_exception_cmd {
-	a_uint32_t  l3_excep_cmd:2;
-	a_uint32_t  de_acce:1;
 	a_uint32_t  _reserved0:29;
+	a_uint32_t  de_acce:1;
+	a_uint32_t  l3_excep_cmd:2;
 };
 
 union l3_exception_cmd_u {
@@ -76,8 +73,8 @@ union l3_exception_cmd_u {
 	#define L3_EXP_L3_ONLY_CTRL_EXCEP_EN_DEFAULT 0x0
 
 struct l3_exp_l3_only_ctrl {
-	a_uint32_t  excep_en:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  excep_en:1;
 };
 
 union l3_exp_l3_only_ctrl_u {
@@ -103,8 +100,8 @@ union l3_exp_l3_only_ctrl_u {
 	#define L3_EXP_L2_ONLY_CTRL_EXCEP_EN_DEFAULT 0x0
 
 struct l3_exp_l2_only_ctrl {
-	a_uint32_t  excep_en:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  excep_en:1;
 };
 
 union l3_exp_l2_only_ctrl_u {
@@ -130,8 +127,8 @@ union l3_exp_l2_only_ctrl_u {
 	#define L3_EXP_L2_FLOW_CTRL_EXCEP_EN_DEFAULT 0x0
 
 struct l3_exp_l2_flow_ctrl {
-	a_uint32_t  excep_en:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  excep_en:1;
 };
 
 union l3_exp_l2_flow_ctrl_u {
@@ -157,8 +154,8 @@ union l3_exp_l2_flow_ctrl_u {
 	#define L3_EXP_L3_FLOW_CTRL_EXCEP_EN_DEFAULT 0x0
 
 struct l3_exp_l3_flow_ctrl {
-	a_uint32_t  excep_en:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  excep_en:1;
 };
 
 union l3_exp_l3_flow_ctrl_u {
@@ -184,8 +181,8 @@ union l3_exp_l3_flow_ctrl_u {
 	#define L3_EXP_MULTICAST_CTRL_EXCEP_EN_DEFAULT 0x0
 
 struct l3_exp_multicast_ctrl {
-	a_uint32_t  excep_en:1;
 	a_uint32_t  _reserved0:31;
+	a_uint32_t  excep_en:1;
 };
 
 union l3_exp_multicast_ctrl_u {
@@ -212,9 +209,9 @@ union l3_exp_multicast_ctrl_u {
 	#define L3_EXCEPTION_PARSING_CTRL_REG_SMALL_HOP_LIMIT_DEFAULT 0x0
 
 struct l3_exception_parsing_ctrl_reg {
-	a_uint32_t  small_ttl:8;
-	a_uint32_t  small_hop_limit:8;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  small_hop_limit:8;
+	a_uint32_t  small_ttl:8;
 };
 
 union l3_exception_parsing_ctrl_reg_u {
@@ -251,14 +248,14 @@ union l3_exception_parsing_ctrl_reg_u {
 	#define L4_EXCEPTION_PARSING_CTRL_0_REG_TCP_FLAGS1_MASK_DEFAULT 0x0
 
 struct l4_exception_parsing_ctrl_0_reg {
-	a_uint32_t  tcp_flags0:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  tcp_flags0_mask:6;
-	a_uint32_t  _reserved1:2;
-	a_uint32_t  tcp_flags1:6;
-	a_uint32_t  _reserved2:2;
-	a_uint32_t  tcp_flags1_mask:6;
 	a_uint32_t  _reserved3:2;
+	a_uint32_t  tcp_flags1_mask:6;
+	a_uint32_t  _reserved2:2;
+	a_uint32_t  tcp_flags1:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  tcp_flags0_mask:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  tcp_flags0:6;
 };
 
 union l4_exception_parsing_ctrl_0_reg_u {
@@ -295,14 +292,14 @@ union l4_exception_parsing_ctrl_0_reg_u {
 	#define L4_EXCEPTION_PARSING_CTRL_1_REG_TCP_FLAGS3_MASK_DEFAULT 0x0
 
 struct l4_exception_parsing_ctrl_1_reg {
-	a_uint32_t  tcp_flags2:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  tcp_flags2_mask:6;
-	a_uint32_t  _reserved1:2;
-	a_uint32_t  tcp_flags3:6;
-	a_uint32_t  _reserved2:2;
-	a_uint32_t  tcp_flags3_mask:6;
 	a_uint32_t  _reserved3:2;
+	a_uint32_t  tcp_flags3_mask:6;
+	a_uint32_t  _reserved2:2;
+	a_uint32_t  tcp_flags3:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  tcp_flags2_mask:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  tcp_flags2:6;
 };
 
 union l4_exception_parsing_ctrl_1_reg_u {
@@ -339,14 +336,14 @@ union l4_exception_parsing_ctrl_1_reg_u {
 	#define L4_EXCEPTION_PARSING_CTRL_2_REG_TCP_FLAGS5_MASK_DEFAULT 0x0
 
 struct l4_exception_parsing_ctrl_2_reg {
-	a_uint32_t  tcp_flags4:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  tcp_flags4_mask:6;
-	a_uint32_t  _reserved1:2;
-	a_uint32_t  tcp_flags5:6;
-	a_uint32_t  _reserved2:2;
-	a_uint32_t  tcp_flags5_mask:6;
 	a_uint32_t  _reserved3:2;
+	a_uint32_t  tcp_flags5_mask:6;
+	a_uint32_t  _reserved2:2;
+	a_uint32_t  tcp_flags5:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  tcp_flags4_mask:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  tcp_flags4:6;
 };
 
 union l4_exception_parsing_ctrl_2_reg_u {
@@ -383,14 +380,14 @@ union l4_exception_parsing_ctrl_2_reg_u {
 	#define L4_EXCEPTION_PARSING_CTRL_3_REG_TCP_FLAGS7_MASK_DEFAULT 0x0
 
 struct l4_exception_parsing_ctrl_3_reg {
-	a_uint32_t  tcp_flags6:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  tcp_flags6_mask:6;
-	a_uint32_t  _reserved1:2;
-	a_uint32_t  tcp_flags7:6;
-	a_uint32_t  _reserved2:2;
-	a_uint32_t  tcp_flags7_mask:6;
 	a_uint32_t  _reserved3:2;
+	a_uint32_t  tcp_flags7_mask:6;
+	a_uint32_t  _reserved2:2;
+	a_uint32_t  tcp_flags7:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  tcp_flags6_mask:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  tcp_flags6:6;
 };
 
 union l4_exception_parsing_ctrl_3_reg_u {
@@ -398,5 +395,4 @@ union l4_exception_parsing_ctrl_3_reg_u {
 	struct l4_exception_parsing_ctrl_3_reg bf;
 };
 
-#endif
 #endif

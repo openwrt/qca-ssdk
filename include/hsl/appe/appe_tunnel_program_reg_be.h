@@ -15,9 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_tunnel_program_reg_be.h"
-#else
+
  /**
  * @defgroup
  * @{
@@ -44,9 +42,9 @@
 	#define TPR_HDR_MATCH_0_IP_VER_DEFAULT 0x3
 
 struct tpr_hdr_match_0 {
-	a_uint32_t  cur_hdr_type:4;
-	a_uint32_t  ip_ver:2;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  ip_ver:2;
+	a_uint32_t  cur_hdr_type:4;
 };
 
 union tpr_hdr_match_0_u {
@@ -112,8 +110,8 @@ union tpr_hdr_match_2_u {
 	#define TPR_PROGRAM_HDR_HDR_TYPE_MAP_DEFAULT 0x0
 
 struct tpr_program_hdr {
-	a_uint32_t  hdr_type_map:6;
 	a_uint32_t  _reserved0:26;
+	a_uint32_t  hdr_type_map:6;
 };
 
 union tpr_program_hdr_u {
@@ -160,13 +158,13 @@ union tpr_program_hdr_u {
 	#define TPR_PROGRAM_RESULT_LEN_MASK_DEFAULT 0x0
 
 struct tpr_program_result {
-	a_uint32_t  next_hdr_mode:1;
-	a_uint32_t  hdr_pos_mode:1;
-	a_uint32_t  next_hdr_type:2;
-	a_uint32_t  _reserved0:4;
-	a_uint32_t  hdr_len:6;
-	a_uint32_t  len_unit:2;
 	a_uint32_t  len_mask:16;
+	a_uint32_t  len_unit:2;
+	a_uint32_t  hdr_len:6;
+	a_uint32_t  _reserved0:4;
+	a_uint32_t  next_hdr_type:2;
+	a_uint32_t  hdr_pos_mode:1;
+	a_uint32_t  next_hdr_mode:1;
 };
 
 union tpr_program_result_u {
@@ -198,12 +196,12 @@ union tpr_program_result_u {
 	#define TPR_PROGRAM_UDF_CTRL_UDF2_OFFSET_DEFAULT 0x0
 
 struct tpr_program_udf_ctrl {
-	a_uint32_t  udf0_offset:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  udf1_offset:6;
-	a_uint32_t  _reserved1:2;
-	a_uint32_t  udf2_offset:6;
 	a_uint32_t  _reserved2:10;
+	a_uint32_t  udf2_offset:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  udf1_offset:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  udf0_offset:6;
 };
 
 union tpr_program_udf_ctrl_u {
@@ -230,8 +228,8 @@ union tpr_program_udf_ctrl_u {
 	#define TPR_PROGRAM_UDF_DATA_0_DATA1_DEFAULT 0x0
 
 struct tpr_program_udf_data_0 {
-	a_uint32_t  data0:16;
 	a_uint32_t  data1:16;
+	a_uint32_t  data0:16;
 };
 
 union tpr_program_udf_data_0_u {
@@ -278,13 +276,13 @@ union tpr_program_udf_data_0_u {
 	#define TPR_PROGRAM_UDF_DATA_1_PROGRAM_ID_DEFAULT 0x0
 
 struct tpr_program_udf_data_1 {
-	a_uint32_t  data2:16;
-	a_uint32_t  udf0_valid:1;
-	a_uint32_t  udf1_valid:1;
-	a_uint32_t  udf2_valid:1;
-	a_uint32_t  comp_mode:1;
-	a_uint32_t  program_id:3;
 	a_uint32_t  _reserved0:9;
+	a_uint32_t  program_id:3;
+	a_uint32_t  comp_mode:1;
+	a_uint32_t  udf2_valid:1;
+	a_uint32_t  udf1_valid:1;
+	a_uint32_t  udf0_valid:1;
+	a_uint32_t  data2:16;
 };
 
 union tpr_program_udf_data_1_u {
@@ -311,8 +309,8 @@ union tpr_program_udf_data_1_u {
 	#define TPR_PROGRAM_UDF_MASK_0_MASK1_DEFAULT 0x0
 
 struct tpr_program_udf_mask_0 {
-	a_uint32_t  mask0:16;
 	a_uint32_t  mask1:16;
+	a_uint32_t  mask0:16;
 };
 
 union tpr_program_udf_mask_0_u {
@@ -349,11 +347,11 @@ union tpr_program_udf_mask_0_u {
 	#define TPR_PROGRAM_UDF_MASK_1_UDF2_VALID_MASK_DEFAULT 0x0
 
 struct tpr_program_udf_mask_1 {
-	a_uint32_t  mask2:16;
-	a_uint32_t  udf0_valid_mask:1;
-	a_uint32_t  udf1_valid_mask:1;
-	a_uint32_t  udf2_valid_mask:1;
 	a_uint32_t  _reserved0:13;
+	a_uint32_t  udf2_valid_mask:1;
+	a_uint32_t  udf1_valid_mask:1;
+	a_uint32_t  udf0_valid_mask:1;
+	a_uint32_t  mask2:16;
 };
 
 union tpr_program_udf_mask_1_u {
@@ -395,14 +393,14 @@ union tpr_program_udf_mask_1_u {
 	#define TPR_PROGRAM_UDF_ACTION_EXCEPTION_EN_DEFAULT 0x0
 
 struct tpr_program_udf_action {
-	a_uint32_t  next_hdr_type_valid:1;
-	a_uint32_t  hdr_len_valid:1;
-	a_uint32_t  next_hdr_type:2;
-	a_uint32_t  _reserved0:4;
-	a_uint32_t  hdr_len:4;
-	a_uint32_t  _reserved1:4;
-	a_uint32_t  exception_en:1;
 	a_uint32_t  _reserved2:15;
+	a_uint32_t  exception_en:1;
+	a_uint32_t  _reserved1:4;
+	a_uint32_t  hdr_len:4;
+	a_uint32_t  _reserved0:4;
+	a_uint32_t  next_hdr_type:2;
+	a_uint32_t  hdr_len_valid:1;
+	a_uint32_t  next_hdr_type_valid:1;
 };
 
 union tpr_program_udf_action_u {
@@ -410,5 +408,4 @@ union tpr_program_udf_action_u {
 	struct tpr_program_udf_action bf;
 };
 
-#endif
 #endif

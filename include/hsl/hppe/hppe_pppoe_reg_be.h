@@ -14,9 +14,6 @@
  */
 
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "hppe_pppoe_reg_be.h"
-#else
 /**
  * @defgroup
  * @{
@@ -49,9 +46,9 @@
 	#define PPPOE_SESSION_L3_IF_INDEX_DEFAULT 0x0
 
 struct pppoe_session {
-	a_uint32_t  session_id:16;
-	a_uint32_t  port_bitmap:8;
 	a_uint32_t  l3_if_index:8;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  session_id:16;
 };
 
 union pppoe_session_u {
@@ -93,12 +90,12 @@ union pppoe_session_u {
 	#define PPPOE_SESSION_EXT_SMAC_DEFAULT 0x0
 
 struct pppoe_session_ext {
-	a_uint32_t  l3_if_valid:1;
-	a_uint32_t  mc_valid:1;
-	a_uint32_t  uc_valid:1;
-	a_uint32_t  smac_valid:1;
-	a_uint32_t  _reserved0:12;
 	a_uint32_t  smac:16;
+	a_uint32_t  _reserved0:12;
+	a_uint32_t  smac_valid:1;
+	a_uint32_t  uc_valid:1;
+	a_uint32_t  mc_valid:1;
+	a_uint32_t  l3_if_valid:1;
 };
 
 union pppoe_session_ext_u {
@@ -128,5 +125,4 @@ union pppoe_session_ext1_u {
 	struct pppoe_session_ext1 bf;
 };
 
-#endif
 #endif

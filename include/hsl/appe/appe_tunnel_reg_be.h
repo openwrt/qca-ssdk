@@ -15,9 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if defined(CONFIG_CPU_BIG_ENDIAN)
-#include "appe_tunnel_reg_be.h"
-#else
+
 /**
  * @defgroup
  * @{
@@ -84,20 +82,20 @@
 	#define TPR_UDF_CTRL_0_VALID_DEFAULT 0x0
 
 struct tpr_udf_ctrl_0 {
-	a_uint32_t  l3_type:2;
-	a_uint32_t  l3_type_incl:1;
-	a_uint32_t  _reserved0:1;
-	a_uint32_t  l4_type:3;
-	a_uint32_t  l4_type_incl:1;
-	a_uint32_t  overlay_type:2;
-	a_uint32_t  overlay_type_incl:1;
-	a_uint32_t  _reserved1:1;
-	a_uint32_t  program_type:3;
-	a_uint32_t  program_type_incl:1;
-	a_uint32_t  _reserved2:1;
-	a_uint32_t  udf_profile:3;
-	a_uint32_t  _reserved3:11;
 	a_uint32_t  valid:1;
+	a_uint32_t  _reserved3:11;
+	a_uint32_t  udf_profile:3;
+	a_uint32_t  _reserved2:1;
+	a_uint32_t  program_type_incl:1;
+	a_uint32_t  program_type:3;
+	a_uint32_t  _reserved1:1;
+	a_uint32_t  overlay_type_incl:1;
+	a_uint32_t  overlay_type:2;
+	a_uint32_t  l4_type_incl:1;
+	a_uint32_t  l4_type:3;
+	a_uint32_t  _reserved0:1;
+	a_uint32_t  l3_type_incl:1;
+	a_uint32_t  l3_type:2;
 };
 
 union tpr_udf_ctrl_0_u {
@@ -134,14 +132,14 @@ union tpr_udf_ctrl_0_u {
 	#define TPR_UDF_PROFILE_BASE_UDF3_BASE_DEFAULT 0x0
 
 struct tpr_udf_profile_base {
-	a_uint32_t  udf0_base:3;
-	a_uint32_t  _reserved0:5;
-	a_uint32_t  udf1_base:3;
-	a_uint32_t  _reserved1:5;
-	a_uint32_t  udf2_base:3;
-	a_uint32_t  _reserved2:5;
-	a_uint32_t  udf3_base:3;
 	a_uint32_t  _reserved3:5;
+	a_uint32_t  udf3_base:3;
+	a_uint32_t  _reserved2:5;
+	a_uint32_t  udf2_base:3;
+	a_uint32_t  _reserved1:5;
+	a_uint32_t  udf1_base:3;
+	a_uint32_t  _reserved0:5;
+	a_uint32_t  udf0_base:3;
 };
 
 union tpr_udf_profile_base_u {
@@ -178,14 +176,14 @@ union tpr_udf_profile_base_u {
 	#define TPR_UDF_PROFILE_OFFSET_UDF3_OFFSET_DEFAULT 0x0
 
 struct tpr_udf_profile_offset {
-	a_uint32_t  udf0_offset:6;
-	a_uint32_t  _reserved0:2;
-	a_uint32_t  udf1_offset:6;
-	a_uint32_t  _reserved1:2;
-	a_uint32_t  udf2_offset:6;
-	a_uint32_t  _reserved2:2;
-	a_uint32_t  udf3_offset:6;
 	a_uint32_t  _reserved3:2;
+	a_uint32_t  udf3_offset:6;
+	a_uint32_t  _reserved2:2;
+	a_uint32_t  udf2_offset:6;
+	a_uint32_t  _reserved1:2;
+	a_uint32_t  udf1_offset:6;
+	a_uint32_t  _reserved0:2;
+	a_uint32_t  udf0_offset:6;
 };
 
 union tpr_udf_profile_offset_u {
@@ -232,13 +230,13 @@ union tpr_udf_profile_offset_u {
 	#define TL_TBL_OP_BUSY_DEFAULT 0x0
 
 struct tl_tbl_op {
-	a_uint32_t  op_type:3;
-	a_uint32_t  hash_block_bitmap:2;
-	a_uint32_t  op_mode:1;
-	a_uint32_t  entry_index:7;
-	a_uint32_t  op_rslt:1;
-	a_uint32_t  busy:1;
 	a_uint32_t  _reserved0:17;
+	a_uint32_t  busy:1;
+	a_uint32_t  op_rslt:1;
+	a_uint32_t  entry_index:7;
+	a_uint32_t  op_mode:1;
+	a_uint32_t  hash_block_bitmap:2;
+	a_uint32_t  op_type:3;
 };
 
 union tl_tbl_op_u {
@@ -659,13 +657,13 @@ union tl_tbl_op_data16_u {
 	#define TL_TBL_RD_OP_BUSY_DEFAULT 0x0
 
 struct tl_tbl_rd_op {
-	a_uint32_t  op_type:3;
-	a_uint32_t  hash_block_bitmap:2;
-	a_uint32_t  op_mode:1;
-	a_uint32_t  entry_index:7;
-	a_uint32_t  op_rslt:1;
-	a_uint32_t  busy:1;
 	a_uint32_t  _reserved0:17;
+	a_uint32_t  busy:1;
+	a_uint32_t  op_rslt:1;
+	a_uint32_t  entry_index:7;
+	a_uint32_t  op_mode:1;
+	a_uint32_t  hash_block_bitmap:2;
+	a_uint32_t  op_type:3;
 };
 
 union tl_tbl_rd_op_u {
@@ -1510,23 +1508,23 @@ union tl_tbl_rd_rslt_data16_u {
 	#define TL_CTRL_TL_MAP_UDP_CSUM_ZERO_CMD_DEFAULT 0x3
 
 struct tl_ctrl {
-	a_uint32_t  tl_de_acce_cmd:2;
-	a_uint32_t  tl_src_if_check_cmd:2;
-	a_uint32_t  tl_src_if_check_de_acce:1;
-	a_uint32_t  tl_vlan_check_cmd:2;
-	a_uint32_t  tl_vlan_check_de_acce:1;
-	a_uint32_t  pppoe_multicast_cmd:2;
-	a_uint32_t  pppoe_multicast_de_acce:1;
-	a_uint32_t  udp_csum_zero_cmd:2;
-	a_uint32_t  udp_csum_zero_de_acce:1;
-	a_uint32_t  tl_hash_mode_0:2;
-	a_uint32_t  tl_hash_mode_1:2;
-	a_uint32_t  ipv4_df_set:2;
-	a_uint32_t  tl_map_src_check_cmd:2;
-	a_uint32_t  tl_map_dst_check_cmd:2;
-	a_uint32_t  tl_map_non_tcp_udp_cmd:2;
-	a_uint32_t  tl_map_udp_csum_zero_cmd:2;
 	a_uint32_t  _reserved0:4;
+	a_uint32_t  tl_map_udp_csum_zero_cmd:2;
+	a_uint32_t  tl_map_non_tcp_udp_cmd:2;
+	a_uint32_t  tl_map_dst_check_cmd:2;
+	a_uint32_t  tl_map_src_check_cmd:2;
+	a_uint32_t  ipv4_df_set:2;
+	a_uint32_t  tl_hash_mode_1:2;
+	a_uint32_t  tl_hash_mode_0:2;
+	a_uint32_t  udp_csum_zero_de_acce:1;
+	a_uint32_t  udp_csum_zero_cmd:2;
+	a_uint32_t  pppoe_multicast_de_acce:1;
+	a_uint32_t  pppoe_multicast_cmd:2;
+	a_uint32_t  tl_vlan_check_de_acce:1;
+	a_uint32_t  tl_vlan_check_cmd:2;
+	a_uint32_t  tl_src_if_check_de_acce:1;
+	a_uint32_t  tl_src_if_check_cmd:2;
+	a_uint32_t  tl_de_acce_cmd:2;
 };
 
 union tl_ctrl_u {
@@ -1578,14 +1576,14 @@ union tl_ctrl_u {
 	#define TL_L3_IF_TBL_MIN_IPV6_MTU_DEFAULT 0x0
 
 struct tl_l3_if_tbl {
-	a_uint32_t  ipv4_decap_en:1;
-	a_uint32_t  ipv6_decap_en:1;
-	a_uint32_t  dmac_check_dis:1;
-	a_uint32_t  ttl_exceed_cmd:2;
-	a_uint32_t  ttl_exceed_de_acce:1;
-	a_uint32_t  lpm_en:1;
-	a_uint32_t  min_ipv6_mtu:14;
 	a_uint32_t  _reserved0:11;
+	a_uint32_t  min_ipv6_mtu:14;
+	a_uint32_t  lpm_en:1;
+	a_uint32_t  ttl_exceed_de_acce:1;
+	a_uint32_t  ttl_exceed_cmd:2;
+	a_uint32_t  dmac_check_dis:1;
+	a_uint32_t  ipv6_decap_en:1;
+	a_uint32_t  ipv4_decap_en:1;
 };
 
 union tl_l3_if_tbl_u {
@@ -1672,23 +1670,23 @@ union tl_l3_if_tbl_u {
 	#define TL_KEY_GEN_KEY_TYPE_DEFAULT 0x0
 
 struct tl_key_gen {
-	a_uint32_t  sip_inc:1;
-	a_uint32_t  dip_inc:1;
-	a_uint32_t  ip_prot_inc:1;
-	a_uint32_t  sport_inc:1;
-	a_uint32_t  dport_inc:1;
-	a_uint32_t  vni_resv_inc:1;
-	a_uint32_t  udf0_inc:1;
-	a_uint32_t  udf0_id:2;
-	a_uint32_t  udf1_inc:1;
-	a_uint32_t  udf1_id:2;
 	a_uint32_t  vni_resv_mask_0:20;
-	a_uint32_t  vni_resv_mask_1:12;
-	a_uint32_t  udf0_mask:16;
+	a_uint32_t  udf1_id:2;
+	a_uint32_t  udf1_inc:1;
+	a_uint32_t  udf0_id:2;
+	a_uint32_t  udf0_inc:1;
+	a_uint32_t  vni_resv_inc:1;
+	a_uint32_t  dport_inc:1;
+	a_uint32_t  sport_inc:1;
+	a_uint32_t  ip_prot_inc:1;
+	a_uint32_t  dip_inc:1;
+	a_uint32_t  sip_inc:1;
 	a_uint32_t  udf1_mask_0:4;
-	a_uint32_t  udf1_mask_1:12;
-	a_uint32_t  key_type:4;
+	a_uint32_t  udf0_mask:16;
+	a_uint32_t  vni_resv_mask_1:12;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  key_type:4;
+	a_uint32_t  udf1_mask_1:12;
 };
 
 union tl_key_gen_u {
@@ -1910,114 +1908,132 @@ union tl_key_gen_u {
 	#define TL_TBL_EXP_PROFILE_DEFAULT 0x0
 
 struct tl_tbl_0 {
-	a_uint32_t  valid:1;
-	a_uint32_t  entry_type:1;
-	a_uint32_t  key_type:4;
-	a_uint32_t  protocol:8;
 	a_uint32_t  ipv6_src_addr_0:18;
+	a_uint32_t  protocol:8;
+	a_uint32_t  key_type:4;
+	a_uint32_t  entry_type:1;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  ipv6_src_addr_1:32;
 	a_uint32_t  ipv6_src_addr_2:32;
 	a_uint32_t  ipv6_src_addr_3:32;
-	a_uint32_t  ipv6_src_addr_4:14;
+
 	a_uint32_t  ipv6_dst_addr_0:18;
+	a_uint32_t  ipv6_src_addr_4:14;
+
 	a_uint32_t  ipv6_dst_addr_1:32;
 	a_uint32_t  ipv6_dst_addr_2:32;
 	a_uint32_t  ipv6_dst_addr_3:32;
-	a_uint32_t  ipv6_dst_addr_4:14;
-	a_uint32_t  l4_sport:16;
+
 	a_uint32_t  l4_dport_0:2;
-	a_uint32_t  l4_dport_1:14;
+	a_uint32_t  l4_sport:16;
+	a_uint32_t  ipv6_dst_addr_4:14;
+
 	a_uint32_t  vni_resv_0:18;
-	a_uint32_t  vni_resv_1:14;
-	a_uint32_t  udf0:16;
+	a_uint32_t  l4_dport_1:14;
+
 	a_uint32_t  udf1_0:2;
-	a_uint32_t  udf1_1:14;
-	a_uint32_t  vni_resv_valid:1;
-	a_uint32_t  udf0_valid:1;
-	a_uint32_t  udf1_valid:1;
-	a_uint32_t  fwd_type:2;
-	a_uint32_t  de_acce:1;
-	a_uint32_t  decap_en:1;
-	a_uint32_t  udp_csum_zero:1;
-	a_uint32_t  service_code_en:1;
-	a_uint32_t  service_code:8;
+	a_uint32_t  udf0:16;
+	a_uint32_t  vni_resv_1:14;
+
 	a_uint32_t  spcp_mode:1;
-	a_uint32_t  sdei_mode:1;
-	a_uint32_t  cpcp_mode:1;
-	a_uint32_t  cdei_mode:1;
-	a_uint32_t  ttl_mode:1;
-	a_uint32_t  dscp_mode:1;
-	a_uint32_t  ecn_mode:2;
-	a_uint32_t  src_info_valid:1;
-	a_uint32_t  src_info_type:1;
-	a_uint32_t  src_info:8;
-	a_uint32_t  tl_l3_if:7;
-	a_uint32_t  svlan_fmt:1;
+	a_uint32_t  service_code:8;
+	a_uint32_t  service_code_en:1;
+	a_uint32_t  udp_csum_zero:1;
+	a_uint32_t  decap_en:1;
+	a_uint32_t  de_acce:1;
+	a_uint32_t  fwd_type:2;
+	a_uint32_t  udf1_valid:1;
+	a_uint32_t  udf0_valid:1;
+	a_uint32_t  vni_resv_valid:1;
+	a_uint32_t  udf1_1:14;
+
 	a_uint32_t  svlan_id_0:7;
-	a_uint32_t  svlan_id_1:5;
-	a_uint32_t  cvlan_fmt:1;
-	a_uint32_t  cvlan_id:12;
-	a_uint32_t  svlan_check_en:1;
-	a_uint32_t  cvlan_check_en:1;
-	a_uint32_t  tl_l3_if_check_en:1;
-	a_uint32_t  exp_profile:2;
+	a_uint32_t  svlan_fmt:1;
+	a_uint32_t  tl_l3_if:7;
+	a_uint32_t  src_info:8;
+	a_uint32_t  src_info_type:1;
+	a_uint32_t  src_info_valid:1;
+	a_uint32_t  ecn_mode:2;
+	a_uint32_t  dscp_mode:1;
+	a_uint32_t  ttl_mode:1;
+	a_uint32_t  cdei_mode:1;
+	a_uint32_t  cpcp_mode:1;
+	a_uint32_t  sdei_mode:1;
+
 	a_uint32_t  _reserved0:9;
+	a_uint32_t  exp_profile:2;
+	a_uint32_t  tl_l3_if_check_en:1;
+	a_uint32_t  cvlan_check_en:1;
+	a_uint32_t  svlan_check_en:1;
+	a_uint32_t  cvlan_id:12;
+	a_uint32_t  cvlan_fmt:1;
+	a_uint32_t  svlan_id_1:5;
 };
 
 struct tl_tbl_1 {
-	a_uint32_t  valid:1;
-	a_uint32_t  entry_type:1;
-	a_uint32_t  key_type:4;
-	a_uint32_t  protocol:8;
 	a_uint32_t  ipv4_src_addr_0:18;
-	a_uint32_t  ipv4_src_addr_1:14;
+	a_uint32_t  protocol:8;
+	a_uint32_t  key_type:4;
+	a_uint32_t  entry_type:1;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  ipv4_dst_addr_0:18;
-	a_uint32_t  ipv4_dst_addr_1:14;
+	a_uint32_t  ipv4_src_addr_1:14;
+
 	a_uint32_t  _reserved0_0:18;
+	a_uint32_t  ipv4_dst_addr_1:14;
+
 	a_uint32_t  _reserved0_1:32;
 	a_uint32_t  _reserved0_2:32;
 	a_uint32_t  _reserved0_3:32;
 	a_uint32_t  _reserved0_4:32;
 	a_uint32_t  _reserved0_5:32;
-	a_uint32_t  _reserved0_6:14;
-	a_uint32_t  l4_sport:16;
+
 	a_uint32_t  l4_dport_0:2;
-	a_uint32_t  l4_dport_1:14;
+	a_uint32_t  l4_sport:16;
+	a_uint32_t  _reserved0_6:14;
+
 	a_uint32_t  vni_resv_0:18;
-	a_uint32_t  vni_resv_1:14;
-	a_uint32_t  udf0:16;
+	a_uint32_t  l4_dport_1:14;
+
 	a_uint32_t  udf1_0:2;
-	a_uint32_t  udf1_1:14;
-	a_uint32_t  vni_resv_valid:1;
-	a_uint32_t  udf0_valid:1;
-	a_uint32_t  udf1_valid:1;
-	a_uint32_t  fwd_type:2;
-	a_uint32_t  de_acce:1;
-	a_uint32_t  decap_en:1;
-	a_uint32_t  udp_csum_zero:1;
-	a_uint32_t  service_code_en:1;
-	a_uint32_t  service_code:8;
+	a_uint32_t  udf0:16;
+	a_uint32_t  vni_resv_1:14;
+
 	a_uint32_t  spcp_mode:1;
-	a_uint32_t  sdei_mode:1;
-	a_uint32_t  cpcp_mode:1;
-	a_uint32_t  cdei_mode:1;
-	a_uint32_t  ttl_mode:1;
-	a_uint32_t  dscp_mode:1;
-	a_uint32_t  ecn_mode:2;
-	a_uint32_t  src_info_valid:1;
-	a_uint32_t  src_info_type:1;
-	a_uint32_t  src_info:8;
-	a_uint32_t  tl_l3_if:7;
-	a_uint32_t  svlan_fmt:1;
+	a_uint32_t  service_code:8;
+	a_uint32_t  service_code_en:1;
+	a_uint32_t  udp_csum_zero:1;
+	a_uint32_t  decap_en:1;
+	a_uint32_t  de_acce:1;
+	a_uint32_t  fwd_type:2;
+	a_uint32_t  udf1_valid:1;
+	a_uint32_t  udf0_valid:1;
+	a_uint32_t  vni_resv_valid:1;
+	a_uint32_t  udf1_1:14;
+
 	a_uint32_t  svlan_id_0:7;
-	a_uint32_t  svlan_id_1:5;
-	a_uint32_t  cvlan_fmt:1;
-	a_uint32_t  cvlan_id:12;
-	a_uint32_t  svlan_check_en:1;
-	a_uint32_t  cvlan_check_en:1;
-	a_uint32_t  tl_l3_if_check_en:1;
-	a_uint32_t  exp_profile:2;
+	a_uint32_t  svlan_fmt:1;
+	a_uint32_t  tl_l3_if:7;
+	a_uint32_t  src_info:8;
+	a_uint32_t  src_info_type:1;
+	a_uint32_t  src_info_valid:1;
+	a_uint32_t  ecn_mode:2;
+	a_uint32_t  dscp_mode:1;
+	a_uint32_t  ttl_mode:1;
+	a_uint32_t  cdei_mode:1;
+	a_uint32_t  cpcp_mode:1;
+	a_uint32_t  sdei_mode:1;
+
 	a_uint32_t  _reserved1:9;
+	a_uint32_t  exp_profile:2;
+	a_uint32_t  tl_l3_if_check_en:1;
+	a_uint32_t  cvlan_check_en:1;
+	a_uint32_t  svlan_check_en:1;
+	a_uint32_t  cvlan_id:12;
+	a_uint32_t  cvlan_fmt:1;
+	a_uint32_t  svlan_id_1:5;
 };
 
 union tl_tbl_u {
@@ -2045,9 +2061,9 @@ union tl_tbl_u {
 	#define EG_IPV4_HDR_CTRL_IPV4_DF_SET_DEFAULT 0x0
 
 struct eg_ipv4_hdr_ctrl {
-	a_uint32_t  ipv4_id_seed:16;
-	a_uint32_t  ipv4_df_set:2;
 	a_uint32_t  _reserved0:14;
+	a_uint32_t  ipv4_df_set:2;
+	a_uint32_t  ipv4_id_seed:16;
 };
 
 union eg_ipv4_hdr_ctrl_u {
@@ -2074,8 +2090,8 @@ union eg_ipv4_hdr_ctrl_u {
 	#define EG_UDP_ENTROPY_CTRL_PORT_MASK_DEFAULT 0x0
 
 struct eg_udp_entropy_ctrl {
-	a_uint32_t  port_base:16;
 	a_uint32_t  port_mask:16;
+	a_uint32_t  port_base:16;
 };
 
 union eg_udp_entropy_ctrl_u {
@@ -2107,10 +2123,10 @@ union eg_udp_entropy_ctrl_u {
 	#define ECN_PROFILE_PROFILE2_DEFAULT 0xe4
 
 struct ecn_profile {
-	a_uint32_t  profile0:8;
-	a_uint32_t  profile1:8;
-	a_uint32_t  profile2:8;
 	a_uint32_t  _reserved0:8;
+	a_uint32_t  profile2:8;
+	a_uint32_t  profile1:8;
+	a_uint32_t  profile0:8;
 };
 
 union ecn_profile_u {
@@ -2176,8 +2192,8 @@ union eg_proto_mapping1_u {
 	#define DBG_ADDR_DBG_ADDR_DEFAULT 0x0
 
 struct dbg_addr {
-	a_uint32_t  dbg_addr:16;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  dbg_addr:16;
 };
 
 union dbg_addr_u {
@@ -2442,44 +2458,46 @@ union eg_header_data_u {
 	#define EG_XLAT_TUN_CTRL_OUTPUT_VP_DEFAULT 0x0
 
 struct eg_xlat_tun_ctrl {
-	a_uint32_t  type:1;
+	a_uint32_t  dscp_mode:1;
+	a_uint32_t  ip_ver:1;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  l3_offset:6;
+	a_uint32_t  vlan_offset:5;
+	a_uint32_t  data_length:8;
+	a_uint32_t  edit_rule_target:2;
+	a_uint32_t  edit_rule_id:4;
+	a_uint32_t  ipv4_df_mode_ext:1;
 #if defined(MPPE)
-	a_uint32_t  mapt_udp_csm0_dis:1;
 	a_uint32_t  resv:1;
+	a_uint32_t  mapt_udp_csm0_dis:1;
 #else
 	a_uint32_t  resv:2;
 #endif
-	a_uint32_t  ipv4_df_mode_ext:1;
-	a_uint32_t  edit_rule_id:4;
-	a_uint32_t  edit_rule_target:2;
-	a_uint32_t  data_length:8;
-	a_uint32_t  vlan_offset:5;
-	a_uint32_t  l3_offset:6;
-	a_uint32_t  pppoe_en:1;
-	a_uint32_t  ip_ver:1;
-	a_uint32_t  dscp_mode:1;
-	a_uint32_t  l4_offset:7;
-	a_uint32_t  tunnel_offset:7;
-	a_uint32_t  stag_fmt:1;
-	a_uint32_t  ctag_fmt:1;
-	a_uint32_t  spcp_mode:1;
-	a_uint32_t  sdei_mode:1;
-	a_uint32_t  cpcp_mode:1;
-	a_uint32_t  cdei_mode:1;
-	a_uint32_t  ecn_mode:2;
-	a_uint32_t  ttl_mode:1;
-	a_uint32_t  ipv4_df_mode:1;
-	a_uint32_t  ipv4_id_mode:1;
-	a_uint32_t  ipv6_fl_mode:2;
-	a_uint32_t  ip_proto_update:1;
-	a_uint32_t  l4_type:3;
+	a_uint32_t  type:1;
+
 	a_uint32_t  sport_entropy_en:1;
-	a_uint32_t  l4_checksum_en:1;
-	a_uint32_t  vni_mode:1;
-	a_uint32_t  payload_type:2;
-	a_uint32_t  output_vp_valid:1;
-	a_uint32_t  output_vp:8;
+	a_uint32_t  l4_type:3;
+	a_uint32_t  ip_proto_update:1;
+	a_uint32_t  ipv6_fl_mode:2;
+	a_uint32_t  ipv4_id_mode:1;
+	a_uint32_t  ipv4_df_mode:1;
+	a_uint32_t  ttl_mode:1;
+	a_uint32_t  ecn_mode:2;
+	a_uint32_t  cdei_mode:1;
+	a_uint32_t  cpcp_mode:1;
+	a_uint32_t  sdei_mode:1;
+	a_uint32_t  spcp_mode:1;
+	a_uint32_t  ctag_fmt:1;
+	a_uint32_t  stag_fmt:1;
+	a_uint32_t  tunnel_offset:7;
+	a_uint32_t  l4_offset:7;
+
 	a_uint32_t  _reserved0:19;
+	a_uint32_t  output_vp:8;
+	a_uint32_t  output_vp_valid:1;
+	a_uint32_t  payload_type:2;
+	a_uint32_t  vni_mode:1;
+	a_uint32_t  l4_checksum_en:1;
 };
 
 union eg_xlat_tun_ctrl_u {
@@ -2591,27 +2609,29 @@ union eg_xlat_tun_ctrl_u {
 	#define EG_EDIT_RULE_POS3_1_DEFAULT 0x0
 
 struct eg_edit_rule {
-	a_uint32_t  src1:6;
-	a_uint32_t  src2:3;
-	a_uint32_t  valid2_0:1;
-	a_uint32_t  start2_0:5;
-	a_uint32_t  width2_0:5;
-	a_uint32_t  pos2_0:7;
-	a_uint32_t  valid2_1:1;
 	a_uint32_t  start2_1_0:4;
-	a_uint32_t  start2_1_1:1;
-	a_uint32_t  width2_1:5;
-	a_uint32_t  pos2_1:7;
-	a_uint32_t  src3:3;
-	a_uint32_t  valid3_0:1;
-	a_uint32_t  start3_0:4;
-	a_uint32_t  width3_0:4;
+	a_uint32_t  valid2_1:1;
+	a_uint32_t  pos2_0:7;
+	a_uint32_t  width2_0:5;
+	a_uint32_t  start2_0:5;
+	a_uint32_t  valid2_0:1;
+	a_uint32_t  src2:3;
+	a_uint32_t  src1:6;
+
 	a_uint32_t  pos3_0:7;
-	a_uint32_t  valid3_1:1;
-	a_uint32_t  start3_1:4;
-	a_uint32_t  width3_1:4;
-	a_uint32_t  pos3_1:7;
+	a_uint32_t  width3_0:4;
+	a_uint32_t  start3_0:4;
+	a_uint32_t  valid3_0:1;
+	a_uint32_t  src3:3;
+	a_uint32_t  pos2_1:7;
+	a_uint32_t  width2_1:5;
+	a_uint32_t  start2_1_1:1;
+
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  pos3_1:7;
+	a_uint32_t  width3_1:4;
+	a_uint32_t  start3_1:4;
+	a_uint32_t  valid3_1:1;
 };
 
 union eg_edit_rule_u {
@@ -2640,8 +2660,9 @@ union eg_edit_rule_u {
 struct tl_cnt_tbl {
 	a_uint32_t  rx_pkt_cnt:32;
 	a_uint32_t  rx_byte_cnt_0:32;
-	a_uint32_t  rx_byte_cnt_1:8;
+
 	a_uint32_t  _reserved0:24;
+	a_uint32_t  rx_byte_cnt_1:8;
 };
 
 union tl_cnt_tbl_u {
@@ -2698,16 +2719,18 @@ union tl_cnt_tbl_u {
 	#define TL_PORT_VP_TBL_RX_CNT_EN_DEFAULT 0x0
 
 struct tl_port_vp_tbl {
-	a_uint32_t  vlan_profile:8;
-	a_uint32_t  pppoe_profile:8;
-	a_uint32_t  pre_ipo_profile:8;
-	a_uint32_t  tl_l3_if_valid:1;
 	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  pre_ipo_profile:8;
+	a_uint32_t  pppoe_profile:8;
+	a_uint32_t  vlan_profile:8;
+
 	a_uint32_t  mac_addr_0:32;
-	a_uint32_t  mac_addr_1:16;
-	a_uint32_t  pppoe_en:1;
-	a_uint32_t  rx_cnt_en:1;
+
 	a_uint32_t  _reserved0:14;
+	a_uint32_t  rx_cnt_en:1;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  mac_addr_1:16;
 };
 
 union tl_port_vp_tbl_u {
@@ -2794,54 +2817,57 @@ union tl_port_vp_tbl_u {
 	#define TL_VLAN_TBL_PPPOE_EN_DEFAULT 0x0
 
 struct tl_vlan_tbl_2 {
-	a_uint32_t  valid:1;
-	a_uint32_t  type:2;
-	a_uint32_t  vp_profile:8;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
-	a_uint32_t  skey_vid:12;
-	a_uint32_t  ckey_fmt:3;
-	a_uint32_t  ckey_vid_incl:1;
 	a_uint32_t  ckey_vid_0:1;
-	a_uint32_t  ckey_vid_1:11;
-	a_uint32_t  tl_l3_if_valid:1;
-	a_uint32_t  tl_l3_if_index:7;
-	a_uint32_t  pppoe_en:1;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  vp_profile:8;
+	a_uint32_t  type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0:12;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  ckey_vid_1:11;
 };
 
 struct tl_vlan_tbl_0 {
-	a_uint32_t  valid:1;
-	a_uint32_t  type:2;
-	a_uint32_t  port_vp_id:8;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
-	a_uint32_t  skey_vid:12;
-	a_uint32_t  ckey_fmt:3;
-	a_uint32_t  ckey_vid_incl:1;
 	a_uint32_t  ckey_vid_0:1;
-	a_uint32_t  ckey_vid_1:11;
-	a_uint32_t  tl_l3_if_valid:1;
-	a_uint32_t  tl_l3_if_index:7;
-	a_uint32_t  pppoe_en:1;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  port_vp_id:8;
+	a_uint32_t  type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0:12;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  ckey_vid_1:11;
 };
 
 struct tl_vlan_tbl_1 {
-	a_uint32_t  valid:1;
-	a_uint32_t  type:2;
-	a_uint32_t  port_bitmap:8;
-	a_uint32_t  skey_fmt:3;
-	a_uint32_t  skey_vid_incl:1;
-	a_uint32_t  skey_vid:12;
-	a_uint32_t  ckey_fmt:3;
-	a_uint32_t  ckey_vid_incl:1;
 	a_uint32_t  ckey_vid_0:1;
-	a_uint32_t  ckey_vid_1:11;
-	a_uint32_t  tl_l3_if_valid:1;
-	a_uint32_t  tl_l3_if_index:7;
-	a_uint32_t  pppoe_en:1;
+	a_uint32_t  ckey_vid_incl:1;
+	a_uint32_t  ckey_fmt:3;
+	a_uint32_t  skey_vid:12;
+	a_uint32_t  skey_vid_incl:1;
+	a_uint32_t  skey_fmt:3;
+	a_uint32_t  port_bitmap:8;
+	a_uint32_t  type:2;
+	a_uint32_t  valid:1;
+
 	a_uint32_t  _reserved0:12;
+	a_uint32_t  pppoe_en:1;
+	a_uint32_t  tl_l3_if_index:7;
+	a_uint32_t  tl_l3_if_valid:1;
+	a_uint32_t  ckey_vid_1:11;
 };
 
 union tl_vlan_tbl_u {
@@ -2887,8 +2913,8 @@ union ecn_map_mode0_0_u {
 	#define ECN_MAP_MODE0_1_EXCEPTION_EN_DEFAULT 0x1000
 
 struct ecn_map_mode0_1 {
-	a_uint32_t  exception_en:16;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  exception_en:16;
 };
 
 union ecn_map_mode0_1_u {
@@ -2932,8 +2958,8 @@ union ecn_map_mode1_0_u {
 	#define ECN_MAP_MODE1_1_EXCEPTION_EN_DEFAULT 0x0
 
 struct ecn_map_mode1_1 {
-	a_uint32_t  exception_en:16;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  exception_en:16;
 };
 
 union ecn_map_mode1_1_u {
@@ -2977,13 +3003,12 @@ union ecn_map_mode2_0_u {
 	#define ECN_MAP_MODE2_1_EXCEPTION_EN_DEFAULT 0x1000
 
 struct ecn_map_mode2_1 {
-	a_uint32_t  exception_en:16;
 	a_uint32_t  _reserved0:16;
+	a_uint32_t  exception_en:16;
 };
 
 union ecn_map_mode2_1_u {
 	a_uint32_t val;
 	struct ecn_map_mode2_1 bf;
 };
-#endif
 #endif

@@ -17888,9 +17888,8 @@ cmd_data_check_tunnel_decap_action_entry(char *cmd_str,
 
 	cmd_data_check_element("svlan_fmt", "untag",
 			"usage: tag or untag\n",
-			cmd_data_check_tag_format,
-			(cmd, (a_uint32_t *)&(entry_action.verify_entry.svlan_fmt),
-			 sizeof(a_uint32_t)));
+			cmd_data_check_tag_format, (cmd, &tmp, sizeof(a_uint32_t)));
+	entry_action.verify_entry.svlan_fmt = tmp;
 
 	cmd_data_check_element("svlan_id", "0",
 			"usage: svlan id\n",
@@ -17912,9 +17911,8 @@ cmd_data_check_tunnel_decap_action_entry(char *cmd_str,
 
 	cmd_data_check_element("cvlan_fmt", "untag",
 			"usage: tag or untag\n",
-			cmd_data_check_tag_format,
-			(cmd, (a_uint32_t *)&(entry_action.verify_entry.cvlan_fmt),
-			 sizeof(a_uint32_t)));
+			cmd_data_check_tag_format, (cmd, &tmp, sizeof(a_uint32_t)));
+	entry_action.verify_entry.cvlan_fmt = tmp;
 
 	cmd_data_check_element("cvlan_id", "0",
 			"usage: cvlan id\n",
@@ -18120,9 +18118,8 @@ cmd_data_check_tunnel_encap_entry(char *cmd_str, fal_tunnel_encap_cfg_t *arg_val
 
 	cmd_data_check_element("svlan_fmt", "untag",
 			"usage: tag or untag\n",
-			cmd_data_check_tag_format,
-			(cmd, (a_uint32_t *)&(entry.svlan_fmt),
-			 sizeof(a_uint32_t)));
+			cmd_data_check_tag_format, (cmd, &tmp, sizeof(a_uint32_t)));
+	entry.svlan_fmt = tmp;
 
 	cmd_data_check_element("spcp_mode", "pipe",
 			"usage: <piep/uniform>\n",
@@ -18138,9 +18135,8 @@ cmd_data_check_tunnel_encap_entry(char *cmd_str, fal_tunnel_encap_cfg_t *arg_val
 
 	cmd_data_check_element("cvlan_fmt", "untag",
 			"usage: tag or untag\n",
-			cmd_data_check_tag_format,
-			(cmd, (a_uint32_t *)&(entry.cvlan_fmt),
-			 sizeof(a_uint32_t)));
+			cmd_data_check_tag_format, (cmd, &tmp, sizeof(a_uint32_t)));
+	entry.cvlan_fmt = tmp;
 
 	cmd_data_check_element("cpcp_mode", "pipe",
 			"usage: <piep/uniform>\n",
@@ -18830,9 +18826,8 @@ cmd_data_check_mapt_decap_entry(char *cmd_str, void *arg_val, a_uint32_t size)
 
 	cmd_data_check_element("svlan_fmt", "untag",
 			"usage: tag or untag\n",
-			cmd_data_check_tag_format,
-			(cmd, (a_uint32_t *)&(entry.verify_entry.svlan_fmt),
-			 sizeof(a_uint32_t)));
+			cmd_data_check_tag_format, (cmd, &tmp, sizeof(a_uint32_t)));
+	entry.verify_entry.svlan_fmt = tmp;
 
 	cmd_data_check_element("svlan_id", "0",
 			"usage: svlan id\n",
@@ -18853,9 +18848,8 @@ cmd_data_check_mapt_decap_entry(char *cmd_str, void *arg_val, a_uint32_t size)
 
 	cmd_data_check_element("cvlan_fmt", "untag",
 			"usage: tag or untag\n",
-			cmd_data_check_tag_format,
-			(cmd, (a_uint32_t *)&(entry.verify_entry.cvlan_fmt),
-			 sizeof(a_uint32_t)));
+			cmd_data_check_tag_format, (cmd, &tmp, sizeof(a_uint32_t)));
+	entry.verify_entry.cvlan_fmt = tmp;
 
 	cmd_data_check_element("cvlan_id", "0",
 			"usage: cvlan id\n",

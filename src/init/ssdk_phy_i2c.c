@@ -1,16 +1,20 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+
 /*qca808x_start*/
 #include "sw.h"
 #include "ssdk_phy_i2c.h"
@@ -28,7 +32,7 @@
 * read data per i2c bus
 */
 static inline a_int16_t
-_qca_i2c_read(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
+__qca_i2c_read(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
 		a_uint32_t data_addr, a_uint8_t *buf, a_uint32_t count)
 {
 	a_int16_t ret, i;
@@ -67,7 +71,7 @@ _qca_i2c_read(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
 
 	adapt = i2c_get_adapter(i2c_bus_id);
 	if (adapt) {
-		ret = i2c_transfer(adapt, msg, ARRAY_SIZE(msg));
+		ret = __i2c_transfer(adapt, msg, ARRAY_SIZE(msg));
 		i2c_put_adapter(adapt);
 	}
 
@@ -85,14 +89,14 @@ _qca_i2c_read(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
 * wrapper of reading data per i2c bus
 */
 sw_error_t
-qca_i2c_data_get(a_uint32_t dev_id, a_uint32_t i2c_slave,
+__qca_i2c_data_get(a_uint32_t dev_id, a_uint32_t i2c_slave,
 		a_uint32_t data_addr, a_uint8_t *buf, a_uint32_t count)
 {
 	a_int16_t ret = 0, cur = 0;
 	a_uint16_t cnt = count;
 
 	while (cnt) {
-		cur = _qca_i2c_read(I2C_ADAPTER_DEFAULT_ID,
+		cur = __qca_i2c_read(I2C_ADAPTER_DEFAULT_ID,
 				i2c_slave, data_addr, buf, cnt);
 
 		/* No such i2c_slave device */
@@ -120,6 +124,22 @@ qca_i2c_data_get(a_uint32_t dev_id, a_uint32_t i2c_slave,
 	return SW_OK;
 }
 
+sw_error_t
+qca_i2c_data_get(a_uint32_t dev_id, a_uint32_t i2c_slave,
+		a_uint32_t data_addr, a_uint8_t *buf, a_uint32_t count)
+{
+	sw_error_t rv = SW_OK;
+	struct i2c_adapter *adapt = i2c_get_adapter(I2C_ADAPTER_DEFAULT_ID);
+
+	SW_RTN_ON_NULL(adapt);
+
+	i2c_lock_bus(adapt, I2C_LOCK_SEGMENT);
+	rv = __qca_i2c_data_get(dev_id, i2c_slave, data_addr, buf, count);
+	i2c_unlock_bus(adapt, I2C_LOCK_SEGMENT);
+
+	return rv;
+}
+
 /******************************************************************************
 *
 * _qca_i2c_write - write data per i2c bus
@@ -127,7 +147,7 @@ qca_i2c_data_get(a_uint32_t dev_id, a_uint32_t i2c_slave,
 * write data per i2c bus
 */
 static inline a_int16_t
-_qca_i2c_write(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
+__qca_i2c_write(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
 		a_uint32_t data_addr, a_uint8_t *buf, a_uint32_t count)
 {
 	a_int16_t ret, i;
@@ -160,7 +180,7 @@ _qca_i2c_write(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
 
 	adapt = i2c_get_adapter(i2c_bus_id);
 	if (adapt) {
-		ret = i2c_transfer(adapt, &msg, 1);
+		ret = __i2c_transfer(adapt, &msg, 1);
 		i2c_put_adapter(adapt);
 	}
 
@@ -178,14 +198,14 @@ _qca_i2c_write(a_uint32_t i2c_bus_id, a_uint32_t i2c_slave,
 * wrapper of writting data per i2c bus
 */
 sw_error_t
-qca_i2c_data_set(a_uint32_t dev_id, a_uint32_t i2c_slave,
+__qca_i2c_data_set(a_uint32_t dev_id, a_uint32_t i2c_slave,
 		a_uint32_t data_addr, a_uint8_t *buf, a_uint32_t count)
 {
 	a_int16_t ret = 0, cur = 0;
 	a_uint16_t cnt = count;
 
 	while (cnt) {
-		cur = _qca_i2c_write(I2C_ADAPTER_DEFAULT_ID,
+		cur = __qca_i2c_write(I2C_ADAPTER_DEFAULT_ID,
 				i2c_slave, data_addr, buf, cnt);
 
 		/* No such i2c_slave device */
@@ -213,14 +233,30 @@ qca_i2c_data_set(a_uint32_t dev_id, a_uint32_t i2c_slave,
 	return SW_OK;
 }
 
+sw_error_t
+qca_i2c_data_set(a_uint32_t dev_id, a_uint32_t i2c_slave,
+		a_uint32_t data_addr, a_uint8_t *buf, a_uint32_t count)
+{
+	sw_error_t rv = SW_OK;
+	struct i2c_adapter *adapt = i2c_get_adapter(I2C_ADAPTER_DEFAULT_ID);
+
+	SW_RTN_ON_NULL(adapt);
+
+	i2c_lock_bus(adapt, I2C_LOCK_SEGMENT);
+	rv = __qca_i2c_data_set(dev_id, i2c_slave, data_addr, buf, count);
+	i2c_unlock_bus(adapt, I2C_LOCK_SEGMENT);
+
+	return rv;
+}
+#ifdef IN_PHY_I2C_MODE
 /******************************************************************************
 *
 * _qca_phy_i2c_mii_read - mii register i2c read
 *
 * mii register i2c read
 */
-sw_error_t
-qca_phy_i2c_mii_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+static sw_error_t
+__qca_phy_i2c_mii_read(a_uint32_t dev_id, a_uint32_t phy_addr,
                           a_uint32_t reg_addr, a_uint16_t *reg_data)
 {
 	sw_error_t ret;
@@ -228,7 +264,7 @@ qca_phy_i2c_mii_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	reg_addr &= 0xff;
 
-	ret = qca_i2c_data_get(dev_id, phy_addr,
+	ret = __qca_i2c_data_get(dev_id, phy_addr,
 			reg_addr, rx, sizeof(rx));
 
 	if (ret == SW_OK) {
@@ -246,8 +282,8 @@ qca_phy_i2c_mii_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 *
 * mii register i2c write
 */
-sw_error_t
-qca_phy_i2c_mii_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+static sw_error_t
+__qca_phy_i2c_mii_write(a_uint32_t dev_id, a_uint32_t phy_addr,
                            a_uint32_t reg_addr, a_uint16_t reg_data)
 {
 	sw_error_t ret;
@@ -255,21 +291,20 @@ qca_phy_i2c_mii_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	reg_addr &= 0xff;
 
-	ret = qca_i2c_data_set(dev_id, phy_addr,
+	ret = __qca_i2c_data_set(dev_id, phy_addr,
 			reg_addr, tx, sizeof(tx));
 
 	return ret;
 }
 
-#ifdef IN_PHY_I2C_MODE
 /******************************************************************************
 *
 * _qca_phy_i2c_mmd_read - mmd register i2c read
 *
 * mmd register i2c read
 */
-sw_error_t
-qca_phy_i2c_mmd_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num,
+static sw_error_t
+__qca_phy_i2c_mmd_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num,
                             a_uint32_t reg_addr, a_uint16_t *reg_data)
 {
 	a_uint8_t ret;
@@ -308,7 +343,7 @@ qca_phy_i2c_mmd_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num,
 		return SW_FAIL;
 	}
 
-	ret = i2c_transfer(adapt, msg, ARRAY_SIZE(msg));
+	ret = __i2c_transfer(adapt, msg, ARRAY_SIZE(msg));
 	*reg_data = (rx[0] << 8) | rx[1];
 
 	i2c_put_adapter(adapt);
@@ -326,8 +361,8 @@ qca_phy_i2c_mmd_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num,
 *
 * mmd register i2c write
 */
-sw_error_t
-qca_phy_i2c_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num,
+static sw_error_t
+__qca_phy_i2c_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num,
                             a_uint32_t reg_addr, a_uint16_t reg_data)
 {
 	a_uint8_t ret;
@@ -371,7 +406,7 @@ qca_phy_i2c_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num
 		return SW_FAIL;
 	}
 
-	ret = i2c_transfer(adapt, msg, ARRAY_SIZE(msg));
+	ret = __i2c_transfer(adapt, msg, ARRAY_SIZE(msg));
 
 	i2c_put_adapter(adapt);
 
@@ -388,7 +423,7 @@ qca_phy_i2c_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint16_t mmd_num
 *
 * check if phy addr is i2c addr
 */
-a_bool_t
+static a_bool_t
 qca_phy_is_i2c_addr(a_uint32_t phy_addr)
 {
 	if(((phy_addr & QCA_PHY_I2C_DEVADDR_MASK) ==
@@ -403,12 +438,12 @@ qca_phy_is_i2c_addr(a_uint32_t phy_addr)
 
 /******************************************************************************
 *
-* qca_phy_i2c_read -  PHY register i2c read
+* __qca_phy_i2c_read -  PHY register i2c read
 *
 * PHY register i2c read
 */
 sw_error_t
-qca_phy_i2c_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+__qca_phy_i2c_read(a_uint32_t dev_id, a_uint32_t phy_addr,
                            a_uint32_t reg_addr_c45, a_uint16_t *reg_data)
 {
 	a_uint32_t mmd_num = QCA_PHY_MII_ADDR_C45_MMD_NUM(reg_addr_c45);
@@ -419,23 +454,38 @@ qca_phy_i2c_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 	}
 
 	if(QCA_PHY_MII_ADDR_C45_IS_MMD(reg_addr_c45)) {
-		qca_phy_i2c_mmd_read(dev_id, phy_addr, mmd_num, reg_addr, reg_data);
+		__qca_phy_i2c_mmd_read(dev_id, phy_addr, mmd_num, reg_addr, reg_data);
 
 	} else {
-		qca_phy_i2c_mii_read(dev_id, phy_addr, reg_addr, reg_data);
+		__qca_phy_i2c_mii_read(dev_id, phy_addr, reg_addr, reg_data);
 	}
 
 	return SW_OK;
 }
 
+sw_error_t
+qca_phy_i2c_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+                           a_uint32_t reg_addr_c45, a_uint16_t *reg_data)
+{
+	sw_error_t rv = SW_OK;
+	struct i2c_adapter *adapt = i2c_get_adapter(I2C_ADAPTER_DEFAULT_ID);
+
+	SW_RTN_ON_NULL(adapt);
+
+	i2c_lock_bus(adapt, I2C_LOCK_SEGMENT);
+	rv = __qca_phy_i2c_read(dev_id, phy_addr, reg_addr_c45, reg_data);
+	i2c_unlock_bus(adapt, I2C_LOCK_SEGMENT);
+
+	return rv;
+}
 /******************************************************************************
 *
-* qca_phy_i2c_write -  PHY register i2c write
+* __qca_phy_i2c_write -  PHY register i2c write
 *
 * PHY register i2c write
 */
 sw_error_t
-qca_phy_i2c_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+__qca_phy_i2c_write(a_uint32_t dev_id, a_uint32_t phy_addr,
                             a_uint32_t reg_addr_c45, a_uint16_t reg_data)
 {
 	a_uint32_t mmd_num = QCA_PHY_MII_ADDR_C45_MMD_NUM(reg_addr_c45);
@@ -446,13 +496,29 @@ qca_phy_i2c_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 	}
 
 	if(QCA_PHY_MII_ADDR_C45_IS_MMD(reg_addr_c45)) {
-		qca_phy_i2c_mmd_write(dev_id, phy_addr, mmd_num, reg_addr, reg_data);
+		__qca_phy_i2c_mmd_write(dev_id, phy_addr, mmd_num, reg_addr, reg_data);
 
 	} else {
-		qca_phy_i2c_mii_write(dev_id, phy_addr, reg_addr, reg_data);
+		__qca_phy_i2c_mii_write(dev_id, phy_addr, reg_addr, reg_data);
 	}
 
 	return SW_OK;
+}
+
+sw_error_t
+qca_phy_i2c_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+                            a_uint32_t reg_addr_c45, a_uint16_t reg_data)
+{
+	sw_error_t rv = SW_OK;
+	struct i2c_adapter *adapt = i2c_get_adapter(I2C_ADAPTER_DEFAULT_ID);
+
+	SW_RTN_ON_NULL(adapt);
+
+	i2c_lock_bus(adapt, I2C_LOCK_SEGMENT);
+	rv = __qca_phy_i2c_write(dev_id, phy_addr, reg_addr_c45, reg_data);
+	i2c_unlock_bus(adapt, I2C_LOCK_SEGMENT);
+
+	return rv;
 }
 /*qca808x_end*/
 EXPORT_SYMBOL(qca_phy_i2c_read);

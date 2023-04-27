@@ -267,6 +267,24 @@ static int sfp_phy_read_abilities(struct phy_device *pdev)
 }
 #endif
 
+static sw_error_t
+sfp_phy_i2c_read(a_uint32_t dev_id, a_uint32_t i2c_slaver, a_uint32_t reg_addr,
+	a_uint16_t *reg_data)
+{
+	sw_error_t rv = SW_OK;
+	a_uint8_t rx[2] = { 0 };
+
+	rv = qca_i2c_data_get(dev_id, i2c_slaver, reg_addr & 0xff, rx, sizeof(rx));
+
+	if (rv == SW_OK) {
+		*reg_data = (rx[0] << 8) | rx[1];
+	} else {
+		*reg_data = 0xffff;
+	}
+
+	return rv;
+}
+
 static struct phy_driver sfp_phy_driver = {
 	.name		= "QCA SFP",
 	.phy_id		= SFP_PHY,
@@ -426,7 +444,7 @@ sfp_phy_part_number_check(a_uint32_t dev_id, a_uint32_t port_id)
 	a_uint16_t reg_data[5] = {0}, i = 0;
 
 	for (i = 0; i < 5; i++) {
-		rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_ADDR,
+		rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_ADDR,
 			SFP_E2PROM_PART_NUM_OFFSET + i *2, &reg_data[i]);
 		if (rv != SW_OK)
 			return A_FALSE;
@@ -442,7 +460,7 @@ sfp_phy_usxgmii_check(a_uint32_t dev_id, a_uint32_t port_id)
 	if (sfp_phy_part_number_check(dev_id, port_id) == A_TRUE) {
 		sw_error_t rv = SW_OK;
 		a_uint16_t reg_data = 0;
-		rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
+		rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
 			SFP_EXTEND_USXGMII_OFFSET, &reg_data);
 		if (rv != SW_OK)
 			return A_FALSE;
@@ -493,7 +511,7 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 	}
 	rv = hsl_port_phydev_get(dev_id, port_id, &phydev);
 	SW_RTN_ON_ERROR(rv);
-	rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_ADDR, SFP_SPEED_ADDR,
+	rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_ADDR, SFP_SPEED_ADDR,
 		&reg_data);
 	SW_RTN_ON_ERROR(rv);
 	sfp_speed = SFP_TO_SFP_SPEED(reg_data);
@@ -503,7 +521,7 @@ sw_error_t sfp_phy_interface_get_mode_status(a_uint32_t dev_id,
 		sfp_speed < SFP_SPEED_2500M)
 	{
 		reg_data = 0;
-		rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_ADDR, SFP_TYPE_ADDR,
+		rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_ADDR, SFP_TYPE_ADDR,
 			&reg_data);
 		SW_RTN_ON_ERROR(rv);
 		sfp_type = SFP_TO_SFP_TYPE(reg_data);
@@ -743,7 +761,7 @@ sfp_phy_port_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 		return SW_OK;
 	}
 	if (sfp_phy_part_number_check(dev_id, port_id) == A_TRUE) {
-		rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
+		rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
 			SFP_EXTEND_LINK_OFFSET, &reg_data);
 		SW_RTN_ON_ERROR(rv);
 
@@ -756,7 +774,7 @@ sfp_phy_port_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 			} else {
 				phy_status->duplex = FAL_FULL_DUPLEX;
 			}
-			rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
+			rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
 					SFP_EXTEND_SPEED_OFFSET, &reg_data);
 			SW_RTN_ON_ERROR(rv);
 			speed_data = (reg_data >> 0x8) & 0x7;
@@ -770,7 +788,7 @@ sfp_phy_port_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 					SSDK_ERROR("usxgmii sfp port speed sync failed!\n");
 					break;
 				}
-				rv = qca_phy_i2c_mii_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
+				rv = sfp_phy_i2c_read(dev_id, SFP_E2PROM_EXTEND_ADDR,
 					SFP_EXTEND_SPEED_OFFSET, &reg_data);
 				SW_RTN_ON_ERROR(rv);
 				speed_data = (reg_data >> 0x8) & 0x7;

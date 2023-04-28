@@ -285,6 +285,7 @@ endif
 
 ifeq (TRUE, $(API_LOCK))
   MODULE_CFLAG += -DAPI_LOCK
+  MODULE_CFLAG += -DSW_API_LOCK
 endif
 
 ifeq (TRUE, $(REG_ACCESS_SPEEDUP))

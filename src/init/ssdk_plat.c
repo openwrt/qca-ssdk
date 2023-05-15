@@ -113,6 +113,7 @@
 
 #ifdef IN_LINUX_STD_PTP
 #include "hsl_ptp.h"
+#include "qca808x.h"
 #endif
 #include "hsl_port_prop.h"
 /*qca808x_start*/
@@ -1415,7 +1416,7 @@ static ssize_t ssdk_ptp_counter_get(struct device *dev,
 	ssize_t count = 0;
 
 	snprintf(buf + PAGE_SIZE - 5, 5, "%zd", count);
-	hsl_ptp_event_stat_operation("QCA808X ethernet", buf);
+	hsl_ptp_event_stat_operation(QCA808X_SSDK_PHY_DRIVER_NAME, buf);
 
 	/* the last 5 bytes save the length of data bytes */
 	sscanf(buf + PAGE_SIZE - 5, "%zd", &count);
@@ -1428,7 +1429,7 @@ static ssize_t ssdk_ptp_counter_set(struct device *dev,
 		const char *buf, size_t count)
 {
 	char *op_set = "set";
-	hsl_ptp_event_stat_operation("QCA808X ethernet", op_set);
+	hsl_ptp_event_stat_operation(QCA808X_SSDK_PHY_DRIVER_NAME, op_set);
 
 	return count;
 }

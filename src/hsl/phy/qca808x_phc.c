@@ -1256,7 +1256,11 @@ void qca808x_txtstamp(struct phy_device *phydev, struct sk_buff *org_skb, int ty
 						*reserved2 = ptp_info->embeded_ts.reserved2;
 						*correction = ptp_info->embeded_ts.correction;
 					}
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+					fallthrough;
+#else
 					/* fall through */
+#endif
 				case PTP_MSG_SYNC:
 					skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 					kfree_skb(skb);

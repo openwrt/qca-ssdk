@@ -347,7 +347,11 @@ qca_ar8327_phy_fixup(struct qca_phy_priv *priv, int phy)
 	case 2:
 		priv->phy_mmd_write(priv->device_id, phy, 0x7, 0x3c);
 		priv->phy_mmd_write(priv->device_id, phy, 0x4007, 0x0);
-		/* fallthrough */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+		fallthrough;
+#else
+		/* fall through */
+#endif
 	case 4:
 		if(priv->version == QCA_VER_AR8327)
 		{

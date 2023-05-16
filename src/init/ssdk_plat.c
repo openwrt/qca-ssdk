@@ -1324,6 +1324,7 @@ static ssize_t ssdk_phy_write_reg_set(struct device *dev,
 	char *this_opt;
 	char *options = phy_buf;
 	unsigned int phy_addr, reg_addr, reg_value;
+	int ret;
 
 	if (count >= sizeof(phy_buf))
 		return 0;
@@ -1334,7 +1335,10 @@ static ssize_t ssdk_phy_write_reg_set(struct device *dev,
 	if (!this_opt)
 		goto fail;
 
-	kstrtouint(this_opt, 0, &phy_addr);
+	ret = kstrtouint(this_opt, 0, &phy_addr);
+	if (ret)
+		goto fail;
+
 	if ((options - phy_buf) >= (count - 1))
 		goto fail;
 
@@ -1342,7 +1346,10 @@ static ssize_t ssdk_phy_write_reg_set(struct device *dev,
 	if (!this_opt)
 		goto fail;
 
-	kstrtouint(this_opt, 0, &reg_addr);
+	ret = kstrtouint(this_opt, 0, &reg_addr);
+	if (ret)
+		goto fail;
+
 	if ((options - phy_buf) >= (count - 1))
 		goto fail;
 
@@ -1350,7 +1357,9 @@ static ssize_t ssdk_phy_write_reg_set(struct device *dev,
 	if (!this_opt)
 		goto fail;
 
-	kstrtouint(this_opt, 0, &reg_value);
+	ret = kstrtouint(this_opt, 0, &reg_value);
+	if (ret)
+		goto fail;
 
 	qca_ar8327_phy_write(0, phy_addr, reg_addr, reg_value);
 
@@ -1379,6 +1388,7 @@ static ssize_t ssdk_phy_read_reg_set(struct device *dev,
 	char *this_opt;
 	char *options = phy_buf;
 	unsigned int phy_addr, reg_addr;
+	int ret;
 
 	if (count >= sizeof(phy_buf))
 		return 0;
@@ -1389,7 +1399,10 @@ static ssize_t ssdk_phy_read_reg_set(struct device *dev,
 	if (!this_opt)
 		goto fail;
 
-	kstrtouint(this_opt, 0, &phy_addr);
+	ret = kstrtouint(this_opt, 0, &phy_addr);
+	if (ret)
+		goto fail;
+
 	if ((options - phy_buf) >= (count - 1))
 		goto fail;
 
@@ -1397,7 +1410,9 @@ static ssize_t ssdk_phy_read_reg_set(struct device *dev,
 	if (!this_opt)
 		goto fail;
 
-	kstrtouint(this_opt, 0, &reg_addr);
+	ret = kstrtouint(this_opt, 0, &reg_addr);
+	if (ret)
+		goto fail;
 
 	qca_ar8327_phy_read(0, phy_addr, reg_addr, &phy_reg_val);
 

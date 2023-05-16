@@ -1677,8 +1677,9 @@ hsl_port_combo_phy_driver_update(a_uint32_t dev_id,
 	}
 	mutex_unlock(&phydev->lock);
 
-	/*reprobe phy driver*/
-	device_reprobe(dev);
+	/* reprobe phy driver, the return value must be checked incase of warning. */
+	if (device_reprobe(dev))
+		SSDK_ERROR("reprobe failed\n");
 
 	SSDK_DEBUG("combo phy switched to: phy_type %d, phyid 0x%x, is_c45 %d, "
 		"phydrv %s, phydev state %d\n", phy_info[dev_id]->phy_type[port_id],

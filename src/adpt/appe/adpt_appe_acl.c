@@ -1024,6 +1024,7 @@ _adpt_appe_pre_acl_rule_sw_query(a_uint32_t dev_id,
 	a_uint32_t hw_list_id, a_uint32_t hw_entries, fal_acl_rule_t * rule)
 {
 	a_uint32_t hw_index;
+	a_uint64_t byte_cnt;
 	sw_error_t rv = SW_OK;
 	fal_acl_rule_t * sw_rule;
 	fal_acl_rule_t inner_rule;
@@ -1034,23 +1035,12 @@ _adpt_appe_pre_acl_rule_sw_query(a_uint32_t dev_id,
 
 	aos_mem_zero(&inner_rule, sizeof(fal_acl_rule_t));
 
-	hw_index = _acl_bit_index(hw_entries, ADPT_PRE_ACL_ENTRY_NUM_PER_LIST, 0);
-	if(hw_index >= ADPT_PRE_ACL_ENTRY_NUM_PER_LIST)
-	{
-		return SW_FAIL;
-	}
-	appe_pre_ipo_cnt_tbl_get(dev_id,
-		hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index, &hw_match);
-
-	rule->match_cnt = hw_match.bf.hit_pkt_cnt;
-	rule->match_bytes = hw_match.bf.hit_byte_cnt_1;
-	rule->match_bytes = rule->match_bytes<<32|hw_match.bf.hit_byte_cnt_0;
 	while(hw_entries != 0)
 	{
 		hw_index = _acl_bit_index(hw_entries, ADPT_PRE_ACL_ENTRY_NUM_PER_LIST, 0);
 		if(hw_index >= ADPT_PRE_ACL_ENTRY_NUM_PER_LIST)
 		{
-			break;
+			return SW_FAIL;
 		}
 		rv |= appe_pre_ipo_rule_reg_get(dev_id,
 			hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index, &hw_reg);
@@ -1089,6 +1079,13 @@ _adpt_appe_pre_acl_rule_sw_query(a_uint32_t dev_id,
 		}
 
 		_adpt_appe_pre_acl_action_hw_2_sw(dev_id, &hw_act, rule);
+
+		rv |= appe_pre_ipo_cnt_tbl_get(dev_id,
+			hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index, &hw_match);
+		rule->match_cnt += hw_match.bf.hit_pkt_cnt;
+		byte_cnt = hw_match.bf.hit_byte_cnt_1;
+		rule->match_bytes += byte_cnt<<32|hw_match.bf.hit_byte_cnt_0;
+
 		hw_entries &= (~(1<<hw_index));
 	}
 	acl_rule_field_convert(&inner_rule, &rule->inner_rule_field, A_TRUE);

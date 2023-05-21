@@ -21,6 +21,7 @@
 #include <linux/i2c.h>
 #include "ssdk_init.h"
 #include "ssdk_plat.h"
+#include "hsl_phy.h"
 
 #define I2C_RW_LIMIT           8
 #define I2C_ADAPTER_DEFAULT_ID 0
@@ -449,6 +450,7 @@ __qca_phy_i2c_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t mmd_num = QCA_PHY_MII_ADDR_C45_MMD_NUM(reg_addr_c45);
 	a_uint32_t reg_addr = QCA_PHY_MII_ADDR_C45_REG_ADDR(reg_addr_c45);
 
+	phy_addr = TO_PHY_I2C_ADDR_VAL(phy_addr);
 	if(qca_phy_is_i2c_addr(phy_addr) == A_FALSE) {
 		return SW_BAD_PARAM;
 	}
@@ -491,6 +493,7 @@ __qca_phy_i2c_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t mmd_num = QCA_PHY_MII_ADDR_C45_MMD_NUM(reg_addr_c45);
 	a_uint32_t reg_addr = QCA_PHY_MII_ADDR_C45_REG_ADDR(reg_addr_c45);
 
+	phy_addr = TO_PHY_I2C_ADDR_VAL(phy_addr);
 	if(qca_phy_is_i2c_addr(phy_addr) == A_FALSE) {
 		return SW_BAD_PARAM;
 	}

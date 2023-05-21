@@ -507,20 +507,6 @@ void qca_ssdk_phy_mdio_fake_address_set(a_uint32_t dev_id, a_uint32_t i,
 
 	return;
 }
-
-a_uint32_t
-qca_ssdk_phy_mdio_fake_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_mdio_fake_addr)
-{
-	a_uint32_t i = 0;
-
-	for (i = 0; i < SW_MAX_NR_PORT; i ++)
-	{
-		if (phy_info[dev_id]->phy_mdio_fake_address[i] == phy_mdio_fake_addr)
-			return i;
-	}
-	SSDK_ERROR("doesn't match port_id to specified phy_mdio_fake_addr !\n");
-	return 0;
-}
 #endif
 /*qca808x_start*/
 a_uint32_t
@@ -538,6 +524,12 @@ qca_ssdk_phy_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr)
 	{
 		if (phy_info[dev_id]->phy_address[i] == phy_addr)
 			return i;
+#if defined(IN_PHY_I2C_MODE)
+		/*for the case that IN_PHY_I2C_MODE was enabled,
+		if port id was not found, the mdio fake address can be used*/
+		if (phy_info[dev_id]->phy_mdio_fake_address[i] == TO_PHY_ADDR(phy_addr))
+			return i;
+#endif
 	}
 	SSDK_DEBUG("doesn't match port_id to specified phy_addr !\n");
 	return 0;

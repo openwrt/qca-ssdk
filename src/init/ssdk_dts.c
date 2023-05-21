@@ -628,7 +628,8 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 				return SW_BAD_VALUE;
 			}
 			/* phy_i2c_address is the i2c slave addr */
-			hsl_phy_address_init(dev_id, port_id, phy_i2c_addr);
+			hsl_phy_address_init(dev_id, port_id,
+				TO_PHY_I2C_ADDR(phy_i2c_addr));
 			/* phy_address is the mdio addr,
 			 * which is a fake mdio addr in i2c mode */
 			qca_ssdk_phy_mdio_fake_address_set(dev_id, port_id, phy_addr);

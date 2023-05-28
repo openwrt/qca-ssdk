@@ -242,6 +242,9 @@ enum {
 #define SSDK_LOG_LEVEL_INFO     2
 #define SSDK_LOG_LEVEL_DEBUG    3
 #define SSDK_LOG_LEVEL_DEFAULT  SSDK_LOG_LEVEL_INFO
+#define SSDK_MII_BUS_MAX           2
+#define SSDK_MII_INVALID_BUS_ID    SSDK_MII_BUS_MAX
+#define SSDK_MII_DEFAULT_BUS_ID    0
 
 extern a_uint32_t ssdk_log_level;
 
@@ -329,7 +332,7 @@ struct qca_phy_priv {
 	fal_pbmp_t fdb_sw_sync_port_map;
 	/*hppe_fdb_sw_sync end*/
 /*qca808x_start*/
-	struct mii_bus *miibus;
+	struct mii_bus *miibus[SSDK_MII_BUS_MAX];
 /*qca808x_end*/
 	u64 *mib_counters;
 	a_uint32_t mib_loop_cnt;
@@ -466,10 +469,14 @@ sw_error_t
 qca_uniphy_reg_read(a_uint32_t dev_id, a_uint32_t uniphy_index,
 				a_uint32_t reg_addr, a_uint8_t * reg_data, a_uint32_t len);
 /*qca808x_start*/
-struct mii_bus *ssdk_miibus_get_by_device(a_uint32_t dev_id);
+struct mii_bus *ssdk_miibus_get(a_uint32_t dev_id, a_uint32_t index);
+struct mii_bus *ssdk_port_miibus_get(a_uint32_t dev_id, a_uint32_t port_id);
+struct mii_bus *ssdk_phy_miibus_get(a_uint32_t dev_id, a_uint32_t phy_addr);
+sw_error_t ssdk_miibus_add(a_uint32_t dev_id, struct mii_bus *miibus, a_uint32_t *index);
+a_uint32_t ssdk_miibus_index_get(a_uint32_t dev_id, struct mii_bus *miibus);
 /*qca808x_end*/
-sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t freq);
-sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t *freq);
+sw_error_t ssdk_miibus_freq_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t freq);
+sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t index, a_uint32_t *freq);
 
 int ssdk_sysfs_init (void);
 void ssdk_sysfs_exit (void);

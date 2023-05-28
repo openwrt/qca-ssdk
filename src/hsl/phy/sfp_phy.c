@@ -51,15 +51,9 @@ static int
 sfp_phy_probe(struct phy_device *pdev)
 {
 	fal_port_t port;
-	a_uint32_t addr;
 	struct qca_phy_priv *priv = pdev->priv;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-	addr = pdev->mdio.addr;
-#else
-	addr = pdev->addr;
-#endif
-	port = qca_ssdk_phy_addr_to_port(priv->device_id, addr);
+	port = qca_ssdk_phydev_to_port(priv->device_id, pdev);
 	if (A_TRUE == hsl_port_feature_get(priv->device_id, port, PHY_F_SFP_SGMII)) {
 		pdev->autoneg = AUTONEG_ENABLE;
 	} else {
@@ -184,7 +178,6 @@ static int
 sfp_read_status(struct phy_device *pdev)
 {
 	fal_port_t port;
-	a_uint32_t addr = 0;
 	struct qca_phy_priv *priv = pdev->priv;
 #ifdef MP
 	a_uint32_t port_mode = 0, uniphy_index = 0, uniphy_mode = 0;
@@ -193,12 +186,7 @@ sfp_read_status(struct phy_device *pdev)
 	phy_info_t *phy_info = NULL;
 #endif
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-	addr = pdev->mdio.addr;
-#else
-	addr = pdev->addr;
-#endif
-	port = qca_ssdk_phy_addr_to_port(priv->device_id, addr);
+	port = qca_ssdk_phydev_to_port(priv->device_id, pdev);
 	if(port == 0)
 		return -ENXIO;
 #ifdef MP
@@ -328,9 +316,11 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
 	} else
 #endif
 	{
-		addr = qca_ssdk_port_to_phy_addr(dev_id, port);
+		addr = TO_PHY_ADDR(qca_ssdk_port_to_phy_addr(dev_id, port));
 	}
-	bus = hsl_phy_miibus_get(dev_id, addr);
+	bus = ssdk_phy_miibus_get(dev_id, addr);
+	if(!bus)
+		return SW_NOT_FOUND;
 	phydev = phy_device_create(bus, addr, phy_id, false, NULL);
 	if (IS_ERR(phydev) || phydev == NULL) {
 		SSDK_ERROR("Failed to create phy device!\n");
@@ -362,14 +352,16 @@ void sfp_phy_device_remove(a_uint32_t dev_id, a_uint32_t port)
 		return;
 	}
 
-	bus = ssdk_miibus_get_by_device(dev_id);
+	bus = ssdk_port_miibus_get(dev_id, port);
+	if(!bus)
+		return;
 #if defined(IN_PHY_I2C_MODE)
 	if (hsl_port_phy_access_type_get(dev_id, port) == PHY_I2C_ACCESS) {
 		addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port);
 	} else
 #endif
 	{
-		addr = qca_ssdk_port_to_phy_addr(dev_id, port);
+		addr = TO_PHY_ADDR(qca_ssdk_port_to_phy_addr(dev_id, port));
 	}
 
 	if (addr < PHY_MAX_ADDR)

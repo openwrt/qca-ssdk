@@ -54,14 +54,7 @@ extern struct list_head g_qca808x_phy_list;
 void qca808x_ptp_gm_gps_seconds_sync_enable(a_uint32_t dev_id,
 		a_uint32_t phy_addr, a_bool_t en)
 {
-	struct qca808x_phy_info *pdata;
-#if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id;
-	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
-	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
-		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
-	}
-#endif
+	struct qca808x_phy_info *pdata = NULL;
 
 	pdata = qca808x_phy_info_get(phy_addr);
 	if (pdata) {
@@ -78,14 +71,7 @@ void qca808x_ptp_gm_gps_seconds_sync_enable(a_uint32_t dev_id,
 a_bool_t qca808x_ptp_gm_gps_seconds_sync_status_get(a_uint32_t dev_id,
 		a_uint32_t phy_addr)
 {
-	struct qca808x_phy_info *pdata;
-#if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id;
-	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
-	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
-		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
-	}
-#endif
+	struct qca808x_phy_info *pdata = NULL;
 
 	pdata = qca808x_phy_info_get(phy_addr);
 	if (pdata) {
@@ -98,14 +84,7 @@ a_bool_t qca808x_ptp_gm_gps_seconds_sync_status_get(a_uint32_t dev_id,
 void qca808x_ptp_clock_mode_config(a_uint32_t dev_id,
 		a_uint32_t phy_addr, a_uint16_t clock_mode, a_uint16_t step_mode)
 {
-	struct qca808x_phy_info *pdata;
-#if defined(IN_PHY_I2C_MODE)
-	a_uint32_t port_id;
-	port_id = qca_ssdk_phy_addr_to_port(dev_id, phy_addr);
-	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
-		phy_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
-	}
-#endif
+	struct qca808x_phy_info *pdata = NULL;
 
 	pdata = qca808x_phy_info_get(phy_addr);
 

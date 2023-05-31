@@ -294,11 +294,11 @@ static struct phy_driver sfp_phy_driver = {
 #endif
 };
 
-int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
+int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id,
+	void *priv)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	struct phy_device *phydev;
-	struct qca_phy_priv *priv;
 	a_uint32_t addr = 0;
 	struct mii_bus *bus;
 
@@ -306,8 +306,6 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
 	{
 		return 0;
 	}
-
-	priv = ssdk_phy_priv_data_get(dev_id);
 	/*create phy device*/
 #if defined(IN_PHY_I2C_MODE)
 	if (hsl_port_phy_access_type_get(dev_id, port) == PHY_I2C_ACCESS) {
@@ -315,7 +313,7 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id)
 	} else
 #endif
 	{
-		addr = TO_PHY_ADDR(qca_ssdk_port_to_phy_addr(dev_id, port));
+		addr = qca_ssdk_port_to_phy_addr(dev_id, port);
 	}
 	bus = ssdk_phy_miibus_get(dev_id, addr);
 	if(!bus)
@@ -401,12 +399,13 @@ void sfp_phy_driver_unregister(void)
 int sfp_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 {
 	a_uint32_t port_id = 0;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
 
 	SSDK_INFO("qca probe sfp phy driver succeeded!\n");
 
 	for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++) {
 		if (port_bmp & (0x1 << port_id)) {
-			sfp_phy_device_setup(dev_id, port_id, SFP_PHY);
+			sfp_phy_device_setup(dev_id, port_id, SFP_PHY, priv);
 		}
 	}
 	return sfp_phy_driver_register();

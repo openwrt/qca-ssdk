@@ -31,25 +31,8 @@ struct qca808x_phy_info* qca808x_phy_info_get(a_uint32_t phy_addr)
 {
 	struct qca808x_phy_info *pdata = NULL;
 	list_for_each_entry(pdata, &g_qca808x_phy_list, list) {
-		if (pdata->phydev_addr == phy_addr) {
+		if (pdata->phy_addr == phy_addr) {
 			return pdata;
-		}
-	}
-
-	return NULL;
-}
-
-static struct qca808x_phy_info* qca808x_phy_info_get_by_phydev(
-	struct phy_device *phydev)
-{
-	struct qca808x_phy_info *pdata = NULL;
-	a_uint32_t miibus_index = 0;
-
-	list_for_each_entry(pdata, &g_qca808x_phy_list, list) {
-		if (phydev->mdio.addr == pdata->phydev_addr) {
-			miibus_index = TO_MIIBUS_INDEX(pdata->phy_addr);
-			if(ssdk_miibus_get(pdata->dev_id, miibus_index) == phydev->mdio.bus)
-				return pdata;
 		}
 	}
 
@@ -593,29 +576,11 @@ static void qca808x_link_change_notify(struct phy_device *phydev)
 
 int qca808x_phy_probe(struct phy_device *phydev)
 {
-	qca808x_priv *priv;
 	int err = 0;
 
-	priv = kzalloc(sizeof(qca808x_priv), GFP_KERNEL);
-	if (!priv) {
-		return -ENOMEM;
-	}
-
-	priv->phydev = phydev;
-
-	priv->phy_info = qca808x_phy_info_get_by_phydev(phydev);
-	/*for switch ports, the phys may also be probed here, but
-	* failed because switch phys are init on another device, so
-	* return ok for the case.
-	*/
-	if(!priv->phy_info) {
-		kfree(priv);
-		return 0;
-	}
-	phydev->priv = priv;
-
 #if defined(IN_LINUX_STD_PTP)
-	err = qca808x_ptp_init(priv);
+	if(phydev->priv != NULL)
+		err = qca808x_ptp_init((qca808x_priv*)(phydev->priv));
 #endif
 
 	return err;
@@ -708,7 +673,10 @@ void qca808x_phy_driver_unregister(void)
 
 void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 {
-	struct qca808x_phy_info *pdata;
+	struct phy_device *phydev = NULL;
+	qca808x_priv *priv = NULL;
+
+	struct qca808x_phy_info *pdata = NULL;
 	pdata = kzalloc(sizeof(struct qca808x_phy_info), GFP_KERNEL);
 
 	if (!pdata) {
@@ -721,6 +689,17 @@ void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 	/* the phy address may be the i2c slave addr or mdio addr */
 	pdata->phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
 	pdata->phydev_addr = TO_PHY_ADDR(pdata->phy_addr);
+
+	hsl_port_phydev_get(dev_id, port_id, &phydev);
+	if(phydev) {
+		priv = kzalloc(sizeof(qca808x_priv), GFP_KERNEL);
+		if (!priv) {
+			return;
+		}
+		priv->phydev = phydev;
+		priv->phy_info = pdata;
+		phydev->priv = priv;
+	}
 #if defined(IN_PHY_I2C_MODE)
 	/* in i2c mode, need to register a fake phy device
 	 * before the phy driver register */
@@ -732,7 +711,7 @@ void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 			return;
 		}
 		pdata->phydev_addr = qca_ssdk_port_to_phy_mdio_fake_addr(dev_id, port_id);
-		sfp_phy_device_setup(dev_id, port_id, phy_id);
+		sfp_phy_device_setup(dev_id, port_id, phy_id, pdata);
 	}
 #endif
 }

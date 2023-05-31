@@ -1275,8 +1275,6 @@ void ssdk_gcc_clock_init(void)
 #endif
 	}
 #endif
-
-	SSDK_INFO("SSDK gcc clock init successfully!\n");
 }
 
 void
@@ -1547,7 +1545,6 @@ void ssdk_ppe_reset_init(a_uint32_t dev_id)
 	ssdk_gcc_reset(rst, SSDK_RESET_DEASSERT);
 	msleep(100);
 	reset_control_put(rst);
-	SSDK_INFO("ppe reset successfully!\n");
 
 	for (i = 0; i < ARRAY_SIZE(ppe_rst_ids); i++)
 		uniphy_rsts[i] = of_reset_control_get(rst_node, ppe_rst_ids[i]);

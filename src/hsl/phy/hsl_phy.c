@@ -54,6 +54,8 @@
 #include "ssdk_plat.h"
 #include "hsl_port_prop.h"
 #include <linux/netdevice.h>
+#include <linux/i2c.h>
+#include "ssdk_phy_i2c.h"
 
 phy_info_t *phy_info[SW_MAX_NR_DEV] = {0};
 a_uint32_t port_bmp[SW_MAX_NR_DEV] = {0};
@@ -1773,5 +1775,472 @@ hsl_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t fea
 	phy_info[dev_id]->phy_features[port_id] &= ~feature;
 
 	return SW_OK;
+}
+/*********************APIs to access PHY with MDIO and I2C*********************/
+static sw_error_t
+hsl_phy_lock(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
+{
+#if defined(IN_PHY_I2C_MODE)
+	if(IS_I2C_PHY_ADDR(phy_addr))
+	{
+		struct i2c_adapter *adapt = i2c_get_adapter(I2C_ADAPTER_DEFAULT_ID);
+		SW_RTN_ON_NULL(adapt);
+		if(enable)
+			i2c_lock_bus(adapt, I2C_LOCK_SEGMENT);
+		else
+			i2c_unlock_bus(adapt, I2C_LOCK_SEGMENT);
+	}
+	else
+#endif
+	{
+		struct mii_bus *miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
+		SW_RTN_ON_NULL(miibus);
+		if(enable)
+			mutex_lock(&miibus->mdio_lock);
+		else
+			mutex_unlock(&miibus->mdio_lock);
+	}
+
+	return SW_OK;
+}
+/*
+ * @brief read mii register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mii_reg mii register id
+ * @return mii register value
+ */
+a_uint16_t
+__hsl_phy_mii_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg)
+{
+	a_uint16_t phy_data = 0;
+
+#if defined(IN_PHY_I2C_MODE)
+	if(IS_I2C_PHY_ADDR(phy_addr))
+	{
+		if(__qca_phy_i2c_read(dev_id, phy_addr, mii_reg, &phy_data))
+			return PHY_INVALID_DATA;
+	}
+	else
+#endif
+	{
+		struct mii_bus *miibus = NULL;
+
+		miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
+		if(!miibus)
+			return PHY_INVALID_DATA;
+		phy_data = __mdiobus_read(miibus, phy_addr, mii_reg);
+	}
+
+	return phy_data;
+}
+/*
+ * @brief write mii register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mii_reg mii register id
+ * @param[in] reg_val write to mii register
+ * @return SW_OK or error code
+ */
+sw_error_t
+__hsl_phy_mii_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t reg_val)
+{
+	struct mii_bus *miibus = NULL;
+
+#if defined(IN_PHY_I2C_MODE)
+	if(IS_I2C_PHY_ADDR(phy_addr))
+	{
+		if(__qca_phy_i2c_write(dev_id, phy_addr, mii_reg, reg_val))
+			return SW_WRITE_ERROR;
+	}
+	else
+#endif
+	{
+		miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
+		SW_RTN_ON_NULL(miibus);
+		if(__mdiobus_write(miibus, phy_addr, mii_reg, reg_val))
+			return SW_WRITE_ERROR;
+	}
+
+	return SW_OK;
+}
+/*
+ * @brief modify mii register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mii_reg mii register id
+ * @param[in] mask mask of bits to clear
+ * @param[in] value new value of bits
+ * @return SW_OK or error code
+ */
+sw_error_t
+__hsl_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t mask, a_uint16_t value)
+{
+	a_uint16_t phy_data = 0, new_phy_data = 0;
+
+	phy_data = __hsl_phy_mii_reg_read(dev_id, phy_addr, mii_reg);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	new_phy_data = (phy_data & ~mask) | value;
+	return __hsl_phy_mii_reg_write(dev_id, phy_addr, mii_reg, new_phy_data);
+}
+/*
+ * @brief read mii register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mii_reg mii register id
+ * @return mii register value
+ */
+a_uint16_t
+hsl_phy_mii_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg)
+{
+	a_uint16_t phy_data = 0;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	phy_data = __hsl_phy_mii_reg_read(dev_id, phy_addr, mii_reg);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return phy_data;
+}
+/*
+ * @brief write mii register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mii_reg mii register id
+ * @param[in] reg_val write to mii register
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_mii_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t mii_reg, a_uint16_t reg_val)
+{
+	sw_error_t rv = SW_OK;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	rv = __hsl_phy_mii_reg_write(dev_id, phy_addr, mii_reg, reg_val);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return rv;
+}
+/*
+ * @brief modify mii register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mii_reg mii register id
+ * @param[in] mask mask of bits to clear
+ * @param[in] value new value of bits
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t mask, a_uint16_t value)
+{
+	sw_error_t rv = SW_OK;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	rv = __hsl_phy_modify_mii(dev_id, phy_addr, mii_reg, mask, value);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return rv;
+}
+
+static a_uint16_t
+__hsl_phy_c45_mmd_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg)
+{
+	return __hsl_phy_mii_reg_read(dev_id, phy_addr,
+		HSL_PHY_REG_C45_ADDR(mmd_num, mmd_reg));
+}
+
+static a_uint16_t
+__hsl_phy_c22_mmd_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_CTRL_REG, mmd_num);
+	rv |= __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_DATA_REG, mmd_reg);
+	rv |= __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_CTRL_REG,
+		0x4000 | mmd_num);
+	if(rv != SW_OK)
+		return PHY_INVALID_DATA;
+	return __hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_MMD_DATA_REG);
+}
+
+static sw_error_t
+__hsl_phy_c45_mmd_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint16_t mmd_num, a_uint16_t mmd_reg, a_uint16_t reg_val)
+{
+	return __hsl_phy_mii_reg_write(dev_id, phy_addr,
+		HSL_PHY_REG_C45_ADDR(mmd_num, mmd_reg), reg_val);
+}
+
+static a_uint16_t
+__hsl_phy_c22_mmd_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t reg_val)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_CTRL_REG, mmd_num);
+	rv |= __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_DATA_REG, mmd_reg);
+	rv |= __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_CTRL_REG,
+		0x4000 | mmd_num);
+	rv |= __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_MMD_DATA_REG, reg_val);
+
+	return rv;
+}
+/*
+ * @brief read mmd register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] is_c45 is c45 access or not
+ * @param[in] mmd_num mmd number
+ * @param[in] mmd_reg mmd register id
+ * @return mmd register value
+ */
+a_uint16_t
+__hsl_phy_mmd_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg)
+{
+	if(is_c45)
+		return __hsl_phy_c45_mmd_reg_read(dev_id, phy_addr, mmd_num, mmd_reg);
+	else
+		return __hsl_phy_c22_mmd_reg_read(dev_id, phy_addr, mmd_num, mmd_reg);
+}
+/*
+ * @brief write mmd register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] is_c45 is c45 access or not
+ * @param[in] mmd_num mmd number
+ * @param[in] mmd_reg mmd register id
+ * @param[in] reg_val write to mmd register
+ * @return SW_OK or error code
+ */
+sw_error_t
+__hsl_phy_mmd_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t reg_val)
+{
+	if(is_c45)
+		return __hsl_phy_c45_mmd_reg_write(dev_id, phy_addr, mmd_num, mmd_reg,
+			reg_val);
+	else
+		return __hsl_phy_c22_mmd_reg_write(dev_id, phy_addr, mmd_num, mmd_reg,
+			reg_val);
+}
+/*
+ * @brief modify mmd register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] is_c45 is c45 access or not
+ * @param[in] mmd_num mmd number
+ * @param[in] mmd_reg mmd register id
+ * @param[in] mask mask of bits to clear
+ * @param[in] value new value of bits
+ * @return SW_OK or error code
+ */
+sw_error_t
+__hsl_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t mask, a_uint16_t value)
+{
+	a_uint16_t phy_data = 0, new_phy_data = 0;
+
+	phy_data = __hsl_phy_mmd_reg_read(dev_id, phy_addr, is_c45, mmd_num, mmd_reg);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	new_phy_data = (phy_data & ~mask) | value;
+	return __hsl_phy_mmd_reg_write(dev_id, phy_addr, is_c45, mmd_num, mmd_reg,
+		new_phy_data);
+}
+/*
+ * @brief read mmd register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] is_c45 is c45 access or not
+ * @param[in] mmd_num mmd number
+ * @param[in] mmd_reg mmd register id
+ * @return mmd register value
+ */
+a_uint16_t
+hsl_phy_mmd_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg)
+{
+	a_uint16_t phy_data = 0;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	phy_data = __hsl_phy_mmd_reg_read(dev_id, phy_addr, is_c45, mmd_num,
+		mmd_reg);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return phy_data;
+}
+/*
+ * @brief write mmd register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] is_c45 is c45 access or not
+ * @param[in] mmd_num mmd number
+ * @param[in] mmd_reg mmd register id
+ * @param[in] reg_val write to mmd register
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_mmd_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t reg_val)
+{
+	sw_error_t rv = SW_OK;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	rv = __hsl_phy_mmd_reg_write(dev_id, phy_addr, is_c45, mmd_num, mmd_reg,
+		reg_val);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return rv;
+}
+/*
+ * @brief modify mmd register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] is_c45 is c45 access or not
+ * @param[in] mmd_num mmd number
+ * @param[in] mmd_reg mmd register id
+ * @param[in] mask mask of bits to clear
+ * @param[in] value new value of bits
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t mask, a_uint16_t value)
+{
+	sw_error_t rv = SW_OK;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	rv = __hsl_phy_modify_mmd(dev_id, phy_addr, is_c45, mmd_num, mmd_reg,
+		mask, value);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return rv;
+}
+/*
+ * @brief read debug register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] debug_reg debug register id
+ * @return debug register value
+ */
+a_uint16_t
+__hsl_phy_debug_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = __hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_DEBUG_PORT_ADDRESS,
+		debug_reg);
+	if(rv != SW_OK)
+		return PHY_INVALID_DATA;
+	return __hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_DEBUG_PORT_DATA);
+}
+/*
+ * @brief write debug register without lock.
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] debug_reg debug register id
+ * @param[in] reg_val write to debug register
+ * @return SW_OK or error code
+ */
+sw_error_t
+__hsl_phy_debug_reg_write(a_uint32_t dev_id, a_uint32_t phy_id,
+	a_uint32_t debug_reg, a_uint16_t reg_val)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = __hsl_phy_mii_reg_write(dev_id, phy_id, HSL_PHY_DEBUG_PORT_ADDRESS,
+		debug_reg);
+
+	rv |= __hsl_phy_mii_reg_write(dev_id, phy_id, HSL_PHY_DEBUG_PORT_DATA,
+		reg_val);
+
+	return rv;
+}
+/*
+ * @brief modify debug register without lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] debug_reg debug register id
+ * @param[in] mask mask of bits to clear
+ * @param[in] value new value of bits
+ * @return SW_OK or error code
+ */
+sw_error_t
+__hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint16_t mask, a_uint16_t value)
+{
+	a_uint16_t phy_data = 0, new_phy_data = 0;
+
+	phy_data = __hsl_phy_debug_reg_read(dev_id, phy_addr, debug_reg);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	new_phy_data = (phy_data & ~mask) | value;
+	return __hsl_phy_debug_reg_write (dev_id, phy_addr, debug_reg,
+		new_phy_data);
+}
+/*
+ * @brief read debug register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] debug_reg debug register id
+ * @return debug register value
+ */
+a_uint16_t
+hsl_phy_debug_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg)
+{
+	a_uint16_t phy_data = 0;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	phy_data = __hsl_phy_debug_reg_read(dev_id, phy_addr, debug_reg);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return phy_data;
+}
+/*
+ * @brief write debug register with lock.
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] debug_reg debug register id
+ * @param[in] reg_val write to debug register
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_debug_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint16_t reg_val)
+{
+	sw_error_t rv = SW_OK;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	rv = __hsl_phy_debug_reg_write(dev_id, phy_addr, debug_reg, reg_val);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return rv;
+}
+/*
+ * @brief modify debug register with lock
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] debug_reg debug register id
+ * @param[in] mask mask of bits to clear
+ * @param[in] value new value of bits
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint16_t mask, a_uint16_t value)
+{
+	sw_error_t rv = SW_OK;
+
+	hsl_phy_lock(dev_id, phy_addr, A_TRUE);
+	rv = __hsl_phy_modify_debug(dev_id, phy_addr, debug_reg, mask, value);
+	hsl_phy_lock(dev_id, phy_addr, A_FALSE);
+
+	return rv;
 }
 /*qca808x_end*/

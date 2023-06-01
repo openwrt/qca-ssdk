@@ -831,6 +831,69 @@ sw_error_t
 hsl_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
 sw_error_t
 hsl_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
+/*********************APIs to access PHY with MDIO and I2C*********************/
+#define HSL_PHY_REG_C45_ADDR(mmd_num, reg_num) (BIT(30) | mmd_num << 16 | reg_num)
+#define HSL_PHY_MMD_CTRL_REG                                   13
+#define HSL_PHY_MMD_DATA_REG                                   14
+#define HSL_PHY_DEBUG_PORT_ADDRESS                             29
+#define HSL_PHY_DEBUG_PORT_DATA                                30
+#define I2C_ADAPTER_DEFAULT_ID                                 0
+
+/*APIs to access mii register*/
+a_uint16_t
+__hsl_phy_mii_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg);
+sw_error_t
+__hsl_phy_mii_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t reg_val);
+sw_error_t
+__hsl_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t mask, a_uint16_t value);
+a_uint16_t
+hsl_phy_mii_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg);
+sw_error_t
+hsl_phy_mii_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t reg_val);
+sw_error_t
+hsl_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
+	a_uint16_t mask, a_uint16_t value);
+/*APIs to access mmd register*/
+a_uint16_t
+__hsl_phy_mmd_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg);
+sw_error_t
+__hsl_phy_mmd_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t reg_val);
+sw_error_t
+__hsl_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t mask, a_uint16_t value);
+a_uint16_t
+hsl_phy_mmd_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg);
+sw_error_t
+hsl_phy_mmd_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t reg_val);
+sw_error_t
+hsl_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t is_c45,
+	a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint16_t mask, a_uint16_t value);
+/*APIs to access debug register*/
+a_uint16_t
+__hsl_phy_debug_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg);
+sw_error_t
+__hsl_phy_debug_reg_write(a_uint32_t dev_id, a_uint32_t phy_id,
+	a_uint32_t debug_reg, a_uint16_t reg_val);
+sw_error_t
+__hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint16_t mask, a_uint16_t value);
+a_uint16_t
+hsl_phy_debug_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg);
+sw_error_t
+hsl_phy_debug_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint16_t reg_val);
+sw_error_t
+hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t debug_reg, a_uint16_t mask, a_uint16_t value);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

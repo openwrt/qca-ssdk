@@ -24,8 +24,6 @@
 #include "hsl_phy.h"
 
 #define I2C_RW_LIMIT           8
-#define I2C_ADAPTER_DEFAULT_ID 0
-
 /******************************************************************************
 *
 * _qca_i2c_read - read data per i2c bus

@@ -633,6 +633,9 @@ typedef struct {
 #define TO_PHY_ADDR(phy_addr_e) (phy_addr_e & 0x1f)
 #define TO_MIIBUS_INDEX(phy_addr_e) (phy_addr_e >> 8 & 0xf)
 
+#define TO_PHY_I2C_ADDR(phy_addr) (BIT(24) | phy_addr)
+#define TO_PHY_I2C_ADDR_VAL(i2c_addr) (i2c_addr & 0x7f)
+#define IS_I2C_PHY_ADDR(phy_addr) (phy_addr & BIT(24))
 sw_error_t
 hsl_phy_api_ops_register(phy_type_t phy_type, hsl_phy_ops_t * phy_api_ops);
 
@@ -661,9 +664,6 @@ qca_ssdk_port_to_phy_addr(a_uint32_t dev_id, a_uint32_t port_id);
 #if defined(IN_PHY_I2C_MODE)
 a_uint32_t
 qca_ssdk_port_to_phy_mdio_fake_addr(a_uint32_t dev_id, a_uint32_t port_id);
-
-a_uint32_t
-qca_ssdk_phy_mdio_fake_addr_to_port(a_uint32_t dev_id, a_uint32_t phy_addr);
 
 void qca_ssdk_phy_mdio_fake_address_set(a_uint32_t dev_id, a_uint32_t i,
 				a_uint32_t value);

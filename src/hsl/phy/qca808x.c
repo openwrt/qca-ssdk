@@ -50,7 +50,7 @@ static a_bool_t qca808x_sfp_present(struct phy_device *phydev)
 		SSDK_ERROR("pdata is null\n");
 		return A_FALSE;
 	}
-	rv = qca808x_phy_get_phy_id(pdata->dev_id, pdata->phy_addr, &phy_id);
+	rv = hsl_phy_get_phy_id(pdata->dev_id, pdata->phy_addr, &phy_id);
 	if(rv == SW_READ_ERROR) {
 		return A_FALSE;
 	}
@@ -201,7 +201,7 @@ static int qca808x_ack_interrupt(struct phy_device *phydev)
 	dev_id = pdata->dev_id;
 	phy_id = pdata->phy_addr;
 
-	err = qca808x_phy_reg_read(dev_id, phy_id,
+	err = hsl_phy_mii_reg_read(dev_id, phy_id,
 			QCA808X_PHY_INTR_STATUS);
 
 	return (err < 0) ? err : 0;
@@ -222,7 +222,7 @@ static int qca808x_config_intr(struct phy_device *phydev)
 	dev_id = pdata->dev_id;
 	phy_id = pdata->phy_addr;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id,
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_id,
 			QCA808X_PHY_INTR_MASK);
 
 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
@@ -231,11 +231,11 @@ static int qca808x_config_intr(struct phy_device *phydev)
 		if (err < 0)
 			return err;
 #endif
-		err = qca808x_phy_reg_write(dev_id, phy_id,
+		err = hsl_phy_mii_reg_write(dev_id, phy_id,
 				QCA808X_PHY_INTR_MASK,
 				phy_data | QCA808X_INTR_INIT);
 	} else {
-		err = qca808x_phy_reg_write(dev_id, phy_id,
+		err = hsl_phy_mii_reg_write(dev_id, phy_id,
 				QCA808X_PHY_INTR_MASK, 0);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0))
 		if (err)
@@ -321,7 +321,7 @@ static a_uint32_t qca808x_negtiation_cap_get(struct phy_device *phydev)
 static int qca808x_config_aneg(struct phy_device *phydev)
 {
 	a_uint32_t advertise = 0, advertise_old = 0;
-	a_uint16_t phy_data = 0;
+	a_uint16_t phy_data = 0, mask = 0;
 	int err = 0;
 	a_uint32_t dev_id = 0, phy_id = 0;
 	qca808x_priv *priv = phydev->priv;
@@ -344,14 +344,12 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 		phydev->pause = 0;
 		phydev->asym_pause = 0;
 
-		phy_data = qca808x_phy_reg_read(dev_id, phy_id, QCA808X_PHY_CONTROL);
-		phy_data &= ~QCA808X_CTRL_AUTONEGOTIATION_ENABLE;
+		mask = QCA808X_CTRL_AUTONEGOTIATION_ENABLE | QCA808X_CTRL_FULL_DUPLEX;
 		if (phydev->duplex == FAL_FULL_DUPLEX) {
 			phy_data |= QCA808X_CTRL_FULL_DUPLEX;
-		} else {
-			phy_data &= ~QCA808X_CTRL_FULL_DUPLEX;
 		}
-		qca808x_phy_reg_write(dev_id, phy_id, QCA808X_PHY_CONTROL, phy_data);
+		hsl_phy_modify_mii(dev_id, phy_id, QCA808X_PHY_CONTROL, mask,
+			phy_data);
 		err = qca808x_phy_set_force_speed(dev_id, phy_id, phydev->speed);
 	} else {
 		/* autoneg enabled */
@@ -387,7 +385,7 @@ static int qca808x_aneg_done(struct phy_device *phydev)
 	dev_id = pdata->dev_id;
 	phy_id = pdata->phy_addr;
 
-	phy_data = qca808x_phy_reg_read(dev_id, phy_id,
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_id,
 			QCA808X_PHY_STATUS);
 
 	return (phy_data < 0) ? phy_data : (phy_data & QCA808X_STATUS_AUTO_NEG_DONE);
@@ -542,7 +540,7 @@ static int qca808x_resume(struct phy_device *phydev)
 	dev_id = pdata->dev_id;
 	phy_id = pdata->phy_addr;
 
-	return qca808x_phy_poweron(dev_id, phy_id);
+	return hsl_phy_poweron(dev_id, phy_id);
 }
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
@@ -705,7 +703,7 @@ void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 	 * before the phy driver register */
 	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
 		a_uint32_t phy_id = QCA8081_PHY_V1_1;
-		qca808x_phy_get_phy_id(dev_id, pdata->phy_addr, &phy_id);
+		hsl_phy_get_phy_id(dev_id, pdata->phy_addr, &phy_id);
 		if(phy_id != QCA8081_PHY_V1_1 && phy_id != INVALID_PHY_ID) {
 			SSDK_ERROR("phy id 0x%x is not supported\n", phy_id);
 			return;

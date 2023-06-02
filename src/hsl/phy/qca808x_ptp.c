@@ -301,27 +301,17 @@ _qca808x_phy_ptp_synce_clock_set(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t 
 	sw_error_t rv = SW_OK;
 	a_uint16_t data0 = 0, data1 = 0;
 
-	data0 = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
-			QCA808X_MMD7_CLOCK_CTRL_REG);
-
-	data1 = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
-			QCA808X_MMD1_SYNCE_CTRL);
-
 	if (enable) {
 		data0 |= QCA808X_SYNCE_CLK_SEL_EN;
-		data1 &= ~QCA808X_SYNCE_CLK_SEL_MASK;
 		data1 |= QCA808X_SYNCE_CLK_CH0_SEL;
-	} else {
-		data0 &= ~QCA808X_SYNCE_CLK_SEL_EN;
-		data1 &= ~QCA808X_SYNCE_CLK_SEL_MASK;
 	}
 
-	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
-			QCA808X_MMD7_CLOCK_CTRL_REG, data0);
+	rv = hsl_phy_modify_mmd(dev_id, phy_id, A_TRUE, QCA808X_PHY_MMD7_NUM,
+			QCA808X_MMD7_CLOCK_CTRL_REG, QCA808X_SYNCE_CLK_SEL_EN, data0);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = qca808x_phy_mmd_write(dev_id, phy_id, QCA808X_PHY_MMD1_NUM,
-			QCA808X_MMD1_SYNCE_CTRL, data1);
+	rv = hsl_phy_modify_mmd(dev_id, phy_id, A_TRUE, QCA808X_PHY_MMD1_NUM,
+			QCA808X_MMD1_SYNCE_CTRL, QCA808X_SYNCE_CLK_SEL_MASK, data1);
 
 	return rv;
 }
@@ -332,8 +322,8 @@ _qca808x_phy_ptp_synce_clock_get(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t 
 	sw_error_t rv = SW_OK;
 	a_uint16_t data = 0;
 
-	data = qca808x_phy_mmd_read(dev_id, phy_id, QCA808X_PHY_MMD7_NUM,
-			QCA808X_MMD7_CLOCK_CTRL_REG);
+	data = hsl_phy_mmd_reg_read(dev_id, phy_id, A_TRUE,
+		QCA808X_PHY_MMD7_NUM, QCA808X_MMD7_CLOCK_CTRL_REG);
 
 	if (data & QCA808X_SYNCE_CLK_SEL_EN)
 		*enable = A_TRUE;

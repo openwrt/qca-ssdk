@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -32,21 +32,22 @@
 sw_error_t
 qca808x_phy_ptp_reg_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg, a_uint32_t * val)
 {
-	*val = qca808x_phy_reg_read(dev_id, phy_id, reg);
+	*val = hsl_phy_mii_reg_read(dev_id, phy_id, reg);
 	return SW_OK;
 }
 
 sw_error_t
 qca808x_phy_ptp_reg_write(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg, a_uint32_t val)
 {
-	return qca808x_phy_reg_write(dev_id, phy_id, reg, (a_uint16_t)val);
+	return hsl_phy_mii_reg_write(dev_id, phy_id, reg, (a_uint16_t)val);
 }
 
 sw_error_t
 qca808x_phy_ptp_mmd_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint16_t mmd_num,
 		a_uint32_t reg, a_uint32_t * val)
 {
-	*val = qca808x_phy_mmd_read(dev_id, phy_id, mmd_num, (a_uint16_t)reg);
+	*val = hsl_phy_mmd_reg_read(dev_id, phy_id, A_TRUE,
+		mmd_num, (a_uint16_t)reg);
 	return SW_OK;
 }
 
@@ -54,7 +55,8 @@ sw_error_t
 qca808x_phy_ptp_mmd_write(a_uint32_t dev_id, a_uint32_t phy_id, a_uint16_t mmd_num,
 		a_uint32_t reg, a_uint32_t val)
 {
-	return qca808x_phy_mmd_write(dev_id, phy_id, mmd_num, (a_uint16_t)reg, (a_uint16_t)val);
+	return hsl_phy_mmd_reg_write(dev_id, phy_id, A_TRUE,mmd_num, (a_uint16_t)reg,
+		(a_uint16_t)val);
 }
 
 sw_error_t

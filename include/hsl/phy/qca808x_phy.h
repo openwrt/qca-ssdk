@@ -158,7 +158,7 @@ extern "C"
 #define QCA808X_SYNCE_CLK_SEL_EN           BIT(1)	/* enable synce clock when link up */
 
 #define QCA808X_MMD1_SYNCE_CTRL            0x2000
-#define QCA808X_SYNCE_CLK_SEL_MASK         BITS(0, 5)
+#define QCA808X_SYNCE_CLK_SEL_MASK         BITS(0, 6)
 #define QCA808X_SYNCE_CLK_CH0_SEL          0x20
 
   /* PHY Registers Field */
@@ -444,214 +444,158 @@ extern "C"
 #define QCA808X_PHY_MMD7_CHIP_TYPE              0x901d
 #define QCA808X_PHY_1G_CHIP_TYPE                0x1
 
-a_uint16_t
-qca808x_phy_reg_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_id);
-
-sw_error_t
-qca808x_phy_reg_write(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t reg_id, a_uint16_t reg_val);
-
-sw_error_t
-qca808x_phy_mmd_write(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint16_t mmd_num, a_uint16_t reg_id,
-		a_uint16_t reg_val);
-
-a_uint16_t
-qca808x_phy_mmd_read(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint16_t mmd_num, a_uint16_t reg_id);
-
-a_uint16_t
-qca808x_phy_reg_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t reg_id);
-
-sw_error_t
-qca808x_phy_reg_write(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t
-reg_id, a_uint16_t reg_val);
-
-sw_error_t
-qca808x_phy_debug_write(a_uint32_t dev_id, a_uint32_t phy_id, a_uint16_t reg_id,
-		       a_uint16_t reg_val);
-a_uint16_t
-qca808x_phy_debug_read(a_uint32_t dev_id, a_uint32_t phy_id, a_uint16_t reg_id);
-
-sw_error_t
-qca808x_phy_mmd_write(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint16_t mmd_num, a_uint16_t reg_id, a_uint16_t
-reg_val);
-
-a_uint16_t
-qca808x_phy_mmd_read(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint16_t mmd_num, a_uint16_t reg_id);
-
-sw_error_t
-qca808x_phy_modify_mmd(a_uint32_t dev_id, a_uint32_t phy_addr,
-		a_uint32_t mmd_num, a_uint32_t mmd_reg, a_uint32_t mask, a_uint32_t value);
-
-sw_error_t
-qca808x_phy_modify_mii(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_reg,
-		a_uint32_t mask, a_uint32_t value);
-
-sw_error_t
-qca808x_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,a_uint32_t debug_reg,
-		a_uint32_t mask, a_uint32_t value);
-
 #define QCA808X_PHY_8023AZ_AFE_CTRL_MASK        0x01f0
 #define QCA808X_PHY_8023AZ_AFE_EN               0x0090
 
 sw_error_t
-qca808x_phy_set_duplex (a_uint32_t dev_id, a_uint32_t phy_id,
-		   fal_port_duplex_t duplex);
+qca808x_phy_set_duplex (a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_duplex_t duplex);
 
 sw_error_t
-qca808x_phy_get_duplex (a_uint32_t dev_id, a_uint32_t phy_id,
-		   fal_port_duplex_t * duplex);
+qca808x_phy_get_duplex (a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_duplex_t * duplex);
 
 sw_error_t
-qca808x_phy_set_speed (a_uint32_t dev_id, a_uint32_t phy_id,
-		  fal_port_speed_t speed);
+qca808x_phy_set_speed (a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_speed_t speed);
 
 sw_error_t
-qca808x_phy_get_speed (a_uint32_t dev_id, a_uint32_t phy_id,
-		  fal_port_speed_t * speed);
+qca808x_phy_get_speed (a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_speed_t * speed);
 
 sw_error_t
-qca808x_phy_restart_autoneg (a_uint32_t dev_id, a_uint32_t phy_id);
+qca808x_phy_restart_autoneg (a_uint32_t dev_id, a_uint32_t phy_addr);
 
 sw_error_t
-qca808x_phy_enable_autoneg (a_uint32_t dev_id, a_uint32_t phy_id);
+qca808x_phy_enable_autoneg (a_uint32_t dev_id, a_uint32_t phy_addr);
 
 a_bool_t
-qca808x_phy_get_link_status (a_uint32_t dev_id, a_uint32_t phy_id);
+qca808x_phy_get_link_status (a_uint32_t dev_id, a_uint32_t phy_addr);
 
 sw_error_t
-qca808x_phy_set_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
-			a_uint32_t autoneg);
+qca808x_phy_set_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t autoneg);
 
 sw_error_t
-qca808x_phy_get_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
-			a_uint32_t * autoneg);
+qca808x_phy_get_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t * autoneg);
 
 sw_error_t
-qca808x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t * ability);
 
-a_bool_t qca808x_phy_autoneg_status (a_uint32_t dev_id, a_uint32_t phy_id);
+a_bool_t qca808x_phy_autoneg_status (a_uint32_t dev_id, a_uint32_t phy_addr);
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
-qca808x_phy_intr_mask_set (a_uint32_t dev_id, a_uint32_t phy_id,
-		      a_uint32_t intr_mask_flag);
+qca808x_phy_intr_mask_set (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t intr_mask_flag);
 
 sw_error_t
-qca808x_phy_intr_mask_get (a_uint32_t dev_id, a_uint32_t phy_id,
-		      a_uint32_t * intr_mask_flag);
+qca808x_phy_intr_mask_get (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t * intr_mask_flag);
 
 sw_error_t
-qca808x_phy_intr_status_get (a_uint32_t dev_id, a_uint32_t phy_id,
-			a_uint32_t * intr_status_flag);
+qca808x_phy_intr_status_get (a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t * intr_status_flag);
 #endif
 sw_error_t
-qca808x_phy_get_phy_id(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *phy_data);
+qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_addr,
+	struct port_phy_status *phy_status);
 
 sw_error_t
-qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_id,
-		struct port_phy_status *phy_status);
+qca808x_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_interface_mode_t *interface_mode_status);
+
+sw_error_t qca808x_phy_reset(a_uint32_t dev_id, a_uint32_t phy_addr);
 
 sw_error_t
-qca808x_phy_interface_get_mode_status(a_uint32_t dev_id, a_uint32_t phy_id,
-		fal_port_interface_mode_t *interface_mode_status);
-
-sw_error_t qca808x_phy_reset(a_uint32_t dev_id, a_uint32_t phy_id);
-
-sw_error_t
-qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_id,
-		     fal_port_speed_t speed);
-sw_error_t qca808x_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_id);
-sw_error_t qca808x_phy_poweron(a_uint32_t dev_id, a_uint32_t phy_id);
+qca808x_phy_set_force_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_speed_t speed);
+sw_error_t qca808x_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_addr);
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
-qca808x_phy_set_hibernate(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t enable);
+qca808x_phy_set_hibernate(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
 sw_error_t
-qca808x_phy_get_hibernate(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_hibernate(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t * enable);
 #endif
 sw_error_t
-qca808x_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
+qca808x_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mdi_pair,
 	fal_cable_status_t * cable_status, a_uint32_t * cable_len);
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
-qca808x_phy_set_mdix(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_mdix(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_mdix_mode_t mode);
 sw_error_t
-qca808x_phy_get_mdix(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_mdix(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_mdix_mode_t * mode);
 sw_error_t
-qca808x_phy_get_mdix_status(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_mdix_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_mdix_status_t * mode);
 sw_error_t
-qca808x_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t enable);
 sw_error_t
-qca808x_phy_get_local_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t * enable);
 sw_error_t
-qca808x_phy_set_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t enable);
 sw_error_t
-qca808x_phy_get_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t * enable);
 sw_error_t
-qca808x_phy_set_wol_status(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t enable);
+qca808x_phy_set_wol_status(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
 sw_error_t
-qca808x_phy_get_wol_status(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t * enable);
+qca808x_phy_get_wol_status(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable);
 sw_error_t
-qca808x_phy_set_magic_frame_mac(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_magic_frame_mac(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_mac_addr_t * mac);
 sw_error_t
-qca808x_phy_get_magic_frame_mac(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_magic_frame_mac(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_mac_addr_t * mac);
 sw_error_t
-qca808x_phy_set_counter(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t enable);
+qca808x_phy_set_counter(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
 sw_error_t
-qca808x_phy_get_counter(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_counter(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t * enable);
 sw_error_t
-qca808x_phy_show_counter(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_show_counter(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_counter_info_t * counter_infor);
 sw_error_t
-qca808x_phy_set_intr_mask(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_intr_mask(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t intr_mask_flag);
 sw_error_t
-qca808x_phy_get_intr_mask(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_intr_mask(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t * intr_mask_flag);
 sw_error_t
-qca808x_phy_get_intr_status(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_intr_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t * intr_status_flag);
 sw_error_t
-qca808x_phy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t enable);
+qca808x_phy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
 sw_error_t
-qca808x_phy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_id, a_bool_t * enable);
+qca808x_phy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable);
 #endif
 sw_error_t
-qca808x_phy_set_eee_adv(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_set_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t adv);
 sw_error_t
-qca808x_phy_get_eee_adv(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t *adv);
 sw_error_t
-qca808x_phy_get_eee_partner_adv(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_eee_partner_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t *adv);
 sw_error_t
-qca808x_phy_get_eee_cap(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_eee_cap(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t *cap);
 sw_error_t
-qca808x_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_id,
+qca808x_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t *status);
-void qca808x_phy_lock_init(void);
 int qca808x_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp);
 
 void qca808x_phy_exit(a_uint32_t dev_id, a_uint32_t port_id);
 a_bool_t
-qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_id);
+qca808x_phy_2500caps(a_uint32_t dev_id, a_uint32_t phy_addr);
 a_bool_t
 qca808x_phy_id_check(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t phy_id);

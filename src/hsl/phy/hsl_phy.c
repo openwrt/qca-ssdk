@@ -2292,4 +2292,703 @@ hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	return rv;
 }
+/*********************the function for GE PHY mii registers*********************/
+/*
+ * @brief reset phy
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_sw_reset(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	return hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL,
+		HSL_PHY_CTRL_SOFTWARE_RESET, HSL_PHY_CTRL_SOFTWARE_RESET);
+}
+/*
+ * @brief set local loopback
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_bool_t enable)
+{
+	a_uint16_t phy_data = 0;
+	fal_port_speed_t cur_speed = 0;
+	sw_error_t rv = SW_OK;
+
+	if (enable == A_TRUE) {
+		rv = hsl_phy_get_speed(dev_id, phy_addr, &cur_speed);
+		PHY_RTN_ON_ERROR(rv);
+		if (cur_speed == FAL_SPEED_1000) {
+			phy_data = HSL_1000M_LOOPBACK;
+		} else if (cur_speed == FAL_SPEED_100) {
+			phy_data = HSL_100M_LOOPBACK;
+		} else if (cur_speed == FAL_SPEED_10) {
+			phy_data = HSL_10M_LOOPBACK;
+		} else {
+			return SW_FAIL;
+		}
+	} else {
+		phy_data = HSL_COMMON_CTRL;
+	}
+
+	return hsl_phy_mii_reg_write(dev_id, phy_addr, HSL_PHY_CONTROL, phy_data);
+}
+/*
+ * @brief get local loopback status
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] enable A_TRUE or A_FALSE
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_bool_t *enable)
+{
+	a_uint16_t phy_data = 0;
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_CONTROL);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if (phy_data & HSL_LOCAL_LOOPBACK_ENABLE) {
+		*enable = A_TRUE;
+	} else {
+		*enable = A_FALSE;
+	}
+
+	return SW_OK;
+}
+/*
+ * @brief configure the force speed
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] speed force speed
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_speed_t speed)
+{
+	a_uint16_t phy_data = 0, mask = 0;
+	fal_port_duplex_t cur_duplex = HSL_CTRL_FULL_DUPLEX;
+	sw_error_t rv = SW_OK;
+
+	switch(speed)
+	{
+		case FAL_SPEED_1000:
+			rv = hsl_phy_set_autoneg_adv(dev_id, phy_addr,
+				FAL_PHY_ADV_1000T_FD);
+			PHY_RTN_ON_ERROR(rv);
+			phy_data |= HSL_CTRL_FULL_DUPLEX;
+			phy_data |= HSL_CTRL_AUTONEGOTIATION_ENABLE;
+			phy_data |= HSL_CTRL_RESTART_AUTONEGOTIATION;
+			mask = phy_data;
+			break;
+		case FAL_SPEED_100:
+		case FAL_SPEED_10:
+			mask = HSL_CONTROL_SPEED_MASK | HSL_CTRL_FULL_DUPLEX |
+				HSL_CTRL_AUTONEGOTIATION_ENABLE;
+			if (speed == FAL_SPEED_100) {
+				phy_data |= HSL_CONTROL_SPEED_100M;
+			} else {
+				phy_data |= HSL_CONTROL_SPEED_10M;
+			}
+			rv = hsl_phy_get_duplex(dev_id, phy_addr, &cur_duplex);
+			PHY_RTN_ON_ERROR(rv);
+
+			if (cur_duplex == FAL_FULL_DUPLEX) {
+				phy_data |= HSL_CTRL_FULL_DUPLEX;
+			}
+			break;
+		default:
+			return SW_BAD_PARAM;
+	}
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL, mask, phy_data);
+	PHY_RTN_ON_ERROR(rv);
+/*qca808x_end*/
+	if(speed < FAL_SPEED_1000) {
+		rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+		PHY_RTN_ON_ERROR(rv);
+	}
+/*qca808x_start*/
+
+	return SW_OK;
+}
+/*
+ * @brief configure the force speed
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] speed force duplex as full or half
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_duplex_t duplex)
+{
+	a_uint16_t phy_data = 0, mask = 0;
+	fal_port_speed_t cur_speed = 0;
+	sw_error_t rv = SW_OK;
+
+	rv = hsl_phy_get_speed(dev_id, phy_addr, &cur_speed);
+	PHY_RTN_ON_ERROR(rv);
+
+	switch(cur_speed)
+	{
+		case FAL_SPEED_1000:
+			if (duplex == FAL_FULL_DUPLEX) {
+				phy_data |= HSL_CTRL_FULL_DUPLEX;
+			} else {
+				return SW_NOT_SUPPORTED;
+			}
+			rv = hsl_phy_set_autoneg_adv(dev_id, phy_addr,
+				FAL_PHY_ADV_1000T_FD);
+			PHY_RTN_ON_ERROR(rv);
+			phy_data |= HSL_CTRL_AUTONEGOTIATION_ENABLE;
+			phy_data |= HSL_CTRL_RESTART_AUTONEGOTIATION;
+			mask = phy_data;
+			break;
+		case FAL_SPEED_100:
+		case FAL_SPEED_10:
+			mask = HSL_CONTROL_SPEED_MASK | HSL_CTRL_AUTONEGOTIATION_ENABLE
+				| HSL_CTRL_FULL_DUPLEX;
+			if (cur_speed == FAL_SPEED_100) {
+				phy_data |= HSL_CONTROL_SPEED_100M;
+			} else {
+				phy_data |= HSL_CONTROL_SPEED_10M;
+			}
+			if (duplex == FAL_FULL_DUPLEX) {
+				phy_data |= HSL_CTRL_FULL_DUPLEX;
+			}
+			break;
+		default:
+			return SW_FAIL;
+	}
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL, mask,
+		phy_data);
+	PHY_RTN_ON_ERROR(rv);
+/*qca808x_end*/
+	if(cur_speed < FAL_SPEED_1000) {
+		rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_FALSE, 0);
+		PHY_RTN_ON_ERROR(rv);
+	}
+/*qca808x_start*/
+
+	return SW_OK;
+}
+/*
+ * @brief enable autoneg
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_autoneg_enable(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL,
+		HSL_CTRL_AUTONEGOTIATION_ENABLE, HSL_CTRL_AUTONEGOTIATION_ENABLE);
+	PHY_RTN_ON_ERROR(rv);
+/*qca808x_end*/
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
+/*qca808x_start*/
+
+	return rv;
+}
+/*
+ * @brief power off the phy
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return SW_OK or error code
+ */
+a_bool_t
+hsl_phy_autoneg_status(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	a_uint16_t phy_data;
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_CONTROL);
+
+	if (phy_data & HSL_CTRL_AUTONEGOTIATION_ENABLE) {
+		return A_TRUE;
+	}
+
+	return A_FALSE;
+}
+/*
+ * @brief power off the phy
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	return hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL,
+		HSL_CTRL_POWER_MASK, HSL_CTRL_POWER_DOWN);
+}
+/*
+ * @brief power on the phy
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_poweron(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL,
+		HSL_CTRL_POWER_MASK, HSL_CTRL_POWER_UP);
+	PHY_RTN_ON_ERROR(rv);
+	aos_mdelay(200);
+
+	return SW_OK;
+}
+/*
+ * @brief restart autoneg
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_CONTROL,
+		HSL_CTRL_AUTONEGOTIATION_ENABLE | HSL_CTRL_RESTART_AUTONEGOTIATION,
+		HSL_CTRL_AUTONEGOTIATION_ENABLE | HSL_CTRL_RESTART_AUTONEGOTIATION);
+	PHY_RTN_ON_ERROR(rv);
+/*qca808x_end*/
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, 0);
+/*qca808x_start*/
+
+	return rv;
+}
+/*
+ * @brief get phy support ability
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] ability support ability
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_capability(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *cap)
+{
+	a_uint16_t phy_data = 0;
+
+	*cap = 0;
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_STATUS);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if (phy_data & HSL_STATUS_AUTONEG_CAPS) {
+		*cap |= FAL_PHY_ADV_AUTONEG;
+	}
+	if (phy_data & HSL_STATUS_10T_HD_CAPS) {
+		*cap |= FAL_PHY_ADV_10T_HD;
+	}
+	if (phy_data & HSL_STATUS_10T_FD_CAPS) {
+		*cap |= FAL_PHY_ADV_10T_FD;
+	}
+	if (phy_data & HSL_STATUS_100TX_HD_CAPS) {
+		*cap |= FAL_PHY_ADV_100TX_HD;
+	}
+	if (phy_data & HSL_STATUS_100TX_FD_CAPS) {
+		*cap |= FAL_PHY_ADV_100TX_FD;
+	}
+	if (phy_data & HSL_STATUS_EXTENDED_STATUS) {
+		phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr,
+			HSL_EXTENDED_STATUS);
+		PHY_RTN_ON_READ_ERROR(phy_data);
+		if (phy_data & HSL_STATUS_1000T_FD_CAPS)
+			*cap |= FAL_PHY_ADV_1000T_FD;
+	}
+	*cap |= (FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE);
+
+	return SW_OK;
+}
+/*
+ * @brief get phy id
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] phy_id phy id
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_phy_id(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *phy_id)
+{
+	a_uint16_t org_id = 0, rev_id = 0;
+	org_id = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_ID1);
+	PHY_RTN_ON_READ_ERROR(org_id);
+
+	rev_id = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_ID2);
+	PHY_RTN_ON_READ_ERROR(rev_id);
+
+	*phy_id = ((org_id & 0xffff) << 16) | (rev_id & 0xffff);
+
+	return SW_OK;
+}
+/*
+ * @brief set phy autoadv
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] autoneg_adv auto-negotiation adv bitmap
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t autoneg_adv)
+{
+	a_uint16_t phy_data = 0;
+	sw_error_t rv = SW_OK;
+
+	if (autoneg_adv & FAL_PHY_ADV_100TX_FD) {
+		phy_data |= HSL_ADVERTISE_100FULL;
+	}
+
+	if (autoneg_adv & FAL_PHY_ADV_100TX_HD) {
+		phy_data |= HSL_ADVERTISE_100HALF;
+	}
+
+	if (autoneg_adv & FAL_PHY_ADV_10T_FD) {
+		phy_data |= HSL_ADVERTISE_10FULL;
+	}
+
+	if (autoneg_adv & FAL_PHY_ADV_10T_HD) {
+		phy_data |= HSL_ADVERTISE_10HALF;
+	}
+
+	if (autoneg_adv & FAL_PHY_ADV_PAUSE) {
+		phy_data |= HSL_ADVERTISE_PAUSE;
+	}
+
+	if (autoneg_adv & FAL_PHY_ADV_ASY_PAUSE) {
+		phy_data |= HSL_ADVERTISE_ASYM_PAUSE;
+	}
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_AUTONEG_ADVERT,
+		HSL_ADVERTISE_MEGA_ALL, phy_data);
+
+	phy_data = 0;
+	if (autoneg_adv & FAL_PHY_ADV_1000T_FD) {
+		phy_data |= HSL_ADVERTISE_1000FULL;
+	}
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_1000BASET_CONTROL,
+		HSL_ADVERTISE_1000FULL | HSL_ADVERTISE_1000FULL, phy_data);
+	PHY_RTN_ON_ERROR(rv);
+
+/*qca808x_end*/
+	rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, autoneg_adv);
+/*qca808x_start*/
+
+	return rv;
+}
+/*
+ * @brief set phy autoadv
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] autoneg_adv auto-negotiation adv bitmap
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *autoneg_adv)
+{
+	a_uint16_t phy_data = 0;
+
+	*autoneg_adv = 0;
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_AUTONEG_ADVERT);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if (phy_data & HSL_ADVERTISE_100FULL) {
+		*autoneg_adv |= FAL_PHY_ADV_100TX_FD;
+	}
+
+	if (phy_data & HSL_ADVERTISE_100HALF) {
+		*autoneg_adv |= FAL_PHY_ADV_100TX_HD;
+	}
+
+	if (phy_data & HSL_ADVERTISE_10FULL) {
+		*autoneg_adv |= FAL_PHY_ADV_10T_FD;
+	}
+
+	if (phy_data & HSL_ADVERTISE_10HALF) {
+		*autoneg_adv |= FAL_PHY_ADV_10T_HD;
+	}
+
+	if (phy_data & HSL_ADVERTISE_PAUSE) {
+		*autoneg_adv |= FAL_PHY_ADV_PAUSE;
+	}
+
+	if (phy_data & HSL_ADVERTISE_ASYM_PAUSE) {
+		*autoneg_adv |= FAL_PHY_ADV_ASY_PAUSE;
+	}
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_1000BASET_CONTROL);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if (phy_data & HSL_ADVERTISE_1000FULL) {
+		*autoneg_adv |= FAL_PHY_ADV_1000T_FD;
+	}
+
+	return SW_OK;
+}
+/*
+ * @brief get link partner ability
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] link partner ability bitmap
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_lp_capability_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *cap)
+{
+	a_uint16_t phy_data = 0;
+
+	*cap = 0;
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_LINK_PARTNER_ABILITY);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if(phy_data & HSL_LINK_10BASETX_HALF_DUPLEX)
+		*cap |= FAL_PHY_ADV_10T_HD;
+
+	if(phy_data & HSL_LINK_10BASETX_FULL_DUPLEX)
+		*cap |= FAL_PHY_ADV_10T_FD;
+
+	if(phy_data & HSL_LINK_100BASETX_HALF_DUPLEX)
+		*cap |= FAL_PHY_ADV_100TX_HD;
+
+	if(phy_data & HSL_LINK_100BASETX_FULL_DUPLEX)
+		*cap |= FAL_PHY_ADV_100TX_FD;
+
+	if(phy_data & HSL_LINK_PAUSE)
+		*cap |= FAL_PHY_ADV_PAUSE;
+
+	if(phy_data & HSL_LINK_ASYPAUSE)
+		*cap |= FAL_PHY_ADV_ASY_PAUSE;
+
+	if(phy_data & HSL_LINK_LPACK)
+		*cap |= FAL_PHY_ADV_AUTONEG;
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_1000BASET_STATUS);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(phy_data & HSL_LINK_1000BASETX_FULL_DUPLEX)
+		*cap |= FAL_PHY_ADV_1000T_FD;
+
+	return SW_OK;
+}
+/*
+ * @brief set phy mdix mode
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] mdix mode
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_mdix(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_mdix_mode_t mode)
+{
+	a_uint16_t phy_data = 0;
+	sw_error_t rv = SW_OK;
+
+	if (mode == PHY_MDIX_AUTO) {
+		phy_data = HSL_PHY_MDIX_AUTO;
+	} else if (mode == PHY_MDIX_MDIX) {
+		phy_data = HSL_PHY_MDIX;
+	} else if (mode == PHY_MDIX_MDI) {
+		phy_data = HSL_PHY_MDI;
+	} else {
+		return SW_BAD_PARAM;
+	}
+
+	rv = hsl_phy_modify_mii(dev_id, phy_addr, HSL_PHY_SPEC_CONTROL,
+		HSL_PHY_MDIX_AUTO, phy_data);
+	PHY_RTN_ON_ERROR(rv);
+
+	return hsl_phy_sw_reset(dev_id, phy_addr);
+}
+/*
+ * @brief get phy mdix mode
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] mdix mode
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_mdix(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_mdix_mode_t * mode)
+{
+	a_uint16_t phy_data = 0;
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_SPEC_CONTROL);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	if ((phy_data & HSL_PHY_MDIX_AUTO) == HSL_PHY_MDIX_AUTO) {
+		*mode = PHY_MDIX_AUTO;
+	} else if ((phy_data & HSL_PHY_MDIX_AUTO) == HSL_PHY_MDIX) {
+		*mode = PHY_MDIX_MDIX;
+	} else {
+		*mode = PHY_MDIX_MDI;
+	}
+
+	return SW_OK;
+
+}
+/*
+ * @brief get phy mdix mode status
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] mdix mode
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_mdix_status(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_mdix_status_t * mode)
+{
+	a_uint16_t phy_data = 0;
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_SPEC_STATUS);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	*mode = (phy_data & HSL_PHY_MDIX_STATUS) ? PHY_MDIX_STATUS_MDIX :
+		PHY_MDIX_STATUS_MDI;
+
+	return SW_OK;
+
+}
+/*
+ * @brief get phy status
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] phy_status phy status
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_status_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	struct port_phy_status *phy_status)
+{
+	a_uint16_t phy_data;
+
+	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_SPEC_STATUS);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+
+	/*get phy link status*/
+	if (phy_data & HSL_STATUS_LINK_PASS) {
+		phy_status->link_status = PORT_LINK_UP;
+	} else {
+		phy_status->link_status = PORT_LINK_DOWN;
+		return SW_OK;
+	}
+	/*get phy speed*/
+	switch (phy_data & HSL_STATUS_SPEED_MASK) {
+		case HSL_STATUS_SPEED_2500MBS:
+			phy_status->speed = FAL_SPEED_2500;
+			break;
+		case HSL_STATUS_SPEED_1000MBS:
+			phy_status->speed = FAL_SPEED_1000;
+			break;
+		case HSL_STATUS_SPEED_100MBS:
+			phy_status->speed = FAL_SPEED_100;
+			break;
+		case HSL_STATUS_SPEED_10MBS:
+			phy_status->speed = FAL_SPEED_10;
+			break;
+		default:
+			return SW_READ_ERROR;
+	}
+	/*get phy duplex*/
+	if (phy_data & HSL_STATUS_FULL_DUPLEX) {
+		phy_status->duplex = FAL_FULL_DUPLEX;
+	} else {
+		phy_status->duplex = FAL_HALF_DUPLEX;
+	}
+	/* get phy flowctrl resolution status */
+	if (phy_data & HSL_PHY_RX_FLOWCTRL_STATUS) {
+		phy_status->rx_flowctrl = A_TRUE;
+	} else {
+		phy_status->rx_flowctrl = A_FALSE;
+	}
+	if (phy_data & HSL_PHY_TX_FLOWCTRL_STATUS) {
+		phy_status->tx_flowctrl = A_TRUE;
+	} else {
+		phy_status->tx_flowctrl = A_FALSE;
+	}
+
+	return SW_OK;
+}
+/*
+ * @brief get phy speed
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @return A_TRUE for link up, A_FALS for link down
+ */
+a_bool_t
+hsl_phy_get_link_status(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	struct port_phy_status phy_status = {0};
+	sw_error_t rv = SW_OK;
+
+	rv = hsl_phy_status_get(dev_id, phy_addr, &phy_status);
+	PHY_RTN_ON_ERROR(rv);
+	if(phy_status.link_status == PORT_LINK_UP)
+		return A_TRUE;
+	else
+		return A_FALSE;
+}
+/*
+ * @brief get phy speed
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] speed
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_speed_t * speed)
+{
+	sw_error_t rv = SW_OK;
+	struct port_phy_status phy_status = {0};
+
+	rv = hsl_phy_status_get(dev_id, phy_addr, &phy_status);
+	PHY_RTN_ON_ERROR(rv);
+
+	if (phy_status.link_status == PORT_LINK_UP) {
+		*speed = phy_status.speed;
+	} else {
+		*speed = FAL_SPEED_10;
+	}
+
+	return SW_OK;
+}
+/*
+ * @brief get phy duplex
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] speed
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
+	fal_port_duplex_t * duplex)
+{
+	sw_error_t rv = SW_OK;
+	struct port_phy_status phy_status = {0};
+
+	rv = hsl_phy_status_get(dev_id, phy_addr, &phy_status);
+	PHY_RTN_ON_ERROR(rv);
+
+	if (phy_status.link_status == PORT_LINK_UP) {
+		*duplex = phy_status.duplex;
+	} else {
+		*duplex = FAL_HALF_DUPLEX;
+	}
+
+	return SW_OK;
+}
 /*qca808x_end*/

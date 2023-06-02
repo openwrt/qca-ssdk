@@ -59,7 +59,6 @@ sfp_phy_probe(struct phy_device *pdev)
 	} else {
 		pdev->autoneg = AUTONEG_DISABLE;
 	}
-	SSDK_INFO("sfp phy is probed!\n");
 	return 0;
 }
 
@@ -403,7 +402,7 @@ int sfp_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 {
 	a_uint32_t port_id = 0;
 
-	SSDK_INFO("sfp phy init for port_bmp 0x%x!\n", port_bmp);
+	SSDK_INFO("qca probe sfp phy driver succeeded!\n");
 
 	for (port_id = 0; port_id < SW_MAX_NR_PORT; port_id ++) {
 		if (port_bmp & (0x1 << port_id)) {

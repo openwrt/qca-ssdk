@@ -1575,9 +1575,7 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	#ifdef BOARD_AR71XX
 	int rv = 0;
 	#endif
-/*qca808x_start*/
-	SSDK_INFO("ssdk_plat_init start\n");
-/*qca808x_end*/
+
 #ifdef IN_UNIPHY
 	reg_mode = ssdk_uniphy_reg_access_mode_get(dev_id);
 	if(reg_mode == HSL_REG_LOCAL_BUS) {

@@ -275,7 +275,6 @@ static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 		SSDK_INFO("mac mode doesn't exit!\n");
 	else {
 		cfg->mac_mode = be32_to_cpup(mac_mode);
-		SSDK_INFO("mac mode = 0x%x\n", be32_to_cpup(mac_mode));
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->mac_mode = cfg->mac_mode;
 	}
 
@@ -284,7 +283,6 @@ static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 		SSDK_INFO("mac mode1 doesn't exit!\n");
 	else {
 		cfg->mac_mode1 = be32_to_cpup(mac_mode);
-		SSDK_INFO("mac mode1 = 0x%x\n", be32_to_cpup(mac_mode));
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->mac_mode1 = cfg->mac_mode1;
 	}
 
@@ -293,7 +291,6 @@ static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 		SSDK_INFO("mac mode2 doesn't exit!\n");
 	else {
 		cfg->mac_mode2 = be32_to_cpup(mac_mode);
-		SSDK_INFO("mac mode2 = 0x%x\n", be32_to_cpup(mac_mode));
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->mac_mode2 = cfg->mac_mode2;
 	}
 
@@ -312,7 +309,6 @@ static void ssdk_dt_parse_uniphy(a_uint32_t dev_id)
 	if (!uniphy_node)
 		SSDK_INFO("ess-uniphy DT doesn't exist!\n");
 	else {
-		SSDK_INFO("ess-uniphy DT exist!\n");
 		cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
 		reg_cfg = of_get_property(uniphy_node, "reg", &len);
 		if(!reg_cfg)
@@ -587,7 +583,6 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 
 	phy_info_node = of_get_child_by_name(switch_node, "qcom,port_phyinfo");
 	if (!phy_info_node) {
-		SSDK_INFO("qcom,port_phyinfo DT doesn't exist!\n");
 		return SW_NOT_FOUND;
 	}
 
@@ -609,8 +604,6 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 				SSDK_PHY_RESET_GPIO_INDEX);
 			if(phy_reset_gpio > 0)
 			{
-				SSDK_INFO("port%d's phy-reset-gpio is GPIO%d\n", port_id,
-					phy_reset_gpio);
 				hsl_port_phy_reset_gpio_set(dev_id, port_id,
 					(a_uint32_t)phy_reset_gpio);
 			}
@@ -621,7 +614,6 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 #if defined(IN_PHY_I2C_MODE)
 		phy_i2c = of_property_read_bool(port_node, "phy-i2c-mode");
 		if (phy_i2c) {
-			SSDK_INFO("[PORT %d] phy-i2c-mode\n", port_id);
 			hsl_port_phy_access_type_set(dev_id, port_id, PHY_I2C_ACCESS);
 			if (of_property_read_u32(port_node, "phy_i2c_address",
 						&phy_i2c_addr)) {
@@ -661,7 +653,6 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 
 		if (!of_property_read_string(port_node, "port_mac_sel", &mac_type))
 		{
-			SSDK_INFO("[PORT %d] port_mac_sel = %s\n", port_id, mac_type);
 			if (!strncmp("QGMAC_PORT", mac_type, 10)) {
 				phy_features |= PHY_F_QGMAC;
 			}
@@ -673,10 +664,8 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 		if (!of_property_read_string(port_node, "media-type", &media_type)) {
 			if (!strncmp("sfp", media_type, strlen(media_type))) {
 				phy_features |= PHY_F_SFP;
-				SSDK_INFO("[PORT %d] media type is %s\n", port_id, media_type);
 			} else if (!strncmp("sfp_sgmii", media_type, strlen(media_type))) {
 				phy_features |= (PHY_F_SFP | PHY_F_SFP_SGMII);
-				SSDK_INFO("[PORT %d] media type sfp support sfp_sgmii\n", port_id);
 			}
 			if(phy_features & PHY_F_SFP) {
 				/*get related PINs for SFP port*/
@@ -685,24 +674,18 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 						"sfp_rx_los_pin", 0);
 					if(sfp_rx_los_pin > 0)
 					{
-						SSDK_INFO("port%d sfp_rx_los_pin is GPIO%d\n",
-							port_id, sfp_rx_los_pin);
 						priv->sfp_rx_los_pin[port_id] = sfp_rx_los_pin;
 					}
 					sfp_tx_dis_pin = of_get_named_gpio(port_node,
 						"sfp_tx_dis_pin", 0);
 					if(sfp_tx_dis_pin > 0)
 					{
-						SSDK_INFO("port%d sfp_tx_dis_pin is GPIO%d\n",
-							port_id, sfp_tx_dis_pin);
 						priv->sfp_tx_dis_pin[port_id] = sfp_tx_dis_pin;
 					}
 					sfp_mod_present_pin = of_get_named_gpio(port_node,
 						"sfp_mod_present_pin", 0);
 					if(sfp_mod_present_pin > 0)
 					{
-						SSDK_INFO("port%d sfp_mod_present_pin is GPIO%d\n",
-							port_id, sfp_mod_present_pin);
 						priv->sfp_mod_present_pin[port_id] =
 							sfp_mod_present_pin;
 					}
@@ -710,8 +693,6 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 						"sfp_medium_pin", 0);
 					if(sfp_medium_pin > 0)
 					{
-						SSDK_INFO("port%d sfp_medium_pin is GPIO%d\n",
-							port_id, sfp_medium_pin);
 						priv->sfp_medium_pin[port_id] = sfp_medium_pin;
 					}
 				}
@@ -805,7 +786,6 @@ static void ssdk_dt_parse_mdio(a_uint32_t dev_id, struct device_node *switch_nod
 		SSDK_INFO("mdio DT doesn't exist!\n");
 	}
 	else {
-		SSDK_INFO("mdio DT exist!\n");
 		for_each_available_child_of_node(mdio_node, child) {
 			phy_addr = of_get_property(child, "reg", &len);
 			if (phy_addr) {
@@ -965,9 +945,6 @@ static void ssdk_dt_parse_intf_mac(void)
 #endif
 			ssdk_dt_global.num_intf_mac++;
 			ether_addr_copy(ssdk_dt_global.intf_mac[dp-1].uc, maddr);
-			SSDK_INFO("%s MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
-				dp_name, maddr[0], maddr[1], maddr[2], maddr[3],
-				maddr[4], maddr[5]);
 		}
 	}
 	return;
@@ -1021,8 +998,6 @@ static sw_error_t ssdk_dt_parse_access_mode(struct device_node *switch_node,
 			        switch_node->name);
 		return SW_BAD_PARAM;
 	}
-
-	SSDK_INFO("switch_access_mode: %s\n", ssdk_dt_priv->reg_access_mode);
 	if(!strcmp(ssdk_dt_priv->reg_access_mode, "local bus")) {
 		ssdk_dt_priv->switch_reg_access_mode = HSL_REG_LOCAL_BUS;
 
@@ -1034,9 +1009,6 @@ static sw_error_t ssdk_dt_parse_access_mode(struct device_node *switch_node,
 		}
 		ssdk_dt_priv->switchreg_base_addr = be32_to_cpup(reg_cfg);
 		ssdk_dt_priv->switchreg_size = be32_to_cpup(reg_cfg + 1);
-
-		SSDK_INFO("switchreg_base_addr: 0x%x\n", ssdk_dt_priv->switchreg_base_addr);
-		SSDK_INFO("switchreg_size: 0x%x\n", ssdk_dt_priv->switchreg_size);
 	} else if (!strcmp(ssdk_dt_priv->reg_access_mode, "pcie bus")) {
 		ssdk_dt_priv->switch_reg_access_mode = HSL_REG_PCIE_BUS;
 
@@ -1146,9 +1118,6 @@ static sw_error_t ssdk_dt_get_switch_node(struct device_node **switch_node,
 		SSDK_WARN("cannot find ess-switch node\n");
 		return SW_BAD_PARAM;
 	}
-
-	SSDK_INFO("ess-switch DT exist!\n");
-
 	if (!of_device_is_available(*switch_node))
 	{
 		SSDK_WARN("ess-switch node[%s] is disabled\n", ess_switch_name);
@@ -1302,7 +1271,6 @@ int ssdk_switch_device_num_init(void)
 	}
 
 	ssdk_dt_global.num_devices = dev_num;
-	SSDK_INFO("ess-switch dts node number: %d\n", dev_num);
 
 	return 0;
 }

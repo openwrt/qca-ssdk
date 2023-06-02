@@ -160,10 +160,8 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 #endif
 
 	if(adpt_chip_revision_get(dev_id) == CPPE_REVISION) {
-		SSDK_INFO("Cypress PPE port initializing\n");
 		port_max = SSDK_PHYSICAL_PORT6;
 	} else {
-		SSDK_INFO("Hawkeye PPE port initializing\n");
 		port_max = SSDK_PHYSICAL_PORT7;
 	}
 	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
@@ -771,7 +769,6 @@ qca_hppe_tdm_hw_init(a_uint32_t dev_id, a_bool_t enable)
 	tdm_ctrl.offset = A_FALSE;
 	tdm_ctrl.depth = num;
 	p_api->adpt_port_tdm_ctrl_set(dev_id, &tdm_ctrl);
-	SSDK_DEBUG("tdm setup num=%d\n", num);
 	return SW_OK;
 }
 #endif

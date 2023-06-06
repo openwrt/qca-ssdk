@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -54,6 +54,10 @@ adpt_cppe_qos_mapping_get(a_uint32_t dev_id, a_uint32_t index,
 	cosmap->dp_en = qos_mapping_tbl.bf.int_dp_en;
 	cosmap->qos_prec = qos_mapping_tbl.bf.qos_res_prec_0 |
 			     qos_mapping_tbl.bf.qos_res_prec_1 << 1;
+#if defined(MPPE)
+	cosmap->policy_en = qos_mapping_tbl.bf.flow_policy_valid;
+	cosmap->policy_id = qos_mapping_tbl.bf.flow_policy_id;
+#endif
 
 	return SW_OK;
 }
@@ -82,6 +86,10 @@ adpt_cppe_qos_mapping_set(a_uint32_t dev_id, a_uint32_t index,
 	qos_mapping_tbl.bf.int_dp_en = cosmap->dp_en;
 	qos_mapping_tbl.bf.qos_res_prec_0 = cosmap->qos_prec & 1;
 	qos_mapping_tbl.bf.qos_res_prec_1 = (cosmap->qos_prec >> 1) & 3;
+#if defined(MPPE)
+	qos_mapping_tbl.bf.flow_policy_valid = cosmap->policy_en;
+	qos_mapping_tbl.bf.flow_policy_id = cosmap->policy_id;
+#endif
 
 	return cppe_qos_mapping_tbl_set(dev_id, index, &qos_mapping_tbl);
 }

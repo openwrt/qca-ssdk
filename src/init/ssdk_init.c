@@ -618,6 +618,8 @@ qca_switch_init(a_uint32_t dev_id)
 					if (cpu_bmp & BIT(i)) {
 #if defined(IN_PORTCONTROL)
 						fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
+						fal_port_flow_ctrl_thres_set(dev_id, i,
+								MHT_PORT0_XON_THRES, MHT_PORT0_XOFF_THRES);
 						fal_header_type_set(dev_id,
 								A_TRUE, MHT_HEADER_TYPE_VAL);
 						fal_port_rxhdr_mode_set(dev_id,

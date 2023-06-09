@@ -1697,6 +1697,14 @@ cmd_data_check_interface_mode(char *cmd_str, a_uint32_t * arg_val, a_uint32_t si
     {
 	*arg_val = PORT_UQXGMII_3CHANNELS;
     }
+    else if (!strncasecmp(cmd_str, "sgmii_fiber", 20))
+    {
+	*arg_val = PORT_SGMII_FIBER;
+    }
+    else if (!strncasecmp(cmd_str, "interfacemode_auto", 20))
+    {
+	*arg_val = PORT_INTERFACE_MODE_AUTO;
+    }
     else if (!strncasecmp(cmd_str, "interfacemode_max", 20))
     {
 	*arg_val = PORT_INTERFACE_MODE_MAX;

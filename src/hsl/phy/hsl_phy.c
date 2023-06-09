@@ -681,8 +681,8 @@ hsl_port_phy_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_uint32_t phy_addr = 0;
 	hsl_phy_ops_t *phy_drv;
 
-	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_interface_mode_set)
+	phy_drv = hsl_phy_api_ops_get (dev_id, port_id);
+	if (NULL == phy_drv || NULL == phy_drv->phy_interface_mode_set)
 	{
 		/*PHY driver did not register phy_interface_mode_set,
 		so no need to configure PHY interface mode*/
@@ -1207,6 +1207,55 @@ a_uint32_t hsl_port_mode_to_uniphy_mode(a_uint32_t dev_id,
 	}
 
 	return uniphy_mode;
+}
+
+a_uint32_t hsl_uniphy_mode_to_port_mode(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t uniphy_mode)
+{
+	a_uint32_t port_mode = 0;
+
+	switch(uniphy_mode)
+	{
+		case PORT_WRAPPER_PSGMII:
+		case PORT_WRAPPER_PSGMII_FIBER:
+			if(port_id >= SSDK_PHYSICAL_PORT1 && port_id <= SSDK_PHYSICAL_PORT4)
+				port_mode = PHY_PSGMII_BASET;
+			if(port_id == SSDK_PHYSICAL_PORT5) {
+				if(uniphy_mode == PORT_WRAPPER_PSGMII)
+					port_mode = PHY_PSGMII_BASET;
+				else
+					port_mode = PHY_PSGMII_FIBER;
+			}
+			break;
+		case PORT_WRAPPER_QSGMII:
+			port_mode = PORT_QSGMII;
+			break;
+		case PORT_WRAPPER_SGMII_PLUS:
+			port_mode = PORT_SGMII_PLUS;
+			break;
+		case PORT_WRAPPER_USXGMII:
+			port_mode = PORT_USXGMII;
+			break;
+		case PORT_WRAPPER_10GBASE_R:
+			port_mode = PORT_10GBASE_R;
+			break;
+		case PORT_WRAPPER_SGMII_CHANNEL0:
+		case PORT_WRAPPER_SGMII_CHANNEL1:
+		case PORT_WRAPPER_SGMII_CHANNEL4:
+			port_mode = PHY_SGMII_BASET;
+			break;
+		case PORT_WRAPPER_SGMII_FIBER:
+			port_mode = PORT_SGMII_FIBER;
+			break;
+		case PORT_WRAPPER_UQXGMII:
+		case PORT_WRAPPER_UDXGMII:
+			port_mode = PORT_UQXGMII;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+
+	return port_mode;
 }
 
 a_uint32_t hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id)

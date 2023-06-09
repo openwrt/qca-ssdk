@@ -138,6 +138,7 @@ a_uint16_t ssdk_ucast_l0_cdrr_num_get(a_uint32_t dev_id, a_uint32_t port);
 a_uint32_t ssdk_intf_mac_num_get(void);
 a_uint8_t* ssdk_intf_macaddr_get(a_uint32_t index);
 a_uint32_t ssdk_dt_global_get_mac_mode(a_uint32_t dev_id, a_uint32_t index);
+a_uint32_t ssdk_dt_get_port_mode(a_uint32_t dev_id, a_uint32_t port_id);
 a_uint32_t ssdk_dt_global_set_mac_mode(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode);
 a_uint32_t ssdk_cpu_bmp_get(a_uint32_t dev_id);
 a_uint32_t ssdk_lan_bmp_get(a_uint32_t dev_id);

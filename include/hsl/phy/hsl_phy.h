@@ -789,6 +789,9 @@ hsl_port_mode_to_phydev_interface(a_uint32_t dev_id, a_uint32_t port_mode);
 a_uint32_t
 hsl_port_mode_to_uniphy_mode(a_uint32_t dev_id, a_uint32_t port_mode);
 a_uint32_t
+hsl_uniphy_mode_to_port_mode(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t uniphy_mode);
+a_uint32_t
 hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id);
 sw_error_t
 hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,

@@ -114,6 +114,16 @@ a_uint32_t ssdk_dt_global_get_mac_mode(a_uint32_t dev_id, a_uint32_t index)
 	return 0;
 }
 
+a_uint32_t ssdk_dt_get_port_mode(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	a_uint32_t uniphy_index = 0, mac_mode = 0;
+
+	uniphy_index = hsl_port_to_uniphy(dev_id, port_id);
+
+	mac_mode = ssdk_dt_global_get_mac_mode(dev_id, uniphy_index);
+	return hsl_uniphy_mode_to_port_mode(dev_id, port_id, mac_mode);
+}
+
 a_uint32_t ssdk_dt_global_set_mac_mode(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 {
 	if (index == 0)

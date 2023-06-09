@@ -228,8 +228,10 @@ _qca8084_phy_interface_mode_fixup(a_uint32_t dev_id, a_uint32_t phy_id,
 	SSDK_DEBUG("dev_id :0x%x, phy_id:0x%x, interface mode: 0x%x\n", dev_id, phy_id,
 		mode_new);
 
-	/*only SGMII and SGMII+ may need to change interface mode*/
-	if(mode_new != PHY_SGMII_BASET && mode_new != PORT_SGMII_PLUS)
+	/*only SGMII and SGMII+ may need to change interface mode.
+	no need to change interface mode if port force mode is true*/
+	if((mode_new != PHY_SGMII_BASET && mode_new != PORT_SGMII_PLUS) ||
+		hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE_INTERFACE_MODE))
 		return SW_OK;
 
 	if(phy_info->port_mode[port_id] != mode_new)
@@ -267,8 +269,7 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 		fal_port_interface_mode_t interface_mode)
 {
 	sw_error_t rv = SW_OK;
-	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
-	a_uint32_t port_id  = 0, mht_port_id = 0, phy_addr = 0;
+	a_uint32_t mht_port_id = 0, phy_addr = 0;
 
 	switch (interface_mode) {
 		case PORT_UQXGMII:
@@ -299,13 +300,6 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 
 			/*init pinctrl for phy mode*/
 			rv = ssdk_mht_pinctrl_init(dev_id);
-
-			/*init port mode*/
-			for(port_id = SSDK_PHYSICAL_PORT1; port_id <= SSDK_PHYSICAL_PORT4;
-				port_id++)
-			{
-				phy_info->port_mode[port_id] = PORT_UQXGMII;
-			}
 			break;
 		case PHY_SGMII_BASET:
 		case PORT_SGMII_PLUS:
@@ -314,9 +308,6 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 				SSDK_ERROR("MHT uniphy 0 is not enabled on the sku\n");
 				return SW_NOT_SUPPORTED;
 			}
-			if(interface_mode ==
-				phy_info->port_mode[qca_ssdk_phy_addr_to_port(dev_id, phy_id)])
-				return SW_OK;
 			/*need to configure work mode as MHT_PHY_SGMII_USXGMII_MODE*/
 			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);
 			SW_RTN_ON_ERROR (rv);
@@ -326,8 +317,6 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_id,
 			SSDK_DEBUG(" ethphy3 software reset\n");
 			rv = qca808x_phy_reset(dev_id, phy_id);
 			SW_RTN_ON_ERROR (rv);
-			phy_info->port_mode[qca_ssdk_phy_addr_to_port(dev_id, phy_id)] =
-				interface_mode;
 			break;
 		default:
 			rv = SW_NOT_SUPPORTED;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,9 @@ extern "C" {
 #endif                          /* __cplusplus */
 
 #include "ssdk_init.h"
-#define MHT_HEADER_TYPE_VAL	0xaaaa
+#define MHT_HEADER_TYPE_VAL      0xaaaa
+#define MHT_PORT0_XON_THRES      0x80
+#define MHT_PORT0_XOFF_THRES     0xc0
 
 int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 sw_error_t

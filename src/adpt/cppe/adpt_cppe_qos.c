@@ -54,10 +54,6 @@ adpt_cppe_qos_mapping_get(a_uint32_t dev_id, a_uint32_t index,
 	cosmap->dp_en = qos_mapping_tbl.bf.int_dp_en;
 	cosmap->qos_prec = qos_mapping_tbl.bf.qos_res_prec_0 |
 			     qos_mapping_tbl.bf.qos_res_prec_1 << 1;
-#if defined(MPPE)
-	cosmap->policy_en = qos_mapping_tbl.bf.flow_policy_valid;
-	cosmap->policy_id = qos_mapping_tbl.bf.flow_policy_id;
-#endif
 
 	return SW_OK;
 }
@@ -66,12 +62,16 @@ static sw_error_t
 adpt_cppe_qos_mapping_set(a_uint32_t dev_id, a_uint32_t index,
 			fal_qos_cosmap_t *cosmap)
 {
+	sw_error_t rv = SW_OK;
 	union qos_mapping_tbl_u qos_mapping_tbl;
 
 	ADPT_DEV_ID_CHECK(dev_id);
         ADPT_NULL_POINT_CHECK(cosmap);
 
 	memset(&qos_mapping_tbl, 0, sizeof(qos_mapping_tbl));
+	rv = cppe_qos_mapping_tbl_get(dev_id, index, &qos_mapping_tbl);
+	if (rv != SW_OK)
+		return rv;
 
 	qos_mapping_tbl.bf.int_pcp = cosmap->internal_pcp;
 	qos_mapping_tbl.bf.int_dei = cosmap->internal_dei;
@@ -86,10 +86,6 @@ adpt_cppe_qos_mapping_set(a_uint32_t dev_id, a_uint32_t index,
 	qos_mapping_tbl.bf.int_dp_en = cosmap->dp_en;
 	qos_mapping_tbl.bf.qos_res_prec_0 = cosmap->qos_prec & 1;
 	qos_mapping_tbl.bf.qos_res_prec_1 = (cosmap->qos_prec >> 1) & 3;
-#if defined(MPPE)
-	qos_mapping_tbl.bf.flow_policy_valid = cosmap->policy_en;
-	qos_mapping_tbl.bf.flow_policy_id = cosmap->policy_id;
-#endif
 
 	return cppe_qos_mapping_tbl_set(dev_id, index, &qos_mapping_tbl);
 }

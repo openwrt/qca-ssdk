@@ -29,30 +29,28 @@ extern "C" {
 #include "sw.h"
 #include "fal/fal_type.h"
 
-    /**
-    @brief This enum defines traffic scheduling mode.
-    */
-    typedef enum {
-        FAL_SCH_SP_MODE = 0,    /**<  strict priority scheduling mode */
-        FAL_SCH_WRR_MODE,       /**<   weight round robin scheduling mode*/
-        FAL_SCH_MIX_MODE,       /**<  sp and wrr mixed scheduling mode */
-        FAL_SCH_MIX_PLUS_MODE,  /**<  sp and wrr mixed plus scheduling mode */
-        FAL_SCH_MODE_BUTT
-    }
-    fal_sch_mode_t;
+/**
+  @brief This enum defines traffic scheduling mode.
+  */
+typedef enum {
+	FAL_SCH_SP_MODE = 0,    /**<  strict priority scheduling mode */
+	FAL_SCH_WRR_MODE,       /**<   weight round robin scheduling mode*/
+	FAL_SCH_MIX_MODE,       /**<  sp and wrr mixed scheduling mode */
+	FAL_SCH_MIX_PLUS_MODE,  /**<  sp and wrr mixed plus scheduling mode */
+	FAL_SCH_MODE_BUTT
+} fal_sch_mode_t;
 
-    /**
-    @brief This enum defines qos assignment mode.
-    */
-    typedef enum
-    {
-        FAL_QOS_DA_MODE = 0,    /**<   qos assignment based on destination mac address*/
-        FAL_QOS_UP_MODE,        /**<   qos assignment based on 802.1p field in vlan tag*/
-        FAL_QOS_DSCP_MODE,      /**<  qos assignment based on dscp field in ip header */
-        FAL_QOS_PORT_MODE,      /**<  qos assignment based on port */
-        FAL_QOS_FLOW_MODE,      /**<  qos assignment based on flow */
-        FAL_QOS_MODE_BUTT
-    } fal_qos_mode_t;
+/**
+  @brief This enum defines qos assignment mode.
+  */
+typedef enum {
+	FAL_QOS_DA_MODE = 0,    /**<   qos assignment based on destination mac address*/
+	FAL_QOS_UP_MODE,        /**<   qos assignment based on 802.1p field in vlan tag*/
+	FAL_QOS_DSCP_MODE,      /**<  qos assignment based on dscp field in ip header */
+	FAL_QOS_PORT_MODE,      /**<  qos assignment based on port */
+	FAL_QOS_FLOW_MODE,      /**<  qos assignment based on flow */
+	FAL_QOS_MODE_BUTT
+} fal_qos_mode_t;
 
 typedef struct {
 	a_uint8_t pcp_group; /* 0: group 0 1: group 1 */
@@ -94,8 +92,6 @@ typedef struct {
 	a_bool_t pri_en;
 	a_bool_t dp_en;
 	a_uint8_t qos_prec; /* resolution precedence */
-	a_bool_t policy_en; /* added for ipq53xx */
-	a_uint8_t policy_id; /* added for ipq53xx */
 } fal_qos_cosmap_t;
 
 typedef enum {

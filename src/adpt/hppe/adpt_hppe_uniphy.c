@@ -1166,20 +1166,18 @@ _adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index,
 	SSDK_INFO("uniphy will output clock as %dHz\n", clk_rate);
 	rv = mppe_uniphy_clkout_50m_ctrl_get(dev_id, index, &clkout_50m_ctrl);
 	SW_RTN_ON_ERROR(rv);
-	if(clk_rate == UNIPHY_CLK_RATE_25M)
-	{
+
+	if (clk_rate == UNIPHY_CLK_RATE_25M) {
 		clkout_50m_ctrl.bf.clk_50m_div2_sel = 1;
-	}
-	else if(clk_rate == UNIPHY_CLK_RATE_50M)
-	{
+	} else if (clk_rate == UNIPHY_CLK_RATE_50M) {
 		clkout_50m_ctrl.bf.clk_50m_div2_sel = 0;
-	}
-	else
-	{
+	} else if (clk_rate == 0) {
+		clkout_50m_ctrl.bf.clk_50m_25m_en = 0;
+	} else {
 		return SW_NOT_SUPPORTED;
 	}
-	rv = mppe_uniphy_clkout_50m_ctrl_set(dev_id, index, &clkout_50m_ctrl);
 
+	rv = mppe_uniphy_clkout_50m_ctrl_set(dev_id, index, &clkout_50m_ctrl);
 	return rv;
 }
 
@@ -1195,12 +1193,20 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 		hsl_port_force_speed_get(dev_id, port_id) == FAL_SPEED_1000)
 		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
 	phy_id = hsl_port_phyid_get(dev_id, port_id);
+
 	if (phy_id == QCA8030_PHY || phy_id == QCA8033_PHY || phy_id == QCA8035_PHY)
 	{
 		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
 		hsl_port_phy_gpio_reset(dev_id, port_id);
 		hsl_port_phy_hw_init(dev_id, port_id);
 	}
+
+	/* For miami connected with manhattan bypass device, the port4 is connected with
+	 * uniphy1 of miami, the clock of manhattan is provided from the uniphy0 of miami,
+	 * so do not need to enable the clock from uniphy1 of miami.
+	 */
+	if (QCA8084_PHY == phy_id)
+		_adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
 
 	return;
 }

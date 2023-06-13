@@ -2800,20 +2800,22 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id)
 
 	if (port_type == PORT_GMAC_TYPE)
 	{
-		rv = adpt_hppe_port_mac_speed_set(dev_id, port_id, FAL_SPEED_1000);
-		rv = adpt_hppe_port_mac_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
+		rv = _adpt_hppe_gmac_speed_set(dev_id, port_id, FAL_SPEED_1000);
+		SW_RTN_ON_ERROR(rv);
+		rv = _adpt_hppe_gmac_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
+		SW_RTN_ON_ERROR(rv);
 	}
 	else if (port_type == PORT_XGMAC_TYPE)
 	{
 		if ((port_mode == PORT_SGMII_PLUS) || (port_mode == PORT_UQXGMII))
 		{
-			rv = adpt_hppe_port_mac_speed_set(dev_id, port_id, FAL_SPEED_2500);
-			rv = adpt_hppe_port_mac_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
+			rv = _adpt_hppe_xgmac_speed_set(dev_id, port_id, FAL_SPEED_2500);
+			SW_RTN_ON_ERROR(rv);
 		}
 		else
 		{
-			rv = adpt_hppe_port_mac_speed_set(dev_id, port_id, FAL_SPEED_10000);
-			rv = adpt_hppe_port_mac_duplex_set(dev_id, port_id, FAL_FULL_DUPLEX);
+			rv = _adpt_hppe_xgmac_speed_set(dev_id, port_id, FAL_SPEED_10000);
+			SW_RTN_ON_ERROR(rv);
 		}
 	}
 	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
@@ -2821,20 +2823,31 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id)
 	} else {
 		xgmac_port = SSDK_PHYSICAL_PORT5;
 	}
+
 	if (port_id >= xgmac_port) {
+		a_bool_t gmac_rxfc = A_FALSE, gmac_txfc = A_FALSE, xgmac_rxfc = A_FALSE,
+			xgmac_txfc = A_FALSE;
+		struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+		SW_RTN_ON_NULL(priv);
 		if (port_type == PORT_GMAC_TYPE) {
-			rv = _adpt_xgmac_port_txfc_status_set( dev_id, port_id, A_FALSE);
-			SW_RTN_ON_ERROR(rv);
-			rv = _adpt_xgmac_port_rxfc_status_set( dev_id, port_id, A_FALSE);
-			SW_RTN_ON_ERROR(rv);
+			gmac_rxfc = priv->port_old_rx_flowctrl[port_id-1];
+			gmac_txfc = priv->port_old_tx_flowctrl[port_id-1];
 		} else if (port_type == PORT_XGMAC_TYPE) {
-			rv = _adpt_gmac_port_txfc_status_set( dev_id, port_id, A_FALSE);
-			SW_RTN_ON_ERROR(rv);
-			rv = _adpt_gmac_port_rxfc_status_set( dev_id, port_id, A_FALSE);
-			SW_RTN_ON_ERROR(rv);
+			xgmac_rxfc = priv->port_old_rx_flowctrl[port_id-1];
+			xgmac_txfc = priv->port_old_tx_flowctrl[port_id-1];
 		} else {
 			return SW_NOT_SUPPORTED;
 		}
+
+		rv = _adpt_gmac_port_txfc_status_set( dev_id, port_id, gmac_txfc);
+		SW_RTN_ON_ERROR(rv);
+		rv = _adpt_gmac_port_rxfc_status_set( dev_id, port_id, gmac_rxfc);
+		SW_RTN_ON_ERROR(rv);
+		rv = _adpt_xgmac_port_txfc_status_set( dev_id, port_id, xgmac_txfc);
+		SW_RTN_ON_ERROR(rv);
+		rv = _adpt_xgmac_port_rxfc_status_set( dev_id, port_id, xgmac_rxfc);
+		SW_RTN_ON_ERROR(rv);
 		rv = adpt_hppe_port_interface_mode_switch_mac_reset(dev_id, port_id);
 	}
 	if (adpt_chip_type_get( dev_id) == CHIP_APPE) {
@@ -3501,12 +3514,6 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 	/*init port status for special ports to triger polling*/
 	for(port_id = port_id_from; port_id <= port_id_end; port_id++)
 	{
-		/*if the port did not connect phy, then no need to disable flow control*/
-		if(_adpt_hppe_port_phy_connected(dev_id, port_id) == A_TRUE)
-		{
-			_adpt_hppe_port_txfc_status_set(dev_id, port_id, A_FALSE);
-			_adpt_hppe_port_rxfc_status_set(dev_id, port_id, A_FALSE);
-		}
 		qca_mac_port_status_init(dev_id, port_id);
 	}
 

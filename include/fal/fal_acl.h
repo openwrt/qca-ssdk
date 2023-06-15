@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -455,6 +455,12 @@ typedef struct
 	a_uint8_t tunnel_decap_en_mask;
 } fal_acl_tunnel_info_t;
 
+typedef struct {
+	a_uint32_t hw_rule_id;
+	a_uint32_t hw_list_id;
+	a_uint32_t hw_entries;
+} fal_acl_rule_hw_info_t;
+
     /**
      * @brief This structure defines the Acl rule.
      *   @details  Fields description:
@@ -727,6 +733,9 @@ typedef struct
 	a_uint8_t metadata_pri; /*metadata priority*/
 	a_uint16_t cookie_val; /*cookie vaule*/
 	a_uint8_t cookie_pri; /*cookie priority */
+
+	/*returned info*/
+	fal_acl_rule_hw_info_t hw_info;
 } fal_acl_rule_t;
 
 

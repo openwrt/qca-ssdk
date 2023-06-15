@@ -2119,6 +2119,13 @@ adpt_hppe_acl_rule_query(a_uint32_t dev_id, a_uint32_t list_id, a_uint32_t rule_
 	aos_unlock_bh(&hppe_acl_lock[dev_id]);
 	/*query rule*/
 	rv = _adpt_ppe_acl_rule_sw_query(dev_id, hw_list_id, hw_entries, rule);
+
+	/*update hw rule info*/
+	rule->hw_info.hw_rule_id = hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + \
+			_acl_bit_index(hw_entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
+	rule->hw_info.hw_list_id = hw_list_id;
+	rule->hw_info.hw_entries = hw_entries;
+
 	return rv;
 }
 
@@ -4497,6 +4504,12 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		g_acl_hw_list[dev_id][hw_list_index].free_hw_entry_count);
 	/*resort hw list */
 	 _adpt_hppe_acl_hw_list_resort(dev_id, hw_list_index, A_TRUE);
+
+	 /*return rule hw info*/
+	rule->hw_info.hw_rule_id = hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + \
+		_acl_bit_index(s_acl_entries[index].entries, ADPT_ACL_ENTRY_NUM_PER_LIST, 0);
+	rule->hw_info.hw_list_id = hw_list_id;
+	rule->hw_info.hw_entries = s_acl_entries[index].entries;
 
 	aos_unlock_bh(&hppe_acl_lock[dev_id]);
 	return SW_OK;

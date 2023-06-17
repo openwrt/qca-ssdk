@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018, 2020-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -47,7 +47,8 @@ extern "C"
 #define SFP_TO_SFP_SPEED(reg_data) ((reg_data >> 8) & 0xff)
 #define SFP_TO_SFP_TYPE(reg_data) ((reg_data >> 8) & 0xff)
 
-int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t phy_id);
+int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t phy_id,
+	void *priv);
 void sfp_phy_device_remove(a_uint32_t dev_id, a_uint32_t port);
 int sfp_phy_driver_register(void);
 void sfp_phy_driver_unregister(void);

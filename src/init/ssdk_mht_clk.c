@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -823,6 +823,8 @@ a_uint32_t ssdk_mht_clk_dump(a_uint32_t dev_id, char *buf)
 	for (i = 0; i < ARRAY_SIZE(mht_clk_lookup_table); i++) {
 		clk = &mht_clk_lookup_table[i];
 		if (clk->rcg != 0) {
+			memset(&clk_data, 0, sizeof(clk_data));
+
 			rv = ssdk_mht_clk_rate_get(dev_id, clk->clk_name, &clk_data);
 			if (rv != SW_OK)
 				continue;

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -39,7 +39,9 @@
 #define L0_ENS_Q_HEAD_TBL_MAX_ENTRY	8
 #define L0_ENS_Q_ENTRY_TBL_MAX_ENTRY	300
 #define L0_FLOW_STATUS_TBL_MAX_ENTRY	300
-#if defined(MPPE)
+#if defined(MRPPE)
+#define RING_Q_MAP_TBL_MAX_ENTRY	24
+#elif defined(MPPE)
 #define RING_Q_MAP_TBL_MAX_ENTRY	16
 #elif defined(APPE)
 #define RING_Q_MAP_TBL_MAX_ENTRY	24

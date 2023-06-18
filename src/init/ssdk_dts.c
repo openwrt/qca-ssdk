@@ -1316,7 +1316,8 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 	else if (of_device_is_compatible(switch_node, "qcom,ess-switch-ipq807x") ||
 			of_device_is_compatible(switch_node, "qcom,ess-switch-ipq95xx") ||
 			of_device_is_compatible(switch_node, "qcom,ess-switch-ipq60xx") ||
-			of_device_is_compatible(switch_node, "qcom,ess-switch-ipq53xx")) {
+			of_device_is_compatible(switch_node, "qcom,ess-switch-ipq53xx") ||
+			of_device_is_compatible(switch_node, "qcom,ess-switch-ipq54xx")) {
 		/* HPPE chip */
 #ifdef HPPE
 		a_uint32_t mode = 0;

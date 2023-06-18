@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2014, 2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -478,7 +478,8 @@ qca_ar8327_sw_hw_apply(struct switch_dev *dev)
     fal_pbmp_t *portmask = NULL;
     int i, j;
 
-    if (priv->version == QCA_VER_HPPE || priv->version == QCA_VER_APPE) {
+    if (priv->version == QCA_VER_HPPE || priv->version == QCA_VER_APPE ||
+		priv->version == QCA_VER_MRPPE) {
         return 0;
     }
 

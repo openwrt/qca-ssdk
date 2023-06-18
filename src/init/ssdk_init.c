@@ -1538,6 +1538,7 @@ _ssdk_mac_sw_sync_chip_check(struct qca_phy_priv *priv)
 	switch (priv->version) {
 		case QCA_VER_HPPE:
 		case QCA_VER_SCOMPHY:
+		case QCA_VER_MRPPE:
 		case QCA_VER_APPE:
 			break;
 		default:
@@ -1733,6 +1734,10 @@ static int qca_switchdev_register(struct qca_phy_priv *priv)
 			sw_dev->name = "QCA APPE";
 			sw_dev->alias = "QCA APPE";
 			break;
+		case QCA_VER_MRPPE:
+			sw_dev->name = "QCA MRPPE";
+			sw_dev->alias = "QCA MRPPE";
+			break;
 		case QCA_VER_HPPE:
 			sw_dev->name = "QCA HPPE";
 			sw_dev->alias = "QCA HPPE";
@@ -1798,6 +1803,8 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 			priv->ports = 3;
 		}
 #endif
+	} else if (chip_type == CHIP_MRPPE) {
+		priv->ports = 4;
 	} else {
 #ifdef MPPE
 		if (chip_type == CHIP_APPE &&
@@ -2236,6 +2243,9 @@ static int chip_ver_get(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 			cfg->chip_type = CHIP_APPE;
 			cfg->chip_revision = chip_revision;
 			break;
+		case QCA_VER_MRPPE:
+			cfg->chip_type = CHIP_MRPPE;
+			break;
 		case QCA_VER_MHT:
 			cfg->chip_type = CHIP_MHT;
 			break;
@@ -2557,6 +2567,7 @@ static int __init regi_init(void)
 				SSDK_INFO("Initializing MHT Done!!\n");
 #endif
 				break;
+			case CHIP_MRPPE:
 			case CHIP_APPE:
 #if defined(APPE)
 				qca_appe_hw_init(&cfg, dev_id);

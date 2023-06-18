@@ -571,7 +571,8 @@ sw_error_t ppe_vsi_init(a_uint32_t dev_id)
 	stamove.stamove_en = 1;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 		return SW_OK;
 #endif
 

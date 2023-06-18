@@ -808,6 +808,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 			group_buf = 1024;
 			break;
 		case APPE_TYPE:
+		case MRPPE_TYPE:
 			group_buf = 1550;
 			break;
 		case MPPE_TYPE:
@@ -826,6 +827,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 		switch (chip_type) {
 			case HPPE_TYPE:
 			case APPE_TYPE:
+			case MRPPE_TYPE:
 				if (i < PPE_BM_PHY_PORT_OFFSET) {
 					prealloc_buf = 0;
 					react_buf = 100;
@@ -886,6 +888,7 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 				cfg.weight= 4;
 				break;
 			case APPE_TYPE:
+			case MRPPE_TYPE:
 				if (i == PPE_BM_PORT_MIN) {
 					share_ceiling = 1146;
 					cfg.resume_min_thresh = 0;
@@ -969,7 +972,8 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 	queue_dst.service_code = 7;
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 252, 0);
 	else
 #endif
@@ -1114,6 +1118,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 	switch (chip_type) {
 		case HPPE_TYPE:
+		case MRPPE_TYPE:
 		case APPE_TYPE:
 			total_buf = 2000;
 			ceiling = 400;
@@ -1186,12 +1191,14 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 		if (dt_cfg->l1cfg[i].valid) {
 			port_id = dt_cfg->l1cfg[i].port_id;
 #if defined(IN_ATHTAG)
-#if defined(MPPE)
+#if defined(MRPPE)
+			if (port_id >= SSDK_PHYSICAL_PORT4 &&
+#else
 			if (port_id >= SSDK_PHYSICAL_PORT3 &&
+#endif
 				port_id <= SSDK_PHYSICAL_PORT6) {
 				port_id = SSDK_PHYSICAL_PORT1;
 			}
-#endif
 #endif
 			cfg.sp_id = port_id;
 			cfg.c_pri = dt_cfg->l1cfg[i].cpri;
@@ -1210,12 +1217,14 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 		if (dt_cfg->l0cfg[i].valid) {
 			port_id = dt_cfg->l0cfg[i].port_id;
 #if defined(IN_ATHTAG)
-#if defined(MPPE)
+#if defined(MRPPE)
+			if (port_id >= SSDK_PHYSICAL_PORT4 &&
+#else
 			if (port_id >= SSDK_PHYSICAL_PORT3 &&
+#endif
 				port_id <= SSDK_PHYSICAL_PORT6) {
 				port_id = SSDK_PHYSICAL_PORT1;
 			}
-#endif
 #endif
 			cfg.sp_id = dt_cfg->l0cfg[i].sp_id;
 			cfg.c_pri = dt_cfg->l0cfg[i].cpri;
@@ -1477,6 +1486,10 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 		case MPPE_TYPE:
 			port_max = SSDK_PHYSICAL_PORT3;
 			SSDK_INFO("mppe interface mode initialization\n");
+			break;
+		case MRPPE_TYPE:
+			port_max = SSDK_PHYSICAL_PORT4;
+			SSDK_INFO("mrppe interface mode initialization\n");
 			break;
 		default:
 			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);

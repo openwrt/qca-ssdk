@@ -577,7 +577,8 @@ adpt_hppe_debug_counter_set(a_uint32_t dev_id)
 		hppe_drop_cpu_cnt_tbl_set(dev_id, i, &drop_cpu_cnt_tbl);
 
 #ifdef APPE
-	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	   adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		/* clear VP_RX_COUNTER_TBL and VP_RX_DROP_CNT_TBL */
 		for (i = 0; i < PORT_RX_CNT_TBL_NUM; i++)
@@ -1216,7 +1217,8 @@ adpt_hppe_debug_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 	/* show DROP_CPU_CNT_TBL */
 	adpt_hppe_debug_drop_cpu_counter_get(dev_id, show_type);
 #ifdef APPE
-	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	   adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		/* show VP_PORT_RX_COUNTER_TBL*/
 		adpt_appe_debug_vp_rx_counter_get(dev_id, show_type);

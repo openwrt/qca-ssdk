@@ -86,6 +86,9 @@ adpt_ppe_type_t adpt_ppe_type_get(a_uint32_t dev_id)
 			if (revision == MPPE_REVISION)
 				ppe_type = MPPE_TYPE;
 			break;
+		case CHIP_MRPPE:
+			ppe_type = MRPPE_TYPE;
+			break;
 		default:
 			break;
 	}
@@ -356,6 +359,7 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 	switch (cfg->chip_type)
 	{
 #if defined(APPE)
+		case CHIP_MRPPE:
 		case CHIP_APPE:
 			/* APPE specific module initialization */
 			if (g_adpt_api[dev_id] == NULL) {

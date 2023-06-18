@@ -1024,7 +1024,8 @@ adpt_hppe_port_scheduler_cfg_set(a_uint32_t dev_id,
 	psch_tdm_cfg.bf.ens_port = cfg->en_scheduler_port;
 	psch_tdm_cfg.bf.des_port = cfg->de_scheduler_port;
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		psch_tdm_cfg.bf.des_second_port_en = cfg->de_scheduler_2nd_port_en;
 		psch_tdm_cfg.bf.des_second_port = cfg->de_scheduler_2nd_port;
 	}
@@ -1048,7 +1049,8 @@ adpt_hppe_port_scheduler_cfg_get(a_uint32_t dev_id,
 	cfg->en_scheduler_port = psch_tdm_cfg.bf.ens_port;
 	cfg->de_scheduler_port = psch_tdm_cfg.bf.des_port;
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		cfg->de_scheduler_2nd_port_en = psch_tdm_cfg.bf.des_second_port_en;
 		cfg->de_scheduler_2nd_port = psch_tdm_cfg.bf.des_second_port;
 	}

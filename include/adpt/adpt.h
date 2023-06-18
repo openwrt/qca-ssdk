@@ -2161,6 +2161,7 @@ typedef enum {
 	CPPE_TYPE,
 	APPE_TYPE,
 	MPPE_TYPE,
+	MRPPE_TYPE,
 	MAX_PPE_TYPE,
 } adpt_ppe_type_t;
 

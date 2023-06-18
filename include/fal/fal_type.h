@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -45,6 +45,12 @@ extern "C" {
 #define FAL_IS_TRUNK(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_TRUNK)?1:0)
 #define FAL_IS_VPORT(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VPORT)?1:0)
 #define FAL_IS_VP_GROUP(port_id) (((FAL_PORT_ID_TYPE(port_id))==FAL_PORT_TYPE_VP_GROUP)?1:0)
+
+/*
+* Source info change types for vlan translation/tunnel decap
+*/
+#define FAL_CHG_SRC_TYPE_VP            0x0
+#define FAL_CHG_SRC_L3_IF_TUNNEL       0x1
 
 /* fal_pbmp_t definition,
  * bit31-bit24: port_type, 0-physical port bitmap, 1-trunk port, 2-virtual port, 3-vport group

@@ -3253,7 +3253,11 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 #endif
 			else if (phy_info->port_mode[port_id] == PORT_INTERFACE_MODE_AUTO)
 				continue;
-
+			else if (phy_info->port_mode[port_id] == PORT_INTERFACE_MODE_MAX)
+			{
+				*mode0 = PORT_WRAPPER_MAX;
+				continue;
+			}
 			SSDK_ERROR("port %d doesn't support port_interface_mode %d\n",
 				port_id, phy_info->port_mode[port_id]);
 			return SW_NOT_SUPPORTED;
@@ -3302,7 +3306,9 @@ _adpt_hppe_instance1_mode_get(a_uint32_t dev_id, a_uint32_t port_id,  a_uint32_t
 			*mode = PORT_WRAPPER_MAX;
 			break;
 		case PORT_INTERFACE_MODE_AUTO:
+			break;
 		case PORT_INTERFACE_MODE_MAX:
+			*mode = PORT_WRAPPER_MAX;
 			break;
 		default:
 			SSDK_ERROR("port %d doesn't support port_interface_mode %d\n",
@@ -5373,10 +5379,13 @@ adpt_hppe_gcc_uniphy_clock_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 				a_bool_t enable)
 {
 	a_uint32_t uniphy_index = 0;
+	fal_port_interface_mode_t port_mode = PORT_INTERFACE_MODE_MAX;
 #if defined(CPPE)
 	a_uint32_t channel_id = 0;
 #endif
-
+	adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode);
+	if(port_mode == PORT_INTERFACE_MODE_MAX)
+		return;
 	uniphy_index = hsl_port_to_uniphy(dev_id, port_id);
 
 #if defined(CPPE)

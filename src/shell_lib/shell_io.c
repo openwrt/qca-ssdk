@@ -4212,6 +4212,31 @@ cmd_data_check_egress_mode(char *info, void *val, a_uint32_t size)
 }
 
 sw_error_t
+cmd_data_check_vlan_xlt_tag_fmt(char *cmdstr, a_uint32_t *val, a_uint32_t size)
+{
+	if (!cmdstr)
+		return SW_BAD_VALUE;
+
+	*val = 0;
+
+	if (SW_OK != cmd_data_check_uint8(cmdstr, val, size) && strstr(cmdstr, "tag")) {
+		if (strstr(cmdstr, "untag"))
+			*val |= FAL_PORT_VLAN_XLT_MATCH_UNTAGGED;
+
+		if (strstr(cmdstr, "pri_tag"))
+			*val |= FAL_PORT_VLAN_XLT_MATCH_PRIO_TAG;
+
+		if (strstr(cmdstr, "tagged"))
+			*val |= FAL_PORT_VLAN_XLT_MATCH_TAGGED;
+	}
+
+	if (0 == *val)
+		return SW_BAD_VALUE;
+
+	return SW_OK;
+}
+
+sw_error_t
 cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t size)
 {
 	char *cmd = NULL;
@@ -4228,7 +4253,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("stagformat", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->s_tagged), sizeof (a_uint32_t));
+		rv = cmd_data_check_vlan_xlt_tag_fmt(cmd, (a_uint32_t *)&(pEntry->s_tagged), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -4298,7 +4323,7 @@ cmd_data_check_port_vlan_translation_adv_rule(char *info, void *val, a_uint32_t 
 		cmd = get_sub_cmd("ctagformat", "0");
 		SW_RTN_ON_NULL_PARAM(cmd);
 
-		rv = cmd_data_check_uint32(cmd, (a_uint32_t *)&(pEntry->c_tagged), sizeof (a_uint32_t));
+		rv = cmd_data_check_vlan_xlt_tag_fmt(cmd, (a_uint32_t *)&(pEntry->c_tagged), sizeof (a_uint32_t));
 	}
 	while (talk_mode && (SW_OK != rv));
 
@@ -4469,9 +4494,9 @@ cmd_data_check_srctype(char *cmdstr, a_uint8_t def, a_uint8_t *val, a_uint32_t s
 	if (0 == cmdstr[0]) {
 		*val = def;
 	} else if (!strcasecmp(cmdstr, "vp")) {
-		*val = 0;
+		*val = FAL_CHG_SRC_TYPE_VP;
 	} else if (!strcasecmp(cmdstr, "l3_if")) {
-		*val = 1;
+		*val = FAL_CHG_SRC_L3_IF_TUNNEL;
 	} else {
 		return SW_BAD_VALUE;
 	}

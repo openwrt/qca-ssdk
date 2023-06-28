@@ -41,6 +41,13 @@ extern "C" {
 #define FAL_DEF_VLAN_STPID 0x88a8
 #define FAL_DEF_VLAN_CTPID 0x8100
 
+/*
+* Vlan frame type match in vlan translation
+*/
+#define FAL_PORT_VLAN_XLT_MATCH_UNTAGGED    0x1
+#define FAL_PORT_VLAN_XLT_MATCH_PRIO_TAG    0x2
+#define FAL_PORT_VLAN_XLT_MATCH_TAGGED      0x4
+
 /**
   @brief This enum defines 802.1q mode type.
   */

@@ -426,7 +426,9 @@ _fal_port_hibernate_get (a_uint32_t dev_id, fal_port_t port_id,
   rv = p_api->port_hibernate_get (dev_id, port_id, enable);
   return rv;
 }
-
+/*qca808x_end*/
+#endif
+/*qca808x_start*/
 static sw_error_t
 _fal_port_cdt (a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
 	       a_uint32_t * cable_status, a_uint32_t * cable_len)
@@ -451,6 +453,7 @@ _fal_port_cdt (a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
   return rv;
 }
 /*qca808x_end*/
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _fal_port_rxhdr_mode_get (a_uint32_t dev_id, fal_port_t port_id,
 			  fal_port_header_mode_t * mode)
@@ -2499,7 +2502,9 @@ fal_port_hibernate_get (a_uint32_t dev_id, fal_port_t port_id,
   FAL_API_UNLOCK;
   return rv;
 }
-
+/*qca808x_end*/
+#endif
+/*qca808x_start*/
 /**
  * @brief cable diagnostic test.
  * @param[in] dev_id device id
@@ -2521,6 +2526,7 @@ fal_port_cdt (a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
   return rv;
 }
 /*qca808x_end*/
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Get status of Atheros header packets parsed on a particular port.
  * @param[in] dev_id device id

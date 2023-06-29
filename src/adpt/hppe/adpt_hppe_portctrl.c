@@ -791,7 +791,7 @@ adpt_hppe_port_rxmac_status_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-
+#endif
 sw_error_t
 adpt_hppe_port_cdt(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t mdi_pair, fal_cable_status_t * cable_status,
@@ -825,7 +825,7 @@ adpt_hppe_port_cdt(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 
 }
-#endif
+
 sw_error_t
 adpt_hppe_port_txmac_status_set(a_uint32_t dev_id, fal_port_t port_id,
 				      a_bool_t enable)
@@ -6303,11 +6303,11 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	{
 		p_adpt_api->adpt_port_rxmac_status_get = adpt_hppe_port_rxmac_status_get;
 	}
+#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_CDT))
 	{
 		p_adpt_api->adpt_port_cdt = adpt_hppe_port_cdt;
 	}
-#endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[0] & (1 << FUNC_ADPT_PORT_TXMAC_STATUS_SET))
 	{
 		p_adpt_api->adpt_port_txmac_status_set = adpt_hppe_port_txmac_status_set;

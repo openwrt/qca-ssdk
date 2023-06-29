@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -403,7 +403,7 @@ mpge_phy_get_hibernate(a_uint32_t dev_id, a_uint32_t phy_id,
 {
 	return qca808x_phy_get_hibernate (dev_id, phy_id, enable);
 }
-
+#endif
 /******************************************************************************
 *
 * mpge_phy_cdt - cable diagnostic test
@@ -416,7 +416,7 @@ mpge_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 	return qca808x_phy_cdt (dev_id, phy_id, mdi_pair,
 		cable_status, cable_len);
 }
-
+#ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
 * mpge_phy_set_mdix - set phy mdix configuration
@@ -1052,8 +1052,8 @@ static sw_error_t mpge_phy_api_ops_init(void)
 	mpge_phy_api_ops->phy_id_get = mpge_phy_get_phy_id;
 	mpge_phy_api_ops->phy_power_off = mpge_phy_poweroff;
 	mpge_phy_api_ops->phy_power_on = mpge_phy_poweron;
-#ifndef IN_PORTCONTROL_MINI
 	mpge_phy_api_ops->phy_cdt = mpge_phy_cdt;
+#ifndef IN_PORTCONTROL_MINI
 	mpge_phy_api_ops->phy_mdix_set = mpge_phy_set_mdix;
 	mpge_phy_api_ops->phy_mdix_get = mpge_phy_get_mdix;
 	mpge_phy_api_ops->phy_mdix_status_get = mpge_phy_get_mdix_status;

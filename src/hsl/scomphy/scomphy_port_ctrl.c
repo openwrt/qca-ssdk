@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -299,7 +299,7 @@ _scomphy_port_hibernate_get (a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-
+#endif
 static sw_error_t
 _scomphy_port_cdt (a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
 		fal_cable_status_t * cable_status, a_uint32_t * cable_len)
@@ -326,7 +326,7 @@ _scomphy_port_cdt (a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _scomphy_port_8023az_set (a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
 {
@@ -1291,7 +1291,7 @@ scomphy_port_hibernate_get (a_uint32_t dev_id, fal_port_t port_id,
 	HSL_API_UNLOCK;
 	return rv;
 }
-
+#endif
 /**
  * @brief Run cable diagnostic test on a particular port.
  * @param[in] dev_id device id
@@ -1312,6 +1312,7 @@ scomphy_port_cdt (a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
 	HSL_API_UNLOCK;
 	return rv;
 }
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Set 802.3az status on a particular port.
  * @param[in] dev_id device id
@@ -1878,7 +1879,9 @@ scomphy_port_ctrl_init(a_uint32_t dev_id)
 	p_api->port_powersave_get = scomphy_port_powersave_get;
 	p_api->port_hibernate_set = scomphy_port_hibernate_set;
 	p_api->port_hibernate_get = scomphy_port_hibernate_get;
+#endif
 	p_api->port_cdt = scomphy_port_cdt;
+#ifndef IN_PORTCONTROL_MINI
 	p_api->port_8023az_set = scomphy_port_8023az_set;
 	p_api->port_8023az_get = scomphy_port_8023az_get;
 	p_api->port_mdix_set = scomphy_port_mdix_set;

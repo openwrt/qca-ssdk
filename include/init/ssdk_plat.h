@@ -34,6 +34,13 @@
 #include <net/switch.h>
 #endif
 #endif
+#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+#include <dt-bindings/arm/qcom,ids.h>
+#include <linux/soc/qcom/smem.h>
+#else
+#include <soc/qcom/socinfo.h>
+#endif
+
 /*qca808x_start*/
 #include <linux/phy.h>
 
@@ -480,6 +487,7 @@ sw_error_t ssdk_miibus_freq_get(a_uint32_t dev_id, a_uint32_t index, a_uint32_t 
 
 int ssdk_sysfs_init (void);
 void ssdk_sysfs_exit (void);
+int ssdk_uniphy_valid_check(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode);
 /*qca808x_start*/
 int ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 void ssdk_plat_exit(a_uint32_t dev_id);

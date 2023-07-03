@@ -35,9 +35,6 @@
 #include <linux/clk-provider.h>
 #include <linux/clkdev.h>
 #endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
-#include <soc/qcom/socinfo.h>
-#endif
 
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 struct device_node *clock_node = NULL;
@@ -59,14 +56,16 @@ void ssdk_clock_rate_set_and_enable(
 #if defined(APPE) && (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
 	if ((!strcmp("uniphy1_sys_clk", clock_id)) ||
 		(!strcmp("uniphy1_ahb_clk", clock_id))) {
-		if (cpu_is_uniphy1_enabled() == A_FALSE) {
+		if (ssdk_uniphy_valid_check(0, SSDK_UNIPHY_INSTANCE1,
+			PORT_WRAPPER_MAX) == A_FALSE) {
 			SSDK_INFO("UNIPHY 1 is not available on this SKU!\n");
 			return;
 		}
 	}
 	if ((!strcmp("uniphy2_sys_clk", clock_id)) ||
 		(!strcmp("uniphy2_ahb_clk", clock_id))) {
-		if (cpu_is_uniphy2_enabled() == A_FALSE) {
+		if (ssdk_uniphy_valid_check(0, SSDK_UNIPHY_INSTANCE2,
+			PORT_WRAPPER_MAX) == A_FALSE) {
 			SSDK_INFO("UNIPHY 2 is not available on this SKU!\n");
 			return;
 		}
@@ -188,7 +187,8 @@ void ssdk_uniphy_clock_rate_set(
 		a_uint32_t mode;
 		mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
 		if (mode != PORT_WRAPPER_MAX) {
-			if (cpu_is_uniphy1_enabled() == A_FALSE) {
+			if (ssdk_uniphy_valid_check(dev_id, SSDK_UNIPHY_INSTANCE1,
+				PORT_WRAPPER_MAX) == A_FALSE) {
 				SSDK_INFO("UNIPHY 1 is not available on this SKU!\n");
 				return;
 			}
@@ -196,9 +196,10 @@ void ssdk_uniphy_clock_rate_set(
 	}
 	if ((clock_type == NSS_PORT6_RX_CLK_E) ||
 		(clock_type == NSS_PORT6_TX_CLK_E)) {
-		if (cpu_is_uniphy2_enabled() == A_FALSE) {
-				SSDK_INFO("UNIPHY 2 is not available on this SKU!\n");
-				return;
+		if (ssdk_uniphy_valid_check(dev_id, SSDK_UNIPHY_INSTANCE2,
+			PORT_WRAPPER_MAX) == A_FALSE) {
+			SSDK_INFO("UNIPHY 2 is not available on this SKU!\n");
+			return;
 		}
 	}
 #endif
@@ -232,7 +233,8 @@ void ssdk_uniphy_clock_enable(
 		a_uint32_t mode;
 		mode = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
 		if (mode != PORT_WRAPPER_MAX) {
-			if (cpu_is_uniphy1_enabled() == A_FALSE) {
+			if (ssdk_uniphy_valid_check(dev_id,
+				SSDK_UNIPHY_INSTANCE1, PORT_WRAPPER_MAX) == A_FALSE) {
 				SSDK_INFO("UNIPHY 1 is not available on this SKU!\n");
 				return;
 			}
@@ -240,9 +242,10 @@ void ssdk_uniphy_clock_enable(
 	}
 	if ((clock_type == UNIPHY2_PORT6_RX_CLK_E) ||
 		(clock_type == UNIPHY2_PORT6_TX_CLK_E)) {
-		if (cpu_is_uniphy2_enabled() == A_FALSE) {
-				SSDK_INFO("UNIPHY 2 is not available on this SKU!\n");
-				return;
+		if (ssdk_uniphy_valid_check(dev_id,
+			SSDK_UNIPHY_INSTANCE2,PORT_WRAPPER_MAX) == A_FALSE) {
+			SSDK_INFO("UNIPHY 2 is not available on this SKU!\n");
+			return;
 		}
 	}
 #endif
@@ -941,7 +944,8 @@ static
 void ssdk_uniphy1_clock_source_set(void)
 {
 #if defined(APPE) && (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
-	if (cpu_is_uniphy1_enabled() == A_FALSE) {
+	if (ssdk_uniphy_valid_check(0,
+		SSDK_UNIPHY_INSTANCE1, PORT_WRAPPER_MAX) == A_FALSE) {
 		SSDK_INFO("UNIPHY 1 is not available on this SKU!\n");
 		return;
 	}
@@ -1054,7 +1058,8 @@ void ssdk_uniphy_port5_clock_source_set(void)
 		} else {
 			id = SSDK_UNIPHY_INSTANCE1*2 + i;
 #if defined(APPE) && (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
-			if (cpu_is_uniphy1_enabled() == A_FALSE) {
+			if (ssdk_uniphy_valid_check(0, SSDK_UNIPHY_INSTANCE1,
+				PORT_WRAPPER_MAX) == A_FALSE) {
 				SSDK_INFO("UNIPHY 1 is not available on this SKU!\n");
 				return;
 			}

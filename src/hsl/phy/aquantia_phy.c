@@ -505,7 +505,7 @@ aquantia_phy_get_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
 
 	return rv;
 }
-
+#endif
 /******************************************************************************
 *
 * aquantia_phy_cdt - cable diagnostic test
@@ -699,7 +699,6 @@ aquantia_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 
 	return rv;
 }
-#endif
 /******************************************************************************
 *
 * AQUANTIA_autoneg_done
@@ -2207,9 +2206,7 @@ static int aquantia_phy_api_ops_init(void)
 #endif
 	aquantia_phy_api_ops->phy_power_on = aquantia_phy_poweron;
 	aquantia_phy_api_ops->phy_power_off = aquantia_phy_poweroff;
-#ifndef IN_PORTCONTROL_MINI
 	aquantia_phy_api_ops->phy_cdt = aquantia_phy_cdt;
-#endif
 	aquantia_phy_api_ops->phy_link_status_get = aquantia_phy_get_link_status;
 #ifndef IN_PORTCONTROL_MINI
 	aquantia_phy_api_ops->phy_mdix_set = aquantia_phy_set_mdix;

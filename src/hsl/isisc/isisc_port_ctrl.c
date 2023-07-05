@@ -733,7 +733,7 @@ _isisc_port_hibernate_get(a_uint32_t dev_id, fal_port_t port_id,
 
     return rv;
 }
-
+#endif
 static sw_error_t
 _isisc_port_cdt(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
                fal_cable_status_t * cable_status, a_uint32_t * cable_len)
@@ -760,7 +760,7 @@ _isisc_port_cdt(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
 
     return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _isisc_port_phy_id_get (a_uint32_t dev_id, fal_port_t port_id,
 				a_uint16_t * org_id, a_uint16_t * rev_id)
@@ -2218,7 +2218,7 @@ isisc_port_hibernate_get(a_uint32_t dev_id, fal_port_t port_id,
     HSL_API_UNLOCK;
     return rv;
 }
-
+#endif
 /**
  * @brief Run cable diagnostic test on a particular port.
  * @param[in] dev_id device id
@@ -2239,7 +2239,7 @@ isisc_port_cdt(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
     HSL_API_UNLOCK;
     return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Get phy id on a particular port.
  * @param[in] dev_id device id
@@ -2918,7 +2918,9 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
         p_api->port_powersave_get = isisc_port_powersave_get;
         p_api->port_hibernate_set = isisc_port_hibernate_set;
         p_api->port_hibernate_get = isisc_port_hibernate_get;
+#endif
         p_api->port_cdt = isisc_port_cdt;
+#ifndef IN_PORTCONTROL_MINI
         p_api->port_phy_id_get = isisc_port_phy_id_get;
         p_api->port_rxhdr_mode_get = isisc_port_rxhdr_mode_get;
         p_api->port_txhdr_mode_get = isisc_port_txhdr_mode_get;

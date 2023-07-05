@@ -670,13 +670,12 @@ fal_port_hibernate_set(a_uint32_t dev_id, fal_port_t port_id,
 sw_error_t
 fal_port_hibernate_get(a_uint32_t dev_id, fal_port_t port_id,
 			  a_bool_t * enable);
-
+#endif
 sw_error_t
 fal_port_cdt(a_uint32_t dev_id, fal_port_t port_id,
 		a_uint32_t mdi_pair, fal_cable_status_t * cable_status,
 		a_uint32_t * cable_len);
-
-
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 fal_port_8023az_set(a_uint32_t dev_id, fal_port_t port_id,
 				a_bool_t enable);

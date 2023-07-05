@@ -946,7 +946,7 @@ malibu_phy_get_remote_loopback(a_uint32_t dev_id, a_uint32_t phy_id,
 	return SW_OK;
 
 }
-
+#endif
 /******************************************************************************
 *
 * malibu_phy_cdt - cable diagnostic test
@@ -1118,7 +1118,7 @@ malibu_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 
 	return SW_OK;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
 * malibu_phy_reset_done - reset the phy
@@ -2782,8 +2782,8 @@ static int malibu_phy_api_ops_init(void)
 #ifndef IN_PORTCONTROL_MINI
 	malibu_phy_api_ops->phy_powersave_set = malibu_phy_set_powersave;
 	malibu_phy_api_ops->phy_powersave_get = malibu_phy_get_powersave;
-	malibu_phy_api_ops->phy_cdt = malibu_phy_cdt;
 #endif
+	malibu_phy_api_ops->phy_cdt = malibu_phy_cdt;
 	malibu_phy_api_ops->phy_link_status_get = malibu_phy_get_link_status;
 #ifndef IN_PORTCONTROL_MINI
 	malibu_phy_api_ops->phy_mdix_set = malibu_phy_set_mdix;

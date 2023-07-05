@@ -381,7 +381,6 @@ a_bool_t qca803x_phy_get_link_status(a_uint32_t dev_id, a_uint32_t phy_id)
 	}
 	return rv;
 }
-#ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
 * qca803x_phy_cdt - cable diagnostic test
@@ -449,7 +448,7 @@ qca803x_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_id, a_uint32_t mdi_pair,
 
 	return SW_OK;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
 * qca803x_phy_set_mdix -
@@ -2142,7 +2141,9 @@ static sw_error_t qca803x_phy_api_ops_init(void)
 #ifndef IN_PORTCONTROL_MINI
 	qca803x_phy_api_ops->phy_powersave_set = qca803x_phy_set_powersave;
 	qca803x_phy_api_ops->phy_powersave_get = qca803x_phy_get_powersave;
+#endif
 	qca803x_phy_api_ops->phy_cdt = qca803x_phy_cdt;
+#ifndef IN_PORTCONTROL_MINI
 	qca803x_phy_api_ops->phy_mdix_set = qca803x_phy_set_mdix;
 	qca803x_phy_api_ops->phy_mdix_get = qca803x_phy_get_mdix;
 	qca803x_phy_api_ops->phy_mdix_status_get = qca803x_phy_get_mdix_status;

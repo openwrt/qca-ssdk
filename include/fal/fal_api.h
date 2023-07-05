@@ -279,6 +279,7 @@ extern "C" {
 /*qca808x_end*/
 #else
 #define PORTCONTROL_API \
+    SW_API_DEF(SW_API_PT_CDT, fal_port_cdt),  \
     SW_API_DEF(SW_API_PT_DUPLEX_SET, fal_port_duplex_set), \
     SW_API_DEF(SW_API_PT_SPEED_SET, fal_port_speed_set), \
     SW_API_DEF(SW_API_PT_AN_ENABLE, fal_port_autoneg_enable), \
@@ -327,6 +328,7 @@ extern "C" {
     SW_API_DEF(SW_API_PT_COMBO_PREFER_MEDIUM_GET, fal_port_combo_prefer_medium_get),
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
+    SW_API_DESC(SW_API_PT_CDT) \
     SW_API_DESC(SW_API_PT_DUPLEX_SET) \
     SW_API_DESC(SW_API_PT_SPEED_SET)  \
     SW_API_DESC(SW_API_PT_AN_ENABLE) \

@@ -1688,3 +1688,147 @@ ssdk_plat_exit(a_uint32_t dev_id)
 }
 /*qca808x_end*/
 
+int ssdk_uniphy_valid_check(a_uint32_t dev_id,
+		a_uint32_t index, a_uint32_t mode)
+{
+	int ret = A_TRUE;
+#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+	a_uint32_t soc_id = 0;
+	int rv = 0;
+#endif
+	if (index > SSDK_UNIPHY_INSTANCE2)
+		return A_FALSE;
+#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+	rv = qcom_smem_get_soc_id(&soc_id);
+	if (rv)
+		return A_FALSE;
+	switch(soc_id) {
+		case QCOM_ID_IPQ8070:
+		case QCOM_ID_IPQ8071:
+		case QCOM_ID_IPQ8072:
+		case QCOM_ID_IPQ8074:
+		case QCOM_ID_IPQ8076:
+		case QCOM_ID_IPQ8078:
+		case QCOM_ID_IPQ8070A:
+		case QCOM_ID_IPQ8071A:
+		case QCOM_ID_IPQ8072A:
+		case QCOM_ID_IPQ8074A:
+		case QCOM_ID_IPQ8076A:
+		case QCOM_ID_IPQ8078A:
+			if (index == SSDK_UNIPHY_INSTANCE0) {
+				if ((mode == PORT_WRAPPER_USXGMII) ||
+					(mode == PORT_WRAPPER_10GBASE_R))
+					ret = A_FALSE;
+			}
+			if ((mode == PORT_WRAPPER_UQXGMII) ||
+				(mode == PORT_WRAPPER_UDXGMII))
+				ret = A_FALSE;
+			break;
+		case QCOM_ID_IPQ6000:
+		case QCOM_ID_IPQ6005:
+		case QCOM_ID_IPQ6010:
+		case QCOM_ID_IPQ6018:
+		case QCOM_ID_IPQ6028:
+			if (index == SSDK_UNIPHY_INSTANCE0) {
+				if ((mode == PORT_WRAPPER_USXGMII) ||
+					(mode == PORT_WRAPPER_10GBASE_R))
+					ret = A_FALSE;
+			}
+			if (index > SSDK_UNIPHY_INSTANCE1)
+				ret = A_FALSE;
+			if ((mode == PORT_WRAPPER_UQXGMII) ||
+				(mode == PORT_WRAPPER_UDXGMII))
+				ret = A_FALSE;
+			break;
+		case QCOM_ID_IPQ9570:
+		case QCOM_ID_IPQ9574:
+			break;
+		case QCOM_ID_IPQ9550:
+		case QCOM_ID_IPQ9554:
+			if (index == SSDK_UNIPHY_INSTANCE1)
+				ret = A_FALSE;
+			break;
+		case QCOM_ID_IPQ9510:
+		case QCOM_ID_IPQ9514:
+			if ((index == SSDK_UNIPHY_INSTANCE1) ||
+				(index == SSDK_UNIPHY_INSTANCE2))
+				ret = A_FALSE;
+			break;
+		case QCOM_ID_IPQ5302:
+		case QCOM_ID_IPQ5312:
+			if (index == SSDK_UNIPHY_INSTANCE2)
+				ret = A_FALSE;
+			if ((mode == PORT_WRAPPER_USXGMII) ||
+				(mode == PORT_WRAPPER_10GBASE_R) ||
+				(mode == PORT_WRAPPER_UQXGMII) ||
+				(mode == PORT_WRAPPER_UDXGMII))
+				ret = A_FALSE;
+			break;
+		case QCOM_ID_IPQ5300:
+		case QCOM_ID_IPQ5322:
+		case QCOM_ID_IPQ5332:
+			if (index == SSDK_UNIPHY_INSTANCE2)
+				ret = A_FALSE;
+			break;
+		default:
+			ret = A_FALSE;
+			break;
+	}
+#else
+	switch(index) {
+		case SSDK_UNIPHY_INSTANCE0:
+			if ((cpu_is_ipq807x() == A_TRUE) ||
+				(cpu_is_ipq60xx() == A_TRUE)) {
+				if ((mode == PORT_WRAPPER_USXGMII) ||
+					(mode == PORT_WRAPPER_10GBASE_R) ||
+					(mode == PORT_WRAPPER_UQXGMII) ||
+					(mode == PORT_WRAPPER_UDXGMII))
+					ret = A_FALSE;
+			}
+			if (cpu_is_ipq53xx() == A_TRUE) {
+				if ((mode == PORT_WRAPPER_UQXGMII) ||
+				(mode == PORT_WRAPPER_UDXGMII)) {
+					ret = A_FALSE;
+				}
+				if ((cpu_is_ipq5302() == A_TRUE) ||
+					(cpu_is_ipq5312() == A_TRUE)) {
+					if ((mode == PORT_WRAPPER_10GBASE_R) ||
+						(mode == PORT_WRAPPER_USXGMII))
+						ret = A_FALSE;
+				}
+			}
+			break;
+		case SSDK_UNIPHY_INSTANCE1:
+			ret = cpu_is_uniphy1_enabled();
+			if ((cpu_is_ipq807x() == A_TRUE) ||
+				(cpu_is_ipq60xx() == A_TRUE) ||
+				(cpu_is_ipq53xx() == A_TRUE) ||
+				(cpu_is_ipq95xx() == A_TRUE)) {
+				if ((mode == PORT_WRAPPER_UQXGMII) ||
+				(mode == PORT_WRAPPER_UDXGMII))
+					ret = A_FALSE;
+			}
+			if ((cpu_is_ipq5302() == A_TRUE) ||
+				(cpu_is_ipq5312() == A_TRUE)) {
+				if ((mode == PORT_WRAPPER_10GBASE_R) ||
+					(mode == PORT_WRAPPER_USXGMII))
+					ret = A_FALSE;
+			}
+			break;
+		case SSDK_UNIPHY_INSTANCE2:
+			ret = cpu_is_uniphy2_enabled();
+			if ((cpu_is_ipq807x() == A_TRUE) ||
+				(cpu_is_ipq60xx() == A_TRUE) ||
+				(cpu_is_ipq95xx() == A_TRUE)) {
+				if ((mode == PORT_WRAPPER_UQXGMII) ||
+				(mode == PORT_WRAPPER_UDXGMII))
+					ret = A_FALSE;
+			}
+			break;
+		default:
+			ret = A_FALSE;
+			break;
+	}
+#endif
+	return ret;
+}

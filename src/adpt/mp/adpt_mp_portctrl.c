@@ -790,32 +790,6 @@ adpt_mp_port_mac_eee_enable_set(a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
-#ifndef IN_PORTCONTROL_MINI
-static sw_error_t
-adpt_mp_port_mac_eee_enable_get(a_uint32_t dev_id, fal_port_t port_id,
-	a_bool_t *enable)
-{
-	sw_error_t rv = 0;
-	a_uint32_t gmac_id = 0;
-	union mac_lpi_ctrl_status_u mac_lpi_ctrl_status;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	MP_PORT_ID_CHECK(port_id);
-	ADPT_NULL_POINT_CHECK(enable);
-
-	memset(&mac_lpi_ctrl_status, 0, sizeof(mac_lpi_ctrl_status));
-	gmac_id = MP_PORT_TO_GMAC_ID(port_id);
-
-	rv = mp_mac_lpi_ctrl_status_get(dev_id, gmac_id, &mac_lpi_ctrl_status);
-	SW_RTN_ON_ERROR(rv);
-
-	*enable = mac_lpi_ctrl_status.bf.lpi_enable;
-
-	return rv;
-
-}
-#endif
-
 static sw_error_t
 adpt_mp_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
@@ -1366,7 +1340,6 @@ adpt_mp_portctrl_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_port_txmac_status_get = adpt_mp_port_txmac_status_get;
 	p_adpt_api->adpt_port_rxmac_status_get = adpt_mp_port_rxmac_status_get;
 	p_adpt_api->adpt_port_promisc_mode_get = adpt_mp_port_promisc_mode_get;
-	p_adpt_api->adpt_port_interface_3az_status_get = adpt_mp_port_mac_eee_enable_get;
 #endif
 	p_adpt_api->adpt_port_rxfc_status_get = adpt_mp_port_rxfc_status_get;
 	p_adpt_api->adpt_port_txfc_status_get = adpt_mp_port_txfc_status_get;
@@ -1388,7 +1361,6 @@ adpt_mp_portctrl_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_port_mac_duplex_set = adpt_mp_port_mac_duplex_set;
 	p_adpt_api->adpt_port_duplex_get = adpt_mp_port_duplex_get;
 	p_adpt_api->adpt_port_link_status_get = adpt_mp_port_link_status_get;
-	p_adpt_api->adpt_port_interface_3az_status_set = adpt_mp_port_mac_eee_enable_set;
 	p_adpt_api->adpt_port_interface_eee_cfg_set = adpt_mp_port_interface_eee_cfg_set;
 	p_adpt_api->adpt_port_interface_eee_cfg_get = adpt_mp_port_interface_eee_cfg_get;
 	p_adpt_api->adpt_port_netdev_notify_set = adpt_mp_port_netdev_change_notify;

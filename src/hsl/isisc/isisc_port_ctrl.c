@@ -1676,6 +1676,171 @@ _isisc_port_link_forcemode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *
     return SW_OK;
 }
 
+#define ISISC_LPI_PORT1_OFFSET 4
+#define ISISC_LPI_BIT_STEP     2
+
+static sw_error_t
+_isisc_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+    sw_error_t rv = SW_OK;
+    a_uint32_t reg = 0, field = 0, offset = 0, device_id = 0, rev_id = 0, reverse = 0;
+    a_uint32_t eee_mask = 0, phy_addr = 0, adv = 0;
+    hsl_phy_ops_t *phy_drv = NULL;
+
+    SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+    if (NULL == phy_drv->phy_eee_adv_set) {
+        return SW_NOT_SUPPORTED;
+    }
+    if(port_eee_cfg->enable)
+        adv = port_eee_cfg->advertisement;
+    else
+        adv = 0;
+    rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+    SW_RTN_ON_ERROR (rv);
+    rv = phy_drv->phy_eee_adv_set(dev_id, phy_addr, adv);
+    SW_RTN_ON_ERROR (rv);
+    HSL_REG_ENTRY_GET(rv, dev_id, MASK_CTL, 0,
+                        (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+
+    SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
+    SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
+    switch (device_id) {
+        case S17C_DEVICE_ID:
+            eee_mask = 1;
+            if (rev_id == 0)
+                reverse = 1;
+            else
+                reverse = 0;
+            break;
+        case MHT_DEVICE_ID:
+            eee_mask = 3;
+            reverse = 0;
+            break;
+        default:
+            return SW_NOT_SUPPORTED;
+    }
+
+    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+    {
+        return SW_BAD_PARAM;
+    }
+
+    HSL_REG_ENTRY_GET(rv, dev_id, EEE_CTL, 0,
+                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+
+    if (A_TRUE == port_eee_cfg->lpi_tx_enable)
+    {
+        field  = eee_mask;
+    }
+    else
+    {
+        field  = 0;
+    }
+
+    if (reverse)
+    {
+        field = (~field) & eee_mask;
+    }
+
+    offset = (port_id - 1) * ISISC_LPI_BIT_STEP + ISISC_LPI_PORT1_OFFSET;
+    reg &= (~(eee_mask << offset));
+    reg |= (field << offset);
+
+    HSL_REG_ENTRY_SET(rv, dev_id, EEE_CTL, 0,
+                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    return rv;
+}
+
+static sw_error_t
+_isisc_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+    sw_error_t rv;
+    a_uint32_t reg = 0, field, offset, device_id, rev_id, reverse = 0;
+    a_uint32_t eee_mask = 0, phy_addr = 0, adv = 0, lp_adv = 0, cap = 0,
+        status = 0;
+    hsl_phy_ops_t *phy_drv = NULL;
+
+    SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+    if ((NULL == phy_drv->phy_eee_adv_get) || (NULL == phy_drv->phy_eee_partner_adv_get) ||
+        (NULL == phy_drv->phy_eee_cap_get) || (NULL == phy_drv->phy_eee_status_get)) {
+        return SW_NOT_SUPPORTED;
+    }
+    rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+    SW_RTN_ON_ERROR (rv);
+    rv = phy_drv->phy_eee_adv_get(dev_id, phy_addr, &adv);
+    SW_RTN_ON_ERROR (rv);
+    port_eee_cfg->advertisement = adv;
+    rv = phy_drv->phy_eee_partner_adv_get(dev_id, phy_addr, &lp_adv);
+    SW_RTN_ON_ERROR (rv);
+    port_eee_cfg->link_partner_advertisement = lp_adv;
+    rv = phy_drv->phy_eee_cap_get(dev_id, phy_addr, &cap);
+    SW_RTN_ON_ERROR (rv);
+    port_eee_cfg->capability = cap;
+    rv = phy_drv->phy_eee_status_get(dev_id, phy_addr, &status);
+    SW_RTN_ON_ERROR (rv);
+
+    port_eee_cfg->eee_status = status;
+    if (port_eee_cfg->advertisement) {
+        port_eee_cfg->enable = A_TRUE;
+    } else {
+        port_eee_cfg->enable = A_FALSE;
+    }
+
+    HSL_REG_ENTRY_GET(rv, dev_id, MASK_CTL, 0,
+                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+
+    SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
+    SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
+    switch (device_id) {
+        case S17C_DEVICE_ID:
+            eee_mask = 1;
+            if (rev_id == 0)
+                reverse = 1;
+            else
+                reverse = 0;
+            break;
+        case MHT_DEVICE_ID:
+            eee_mask = 3;
+            reverse = 0;
+            break;
+        default:
+            return SW_NOT_SUPPORTED;
+    }
+
+    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+    {
+        return SW_BAD_PARAM;
+    }
+
+    HSL_REG_ENTRY_GET(rv, dev_id, EEE_CTL, 0,
+                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+
+    offset = (port_id - 1) * ISISC_LPI_BIT_STEP + ISISC_LPI_PORT1_OFFSET;
+    field = (reg >> offset) & eee_mask;
+
+    if (reverse)
+    {
+        field = (~field) & eee_mask;
+    }
+
+    if (field == eee_mask)
+    {
+        port_eee_cfg->lpi_tx_enable = A_TRUE;
+    }
+    else
+    {
+       port_eee_cfg->lpi_tx_enable = A_FALSE;
+    }
+
+    return SW_OK;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _isisc_port_bp_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
@@ -2720,6 +2885,44 @@ isisc_port_link_forcemode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * 
     return rv;
 }
 
+/**
+  * @brief Set 802.3az status on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[in] port_eee_cfg port eee cfg
+ * @return SW_OK or error code
+ */
+HSL_LOCAL sw_error_t
+isisc_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+{
+    sw_error_t rv;
+
+    HSL_API_LOCK;
+   rv = _isisc_port_interface_eee_cfg_set(dev_id, port_id, port_eee_cfg);
+    HSL_API_UNLOCK;
+    return rv;
+}
+
+/**
+  * @brief Get 802.3az status on a particular port.
+ * @param[in] dev_id device id
+ * @param[in] port_id port id
+ * @param[out] port_eee_cfg port eee cfg
+ * @return SW_OK or error code
+ */
+HSL_LOCAL sw_error_t
+isisc_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_eee_cfg_t *port_eee_cfg)
+
+{
+    sw_error_t rv;
+
+    HSL_API_LOCK;
+    rv = _isisc_port_interface_eee_cfg_get(dev_id, port_id, port_eee_cfg);
+    HSL_API_UNLOCK;
+    return rv;
+}
 #ifndef IN_PORTCONTROL_MINI
 /**
  * @brief Set status of back pressure on a particular port.
@@ -2935,6 +3138,8 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
         p_api->port_remote_loopback_get = isisc_port_remote_loopback_get;
 
 #endif
+        p_api->port_interface_eee_cfg_get = isisc_port_interface_eee_cfg_get;
+        p_api->port_interface_eee_cfg_set = isisc_port_interface_eee_cfg_set;
         p_api->port_rxhdr_mode_set = isisc_port_rxhdr_mode_set;
         p_api->port_txhdr_mode_set = isisc_port_txhdr_mode_set;
         p_api->header_type_set = isisc_header_type_set;

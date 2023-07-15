@@ -1192,7 +1192,6 @@ struct sub_cmd_des_t g_trunk_des[] =
 struct sub_cmd_des_t g_interfacecontrol_des[] =
 {
 	{"macmode", "set",   SW_API_MAC_MODE_SET, NULL},
-	{"pt3azstatus", "set",   SW_API_PORT_3AZ_STATUS_SET, NULL},
 	{"phymode", "set",   SW_API_PHY_MODE_SET, NULL},
 	{"fx100ctrl", "set",   SW_API_FX100_CTRL_SET, NULL},
 	{"mac06exch", "set",   SW_API_MAC06_EXCH_SET, NULL},

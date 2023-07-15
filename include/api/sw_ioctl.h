@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -785,8 +785,6 @@ extern "C" {
 #define SW_API_INTERFACE_OFFSET        1900
 #define SW_API_MAC_MODE_SET            (0  + SW_API_INTERFACE_OFFSET)
 #define SW_API_MAC_MODE_GET            (1  + SW_API_INTERFACE_OFFSET)
-#define SW_API_PORT_3AZ_STATUS_SET     (2  + SW_API_INTERFACE_OFFSET)
-#define SW_API_PORT_3AZ_STATUS_GET     (3  + SW_API_INTERFACE_OFFSET)
 #define SW_API_PHY_MODE_SET            (4  + SW_API_INTERFACE_OFFSET)
 #define SW_API_PHY_MODE_GET            (5  + SW_API_INTERFACE_OFFSET)
 #define SW_API_FX100_CTRL_SET          (6  + SW_API_INTERFACE_OFFSET)

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -4181,18 +4181,6 @@ extern "C" {
     SW_PARAM_DEF(SW_API_MAC_MODE_GET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"), \
     SW_PARAM_DEF(SW_API_MAC_MODE_GET, SW_MACCONFIG, \
 		    sizeof(fal_mac_config_t), SW_PARAM_PTR|SW_PARAM_OUT, "MAC config"),
-
-#define SW_API_PORT_3AZ_STATUS_SET_DESC \
-    SW_PARAM_DEF(SW_API_PORT_3AZ_STATUS_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
-    SW_PARAM_DEF(SW_API_PORT_3AZ_STATUS_SET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"), \
-    SW_PARAM_DEF(SW_API_PORT_3AZ_STATUS_SET, SW_ENABLE, \
-		    sizeof(a_bool_t), SW_PARAM_IN, "Status"),
-
-#define SW_API_PORT_3AZ_STATUS_GET_DESC \
-    SW_PARAM_DEF(SW_API_PORT_3AZ_STATUS_GET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
-    SW_PARAM_DEF(SW_API_PORT_3AZ_STATUS_GET, SW_UINT32, 4, SW_PARAM_IN, "Port ID"), \
-    SW_PARAM_DEF(SW_API_PORT_3AZ_STATUS_GET, SW_ENABLE, \
-		    sizeof(a_bool_t), SW_PARAM_PTR|SW_PARAM_OUT, "Status"),
 
 #define SW_API_PHY_MODE_SET_DESC \
     SW_PARAM_DEF(SW_API_PHY_MODE_SET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \

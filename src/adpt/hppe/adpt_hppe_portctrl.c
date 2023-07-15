@@ -4241,88 +4241,6 @@ adpt_ppe_port_source_filter_config_set(a_uint32_t dev_id,
 #endif
 	return SW_NOT_SUPPORTED;
 }
-#ifndef IN_PORTCONTROL_MINI
-static sw_error_t
-adpt_hppe_port_interface_3az_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
-{
-	sw_error_t rv = 0;
-	union lpi_enable_u lpi_enable = {0};
-	union lpi_port_timer_u lpi_port_timer = {0};
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id))
-		return SW_NOT_SUPPORTED;
-
-	SW_RTN_ON_NULL(phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
-	if (NULL == phy_drv->phy_8023az_set)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = phy_drv->phy_8023az_set(dev_id, phy_id, enable);
-	SW_RTN_ON_ERROR (rv);
-
-	hppe_lpi_enable_get(dev_id, port_id, &lpi_enable);
-
-	lpi_enable.val &= ~(0x1 << (port_id - 1));
-	lpi_enable.val |= (((a_uint32_t)enable) << (port_id - 1));
-	hppe_lpi_enable_set(dev_id, port_id, &lpi_enable);
-
-	lpi_port_timer.bf.lpi_port_wakeup_timer = LPI_WAKEUP_TIMER;
-	lpi_port_timer.bf.lpi_port_sleep_timer = LPI_SLEEP_TIMER;
-	hppe_lpi_timer_set(dev_id, port_id, &lpi_port_timer);
-
-	return SW_OK;
-}
-static sw_error_t
-adpt_hppe_port_interface_3az_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
-{
-	sw_error_t rv = 0;
-	union lpi_enable_u lpi_enable = {0};
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
-	a_bool_t phy_status = 0, mac_status = 0;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(enable);
-
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-	if (A_FALSE == _adpt_hppe_port_phy_connected (dev_id, port_id))
-		return SW_NOT_SUPPORTED;
-
-	SW_RTN_ON_NULL (phy_drv =hsl_phy_api_ops_get (dev_id, port_id));
-	if (NULL == phy_drv->phy_8023az_get)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = phy_drv->phy_8023az_get(dev_id, phy_id, &phy_status);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = hppe_lpi_enable_get(dev_id, port_id, &lpi_enable);
-
-	if(((lpi_enable.val >> (port_id - 1)) & 0x1) == A_TRUE)
-		mac_status = A_TRUE;
-	else
-		mac_status = A_FALSE;
-
-	*enable = (phy_status & mac_status);
-
-	return SW_OK;
-}
-#endif
 
 sw_error_t
 adpt_hppe_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
@@ -6267,8 +6185,6 @@ static void adpt_hppe_port_ctrl_func_unregister(a_uint32_t dev_id, adpt_api_t *p
 	p_adpt_api->adpt_port_max_frame_size_get = NULL;
 	p_adpt_api->adpt_port_source_filter_get = NULL;
 	p_adpt_api->adpt_port_source_filter_set = NULL;
-	p_adpt_api->adpt_port_interface_3az_status_set = NULL;
-	p_adpt_api->adpt_port_interface_3az_status_get = NULL;
 	p_adpt_api->adpt_port_promisc_mode_set = NULL;
 	p_adpt_api->adpt_port_promisc_mode_get = NULL;
 	p_adpt_api->adpt_port_flowctrl_forcemode_set = NULL;
@@ -6596,16 +6512,6 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 		(1 <<  (FUNC_ADPT_PORT_INTERFACE_MODE_APPLY% 32)))
 	{
 		p_adpt_api->adpt_port_interface_mode_apply = adpt_hppe_port_interface_mode_apply;
-	}
-	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
-		(1 <<  (FUNC_ADPT_PORT_INTERFACE_3AZ_STATUS_SET% 32)))
-	{
-		p_adpt_api->adpt_port_interface_3az_status_set = adpt_hppe_port_interface_3az_set;
-	}
-	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &
-		(1 <<  (FUNC_ADPT_PORT_INTERFACE_3AZ_STATUS_GET% 32)))
-	{
-		p_adpt_api->adpt_port_interface_3az_status_get = adpt_hppe_port_interface_3az_get;
 	}
 #endif
 	if(p_adpt_api->adpt_port_ctrl_func_bitmap[2] &

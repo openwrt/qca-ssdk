@@ -2048,8 +2048,6 @@ extern "C" {
 #define INTERFACECTRL_API \
     SW_API_DEF(SW_API_MAC_MODE_SET, fal_interface_mac_mode_set), \
     SW_API_DEF(SW_API_MAC_MODE_GET, fal_interface_mac_mode_get), \
-    SW_API_DEF(SW_API_PORT_3AZ_STATUS_SET, fal_port_3az_status_set), \
-    SW_API_DEF(SW_API_PORT_3AZ_STATUS_GET, fal_port_3az_status_get), \
     SW_API_DEF(SW_API_PHY_MODE_SET, fal_interface_phy_mode_set), \
     SW_API_DEF(SW_API_PHY_MODE_GET, fal_interface_phy_mode_get), \
     SW_API_DEF(SW_API_FX100_CTRL_SET, fal_interface_fx100_ctrl_set), \
@@ -2061,8 +2059,6 @@ extern "C" {
 #define INTERFACECTRL_API_PARAM \
     SW_API_DESC(SW_API_MAC_MODE_SET)  \
     SW_API_DESC(SW_API_MAC_MODE_GET)  \
-    SW_API_DESC(SW_API_PORT_3AZ_STATUS_SET)  \
-    SW_API_DESC(SW_API_PORT_3AZ_STATUS_GET)  \
     SW_API_DESC(SW_API_PHY_MODE_SET)  \
     SW_API_DESC(SW_API_PHY_MODE_GET)  \
     SW_API_DESC(SW_API_FX100_CTRL_SET)  \

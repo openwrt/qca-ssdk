@@ -778,13 +778,16 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 	}
 	hppe_uniphy_reg_set(dev_id, UNIPHY_MISC2_REG_OFFSET,
 		uniphy_index, UNIPHY_MISC2_REG_SGMII_PLUS_MODE);
-	/*reset uniphy*/
-	hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
-		uniphy_index, UNIPHY_PLL_RESET_REG_VALUE);
-	msleep(100);
-	hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
-		uniphy_index, UNIPHY_PLL_RESET_REG_DEFAULT_VALUE);
-	msleep(100);
+
+	if (adpt_ppe_type_get(dev_id) != MPPE_TYPE) {
+		/*reset uniphy*/
+		hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
+				uniphy_index, UNIPHY_PLL_RESET_REG_VALUE);
+		msleep(100);
+		hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
+				uniphy_index, UNIPHY_PLL_RESET_REG_DEFAULT_VALUE);
+		msleep(100);
+	}
 
 	/* keep xpcs to reset status */
 	__adpt_hppe_gcc_uniphy_xpcs_reset(dev_id, uniphy_index, A_TRUE);
@@ -1183,27 +1186,66 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 {
 	a_uint32_t phy_id =0, port_id = 0;
 
-	/*when miami connect s17c or qca803x, need to reconfigure reference clock
-	as 25M*/
 	port_id = adpt_hppe_port_get_by_uniphy(dev_id, index, SSDK_UNIPHY_CHANNEL0);
-	if(hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE) &&
-		hsl_port_force_speed_get(dev_id, port_id) == FAL_SPEED_1000)
-		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
-	phy_id = hsl_port_phyid_get(dev_id, port_id);
+	if (hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE)) {
+		a_uint32_t force_speed = hsl_port_force_speed_get(dev_id, port_id);
 
-	if (phy_id == QCA8030_PHY || phy_id == QCA8033_PHY || phy_id == QCA8035_PHY)
-	{
-		_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
-		hsl_port_phy_gpio_reset(dev_id, port_id);
-		hsl_port_phy_hw_init(dev_id, port_id);
+		if (force_speed == FAL_SPEED_1000) {
+			/* modify the uniphy clock as 25M for s17c connected. */
+			_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
+		} else if (force_speed == FAL_SPEED_2500) {
+			struct mii_bus *mdio_bus = NULL;
+			struct qca_mdio_data *mdio_priv = NULL;
+
+			/* if manhattan switch is connected, need to reset manhattan with GPIO,
+			 * and do the initialization sequence, since this initialization needs
+			 * to be configured after the miami uniphy clock configured stably.
+			 */
+			mdio_bus = ssdk_port_miibus_get(dev_id, port_id);
+			if (mdio_bus)
+				mdio_priv = mdio_bus->priv;
+
+			if (mdio_priv && mdio_priv->preinit) {
+				hsl_port_phy_gpio_reset(dev_id, port_id);
+				mdio_priv->preinit(mdio_bus);
+
+				/* do the HW initialization on mht bypass port if connected,
+				 * miami only has two physcial ports(port id 1, 2), the HW
+				 * initialization is also needed on the other bypass port
+				 * after the GPIO rest.
+				 */
+				phy_id = hsl_port_phyid_get(dev_id, port_id ^ 3);
+				if (phy_id == QCA8084_PHY)
+					hsl_port_phy_hw_init(dev_id, port_id ^ 3);
+			}
+		}
+
+		return;
 	}
 
-	/* For miami connected with manhattan bypass device, the port4 is connected with
-	 * uniphy1 of miami, the clock of manhattan is provided from the uniphy0 of miami,
-	 * so do not need to enable the clock from uniphy1 of miami.
-	 */
-	if (QCA8084_PHY == phy_id)
-		_adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
+	phy_id = hsl_port_phyid_get(dev_id, port_id);
+	/* modify the uniphy clock as 25M for qca803x phy connected. */
+	switch (phy_id) {
+		case QCA8030_PHY:
+		case QCA8033_PHY:
+		case QCA8035_PHY:
+			_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
+			hsl_port_phy_gpio_reset(dev_id, port_id);
+			hsl_port_phy_hw_init(dev_id, port_id);
+			break;
+		case QCA8084_PHY:
+			/* checking whether another miami port is connected with
+			 * manhattan bypass port4 or not, if yes, we need to disable
+			 * the clock output of this miami uniphy, since the clock for
+			 * manhattan switch core is already provided by the miami uniphy
+			 * connected with switch core, so do not need to enable the clock
+			 * from uniphy connected with bypass port.
+			 */
+			_adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
+			break;
+		default:
+			break;
+	}
 
 	return;
 }

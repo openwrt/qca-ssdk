@@ -372,10 +372,11 @@ struct qca_phy_priv {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
 #define ETH_LDO_RDY_CNT		3
 struct qca_mdio_data{
-	void __iomem	*membase;
+	void __iomem	*membase[2];
 	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
 	int clk_div;
 	struct gpio_descs *reset_gpios;
+	void (*preinit)(struct mii_bus *bus);
 	struct clk *clk[];
 };
 #else
@@ -385,6 +386,7 @@ struct qca_mdio_data {
 	void __iomem *membase;
 	int phy_irq[PHY_MAX_ADDR];
 	int clk_div;
+	void (*preinit)(struct mii_bus *bus);
 };
 #endif
 

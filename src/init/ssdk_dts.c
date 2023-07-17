@@ -570,6 +570,22 @@ static void ssdk_dt_parse_scheduler_cfg(a_uint32_t dev_id, struct device_node *s
 }
 #endif
 #endif
+
+static struct device_node *ssdk_dt_get_mdio_node(a_uint32_t dev_id)
+{
+	struct device_node *mdio_node = NULL;
+	hsl_reg_mode reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
+
+	if (reg_mode == HSL_REG_LOCAL_BUS) {
+		mdio_node = of_find_compatible_node(NULL, NULL, "qcom,ipq40xx-mdio");
+		if (!mdio_node)
+			mdio_node = of_find_compatible_node(NULL, NULL, "qcom,qca-mdio");
+	} else
+		mdio_node = of_find_compatible_node(NULL, NULL, "virtual,mdio-gpio");
+
+	return mdio_node;
+}
+
 static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint32_t dev_id,
 		ssdk_init_cfg *cfg)
 {
@@ -607,6 +623,9 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 
 		/* initialize phy_addr in case of undefined dts field */
 		mdio_node = of_parse_phandle(port_node, "mdiobus", 0);
+		if (!mdio_node)
+			mdio_node = ssdk_dt_get_mdio_node(dev_id);
+
 		if (mdio_node)
 		{
 			ssdk_miibus_add(dev_id, of_mdio_find_bus(mdio_node), &miibus_index);
@@ -646,6 +665,12 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 			!of_property_read_u32(port_node, "forced-duplex", &forced_duplex)) {
 			hsl_port_force_speed_set(dev_id, port_id, forced_speed);
 			hsl_port_force_duplex_set(dev_id, port_id, (a_uint8_t)forced_duplex);
+
+			/* save the force port address for getting mii bus on force port, this
+			 * mii bus can be used to initialize the manhattan after GPIO reset.
+			 */
+			hsl_phy_address_init(dev_id, port_id,
+				TO_PHY_ADDR_E(phy_addr, miibus_index));
 		}
 
 		paddr = of_get_property(port_node, "phy_dac", &len);
@@ -730,16 +755,10 @@ ssdk_dt_parse_default_mdio_bus(struct device_node *switch_node, a_uint32_t dev_i
 				&miibus_index);
 		}
 	}
-	reg_mode=ssdk_switch_reg_access_mode_get(dev_id);
-	if (reg_mode == HSL_REG_LOCAL_BUS) {
-		mdio_node = of_find_compatible_node(NULL, NULL, "qcom,ipq40xx-mdio");
-		if (!mdio_node)
-			mdio_node = of_find_compatible_node(NULL, NULL, "qcom,qca-mdio");
-	} else
-		mdio_node = of_find_compatible_node(NULL, NULL, "virtual,mdio-gpio");
 
+	mdio_node = ssdk_dt_get_mdio_node(dev_id);
 	if (!mdio_node) {
-		SSDK_ERROR("No MDIO node found in DTS!\n");
+		SSDK_ERROR("can't find mdio node\n");
 		return SW_NOT_FOUND;
 	}
 

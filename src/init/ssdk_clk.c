@@ -1160,7 +1160,6 @@ void ssdk_gcc_appe_clock_init(enum cmnblk_clk_type mode)
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	ssdk_appe_fixed_clock_init(APPE_REVISION);
 	ssdk_ppe_uniphy_clock_init(CHIP_APPE, APPE_REVISION);
-	ssdk_cmnblk_init(mode);
 	ssdk_uniphy_port5_clock_source_set();
 #endif
 }
@@ -1172,7 +1171,6 @@ void ssdk_gcc_mppe_clock_init(enum cmnblk_clk_type mode)
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	ssdk_appe_fixed_clock_init(MPPE_REVISION);
 	ssdk_ppe_uniphy_clock_init(CHIP_APPE, MPPE_REVISION);
-	ssdk_cmnblk_init(mode);
 #endif
 }
 #endif

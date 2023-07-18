@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -473,7 +473,7 @@ ppe_port_vsi_get(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t *vsi_id)
 			}
 		}
 	}
-	SSDK_INFO("VSI is not configured on port 0x%x\n", port_id);
+	SSDK_DEBUG("VSI is not configured on port 0x%x\n", port_id);
 	return SW_NOT_FOUND;
 }
 

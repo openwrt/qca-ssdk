@@ -2753,7 +2753,8 @@ adpt_hppe_port_interface_mode_switch_mac_reset(a_uint32_t dev_id,
 	fal_port_interface_mode_t mode = PORT_INTERFACE_MODE_MAX;
 
 	phy_type = hsl_phy_type_get(dev_id, port_id);
-	if (phy_type != AQUANTIA_PHY_CHIP && phy_type != SFP_PHY_CHIP) {
+	if (phy_type != AQUANTIA_PHY_CHIP && phy_type != SFP_PHY_CHIP &&
+		phy_type != QCA808X_PHY_CHIP) {
 		return SW_OK;
 	}
 	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &mode);

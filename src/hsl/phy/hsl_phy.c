@@ -2873,8 +2873,28 @@ sw_error_t
 hsl_phy_status_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct port_phy_status *phy_status)
 {
-	a_uint16_t phy_data;
+	a_uint16_t phy_data = 0;
+/*qca808x_end*/
+	a_uint32_t new_adv = 0, old_adv = 0, phy_id = 0;
+	struct phy_device *phydev = NULL;
+	phy_type_t phy_type = MAX_PHY_CHIP;
+	sw_error_t rv = SW_OK;
 
+	rv = hsl_phy_phydev_get(dev_id, phy_addr, &phydev);
+	PHY_RTN_ON_ERROR(rv);
+	SSDK_DEBUG("phy_addr:0x%x, phydev->drv->name:%s", phy_addr,
+		phydev->drv->name);
+	if(phydev->drv && !strcmp(phydev->drv->name, "Generic PHY")) {
+		rv = hsl_phy_linkmode_adv_to_adv(phydev->advertising, &old_adv);
+		SW_RTN_ON_ERROR (rv);
+		rv = hsl_phy_get_autoneg_adv(dev_id, phy_addr, &new_adv);
+		PHY_RTN_ON_ERROR(rv);
+		if(new_adv != old_adv) {
+			rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, new_adv);
+			PHY_RTN_ON_ERROR(rv);
+		}
+	}
+/*qca808x_start*/
 	phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, HSL_PHY_SPEC_STATUS);
 	PHY_RTN_ON_READ_ERROR(phy_data);
 
@@ -2885,23 +2905,47 @@ hsl_phy_status_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 		phy_status->link_status = PORT_LINK_DOWN;
 		return SW_OK;
 	}
+/*qca808x_end*/
 	/*get phy speed*/
-	switch (phy_data & HSL_STATUS_SPEED_MASK) {
-		case HSL_STATUS_SPEED_2500MBS:
-			phy_status->speed = FAL_SPEED_2500;
-			break;
-		case HSL_STATUS_SPEED_1000MBS:
-			phy_status->speed = FAL_SPEED_1000;
-			break;
-		case HSL_STATUS_SPEED_100MBS:
-			phy_status->speed = FAL_SPEED_100;
-			break;
-		case HSL_STATUS_SPEED_10MBS:
-			phy_status->speed = FAL_SPEED_10;
-			break;
-		default:
-			return SW_READ_ERROR;
+	rv = hsl_phy_get_phy_id(dev_id, phy_addr, &phy_id);
+	PHY_RTN_ON_ERROR(rv);
+	phy_type = hsl_phytype_get_by_phyid(dev_id, phy_id);
+	if(phy_type == QCA808X_PHY_CHIP || phy_type == MPGE_PHY_CHIP) {
+/*qca808x_start*/
+		switch (phy_data & HSL_STATUS_SPEED_MASK) {
+			case HSL_STATUS_SPEED_2500MBS:
+				phy_status->speed = FAL_SPEED_2500;
+				break;
+			case HSL_STATUS_SPEED_1000MBS:
+				phy_status->speed = FAL_SPEED_1000;
+				break;
+			case HSL_STATUS_SPEED_100MBS:
+				phy_status->speed = FAL_SPEED_100;
+				break;
+			case HSL_STATUS_SPEED_10MBS:
+				phy_status->speed = FAL_SPEED_10;
+				break;
+			default:
+				return SW_READ_ERROR;
+		}
+/*qca808x_end*/
+	} else if(phy_type == F1_PHY_CHIP || MALIBU_PHY_CHIP ||
+		phy_type == QCA803X_PHY_CHIP) {
+		switch (phy_data & HSL_STATUS_SPEED_MASK_1) {
+			case HSL_STATUS_SPEED_1000MBS_1:
+				phy_status->speed = FAL_SPEED_1000;
+				break;
+			case HSL_STATUS_SPEED_100MBS_1:
+				phy_status->speed = FAL_SPEED_100;
+				break;
+			case HSL_STATUS_SPEED_10MBS:
+				phy_status->speed = FAL_SPEED_10;
+				break;
+			default:
+				return SW_READ_ERROR;
+		}
 	}
+/*qca808x_start*/
 	/*get phy duplex*/
 	if (phy_data & HSL_STATUS_FULL_DUPLEX) {
 		phy_status->duplex = FAL_FULL_DUPLEX;

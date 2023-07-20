@@ -254,6 +254,7 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_addr,
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t mht_port_id = 0, mht_phy_addr = 0;
+	phy_info_t *phy_info = hsl_phy_info_get(dev_id);
 
 	switch (interface_mode) {
 		case PORT_UQXGMII:
@@ -293,6 +294,9 @@ qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_addr,
 				SSDK_ERROR("MHT uniphy 0 is not enabled on the sku\n");
 				return SW_NOT_SUPPORTED;
 			}
+			if(interface_mode ==
+				phy_info->port_mode[qca_ssdk_phy_addr_to_port(dev_id, phy_addr)])
+				return SW_OK;
 			/*need to configure work mode as MHT_PHY_SGMII_USXGMII_MODE*/
 			rv = qca_mht_work_mode_set(dev_id, MHT_PHY_SGMII_UQXGMII_MODE);
 			PHY_RTN_ON_ERROR (rv);

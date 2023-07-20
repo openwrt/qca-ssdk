@@ -1160,7 +1160,7 @@ _adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index,
 	sw_error_t rv = SW_OK;
 	union uniphy_clkout_50m_ctrl_u clkout_50m_ctrl = {0};
 
-	SSDK_INFO("uniphy will output clock as %dHz\n", clk_rate);
+	SSDK_DEBUG("uniphy %d will output clock as %dHz\n", index, clk_rate);
 	rv = mppe_uniphy_clkout_50m_ctrl_get(dev_id, index, &clkout_50m_ctrl);
 	SW_RTN_ON_ERROR(rv);
 

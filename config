@@ -306,9 +306,9 @@ else ifeq (APPE, $(CHIP_TYPE))
 	IN_MALIBU_PHY=TRUE
 else ifeq (MPPE, $(CHIP_TYPE))
 	ifeq ($(LOWMEM_FLASH), enable)
-		IN_QCA803X_PHY=TRUE
-		ISISC_ENABLE=enable
-		MHT_ENABLE=disable
+		IN_QCA808X_PHY=TRUE
+		IN_SFP_PHY=TRUE
+		IN_SFP=TRUE
 	else ifeq ($(LOWMEM_256), enable)
 		LNX_LOCAL_CFLAGS += -DSW_MAX_NR_DEV=2 \
 			-DSW_MAX_NR_PORT=8

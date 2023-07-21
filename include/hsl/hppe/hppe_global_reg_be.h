@@ -73,6 +73,7 @@ union rgmii_ctrl_u {
 	a_uint32_t val;
 	struct rgmii_ctrl bf;
 };
+#endif
 
 /*[register] CLK_GATING_CTRL*/
 #define CLK_GATING_CTRL
@@ -88,14 +89,19 @@ union rgmii_ctrl_u {
 	#define CLK_GATING_CTRL_CLK_GATING_CTRL_DEFAULT 0xffffffff
 
 struct clk_gating_ctrl {
-	a_uint32_t  clk_gating_ctrl:32;
+	a_uint32_t  _reserved0:26;
+	a_uint32_t  ptx_clk_gate_en:1;
+	a_uint32_t  qm_clk_gate_en:1;
+	a_uint32_t  bm_clk_gate_en:1;
+	a_uint32_t  ipo_clk_gate_en:1;
+	a_uint32_t  iv_clk_gate_en:1;
+	a_uint32_t  ipr_clk_gate_en:1;
 };
 
 union clk_gating_ctrl_u {
 	a_uint32_t val;
 	struct clk_gating_ctrl bf;
 };
-#endif
 /*[register] PORT_MUX_CTRL*/
 #define PORT_MUX_CTRL
 #define PORT_MUX_CTRL_ADDRESS 0x10

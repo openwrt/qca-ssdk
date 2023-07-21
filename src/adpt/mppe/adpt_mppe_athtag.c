@@ -27,9 +27,6 @@
 #include "appe_portvlan.h"
 #include "hsl.h"
 #include "hsl_dev.h"
-#if defined(MHT)
-#include "ssdk_mht.h"
-#endif
 
 sw_error_t
 adpt_mppe_athtag_pri_mapping_set(a_uint32_t dev_id,
@@ -213,6 +210,8 @@ _adpt_mppe_athtag_slave_switch_set (a_uint32_t dev_id, a_uint32_t ath_port)
 	a_uint32_t port_id = 0;
 	if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
 	{
+		fal_header_type_set(dev_id, A_TRUE, MHT_ATHTAG_TYPE);
+		fal_port_rxhdr_mode_set(dev_id, SSDK_PHYSICAL_PORT0, FAL_ONLY_MANAGE_FRAME_EN);
 		fal_port_txhdr_mode_set(dev_id, SSDK_PHYSICAL_PORT0, FAL_ALL_TYPE_FRAME_EN);
 		if ((ath_port & (ath_port -1)) == 0)
 		{
@@ -246,7 +245,12 @@ adpt_mppe_athtag_port_mapping_set(a_uint32_t dev_id,
 	{
 		/* enable rx athtag for mppe port1 */
 		rx_cfg.athtag_en = A_TRUE;
-		rx_cfg.athtag_type = MHT_HEADER_TYPE_VAL;
+#if defined(MHT)
+		if (hsl_get_current_chip_type(dev_id + 1) == CHIP_MHT)
+		{
+			rx_cfg.athtag_type = MHT_ATHTAG_TYPE;
+		}
+#endif
 		adpt_mppe_port_athtag_rx_set(dev_id, SSDK_PHYSICAL_PORT1, &rx_cfg);
 
 		/* ingress port mapping */
@@ -271,7 +275,10 @@ adpt_mppe_athtag_port_mapping_set(a_uint32_t dev_id,
 			tx_cfg.version = FAL_ATHTAG_VER3;
 		tx_cfg.athtag_en = A_TRUE;
 #if defined(MHT)
-		tx_cfg.athtag_type = MHT_HEADER_TYPE_VAL;
+		if (hsl_get_current_chip_type(dev_id + 1) == CHIP_MHT)
+		{
+			tx_cfg.athtag_type = MHT_ATHTAG_TYPE;
+		}
 #endif
 		tx_cfg.action = FAL_ATHTAG_ACTION_DISABLE_LEARN;
 		tx_cfg.bypass_fwd_en = A_TRUE;

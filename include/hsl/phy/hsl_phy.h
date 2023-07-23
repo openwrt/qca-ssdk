@@ -973,6 +973,26 @@ hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
 #define HSL_PHY_RX_FLOWCTRL_STATUS                              0x4
 #define HSL_PHY_TX_FLOWCTRL_STATUS                              0x8
 
+/*MMD number*/
+#define HSL_PHY_MMD3_NUM                                        0x3
+#define HSL_PHY_MMD7_NUM                                        0x7
+/*MMD register*/
+#define HSL_PHY_MMD7_ADDR_8023AZ_EEE_CTRL                       0x3c
+#define HSL_PHY_MMD7_ADDR_8023AZ_EEE_PARTNER                    0x3d
+#define HSL_PHY_MMD7_ADDR_8023AZ_EEE_STATUS                     0x8000
+#define HSL_PHY_MMD3_ADDR_8023AZ_EEE_CAPABILITY                 0x14
+
+/*MMD registers field*/
+#define HSL_PHY_EEE_MASK                                        0X0006
+#define HSL_PHY_EEE_ADV_100M                                    0x0002
+#define HSL_PHY_EEE_ADV_1000M                                   0x0004
+#define HSL_PHY_EEE_PARTNER_ADV_100M                            0x0002
+#define HSL_PHY_EEE_PARTNER_ADV_1000M                           0x0004
+#define HSL_PHY_EEE_CAPABILITY_100M                             0x0002
+#define HSL_PHY_EEE_CAPABILITY_1000M                            0x0004
+#define HSL_PHY_EEE_STATUS_100M                                 0x0002
+#define HSL_PHY_EEE_STATUS_1000M                                0x0004
+
 sw_error_t
 hsl_phy_sw_reset(a_uint32_t dev_id, a_uint32_t phy_addr);
 sw_error_t
@@ -1032,6 +1052,26 @@ hsl_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 sw_error_t
 hsl_phy_get_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_duplex_t * duplex);
+
+sw_error_t
+hsl_phy_set_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t adv);
+sw_error_t
+hsl_phy_get_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *adv);
+sw_error_t
+hsl_phy_get_eee_partner_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *adv);
+sw_error_t
+hsl_phy_get_eee_cap(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *cap);
+sw_error_t
+hsl_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *status);
+sw_error_t
+hsl_phy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
+sw_error_t
+hsl_phy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

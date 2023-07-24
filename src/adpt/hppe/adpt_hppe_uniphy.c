@@ -1196,6 +1196,16 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 		} else if (force_speed == FAL_SPEED_2500) {
 			struct mii_bus *mdio_bus = NULL;
 			struct qca_mdio_data *mdio_priv = NULL;
+			static bool mht_preinit_done = false;
+
+			/* Disable the second uniphy clock output and skip the preinit of mht,
+			 * when the P0 and P5 are connected with the uniphy0 and uniphy 1 of
+			 * Miami.
+			 */
+			if (mht_preinit_done && 2 == ssdk_switch_device_num_get()) {
+				_adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
+				return;
+			}
 
 			/* if manhattan switch is connected, need to reset manhattan with GPIO,
 			 * and do the initialization sequence, since this initialization needs
@@ -1217,6 +1227,8 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 				phy_id = hsl_port_phyid_get(dev_id, port_id ^ 3);
 				if (phy_id == QCA8084_PHY)
 					hsl_port_phy_hw_init(dev_id, port_id ^ 3);
+
+				mht_preinit_done = true;
 			}
 		}
 

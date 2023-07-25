@@ -966,6 +966,9 @@ hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
 #define HSL_STATUS_SPEED_1000MBS                                0x100
 #define HSL_STATUS_SPEED_100MBS                                 0x80
 #define HSL_STATUS_SPEED_10MBS                                  0
+#define HSL_STATUS_SPEED_MASK_1                                 0xC000
+#define HSL_STATUS_SPEED_100MBS_1                               0x4000
+#define HSL_STATUS_SPEED_1000MBS_1                              0x8000
 #define HSL_STATUS_FULL_DUPLEX                                  0x2000
 #define HSL_PHY_RX_FLOWCTRL_STATUS                              0x4
 #define HSL_PHY_TX_FLOWCTRL_STATUS                              0x8

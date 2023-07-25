@@ -37,6 +37,7 @@
 #include "adpt_cppe_uniphy.h"
 #include "adpt_cppe_portctrl.h"
 #endif
+#include <linux/mdio-bitbang.h>
 
 extern void adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id,
 				a_uint32_t port_id, fal_port_speed_t phy_speed);
@@ -1197,6 +1198,8 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 			struct mii_bus *mdio_bus = NULL;
 			struct qca_mdio_data *mdio_priv = NULL;
 			static bool mht_preinit_done = false;
+			struct mdiobb_ctrl *gpio_priv = NULL;
+			void (*mht_preinit)(struct mii_bus *bus) = NULL;
 
 			/* Disable the second uniphy clock output and skip the preinit of mht,
 			 * when the P0 and P5 are connected with the uniphy0 and uniphy 1 of
@@ -1212,12 +1215,19 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 			 * to be configured after the miami uniphy clock configured stably.
 			 */
 			mdio_bus = ssdk_port_miibus_get(dev_id, port_id);
-			if (mdio_bus)
-				mdio_priv = mdio_bus->priv;
+			if (mdio_bus) {
+				if (!strncmp(mdio_bus->id, "gpio", strlen("gpio"))) {
+					gpio_priv = mdio_bus->priv;
+					mht_preinit = gpio_priv ? gpio_priv->preinit : NULL;
+				} else {
+					mdio_priv = mdio_bus->priv;
+					mht_preinit = mdio_priv ? mdio_priv->preinit : NULL;
+				}
+			}
 
-			if (mdio_priv && mdio_priv->preinit) {
+			if (mht_preinit) {
 				hsl_port_phy_gpio_reset(dev_id, port_id);
-				mdio_priv->preinit(mdio_bus);
+				mht_preinit(mdio_bus);
 
 				/* do the HW initialization on mht bypass port if connected,
 				 * miami only has two physcial ports(port id 1, 2), the HW

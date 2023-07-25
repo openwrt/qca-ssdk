@@ -4138,7 +4138,9 @@ EXPORT_SYMBOL(fal_port_powersave_set);
 EXPORT_SYMBOL(fal_port_powersave_get);
 EXPORT_SYMBOL(fal_port_hibernate_set);
 EXPORT_SYMBOL(fal_port_hibernate_get);
+#endif
 EXPORT_SYMBOL(fal_port_cdt);
+#ifndef IN_PORTCONTROL_MINI
 EXPORT_SYMBOL(fal_port_txmac_status_get);
 #endif
 EXPORT_SYMBOL(fal_port_txmac_status_set);

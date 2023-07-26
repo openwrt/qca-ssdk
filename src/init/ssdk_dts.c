@@ -350,13 +350,14 @@ static void ssdk_dt_parse_l1_scheduler_cfg(
 	ssdk_dt_scheduler_cfg *cfg = &(ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->scheduler_cfg);
 	a_uint32_t tmp_cfg[4];
 	const __be32 *paddr;
-	a_uint32_t len, i, sp_id;
+	a_uint32_t len, i, sp_id, pri_loop = 0;
 
 	scheduler_node = of_find_node_by_name(port_node, "l1scheduler");
 	if (!scheduler_node) {
 		SSDK_ERROR("cannot find l1scheduler node for port\n");
 		return;
 	}
+
 	for_each_available_child_of_node(scheduler_node, child) {
 		paddr = of_get_property(child, "sp", &len);
 		len /= sizeof(a_uint32_t);
@@ -369,19 +370,41 @@ static void ssdk_dt_parse_l1_scheduler_cfg(
 			SSDK_ERROR("error reading cfg property!\n");
 			return;
 		}
-		for (i = 0; i < len; i++) {
-			sp_id = be32_to_cpup(paddr+i);
-			if (sp_id >= SSDK_L1SCHEDULER_CFG_MAX) {
-				SSDK_ERROR("Invalid parameter for sp(%d)\n",
-					sp_id);
+
+		if (of_property_read_u32(child, "sp_loop_pri", &pri_loop)) {
+			for (i = 0; i < len; i++) {
+				sp_id = be32_to_cpup(paddr+i);
+				if (sp_id >= SSDK_L1SCHEDULER_CFG_MAX) {
+					SSDK_ERROR("Invalid parameter for sp(%d)\n", sp_id);
+					return;
+				}
+				cfg->l1cfg[sp_id].valid = 1;
+				cfg->l1cfg[sp_id].port_id = port_id;
+				cfg->l1cfg[sp_id].cpri = tmp_cfg[0];
+				cfg->l1cfg[sp_id].cdrr_id = tmp_cfg[1];
+				cfg->l1cfg[sp_id].epri = tmp_cfg[2];
+				cfg->l1cfg[sp_id].edrr_id = tmp_cfg[3];
+			}
+		} else {
+			/* should one SP for priority loop */
+			if (len != 1) {
+				SSDK_ERROR("should one SP for loop!\n");
 				return;
 			}
-			cfg->l1cfg[sp_id].valid = 1;
-			cfg->l1cfg[sp_id].port_id = port_id;
-			cfg->l1cfg[sp_id].cpri = tmp_cfg[0];
-			cfg->l1cfg[sp_id].cdrr_id = tmp_cfg[1];
-			cfg->l1cfg[sp_id].epri = tmp_cfg[2];
-			cfg->l1cfg[sp_id].edrr_id = tmp_cfg[3];
+
+			sp_id = be32_to_cpup(paddr);
+			if (sp_id >= SSDK_L1SCHEDULER_CFG_MAX) {
+				SSDK_ERROR("Invalid parameter for sp(%d)\n", sp_id);
+				return;
+			}
+			for (i = 0; i < pri_loop; i++) {
+				cfg->l1cfg[sp_id + i].valid = 1;
+				cfg->l1cfg[sp_id + i].port_id = port_id;
+				cfg->l1cfg[sp_id + i].cpri = tmp_cfg[0] + i%SSDK_SP_MAX_PRIORITY;
+				cfg->l1cfg[sp_id + i].cdrr_id = tmp_cfg[1] + i;
+				cfg->l1cfg[sp_id + i].epri = tmp_cfg[2] + i%SSDK_SP_MAX_PRIORITY;
+				cfg->l1cfg[sp_id + i].edrr_id = tmp_cfg[3] + i;
+			}
 		}
 	}
 }

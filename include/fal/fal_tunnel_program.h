@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -99,23 +99,6 @@ typedef struct {
 	fal_hdr_type_t inner_hdr_type;/*user defined inner type, only used in inner type udf mode*/
 	a_uint8_t udf_hdr_len; /*user defined length in program hdr*/
 } fal_tunnel_program_udf_t;
-
-
-enum
-{
-	/*tunnel program*/
-	FUNC_TUNNEL_PROGRAM_ENTRY_ADD = 0,
-	FUNC_TUNNEL_PROGRAM_ENTRY_DEL,
-	FUNC_TUNNEL_PROGRAM_ENTRY_GETFIRST,
-	FUNC_TUNNEL_PROGRAM_ENTRY_GETNEXT,
-	FUNC_TUNNEL_PROGRAM_CFG_SET,
-	FUNC_TUNNEL_PROGRAM_CFG_GET,
-	FUNC_TUNNEL_PROGRAM_UDF_ADD,
-	FUNC_TUNNEL_PROGRAM_UDF_DEL,
-	FUNC_TUNNEL_PROGRAM_UDF_GETFIRST,
-	FUNC_TUNNEL_PROGRAM_UDF_GETNEXT,
-};
-
 
 sw_error_t
 fal_tunnel_program_entry_add(a_uint32_t dev_id,

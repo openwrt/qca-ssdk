@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_geneve FAL_GENEVE
@@ -29,16 +29,6 @@ extern "C" {
 #include "sw.h"
 #include "fal_type.h"
 #include "fal_tunnel.h"
-
-enum
-{
-	/*geneve*/
-	FUNC_GENEVE_ENTRY_ADD = 0,
-	FUNC_GENEVE_ENTRY_DEL,
-	FUNC_GENEVE_ENTRY_GETFIRST,
-	FUNC_GENEVE_ENTRY_GETNEXT,
-};
-
 
 sw_error_t
 fal_geneve_entry_add(a_uint32_t dev_id, fal_tunnel_udp_entry_t * entry);

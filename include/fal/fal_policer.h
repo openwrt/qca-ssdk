@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -108,27 +108,6 @@ typedef struct
 	a_uint32_t head; /* linklist head, add it for ipq95xx */
 	a_uint32_t tail; /* linklist tail, add it for ipq95xx */
 } fal_policer_ctrl_t;
-
-enum
-{
-	FUNC_ADPT_ACL_POLICER_COUNTER_GET = 0,
-	FUNC_ADPT_PORT_POLICER_COUNTER_GET,
-	FUNC_ADPT_PORT_COMPENSATION_BYTE_GET,
-	FUNC_ADPT_PORT_POLICER_ENTRY_GET,
-	FUNC_ADPT_PORT_POLICER_ENTRY_SET,
-	FUNC_ADPT_ACL_POLICER_ENTRY_GET,
-	FUNC_ADPT_ACL_POLICER_ENTRY_SET,
-	FUNC_ADPT_POLICER_TIME_SLOT_GET,
-	FUNC_ADPT_PORT_COMPENSATION_BYTE_SET,
-	FUNC_ADPT_POLICER_TIME_SLOT_SET,
-	FUNC_ADPT_POLICER_GLOBAL_COUNTER_GET,
-	FUNC_ADPT_POLICER_BYPASS_EN_SET,
-	FUNC_ADPT_POLICER_BYPASS_EN_GET,
-	FUNC_ADPT_POLICER_PRIORITY_REMAP_SET,
-	FUNC_ADPT_POLICER_PRIORITY_REMAP_GET,
-	FUNC_ADPT_POLICER_CTRL_SET,
-	FUNC_ADPT_POLICER_CTRL_GET,
-};
 
 typedef struct
 {

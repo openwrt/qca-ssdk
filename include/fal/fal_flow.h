@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -172,30 +172,6 @@ typedef struct {
 	a_uint16_t age_time; /* age value*/
 	a_uint16_t unit; /*0:second 1:cycle 2:million cycle*/
 } fal_flow_age_timer_t;
-
-enum  {
-	FUNC_FLOW_HOST_ADD = 0,
-	FUNC_FLOW_ENTRY_GET,
-	FUNC_FLOW_ENTRY_DEL,
-	FUNC_FLOW_STATUS_GET,
-	FUNC_FLOW_CTRL_SET,
-	FUNC_FLOW_AGE_TIMER_GET,
-	FUNC_FLOW_STATUS_SET,
-	FUNC_FLOW_HOST_GET,
-	FUNC_FLOW_HOST_DEL,
-	FUNC_FLOW_CTRL_GET,
-	FUNC_FLOW_AGE_TIMER_SET,
-	FUNC_FLOW_ENTRY_ADD,
-	FUNC_FLOW_GLOBAL_CFG_GET,
-	FUNC_FLOW_GLOBAL_CFG_SET,
-	FUNC_FLOW_ENTRY_NEXT,
-	FUNC_FLOW_COUNTER_GET,
-	FUNC_FLOW_COUNTER_CLEANUP,
-	FUNC_FLOW_ENTRY_EN_SET,
-	FUNC_FLOW_ENTRY_EN_GET,
-	FUNC_FLOW_QOS_SET,
-	FUNC_FLOW_QOS_GET,
-};
 
 sw_error_t
 fal_flow_counter_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_entry_counter_t *flow_counter);

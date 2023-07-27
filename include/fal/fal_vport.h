@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /**
  * @defgroup fal_vport FAL_VPORT
  * @{
@@ -28,13 +28,6 @@ extern "C" {
 
 #include "sw.h"
 #include "fal_type.h"
-
-enum {
-	FUNC_VPORT_PHYSICAL_PORT_SET = 0,
-	FUNC_VPORT_PHYSICAL_PORT_GET,
-	FUNC_VPORT_STATE_CHECK_SET,
-	FUNC_VPORT_STATE_CHECK_GET,
-};
 
 typedef enum {
 	FAL_VPORT_TYPE_TUNNEL = 0,

@@ -4022,7 +4022,6 @@ static int __init regi_init(void)
 				break;
 		}
 
-			fal_module_func_init(dev_id, &cfg);
 /*qca808x_start*/
 
 	}

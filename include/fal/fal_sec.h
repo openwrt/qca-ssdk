@@ -252,25 +252,6 @@ typedef struct {
   a_uint16_t mask;   /* Flags mask for exception check */
 } fal_tunnel_flags_excep_parser_ctrl_t;
 
-enum {
-    FUNC_SEC_L3_EXCEP_CTRL_SET = 0,
-    FUNC_SEC_L3_EXCEP_CTRL_GET,
-    FUNC_SEC_L3_EXCEP_PARSER_CTRL_SET,
-    FUNC_SEC_L3_EXCEP_PARSER_CTRL_GET,
-    FUNC_SEC_L4_EXCEP_PARSER_CTRL_SET,
-    FUNC_SEC_L4_EXCEP_PARSER_CTRL_GET,
-    FUNC_SEC_L2_EXCEP_CTRL_SET,
-    FUNC_SEC_L2_EXCEP_CTRL_GET,
-    FUNC_SEC_TUNNEL_EXCEP_CTRL_SET,
-    FUNC_SEC_TUNNEL_EXCEP_CTRL_GET,
-    FUNC_SEC_TUNNEL_L3_EXCEP_PARSER_CTRL_SET,
-    FUNC_SEC_TUNNEL_L3_EXCEP_PARSER_CTRL_GET,
-    FUNC_SEC_TUNNEL_L4_EXCEP_PARSER_CTRL_SET,
-    FUNC_SEC_TUNNEL_L4_EXCEP_PARSER_CTRL_GET,
-    FUNC_SEC_TUNNEL_flags_EXCEP_PARSER_CTRL_SET,
-    FUNC_SEC_TUNNEL_flags_EXCEP_PARSER_CTRL_GET,
-};
-
 #ifndef IN_SEC_MINI
 sw_error_t
 fal_sec_norm_item_set(a_uint32_t dev_id, fal_norm_item_t item, void *value);

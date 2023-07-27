@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -67,20 +67,6 @@ typedef struct {
 	a_bool_t bypass_fwd_en; /*bypass fwd engine field*/
 	a_bool_t field_disable; /*ver3 fields disable, only vchannel id is valid*/
 } fal_athtag_tx_cfg_t;
-
-enum
-{
-	/*athtag*/
-	FUNC_ATHTAG_PRI_MAPPING_SET = 0,
-	FUNC_ATHTAG_PRI_MAPPING_GET,
-	FUNC_ATHTAG_PORT_MAPPING_SET,
-	FUNC_ATHTAG_PORT_MAPPING_GET,
-	FUNC_PORT_ATHTAG_RX_SET,
-	FUNC_PORT_ATHTAG_RX_GET,
-	FUNC_PORT_ATHTAG_TX_SET,
-	FUNC_PORT_ATHTAG_TX_GET,
-};
-
 
 sw_error_t
 fal_athtag_pri_mapping_set(a_uint32_t dev_id,

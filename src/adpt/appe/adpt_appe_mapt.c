@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -518,50 +518,6 @@ adpt_appe_mapt_decap_en_get(a_uint32_t dev_id,
 	return rv;
 }
 
-void adpt_appe_mapt_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_mapt_func_bitmap = BIT(FUNC_MAPT_DECAP_CTRL_SET) |
-		BIT(FUNC_MAPT_DECAP_CTRL_GET) |
-		BIT(FUNC_MAPT_DECAP_RULE_ENTRY_SET) |
-		BIT(FUNC_MAPT_DECAP_RULE_ENTRY_GET) |
-		BIT(FUNC_MAPT_DECAP_RULE_ENTRY_DEL) |
-		BIT(FUNC_MAPT_DECAP_ENTRY_ADD) |
-		BIT(FUNC_MAPT_DECAP_ENTRY_DEL) |
-		BIT(FUNC_MAPT_DECAP_ENTRY_GETFIRST) |
-		BIT(FUNC_MAPT_DECAP_ENTRY_GETNEXT) |
-		BIT(FUNC_MAPT_DECAP_EN_SET) |
-		BIT(FUNC_MAPT_DECAP_EN_GET);
-
-	return;
-}
-
-static void adpt_appe_mapt_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_mapt_decap_ctrl_set = NULL;
-	p_adpt_api->adpt_mapt_decap_ctrl_get = NULL;
-	p_adpt_api->adpt_mapt_decap_rule_entry_set = NULL;
-	p_adpt_api->adpt_mapt_decap_rule_entry_get = NULL;
-	p_adpt_api->adpt_mapt_decap_rule_entry_del = NULL;
-	p_adpt_api->adpt_mapt_decap_entry_add = NULL;
-	p_adpt_api->adpt_mapt_decap_entry_del = NULL;
-	p_adpt_api->adpt_mapt_decap_entry_getfirst = NULL;
-	p_adpt_api->adpt_mapt_decap_entry_getnext = NULL;
-	p_adpt_api->adpt_mapt_decap_en_set = NULL;
-	p_adpt_api->adpt_mapt_decap_en_get = NULL;
-
-	return;
-}
-
 sw_error_t
 adpt_appe_mapt_init(a_uint32_t dev_id)
 {
@@ -571,30 +527,17 @@ adpt_appe_mapt_init(a_uint32_t dev_id)
 
 	ADPT_NULL_POINT_CHECK(p_adpt_api);
 
-	adpt_appe_mapt_func_unregister(dev_id, p_adpt_api);
-
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_CTRL_SET))
-		p_adpt_api->adpt_mapt_decap_ctrl_set = adpt_appe_mapt_decap_ctrl_set;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_CTRL_GET))
-		p_adpt_api->adpt_mapt_decap_ctrl_get = adpt_appe_mapt_decap_ctrl_get;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_RULE_ENTRY_SET))
-		p_adpt_api->adpt_mapt_decap_rule_entry_set = adpt_appe_mapt_decap_rule_entry_set;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_RULE_ENTRY_GET))
-		p_adpt_api->adpt_mapt_decap_rule_entry_get = adpt_appe_mapt_decap_rule_entry_get;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_RULE_ENTRY_DEL))
-		p_adpt_api->adpt_mapt_decap_rule_entry_del = adpt_appe_mapt_decap_rule_entry_del;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_ENTRY_ADD))
-		p_adpt_api->adpt_mapt_decap_entry_add = adpt_appe_mapt_decap_entry_add;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_ENTRY_DEL))
-		p_adpt_api->adpt_mapt_decap_entry_del = adpt_appe_mapt_decap_entry_del;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_ENTRY_GETFIRST))
-		p_adpt_api->adpt_mapt_decap_entry_getfirst = adpt_appe_mapt_decap_entry_getfirst;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_ENTRY_GETNEXT))
-		p_adpt_api->adpt_mapt_decap_entry_getnext = adpt_appe_mapt_decap_entry_getnext;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_EN_SET))
-		p_adpt_api->adpt_mapt_decap_en_set = adpt_appe_mapt_decap_en_set;
-	if (p_adpt_api->adpt_mapt_func_bitmap & BIT(FUNC_MAPT_DECAP_EN_GET))
-		p_adpt_api->adpt_mapt_decap_en_get = adpt_appe_mapt_decap_en_get;
+	p_adpt_api->adpt_mapt_decap_ctrl_set = adpt_appe_mapt_decap_ctrl_set;
+	p_adpt_api->adpt_mapt_decap_ctrl_get = adpt_appe_mapt_decap_ctrl_get;
+	p_adpt_api->adpt_mapt_decap_rule_entry_set = adpt_appe_mapt_decap_rule_entry_set;
+	p_adpt_api->adpt_mapt_decap_rule_entry_get = adpt_appe_mapt_decap_rule_entry_get;
+	p_adpt_api->adpt_mapt_decap_rule_entry_del = adpt_appe_mapt_decap_rule_entry_del;
+	p_adpt_api->adpt_mapt_decap_entry_add = adpt_appe_mapt_decap_entry_add;
+	p_adpt_api->adpt_mapt_decap_entry_del = adpt_appe_mapt_decap_entry_del;
+	p_adpt_api->adpt_mapt_decap_entry_getfirst = adpt_appe_mapt_decap_entry_getfirst;
+	p_adpt_api->adpt_mapt_decap_entry_getnext = adpt_appe_mapt_decap_entry_getnext;
+	p_adpt_api->adpt_mapt_decap_en_set = adpt_appe_mapt_decap_en_set;
+	p_adpt_api->adpt_mapt_decap_en_get = adpt_appe_mapt_decap_en_get;
 
 	return SW_OK;
 }

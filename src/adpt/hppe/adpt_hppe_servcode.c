@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -150,49 +150,6 @@ sw_error_t adpt_hppe_servcode_loopcheck_status_get(a_uint32_t dev_id, a_bool_t *
 	return SW_OK;
 }
 
-void adpt_hppe_servcode_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_servcode_func_bitmap = ((1<<FUNC_SERVCODE_CONFIG_SET) |
-						(1<<FUNC_SERVCODE_CONFIG_GET) |
-						(1<<FUNC_SERVCODE_LOOPCHECK_EN) |
-						(1<<FUNC_SERVCODE_LOOPCHECK_STATUS_GET));
-#if defined(MPPE)
-	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
-	{
-		p_adpt_api->adpt_servcode_func_bitmap |= ((1<<FUNC_PORT_SERVCODE_SET) |
-						(1<<FUNC_PORT_SERVCODE_GET));
-		p_adpt_api->adpt_servcode_func_bitmap |= ((1<<FUNC_SERVCODE_ATHTAG_SET) |
-						(1<<FUNC_SERVCODE_ATHTAG_GET));
-	}
-#endif
-
-	return;
-}
-
-static void adpt_hppe_servcode_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_servcode_config_set = NULL;
-	p_adpt_api->adpt_servcode_config_get = NULL;
-	p_adpt_api->adpt_servcode_loopcheck_en = NULL;
-	p_adpt_api->adpt_servcode_loopcheck_status_get = NULL;
-	p_adpt_api->adpt_port_servcode_set = NULL;
-	p_adpt_api->adpt_port_servcode_get = NULL;
-	p_adpt_api->adpt_servcode_athtag_set = NULL;
-	p_adpt_api->adpt_servcode_athtag_get = NULL;
-
-	return;
-}
-
 sw_error_t adpt_hppe_servcode_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -202,27 +159,17 @@ sw_error_t adpt_hppe_servcode_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return SW_FAIL;
 
-	adpt_hppe_servcode_func_unregister(dev_id, p_adpt_api);
-
-	if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_CONFIG_SET))
-		p_adpt_api->adpt_servcode_config_set = adpt_hppe_servcode_config_set;
-	if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_CONFIG_GET))
-		p_adpt_api->adpt_servcode_config_get = adpt_hppe_servcode_config_get;
-	if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_LOOPCHECK_EN))
-		p_adpt_api->adpt_servcode_loopcheck_en = adpt_hppe_servcode_loopcheck_en;
-	if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_LOOPCHECK_STATUS_GET))
-		p_adpt_api->adpt_servcode_loopcheck_status_get = adpt_hppe_servcode_loopcheck_status_get;
+	p_adpt_api->adpt_servcode_config_set = adpt_hppe_servcode_config_set;
+	p_adpt_api->adpt_servcode_config_get = adpt_hppe_servcode_config_get;
+	p_adpt_api->adpt_servcode_loopcheck_en = adpt_hppe_servcode_loopcheck_en;
+	p_adpt_api->adpt_servcode_loopcheck_status_get = adpt_hppe_servcode_loopcheck_status_get;
 #if defined(MPPE)
 	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
 	{
-		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_PORT_SERVCODE_SET))
-			p_adpt_api->adpt_port_servcode_set = adpt_mppe_port_servcode_set;
-		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_PORT_SERVCODE_GET))
-			p_adpt_api->adpt_port_servcode_get = adpt_mppe_port_servcode_get;
-		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_ATHTAG_SET))
-			p_adpt_api->adpt_servcode_athtag_set = adpt_mppe_servcode_athtag_set;
-		if(p_adpt_api->adpt_servcode_func_bitmap & (1<<FUNC_SERVCODE_ATHTAG_GET))
-			p_adpt_api->adpt_servcode_athtag_get = adpt_mppe_servcode_athtag_get;
+		p_adpt_api->adpt_port_servcode_set = adpt_mppe_port_servcode_set;
+		p_adpt_api->adpt_port_servcode_get = adpt_mppe_port_servcode_get;
+		p_adpt_api->adpt_servcode_athtag_set = adpt_mppe_servcode_athtag_set;
+		p_adpt_api->adpt_servcode_athtag_get = adpt_mppe_servcode_athtag_get;
 	}
 #endif
 

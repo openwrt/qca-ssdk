@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -70,26 +70,6 @@ typedef struct
 	a_uint32_t drop_packet_counter;
 	a_uint64_t drop_byte_counter;
 }fal_vsi_counter_t;
-
-
-enum{
-	FUNC_PORT_VLAN_VSI_SET,
-	FUNC_PORT_VLAN_VSI_GET,
-	FUNC_PORT_VSI_SET,
-	FUNC_PORT_VSI_GET,
-	FUNC_VSI_STAMOVE_SET,
-	FUNC_VSI_STAMOVE_GET,
-	FUNC_VSI_NEWADDR_LRN_SET,
-	FUNC_VSI_NEWADDR_LRN_GET,
-	FUNC_VSI_MEMBER_SET,
-	FUNC_VSI_MEMBER_GET,
-	FUNC_VSI_COUNTER_GET,
-	FUNC_VSI_COUNTER_CLEANUP,
-	FUNC_VSI_INVALIDVSI_CTRL_SET,
-	FUNC_VSI_INVALIDVSI_CTRL_GET,
-	FUNC_VSI_BRIDGE_VSI_SET,
-	FUNC_VSI_BRIDGE_VSI_GET,
-};
 
 typedef struct
 {

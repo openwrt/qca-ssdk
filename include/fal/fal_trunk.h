@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2016-2018, 2020, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_trunk FAL_TRUNK
@@ -40,15 +42,6 @@ extern "C" {
 #define FAL_TRUNK_HASH_KEY_UDF2            0x200
 #define FAL_TRUNK_HASH_KEY_UDF3            0x400
 #define FAL_TRUNK_GROUP_MAX_MEMEBER        8
-
-enum {
-	FUNC_TRUNK_GROUP_SET = 0,
-	FUNC_TRUNK_GROUP_GET,
-	FUNC_TRUNK_HASH_MODE_SET,
-	FUNC_TRUNK_HASH_MODE_GET,
-	FUNC_TRUNK_FAILOVER_ENABLE,
-	FUNC_TRUNK_FAILOVER_STATUS_GET,
-};
 
 sw_error_t
 fal_trunk_group_set(a_uint32_t dev_id, a_uint32_t trunk_id,

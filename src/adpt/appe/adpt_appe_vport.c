@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -144,36 +144,6 @@ adpt_appe_vport_state_check_set(a_uint32_t dev_id, fal_port_t port_id, fal_vport
 	return rv;
 }
 
-void adpt_appe_vport_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_vport_func_bitmap = BIT(FUNC_VPORT_PHYSICAL_PORT_SET) |
-		BIT(FUNC_VPORT_PHYSICAL_PORT_GET) |
-		BIT(FUNC_VPORT_STATE_CHECK_SET) |
-		BIT(FUNC_VPORT_STATE_CHECK_GET);
-
-	return;
-}
-
-static void adpt_appe_vport_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_vport_physical_port_id_set = NULL;
-	p_adpt_api->adpt_vport_physical_port_id_get = NULL;
-	p_adpt_api->adpt_vport_state_check_set = NULL;
-	p_adpt_api->adpt_vport_state_check_get = NULL;
-
-	return;
-}
-
 sw_error_t
 adpt_appe_vport_init(a_uint32_t dev_id)
 {
@@ -183,18 +153,12 @@ adpt_appe_vport_init(a_uint32_t dev_id)
 
 	ADPT_NULL_POINT_CHECK(p_adpt_api);
 
-	adpt_appe_vport_func_unregister(dev_id, p_adpt_api);
-
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_PHYSICAL_PORT_SET))
 		p_adpt_api->adpt_vport_physical_port_id_set =
 			adpt_appe_vport_physical_port_id_set;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_PHYSICAL_PORT_GET))
 		p_adpt_api->adpt_vport_physical_port_id_get =
 			adpt_appe_vport_physical_port_id_get;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_STATE_CHECK_SET))
 		p_adpt_api->adpt_vport_state_check_set =
 			adpt_appe_vport_state_check_set;
-	if (p_adpt_api->adpt_vport_func_bitmap & BIT(FUNC_VPORT_STATE_CHECK_GET))
 		p_adpt_api->adpt_vport_state_check_get =
 			adpt_appe_vport_state_check_get;
 

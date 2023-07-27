@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_qos FAL_QM
@@ -66,24 +68,6 @@ typedef struct
 	a_uint8_t direction; /* 0 for ingreee and 1 for egress */
 	fal_port_t port;
 } fal_port_tdm_tick_cfg_t;
-
-enum {
-	FUNC_PORT_BUFGROUP_MAP_GET = 0,
-	FUNC_BM_PORT_RESERVED_BUFFER_GET,
-	FUNC_BM_BUFGROUP_BUFFER_GET,
-	FUNC_BM_PORT_DYNAMIC_THRESH_GET,
-	FUNC_PORT_BM_CTRL_GET,
-	FUNC_BM_BUFGROUP_BUFFER_SET,
-	FUNC_PORT_BUFGROUP_MAP_SET,
-	FUNC_BM_PORT_STATIC_THRESH_GET,
-	FUNC_BM_PORT_RESERVED_BUFFER_SET,
-	FUNC_BM_PORT_STATIC_THRESH_SET,
-	FUNC_BM_PORT_DYNAMIC_THRESH_SET,
-	FUNC_PORT_BM_CTRL_SET,
-	FUNC_PORT_TDM_CTRL_SET,
-	FUNC_PORT_TDM_TICK_CFG_SET,
-	FUNC_BM_PORT_COUNTER_GET,
-};
 
 sw_error_t
 fal_port_bm_ctrl_set(a_uint32_t dev_id, fal_port_t port, a_bool_t enable);

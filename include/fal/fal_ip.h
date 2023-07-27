@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015, 2017-2018, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021, 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -336,52 +336,6 @@ typedef struct
 	fal_fwd_cmd_t rt_fail_no_eth_action; /* route fail with no eth header action
 					      * added for ipq95xx */
 } fal_ip_global_cfg_t;
-
-enum {
-	FUNC_IP_NETWORK_ROUTE_GET = 0,
-	FUNC_IP_HOST_ADD,
-	FUNC_IP_VSI_SG_CFG_GET,
-	FUNC_IP_PUB_ADDR_SET,
-	FUNC_IP_PORT_SG_CFG_SET,
-	FUNC_IP_PORT_INTF_GET,
-	FUNC_IP_VSI_ARP_SG_CFG_SET,
-	FUNC_IP_PUB_ADDR_GET,
-	FUNC_IP_PORT_INTF_SET,
-	FUNC_IP_VSI_SG_CFG_SET,
-	FUNC_IP_HOST_NEXT,
-	FUNC_IP_PORT_MACADDR_SET,
-	FUNC_IP_VSI_INTF_GET,
-	FUNC_IP_NETWORK_ROUTE_ADD,
-	FUNC_IP_PORT_SG_CFG_GET,
-	FUNC_IP_INTF_GET,
-	FUNC_IP_NETWORK_ROUTE_DEL,
-	FUNC_IP_HOST_DEL,
-	FUNC_IP_ROUTE_MISMATCH_GET,
-	FUNC_IP_VSI_ARP_SG_CFG_GET,
-	FUNC_IP_PORT_ARP_SG_CFG_SET,
-	FUNC_IP_VSI_MC_MODE_SET,
-	FUNC_IP_VSI_INTF_SET,
-	FUNC_IP_NEXTHOP_GET,
-	FUNC_IP_ROUTE_MISMATCH_SET,
-	FUNC_IP_HOST_GET,
-	FUNC_IP_INTF_SET,
-	FUNC_IP_VSI_MC_MODE_GET,
-	FUNC_IP_PORT_MACADDR_GET,
-	FUNC_IP_PORT_ARP_SG_CFG_GET,
-	FUNC_IP_NEXTHOP_SET,
-	FUNC_IP_GLOBAL_CTRL_GET,
-	FUNC_IP_GLOBAL_CTRL_SET,
-	FUNC_IP_INTF_MTU_MRU_SET,
-	FUNC_IP_INTF_MTU_MRU_GET,
-	FUNC_IP6_INTF_MTU_MRU_SET,
-	FUNC_IP6_INTF_MTU_MRU_GET,
-	FUNC_IP_INTF_MACADDR_ADD,
-	FUNC_IP_INTF_MACADDR_DEL,
-	FUNC_IP_INTF_MACADDR_GET_FIRST,
-	FUNC_IP_INTF_MACADDR_GET_NEXT,
-	FUNC_IP_INTF_DMAC_CHECK_SET,
-	FUNC_IP_INTF_DMAC_CHECK_GET,
-};
 
 typedef enum {
 	FAL_IP_BOTH = 0,

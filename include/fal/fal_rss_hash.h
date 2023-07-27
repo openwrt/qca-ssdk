@@ -60,11 +60,6 @@ typedef struct
 	a_uint8_t	hash_fin_outer[FAL_RSS_HASH_FIN_MAX_NUM]; /* hash fin outer mix */
 } fal_rss_hash_config_t;
 
-enum {
-	FUNC_RSS_HASH_CONFIG_SET = 0,
-	FUNC_RSS_HASH_CONFIG_GET,
-};
-
 sw_error_t
 fal_rss_hash_config_set(a_uint32_t dev_id, fal_rss_hash_mode_t mode, fal_rss_hash_config_t * config);
 

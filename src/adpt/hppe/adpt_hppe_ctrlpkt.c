@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -337,62 +339,6 @@ adpt_hppe_mgmtctrl_ctrlpkt_profile_getnext(a_uint32_t dev_id, fal_ctrlpkt_profil
 	return SW_NO_MORE;
 }
 
-void adpt_hppe_ctrlpkt_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_ctrlpkt_func_bitmap = ((1 << FUNC_MGMTCTRL_ETHTYPE_PROFILE_SET) |
-						(1 << FUNC_MGMTCTRL_ETHTYPE_PROFILE_GET) |
-						(1 << FUNC_MGMTCTRL_RFDB_PROFILE_SET) |
-						(1 << FUNC_MGMTCTRL_RFDB_PROFILE_GET) |
-						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_ADD) |
-						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_DEL) |
-						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETFIRST) |
-						(1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT));
-#ifdef APPE
-	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
-	{
-		p_adpt_api->adpt_ctrlpkt_func_bitmap |= (
-						(1 << FUNC_MGMTCTRL_VPGROUP_SET) |
-						(1 << FUNC_MGMTCTRL_VPGROUP_GET) |
-						(1 << FUNC_MGMTCTRL_TUNNEL_DECAP_SET) |
-						(1 << FUNC_MGMTCTRL_TUNNEL_DECAP_GET));
-	}
-#endif
-
-	return;
-}
-
-static void adpt_hppe_ctrlpkt_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_mgmtctrl_ethtype_profile_set = NULL;
-	p_adpt_api->adpt_mgmtctrl_ethtype_profile_get = NULL;
-	p_adpt_api->adpt_mgmtctrl_rfdb_profile_set = NULL;
-	p_adpt_api->adpt_mgmtctrl_rfdb_profile_get = NULL;
-	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_add = NULL;
-	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_del = NULL;
-	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getfirst = NULL;
-	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getnext = NULL;
-#ifdef APPE
-	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
-	{
-		p_adpt_api->adpt_mgmtctrl_vpgroup_set = NULL;
-		p_adpt_api->adpt_mgmtctrl_vpgroup_get = NULL;
-		p_adpt_api->adpt_mgmtctrl_tunnel_decap_set = NULL;
-		p_adpt_api->adpt_mgmtctrl_tunnel_decap_get = NULL;
-	}
-#endif
-	return;
-}
-
 sw_error_t adpt_hppe_ctrlpkt_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -402,39 +348,25 @@ sw_error_t adpt_hppe_ctrlpkt_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return SW_FAIL;
 
-	adpt_hppe_ctrlpkt_func_unregister(dev_id, p_adpt_api);
-
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_ETHTYPE_PROFILE_SET))
-		p_adpt_api->adpt_mgmtctrl_ethtype_profile_set = adpt_hppe_mgmtctrl_ethtype_profile_set;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_ETHTYPE_PROFILE_GET))
-		p_adpt_api->adpt_mgmtctrl_ethtype_profile_get = adpt_hppe_mgmtctrl_ethtype_profile_get;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_RFDB_PROFILE_SET))
-		p_adpt_api->adpt_mgmtctrl_rfdb_profile_set = adpt_hppe_mgmtctrl_rfdb_profile_set;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_RFDB_PROFILE_GET))
-		p_adpt_api->adpt_mgmtctrl_rfdb_profile_get = adpt_hppe_mgmtctrl_rfdb_profile_get;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_ADD))
-		p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_add = adpt_hppe_mgmtctrl_ctrlpkt_profile_add;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_DEL))
-		p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_del = adpt_hppe_mgmtctrl_ctrlpkt_profile_del;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETFIRST))
-		p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getfirst = adpt_hppe_mgmtctrl_ctrlpkt_profile_getfirst;
-	if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_CTRLPKT_PROFILE_GETNEXT))
-		p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getnext = adpt_hppe_mgmtctrl_ctrlpkt_profile_getnext;
+	p_adpt_api->adpt_mgmtctrl_ethtype_profile_set = adpt_hppe_mgmtctrl_ethtype_profile_set;
+	p_adpt_api->adpt_mgmtctrl_ethtype_profile_get = adpt_hppe_mgmtctrl_ethtype_profile_get;
+	p_adpt_api->adpt_mgmtctrl_rfdb_profile_set = adpt_hppe_mgmtctrl_rfdb_profile_set;
+	p_adpt_api->adpt_mgmtctrl_rfdb_profile_get = adpt_hppe_mgmtctrl_rfdb_profile_get;
+	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_add = adpt_hppe_mgmtctrl_ctrlpkt_profile_add;
+	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_del = adpt_hppe_mgmtctrl_ctrlpkt_profile_del;
+	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getfirst = adpt_hppe_mgmtctrl_ctrlpkt_profile_getfirst;
+	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getnext = adpt_hppe_mgmtctrl_ctrlpkt_profile_getnext;
 #ifdef APPE
 	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
 	{
-		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_VPGROUP_SET))
-			p_adpt_api->adpt_mgmtctrl_vpgroup_set =
-				adpt_appe_mgmtctrl_vpgroup_set;
-		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_VPGROUP_GET))
-			p_adpt_api->adpt_mgmtctrl_vpgroup_get =
-				adpt_appe_mgmtctrl_vpgroup_get;
-		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_TUNNEL_DECAP_SET))
-			p_adpt_api->adpt_mgmtctrl_tunnel_decap_set =
-				adpt_appe_mgmtctrl_tunnel_decap_set;
-		if (p_adpt_api->adpt_ctrlpkt_func_bitmap & (1 << FUNC_MGMTCTRL_TUNNEL_DECAP_GET))
-			p_adpt_api->adpt_mgmtctrl_tunnel_decap_get =
-				adpt_appe_mgmtctrl_tunnel_decap_get;
+		p_adpt_api->adpt_mgmtctrl_vpgroup_set =
+			adpt_appe_mgmtctrl_vpgroup_set;
+		p_adpt_api->adpt_mgmtctrl_vpgroup_get =
+			adpt_appe_mgmtctrl_vpgroup_get;
+		p_adpt_api->adpt_mgmtctrl_tunnel_decap_set =
+			adpt_appe_mgmtctrl_tunnel_decap_set;
+		p_adpt_api->adpt_mgmtctrl_tunnel_decap_get =
+			adpt_appe_mgmtctrl_tunnel_decap_get;
 	}
 #endif
 	return SW_OK;

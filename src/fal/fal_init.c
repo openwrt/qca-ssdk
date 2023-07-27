@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2016-2018, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*qca808x_start*/
@@ -90,18 +93,6 @@ _fal_ssdk_cfg(a_uint32_t dev_id, ssdk_cfg_t *ssdk_cfg)
 }
 
 static sw_error_t
-_fal_module_func_ctrl_set(a_uint32_t dev_id, a_uint32_t module, fal_func_ctrl_t *func_ctrl)
-{
-    return adpt_module_func_ctrl_set(dev_id, module, func_ctrl);
-}
-
-static sw_error_t
-_fal_module_func_ctrl_get(a_uint32_t dev_id, a_uint32_t module, fal_func_ctrl_t *func_ctrl)
-{
-    return adpt_module_func_ctrl_get(dev_id, module, func_ctrl);
-}
-
-static sw_error_t
 _fal_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capacity)
 {
     return adpt_ppe_capacity_get(dev_id, ppe_capacity);
@@ -177,40 +168,6 @@ fal_switch_devid_get(ssdk_chip_type chip_type, a_uint32_t *pdev_id)
 }
 
 sw_error_t
-fal_module_func_ctrl_set(a_uint32_t dev_id, a_uint32_t module, fal_func_ctrl_t *func_ctrl)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_module_func_ctrl_set(dev_id, module, func_ctrl);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-sw_error_t
-fal_module_func_ctrl_get(a_uint32_t dev_id, a_uint32_t module, fal_func_ctrl_t *func_ctrl)
-{
-    sw_error_t rv;
-
-    FAL_API_LOCK;
-    rv = _fal_module_func_ctrl_get(dev_id, module, func_ctrl);
-    FAL_API_UNLOCK;
-    return rv;
-}
-
-sw_error_t
-fal_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
-{
-    sw_error_t rv;
-    HSL_DEV_ID_CHECK(dev_id);
-
-    rv = adpt_module_func_init(dev_id, cfg);
-    SW_RTN_ON_ERROR(rv);
-
-    return rv;
-}
-
-sw_error_t
 fal_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capacity)
 {
     sw_error_t rv;
@@ -222,8 +179,6 @@ fal_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capacity)
 }
 
 EXPORT_SYMBOL(fal_switch_devid_get);
-EXPORT_SYMBOL(fal_module_func_ctrl_set);
-EXPORT_SYMBOL(fal_module_func_ctrl_get);
 EXPORT_SYMBOL(fal_ppe_capacity_get);
 
 /**

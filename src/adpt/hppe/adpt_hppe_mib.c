@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -402,50 +402,6 @@ adpt_ppe_get_rx_mib_info(a_uint32_t dev_id, fal_port_t port_id,
 	}
 #endif
 	return adpt_hppe_get_rx_mib_info(dev_id, port_id, mib_info);
-}
-
-void adpt_hppe_mib_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_mib_func_bitmap = ((1<<FUNC_GET_MIB_INFO)|
-						(1<<FUNC_GET_RX_MIB_INFO)|
-						(1<<FUNC_GET_TX_MIB_INFO)|
-						(1<<FUNC_GET_XGMIB_INFO)|
-						(1<<FUNC_GET_TX_XGMIB_INFO)|
-						(1<<FUNC_GET_RX_XGMIB_INFO)|
-						(1<<FUNC_MIB_STATUS_SET)|
-						(1<<FUNC_MIB_STATUS_GET)|
-						(1<<FUNC_MIB_PORT_FLUSH_COUNTERS)|
-						(1<<FUNC_MIB_CPUKEEP_SET)|
-						(1<<FUNC_MIB_CPUKEEP_GET)
-						);
-	return;
-}
-
-static void adpt_hppe_mib_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_get_mib_info = NULL;
-	p_adpt_api->adpt_get_rx_mib_info = NULL;
-	p_adpt_api->adpt_get_tx_mib_info = NULL;
-	p_adpt_api->adpt_mib_status_set = NULL;
-	p_adpt_api->adpt_mib_status_get = NULL;
-	p_adpt_api->adpt_mib_port_flush_counters = NULL;
-	p_adpt_api->adpt_mib_cpukeep_set = NULL;
-	p_adpt_api->adpt_mib_cpukeep_get = NULL;
-	p_adpt_api->adpt_get_xgmib_info = NULL;
-	p_adpt_api->adpt_get_tx_xgmib_info = NULL;
-	p_adpt_api->adpt_get_rx_xgmib_info = NULL;
-
-	return;
 }
 
 sw_error_t
@@ -974,52 +930,17 @@ sw_error_t adpt_hppe_mib_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return SW_FAIL;
 
-	adpt_hppe_mib_func_unregister(dev_id, p_adpt_api);
-
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_GET_MIB_INFO))
-	{
-		p_adpt_api->adpt_get_mib_info = adpt_ppe_get_mib_info;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_GET_RX_MIB_INFO))
-	{
-		p_adpt_api->adpt_get_rx_mib_info = adpt_ppe_get_rx_mib_info;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_GET_TX_MIB_INFO))
-	{
-		p_adpt_api->adpt_get_tx_mib_info = adpt_hppe_get_tx_mib_info;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_MIB_STATUS_SET))
-	{
-		p_adpt_api->adpt_mib_status_set = adpt_ppe_mib_status_set;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_MIB_STATUS_GET))
-	{
-		p_adpt_api->adpt_mib_status_get = adpt_hppe_mib_status_get;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_MIB_PORT_FLUSH_COUNTERS))
-	{
-		p_adpt_api->adpt_mib_port_flush_counters = adpt_ppe_mib_port_flush_counters;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_MIB_CPUKEEP_SET))
-	{
-		p_adpt_api->adpt_mib_cpukeep_set = adpt_ppe_mib_cpukeep_set;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_MIB_CPUKEEP_GET))
-	{
-		p_adpt_api->adpt_mib_cpukeep_get = adpt_hppe_mib_cpukeep_get;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_GET_XGMIB_INFO))
-	{
-		p_adpt_api->adpt_get_xgmib_info= adpt_hppe_get_xgmib_info;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_GET_TX_XGMIB_INFO))
-	{
-		p_adpt_api->adpt_get_tx_xgmib_info = adpt_hppe_get_tx_xgmib_info;
-	}
-	if(p_adpt_api->adpt_mib_func_bitmap & (1<<FUNC_GET_RX_XGMIB_INFO))
-	{
-		p_adpt_api->adpt_get_rx_xgmib_info = adpt_hppe_get_rx_xgmib_info;
-	}
+	p_adpt_api->adpt_get_mib_info = adpt_ppe_get_mib_info;
+	p_adpt_api->adpt_get_rx_mib_info = adpt_ppe_get_rx_mib_info;
+	p_adpt_api->adpt_get_tx_mib_info = adpt_hppe_get_tx_mib_info;
+	p_adpt_api->adpt_mib_status_set = adpt_ppe_mib_status_set;
+	p_adpt_api->adpt_mib_status_get = adpt_hppe_mib_status_get;
+	p_adpt_api->adpt_mib_port_flush_counters = adpt_ppe_mib_port_flush_counters;
+	p_adpt_api->adpt_mib_cpukeep_set = adpt_ppe_mib_cpukeep_set;
+	p_adpt_api->adpt_mib_cpukeep_get = adpt_hppe_mib_cpukeep_get;
+	p_adpt_api->adpt_get_xgmib_info= adpt_hppe_get_xgmib_info;
+	p_adpt_api->adpt_get_tx_xgmib_info = adpt_hppe_get_tx_xgmib_info;
+	p_adpt_api->adpt_get_rx_xgmib_info = adpt_hppe_get_rx_xgmib_info;
 
 	return SW_OK;
 }

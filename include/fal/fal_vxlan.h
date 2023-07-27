@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup fal_vxlan FAL_VXLAN
@@ -40,18 +40,6 @@ typedef struct {
 	a_uint8_t ipv4;
 	a_uint8_t ipv6;
 } fal_vxlan_gpe_proto_cfg_t;
-
-enum
-{
-	/*vxlan*/
-	FUNC_VXLAN_ENTRY_ADD = 0,
-	FUNC_VXLAN_ENTRY_DEL,
-	FUNC_VXLAN_ENTRY_GETFIRST,
-	FUNC_VXLAN_ENTRY_GETNEXT,
-	FUNC_VXLAN_GPE_PROTO_CFG_SET,
-	FUNC_VXLAN_GPE_PROTO_CFG_GET,
-};
-
 
 sw_error_t
 fal_vxlan_entry_add(a_uint32_t dev_id, fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);

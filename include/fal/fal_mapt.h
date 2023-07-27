@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -30,20 +30,6 @@ extern "C" {
 #include "sw.h"
 #include "fal_type.h"
 #include "fal_tunnel.h"
-
-enum {
-	FUNC_MAPT_DECAP_CTRL_SET,
-	FUNC_MAPT_DECAP_CTRL_GET,
-	FUNC_MAPT_DECAP_RULE_ENTRY_SET,
-	FUNC_MAPT_DECAP_RULE_ENTRY_GET,
-	FUNC_MAPT_DECAP_RULE_ENTRY_DEL,
-	FUNC_MAPT_DECAP_ENTRY_ADD,
-	FUNC_MAPT_DECAP_ENTRY_DEL,
-	FUNC_MAPT_DECAP_ENTRY_GETFIRST,
-	FUNC_MAPT_DECAP_ENTRY_GETNEXT,
-	FUNC_MAPT_DECAP_EN_SET,
-	FUNC_MAPT_DECAP_EN_GET,
-};
 
 typedef struct {
 	fal_fwd_cmd_t src_check_action; /* MAPT inbound src check failed

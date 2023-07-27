@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -207,8 +207,6 @@ typedef enum
 	SW_SHAPER_TOKEN_CONFIG,
 	SW_PORT_SHAPER_CONFIG,
 	SW_SHAPER_CONFIG,
-	SW_MODULE,
-	SW_FUNC_CTRL,
 	SW_QM_CNT,
 	SW_POLICER_COUNTER,
 	SW_POLICER_PORT_CONFIG,

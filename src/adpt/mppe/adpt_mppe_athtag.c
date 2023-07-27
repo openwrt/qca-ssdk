@@ -14,7 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /**
  * @defgroup
  * @{
@@ -362,45 +361,6 @@ adpt_mppe_athtag_port_mapping_get(a_uint32_t dev_id,
 	return SW_OK;
 }
 
-void adpt_mppe_athtag_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-	{
-		return;
-	}
-	p_adpt_api->adpt_athtag_func_bitmap = ((1<<FUNC_ATHTAG_PRI_MAPPING_SET) |
-						(1<<FUNC_ATHTAG_PRI_MAPPING_GET) |
-						(1<<FUNC_ATHTAG_PORT_MAPPING_SET) |
-						(1<<FUNC_ATHTAG_PORT_MAPPING_GET) |
-						(1<<FUNC_PORT_ATHTAG_RX_SET) |
-						(1<<FUNC_PORT_ATHTAG_RX_GET) |
-						(1<<FUNC_PORT_ATHTAG_TX_SET) |
-						(1<<FUNC_PORT_ATHTAG_TX_GET));
-	return;
-}
-
-static void adpt_mppe_athtag_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-	{
-		return;
-	}
-
-	p_adpt_api->adpt_athtag_pri_mapping_set = NULL;
-	p_adpt_api->adpt_athtag_pri_mapping_get = NULL;
-	p_adpt_api->adpt_athtag_port_mapping_set = NULL;
-	p_adpt_api->adpt_athtag_port_mapping_get = NULL;
-	p_adpt_api->adpt_port_athtag_rx_set = NULL;
-	p_adpt_api->adpt_port_athtag_rx_get = NULL;
-	p_adpt_api->adpt_port_athtag_tx_set = NULL;
-	p_adpt_api->adpt_port_athtag_tx_get = NULL;
-	return;
-}
-
 sw_error_t adpt_mppe_athtag_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -409,43 +369,17 @@ sw_error_t adpt_mppe_athtag_init(a_uint32_t dev_id)
 
 	ADPT_NULL_POINT_CHECK(p_adpt_api);
 
-	adpt_mppe_athtag_func_unregister(dev_id, p_adpt_api);
+	p_adpt_api->adpt_athtag_pri_mapping_set = adpt_mppe_athtag_pri_mapping_set;
+	p_adpt_api->adpt_athtag_pri_mapping_get = adpt_mppe_athtag_pri_mapping_get;
+	p_adpt_api->adpt_athtag_port_mapping_set = adpt_mppe_athtag_port_mapping_set;
+	p_adpt_api->adpt_athtag_port_mapping_get = adpt_mppe_athtag_port_mapping_get;
+	p_adpt_api->adpt_port_athtag_rx_set = adpt_mppe_port_athtag_rx_set;
+	p_adpt_api->adpt_port_athtag_rx_get = adpt_mppe_port_athtag_rx_get;
+	p_adpt_api->adpt_port_athtag_tx_set = adpt_mppe_port_athtag_tx_set;
+	p_adpt_api->adpt_port_athtag_tx_get = adpt_mppe_port_athtag_tx_get;
 
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_ATHTAG_PRI_MAPPING_SET))
-	{
-		p_adpt_api->adpt_athtag_pri_mapping_set = adpt_mppe_athtag_pri_mapping_set;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_ATHTAG_PRI_MAPPING_GET))
-	{
-		p_adpt_api->adpt_athtag_pri_mapping_get = adpt_mppe_athtag_pri_mapping_get;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_ATHTAG_PORT_MAPPING_SET))
-	{
-		p_adpt_api->adpt_athtag_port_mapping_set = adpt_mppe_athtag_port_mapping_set;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_ATHTAG_PORT_MAPPING_GET))
-	{
-		p_adpt_api->adpt_athtag_port_mapping_get = adpt_mppe_athtag_port_mapping_get;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_PORT_ATHTAG_RX_SET))
-	{
-		p_adpt_api->adpt_port_athtag_rx_set = adpt_mppe_port_athtag_rx_set;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_PORT_ATHTAG_RX_GET))
-	{
-		p_adpt_api->adpt_port_athtag_rx_get = adpt_mppe_port_athtag_rx_get;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_PORT_ATHTAG_TX_SET))
-	{
-		p_adpt_api->adpt_port_athtag_tx_set = adpt_mppe_port_athtag_tx_set;
-	}
-	if(p_adpt_api->adpt_athtag_func_bitmap & (1<<FUNC_PORT_ATHTAG_TX_GET))
-	{
-		p_adpt_api->adpt_port_athtag_tx_get = adpt_mppe_port_athtag_tx_get;
-	}
 	return SW_OK;
 }
-
 
 /**
  * @}

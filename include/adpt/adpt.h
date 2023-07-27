@@ -1459,7 +1459,6 @@ typedef struct
 }adpt_chip_ver_t;
 typedef struct
 {
-	a_uint32_t adpt_fdb_func_bitmap[2];
 	adpt_fdb_first_func adpt_fdb_first;
 	adpt_fdb_next_func adpt_fdb_next;
 	adpt_fdb_add_func adpt_fdb_add;
@@ -1494,7 +1493,6 @@ typedef struct
 	adpt_fdb_port_maclimit_ctrl_get_func adpt_fdb_port_maclimit_ctrl_get;
 	adpt_fdb_del_by_fid_func adpt_fdb_del_by_fid;
 	/*mib*/
-	a_uint32_t adpt_mib_func_bitmap;
 	adpt_mib_cpukeep_get_func adpt_mib_cpukeep_get;
 	adpt_mib_cpukeep_set_func adpt_mib_cpukeep_set;
 	adpt_get_mib_info_func adpt_get_mib_info;
@@ -1507,12 +1505,10 @@ typedef struct
 	adpt_get_tx_xgmib_info_func adpt_get_tx_xgmib_info;
 	adpt_get_rx_xgmib_info_func adpt_get_rx_xgmib_info;
 
-	a_uint32_t adpt_stp_func_bitmap;
 	adpt_stp_port_state_get_func adpt_stp_port_state_get;
 	adpt_stp_port_state_set_func adpt_stp_port_state_set;
 
     /*vsi*/
-	a_uint32_t adpt_vsi_func_bitmap;
 	adpt_port_vlan_vsi_set_func adpt_port_vlan_vsi_set;
 	adpt_port_vlan_vsi_get_func adpt_port_vlan_vsi_get;
 	adpt_port_vsi_set_func adpt_port_vsi_set;
@@ -1531,7 +1527,6 @@ typedef struct
 	adpt_vsi_invalidvsi_ctrl_set_func adpt_vsi_invalidvsi_ctrl_set;
 
 	// port_ctrl
-	a_uint32_t adpt_port_ctrl_func_bitmap[3];
 	adpt_port_local_loopback_get_func adpt_port_local_loopback_get;
 	adpt_port_autoneg_restart_func adpt_port_autoneg_restart;
 	adpt_port_duplex_set_func adpt_port_duplex_set;
@@ -1631,7 +1626,6 @@ typedef struct
 	adpt_port_rx_buff_thresh_set_func adpt_port_rx_buff_thresh_set;
 	adpt_port_rx_buff_thresh_get_func adpt_port_rx_buff_thresh_get;
 // mirror
-	a_uint32_t adpt_mirror_func_bitmap;
 	adpt_mirr_port_in_set_func adpt_mirr_port_in_set;
 	adpt_mirr_port_in_get_func adpt_mirr_port_in_get;
 	adpt_mirr_port_eg_set_func adpt_mirr_port_eg_set;
@@ -1641,11 +1635,9 @@ typedef struct
 	adpt_mirr_analysis_config_set_func adpt_mirr_analysis_config_set;
 	adpt_mirr_analysis_config_get_func adpt_mirr_analysis_config_get;
 //rss hash
-	a_uint32_t adpt_rss_hash_func_bitmap;
 	adpt_rss_hash_config_set_func adpt_rss_hash_config_set;
 	adpt_rss_hash_config_get_func adpt_rss_hash_config_get;
 //trunk
-	a_uint32_t adpt_trunk_func_bitmap;
 	adpt_trunk_fail_over_en_get_func adpt_trunk_fail_over_en_get;
 	adpt_trunk_hash_mode_get_func adpt_trunk_hash_mode_get;
 	adpt_trunk_group_get_func adpt_trunk_group_get;
@@ -1654,7 +1646,6 @@ typedef struct
 	adpt_trunk_hash_mode_set_func adpt_trunk_hash_mode_set;
 
 	/* ip */
-	a_uint32_t adpt_ip_func_bitmap[2];
 	adpt_ip_network_route_get_func adpt_ip_network_route_get;
 	adpt_ip_network_route_add_func adpt_ip_network_route_add;
 	adpt_ip_network_route_del_func adpt_ip_network_route_del;
@@ -1700,7 +1691,6 @@ typedef struct
 	adpt_ip_intf_dmac_check_get_func adpt_ip_intf_dmac_check_get;
 
 	/* flow */
-	a_uint32_t adpt_flow_func_bitmap;
 	adpt_flow_host_add_func adpt_flow_host_add;
 	adpt_flow_entry_get_func adpt_flow_entry_get;
 	adpt_flow_entry_del_func adpt_flow_entry_del;
@@ -1724,7 +1714,6 @@ typedef struct
 	adpt_flow_qos_get_func adpt_flow_qos_get;
 
 	/* qm */
-	a_uint32_t adpt_qm_func_bitmap[2];
 	adpt_ucast_hash_map_set_func adpt_ucast_hash_map_set;
 	adpt_ac_dynamic_threshold_get_func adpt_ac_dynamic_threshold_get;
 	adpt_ucast_queue_base_profile_get_func adpt_ucast_queue_base_profile_get;
@@ -1762,7 +1751,6 @@ typedef struct
 	adpt_qm_enqueue_config_set_func adpt_qm_enqueue_config_set;
 
 	/*portvlan module begin*/
-	a_uint32_t adpt_portvlan_func_bitmap[2];
 	adpt_global_qinq_mode_set_func adpt_global_qinq_mode_set;
 	adpt_global_qinq_mode_get_func adpt_global_qinq_mode_get;
 	adpt_tpid_set_func adpt_tpid_set;
@@ -1816,7 +1804,6 @@ typedef struct
 	/*portvlan module end*/
 
 	/*ctrlpkt module begin*/
-	a_uint32_t adpt_ctrlpkt_func_bitmap;
 	adpt_mgmtctrl_ethtype_profile_set_func adpt_mgmtctrl_ethtype_profile_set;
 	adpt_mgmtctrl_ethtype_profile_get_func adpt_mgmtctrl_ethtype_profile_get;
 	adpt_mgmtctrl_rfdb_profile_set_func adpt_mgmtctrl_rfdb_profile_set;
@@ -1832,7 +1819,6 @@ typedef struct
 	/*ctrlpkt module end*/
 
 	/*servcode module begin*/
-	a_uint32_t adpt_servcode_func_bitmap;
 	adpt_servcode_config_set_func adpt_servcode_config_set;
 	adpt_servcode_config_get_func adpt_servcode_config_get;
 	adpt_servcode_loopcheck_en_func adpt_servcode_loopcheck_en;
@@ -1844,7 +1830,6 @@ typedef struct
 	/*servcode module end*/
 
 	/* pppoe */
-	a_uint32_t adpt_pppoe_func_bitmap;
 	adpt_pppoe_session_table_add_func adpt_pppoe_session_table_add;
 	adpt_pppoe_session_table_del_func adpt_pppoe_session_table_del;
 	adpt_pppoe_session_table_get_func adpt_pppoe_session_table_get;
@@ -1856,7 +1841,6 @@ typedef struct
 	adpt_pppoe_global_ctrl_get_func adpt_pppoe_global_ctrl_get;
 
 	/*sec */
-	a_uint32_t adpt_sec_func_bitmap;
 	adpt_sec_l3_excep_parser_ctrl_set_func adpt_sec_l3_excep_parser_ctrl_set;
 	adpt_sec_l3_excep_ctrl_get_func adpt_sec_l3_excep_ctrl_get;
 	adpt_sec_l3_excep_parser_ctrl_get_func adpt_sec_l3_excep_parser_ctrl_get;
@@ -1875,7 +1859,6 @@ typedef struct
 	adpt_sec_tunnel_flags_excep_parser_ctrl_get_func adpt_sec_tunnel_flags_excep_parser_ctrl_get;
 
 	/*acl*/
-	a_uint32_t adpt_acl_func_bitmap;
 	adpt_acl_list_bind_func adpt_acl_list_bind;
 	adpt_acl_list_dump_func adpt_acl_list_dump;
 	adpt_acl_udf_profile_set_func adpt_acl_udf_profile_set;
@@ -1897,7 +1880,6 @@ typedef struct
 	adpt_acl_vpgroup_get_func adpt_acl_vpgroup_get;
 
 	/* qos */
-	a_uint32_t adpt_qos_func_bitmap;
 	adpt_qos_port_pri_set_func adpt_qos_port_pri_set;
 	adpt_qos_port_pri_get_func adpt_qos_port_pri_get;
 	adpt_qos_cosmap_pcp_get_func adpt_qos_cosmap_pcp_get;
@@ -1928,7 +1910,6 @@ typedef struct
 	adpt_reservedpool_scheduler_resource_get_func adpt_reservedpool_scheduler_resource_get;
 
 	/* bm */
-	a_uint32_t adpt_bm_func_bitmap;
 	adpt_port_bufgroup_map_get_func adpt_port_bufgroup_map_get;
 	adpt_bm_port_reserved_buffer_get_func adpt_bm_port_reserved_buffer_get;
 	adpt_bm_bufgroup_buffer_get_func adpt_bm_bufgroup_buffer_get;
@@ -1946,7 +1927,6 @@ typedef struct
 	adpt_bm_port_counter_get_func adpt_bm_port_counter_get;
 
 	//shaper
-	a_uint32_t adpt_shaper_func_bitmap;
 	adpt_flow_shaper_set_func adpt_flow_shaper_set;
 	adpt_queue_shaper_get_func adpt_queue_shaper_get;
 	adpt_queue_shaper_token_number_set_func adpt_queue_shaper_token_number_set;
@@ -1972,7 +1952,6 @@ typedef struct
 	adpt_flow_shaper_ctrl_set_func adpt_flow_shaper_ctrl_set;
 	adpt_flow_shaper_ctrl_get_func adpt_flow_shaper_ctrl_get;
 //policer
-	a_uint32_t adpt_policer_func_bitmap;
 	adpt_acl_policer_counter_get_func adpt_acl_policer_counter_get;
 	adpt_port_policer_counter_get_func adpt_port_policer_counter_get;
 	adpt_port_compensation_byte_get_func adpt_port_compensation_byte_get;
@@ -2069,20 +2048,17 @@ typedef struct
 	adpt_sfp_enhanced_cfg_get_func adpt_sfp_enhanced_cfg_get;
 	adpt_sfp_rate_encode_get_func adpt_sfp_rate_encode_get;
 	/*led*/
-	a_uint32_t adpt_led_func_bitmap;
 	adpt_led_ctrl_pattern_set_func adpt_led_ctrl_pattern_set;
 	adpt_led_ctrl_pattern_get_func adpt_led_ctrl_pattern_get;
 	adpt_led_ctrl_source_set_func adpt_led_ctrl_source_set;
 
 	/* vport */
-	a_uint32_t adpt_vport_func_bitmap;
 	adpt_vport_physical_port_id_set_func adpt_vport_physical_port_id_set;
 	adpt_vport_physical_port_id_get_func adpt_vport_physical_port_id_get;
 	adpt_vport_state_check_set_func adpt_vport_state_check_set;
 	adpt_vport_state_check_get_func adpt_vport_state_check_get;
 
 	/* tunnel */
-	a_uint32_t adpt_tunnel_func_bitmap[2];
 	adpt_tunnel_decap_entry_add_func adpt_tunnel_decap_entry_add;
 	adpt_tunnel_decap_entry_del_func adpt_tunnel_decap_entry_del;
 	adpt_tunnel_decap_entry_get_func adpt_tunnel_decap_entry_get;
@@ -2131,7 +2107,6 @@ typedef struct
 	adpt_tunnel_decap_counter_get_func adpt_tunnel_decap_counter_get;
 
 	/*vxlan*/
-	a_uint32_t adpt_vxlan_func_bitmap;
 	adpt_vxlan_entry_add_func adpt_vxlan_entry_add;
 	adpt_vxlan_entry_del_func adpt_vxlan_entry_del;
 	adpt_vxlan_entry_getfirst_func adpt_vxlan_entry_getfirst;
@@ -2139,13 +2114,11 @@ typedef struct
 	adpt_vxlan_gpe_proto_cfg_set_func adpt_vxlan_gpe_proto_cfg_set;
 	adpt_vxlan_gpe_proto_cfg_get_func adpt_vxlan_gpe_proto_cfg_get;
 	/*geneve*/
-	a_uint32_t adpt_geneve_func_bitmap;
 	adpt_geneve_entry_add_func adpt_geneve_entry_add;
 	adpt_geneve_entry_del_func adpt_geneve_entry_del;
 	adpt_geneve_entry_getfirst_func adpt_geneve_entry_getfirst;
 	adpt_geneve_entry_getnext_func adpt_geneve_entry_getnext;
 	/*tunnel program*/
-	a_uint32_t adpt_tunnel_program_func_bitmap;
 	adpt_tunnel_program_entry_add_func adpt_tunnel_program_entry_add;
 	adpt_tunnel_program_entry_del_func adpt_tunnel_program_entry_del;
 	adpt_tunnel_program_entry_getfirst_func adpt_tunnel_program_entry_getfirst;
@@ -2157,7 +2130,6 @@ typedef struct
 	adpt_tunnel_program_udf_getfirst_func adpt_tunnel_program_udf_getfirst;
 	adpt_tunnel_program_udf_getnext_func adpt_tunnel_program_udf_getnext;
 	/*mapt*/
-	a_uint32_t adpt_mapt_func_bitmap;
 	adpt_mapt_decap_ctrl_set_func adpt_mapt_decap_ctrl_set;
 	adpt_mapt_decap_ctrl_get_func adpt_mapt_decap_ctrl_get;
 	adpt_mapt_decap_rule_entry_set_func adpt_mapt_decap_rule_entry_set;
@@ -2170,7 +2142,6 @@ typedef struct
 	adpt_mapt_decap_en_set_func adpt_mapt_decap_en_set;
 	adpt_mapt_decap_en_get_func adpt_mapt_decap_en_get;
 	/*athtag*/
-	a_uint32_t adpt_athtag_func_bitmap;
 	adpt_athtag_pri_mapping_set_func adpt_athtag_pri_mapping_set;
 	adpt_athtag_pri_mapping_get_func adpt_athtag_pri_mapping_get;
 	adpt_athtag_port_mapping_set_func adpt_athtag_port_mapping_set;
@@ -2329,11 +2300,6 @@ adpt_forward_action_convert(fal_fwd_cmd_t *fwd_cmd, a_uint32_t *value, a_bool_t 
 
 adpt_api_t *adpt_api_ptr_get(a_uint32_t dev_id);
 sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
-sw_error_t adpt_module_func_ctrl_set(a_uint32_t dev_id,
-		a_uint32_t module, fal_func_ctrl_t *func_ctrl);
-sw_error_t adpt_module_func_ctrl_get(a_uint32_t dev_id,
-		a_uint32_t module, fal_func_ctrl_t *func_ctrl);
-sw_error_t adpt_module_func_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
 a_uint32_t adpt_chip_type_get(a_uint32_t dev_id);
 a_uint32_t adpt_chip_revision_get(a_uint32_t dev_id);
 a_uint32_t adpt_chip_freq_get(a_uint32_t dev_id);

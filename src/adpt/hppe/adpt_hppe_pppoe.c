@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021, 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -366,46 +366,6 @@ adpt_hppe_pppoe_global_ctrl_get(a_uint32_t dev_id, fal_pppoe_global_cfg_t *cfg)
 	return rv;
 }
 
-void adpt_hppe_pppoe_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_pppoe_func_bitmap = BIT(FUNC_PPPOE_SESSION_TABLE_ADD) |
-		BIT(FUNC_PPPOE_SESSION_TABLE_DEL) |
-		BIT(FUNC_PPPOE_SESSION_TABLE_GET) |
-		BIT(FUNC_PPPOE_EN_SET) |
-		BIT(FUNC_PPPOE_EN_GET) |
-		BIT(FUNC_PPPOE_L3_INTF_SET) |
-		BIT(FUNC_PPPOE_L3_INTF_GET) |
-		BIT(FUNC_PPPOE_GLOBAL_CTRL_SET) |
-		BIT(FUNC_PPPOE_GLOBAL_CTRL_GET);
-
-	return;
-}
-
-static void adpt_hppe_pppoe_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_pppoe_session_table_add = NULL;
-	p_adpt_api->adpt_pppoe_session_table_del = NULL;
-	p_adpt_api->adpt_pppoe_session_table_get = NULL;
-	p_adpt_api->adpt_pppoe_en_set = NULL;
-	p_adpt_api->adpt_pppoe_en_get = NULL;
-	p_adpt_api->adpt_pppoe_l3_intf_set = NULL;
-	p_adpt_api->adpt_pppoe_l3_intf_get = NULL;
-	p_adpt_api->adpt_pppoe_global_ctrl_set = NULL;
-	p_adpt_api->adpt_pppoe_global_ctrl_get = NULL;
-
-	return;
-}
-
 sw_error_t adpt_hppe_pppoe_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -415,29 +375,17 @@ sw_error_t adpt_hppe_pppoe_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return SW_FAIL;
 
-	adpt_hppe_pppoe_func_unregister(dev_id, p_adpt_api);
-
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_SESSION_TABLE_ADD))
-		p_adpt_api->adpt_pppoe_session_table_add = adpt_ppe_pppoe_session_table_add;
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_SESSION_TABLE_DEL))
-		p_adpt_api->adpt_pppoe_session_table_del = adpt_ppe_pppoe_session_table_del;
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_SESSION_TABLE_GET))
-		p_adpt_api->adpt_pppoe_session_table_get = adpt_ppe_pppoe_session_table_get;
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_EN_SET))
-		p_adpt_api->adpt_pppoe_en_set = adpt_hppe_pppoe_en_set;
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_EN_GET))
-		p_adpt_api->adpt_pppoe_en_get = adpt_hppe_pppoe_en_get;
+	p_adpt_api->adpt_pppoe_session_table_add = adpt_ppe_pppoe_session_table_add;
+	p_adpt_api->adpt_pppoe_session_table_del = adpt_ppe_pppoe_session_table_del;
+	p_adpt_api->adpt_pppoe_session_table_get = adpt_ppe_pppoe_session_table_get;
+	p_adpt_api->adpt_pppoe_en_set = adpt_hppe_pppoe_en_set;
+	p_adpt_api->adpt_pppoe_en_get = adpt_hppe_pppoe_en_get;
 #if defined(APPE)
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_L3_INTF_SET))
-		p_adpt_api->adpt_pppoe_l3_intf_set = adpt_appe_pppoe_l3_intf_set;
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_L3_INTF_GET))
-		p_adpt_api->adpt_pppoe_l3_intf_get = adpt_appe_pppoe_l3_intf_get;
+	p_adpt_api->adpt_pppoe_l3_intf_set = adpt_appe_pppoe_l3_intf_set;
+	p_adpt_api->adpt_pppoe_l3_intf_get = adpt_appe_pppoe_l3_intf_get;
 #endif
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_GLOBAL_CTRL_SET))
-		p_adpt_api->adpt_pppoe_global_ctrl_set = adpt_hppe_pppoe_global_ctrl_set;
-	if (p_adpt_api->adpt_pppoe_func_bitmap & (1 << FUNC_PPPOE_GLOBAL_CTRL_GET))
-		p_adpt_api->adpt_pppoe_global_ctrl_get = adpt_hppe_pppoe_global_ctrl_get;
-
+	p_adpt_api->adpt_pppoe_global_ctrl_set = adpt_hppe_pppoe_global_ctrl_set;
+	p_adpt_api->adpt_pppoe_global_ctrl_get = adpt_hppe_pppoe_global_ctrl_get;
 
 	return SW_OK;
 }

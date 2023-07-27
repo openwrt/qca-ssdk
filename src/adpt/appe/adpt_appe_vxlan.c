@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -332,43 +332,6 @@ adpt_appe_vxlan_gpe_proto_cfg_get(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t *
 
 	return SW_OK;
 }
-
-void adpt_appe_vxlan_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-	{
-		return;
-	}
-	p_adpt_api->adpt_vxlan_func_bitmap = ((1<<FUNC_VXLAN_ENTRY_ADD) |
-						(1<<FUNC_VXLAN_ENTRY_DEL) |
-						(1<<FUNC_VXLAN_ENTRY_GETFIRST) |
-						(1<<FUNC_VXLAN_ENTRY_GETNEXT) |
-						(1<<FUNC_VXLAN_GPE_PROTO_CFG_SET) |
-						(1<<FUNC_VXLAN_GPE_PROTO_CFG_GET));
-	return;
-}
-
-static void adpt_appe_vxlan_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-	{
-		return;
-	}
-
-	p_adpt_api->adpt_vxlan_entry_add = NULL;
-	p_adpt_api->adpt_vxlan_entry_del = NULL;
-	p_adpt_api->adpt_vxlan_entry_getfirst = NULL;
-	p_adpt_api->adpt_vxlan_entry_getnext = NULL;
-	p_adpt_api->adpt_vxlan_gpe_proto_cfg_set = NULL;
-	p_adpt_api->adpt_vxlan_gpe_proto_cfg_get = NULL;
-
-	return;
-}
-
 sw_error_t adpt_appe_vxlan_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -377,32 +340,12 @@ sw_error_t adpt_appe_vxlan_init(a_uint32_t dev_id)
 
 	ADPT_NULL_POINT_CHECK(p_adpt_api);
 
-	adpt_appe_vxlan_func_unregister(dev_id, p_adpt_api);
-
-	if(p_adpt_api->adpt_vxlan_func_bitmap & (1<<FUNC_VXLAN_ENTRY_ADD))
-	{
-		p_adpt_api->adpt_vxlan_entry_add = adpt_appe_vxlan_entry_add;
-	}
-	if(p_adpt_api->adpt_vxlan_func_bitmap & (1<<FUNC_VXLAN_ENTRY_DEL))
-	{
-		p_adpt_api->adpt_vxlan_entry_del = adpt_appe_vxlan_entry_del;
-	}
-	if(p_adpt_api->adpt_vxlan_func_bitmap & (1<<FUNC_VXLAN_ENTRY_GETFIRST))
-	{
-		p_adpt_api->adpt_vxlan_entry_getfirst = adpt_appe_vxlan_entry_getfirst;
-	}
-	if(p_adpt_api->adpt_vxlan_func_bitmap & (1<<FUNC_VXLAN_ENTRY_GETNEXT))
-	{
-		p_adpt_api->adpt_vxlan_entry_getnext = adpt_appe_vxlan_entry_getnext;
-	}
-	if(p_adpt_api->adpt_vxlan_func_bitmap & (1<<FUNC_VXLAN_GPE_PROTO_CFG_SET))
-	{
-		p_adpt_api->adpt_vxlan_gpe_proto_cfg_set = adpt_appe_vxlan_gpe_proto_cfg_set;
-	}
-	if(p_adpt_api->adpt_vxlan_func_bitmap & (1<<FUNC_VXLAN_GPE_PROTO_CFG_GET))
-	{
-		p_adpt_api->adpt_vxlan_gpe_proto_cfg_get = adpt_appe_vxlan_gpe_proto_cfg_get;
-	}
+	p_adpt_api->adpt_vxlan_entry_add = adpt_appe_vxlan_entry_add;
+	p_adpt_api->adpt_vxlan_entry_del = adpt_appe_vxlan_entry_del;
+	p_adpt_api->adpt_vxlan_entry_getfirst = adpt_appe_vxlan_entry_getfirst;
+	p_adpt_api->adpt_vxlan_entry_getnext = adpt_appe_vxlan_entry_getnext;
+	p_adpt_api->adpt_vxlan_gpe_proto_cfg_set = adpt_appe_vxlan_gpe_proto_cfg_set;
+	p_adpt_api->adpt_vxlan_gpe_proto_cfg_get = adpt_appe_vxlan_gpe_proto_cfg_get;
 
 	return SW_OK;
 }

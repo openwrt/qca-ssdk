@@ -194,19 +194,6 @@ typedef struct {
 	a_uint8_t dest_port; /*updated dest portid or portmap field*/
 } fal_servcode_athtag_t;
 
-enum
-{
-	/*servcode*/
-	FUNC_SERVCODE_CONFIG_SET = 0,
-	FUNC_SERVCODE_CONFIG_GET,
-	FUNC_SERVCODE_LOOPCHECK_EN,
-	FUNC_SERVCODE_LOOPCHECK_STATUS_GET,
-	FUNC_PORT_SERVCODE_SET,
-	FUNC_PORT_SERVCODE_GET,
-	FUNC_SERVCODE_ATHTAG_SET,
-	FUNC_SERVCODE_ATHTAG_GET,
-};
-
 sw_error_t
 fal_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_index, fal_servcode_config_t *entry);
 sw_error_t

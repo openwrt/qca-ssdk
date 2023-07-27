@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2017, 2019, 2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -2483,70 +2483,6 @@ adpt_hppe_flow_global_cfg_set(
 	return SW_OK;
 }
 
-void adpt_hppe_flow_func_bitmap_init(a_uint32_t dev_id)
-{
-	adpt_api_t *p_adpt_api = NULL;
-
-	p_adpt_api = adpt_api_ptr_get(dev_id);
-
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_flow_func_bitmap = BIT(FUNC_FLOW_HOST_ADD) |
-		BIT(FUNC_FLOW_ENTRY_GET) |
-		BIT(FUNC_FLOW_ENTRY_DEL) |
-		BIT(FUNC_FLOW_STATUS_GET) |
-		BIT(FUNC_FLOW_CTRL_SET) |
-		BIT(FUNC_FLOW_AGE_TIMER_GET) |
-		BIT(FUNC_FLOW_STATUS_SET) |
-		BIT(FUNC_FLOW_HOST_GET) |
-		BIT(FUNC_FLOW_HOST_DEL) |
-		BIT(FUNC_FLOW_CTRL_GET) |
-		BIT(FUNC_FLOW_AGE_TIMER_SET) |
-		BIT(FUNC_FLOW_ENTRY_ADD) |
-		BIT(FUNC_FLOW_GLOBAL_CFG_GET) |
-		BIT(FUNC_FLOW_GLOBAL_CFG_SET) |
-		BIT(FUNC_FLOW_ENTRY_NEXT) |
-		BIT(FUNC_FLOW_COUNTER_GET) |
-		BIT(FUNC_FLOW_COUNTER_CLEANUP) |
-		BIT(FUNC_FLOW_ENTRY_EN_SET) |
-		BIT(FUNC_FLOW_ENTRY_EN_GET) |
-		BIT(FUNC_FLOW_QOS_SET) |
-		BIT(FUNC_FLOW_QOS_GET);
-
-	return;
-}
-
-static void adpt_hppe_flow_func_unregister(a_uint32_t dev_id, adpt_api_t *p_adpt_api)
-{
-	if(p_adpt_api == NULL)
-		return;
-
-	p_adpt_api->adpt_flow_host_add = NULL;
-	p_adpt_api->adpt_flow_entry_get = NULL;
-	p_adpt_api->adpt_flow_entry_del = NULL;
-	p_adpt_api->adpt_flow_status_get = NULL;
-	p_adpt_api->adpt_flow_ctrl_set = NULL;
-	p_adpt_api->adpt_flow_age_timer_get = NULL;
-	p_adpt_api->adpt_flow_status_set = NULL;
-	p_adpt_api->adpt_flow_host_get = NULL;
-	p_adpt_api->adpt_flow_host_del = NULL;
-	p_adpt_api->adpt_flow_ctrl_get = NULL;
-	p_adpt_api->adpt_flow_age_timer_set = NULL;
-	p_adpt_api->adpt_flow_entry_add = NULL;
-	p_adpt_api->adpt_flow_global_cfg_get = NULL;
-	p_adpt_api->adpt_flow_global_cfg_set = NULL;
-	p_adpt_api->adpt_flow_entry_next = NULL;
-	p_adpt_api->adpt_flow_counter_get = NULL;
-	p_adpt_api->adpt_flow_counter_cleanup = NULL;
-	p_adpt_api->adpt_flow_entry_en_set = NULL;
-	p_adpt_api->adpt_flow_entry_en_get = NULL;
-	p_adpt_api->adpt_flow_qos_set = NULL;
-	p_adpt_api->adpt_flow_qos_get = NULL;
-
-	return;
-}
-
 sw_error_t adpt_hppe_flow_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -2556,52 +2492,29 @@ sw_error_t adpt_hppe_flow_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return SW_FAIL;
 
-	adpt_hppe_flow_func_unregister(dev_id, p_adpt_api);
-
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_HOST_ADD))
-		p_adpt_api->adpt_flow_host_add = adpt_hppe_flow_host_add;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_GET))
-		p_adpt_api->adpt_flow_entry_get = adpt_hppe_flow_entry_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_DEL))
-		p_adpt_api->adpt_flow_entry_del = adpt_hppe_flow_entry_del;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_STATUS_GET))
-		p_adpt_api->adpt_flow_status_get = adpt_hppe_flow_status_get;
+	p_adpt_api->adpt_flow_host_add = adpt_hppe_flow_host_add;
+	p_adpt_api->adpt_flow_entry_get = adpt_hppe_flow_entry_get;
+	p_adpt_api->adpt_flow_entry_del = adpt_hppe_flow_entry_del;
+	p_adpt_api->adpt_flow_status_get = adpt_hppe_flow_status_get;
 #if !defined(IN_FLOW_MINI)
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_AGE_TIMER_GET))
-		p_adpt_api->adpt_flow_age_timer_get = adpt_hppe_flow_age_timer_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_AGE_TIMER_SET))
-		p_adpt_api->adpt_flow_age_timer_set = adpt_hppe_flow_age_timer_set;
+	p_adpt_api->adpt_flow_age_timer_get = adpt_hppe_flow_age_timer_get;
+	p_adpt_api->adpt_flow_age_timer_set = adpt_hppe_flow_age_timer_set;
 #endif
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_STATUS_SET))
-		p_adpt_api->adpt_flow_status_set = adpt_hppe_flow_status_set;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_HOST_GET))
-		p_adpt_api->adpt_flow_host_get = adpt_hppe_flow_host_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_HOST_DEL))
-		p_adpt_api->adpt_flow_host_del = adpt_hppe_flow_host_del;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_ADD))
-		p_adpt_api->adpt_flow_entry_add = adpt_hppe_flow_entry_add;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_GLOBAL_CFG_GET))
-		p_adpt_api->adpt_flow_global_cfg_get = adpt_hppe_flow_global_cfg_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_GLOBAL_CFG_SET))
-		p_adpt_api->adpt_flow_global_cfg_set = adpt_hppe_flow_global_cfg_set;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_NEXT))
-		p_adpt_api->adpt_flow_entry_next = adpt_hppe_flow_entry_next;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_COUNTER_GET))
-		p_adpt_api->adpt_flow_counter_get = adpt_hppe_flow_counter_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_COUNTER_CLEANUP))
-		p_adpt_api->adpt_flow_counter_cleanup = adpt_hppe_flow_counter_cleanup;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_EN_SET))
-		p_adpt_api->adpt_flow_entry_en_set = adpt_hppe_flow_entry_en_set;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_ENTRY_EN_GET))
-		p_adpt_api->adpt_flow_entry_en_get = adpt_hppe_flow_entry_en_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_QOS_SET))
-		p_adpt_api->adpt_flow_qos_set = adpt_hppe_flow_qos_set;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_QOS_GET))
-		p_adpt_api->adpt_flow_qos_get = adpt_hppe_flow_qos_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_CTRL_GET))
-		p_adpt_api->adpt_flow_ctrl_get = adpt_hppe_flow_ctrl_get;
-	if (p_adpt_api->adpt_flow_func_bitmap & (1 << FUNC_FLOW_CTRL_SET))
-		p_adpt_api->adpt_flow_ctrl_set = adpt_hppe_flow_ctrl_set;
+	p_adpt_api->adpt_flow_status_set = adpt_hppe_flow_status_set;
+	p_adpt_api->adpt_flow_host_get = adpt_hppe_flow_host_get;
+	p_adpt_api->adpt_flow_host_del = adpt_hppe_flow_host_del;
+	p_adpt_api->adpt_flow_entry_add = adpt_hppe_flow_entry_add;
+	p_adpt_api->adpt_flow_global_cfg_get = adpt_hppe_flow_global_cfg_get;
+	p_adpt_api->adpt_flow_global_cfg_set = adpt_hppe_flow_global_cfg_set;
+	p_adpt_api->adpt_flow_entry_next = adpt_hppe_flow_entry_next;
+	p_adpt_api->adpt_flow_counter_get = adpt_hppe_flow_counter_get;
+	p_adpt_api->adpt_flow_counter_cleanup = adpt_hppe_flow_counter_cleanup;
+	p_adpt_api->adpt_flow_entry_en_set = adpt_hppe_flow_entry_en_set;
+	p_adpt_api->adpt_flow_entry_en_get = adpt_hppe_flow_entry_en_get;
+	p_adpt_api->adpt_flow_qos_set = adpt_hppe_flow_qos_set;
+	p_adpt_api->adpt_flow_qos_get = adpt_hppe_flow_qos_get;
+	p_adpt_api->adpt_flow_ctrl_get = adpt_hppe_flow_ctrl_get;
+	p_adpt_api->adpt_flow_ctrl_set = adpt_hppe_flow_ctrl_set;
 
 	return SW_OK;
 }

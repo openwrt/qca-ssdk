@@ -1313,7 +1313,6 @@ sw_error_t qca_hppe_acl_remark_ptp_servcode(a_uint32_t dev_id) {
 #define PTP_MSG_PRESP                   3
 
 	sw_error_t ret;
-	fal_func_ctrl_t func_ctrl, func_ctrl_old;
 	fal_servcode_config_t servcode_conf;
 	fal_acl_rule_t entry = {0};
 	a_uint32_t index = 0, msg_type = 0;
@@ -1412,13 +1411,6 @@ sw_error_t qca_hppe_acl_remark_ptp_servcode(a_uint32_t dev_id) {
 			FAL_ACL_DIREC_IN, FAL_ACL_BIND_PORTBITMAP, ptp_port_bmp);
 	SW_RTN_ON_ERROR(ret);
 
-	/* enable service code module temporarily */
-	ret = fal_module_func_ctrl_get(dev_id, FAL_MODULE_SERVCODE, &func_ctrl_old);
-	SW_RTN_ON_ERROR(ret);
-	func_ctrl.bitmap[0] = (1<<FUNC_SERVCODE_CONFIG_SET) | (1<<FUNC_SERVCODE_CONFIG_GET);
-	ret = fal_module_func_ctrl_set(dev_id, FAL_MODULE_SERVCODE, &func_ctrl);
-	SW_RTN_ON_ERROR(ret);
-
 	/* configure the next service code of ptp service code, which
 	 * is needed for EDMA receiving the packet with service code.
 	 */
@@ -1427,9 +1419,6 @@ sw_error_t qca_hppe_acl_remark_ptp_servcode(a_uint32_t dev_id) {
 	servcode_conf.next_service_code = PTP_EVENT_PKT_SERVICE_CODE;
 	ret = fal_servcode_config_set(dev_id, PTP_EVENT_PKT_SERVICE_CODE, &servcode_conf);
 	SW_RTN_ON_ERROR(ret);
-
-	/* restore service code module feature bitmap */
-	ret = fal_module_func_ctrl_set(dev_id, FAL_MODULE_SERVCODE, &func_ctrl_old);
 
 	return ret;
 }

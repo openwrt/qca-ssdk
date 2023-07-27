@@ -4382,12 +4382,12 @@ adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t port_ty
 	return rv;
 }
 
-static a_uint32_t port_lpi_sleep_timer[SW_MAX_NR_DEV][SSDK_PHYSICAL_PORT6] = {
+static a_uint32_t port_lpi_sleep_timer[][SSDK_PHYSICAL_PORT6] = {
 	{218, 218, 218, 218, 218, 218},
 	{218, 218, 218, 218, 218, 218},
 	{218, 218, 218, 218, 218, 218},
 }; /* unit is us*/
-static a_uint32_t port_lpi_wakeup_timer[SW_MAX_NR_DEV][SSDK_PHYSICAL_PORT6] = {
+static a_uint32_t port_lpi_wakeup_timer[][SSDK_PHYSICAL_PORT6] = {
 	{27, 27, 27, 27, 27, 27},
 	{27, 27, 27, 27, 27, 27},
 	{27, 27, 27, 27, 27, 27},

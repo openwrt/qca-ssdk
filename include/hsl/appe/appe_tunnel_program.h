@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -29,11 +29,13 @@
 #define TPR_PROGRAM_HDR_MAX_ENTRY	6
 #define TPR_PROGRAM_RESULT_MAX_ENTRY	6
 #define TPR_PROGRAM_UDF_CTRL_MAX_ENTRY	6
+#ifndef IN_TUNNEL_PROGRAM_MINI
 #define TPR_PROGRAM_UDF_DATA_0_MAX_ENTRY	16
 #define TPR_PROGRAM_UDF_DATA_1_MAX_ENTRY	16
 #define TPR_PROGRAM_UDF_MASK_0_MAX_ENTRY	16
 #define TPR_PROGRAM_UDF_MASK_1_MAX_ENTRY	16
 #define TPR_PROGRAM_UDF_ACTION_MAX_ENTRY	16
+#endif
 
 sw_error_t
 appe_tpr_hdr_match_0_get(
@@ -107,6 +109,7 @@ appe_tpr_program_udf_ctrl_set(
 		a_uint32_t index,
 		union tpr_program_udf_ctrl_u *value);
 
+#ifndef IN_TUNNEL_PROGRAM_MINI
 sw_error_t
 appe_tpr_program_udf_data_0_get(
 		a_uint32_t dev_id,
@@ -166,6 +169,7 @@ appe_tpr_program_udf_action_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union tpr_program_udf_action_u *value);
+#endif
 
 #if 0
 sw_error_t

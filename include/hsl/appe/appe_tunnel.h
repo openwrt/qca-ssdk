@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,9 +23,11 @@
 #ifndef _APPE_TUNNEL_H_
 #define _APPE_TUNNEL_H_
 
+#ifndef IN_TUNNEL_MINI
 #define TPR_UDF_CTRL_0_MAX_ENTRY	16
 #define TPR_UDF_PROFILE_BASE_MAX_ENTRY	8
 #define TPR_UDF_PROFILE_OFFSET_MAX_ENTRY	8
+#endif
 #define TL_L3_IF_TBL_MAX_ENTRY		128
 #define TL_KEY_GEN_MAX_ENTRY		16
 #define TL_TBL_MAX_ENTRY		128
@@ -35,6 +37,7 @@
 #define EG_XLAT_TUN_CTRL_MAX_ENTRY	128
 #define EG_EDIT_RULE_MAX_ENTRY		16
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_tpr_udf_ctrl_0_get(
 		a_uint32_t dev_id,
@@ -70,6 +73,7 @@ appe_tpr_udf_profile_offset_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union tpr_udf_profile_offset_u *value);
+#endif
 
 sw_error_t
 appe_tl_tbl_op_get(
@@ -594,6 +598,7 @@ appe_eg_udp_entropy_ctrl_set(
 		a_uint32_t dev_id,
 		union eg_udp_entropy_ctrl_u *value);
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_ecn_profile_get(
 		a_uint32_t dev_id,
@@ -603,6 +608,7 @@ sw_error_t
 appe_ecn_profile_set(
 		a_uint32_t dev_id,
 		union ecn_profile_u *value);
+#endif
 
 sw_error_t
 appe_eg_proto_mapping0_get(
@@ -715,6 +721,7 @@ appe_tl_port_vp_tbl_pre_ipo_profile_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_tl_vlan_tbl_get(
 		a_uint32_t dev_id,
@@ -786,4 +793,5 @@ sw_error_t
 appe_ecn_map_mode2_1_set(
 		a_uint32_t dev_id,
 		union ecn_map_mode2_1_u *value);
+#endif
 #endif

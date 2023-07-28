@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -38,6 +39,7 @@ sw_error_t
 adpt_appe_tunnel_encap_header_ctrl_get(a_uint32_t dev_id,
 		fal_tunnel_encap_header_ctrl_t *header_ctrl);
 sw_error_t
+#ifndef IN_TUNNEL_MINI
 adpt_appe_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
 		fal_tunnel_ecn_val_t *ecn_value);
 sw_error_t
@@ -49,6 +51,7 @@ adpt_appe_tunnel_decap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule
 sw_error_t
 adpt_appe_tunnel_decap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
 		fal_tunnel_decap_ecn_action_t *ecn_action);
+#endif
 sw_error_t
 adpt_appe_tunnel_global_cfg_get(a_uint32_t dev_id, fal_tunnel_global_cfg_t *cfg);
 sw_error_t
@@ -60,6 +63,7 @@ sw_error_t
 adpt_appe_tunnel_port_intf_get(a_uint32_t dev_id, fal_port_t port_id,
 		fal_tunnel_port_intf_t *port_cfg);
 sw_error_t
+#ifndef IN_TUNNEL_MINI
 adpt_appe_tunnel_vlan_intf_add(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
 sw_error_t
 adpt_appe_tunnel_vlan_intf_getfirst(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
@@ -67,6 +71,7 @@ sw_error_t
 adpt_appe_tunnel_vlan_intf_getnext(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
 sw_error_t
 adpt_appe_tunnel_vlan_intf_del(a_uint32_t dev_id, fal_tunnel_vlan_intf_t *vlan_cfg);
+#endif
 sw_error_t
 adpt_appe_tunnel_intf_set(a_uint32_t dev_id, a_uint32_t l3_if, fal_tunnel_intf_t *intf_t);
 sw_error_t

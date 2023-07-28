@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -65,6 +65,7 @@ static const char *tunnel_encapintftunnelid[] = {
 	"tunnel_id",
 };
 
+#ifndef IN_TUNNEL_MINI
 static const char *tunnel_vlanintf[] = {
 	"port",
 	"svlan_en",
@@ -77,6 +78,7 @@ static const char *tunnel_vlanintf[] = {
 	"tl_l3if_en",
 	"tl_l3if",
 };
+#endif
 
 static const char *tunnel_encapporttunnelid[] = {
 	"port_id",
@@ -200,6 +202,7 @@ static const char *tunnel_encapheaderctrl[] = {
 	"ipv6_proto_map_data",
 };
 
+#ifndef IN_TUNNEL_MINI
 static const char *tunnel_decapecn[] = {
 	"ecn_mode",
 	"outer_ecn",
@@ -213,6 +216,7 @@ static const char *tunnel_encapecn[] = {
 	"inner_ecn",
 	"ecn_val",
 };
+#endif
 
 static const char *tunnel_decapexpfmtctrl[] = {
 	"port_id",
@@ -240,11 +244,7 @@ int parse_tunnel(a_uint32_t dev_id, const char *command_name, struct switch_val 
 {
 	int rv = -1;
 
-	if (!strcmp(command_name, "UdfprofileEntry")) {
-		rv = parse_tunnel_udfprofileentry(dev_id, val);
-	} else if (!strcmp(command_name, "UdfprofileCfg")) {
-		rv = parse_tunnel_udfprofilecfg(val);
-	} else if (!strcmp(command_name, "Intf")) {
+	if (!strcmp(command_name, "Intf")) {
 		rv = parse_uci_option(val, tunnel_intf,
 				ARRAY_SIZE(tunnel_intf));
 	} else if (!strcmp(command_name, "Encaprule")) {
@@ -253,9 +253,15 @@ int parse_tunnel(a_uint32_t dev_id, const char *command_name, struct switch_val 
 	} else if (!strcmp(command_name, "Encapintftunnelid")) {
 		rv = parse_uci_option(val, tunnel_encapintftunnelid,
 				ARRAY_SIZE(tunnel_encapintftunnelid));
+#ifndef IN_TUNNEL_MINI
 	} else if (!strcmp(command_name, "Vlanintf")) {
 		rv = parse_uci_option(val, tunnel_vlanintf,
 				ARRAY_SIZE(tunnel_vlanintf));
+	} else if (!strcmp(command_name, "UdfprofileEntry")) {
+		rv = parse_tunnel_udfprofileentry(dev_id, val);
+	} else if (!strcmp(command_name, "UdfprofileCfg")) {
+		rv = parse_tunnel_udfprofilecfg(val);
+#endif
 	} else if (!strcmp(command_name, "Encapporttunnelid")) {
 		rv = parse_uci_option(val, tunnel_encapporttunnelid,
 				ARRAY_SIZE(tunnel_encapporttunnelid));
@@ -274,12 +280,14 @@ int parse_tunnel(a_uint32_t dev_id, const char *command_name, struct switch_val 
 	} else if (!strcmp(command_name, "Encapheaderctrl")) {
 		rv = parse_uci_option(val, tunnel_encapheaderctrl,
 				ARRAY_SIZE(tunnel_encapheaderctrl));
+#ifndef IN_TUNNEL_MINI
 	} else if (!strcmp(command_name, "Decapecn")) {
 		rv = parse_uci_option(val, tunnel_decapecn,
 				ARRAY_SIZE(tunnel_decapecn));
 	} else if (!strcmp(command_name, "Encapecn")) {
 		rv = parse_uci_option(val, tunnel_encapecn,
 				ARRAY_SIZE(tunnel_encapecn));
+#endif
 	} else if (!strcmp(command_name, "Decapexpfmtctrl")) {
 		rv = parse_uci_option(val, tunnel_decapexpfmtctrl,
 				ARRAY_SIZE(tunnel_decapexpfmtctrl));

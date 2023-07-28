@@ -31,8 +31,10 @@
 /* record the used program id map for one program udf entry */
 static a_uint32_t g_program_entry_used_map[SW_MAX_NR_DEV][ADPT_TUNNEL_PROGRAM_ENTRY_NUM];
 
+#ifndef IN_TUNNEL_PROGRAM_MINI
 /* record if one program udf rule entry is inuse  */
 static a_bool_t g_program_udf_entry_inuse[SW_MAX_NR_DEV][ADPT_TUNNEL_PROGRAM_UDF_ENTRY_NUM];
+#endif
 
 enum{
 	APPE_OUTER_HDR_TYPE_ETHERNET = 0,
@@ -244,46 +246,6 @@ _is_program_entry_equal(a_uint32_t dev_id,
 	}
 }
 
-static a_bool_t
-_is_program_udf_rule_equal(a_uint32_t dev_id,
-		fal_tunnel_program_udf_t * udf1, fal_tunnel_program_udf_t * udf2)
-{
-	a_uint32_t idx;
-	if (udf1->field_flag == udf2->field_flag)
-	{
-		for (idx = 0; idx < TUNNEL_PROGRAM_UDF_NUM; idx++)
-		{
-			if((udf1->udf_val[idx] != udf2->udf_val[idx]) ||
-				(udf1->udf_mask[idx] != udf2->udf_mask[idx]))
-			{ /* not equal */
-				return A_FALSE;
-			}
-		}
-		/* equal */
-		return A_TRUE;
-	}
-	else
-	{ /* not equal */
-		return A_FALSE;
-	}
-}
-
-static a_bool_t
-_is_program_udf_action_equal(a_uint32_t dev_id,
-		fal_tunnel_program_udf_t * udf1, fal_tunnel_program_udf_t * udf2)
-{
-	if (udf1->action_flag == udf2->action_flag &&
-		udf1->inner_hdr_type == udf2->inner_hdr_type &&
-		udf1->udf_hdr_len == udf2->udf_hdr_len)
-	{ /* equal */
-		return A_TRUE;
-	}
-	else
-	{ /* not equal */
-		return A_FALSE;
-	}
-}
-
 static sw_error_t
 _get_program_entry_by_index(a_uint32_t dev_id,
 		a_uint32_t index, fal_tunnel_program_entry_t * entry)
@@ -343,6 +305,47 @@ _set_program_entry_by_index(a_uint32_t dev_id,
 	SW_RTN_ON_ERROR(appe_tpr_hdr_match_2_set(dev_id, index, &match_2));
 
 	return SW_OK;
+}
+
+#ifndef IN_TUNNEL_PROGRAM_MINI
+static a_bool_t
+_is_program_udf_rule_equal(a_uint32_t dev_id,
+		fal_tunnel_program_udf_t * udf1, fal_tunnel_program_udf_t * udf2)
+{
+	a_uint32_t idx;
+	if (udf1->field_flag == udf2->field_flag)
+	{
+		for (idx = 0; idx < TUNNEL_PROGRAM_UDF_NUM; idx++)
+		{
+			if((udf1->udf_val[idx] != udf2->udf_val[idx]) ||
+				(udf1->udf_mask[idx] != udf2->udf_mask[idx]))
+			{ /* not equal */
+				return A_FALSE;
+			}
+		}
+		/* equal */
+		return A_TRUE;
+	}
+	else
+	{ /* not equal */
+		return A_FALSE;
+	}
+}
+
+static a_bool_t
+_is_program_udf_action_equal(a_uint32_t dev_id,
+		fal_tunnel_program_udf_t * udf1, fal_tunnel_program_udf_t * udf2)
+{
+	if (udf1->action_flag == udf2->action_flag &&
+		udf1->inner_hdr_type == udf2->inner_hdr_type &&
+		udf1->udf_hdr_len == udf2->udf_hdr_len)
+	{ /* equal */
+		return A_TRUE;
+	}
+	else
+	{ /* not equal */
+		return A_FALSE;
+	}
 }
 
 static sw_error_t
@@ -497,6 +500,7 @@ _set_program_udf_by_index(a_uint32_t dev_id,
 
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 adpt_appe_tunnel_program_entry_add(a_uint32_t dev_id,
@@ -742,6 +746,7 @@ adpt_appe_tunnel_program_cfg_get(a_uint32_t dev_id,
 	return SW_OK;
 }
 
+#ifndef IN_TUNNEL_PROGRAM_MINI
 sw_error_t
 adpt_appe_tunnel_program_udf_add(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf)
@@ -902,6 +907,7 @@ adpt_appe_tunnel_program_udf_getnext(a_uint32_t dev_id,
 {
 	return _adpt_appe_tunnel_program_udf_get(dev_id, type, udf, A_FALSE);
 }
+#endif
 
 sw_error_t adpt_appe_tunnel_program_init(a_uint32_t dev_id)
 {
@@ -912,7 +918,6 @@ sw_error_t adpt_appe_tunnel_program_init(a_uint32_t dev_id)
 	ADPT_NULL_POINT_CHECK(p_adpt_api);
 
 	p_adpt_api->adpt_tunnel_program_entry_add = adpt_appe_tunnel_program_entry_add;
-
 	p_adpt_api->adpt_tunnel_program_entry_del = adpt_appe_tunnel_program_entry_del;
 	p_adpt_api->adpt_tunnel_program_entry_getfirst =
 					adpt_appe_tunnel_program_entry_getfirst;
@@ -920,12 +925,15 @@ sw_error_t adpt_appe_tunnel_program_init(a_uint32_t dev_id)
 					adpt_appe_tunnel_program_entry_getnext;
 	p_adpt_api->adpt_tunnel_program_cfg_set = adpt_appe_tunnel_program_cfg_set;
 	p_adpt_api->adpt_tunnel_program_cfg_get = adpt_appe_tunnel_program_cfg_get;
+#ifndef IN_TUNNEL_PROGRAM_MINI
 	p_adpt_api->adpt_tunnel_program_udf_add = adpt_appe_tunnel_program_udf_add;
 	p_adpt_api->adpt_tunnel_program_udf_del = adpt_appe_tunnel_program_udf_del;
 	p_adpt_api->adpt_tunnel_program_udf_getfirst =
 					adpt_appe_tunnel_program_udf_getfirst;
 	p_adpt_api->adpt_tunnel_program_udf_getnext =
 					adpt_appe_tunnel_program_udf_getnext;
+#endif
+
 	return SW_OK;
 }
 

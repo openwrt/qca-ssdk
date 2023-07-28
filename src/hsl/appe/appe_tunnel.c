@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,6 +26,7 @@
 #include "appe_tunnel_reg.h"
 #include "appe_tunnel.h"
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_tpr_udf_ctrl_0_get(
 		a_uint32_t dev_id,
@@ -109,6 +110,7 @@ appe_tpr_udf_profile_offset_set(
 				index * TPR_UDF_PROFILE_OFFSET_INC,
 				value->val);
 }
+#endif
 
 sw_error_t
 appe_tl_tbl_op_get(
@@ -1239,6 +1241,7 @@ appe_eg_udp_entropy_ctrl_set(
 				value->val);
 }
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_ecn_profile_get(
 		a_uint32_t dev_id,
@@ -1260,6 +1263,7 @@ appe_ecn_profile_set(
 				NSS_PTX_CSR_BASE_ADDR + ECN_PROFILE_ADDRESS,
 				value->val);
 }
+#endif
 
 sw_error_t
 appe_eg_proto_mapping0_get(
@@ -1552,6 +1556,7 @@ appe_tl_port_vp_tbl_pre_ipo_profile_set(
 	return ret;
 }
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_tl_vlan_tbl_get(
 		a_uint32_t dev_id,
@@ -1711,3 +1716,4 @@ appe_ecn_map_mode2_1_set(
 				PRE_IPO_CSR_BASE_ADDR + ECN_MAP_MODE2_1_ADDRESS,
 				value->val);
 }
+#endif

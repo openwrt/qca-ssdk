@@ -112,6 +112,7 @@ union tpr_vxlan_gpe_cfg_u {
 	struct tpr_vxlan_gpe_cfg bf;
 };
 
+#ifndef IN_VXLAN_MINI
 /*[register] TPR_VXLAN_GPE_PROT_CFG*/
 #define TPR_VXLAN_GPE_PROT_CFG
 #define TPR_VXLAN_GPE_PROT_CFG_ADDRESS 0x4ac
@@ -146,6 +147,7 @@ union tpr_vxlan_gpe_prot_cfg_u {
 	a_uint32_t val;
 	struct tpr_vxlan_gpe_prot_cfg bf;
 };
+#endif
 
 #endif
 #endif

@@ -23,9 +23,10 @@
 #include "adpt.h"
 #include "appe_vxlan_reg.h"
 #include "appe_vxlan.h"
+#ifdef IN_GENEVE
 #include "appe_geneve_reg.h"
 #include "appe_geneve.h"
-
+#endif
 #define ADPT_VXLAN_ENTRY_MAX_NUM 6
 
 sw_error_t
@@ -84,7 +85,7 @@ a_bool_t
 adpt_appe_is_udp_entry_inuse(a_uint32_t dev_id, a_uint32_t index)
 {
 	sw_error_t rv = SW_OK;
-	a_uint32_t port_bitmap, port_bitmap0, port_bitmap1, port_bitmap2;
+	a_uint32_t port_bitmap, port_bitmap0, port_bitmap1, port_bitmap2 = 0;
 
 	rv = appe_tpr_vxlan_cfg_udp_port_map_get(dev_id, &port_bitmap0);
 	if (rv != SW_OK)
@@ -97,13 +98,13 @@ adpt_appe_is_udp_entry_inuse(a_uint32_t dev_id, a_uint32_t index)
 	{
 		port_bitmap1 = 0;
 	}
-
+#ifdef IN_GENEVE
 	rv = appe_tpr_geneve_cfg_udp_port_map_get(dev_id, &port_bitmap2);
 	if (rv != SW_OK)
 	{
 		port_bitmap2 = 0;
 	}
-
+#endif
 	port_bitmap = port_bitmap0 | port_bitmap1 | port_bitmap2;
 	return SW_IS_PBMP_MEMBER(port_bitmap, index);
 }
@@ -300,6 +301,7 @@ adpt_appe_vxlan_entry_getnext(a_uint32_t dev_id, fal_vxlan_type_t type,
 	return SW_OK;
 }
 
+#ifndef IN_VXLAN_MINI
 sw_error_t
 adpt_appe_vxlan_gpe_proto_cfg_set(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t * proto_cfg)
 {
@@ -332,6 +334,8 @@ adpt_appe_vxlan_gpe_proto_cfg_get(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t *
 
 	return SW_OK;
 }
+#endif
+
 sw_error_t adpt_appe_vxlan_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -344,8 +348,10 @@ sw_error_t adpt_appe_vxlan_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_vxlan_entry_del = adpt_appe_vxlan_entry_del;
 	p_adpt_api->adpt_vxlan_entry_getfirst = adpt_appe_vxlan_entry_getfirst;
 	p_adpt_api->adpt_vxlan_entry_getnext = adpt_appe_vxlan_entry_getnext;
+#ifndef IN_VXLAN_MINI
 	p_adpt_api->adpt_vxlan_gpe_proto_cfg_set = adpt_appe_vxlan_gpe_proto_cfg_set;
 	p_adpt_api->adpt_vxlan_gpe_proto_cfg_get = adpt_appe_vxlan_gpe_proto_cfg_get;
+#endif
 
 	return SW_OK;
 }

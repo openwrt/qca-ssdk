@@ -1337,7 +1337,9 @@ struct sub_cmd_des_t g_ctrlpkt_des[] =
 struct sub_cmd_des_t g_vxlan_des[] =
 {
     {"entry", "set", SW_API_VXLAN_ENTRY_ADD, NULL},
+#ifndef IN_VXLAN_MINI
     {"gpeprotocfg", "set", SW_API_VXLAN_GPE_PROTO_CFG_SET, NULL},
+#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif
@@ -1357,7 +1359,9 @@ struct sub_cmd_des_t g_tunnelprogram_des[] =
 {
     {"entry", "set", SW_API_TUNNEL_PROGRAM_ENTRY_ADD, NULL},
     {"cfg", "set", SW_API_TUNNEL_PROGRAM_CFG_SET, NULL},
+#ifndef IN_TUNNEL_PROGRAM_MINI
     {"udf", "set", SW_API_TUNNEL_PROGRAM_UDF_ADD, NULL},
+#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif
@@ -1366,20 +1370,26 @@ struct sub_cmd_des_t g_tunnelprogram_des[] =
 #ifdef IN_TUNNEL
 struct sub_cmd_des_t g_tunnel_des[] =
 {
+#ifndef IN_TUNNEL_MINI
     {"udfprofileEntry", "set", SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, NULL},
     {"udfprofilecfg", "set", SW_API_TUNNEL_UDF_PROFILE_CFG_SET, NULL},
+#endif
     {"Globalcfg", "set", SW_API_TUNNEL_GLOBAL_CFG_SET, NULL},
     {"Portintf", "set", SW_API_TUNNEL_PORT_INTF_SET, NULL},
     {"Intf", "set", SW_API_TUNNEL_INTF_SET, NULL},
+#ifndef IN_TUNNEL_MINI
     {"Vlanintf", "set", SW_API_TUNNEL_VLAN_INTF_ADD, NULL},
+#endif
     {"Encaprule", "set", SW_API_TUNNEL_ENCAP_RULE_ENTRY_SET, NULL},
     {"Encapintftunnelid", "set", SW_API_TUNNEL_ENCAP_INTF_TUNNELID_SET, NULL},
     {"Encapporttunnelid", "set", SW_API_TUNNEL_ENCAP_PORT_TUNNELID_SET, NULL},
     {"Decapentry", "set", SW_API_TUNNEL_DECAP_ENTRY_ADD, NULL},
     {"Encapentry", "set", SW_API_TUNNEL_ENCAP_ENTRY_ADD, NULL},
     {"Encapheaderctrl", "set", SW_API_TUNNEL_ENCAP_HEADER_CTRL_SET, NULL},
+#ifndef IN_TUNNEL_MINI
     {"Encapecn", "set", SW_API_TUNNEL_ENCAP_ECN_MODE_SET, NULL},
     {"Decapecn", "set", SW_API_TUNNEL_DECAP_ECN_MODE_SET, NULL},
+#endif
     {"Decapexpfmtctrl", "set", SW_API_TUNNEL_EXP_DECAP_SET, NULL},
     {"Decapkey", "set", SW_API_TUNNEL_DECAP_KEY_SET, NULL},
     {NULL, NULL, 0, NULL},/*end of desc*/

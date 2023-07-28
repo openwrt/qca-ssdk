@@ -124,6 +124,7 @@ sw_error_t
 fal_tunnel_program_cfg_get(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_cfg_t * cfg);
 
+#ifndef IN_TUNNEL_PROGRAM_MINI
 sw_error_t
 fal_tunnel_program_udf_add(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
@@ -139,6 +140,7 @@ fal_tunnel_program_udf_getfirst(a_uint32_t dev_id,
 sw_error_t
 fal_tunnel_program_udf_getnext(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf);
+#endif
 
 #ifdef __cplusplus
 }

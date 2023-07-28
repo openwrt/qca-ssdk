@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -194,6 +194,7 @@ appe_tpr_program_udf_ctrl_set(
 				value->val);
 }
 
+#ifndef IN_TUNNEL_PROGRAM_MINI
 sw_error_t
 appe_tpr_program_udf_data_0_get(
 		a_uint32_t dev_id,
@@ -333,6 +334,7 @@ appe_tpr_program_udf_action_set(
 				index * TPR_PROGRAM_UDF_ACTION_INC,
 				value->val);
 }
+#endif
 
 #if 0
 sw_error_t

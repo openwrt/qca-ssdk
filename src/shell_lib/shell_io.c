@@ -859,13 +859,11 @@ static sw_data_type_t sw_data_type[] =
 #ifdef IN_CTRLPKT
     SW_TYPE_DEF(SW_CTRLPKT_PROFILE, (param_check_t)cmd_data_check_ctrlpkt_appprofile, NULL),
 #endif
-#ifdef IN_TUNNEL
-    SW_TYPE_DEF(SW_TUNNEL_UDP_ENTRY, (param_check_t)cmd_data_check_tunnel_udp_entry, NULL),
-    SW_TYPE_DEF(SW_TUNNEL_UDF_TYPE, (param_check_t)cmd_data_check_tunnel_udf_type, NULL),
-#endif
 #ifdef IN_VXLAN
     SW_TYPE_DEF(SW_VXLAN_TYPE, (param_check_t)cmd_data_check_vxlan_type, NULL),
+#ifndef IN_VXLAN_MINI
     SW_TYPE_DEF(SW_VXLAN_GPE_PROTO, (param_check_t)cmd_data_check_vxlan_gpe_proto, NULL),
+#endif
 #endif
 #ifdef IN_TUNNEL_PROGRAM
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_TYPE, (param_check_t)cmd_data_check_tunnel_program_type, NULL),
@@ -873,8 +871,11 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_TUNNEL_PROGRAM_CFG, (param_check_t)cmd_data_check_tunnel_program_cfg, NULL),
 #endif
 #ifdef IN_TUNNEL
+	SW_TYPE_DEF(SW_TUNNEL_UDP_ENTRY, (param_check_t)cmd_data_check_tunnel_udp_entry, NULL),
+#ifndef IN_TUNNEL_MINI
     SW_TYPE_DEF(SW_TUNNEL_UDF_TYPE,
 		    (param_check_t)cmd_data_check_tunnel_udf_type, NULL),
+#endif
     SW_TYPE_DEF(SW_TUNNEL_INTF,
 		    (param_check_t)cmd_data_check_tunnel_intf, NULL),
     SW_TYPE_DEF(SW_TUNNEL_PORT_INTF,
@@ -883,8 +884,10 @@ static sw_data_type_t sw_data_type[] =
 		    (param_check_t)cmd_data_check_tunnel_encap_rule_entry, NULL),
     SW_TYPE_DEF(SW_TUNNEL_TUNNEL_ID,
 		    (param_check_t)cmd_data_check_tunnel_encap_tunnelid, NULL),
+#ifndef IN_TUNNEL_MINI
     SW_TYPE_DEF(SW_TUNNEL_VLAN_INTF,
 		    (param_check_t)cmd_data_check_tunnel_vlan_intf, NULL),
+#endif
     SW_TYPE_DEF(SW_TUNNEL_DECAP_ENTRY,
 		    (param_check_t)cmd_data_check_tunnel_decap_entry, NULL),
     SW_TYPE_DEF(SW_TUNNEL_ENCAP_ENTRY,
@@ -893,6 +896,7 @@ static sw_data_type_t sw_data_type[] =
 		    (param_check_t)cmd_data_check_tunnel_global_cfg, NULL),
     SW_TYPE_DEF(SW_TUNNEL_ENCAP_HEADER_CTRL,
 		    (param_check_t)cmd_data_check_tunnel_encap_header_ctrl, NULL),
+#ifndef IN_TUNNEL_MINI
     SW_TYPE_DEF(SW_TUNNEL_DECAP_ECN_RULE,
 		    (param_check_t)cmd_data_check_decap_ecn_rule, NULL),
     SW_TYPE_DEF(SW_TUNNEL_DECAP_ECN_ACTION,
@@ -901,6 +905,7 @@ static sw_data_type_t sw_data_type[] =
 		    (param_check_t)cmd_data_check_encap_ecn_rule, NULL),
     SW_TYPE_DEF(SW_TUNNEL_ECN_VAL,
 		    (param_check_t)cmd_data_check_ecn_val, NULL),
+#endif
     SW_TYPE_DEF(SW_TUNNEL_TYPE,
 		    cmd_data_check_tunnel_type, NULL),
     SW_TYPE_DEF(SW_TUNNEL_KEY,
@@ -11523,6 +11528,7 @@ cmd_data_check_vxlan_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
                     arg_val, sizeof(*arg_val));
 }
 
+#ifndef IN_VXLAN_MINI
 sw_error_t
 cmd_data_check_vxlan_gpe_proto(char * cmd_str, void * val, a_uint32_t size)
 {
@@ -11553,6 +11559,7 @@ cmd_data_check_vxlan_gpe_proto(char * cmd_str, void * val, a_uint32_t size)
     *(fal_vxlan_gpe_proto_cfg_t *) val = proto;
     return SW_OK;
 }
+#endif
 #endif
 
 #ifdef IN_TUNNEL_PROGRAM
@@ -11731,6 +11738,7 @@ cmd_data_check_tunnel_program_cfg(char * cmd_str, void * val, a_uint32_t size)
 #endif
 
 #ifdef IN_TUNNEL
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
 {
@@ -11738,6 +11746,7 @@ cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t s
     return cmd_data_check_attr("tunnel_udf_type", cmd_str,
                     arg_val, sizeof(*arg_val));
 }
+#endif
 
 sw_error_t
 cmd_data_check_tunnel_intf(char *cmd_str, fal_tunnel_intf_t *arg_val, a_uint32_t size)
@@ -12010,6 +12019,7 @@ cmd_data_check_vlantag(char *cmd_str, a_uint8_t *arg_val, a_uint32_t size)
 	return SW_OK;
 }
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 cmd_data_check_tunnel_vlan_intf(char *cmd_str, fal_tunnel_vlan_intf_t *arg_val, a_uint32_t size)
 {
@@ -12090,6 +12100,7 @@ cmd_data_check_tunnel_vlan_intf(char *cmd_str, fal_tunnel_vlan_intf_t *arg_val, 
 	*(fal_tunnel_vlan_intf_t *)arg_val = entry;
 	return rv;
 }
+#endif
 
 sw_error_t
 cmd_data_check_tag_format(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
@@ -12914,6 +12925,7 @@ cmd_data_check_tunnel_global_cfg(char *cmd_str, fal_tunnel_global_cfg_t *arg_val
 	return SW_OK;
 }
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 cmd_data_check_encap_ecn_rule(char *cmd_str, fal_tunnel_encap_ecn_t *arg_val, a_uint32_t size)
 {
@@ -13011,6 +13023,7 @@ cmd_data_check_decap_ecn_action(char *cmd_str,
 
 	return SW_OK;
 }
+#endif
 
 sw_error_t
 cmd_data_check_tunnel_type(char *cmd_str, fal_tunnel_type_t *arg_val, a_uint32_t size)

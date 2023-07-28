@@ -459,6 +459,12 @@ ifneq (, $(filter MPPE APPE , $(CHIP_TYPE)))
 	IN_GENEVE=TRUE
 	IN_TUNNEL_PROGRAM=TRUE
 	IN_MAPT=TRUE
+	ifeq ($(MINI_SSDK), enable)
+		IN_TUNNEL_MINI=TRUE
+		IN_VXLAN_MINI=TRUE
+		IN_GENEVE=FALSE
+		IN_TUNNEL_PROGRAM_MINI=TRUE
+	endif
 endif
 
 ifneq (, $(filter MPPE , $(CHIP_TYPE)))

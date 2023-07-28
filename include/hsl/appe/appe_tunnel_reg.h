@@ -25,6 +25,7 @@
 #ifndef APPE_TUNNEL_REG_H
 #define APPE_TUNNEL_REG_H
 
+#ifndef IN_TUNNEL_MINI
 /*[register] TPR_UDF_CTRL_0*/
 #define TPR_UDF_CTRL_0
 #define TPR_UDF_CTRL_0_ADDRESS 0x400
@@ -192,6 +193,7 @@ union tpr_udf_profile_offset_u {
 	a_uint32_t val;
 	struct tpr_udf_profile_offset bf;
 };
+#endif
 
 /*[register] TL_TBL_OP*/
 #define TL_TBL_OP
@@ -2083,6 +2085,7 @@ union eg_udp_entropy_ctrl_u {
 	struct eg_udp_entropy_ctrl bf;
 };
 
+#ifndef IN_TUNNEL_MINI
 /*[register] ECN_PROFILE*/
 #define ECN_PROFILE
 #define ECN_PROFILE_ADDRESS 0x60
@@ -2117,6 +2120,7 @@ union ecn_profile_u {
 	a_uint32_t val;
 	struct ecn_profile bf;
 };
+#endif
 
 /*[register] EG_PROTO_MAPPING0*/
 #define EG_PROTO_MAPPING0
@@ -2715,6 +2719,7 @@ union tl_port_vp_tbl_u {
 	struct tl_port_vp_tbl bf;
 };
 
+#ifndef IN_TUNNEL_MINI
 /*[table] TL_VLAN_TBL*/
 #define TL_VLAN_TBL
 #define TL_VLAN_TBL_ADDRESS 0x1000
@@ -2985,5 +2990,6 @@ union ecn_map_mode2_1_u {
 	a_uint32_t val;
 	struct ecn_map_mode2_1 bf;
 };
+#endif
 #endif
 #endif

@@ -53,11 +53,13 @@ fal_vxlan_entry_getfirst(a_uint32_t dev_id, fal_vxlan_type_t type, fal_tunnel_ud
 sw_error_t
 fal_vxlan_entry_getnext(a_uint32_t dev_id, fal_vxlan_type_t type, fal_tunnel_udp_entry_t * entry);
 
+#ifndef IN_VXLAN_MINI
 sw_error_t
 fal_vxlan_gpe_proto_cfg_set(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t * proto_cfg);
 
 sw_error_t
 fal_vxlan_gpe_proto_cfg_get(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t * proto_cfg);
+#endif
 
 #ifdef __cplusplus
 }

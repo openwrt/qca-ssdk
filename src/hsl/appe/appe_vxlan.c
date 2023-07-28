@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -98,7 +98,7 @@ appe_tpr_vxlan_gpe_cfg_set(
 				value->val);
 }
 
-
+#ifndef IN_VXLAN_MINI
 sw_error_t
 appe_tpr_vxlan_gpe_prot_cfg_get(
 		a_uint32_t dev_id,
@@ -120,6 +120,7 @@ appe_tpr_vxlan_gpe_prot_cfg_set(
 				TUNNEL_PARSER_BASE_ADDR + TPR_VXLAN_GPE_PROT_CFG_ADDRESS,
 				value->val);
 }
+#endif
 
 #if 0
 sw_error_t

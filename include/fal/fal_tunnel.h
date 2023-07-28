@@ -638,6 +638,8 @@ fal_tunnel_port_intf_set(a_uint32_t dev_id,
 sw_error_t
 fal_tunnel_port_intf_get(a_uint32_t dev_id,
 		fal_port_t port_id, fal_tunnel_port_intf_t *port_cfg);
+
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 fal_tunnel_vlan_intf_add(a_uint32_t dev_id,
 		fal_tunnel_vlan_intf_t *vlan_cfg);
@@ -650,6 +652,8 @@ fal_tunnel_vlan_intf_getnext(a_uint32_t dev_id,
 sw_error_t
 fal_tunnel_vlan_intf_del(a_uint32_t dev_id,
 		fal_tunnel_vlan_intf_t *vlan_cfg);
+#endif
+
 sw_error_t
 fal_tunnel_intf_set(a_uint32_t dev_id,
 		a_uint32_t l3_if, fal_tunnel_intf_t *intf_t);
@@ -689,6 +693,8 @@ fal_tunnel_encap_rule_entry_get(a_uint32_t dev_id, a_uint32_t rule_id,
 sw_error_t
 fal_tunnel_encap_rule_entry_del(a_uint32_t dev_id, a_uint32_t rule_id,
 		fal_tunnel_encap_rule_t *rule_entry);
+
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 fal_tunnel_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
 		fal_tunnel_udf_profile_entry_t * entry);
@@ -707,6 +713,7 @@ fal_tunnel_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
 sw_error_t
 fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
 		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
+#endif
 
 sw_error_t
 fal_tunnel_encap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl_t *header_ctrl);
@@ -714,6 +721,7 @@ fal_tunnel_encap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl
 sw_error_t
 fal_tunnel_encap_header_ctrl_get(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl_t *header_ctrl);
 
+#ifndef IN_TUNNEL_MINI
 sw_error_t
 fal_tunnel_decap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_decap_ecn_rule_t *ecn_rule,
 		fal_tunnel_decap_ecn_action_t *ecn_action);
@@ -729,6 +737,7 @@ fal_tunnel_encap_ecn_mode_set(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rul
 sw_error_t
 fal_tunnel_encap_ecn_mode_get(a_uint32_t dev_id, fal_tunnel_encap_ecn_t *ecn_rule,
 		fal_tunnel_ecn_val_t *ecn_value);
+#endif
 
 sw_error_t
 fal_tunnel_exp_decap_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);

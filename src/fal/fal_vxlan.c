@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -84,6 +85,7 @@ _fal_vxlan_entry_getnext(a_uint32_t dev_id, fal_vxlan_type_t type, fal_tunnel_ud
     return rv;
 }
 
+#ifndef IN_VXLAN_MINI
 sw_error_t
 _fal_vxlan_gpe_proto_cfg_set(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t * proto_cfg)
 {
@@ -113,6 +115,7 @@ _fal_vxlan_gpe_proto_cfg_get(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t * prot
     rv = p_api->adpt_vxlan_gpe_proto_cfg_get(dev_id, proto_cfg);
     return rv;
 }
+#endif
 
 /**
  * @brief Add one tunnel udp entry for vxlan or vxlan-gpe
@@ -186,6 +189,7 @@ fal_vxlan_entry_getnext(a_uint32_t dev_id, fal_vxlan_type_t type, fal_tunnel_udp
     return rv;
 }
 
+#ifndef IN_VXLAN_MINI
 /**
  * @brief Set the vxlan-gpe protocol configurations
  * @param[in] dev_id device id
@@ -219,10 +223,13 @@ fal_vxlan_gpe_proto_cfg_get(a_uint32_t dev_id, fal_vxlan_gpe_proto_cfg_t * proto
     FAL_API_UNLOCK;
     return rv;
 }
+#endif
 
 EXPORT_SYMBOL(fal_vxlan_entry_add);
 EXPORT_SYMBOL(fal_vxlan_entry_del);
 EXPORT_SYMBOL(fal_vxlan_entry_getfirst);
 EXPORT_SYMBOL(fal_vxlan_entry_getnext);
+#ifndef IN_VXLAN_MINI
 EXPORT_SYMBOL(fal_vxlan_gpe_proto_cfg_set);
 EXPORT_SYMBOL(fal_vxlan_gpe_proto_cfg_get);
+#endif

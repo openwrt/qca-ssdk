@@ -28,7 +28,6 @@
 #include "adpt.h"
 #include "adpt_hppe.h"
 
-#ifndef IN_BM_MINI
 sw_error_t
 adpt_hppe_port_bufgroup_map_get(a_uint32_t dev_id, fal_port_t port,
 			a_uint8_t *group)
@@ -136,7 +135,6 @@ adpt_hppe_port_bm_ctrl_get(a_uint32_t dev_id, fal_port_t port, a_bool_t *enable)
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_hppe_bm_bufgroup_buffer_set(a_uint32_t dev_id, a_uint8_t group,
@@ -199,27 +197,6 @@ adpt_hppe_bm_port_static_thresh_get(a_uint32_t dev_id, fal_port_t port,
 
 	return SW_OK;
 }
-#endif
-
-sw_error_t
-adpt_hppe_bm_port_reserved_buffer_set(a_uint32_t dev_id, fal_port_t port,
-			a_uint16_t prealloc_buff, a_uint16_t react_buff)
-{
-	sw_error_t rv = SW_OK;
-	union port_fc_cfg_u port_fc_cfg;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	memset(&port_fc_cfg, 0, sizeof(port_fc_cfg));
-
-	rv = hppe_port_fc_cfg_get(dev_id, port, &port_fc_cfg);
-	if (rv)
-		return rv;
-
-	port_fc_cfg.bf.port_pre_alloc = prealloc_buff;
-	port_fc_cfg.bf.port_react_limit = react_buff;
-
-	return hppe_port_fc_cfg_set(dev_id, port, &port_fc_cfg);
-}
 
 sw_error_t
 adpt_hppe_bm_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port,
@@ -242,6 +219,27 @@ adpt_hppe_bm_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port,
 	port_fc_cfg.bf.port_shared_dynamic = 0;
 
 	return hppe_port_fc_cfg_set(dev_id, port, &port_fc_cfg);;
+}
+#endif
+
+sw_error_t
+adpt_hppe_bm_port_reserved_buffer_set(a_uint32_t dev_id, fal_port_t port,
+			a_uint16_t prealloc_buff, a_uint16_t react_buff)
+{
+	sw_error_t rv = SW_OK;
+	union port_fc_cfg_u port_fc_cfg;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	memset(&port_fc_cfg, 0, sizeof(port_fc_cfg));
+
+	rv = hppe_port_fc_cfg_get(dev_id, port, &port_fc_cfg);
+	if (rv)
+		return rv;
+
+	port_fc_cfg.bf.port_pre_alloc = prealloc_buff;
+	port_fc_cfg.bf.port_react_limit = react_buff;
+
+	return hppe_port_fc_cfg_set(dev_id, port, &port_fc_cfg);
 }
 
 sw_error_t
@@ -310,7 +308,6 @@ adpt_hppe_port_tdm_tick_cfg_set(a_uint32_t dev_id, a_uint32_t tick_index,
 	return hppe_tdm_cfg_set(dev_id, tick_index, &tdm_cfg);
 }
 
-#ifndef IN_BM_MINI
 sw_error_t
 adpt_hppe_bm_port_counter_get(a_uint32_t dev_id, fal_port_t port,
 			fal_bm_port_counter_t *counter)
@@ -349,7 +346,6 @@ adpt_hppe_bm_port_counter_get(a_uint32_t dev_id, fal_port_t port,
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t adpt_hppe_bm_init(a_uint32_t dev_id)
 {
@@ -360,19 +356,19 @@ sw_error_t adpt_hppe_bm_init(a_uint32_t dev_id)
 	if(p_adpt_api == NULL)
 		return SW_FAIL;
 
-#ifndef IN_BM_MINI
 	p_adpt_api->adpt_port_bufgroup_map_get = adpt_hppe_port_bufgroup_map_get;
 	p_adpt_api->adpt_bm_port_reserved_buffer_get = adpt_hppe_bm_port_reserved_buffer_get;
 	p_adpt_api->adpt_bm_bufgroup_buffer_get = adpt_hppe_bm_bufgroup_buffer_get;
 	p_adpt_api->adpt_bm_port_dynamic_thresh_get = adpt_hppe_bm_port_dynamic_thresh_get;
 	p_adpt_api->adpt_port_bm_ctrl_get = adpt_hppe_port_bm_ctrl_get;
+#ifndef IN_BM_MINI
 	p_adpt_api->adpt_bm_port_static_thresh_get = adpt_hppe_bm_port_static_thresh_get;
-	p_adpt_api->adpt_bm_port_counter_get = adpt_hppe_bm_port_counter_get;
+	p_adpt_api->adpt_bm_port_static_thresh_set = adpt_hppe_bm_port_static_thresh_set;
 #endif
+	p_adpt_api->adpt_bm_port_counter_get = adpt_hppe_bm_port_counter_get;
 	p_adpt_api->adpt_bm_bufgroup_buffer_set = adpt_hppe_bm_bufgroup_buffer_set;
 	p_adpt_api->adpt_port_bufgroup_map_set = adpt_hppe_port_bufgroup_map_set;
 	p_adpt_api->adpt_bm_port_reserved_buffer_set = adpt_hppe_bm_port_reserved_buffer_set;
-	p_adpt_api->adpt_bm_port_static_thresh_set = adpt_hppe_bm_port_static_thresh_set;
 	p_adpt_api->adpt_bm_port_dynamic_thresh_set = adpt_hppe_bm_port_dynamic_thresh_set;
 	p_adpt_api->adpt_port_bm_ctrl_set = adpt_hppe_port_bm_ctrl_set;
 	p_adpt_api->adpt_port_tdm_ctrl_set = adpt_hppe_port_tdm_ctrl_set;

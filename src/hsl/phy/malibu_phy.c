@@ -21,6 +21,7 @@
 #include "hsl.h"
 #include "malibu_phy.h"
 #include "hsl_phy.h"
+#include "qcaphy_common.h"
 #include "ssdk_plat.h"
 
 static a_uint32_t first_phy_addr = MAX_PHY_ADDR;
@@ -171,7 +172,7 @@ malibu_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (phy_addr == COMBO_PHY_ID) {
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
-	return hsl_phy_get_speed(dev_id, phy_addr, speed);
+	return qcaphy_get_speed(dev_id, phy_addr, speed);
 }
 
 /******************************************************************************
@@ -186,7 +187,7 @@ malibu_phy_get_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (phy_addr == COMBO_PHY_ID) {
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
-	return hsl_phy_get_duplex(dev_id, phy_addr, duplex);
+	return qcaphy_get_duplex(dev_id, phy_addr, duplex);
 }
 
 static a_bool_t
@@ -211,7 +212,7 @@ sw_error_t malibu_phy_reset(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	if (phy_addr == COMBO_PHY_ID)
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
-	return hsl_phy_sw_reset(dev_id, phy_addr);
+	return qcaphy_sw_reset(dev_id, phy_addr);
 }
 #endif
 /******************************************************************************
@@ -298,7 +299,7 @@ malibu_phy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
 	if(!malibu_phy_is_copper(dev_id, phy_addr))
 		return SW_NOT_SUPPORTED;
 
-	return hsl_phy_set_8023az(dev_id, phy_addr, enable);
+	return qcaphy_set_8023az(dev_id, phy_addr, enable);
 }
 
 /******************************************************************************
@@ -313,7 +314,7 @@ malibu_phy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable)
 	if(!malibu_phy_is_copper(dev_id, phy_addr))
 		return SW_NOT_SUPPORTED;
 
-	return hsl_phy_get_8023az(dev_id, phy_addr, enable);
+	return qcaphy_get_8023az(dev_id, phy_addr, enable);
 }
 
 /******************************************************************************
@@ -489,7 +490,7 @@ malibu_phy_set_mdix(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if(!malibu_phy_is_copper(dev_id, phy_addr))
 		return SW_NOT_SUPPORTED;
 
-	return hsl_phy_set_mdix(dev_id, phy_addr, mode);
+	return qcaphy_set_mdix(dev_id, phy_addr, mode);
 }
 
 /******************************************************************************
@@ -505,7 +506,7 @@ malibu_phy_get_mdix(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if(!malibu_phy_is_copper(dev_id, phy_addr))
 		return SW_NOT_SUPPORTED;
 
-	return hsl_phy_get_mdix(dev_id, phy_addr, mode);
+	return qcaphy_get_mdix(dev_id, phy_addr, mode);
 }
 
 /******************************************************************************
@@ -525,7 +526,7 @@ malibu_phy_get_mdix_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
 	}
 
-	return hsl_phy_get_mdix_status(dev_id, phy_addr, mode);
+	return qcaphy_get_mdix_status(dev_id, phy_addr, mode);
 }
 
 /******************************************************************************
@@ -558,7 +559,7 @@ malibu_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 		}
 	}
 
-	return hsl_phy_set_local_loopback(dev_id, phy_addr, enable);
+	return qcaphy_set_local_loopback(dev_id, phy_addr, enable);
 }
 
 /******************************************************************************
@@ -575,7 +576,7 @@ malibu_phy_get_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
 
-	return hsl_phy_get_local_loopback(dev_id, phy_addr, enable);
+	return qcaphy_get_local_loopback(dev_id, phy_addr, enable);
 }
 
 /******************************************************************************
@@ -882,13 +883,13 @@ sw_error_t malibu_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_addr)
 
 	if (phy_addr == COMBO_PHY_ID) {
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_SGBX_PAGES);
-		rv = hsl_phy_poweroff(dev_id, phy_addr);
+		rv = qcaphy_poweroff(dev_id, phy_addr);
 		PHY_RTN_ON_ERROR(rv);
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
-		rv = hsl_phy_poweroff(dev_id, phy_addr);
+		rv = qcaphy_poweroff(dev_id, phy_addr);
 		PHY_RTN_ON_ERROR(rv);
 	} else {
-		rv = hsl_phy_poweroff(dev_id, phy_addr);
+		rv = qcaphy_poweroff(dev_id, phy_addr);
 		PHY_RTN_ON_ERROR(rv);
 	}
 
@@ -907,13 +908,13 @@ sw_error_t malibu_phy_poweron(a_uint32_t dev_id, a_uint32_t phy_addr)
 
 	if (phy_addr == COMBO_PHY_ID) {
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_SGBX_PAGES);
-		rv = hsl_phy_poweron(dev_id, phy_addr);
+		rv = qcaphy_poweron(dev_id, phy_addr);
 		PHY_RTN_ON_ERROR(rv);
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
-		rv = hsl_phy_poweron(dev_id, phy_addr);
+		rv = qcaphy_poweron(dev_id, phy_addr);
 		PHY_RTN_ON_ERROR(rv);
 	} else {
-		rv = hsl_phy_poweron(dev_id, phy_addr);
+		rv = qcaphy_poweron(dev_id, phy_addr);
 		PHY_RTN_ON_ERROR(rv);
 	}
 
@@ -934,7 +935,7 @@ a_bool_t malibu_phy_get_link_status(a_uint32_t dev_id, a_uint32_t phy_addr)
 	if (phy_addr == COMBO_PHY_ID)
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 
-	return hsl_phy_get_link_status(dev_id, phy_addr);
+	return qcaphy_get_link_status(dev_id, phy_addr);
 }
 
 /******************************************************************************
@@ -976,7 +977,7 @@ malibu_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 		}
 	}
 
-	return hsl_phy_set_autoneg_adv(dev_id, phy_addr, autoneg);
+	return qcaphy_set_autoneg_adv(dev_id, phy_addr, autoneg);
 }
 
 /******************************************************************************
@@ -1017,7 +1018,7 @@ malibu_phy_get_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 		}
 	}
 
-	return hsl_phy_get_autoneg_adv(dev_id, phy_addr, autoneg);
+	return qcaphy_get_autoneg_adv(dev_id, phy_addr, autoneg);
 }
 
 /******************************************************************************
@@ -1034,7 +1035,7 @@ a_bool_t malibu_phy_autoneg_status(a_uint32_t dev_id, a_uint32_t phy_addr)
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
 
-	return hsl_phy_autoneg_status(dev_id, phy_addr);
+	return qcaphy_autoneg_status(dev_id, phy_addr);
 }
 
 /******************************************************************************
@@ -1050,7 +1051,7 @@ sw_error_t malibu_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
 
-	return hsl_phy_autoneg_restart(dev_id, phy_addr);
+	return qcaphy_autoneg_restart(dev_id, phy_addr);
 }
 
 /******************************************************************************
@@ -1066,7 +1067,7 @@ sw_error_t malibu_phy_enable_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
 
-	return hsl_phy_autoneg_enable(dev_id, phy_addr);
+	return qcaphy_autoneg_enable(dev_id, phy_addr);
 }
 
 /******************************************************************************
@@ -1085,7 +1086,7 @@ malibu_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
 	}
 
-	return hsl_phy_set_speed(dev_id, phy_addr, speed);
+	return qcaphy_set_speed(dev_id, phy_addr, speed);
 }
 
 /******************************************************************************
@@ -1129,7 +1130,7 @@ malibu_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
 	}
 
-	return hsl_phy_set_duplex(dev_id, phy_addr, duplex);
+	return qcaphy_set_duplex(dev_id, phy_addr, duplex);
 }
 
 #ifndef IN_PORTCONTROL_MINI
@@ -1694,7 +1695,7 @@ malibu_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (phy_addr == COMBO_PHY_ID) {
 		__phy_reg_pages_sel_by_active_medium(dev_id, phy_addr);
 	}
-	return hsl_phy_status_get(dev_id, phy_addr, phy_status);
+	return qcaphy_status_get(dev_id, phy_addr, phy_status);
 }
 /******************************************************************************
 *
@@ -1710,7 +1711,7 @@ malibu_phy_set_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 			return SW_NOT_SUPPORTED;
 	}
 
-	return hsl_phy_set_eee_adv(dev_id, phy_addr, adv);
+	return qcaphy_set_eee_adv(dev_id, phy_addr, adv);
 }
 
 /******************************************************************************
@@ -1727,7 +1728,7 @@ malibu_phy_get_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 			return SW_NOT_SUPPORTED;
 	}
 
-	return hsl_phy_get_eee_adv(dev_id, phy_addr, adv);
+	return qcaphy_get_eee_adv(dev_id, phy_addr, adv);
 }
 /******************************************************************************
 *
@@ -1743,7 +1744,7 @@ malibu_phy_get_eee_partner_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 			return SW_NOT_SUPPORTED;
 	}
 
-	return hsl_phy_get_eee_partner_adv(dev_id, phy_addr, adv);
+	return qcaphy_get_eee_partner_adv(dev_id, phy_addr, adv);
 }
 /******************************************************************************
 *
@@ -1759,7 +1760,7 @@ malibu_phy_get_eee_cap(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_NOT_SUPPORTED;
 	}
 
-	return hsl_phy_get_eee_cap(dev_id, phy_addr, cap);
+	return qcaphy_get_eee_cap(dev_id, phy_addr, cap);
 }
 /******************************************************************************
 *
@@ -1775,7 +1776,7 @@ malibu_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_NOT_SUPPORTED;
 	}
 
-	return hsl_phy_get_eee_status(dev_id, phy_addr, status);
+	return qcaphy_get_eee_status(dev_id, phy_addr, status);
 }
 /******************************************************************************
 *
@@ -1893,7 +1894,7 @@ static int malibu_phy_api_ops_init(void)
 #endif
 	malibu_phy_api_ops->phy_power_off = malibu_phy_poweroff;
 	malibu_phy_api_ops->phy_power_on = malibu_phy_poweron;
-	malibu_phy_api_ops->phy_id_get = hsl_phy_get_phy_id;
+	malibu_phy_api_ops->phy_id_get = qcaphy_get_phy_id;
 #ifndef IN_PORTCONTROL_MINI
 	malibu_phy_api_ops->phy_magic_frame_mac_set = malibu_phy_set_magic_frame_mac;
 	malibu_phy_api_ops->phy_magic_frame_mac_get = malibu_phy_get_magic_frame_mac;

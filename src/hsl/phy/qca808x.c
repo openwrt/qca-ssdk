@@ -50,7 +50,7 @@ static a_bool_t qca808x_sfp_present(struct phy_device *phydev)
 		SSDK_ERROR("pdata is null\n");
 		return A_FALSE;
 	}
-	rv = hsl_phy_get_phy_id(pdata->dev_id, pdata->phy_addr, &phy_id);
+	rv = qcaphy_get_phy_id(pdata->dev_id, pdata->phy_addr, &phy_id);
 	if(rv == SW_READ_ERROR) {
 		return A_FALSE;
 	}
@@ -540,7 +540,7 @@ static int qca808x_resume(struct phy_device *phydev)
 	dev_id = pdata->dev_id;
 	phy_id = pdata->phy_addr;
 
-	return hsl_phy_poweron(dev_id, phy_id);
+	return qcaphy_poweron(dev_id, phy_id);
 }
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
@@ -703,7 +703,7 @@ void qca808x_phydev_init(a_uint32_t dev_id, a_uint32_t port_id)
 	 * before the phy driver register */
 	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
 		a_uint32_t phy_id = QCA8081_PHY_V1_1;
-		hsl_phy_get_phy_id(dev_id, pdata->phy_addr, &phy_id);
+		qcaphy_get_phy_id(dev_id, pdata->phy_addr, &phy_id);
 		if(phy_id != QCA8081_PHY_V1_1 && phy_id != INVALID_PHY_ID) {
 			SSDK_ERROR("phy id 0x%x is not supported\n", phy_id);
 			return;

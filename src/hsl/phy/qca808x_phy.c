@@ -20,6 +20,7 @@
 #include "hsl_api.h"
 #include "hsl.h"
 #include "hsl_phy.h"
+#include "qcaphy_common.h"
 #include "ssdk_plat.h"
 #include "qca808x_phy.h"
 /*qca808x_end*/
@@ -101,7 +102,7 @@ qca808x_phy_id_check(a_uint32_t dev_id, a_uint32_t phy_addr,
 {
 	a_uint32_t phy_id_tmp = 0;
 
-	hsl_phy_get_phy_id (dev_id, phy_addr, &phy_id_tmp);
+	qcaphy_get_phy_id (dev_id, phy_addr, &phy_id_tmp);
 
 	if(phy_id_tmp == phy_id)
 		return A_TRUE;
@@ -139,7 +140,7 @@ qca808x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 {
 	a_uint16_t phy_data = 0;
 
-	hsl_phy_status_get(dev_id, phy_addr, phy_status);
+	qcaphy_status_get(dev_id, phy_addr, phy_status);
 	if (phy_status->link_status) {
 #if defined(MHT)
 		if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
@@ -288,7 +289,7 @@ qca808x_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 			/* set qca808x phy speed by pma control registers */
 			rv = qca808x_phy_set_force_speed(dev_id, phy_addr, speed);
 			PHY_RTN_ON_ERROR(rv);
-			rv = hsl_phy_get_duplex(dev_id, phy_addr, &cur_duplex);
+			rv = qcaphy_get_duplex(dev_id, phy_addr, &cur_duplex);
 			PHY_RTN_ON_ERROR(rv);
 
 			if (cur_duplex == FAL_FULL_DUPLEX) {
@@ -328,7 +329,7 @@ qca808x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 	sw_error_t rv = SW_OK;
 	a_uint32_t ability = 0;
 
-	rv = hsl_phy_get_speed(dev_id, phy_addr, &cur_speed);
+	rv = qcaphy_get_speed(dev_id, phy_addr, &cur_speed);
 	PHY_RTN_ON_ERROR(rv);
 
 	switch(cur_speed)
@@ -358,7 +359,7 @@ qca808x_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 			/* force the speed */
 			rv = qca808x_phy_set_force_speed(dev_id, phy_addr, cur_speed);
 			PHY_RTN_ON_ERROR(rv);
-			mask |= QCA808X_CTRL_AUTONEGOTIATION_ENABLE | HSL_CTRL_FULL_DUPLEX;
+			mask |= QCA808X_CTRL_AUTONEGOTIATION_ENABLE | QCA808X_CTRL_FULL_DUPLEX;
 			if (duplex == FAL_FULL_DUPLEX) {
 				phy_data |= QCA808X_CTRL_FULL_DUPLEX;
 			} else {
@@ -388,7 +389,7 @@ sw_error_t qca808x_phy_reset(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	sw_error_t rv = SW_OK;
 
-	rv = hsl_phy_sw_reset(dev_id, phy_addr);
+	rv = qcaphy_sw_reset(dev_id, phy_addr);
 	PHY_RTN_ON_ERROR(rv);
 	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8081_PHY_V1_1) &&
 		qca808x_phy_2500caps(dev_id, phy_addr))
@@ -550,7 +551,7 @@ qca808x_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 	if (enable == A_TRUE) {
 		/* get the link speed first, then force the corresponding
 		 * speed to enable local loopback */
-		rv = hsl_phy_get_speed(dev_id, phy_addr, &cur_speed);
+		rv = qcaphy_get_speed(dev_id, phy_addr, &cur_speed);
 		PHY_RTN_ON_ERROR(rv);
 		rv = qca808x_phy_set_force_speed(dev_id, phy_addr, cur_speed);
 		PHY_RTN_ON_ERROR(rv);
@@ -618,7 +619,7 @@ qca808x_phy_get_partner_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint16_t phy_data = 0;
 
 	*ability = 0;
-	rv = hsl_phy_lp_capability_get(dev_id, phy_addr, ability);
+	rv = qcaphy_lp_capability_get(dev_id, phy_addr, ability);
 	PHY_RTN_ON_ERROR(rv);
 	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE,
 		QCA808X_PHY_MMD7_NUM, QCA808X_PHY_MMD7_LP_2500M_ABILITY);
@@ -637,7 +638,7 @@ qca808x_phy_get_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
 	sw_error_t rv = SW_OK;
 
 	*ability = 0;
-	rv = hsl_phy_get_capability(dev_id, phy_addr, ability);
+	rv = qcaphy_get_capability(dev_id, phy_addr, ability);
 	PHY_RTN_ON_ERROR(rv);
 	if(qca808x_phy_2500caps(dev_id, phy_addr))
 	{
@@ -675,7 +676,7 @@ qca808x_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 	PHY_RTN_ON_ERROR(rv);
 	if((autoneg & ability) != autoneg)
 		return SW_NOT_SUPPORTED;
-	rv = hsl_phy_set_autoneg_adv(dev_id, phy_addr, autoneg);
+	rv = qcaphy_set_autoneg_adv(dev_id, phy_addr, autoneg);
 	PHY_RTN_ON_ERROR(rv);
 	if (qca808x_phy_2500caps(dev_id, phy_addr) == A_TRUE) {
 		rv = _qca808x_phy_set_autoneg_adv_ext(dev_id, phy_addr, autoneg);
@@ -714,7 +715,7 @@ qca808x_phy_get_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 	sw_error_t rv = SW_OK;
 
 	*autoneg = 0;
-	rv = hsl_phy_get_autoneg_adv(dev_id, phy_addr, autoneg);
+	rv = qcaphy_get_autoneg_adv(dev_id, phy_addr, autoneg);
 	PHY_RTN_ON_ERROR(rv);
 	if (qca808x_phy_2500caps(dev_id, phy_addr) == A_TRUE) {
 		rv = _qca808x_phy_get_autoneg_adv_ext(dev_id, phy_addr, &phy_data);
@@ -738,7 +739,7 @@ sw_error_t qca808x_phy_restart_autoneg(a_uint32_t dev_id, a_uint32_t phy_addr)
 	/*before autoneg restart, need to reset fifo to avoid garbage signal*/
 	rv = qca808x_phy_fifo_reset(dev_id, phy_addr, A_TRUE);
 	PHY_RTN_ON_ERROR(rv);
-	return hsl_phy_autoneg_restart(dev_id, phy_addr);
+	return qcaphy_autoneg_restart(dev_id, phy_addr);
 }
 /******************************************************************************
 *
@@ -759,7 +760,7 @@ sw_error_t qca808x_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_addr)
 		PHY_RTN_ON_ERROR (rv);
 	}
 #endif
-	rv = hsl_phy_poweroff(dev_id, phy_addr);
+	rv = qcaphy_poweroff(dev_id, phy_addr);
 
 	return rv;
 }
@@ -1681,7 +1682,7 @@ qca808x_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 		if (port_bmp & (0x1 << port_id))
 		{
 			phy_addr = qca_ssdk_port_to_phy_addr(dev_id, port_id);
-			rv = hsl_phy_get_phy_id(dev_id, phy_addr, &phy_id);
+			rv = qcaphy_get_phy_id(dev_id, phy_addr, &phy_id);
 			PHY_RTN_ON_ERROR(rv);
 			switch(phy_id)
 			{
@@ -1732,30 +1733,30 @@ static sw_error_t qca808x_phy_api_ops_init(a_uint32_t dev_id, a_uint32_t port_bm
 	phy_api_ops_init(QCA808X_PHY_CHIP);
 
 	qca808x_phy_api_ops->phy_get_status = qca808x_phy_get_status;
-	qca808x_phy_api_ops->phy_speed_get = hsl_phy_get_speed;
+	qca808x_phy_api_ops->phy_speed_get = qcaphy_get_speed;
 	qca808x_phy_api_ops->phy_speed_set = qca808x_phy_set_speed;
-	qca808x_phy_api_ops->phy_duplex_get = hsl_phy_get_duplex;
+	qca808x_phy_api_ops->phy_duplex_get = qcaphy_get_duplex;
 	qca808x_phy_api_ops->phy_duplex_set = qca808x_phy_set_duplex;
-	qca808x_phy_api_ops->phy_autoneg_enable_set = hsl_phy_autoneg_enable;
+	qca808x_phy_api_ops->phy_autoneg_enable_set = qcaphy_autoneg_enable;
 	qca808x_phy_api_ops->phy_restart_autoneg = qca808x_phy_restart_autoneg;
-	qca808x_phy_api_ops->phy_autoneg_status_get = hsl_phy_autoneg_status;
+	qca808x_phy_api_ops->phy_autoneg_status_get = qcaphy_autoneg_status;
 	qca808x_phy_api_ops->phy_autoneg_adv_set = qca808x_phy_set_autoneg_adv;
 	qca808x_phy_api_ops->phy_autoneg_adv_get = qca808x_phy_get_autoneg_adv;
-	qca808x_phy_api_ops->phy_link_status_get = hsl_phy_get_link_status;
+	qca808x_phy_api_ops->phy_link_status_get = qcaphy_get_link_status;
 	qca808x_phy_api_ops->phy_reset = qca808x_phy_reset;
 	qca808x_phy_api_ops->phy_cdt = qca808x_phy_cdt;
 #ifndef IN_PORTCONTROL_MINI
-	qca808x_phy_api_ops->phy_mdix_set = hsl_phy_set_mdix;
-	qca808x_phy_api_ops->phy_mdix_get = hsl_phy_get_mdix;
-	qca808x_phy_api_ops->phy_mdix_status_get = hsl_phy_get_mdix_status;
+	qca808x_phy_api_ops->phy_mdix_set = qcaphy_set_mdix;
+	qca808x_phy_api_ops->phy_mdix_get = qcaphy_get_mdix;
+	qca808x_phy_api_ops->phy_mdix_status_get = qcaphy_get_mdix_status;
 	qca808x_phy_api_ops->phy_local_loopback_set = qca808x_phy_set_local_loopback;
-	qca808x_phy_api_ops->phy_local_loopback_get = hsl_phy_get_local_loopback;
+	qca808x_phy_api_ops->phy_local_loopback_get = qcaphy_get_local_loopback;
 	qca808x_phy_api_ops->phy_remote_loopback_set = qca808x_phy_set_remote_loopback;
 	qca808x_phy_api_ops->phy_remote_loopback_get = qca808x_phy_get_remote_loopback;
 #endif
-	qca808x_phy_api_ops->phy_id_get = hsl_phy_get_phy_id;
+	qca808x_phy_api_ops->phy_id_get = qcaphy_get_phy_id;
 	qca808x_phy_api_ops->phy_power_off = qca808x_phy_poweroff;
-	qca808x_phy_api_ops->phy_power_on = hsl_phy_poweron;
+	qca808x_phy_api_ops->phy_power_on = qcaphy_poweron;
 #ifndef IN_PORTCONTROL_MINI
 	qca808x_phy_api_ops->phy_8023az_set = qca808x_phy_set_8023az;
 	qca808x_phy_api_ops->phy_8023az_get = qca808x_phy_get_8023az;

@@ -21,6 +21,7 @@
 #include "hsl_api.h"
 #include "hsl.h"
 #include "hsl_phy.h"
+#include "qcaphy_common.h"
 #include "ssdk_plat.h"
 #include "qca808x_phy.h"
 #include "mpge_phy.h"
@@ -550,28 +551,28 @@ static sw_error_t mpge_phy_api_ops_init(void)
 	}
 
 	phy_api_ops_init(MPGE_PHY_CHIP);
-	mpge_phy_api_ops->phy_get_status = hsl_phy_status_get;
-	mpge_phy_api_ops->phy_speed_get = hsl_phy_get_speed;
-	mpge_phy_api_ops->phy_speed_set = hsl_phy_set_speed;
-	mpge_phy_api_ops->phy_duplex_get = hsl_phy_get_duplex;
-	mpge_phy_api_ops->phy_duplex_set = hsl_phy_set_duplex;
-	mpge_phy_api_ops->phy_autoneg_enable_set = hsl_phy_autoneg_enable;
-	mpge_phy_api_ops->phy_restart_autoneg = hsl_phy_autoneg_restart;
-	mpge_phy_api_ops->phy_autoneg_status_get = hsl_phy_autoneg_status;
-	mpge_phy_api_ops->phy_autoneg_adv_set = hsl_phy_set_autoneg_adv;
-	mpge_phy_api_ops->phy_autoneg_adv_get = hsl_phy_get_autoneg_adv;
-	mpge_phy_api_ops->phy_link_status_get = hsl_phy_get_link_status;
-	mpge_phy_api_ops->phy_reset = hsl_phy_sw_reset;
-	mpge_phy_api_ops->phy_id_get = hsl_phy_get_phy_id;
-	mpge_phy_api_ops->phy_power_off = hsl_phy_poweroff;
-	mpge_phy_api_ops->phy_power_on = hsl_phy_poweron;
+	mpge_phy_api_ops->phy_get_status = qcaphy_status_get;
+	mpge_phy_api_ops->phy_speed_get = qcaphy_get_speed;
+	mpge_phy_api_ops->phy_speed_set = qcaphy_set_speed;
+	mpge_phy_api_ops->phy_duplex_get = qcaphy_get_duplex;
+	mpge_phy_api_ops->phy_duplex_set = qcaphy_set_duplex;
+	mpge_phy_api_ops->phy_autoneg_enable_set = qcaphy_autoneg_enable;
+	mpge_phy_api_ops->phy_restart_autoneg = qcaphy_autoneg_restart;
+	mpge_phy_api_ops->phy_autoneg_status_get = qcaphy_autoneg_status;
+	mpge_phy_api_ops->phy_autoneg_adv_set = qcaphy_set_autoneg_adv;
+	mpge_phy_api_ops->phy_autoneg_adv_get = qcaphy_get_autoneg_adv;
+	mpge_phy_api_ops->phy_link_status_get = qcaphy_get_link_status;
+	mpge_phy_api_ops->phy_reset = qcaphy_sw_reset;
+	mpge_phy_api_ops->phy_id_get = qcaphy_get_phy_id;
+	mpge_phy_api_ops->phy_power_off = qcaphy_poweroff;
+	mpge_phy_api_ops->phy_power_on = qcaphy_poweron;
 	mpge_phy_api_ops->phy_cdt = mpge_phy_cdt;
 #ifndef IN_PORTCONTROL_MINI
-	mpge_phy_api_ops->phy_mdix_set = hsl_phy_set_mdix;
-	mpge_phy_api_ops->phy_mdix_get = hsl_phy_get_mdix;
-	mpge_phy_api_ops->phy_mdix_status_get = hsl_phy_get_mdix_status;
-	mpge_phy_api_ops->phy_local_loopback_set = hsl_phy_set_local_loopback;
-	mpge_phy_api_ops->phy_local_loopback_get = hsl_phy_get_local_loopback;
+	mpge_phy_api_ops->phy_mdix_set = qcaphy_set_mdix;
+	mpge_phy_api_ops->phy_mdix_get = qcaphy_get_mdix;
+	mpge_phy_api_ops->phy_mdix_status_get = qcaphy_get_mdix_status;
+	mpge_phy_api_ops->phy_local_loopback_set = qcaphy_set_local_loopback;
+	mpge_phy_api_ops->phy_local_loopback_get = qcaphy_get_local_loopback;
 	mpge_phy_api_ops->phy_remote_loopback_set = mpge_phy_set_remote_loopback;
 	mpge_phy_api_ops->phy_remote_loopback_get = mpge_phy_get_remote_loopback;
 	mpge_phy_api_ops->phy_8023az_set = mpge_phy_set_8023az;

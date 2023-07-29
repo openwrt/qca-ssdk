@@ -83,7 +83,7 @@ ifeq (TRUE, $(IN_SFP_PHY))
     SRC_LIST += sfp_phy.c
 endif
 
-SRC_LIST += hsl_phy.c
+SRC_LIST += hsl_phy.c qcaphy_common.c
 
 ifeq (linux, $(OS))
 	ifeq (KSLIB, $(MODULE_TYPE))

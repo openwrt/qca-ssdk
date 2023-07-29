@@ -834,6 +834,8 @@ sw_error_t
 hsl_port_feature_set(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
 sw_error_t
 hsl_port_feature_clear(a_uint32_t dev_id, a_uint32_t port_id, phy_features_t feature);
+phy_type_t
+hsl_phytype_get_by_phyid(a_uint32_t dev_id, a_uint32_t phy_id);
 /*********************APIs to access PHY with MDIO and I2C*********************/
 #define HSL_PHY_REG_C45_ADDR(mmd_num, reg_num) (BIT(30) | mmd_num << 16 | reg_num)
 #define HSL_PHY_MMD_CTRL_REG                                   13

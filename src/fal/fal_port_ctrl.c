@@ -1811,42 +1811,6 @@ _fal_port_source_filter_config_get(a_uint32_t dev_id,
 			src_filter_config);
 	return rv;
 }
-#ifndef IN_PORTCONTROL_MINI
-static sw_error_t
-_fal_port_interface_3az_status_set(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t enable)
-{
-
-	adpt_api_t *p_api;
-	sw_error_t rv = SW_OK;
-
-	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
-
-	if (NULL == p_api->adpt_port_interface_3az_status_set)
-		return SW_NOT_SUPPORTED;
-
-	rv = p_api->adpt_port_interface_3az_status_set(dev_id, port_id, enable);
-	return rv;
-
-}
-
-static sw_error_t
-_fal_port_interface_3az_status_get(a_uint32_t dev_id, fal_port_t port_id,
-		a_bool_t * enable)
-{
-	adpt_api_t *p_api;
-	sw_error_t rv = SW_OK;
-
-	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
-
-	if (NULL == p_api->adpt_port_interface_3az_status_get)
-		return SW_NOT_SUPPORTED;
-
-	rv = p_api->adpt_port_interface_3az_status_get(dev_id, port_id, enable);
-	return rv;
-
-}
-#endif
 
 static sw_error_t
 _fal_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
@@ -1888,36 +1852,75 @@ static sw_error_t
 _fal_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
 {
+    hsl_api_t *p_api = NULL;
+    adpt_api_t *p_adpt_api = NULL;
 
-	adpt_api_t *p_api;
-	sw_error_t rv = SW_OK;
+    if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
+        p_adpt_api->adpt_port_interface_eee_cfg_set != NULL) {
+        return p_adpt_api->adpt_port_interface_eee_cfg_set(dev_id, port_id, port_eee_cfg);
+    }
 
-	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+  SW_RTN_ON_NULL(p_api = hsl_api_ptr_get (dev_id));
+  if (NULL == p_api->port_interface_eee_cfg_set)
+    return SW_NOT_SUPPORTED;
 
-	if (NULL == p_api->adpt_port_interface_eee_cfg_set)
-		return SW_NOT_SUPPORTED;
-
-	rv = p_api->adpt_port_interface_eee_cfg_set(dev_id, port_id, port_eee_cfg);
-	return rv;
-
+  return p_api->port_interface_eee_cfg_set(dev_id, port_id, port_eee_cfg);
 }
 
 static sw_error_t
 _fal_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
 {
-	adpt_api_t *p_api;
-	sw_error_t rv = SW_OK;
+	hsl_api_t *p_api = NULL;
+	adpt_api_t *p_adpt_api = NULL;
 
-	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+	if((p_adpt_api = adpt_api_ptr_get(dev_id)) != NULL &&
+		p_adpt_api->adpt_port_interface_eee_cfg_get != NULL) {
+			return p_adpt_api->adpt_port_interface_eee_cfg_get(dev_id, port_id,
+				port_eee_cfg);
+	}
 
-	if (NULL == p_api->adpt_port_interface_eee_cfg_get)
+	SW_RTN_ON_NULL(p_api = hsl_api_ptr_get (dev_id));
+	if (NULL == p_api->port_interface_eee_cfg_get)
 		return SW_NOT_SUPPORTED;
 
-	rv = p_api->adpt_port_interface_eee_cfg_get(dev_id, port_id, port_eee_cfg);
-	return rv;
-
+	return p_api->port_interface_eee_cfg_get(dev_id, port_id, port_eee_cfg);
 }
+
+#ifndef IN_PORTCONTROL_MINI
+static sw_error_t
+_fal_port_interface_3az_status_set(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	fal_port_eee_cfg_t port_eee_cfg = {0};
+
+	rv = _fal_port_interface_eee_cfg_get(dev_id, port_id, &port_eee_cfg);
+	SW_RTN_ON_ERROR(rv);
+	port_eee_cfg.enable = enable;
+	if(enable)
+		port_eee_cfg.advertisement = FAL_PHY_EEE_ALL_ADV;
+	port_eee_cfg.lpi_tx_enable = enable;
+	rv = _fal_port_interface_eee_cfg_set(dev_id, port_id, &port_eee_cfg);
+
+	return rv;
+}
+
+static sw_error_t
+_fal_port_interface_3az_status_get(a_uint32_t dev_id, fal_port_t port_id,
+		a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	fal_port_eee_cfg_t port_eee_cfg = {0};
+
+	rv = _fal_port_interface_eee_cfg_get(dev_id, port_id, &port_eee_cfg);
+	SW_RTN_ON_ERROR(rv);
+	*enable = (port_eee_cfg.enable && port_eee_cfg.lpi_tx_enable);
+
+	return SW_OK;
+}
+#endif
+
 static sw_error_t
 _fal_switch_port_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
 	fal_loopback_config_t *loopback_cfg)

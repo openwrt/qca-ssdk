@@ -430,7 +430,7 @@ qca_switch_init(a_uint32_t dev_id)
 	a_uint32_t port_bmp = 0;
 	hsl_reg_mode reg_mode = HSL_REG_MDIO;
 	a_bool_t flag = A_FALSE;
-
+	fal_port_eee_cfg_t port_eee_cfg = {0};
 	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	/*fal_reset(dev_id);*/
@@ -506,6 +506,13 @@ qca_switch_init(a_uint32_t dev_id)
 			fal_igmp_mld_entry_creat_set(dev_id, A_FALSE);
 			fal_igmp_mld_entry_v3_set(dev_id, A_FALSE);
 #endif
+#ifdef IN_PORTCONTROL
+			fal_port_interface_eee_cfg_get(dev_id, i, &port_eee_cfg);
+			port_eee_cfg.enable = A_FALSE;
+			port_eee_cfg.lpi_tx_enable = A_FALSE;
+			fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
+#endif
+
 			switch (chip_type) {
 				case CHIP_SHIVA:
 					return SW_OK;
@@ -539,9 +546,6 @@ qca_switch_init(a_uint32_t dev_id)
 				case CHIP_ISISC:
 				case CHIP_ISIS:
 #if defined(ISISC) || defined(ISIS)
-#ifdef IN_INTERFACECONTROL
-					fal_port_3az_status_set(dev_id, i, A_FALSE);
-#endif
 #ifdef IN_PORTCONTROL
 					fal_port_flowctrl_forcemode_set(dev_id, i, A_TRUE);
 					fal_port_flowctrl_set(dev_id, i, A_FALSE);
@@ -661,10 +665,6 @@ qca_switch_init(a_uint32_t dev_id)
 						/* queue3 tx buf number */
 						queue_hol_ctrl[3] = 64;
 					}
-
-#if defined(IN_INTERFACECONTROL)
-					fal_port_3az_status_set(dev_id, i, A_FALSE);
-#endif
 #if defined(IN_QOS)
 					fal_qos_port_red_en_set(dev_id, i, A_TRUE);
 					fal_qos_port_tx_buf_nr_set(dev_id, i, &port_hol_ctrl[0]);

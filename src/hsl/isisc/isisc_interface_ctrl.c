@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -35,8 +35,6 @@
 #define ISISC_MAC_6     6
 
 #define ISISC_PHY_MODE_PHY_ID  4
-#define ISISC_LPI_PORT1_OFFSET 4
-#define ISISC_LPI_BIT_STEP     2
 
 /* we need to do more about MAC5/PHY4 connection... */
 #if 0
@@ -95,130 +93,6 @@ _isisc_port_phy4_internal_mode(a_uint32_t dev_id, a_bool_t * inter_mode)
     return SW_OK;
 }
 #endif
-
-static sw_error_t
-_isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
-{
-    sw_error_t rv;
-    a_uint32_t reg = 0, field, offset, device_id, rev_id, reverse = 0;
-    a_uint32_t eee_mask = 0;
-
-    HSL_REG_ENTRY_GET(rv, dev_id, MASK_CTL, 0,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
-
-    SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
-    switch (device_id) {
-        case S17C_DEVICE_ID:
-            eee_mask = 1;
-            if (rev_id == 0)
-                reverse = 1;
-            else
-                reverse = 0;
-            break;
-        case MHT_DEVICE_ID:
-            eee_mask = 3;
-            reverse = 0;
-            break;
-        default:
-            return SW_NOT_SUPPORTED;
-    }
-
-    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-    {
-        return SW_BAD_PARAM;
-    }
-
-    HSL_REG_ENTRY_GET(rv, dev_id, EEE_CTL, 0,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
-
-    if (A_TRUE == enable)
-    {
-        field  = eee_mask;
-    }
-    else if (A_FALSE == enable)
-    {
-        field  = 0;
-    }
-    else
-    {
-        return SW_BAD_PARAM;
-    }
-
-    if (reverse)
-    {
-        field = (~field) & eee_mask;
-    }
-
-    offset = (port_id - 1) * ISISC_LPI_BIT_STEP + ISISC_LPI_PORT1_OFFSET;
-    reg &= (~(eee_mask << offset));
-    reg |= (field << offset);
-
-    HSL_REG_ENTRY_SET(rv, dev_id, EEE_CTL, 0,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    return rv;
-}
-
-static sw_error_t
-_isisc_port_3az_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
-{
-    sw_error_t rv;
-    a_uint32_t reg = 0, field, offset, device_id, rev_id, reverse = 0;
-    a_uint32_t eee_mask = 0;
-
-    HSL_REG_ENTRY_GET(rv, dev_id, MASK_CTL, 0,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
-
-    SW_GET_FIELD_BY_REG(MASK_CTL, DEVICE_ID, device_id, reg);
-    SW_GET_FIELD_BY_REG(MASK_CTL, REV_ID, rev_id, reg);
-    switch (device_id) {
-        case S17C_DEVICE_ID:
-            eee_mask = 1;
-            if (rev_id == 0)
-                reverse = 1;
-            else
-                reverse = 0;
-            break;
-        case MHT_DEVICE_ID:
-            eee_mask = 3;
-            reverse = 0;
-            break;
-        default:
-            return SW_NOT_SUPPORTED;
-    }
-
-    if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-    {
-        return SW_BAD_PARAM;
-    }
-
-    HSL_REG_ENTRY_GET(rv, dev_id, EEE_CTL, 0,
-                      (a_uint8_t *) (&reg), sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
-
-    offset = (port_id - 1) * ISISC_LPI_BIT_STEP + ISISC_LPI_PORT1_OFFSET;
-    field = (reg >> offset) & eee_mask;
-
-    if (reverse)
-    {
-        field = (~field) & eee_mask;
-    }
-
-    if (field == eee_mask)
-    {
-        *enable = A_TRUE;
-    }
-    else
-    {
-        *enable = A_FALSE;
-    }
-
-    return SW_OK;
-}
-
 static sw_error_t
 _isisc_port_rgmii_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_mac_rgmii_config_t * config)
 {
@@ -2013,42 +1887,6 @@ _isisc_interface_fx100_status_get(a_uint32_t dev_id, a_uint32_t* status)
 }
 
 /**
-  * @brief Set 802.3az status on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[in] enable A_TRUE or A_FALSE
- * @return SW_OK or error code
- */
-HSL_LOCAL sw_error_t
-isisc_port_3az_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
-{
-    sw_error_t rv;
-
-    HSL_API_LOCK;
-    rv = _isisc_port_3az_status_set(dev_id, port_id, enable);
-    HSL_API_UNLOCK;
-    return rv;
-}
-
-/**
-  * @brief Get 802.3az status on a particular port.
- * @param[in] dev_id device id
- * @param[in] port_id port id
- * @param[out] enable A_TRUE or A_FALSE
- * @return SW_OK or error code
- */
-HSL_LOCAL sw_error_t
-isisc_port_3az_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
-{
-    sw_error_t rv;
-
-    HSL_API_LOCK;
-    rv = _isisc_port_3az_status_get(dev_id, port_id, enable);
-    HSL_API_UNLOCK;
-    return rv;
-}
-
-/**
   * @brief Set interface mode on a particular MAC device.
  * @param[in] dev_id device id
  * @param[in] mca_id MAC device ID
@@ -2292,9 +2130,6 @@ isisc_interface_ctrl_init(a_uint32_t dev_id)
         hsl_api_t *p_api;
 
         SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-        p_api->port_3az_status_set = isisc_port_3az_status_set;
-        p_api->port_3az_status_get = isisc_port_3az_status_get;
 #if defined(MHT)
         if(chip_type == CHIP_MHT)
         {

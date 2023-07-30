@@ -4955,6 +4955,37 @@ adpt_ppe_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type,
 	return SW_NOT_SUPPORTED;
 }
 
+sw_error_t
+adpt_hppe_acl_counter_get(a_uint32_t dev_id,
+			a_uint32_t entry_index, fal_entry_counter_t *acl_counter)
+{
+	sw_error_t rv = SW_OK;
+	union ipo_cnt_tbl_u ipo_cnt = {0};
+
+	if (entry_index < ADPT_ACL_HW_LIST_NUM*ADPT_ACL_ENTRY_NUM_PER_LIST)
+	{
+		rv = hppe_ipo_cnt_tbl_get(dev_id, entry_index, &ipo_cnt);
+		SW_RTN_ON_ERROR(rv);
+		acl_counter->matched_pkts = ipo_cnt.bf.hit_pkt_cnt;
+		acl_counter->matched_bytes = ipo_cnt.bf.hit_byte_cnt_0 |
+			(a_uint64_t)ipo_cnt.bf.hit_byte_cnt_1 << SW_FIELD_OFFSET_IN_WORD(
+				IPO_CNT_TBL_HIT_BYTE_CNT_OFFSET);
+	}
+#if defined(APPE)
+	else if (entry_index < (ADPT_ACL_HW_LIST_NUM*ADPT_ACL_ENTRY_NUM_PER_LIST + \
+			ADPT_PRE_ACL_HW_LIST_NUM*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST))
+	{
+		rv = _adpt_appe_pre_acl_counter_get(dev_id,
+			entry_index - ADPT_ACL_HW_LIST_NUM*ADPT_ACL_ENTRY_NUM_PER_LIST, acl_counter);
+	}
+#endif
+	else
+	{
+		return SW_OUT_OF_RANGE;
+	}
+	return rv;
+}
+
 static sw_error_t
 _adpt_hppe_acl_hw_list_init(a_uint32_t dev_id, a_uint32_t hw_list_start, a_uint32_t hw_list_end)
 
@@ -5024,6 +5055,7 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 				adpt_appe_acl_vpgroup_get;
 	}
 #endif
+	p_adpt_api->adpt_acl_counter_get = adpt_hppe_acl_counter_get;
 
 	aos_lock_init(&hppe_acl_lock[dev_id]);
 

@@ -213,6 +213,10 @@ sw_error_t
 _adpt_appe_pre_acl_rule_dump(a_uint32_t dev_id, a_uint32_t hw_list_id, a_uint32_t hw_entries);
 
 sw_error_t
+_adpt_appe_pre_acl_counter_get(a_uint32_t dev_id,
+	a_uint32_t entry_index, fal_entry_counter_t *acl_counter);
+
+sw_error_t
 adpt_appe_acl_udf_profile_set(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type,
 	a_uint32_t udf_idx, fal_acl_udf_type_t udf_type, a_uint32_t offset);
 sw_error_t

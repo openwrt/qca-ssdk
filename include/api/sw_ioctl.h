@@ -342,6 +342,7 @@ extern "C" {
 #define SW_API_ACL_VPGROUP_GET			(27  + SW_API_ACL_OFFSET)
 #define SW_API_ACL_MAC_ENTRY_SET		(28  + SW_API_ACL_OFFSET)
 #define SW_API_ACL_MAC_ENTRY_DUMP		(29  + SW_API_ACL_OFFSET)
+#define SW_API_ACL_COUNTER_GET			(30  + SW_API_ACL_OFFSET)
 
     /*qos*/
 #define SW_API_QOS_OFFSET             500

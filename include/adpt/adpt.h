@@ -907,6 +907,9 @@ typedef sw_error_t
 typedef sw_error_t
 (*adpt_acl_vpgroup_get_func)(a_uint32_t dev_id, a_uint32_t vport_id,
 		fal_vport_type_t vport_type, a_uint32_t * vpgroup_id);
+typedef sw_error_t
+(*adpt_acl_counter_get_func)(a_uint32_t dev_id, a_uint32_t entry_index,
+		fal_entry_counter_t *acl_counter);
 
 typedef sw_error_t (*adpt_qos_port_pri_set_func)(a_uint32_t dev_id, fal_port_t port_id,
 					fal_qos_pri_precedence_t *pri);
@@ -1878,6 +1881,7 @@ typedef struct
 	adpt_acl_udf_profile_cfg_get_func adpt_acl_udf_profile_cfg_get;
 	adpt_acl_vpgroup_set_func adpt_acl_vpgroup_set;
 	adpt_acl_vpgroup_get_func adpt_acl_vpgroup_get;
+	adpt_acl_counter_get_func adpt_acl_counter_get;
 
 	/* qos */
 	adpt_qos_port_pri_set_func adpt_qos_port_pri_set;

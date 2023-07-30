@@ -1573,6 +1573,24 @@ _adpt_appe_acl_udf_profile_entry_get(a_uint32_t dev_id, a_uint32_t profile_id,
 }
 
 sw_error_t
+_adpt_appe_pre_acl_counter_get(a_uint32_t dev_id,
+			a_uint32_t entry_index, fal_entry_counter_t *acl_counter)
+{
+	sw_error_t rv = SW_OK;
+	union pre_ipo_cnt_tbl_u pre_ipo_cnt = {0};
+
+	rv = appe_pre_ipo_cnt_tbl_get(dev_id, entry_index, &pre_ipo_cnt);
+	SW_RTN_ON_ERROR(rv);
+
+	acl_counter->matched_pkts = pre_ipo_cnt.bf.hit_pkt_cnt;
+	acl_counter->matched_bytes = pre_ipo_cnt.bf.hit_byte_cnt_0 |
+		(a_uint64_t)pre_ipo_cnt.bf.hit_byte_cnt_1 << SW_FIELD_OFFSET_IN_WORD(
+				PRE_IPO_CNT_TBL_HIT_BYTE_CNT_OFFSET);
+
+	return rv;
+}
+
+sw_error_t
 adpt_appe_acl_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
 		fal_acl_udf_profile_entry_t * entry)
 {

@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 #ifndef _ISISC_PORT_CTRL_H_
 #define _ISISC_PORT_CTRL_H_
@@ -58,29 +60,6 @@ extern "C" {
 
 
     HSL_LOCAL sw_error_t
-    isisc_port_autoneg_status_get(a_uint32_t dev_id, fal_port_t port_id,
-                                 a_bool_t * status);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_autoneg_restart(a_uint32_t dev_id, fal_port_t port_id);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_autoneg_adv_set(a_uint32_t dev_id, fal_port_t port_id,
-                              a_uint32_t autoadv);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_autoneg_adv_get(a_uint32_t dev_id, fal_port_t port_id,
-                              a_uint32_t * autoadv);
-
-
-    HSL_LOCAL sw_error_t
     isisc_port_flowctrl_set(a_uint32_t dev_id, fal_port_t port_id,
                            a_bool_t enable);
 
@@ -99,27 +78,6 @@ extern "C" {
     isisc_port_flowctrl_forcemode_get(a_uint32_t dev_id,
                                      fal_port_t port_id,
                                      a_bool_t * enable);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_powersave_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_powersave_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_hibernate_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_hibernate_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
-
-
-    HSL_LOCAL sw_error_t
-    isisc_port_cdt(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
-                  fal_cable_status_t *cable_status, a_uint32_t *cable_len);
 
 
     HSL_LOCAL sw_error_t
@@ -210,13 +168,6 @@ extern "C" {
 
     HSL_LOCAL sw_error_t
     isisc_port_mac_loopback_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable);
-
-    HSL_LOCAL sw_error_t
-    isisc_port_8023az_set (a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
-
-    HSL_LOCAL sw_error_t
-    isisc_port_8023az_get (a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable);
-
 #endif
 
 #ifdef __cplusplus

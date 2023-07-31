@@ -899,6 +899,106 @@ hsl_phy_debug_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 sw_error_t
 hsl_phy_modify_debug(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t debug_reg, a_uint16_t mask, a_uint16_t value);
+sw_error_t
+hsl_port_phy_autoneg_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * status);
+sw_error_t
+hsl_port_phy_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id);
+sw_error_t
+hsl_port_phy_duplex_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_duplex_t duplex);
+sw_error_t
+hsl_port_phy_duplex_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_duplex_t *duplex);
+sw_error_t
+hsl_port_phy_cdt(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
+	fal_cable_status_t * cable_status, a_uint32_t * cable_len);
+sw_error_t
+hsl_port_phy_link_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * status);
+sw_error_t
+hsl_port_phy_power_on(a_uint32_t dev_id, fal_port_t port_id);
+sw_error_t
+hsl_port_phy_power_off(a_uint32_t dev_id, fal_port_t port_id);
+sw_error_t
+hsl_port_phy_speed_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_speed_t speed);
+sw_error_t
+hsl_port_phy_speed_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_speed_t * pspeed);
+sw_error_t
+hsl_port_phy_combo_prefer_medium_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_medium_t medium);
+sw_error_t
+hsl_port_phy_combo_prefer_medium_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_medium_t *medium);
+sw_error_t
+hsl_port_phy_reset(a_uint32_t dev_id, fal_port_t port_id);
+sw_error_t
+hsl_port_phy_eee_adv_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t adv);
+sw_error_t
+hsl_port_phy_eee_adv_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *adv);
+sw_error_t
+hsl_port_phy_eee_partner_adv_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *adv);
+sw_error_t
+hsl_port_phy_eee_cap_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *cap);
+sw_error_t
+hsl_port_phy_eee_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *status);
+#ifndef IN_PORTCONTROL_MINI
+sw_error_t
+hsl_port_phy_local_loopback_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+hsl_port_phy_local_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable);
+sw_error_t
+hsl_port_phy_combo_fiber_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_fiber_mode_t mode);
+sw_error_t
+hsl_port_phy_combo_fiber_mode_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_fiber_mode_t * mode);
+sw_error_t
+hsl_port_phy_combo_medium_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_medium_t *medium);
+sw_error_t
+hsl_port_phy_magic_frame_mac_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_mac_addr_t * mac);
+sw_error_t
+hsl_port_phy_magic_frame_mac_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_mac_addr_t * mac);
+sw_error_t
+hsl_port_phy_powersave_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable);
+sw_error_t
+hsl_port_phy_powersave_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable);
+sw_error_t
+hsl_port_phy_hibernate_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable);
+sw_error_t
+hsl_port_phy_hibernate_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable);
+sw_error_t
+hsl_port_phy_8023az_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+hsl_port_phy_8023az_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable);
+sw_error_t
+hsl_port_phy_remote_loopback_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+hsl_port_phy_remote_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable);
+sw_error_t
+hsl_port_phy_mdix_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_mdix_mode_t mode);
+sw_error_t
+hsl_port_phy_mdix_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_mdix_mode_t * mode);
+sw_error_t
+hsl_port_phy_mdix_status_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_mdix_status_t * mode);
+sw_error_t
+hsl_port_phy_phyid_get(a_uint32_t dev_id, fal_port_t port_id, a_uint16_t * org_id,
+	a_uint16_t * rev_id);
+sw_error_t
+hsl_port_phy_wol_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable);
+sw_error_t
+hsl_port_phy_wol_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable);
+sw_error_t
+hsl_port_phy_mode_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t *mode);
+#endif
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

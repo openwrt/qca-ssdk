@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, 2017, 2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -165,7 +165,9 @@ extern "C"
 #define MALIBU_PHY_PSGMII_AMDET              0x3
 #define MALIBU_PHY_SGMII_BASET              0x4
 
-#define MALIBU_PHY4_PREFER_FIBER  0x400
+#define MALIBU_PHY4_PREFER_FIBER     0x400
+#define MALIBU_PHY4_PREFER_COPPER    0x8000
+
 #define PHY4_PREFER_COPPER                0x0
 #define PHY4_PREFER_FIBER                 0x1
 
@@ -663,10 +665,6 @@ extern "C"
   sw_error_t
   malibu_phy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_id,
 			a_bool_t enable);
-
-  sw_error_t
-  malibu_phy_get_phy_id(a_uint32_t dev_id, a_uint32_t phy_id,
-		  a_uint32_t *phy_data);
 #endif
   int malibu_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp);
 

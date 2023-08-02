@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2017, 2019, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #ifndef _QCA803X_PHY_H_
@@ -366,57 +369,6 @@ extern "C"
 	  QCA803X_PHY_MEDIUM_FIBER = 1,		/* Fiber */
 	  QCA803X_PHY_MEDIUM_MAX
   } qca803x_phy_medium_t;
-
-sw_error_t
-qca803x_phy_set_duplex (a_uint32_t dev_id, a_uint32_t phy_id,
-		   fal_port_duplex_t duplex);
-
-sw_error_t
-qca803x_phy_get_duplex (a_uint32_t dev_id, a_uint32_t phy_id,
-		   fal_port_duplex_t * duplex);
-
-sw_error_t
-qca803x_phy_set_speed (a_uint32_t dev_id, a_uint32_t phy_id,
-		  fal_port_speed_t speed);
-
-sw_error_t
-qca803x_phy_get_speed (a_uint32_t dev_id, a_uint32_t phy_id,
-		  fal_port_speed_t * speed);
-
-sw_error_t
-qca803x_phy_restart_autoneg (a_uint32_t dev_id, a_uint32_t phy_id);
-
-sw_error_t
-qca803x_phy_enable_autoneg (a_uint32_t dev_id, a_uint32_t phy_id);
-
-a_bool_t
-qca803x_phy_get_link_status (a_uint32_t dev_id, a_uint32_t phy_id);
-
-sw_error_t
-qca803x_phy_set_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
-			a_uint32_t autoneg);
-
-sw_error_t
-qca803x_phy_get_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
-			a_uint32_t * autoneg);
-
-a_bool_t qca803x_phy_autoneg_status (a_uint32_t dev_id, a_uint32_t phy_id);
-#ifndef IN_PORTCONTROL_MINI
-sw_error_t
-qca803x_phy_intr_mask_set (a_uint32_t dev_id, a_uint32_t phy_id,
-		      a_uint32_t intr_mask_flag);
-
-sw_error_t
-qca803x_phy_intr_mask_get (a_uint32_t dev_id, a_uint32_t phy_id,
-		      a_uint32_t * intr_mask_flag);
-
-sw_error_t
-qca803x_phy_intr_status_get (a_uint32_t dev_id, a_uint32_t phy_id,
-			a_uint32_t * intr_status_flag);
-#endif
-sw_error_t
-qca803x_phy_get_phy_id(a_uint32_t dev_id, a_uint32_t phy_id,
-		a_uint32_t *phy_data);
 int qca803x_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp);
 
 #ifdef __cplusplus

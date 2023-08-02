@@ -3035,4 +3035,176 @@ hsl_phy_get_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	return SW_OK;
 }
+/*
+ * @brief set eee adv
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] eee adv
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t adv)
+{
+	a_uint16_t phy_data = 0;
+	sw_error_t rv = SW_OK;
+
+	if (adv & FAL_PHY_EEE_100BASE_T) {
+		phy_data |= HSL_PHY_EEE_ADV_100M;
+	}
+	if (adv & FAL_PHY_EEE_1000BASE_T) {
+		phy_data |= HSL_PHY_EEE_ADV_1000M;
+	}
+	rv = hsl_phy_modify_mmd(dev_id, phy_addr, A_FALSE, HSL_PHY_MMD7_NUM,
+		HSL_PHY_MMD7_ADDR_8023AZ_EEE_CTRL, HSL_PHY_EEE_MASK, phy_data);
+	PHY_RTN_ON_ERROR(rv);
+	return hsl_phy_autoneg_restart(dev_id, phy_addr);
+}
+
+/******************************************************************************
+ * @brief get eee adv
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] eee adv
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *adv)
+{
+	a_uint16_t phy_data = 0;
+
+	*adv = 0;
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
+		HSL_PHY_MMD7_NUM, HSL_PHY_MMD7_ADDR_8023AZ_EEE_CTRL);
+
+	if (phy_data & HSL_PHY_EEE_ADV_100M) {
+		*adv |= FAL_PHY_EEE_100BASE_T;
+	}
+	if (phy_data & HSL_PHY_EEE_ADV_1000M) {
+		*adv |= FAL_PHY_EEE_1000BASE_T;
+	}
+
+	return SW_OK;
+}
+/******************************************************************************
+ * @brief get link partner eee adv
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] link partner eee adv
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_eee_partner_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *adv)
+{
+	a_uint16_t phy_data = 0;
+
+	*adv = 0;
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
+		HSL_PHY_MMD7_NUM, HSL_PHY_MMD7_ADDR_8023AZ_EEE_PARTNER);
+
+	if (phy_data & HSL_PHY_EEE_PARTNER_ADV_100M) {
+		*adv |= FAL_PHY_EEE_100BASE_T;
+	}
+	if (phy_data & HSL_PHY_EEE_PARTNER_ADV_1000M) {
+		*adv |= FAL_PHY_EEE_1000BASE_T;
+	}
+
+	return SW_OK;
+}
+/******************************************************************************
+ * @brief get eee capability
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] eee capability
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_eee_cap(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *cap)
+{
+	a_uint16_t phy_data = 0;
+
+	*cap = 0;
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
+		HSL_PHY_MMD3_NUM, HSL_PHY_MMD3_ADDR_8023AZ_EEE_CAPABILITY);
+
+	if (phy_data & HSL_PHY_EEE_CAPABILITY_100M) {
+		*cap |= FAL_PHY_EEE_100BASE_T;
+	}
+	if (phy_data & HSL_PHY_EEE_CAPABILITY_1000M) {
+		*cap |= FAL_PHY_EEE_1000BASE_T;
+	}
+
+	return SW_OK;
+}
+/******************************************************************************
+ * @brief get eee status
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] eee status
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *status)
+{
+	a_uint16_t phy_data = 0;
+	sw_error_t rv = SW_OK;
+
+	*status = 0;
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
+		HSL_PHY_MMD7_NUM, HSL_PHY_MMD7_ADDR_8023AZ_EEE_STATUS);
+
+	if (phy_data & HSL_PHY_EEE_STATUS_100M) {
+		*status |= FAL_PHY_EEE_100BASE_T;
+	}
+	if (phy_data & HSL_PHY_EEE_STATUS_1000M) {
+		*status |= FAL_PHY_EEE_1000BASE_T;
+	}
+
+	return rv;
+}
+
+/******************************************************************************
+ * @brief set 8023 az
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[in] enable
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
+{
+	a_uint32_t eee_adv = 0;
+
+	if (enable == A_TRUE)
+		eee_adv = (HSL_PHY_EEE_ADV_100M | HSL_PHY_EEE_ADV_1000M);
+	return hsl_phy_set_eee_adv(dev_id, phy_addr, eee_adv);
+}
+
+/******************************************************************************
+ * @brief get 8023 az
+ * @param[in] dev_id device id
+ * @param[in] phy_addr phy address
+ * @param[out] enable
+ * @return SW_OK or error code
+ */
+sw_error_t
+hsl_phy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable)
+{
+	a_uint32_t eee_adv = 0;
+	sw_error_t rv = SW_OK;
+
+	*enable = A_FALSE;
+
+	rv = hsl_phy_get_eee_adv(dev_id, phy_addr, &eee_adv);
+	PHY_RTN_ON_ERROR(rv);
+	if ((eee_adv & HSL_PHY_EEE_ADV_100M) &&
+		(eee_adv & HSL_PHY_EEE_ADV_1000M))
+		*enable = A_TRUE;
+
+	return SW_OK;
+}
 /*qca808x_end*/

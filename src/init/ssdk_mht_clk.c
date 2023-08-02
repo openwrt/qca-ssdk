@@ -105,6 +105,8 @@ static const struct mht_parent_data mht_mac5_tx_clk_pdata[] = {
 	{ MHT_XO_CLK_RATE_50M, MHT_P_XO, 0 },
 	{ UQXGMII_SPEED_1000M_CLK, MHT_P_UNIPHY0_TX, 2 },
 	{ UQXGMII_SPEED_2500M_CLK, MHT_P_UNIPHY0_TX, 2 },
+	{ UQXGMII_SPEED_1000M_CLK, MHT_P_UNIPHY1_TX, 7 },
+	{ UQXGMII_SPEED_2500M_CLK, MHT_P_UNIPHY1_TX, 7 },
 };
 
 static const struct mht_parent_data mht_mac5_rx_clk_pdata[] = {
@@ -113,6 +115,8 @@ static const struct mht_parent_data mht_mac5_rx_clk_pdata[] = {
 	{ UQXGMII_SPEED_1000M_CLK, MHT_P_UNIPHY0_TX, 2 },
 	{ UQXGMII_SPEED_2500M_CLK, MHT_P_UNIPHY0_RX, 1 },
 	{ UQXGMII_SPEED_2500M_CLK, MHT_P_UNIPHY0_TX, 2 },
+	{ UQXGMII_SPEED_1000M_CLK, MHT_P_UNIPHY1_TX, 7 },
+	{ UQXGMII_SPEED_2500M_CLK, MHT_P_UNIPHY1_TX, 7 },
 };
 
 static const struct mht_parent_data mht_ahb_clk_pdata[] = {
@@ -1203,6 +1207,10 @@ void ssdk_mht_gcc_port_clk_parent_set(a_uint32_t dev_id,
 					break;
 				case MHT_SWITCH_MODE:
 				case MHT_PHY_UQXGMII_MODE:
+					if(clk_mode == MHT_SWITCH_MODE) {
+						port_tx_parent = MHT_P_UNIPHY1_TX;
+						port_rx_parent = MHT_P_UNIPHY1_TX;
+					}
 					ssdk_mht_port5_uniphy0_clk_src_set(dev_id, A_FALSE);
 					break;
 				default:

@@ -281,7 +281,10 @@ extern "C" {
 #define PORTCONTROL_API \
     SW_API_DEF(SW_API_PT_CDT, fal_port_cdt),  \
     SW_API_DEF(SW_API_PT_DUPLEX_SET, fal_port_duplex_set), \
+    SW_API_DEF(SW_API_PT_DUPLEX_GET, fal_port_duplex_get), \
     SW_API_DEF(SW_API_PT_SPEED_SET, fal_port_speed_set), \
+    SW_API_DEF(SW_API_PT_SPEED_GET, fal_port_speed_get), \
+    SW_API_DEF(SW_API_PT_LINK_STATUS_GET, fal_port_link_status_get), \
     SW_API_DEF(SW_API_PT_AN_ENABLE, fal_port_autoneg_enable), \
     SW_API_DEF(SW_API_PT_AN_RESTART, fal_port_autoneg_restart), \
     SW_API_DEF(SW_API_PT_AN_ADV_SET, fal_port_autoneg_adv_set), \
@@ -329,8 +332,11 @@ extern "C" {
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
     SW_API_DESC(SW_API_PT_CDT) \
+    SW_API_DESC(SW_API_PT_DUPLEX_GET) \
     SW_API_DESC(SW_API_PT_DUPLEX_SET) \
+    SW_API_DESC(SW_API_PT_SPEED_GET)  \
     SW_API_DESC(SW_API_PT_SPEED_SET)  \
+    SW_API_DESC(SW_API_PT_LINK_STATUS_GET) \
     SW_API_DESC(SW_API_PT_AN_ENABLE) \
     SW_API_DESC(SW_API_PT_AN_RESTART) \
     SW_API_DESC(SW_API_PT_AN_ADV_SET) \

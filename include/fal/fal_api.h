@@ -2382,17 +2382,29 @@ extern "C" {
 #else
 #define BM_API \
     SW_API_DEF(SW_API_BM_CTRL_SET, fal_port_bm_ctrl_set), \
+    SW_API_DEF(SW_API_BM_CTRL_GET, fal_port_bm_ctrl_get), \
     SW_API_DEF(SW_API_BM_PORTGROUP_MAP_SET, fal_port_bufgroup_map_set), \
+    SW_API_DEF(SW_API_BM_PORTGROUP_MAP_GET, fal_port_bufgroup_map_get), \
     SW_API_DEF(SW_API_BM_GROUP_BUFFER_SET, fal_bm_bufgroup_buffer_set), \
+    SW_API_DEF(SW_API_BM_GROUP_BUFFER_GET, fal_bm_bufgroup_buffer_get), \
     SW_API_DEF(SW_API_BM_PORT_RSVBUFFER_SET, fal_bm_port_reserved_buffer_set), \
-    SW_API_DEF(SW_API_BM_DYNAMIC_THRESH_SET, fal_bm_port_dynamic_thresh_set),
+    SW_API_DEF(SW_API_BM_PORT_RSVBUFFER_GET, fal_bm_port_reserved_buffer_get), \
+    SW_API_DEF(SW_API_BM_DYNAMIC_THRESH_SET, fal_bm_port_dynamic_thresh_set), \
+    SW_API_DEF(SW_API_BM_DYNAMIC_THRESH_GET, fal_bm_port_dynamic_thresh_get), \
+    SW_API_DEF(SW_API_BM_PORT_COUNTER_GET, fal_bm_port_counter_get),
 
 #define BM_API_PARAM \
     SW_API_DESC(SW_API_BM_CTRL_SET) \
+    SW_API_DESC(SW_API_BM_CTRL_GET) \
     SW_API_DESC(SW_API_BM_PORTGROUP_MAP_SET) \
+    SW_API_DESC(SW_API_BM_PORTGROUP_MAP_GET) \
     SW_API_DESC(SW_API_BM_GROUP_BUFFER_SET) \
+    SW_API_DESC(SW_API_BM_GROUP_BUFFER_GET) \
     SW_API_DESC(SW_API_BM_PORT_RSVBUFFER_SET) \
-    SW_API_DESC(SW_API_BM_DYNAMIC_THRESH_SET)
+    SW_API_DESC(SW_API_BM_PORT_RSVBUFFER_GET) \
+    SW_API_DESC(SW_API_BM_DYNAMIC_THRESH_SET) \
+    SW_API_DESC(SW_API_BM_DYNAMIC_THRESH_GET) \
+    SW_API_DESC(SW_API_BM_PORT_COUNTER_GET)
 #endif
 #else
 #define BM_API

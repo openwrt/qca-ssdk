@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -12,7 +14,6 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /**
  * @defgroup fal_qm FAL_BM
  * @{
@@ -22,7 +23,6 @@
 #include "hsl_api.h"
 #include "adpt.h"
 
-#ifndef IN_BM_MINI
 sw_error_t
 _fal_port_bufgroup_map_get(a_uint32_t dev_id, fal_port_t port,
 			a_uint8_t *group)
@@ -97,7 +97,6 @@ _fal_port_bm_ctrl_get(a_uint32_t dev_id, fal_port_t port, a_bool_t *enable)
 	rv = p_api->adpt_port_bm_ctrl_get(dev_id, port, enable);
 	return rv;
 }
-#endif
 sw_error_t
 _fal_bm_bufgroup_buffer_set(a_uint32_t dev_id, a_uint8_t group,
 			a_uint16_t buff_num)
@@ -153,22 +152,6 @@ _fal_bm_port_static_thresh_get(a_uint32_t dev_id, fal_port_t port,
 	rv = p_hsl_api->port_static_thresh_get(dev_id, port, cfg);
 	return rv;
 }
-#endif
-sw_error_t
-_fal_bm_port_reserved_buffer_set(a_uint32_t dev_id, fal_port_t port,
-			a_uint16_t prealloc_buff, a_uint16_t react_buff)
-{
-	adpt_api_t *p_api;
-	sw_error_t rv = SW_OK;
-
-	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
-
-	if (NULL == p_api->adpt_bm_port_reserved_buffer_set)
-		return SW_NOT_SUPPORTED;
-
-	rv = p_api->adpt_bm_port_reserved_buffer_set(dev_id, port, prealloc_buff, react_buff);
-	return rv;
-}
 sw_error_t
 _fal_bm_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port,
 			fal_bm_static_cfg_t *cfg)
@@ -191,6 +174,22 @@ _fal_bm_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port,
 		return SW_NOT_SUPPORTED;
 
 	rv = p_hsl_api->port_static_thresh_set(dev_id, port, cfg);
+	return rv;
+}
+#endif
+sw_error_t
+_fal_bm_port_reserved_buffer_set(a_uint32_t dev_id, fal_port_t port,
+			a_uint16_t prealloc_buff, a_uint16_t react_buff)
+{
+	adpt_api_t *p_api;
+	sw_error_t rv = SW_OK;
+
+	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
+
+	if (NULL == p_api->adpt_bm_port_reserved_buffer_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = p_api->adpt_bm_port_reserved_buffer_set(dev_id, port, prealloc_buff, react_buff);
 	return rv;
 }
 sw_error_t
@@ -223,7 +222,6 @@ _fal_port_bm_ctrl_set(a_uint32_t dev_id, fal_port_t port, a_bool_t enable)
 	return rv;
 }
 
-#ifndef IN_BM_MINI
 sw_error_t
 _fal_bm_port_counter_get(a_uint32_t dev_id, fal_port_t port,
 			fal_bm_port_counter_t *counter)
@@ -295,7 +293,6 @@ fal_port_bm_ctrl_get(a_uint32_t dev_id, fal_port_t port, a_bool_t *enable)
 	FAL_API_UNLOCK;
 	return rv;
 }
-#endif
 
 sw_error_t
 fal_bm_bufgroup_buffer_set(a_uint32_t dev_id, a_uint8_t group,
@@ -332,6 +329,18 @@ fal_bm_port_static_thresh_get(a_uint32_t dev_id, fal_port_t port,
 	FAL_API_UNLOCK;
 	return rv;
 }
+sw_error_t
+fal_bm_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port,
+			fal_bm_static_cfg_t *cfg)
+{
+	sw_error_t rv = SW_OK;
+
+	FAL_API_LOCK;
+	rv = _fal_bm_port_static_thresh_set(dev_id, port, cfg);
+	FAL_API_UNLOCK;
+	return rv;
+}
+
 #endif
 sw_error_t
 fal_bm_port_reserved_buffer_set(a_uint32_t dev_id, fal_port_t port,
@@ -341,17 +350,6 @@ fal_bm_port_reserved_buffer_set(a_uint32_t dev_id, fal_port_t port,
 
 	FAL_API_LOCK;
 	rv = _fal_bm_port_reserved_buffer_set(dev_id, port, prealloc_buff, react_buff);
-	FAL_API_UNLOCK;
-	return rv;
-}
-sw_error_t
-fal_bm_port_static_thresh_set(a_uint32_t dev_id, fal_port_t port,
-			fal_bm_static_cfg_t *cfg)
-{
-	sw_error_t rv = SW_OK;
-
-	FAL_API_LOCK;
-	rv = _fal_bm_port_static_thresh_set(dev_id, port, cfg);
 	FAL_API_UNLOCK;
 	return rv;
 }
@@ -376,8 +374,6 @@ fal_port_bm_ctrl_set(a_uint32_t dev_id, fal_port_t port, a_bool_t enable)
 	FAL_API_UNLOCK;
 	return rv;
 }
-
-#ifndef IN_BM_MINI
 sw_error_t
 fal_bm_port_counter_get(a_uint32_t dev_id, fal_port_t port,
 			fal_bm_port_counter_t *counter)
@@ -389,7 +385,6 @@ fal_bm_port_counter_get(a_uint32_t dev_id, fal_port_t port,
 	FAL_API_UNLOCK;
 	return rv;
 }
-#endif
 
 EXPORT_SYMBOL(fal_port_bm_ctrl_set);
 
@@ -401,7 +396,6 @@ EXPORT_SYMBOL(fal_bm_port_reserved_buffer_set);
 
 EXPORT_SYMBOL(fal_bm_port_dynamic_thresh_set);
 
-#ifndef IN_BM_MINI
 EXPORT_SYMBOL(fal_port_bm_ctrl_get);
 
 EXPORT_SYMBOL(fal_port_bufgroup_map_get);
@@ -410,13 +404,14 @@ EXPORT_SYMBOL(fal_bm_bufgroup_buffer_get);
 
 EXPORT_SYMBOL(fal_bm_port_reserved_buffer_get);
 
-EXPORT_SYMBOL(fal_bm_port_static_thresh_set);
-
-EXPORT_SYMBOL(fal_bm_port_static_thresh_get);
-
 EXPORT_SYMBOL(fal_bm_port_dynamic_thresh_get);
 
 EXPORT_SYMBOL(fal_bm_port_counter_get);
+
+#ifndef IN_BM_MINI
+EXPORT_SYMBOL(fal_bm_port_static_thresh_set);
+
+EXPORT_SYMBOL(fal_bm_port_static_thresh_get);
 #endif
 
 /*insert flag for outter fal, don't remove it*/

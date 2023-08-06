@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -11,7 +13,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 /**
  * @defgroup
@@ -202,7 +203,7 @@ hppe_bm_dbg_data_set(
 {
 	return SW_NOT_SUPPORTED;
 }
-
+#endif
 sw_error_t
 hppe_port_fc_mode_get(
 		a_uint32_t dev_id,
@@ -217,7 +218,6 @@ hppe_port_fc_mode_get(
 				index * PORT_FC_MODE_INC,
 				&value->val);
 }
-#endif
 
 sw_error_t
 hppe_port_fc_mode_set(
@@ -256,6 +256,7 @@ hppe_port_fc_status_set(
 {
 	return SW_NOT_SUPPORTED;
 }
+#endif
 
 sw_error_t
 hppe_port_group_id_get(
@@ -271,7 +272,6 @@ hppe_port_group_id_get(
 				index * PORT_GROUP_ID_INC,
 				&value->val);
 }
-#endif
 
 sw_error_t
 hppe_port_group_id_set(
@@ -286,7 +286,6 @@ hppe_port_group_id_set(
 				value->val);
 }
 
-#ifndef IN_BM_MINI
 sw_error_t
 hppe_port_cnt_get(
 		a_uint32_t dev_id,
@@ -303,15 +302,6 @@ hppe_port_cnt_get(
 }
 
 sw_error_t
-hppe_port_cnt_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union port_cnt_u *value)
-{
-	return SW_NOT_SUPPORTED;
-}
-
-sw_error_t
 hppe_port_reacted_cnt_get(
 		a_uint32_t dev_id,
 		a_uint32_t index,
@@ -324,6 +314,15 @@ hppe_port_reacted_cnt_get(
 				NSS_BM_CSR_BASE_ADDR + PORT_REACTED_CNT_ADDRESS + \
 				index * PORT_REACTED_CNT_INC,
 				&value->val);
+}
+#ifndef IN_BM_MINI
+sw_error_t
+hppe_port_cnt_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union port_cnt_u *value)
+{
+	return SW_NOT_SUPPORTED;
 }
 
 sw_error_t
@@ -358,6 +357,7 @@ hppe_shared_group_cnt_set(
 {
 	return SW_NOT_SUPPORTED;
 }
+#endif
 
 sw_error_t
 hppe_shared_group_cfg_get(
@@ -373,7 +373,6 @@ hppe_shared_group_cfg_get(
 				index * SHARED_GROUP_CFG_INC,
 				&value->val);
 }
-#endif
 
 sw_error_t
 hppe_shared_group_cfg_set(

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1473,6 +1473,8 @@ hppe_ipo_cnt_tbl_get(
 		a_uint32_t index,
 		union ipo_cnt_tbl_u *value)
 {
+	if (index >= IPO_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_get(
 				dev_id,
 				INGRESS_POLICER_BASE_ADDR + IPO_CNT_TBL_ADDRESS + \
@@ -1487,6 +1489,8 @@ hppe_ipo_cnt_tbl_set(
 		a_uint32_t index,
 		union ipo_cnt_tbl_u *value)
 {
+	if (index >= IPO_CNT_TBL_NUM)
+		return SW_OUT_OF_RANGE;
 	return hppe_reg_tbl_set(
 				dev_id,
 				INGRESS_POLICER_BASE_ADDR + IPO_CNT_TBL_ADDRESS + \

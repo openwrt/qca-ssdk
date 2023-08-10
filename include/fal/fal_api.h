@@ -868,7 +868,8 @@ extern "C" {
     SW_API_DEF(SW_API_ACL_VPGROUP_SET, fal_acl_vpgroup_set),\
     SW_API_DEF(SW_API_ACL_VPGROUP_GET, fal_acl_vpgroup_get), \
     SW_API_DEF(SW_API_ACL_MAC_ENTRY_SET, ref_acl_mac_entry_set), \
-    SW_API_DEF(SW_API_ACL_MAC_ENTRY_DUMP, ref_acl_mac_entry_dump),
+    SW_API_DEF(SW_API_ACL_MAC_ENTRY_DUMP, ref_acl_mac_entry_dump), \
+    SW_API_DEF(SW_API_ACL_COUNTER_GET, fal_acl_counter_get),
 
 #define ACL_API_PARAM \
     SW_API_DESC(SW_API_ACL_LIST_CREAT) \
@@ -899,7 +900,8 @@ extern "C" {
     SW_API_DESC(SW_API_ACL_VPGROUP_SET) \
     SW_API_DESC(SW_API_ACL_VPGROUP_GET) \
     SW_API_DESC(SW_API_ACL_MAC_ENTRY_SET) \
-    SW_API_DESC(SW_API_ACL_MAC_ENTRY_DUMP)
+    SW_API_DESC(SW_API_ACL_MAC_ENTRY_DUMP) \
+    SW_API_DESC(SW_API_ACL_COUNTER_GET)
 #else
 #define ACL_API
 #define ACL_API_PARAM

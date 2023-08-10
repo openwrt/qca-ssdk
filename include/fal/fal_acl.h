@@ -857,7 +857,11 @@ fal_acl_vpgroup_set(a_uint32_t dev_id, a_uint32_t vport_id,
 
 sw_error_t
 fal_acl_vpgroup_get(a_uint32_t dev_id, a_uint32_t vport_id,
-                fal_vport_type_t vport_type, a_uint32_t * vpgroup_id);
+		fal_vport_type_t vport_type, a_uint32_t * vpgroup_id);
+
+sw_error_t
+fal_acl_counter_get(a_uint32_t dev_id, a_uint32_t entry_index,
+		fal_entry_counter_t *acl_counter);
 
 #ifdef __cplusplus
 }

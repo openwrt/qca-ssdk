@@ -1,17 +1,19 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-
 
 #include "sw.h"
 #include "hsl.h"
@@ -155,30 +157,6 @@ _isisc_mdio_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
     sd_reg_mii_set(dev_id, reg_addr, reg_val);
 #endif
     return SW_OK;
-}
-
-sw_error_t
-isisc_phy_get(a_uint32_t dev_id, a_uint32_t phy_addr,
-             a_uint32_t reg, a_uint16_t * value)
-{
-    sw_error_t rv;
-
-    MDIO_LOCKER_LOCK;
-    rv = sd_reg_mdio_get(dev_id, phy_addr, reg, value);
-    MDIO_LOCKER_UNLOCK;
-    return rv;
-}
-
-sw_error_t
-isisc_phy_set(a_uint32_t dev_id, a_uint32_t phy_addr,
-             a_uint32_t reg, a_uint16_t value)
-{
-    sw_error_t rv;
-
-    MDIO_LOCKER_LOCK;
-    rv = sd_reg_mdio_set(dev_id, phy_addr, reg, value);
-    MDIO_LOCKER_UNLOCK;
-    return rv;
 }
 
 sw_error_t
@@ -437,8 +415,6 @@ isisc_reg_access_init(a_uint32_t dev_id, hsl_access_mode mode)
     reg_mode = mode;
 
     SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-    p_api->phy_get = isisc_phy_get;
-    p_api->phy_set = isisc_phy_set;
     p_api->reg_get = isisc_reg_get;
     p_api->reg_set = isisc_reg_set;
     p_api->reg_field_get = isisc_reg_field_get;

@@ -36,6 +36,8 @@
 #if defined(APPE)
 #include "adpt_appe_qm.h"
 #endif
+#include "hppe_global_reg.h"
+#include "hppe_global.h"
 
 #define SERVICE_CODE_QUEUE_OFFSET   2048
 #define CPU_CODE_QUEUE_OFFSET         1024
@@ -723,17 +725,42 @@ adpt_hppe_ucast_priority_class_get(
 }
 
 sw_error_t
+adpt_hppe_qm_enqueue_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t queue_id,
+		a_bool_t *enable)
+{
+	sw_error_t rv = SW_OK;
+	union oq_enq_opr_tbl_u enq;
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	memset(&enq, 0, sizeof(enq));
+
+	rv = hppe_oq_enq_opr_tbl_get(dev_id, queue_id, &enq);
+	if( rv != SW_OK )
+		return rv;
+
+	*enable = !(enq.bf.enq_disable);
+
+	return SW_OK;
+}
+
+sw_error_t
 adpt_hppe_queue_flush(
 		a_uint32_t dev_id,
 		fal_port_t port,
 		a_uint16_t queue_id)
 {
+#define PPE_QUEUE_FLUSH_CHECK_ROUND_MAX		0X2000
 	union flush_cfg_u flush_cfg;
-	a_uint32_t i = 0x100;
+	union clk_gating_ctrl_u clk_gate_ctrl;
+	a_uint32_t round = PPE_QUEUE_FLUSH_CHECK_ROUND_MAX, qm_clk_gate_bak = 0;
 	sw_error_t rv;
+	a_bool_t enable = A_TRUE;
 
-	memset(&flush_cfg, 0, sizeof(flush_cfg));
 	ADPT_DEV_ID_CHECK(dev_id);
+	memset(&flush_cfg, 0, sizeof(flush_cfg));
+	memset(&clk_gate_ctrl, 0, sizeof(clk_gate_ctrl));
 
 	#if 0
 	/* disable queue firstly */
@@ -766,31 +793,57 @@ adpt_hppe_queue_flush(
 	}
 	#endif
 
+	if (queue_id < ALL_QUEUE_ID_MAX) {
+		rv = adpt_hppe_qm_enqueue_ctrl_get(dev_id, queue_id, &enable);
+		SW_RTN_ON_ERROR(rv);
+
+		if (enable) {
+			SSDK_ERROR("queue %d should be disabled before flushing queue\n",
+					queue_id);
+			return SW_NOT_READY;
+		}
+	}
+
 	hppe_flush_cfg_get(dev_id, &flush_cfg);
 
 	if (queue_id == 0xffff) {
 		flush_cfg.bf.flush_all_queues = 1;
 		flush_cfg.bf.flush_qid = 0;
-		i = 0x1000;
-	}
-	else {
+	} else {
 		flush_cfg.bf.flush_all_queues = 0;
 		flush_cfg.bf.flush_qid = queue_id;
 	}
 	flush_cfg.bf.flush_dst_port = FAL_PORT_ID_VALUE(port);
 	flush_cfg.bf.flush_busy = 1;
 	
+	hppe_clk_gating_ctrl_get(dev_id, &clk_gate_ctrl);
+	qm_clk_gate_bak = clk_gate_ctrl.bf.qm_clk_gate_en;
+
+	/* Disable QM clock gate for accelerating queue flush */
+	clk_gate_ctrl.bf.qm_clk_gate_en = A_FALSE;
+	hppe_clk_gating_ctrl_set(dev_id, &clk_gate_ctrl);
+
 	hppe_flush_cfg_set(dev_id, &flush_cfg);
-	rv = hppe_flush_cfg_get(dev_id, &flush_cfg);
-	if (SW_OK != rv)
-		return rv;
-	while (flush_cfg.bf.flush_busy && --i) {
+	while (flush_cfg.bf.flush_busy && --round) {
 		hppe_flush_cfg_get(dev_id, &flush_cfg);
 	}
-	if (i == 0)
+
+	/* Restore QM clock gate */
+	clk_gate_ctrl.bf.qm_clk_gate_en = qm_clk_gate_bak;
+	hppe_clk_gating_ctrl_set(dev_id, &clk_gate_ctrl);
+
+	if (round == 0) {
+		SSDK_ERROR("queue %d flush busily\n", queue_id);
 		return SW_BUSY;
-	if (!flush_cfg.bf.flush_status)
+	}
+
+	if (!flush_cfg.bf.flush_status) {
+		SSDK_ERROR("queue %d flush fail %d\n", queue_id, flush_cfg.bf.flush_status);
 		return SW_FAIL;
+	}
+
+	SSDK_DEBUG("queue %d flush with round %d successfully\n", queue_id,
+			PPE_QUEUE_FLUSH_CHECK_ROUND_MAX - round);
 
 	#if 0
 	/* enable queue again */
@@ -1159,27 +1212,6 @@ adpt_hppe_qm_enqueue_ctrl_set(
 
 	enq.bf.enq_disable = !enable;
 	return hppe_oq_enq_opr_tbl_set(dev_id, queue_id, &enq);
-}
-
-sw_error_t
-adpt_hppe_qm_enqueue_ctrl_get(
-		a_uint32_t dev_id,
-		a_uint32_t queue_id,
-		a_bool_t *enable)
-{
-	sw_error_t rv = SW_OK;
-	union oq_enq_opr_tbl_u enq;
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	memset(&enq, 0, sizeof(enq));
-
-	rv = hppe_oq_enq_opr_tbl_get(dev_id, queue_id, &enq);
-	if( rv != SW_OK )
-		return rv;
-
-	*enable = !(enq.bf.enq_disable);
-
-	return SW_OK;
 }
 
 static sw_error_t

@@ -48,7 +48,8 @@ static const unsigned long mht_phyport_clk_support_rates[] = {
 };
 
 static const unsigned long mht_ahb_clk_support_rates[] = {
-	MHT_AHB_CLK_RATE_104P17M
+	MHT_XO_CLK_RATE_50M,
+	MHT_AHB_CLK_RATE_104P17M,
 };
 
 static const unsigned long mht_sys_clk_support_rates[] = {
@@ -422,6 +423,21 @@ static inline sw_error_t ssdk_mht_clk_update(a_uint32_t dev_id, a_uint32_t cmd_r
 
 	SSDK_ERROR("CLK cmd reg 0x%x fails updating to new configurations\n", cmd_reg);
 	return SW_FAIL;
+}
+
+a_bool_t ssdk_mht_clk_is_asserted(a_uint32_t dev_id, const char *clock_id)
+{
+	struct clk_lookup *clk;
+	a_uint32_t  reg_val = 0;
+
+	clk = ssdk_mht_clk_find(clock_id);
+	if (!clk) {
+		SSDK_ERROR("CLK %s is not found!\n", clock_id);
+		return A_FALSE;
+	}
+
+	reg_val = qca_mht_mii_read(dev_id, MHT_CLK_BASE_REG + clk->cbc);
+	return !!(reg_val & clk->rst_bit);
 }
 
 sw_error_t ssdk_mht_clk_assert(a_uint32_t dev_id, const char *clock_id)
@@ -1112,10 +1128,10 @@ void ssdk_mht_gcc_common_clk_parent_enable(a_uint32_t dev_id, mht_work_mode_t cl
 	/* System */
 	ssdk_mht_clk_parent_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_P_XO);
 	ssdk_mht_clk_rate_set(dev_id, MHT_SRDS0_SYS_CLK, MHT_SYS_CLK_RATE_25M);
-	/* Disable serdes0 clock to save power in phy mode */
+	/* assert serdes0 clock to save power in phy mode */
 	if (MHT_PHY_UQXGMII_MODE == clk_mode)
-		ssdk_mht_clk_disable(dev_id, MHT_SRDS0_SYS_CLK);
-	else
+		ssdk_mht_clk_assert(dev_id, MHT_SRDS0_SYS_CLK);
+	else if (clk_mode != MHT_SWITCH_MODE)
 		ssdk_mht_clk_enable(dev_id, MHT_SRDS0_SYS_CLK);
 	ssdk_mht_clk_enable(dev_id, MHT_SRDS1_SYS_CLK);
 	ssdk_mht_clk_enable(dev_id, MHT_GEPHY0_SYS_CLK);

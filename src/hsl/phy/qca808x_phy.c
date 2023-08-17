@@ -764,6 +764,35 @@ sw_error_t qca808x_phy_poweroff(a_uint32_t dev_id, a_uint32_t phy_addr)
 
 	return rv;
 }
+
+sw_error_t
+qca808x_phy_pll_on(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+#ifdef MHT
+	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
+	{
+		rv = qca8084_phy_pll_on(dev_id, phy_addr);
+		PHY_RTN_ON_ERROR (rv);
+	}
+#endif
+	return rv;
+}
+
+sw_error_t
+qca808x_phy_pll_off(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	sw_error_t rv = SW_OK;
+#ifdef MHT
+	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
+	{
+		rv = qca8084_phy_pll_off(dev_id, phy_addr);
+		PHY_RTN_ON_ERROR (rv);
+	}
+#endif
+	return rv;
+}
+
 #ifndef IN_PORTCONTROL_MINI
 /******************************************************************************
 *
@@ -1784,6 +1813,8 @@ static sw_error_t qca808x_phy_api_ops_init(a_uint32_t dev_id, a_uint32_t port_bm
 	qca808x_phy_api_ops->phy_eee_cap_get = qca808x_phy_get_eee_cap;
 	qca808x_phy_api_ops->phy_eee_status_get = qca808x_phy_get_eee_status;
 	qca808x_phy_api_ops->phy_function_reset = qca808x_phy_function_reset;
+	qca808x_phy_api_ops->phy_pll_on = qca808x_phy_pll_on;
+	qca808x_phy_api_ops->phy_pll_off = qca808x_phy_pll_off;
 #ifdef IN_LED
 	qca808x_phy_led_api_ops_init(qca808x_phy_api_ops);
 #endif

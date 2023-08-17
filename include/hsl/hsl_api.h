@@ -530,12 +530,6 @@ extern "C"
     (*hsl_port_reset) (a_uint32_t dev_id, fal_port_t port_id);
 
   typedef sw_error_t
-    (*hsl_port_power_off) (a_uint32_t dev_id, fal_port_t port_id);
-
-  typedef sw_error_t
-    (*hsl_port_power_on) (a_uint32_t dev_id, fal_port_t port_id);
-
-  typedef sw_error_t
     (*hsl_port_phy_id_get) (a_uint32_t dev_id, fal_port_t port_id,a_uint16_t * org_id, a_uint16_t * rev_id);
 
   typedef sw_error_t
@@ -579,6 +573,10 @@ extern "C"
   typedef sw_error_t
     (*hsl_port_interface_eee_cfg_get)(a_uint32_t dev_id,
 			    fal_port_t port_id, fal_port_eee_cfg_t *port_eee_cfg);
+  typedef sw_error_t
+    (*hsl_port_erp_power_mode_set)(a_uint32_t dev_id,
+			    fal_port_t port_id, fal_port_erp_power_mode_t power_mode);
+
   /* VLAN */
 #define VLAN_FUNC_PROTOTYPE_DEF
   typedef sw_error_t
@@ -2164,8 +2162,6 @@ typedef sw_error_t
     hsl_port_remote_loopback_set port_remote_loopback_set;
     hsl_port_remote_loopback_get port_remote_loopback_get;
     hsl_port_reset port_reset;
-    hsl_port_power_off port_power_off;
-    hsl_port_power_on port_power_on;
     hsl_port_phy_id_get port_phy_id_get;
     hsl_port_wol_status_set port_wol_status_set;
     hsl_port_wol_status_get port_wol_status_get;
@@ -2183,6 +2179,7 @@ typedef sw_error_t
 /*qca808x_end*/
     hsl_port_interface_eee_cfg_set port_interface_eee_cfg_set;
     hsl_port_interface_eee_cfg_get port_interface_eee_cfg_get;
+    hsl_port_erp_power_mode_set port_erp_power_mode_set;
     /* VLAN */
     hsl_vlan_entry_append vlan_entry_append;
     hsl_vlan_create vlan_creat;

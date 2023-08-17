@@ -1413,6 +1413,27 @@ qca_phy_mib_work_stop(struct qca_phy_priv *priv)
 	cancel_delayed_work_sync(&priv->mib_dwork);
 }
 
+void
+qca_phy_mib_work_pause(struct qca_phy_priv *priv)
+{
+	if(!priv)
+		return;
+	cancel_delayed_work_sync(&priv->mib_dwork);
+}
+
+int
+qca_phy_mib_work_resume(struct qca_phy_priv *priv)
+{
+#ifndef SSDK_MIB_CHANGE_WQ
+	schedule_delayed_work(&priv->mib_dwork,
+			               msecs_to_jiffies(QCA_PHY_MIB_WORK_DELAY));
+#else
+	queue_delayed_work_on(0, system_long_wq, &priv->mib_dwork,
+					msecs_to_jiffies(QCA_PHY_MIB_WORK_DELAY));
+#endif
+	return 0;
+}
+
 #define SSDK_QM_CHANGE_WQ
 
 static void

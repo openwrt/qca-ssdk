@@ -253,6 +253,8 @@ extern "C" {
 					      a_uint32_t phy_id,
 					      a_uint32_t source_id,
 					      led_ctrl_pattern_t * pattern);
+	typedef sw_error_t(*hsl_phy_pll_on) (a_uint32_t dev_id, a_uint32_t phy_id);
+	typedef sw_error_t(*hsl_phy_pll_off) (a_uint32_t dev_id, a_uint32_t phy_id);
 	typedef sw_error_t(*hsl_phy_ptp_security_set) (a_uint32_t dev_id,
 				a_uint32_t phy_id, fal_ptp_security_t *sec);
 
@@ -520,6 +522,8 @@ extern "C" {
 		hsl_phy_led_ctrl_pattern_set phy_led_ctrl_pattern_set;
 		hsl_phy_led_ctrl_pattern_get phy_led_ctrl_pattern_get;
 		hsl_phy_led_ctrl_source_set phy_led_ctrl_source_set;
+		hsl_phy_pll_on phy_pll_on;
+		hsl_phy_pll_off phy_pll_off;
 		hsl_phy_ptp_ops_t phy_ptp_ops;
 /*qca808x_start*/
 	} hsl_phy_ops_t;
@@ -757,6 +761,10 @@ hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
 sw_error_t
 hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	led_ctrl_pattern_t *pattern);
+sw_error_t
+hsl_port_phy_pll_on(a_uint32_t dev_id, a_uint32_t port_id);
+sw_error_t
+hsl_port_phy_pll_off(a_uint32_t dev_id, a_uint32_t port_id);
 phy_info_t *hsl_phy_info_get(a_uint32_t dev_id);
 
 sw_error_t

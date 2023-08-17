@@ -52,15 +52,15 @@
 #define QCA8084_PHY_8023AZ_EEE_2500BT                                    0x1
 #define QCA8084_PHY_MMD7_IPG_10_EN                                       0
 #define QCA8084_PHY_MMD7_IPG_11_EN                                       0x1
+
 /*DEBUG port register*/
 #define QCA8084_PHY_CONTROL_DEBUG_REGISTER0                              0x1f
-#define QCA8084_PHY_CONTROL_DEBUG_REGISTER0_VAL                          0x308
+#define QCA8084_PHY_1588_P2_EN                                           0x2
+
 /*DEBUG port analog register*/
 #define QCA8084_PHY_DEBUG_ANA_INTERFACE_CLK_SEL                          0x8b80
 #define QCA8084_PHY_AFE25_CMN_6_MII                                      0x380
-#define QCA8084_PHY_AFE25_CMN_6_MII_VAL                                  0x1640
-#define QCA8084_PHY_AFE25_CMN_9_MII                                      0x680
-#define QCA8084_PHY_AFE25_CMN_9_MII_VAL                                  0xc
+#define QCA8084_PHY_AFE25_PLL_EN                                         0x8000
 #define QCA8084_PHY_DEBUG_ANA_ICC                                        0x280
 #define QCA8084_PHY_DEBUG_ANA_ICC_MASK                                   0x1f
 
@@ -119,3 +119,7 @@ qca8084_phy_fifo_reset(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
 sw_error_t
 qca8084_phy_fixup_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t *ability);
+sw_error_t
+qca8084_phy_pll_on(a_uint32_t dev_id, a_uint32_t phy_addr);
+sw_error_t
+qca8084_phy_pll_off(a_uint32_t dev_id, a_uint32_t phy_addr);

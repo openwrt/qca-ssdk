@@ -314,6 +314,7 @@ typedef enum
 	SW_ATHTAG_TX_CFG,
 	SW_SERVCODE_ATHTAG,
 	SW_COMBO_LINK,
+	SW_ERP_POWER_MODE,
 /* auto_insert_flag */
 } sw_data_type_e;
 

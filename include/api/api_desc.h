@@ -679,6 +679,14 @@ extern "C" {
 		    sizeof(fal_port_combo_link_status_t), SW_PARAM_PTR|SW_PARAM_OUT, \
 		    "Status"),
 
+#define SW_API_PT_ERP_POWER_MODE_SET_DESC \
+    SW_PARAM_DEF(SW_API_PT_ERP_POWER_MODE_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_PT_ERP_POWER_MODE_SET, SW_UINT32, \
+		    sizeof(a_uint32_t), SW_PARAM_IN, "Port ID"), \
+    SW_PARAM_DEF(SW_API_PT_ERP_POWER_MODE_SET, SW_ERP_POWER_MODE, \
+		    sizeof(fal_port_erp_power_mode_t), SW_PARAM_IN, "Power Mode"),
+
 #define SW_API_VLAN_ADD_DESC \
     SW_PARAM_DEF(SW_API_VLAN_ADD, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
     SW_PARAM_DEF(SW_API_VLAN_ADD, SW_UINT32, 4, SW_PARAM_IN, "Vlan Id"),

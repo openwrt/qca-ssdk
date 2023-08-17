@@ -148,7 +148,8 @@ extern "C" {
     SW_API_DEF(SW_API_PT_CNT_CFG_GET, fal_port_cnt_cfg_get), \
     SW_API_DEF(SW_API_PT_CNT_GET, fal_port_cnt_get), \
     SW_API_DEF(SW_API_PT_CNT_FLUSH, fal_port_cnt_flush), \
-    SW_API_DEF(SW_API_PT_COMBO_LINK_STATUS_GET, fal_port_combo_link_status_get ),
+    SW_API_DEF(SW_API_PT_COMBO_LINK_STATUS_GET, fal_port_combo_link_status_get ), \
+    SW_API_DEF(SW_API_PT_ERP_POWER_MODE_SET, fal_port_erp_power_mode_set),
 /*qca808x_start*/
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
@@ -273,7 +274,8 @@ extern "C" {
     SW_API_DESC(SW_API_PT_CNT_CFG_GET) \
     SW_API_DESC(SW_API_PT_CNT_GET) \
     SW_API_DESC(SW_API_PT_CNT_FLUSH) \
-    SW_API_DESC(SW_API_PT_COMBO_LINK_STATUS_GET)
+    SW_API_DESC(SW_API_PT_COMBO_LINK_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_ERP_POWER_MODE_SET)
 /*qca808x_start*/
 /*end of PORTCONTROL_API_PARAM*/
 /*qca808x_end*/
@@ -328,7 +330,8 @@ extern "C" {
     SW_API_DEF(SW_API_PT_PROMISC_MODE_GET, fal_port_promisc_mode_get), \
     SW_API_DEF(SW_API_PT_COMBO_LINK_STATUS_GET, fal_port_combo_link_status_get ), \
     SW_API_DEF(SW_API_PT_COMBO_PREFER_MEDIUM_SET, fal_port_combo_prefer_medium_set), \
-    SW_API_DEF(SW_API_PT_COMBO_PREFER_MEDIUM_GET, fal_port_combo_prefer_medium_get),
+    SW_API_DEF(SW_API_PT_COMBO_PREFER_MEDIUM_GET, fal_port_combo_prefer_medium_get), \
+    SW_API_DEF(SW_API_PT_ERP_POWER_MODE_SET, fal_port_erp_power_mode_set),
 /*end of PORTCONTROL_API*/
 #define PORTCONTROL_API_PARAM \
     SW_API_DESC(SW_API_PT_CDT) \
@@ -380,7 +383,8 @@ extern "C" {
     SW_API_DESC(SW_API_PT_PROMISC_MODE_GET) \
     SW_API_DESC(SW_API_PT_COMBO_LINK_STATUS_GET) \
     SW_API_DESC(SW_API_PT_COMBO_PREFER_MEDIUM_SET) \
-    SW_API_DESC(SW_API_PT_COMBO_PREFER_MEDIUM_GET)
+    SW_API_DESC(SW_API_PT_COMBO_PREFER_MEDIUM_GET) \
+    SW_API_DESC(SW_API_PT_ERP_POWER_MODE_SET)
 /*end of PORTCONTROL_API_PARAM*/
 #endif
 

@@ -467,6 +467,10 @@ _mht_interface_uqxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_addr)
 	for(mht_port_id = SSDK_PHYSICAL_PORT1; mht_port_id <= SSDK_PHYSICAL_PORT4;
 		mht_port_id++)
 	{
+		/* ethphy software reset will power on the phy, for erp low power port
+		 * which has power off, can not power on it */
+		if (hsl_port_feature_get(dev_id, mht_port_id, PHY_F_ERP_LOW_POWER))
+			continue;
 		rv = qca_mht_ephy_addr_get(dev_id, mht_port_id, &phy_addr);
 		PHY_RTN_ON_ERROR (rv);
 		rv = qca808x_phy_reset(dev_id, phy_addr);
@@ -508,6 +512,12 @@ mht_interface_uqxgmii_mode_set(a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t uniphy_addr = 0, mht_port_id = 0;
+
+	/* dassert serdes if it is asserted */
+	if (ssdk_mht_clk_is_asserted(dev_id, MHT_SRDS1_SYS_CLK)) {
+		rv = ssdk_mht_clk_deassert(dev_id, MHT_SRDS1_SYS_CLK);
+		PHY_RTN_ON_ERROR (rv);
+	}
 
 	rv = qca_mht_serdes_addr_get(dev_id, MHT_UNIPHY_SGMII_1, &uniphy_addr);
 	PHY_RTN_ON_ERROR (rv);
@@ -574,6 +584,19 @@ mht_interface_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	a_uint32_t uniphy_addr = 0, mode_ctrl = 0, speed_mode = 0;
 	a_uint32_t uniphy_port_id = 0, ethphy_clk_mask = 0;
 	a_uint64_t raw_clk = 0;
+
+	/* dassert serdes if it is asserted */
+	if (uniphy_index == MHT_UNIPHY_SGMII_0) {
+		if (ssdk_mht_clk_is_asserted(dev_id, MHT_SRDS0_SYS_CLK)) {
+			rv = ssdk_mht_clk_deassert(dev_id, MHT_SRDS0_SYS_CLK);
+			PHY_RTN_ON_ERROR (rv);
+		}
+	} else if (uniphy_index == MHT_UNIPHY_SGMII_1) {
+		if (ssdk_mht_clk_is_asserted(dev_id, MHT_SRDS1_SYS_CLK)) {
+			rv = ssdk_mht_clk_deassert(dev_id, MHT_SRDS1_SYS_CLK);
+			PHY_RTN_ON_ERROR (rv);
+		}
+	}
 
 	/*get the uniphy address*/
 	rv = qca_mht_serdes_addr_get(dev_id, uniphy_index, &uniphy_addr);
@@ -730,7 +753,8 @@ mht_interface_mac_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 			if(config->mac_mode == FAL_MAC_MODE_MAX)
 			{
 				SSDK_INFO("the uniphy for port %d is not used\n", port_id);
-				ssdk_mht_clk_disable(dev_id, MHT_SRDS0_SYS_CLK);
+				/* assert serdes0 to save power */
+				ssdk_mht_clk_assert(dev_id, MHT_SRDS0_SYS_CLK);
 				return SW_OK;
 			}
 		}

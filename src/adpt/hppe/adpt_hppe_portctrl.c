@@ -1684,11 +1684,11 @@ adpt_hppe_port_interface_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 			else if(mode == PHY_SGMII_BASET)
 				hsl_port_feature_set(dev_id, port_id, PHY_F_SFP_SGMII);
 		}
+		rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id, mode);
 	} else {
 		hsl_port_feature_clear(dev_id, port_id, PHY_F_FORCE_INTERFACE_MODE);
 		qca_mac_port_status_init(dev_id, port_id);
 	}
-	rv = _adpt_hppe_port_interface_mode_set(dev_id, port_id, mode);
 
 	return rv;
 }
@@ -2384,8 +2384,7 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 		if(port_id != SSDK_PHYSICAL_PORT5 &&
 				(phy_info->port_mode[port_id] == PORT_SGMII_PLUS ||
 				 phy_info->port_mode[port_id] ==PORT_USXGMII ||
-				 phy_info->port_mode[port_id] == PORT_10GBASE_R ||
-				 phy_info->port_mode[port_id] == PORT_INTERFACE_MODE_AUTO))
+				 phy_info->port_mode[port_id] == PORT_10GBASE_R))
 		{
 			if(phy_info->port_mode[port_id] == PORT_SGMII_PLUS)
 			{
@@ -2422,13 +2421,6 @@ _adpt_hppe_instance0_mode_get(a_uint32_t dev_id, a_uint32_t *mode0)
 				}
 			}
 #endif
-			else if (phy_info->port_mode[port_id] == PORT_INTERFACE_MODE_AUTO)
-				continue;
-			else if (phy_info->port_mode[port_id] == PORT_INTERFACE_MODE_MAX)
-			{
-				*mode0 = PORT_WRAPPER_MAX;
-				continue;
-			}
 			SSDK_ERROR("port %d doesn't support port_interface_mode %d\n",
 				port_id, phy_info->port_mode[port_id]);
 			return SW_NOT_SUPPORTED;
@@ -2475,8 +2467,6 @@ _adpt_hppe_instance1_mode_get(a_uint32_t dev_id, a_uint32_t port_id,  a_uint32_t
 				return SW_NOT_SUPPORTED;
 			}
 			*mode = PORT_WRAPPER_MAX;
-			break;
-		case PORT_INTERFACE_MODE_AUTO:
 			break;
 		case PORT_INTERFACE_MODE_MAX:
 			*mode = PORT_WRAPPER_MAX;
@@ -2609,6 +2599,10 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 				}
 				break;
 			case PORT_WRAPPER_QSGMII:
+#if defined(APPE)
+			case PORT_WRAPPER_UQXGMII:
+			case PORT_WRAPPER_UDXGMII:
+#endif
 				port_id_from = SSDK_PHYSICAL_PORT1;
 				port_id_end = SSDK_PHYSICAL_PORT4;
 				break;
@@ -2695,10 +2689,12 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 		{
 			rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode);
 			SW_RTN_ON_ERROR(rv);
-			rv = hsl_port_phy_mode_set(dev_id, port_id, port_mode);
-			SW_RTN_ON_ERROR(rv);
-			SSDK_DEBUG("port_id:%d is configured as port_mode:0x%x\n",
-				port_id, port_mode);
+			if (port_mode != PORT_INTERFACE_MODE_MAX) {
+				rv = hsl_port_phy_mode_set(dev_id, port_id, port_mode);
+				SW_RTN_ON_ERROR(rv);
+				SSDK_DEBUG("port_id:%d is configured as port_mode:0x%x\n",
+					port_id, port_mode);
+			}
 		}
 	}
 	/*swith PHY driver if need*/
@@ -2728,7 +2724,6 @@ _adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id, a_bool_t force_switch)
 	for(mode_index = SSDK_UNIPHY_INSTANCE0; mode_index <= HPPE_UNIPHY_MAX; mode_index++)
 	{
 		mode_old[mode_index] = ssdk_dt_global_get_mac_mode(dev_id, mode_index);
-		mode_new[mode_index] = mode_old[mode_index];
 		if(mode_index == SSDK_UNIPHY_INSTANCE1 &&
 			mode_new[SSDK_UNIPHY_INSTANCE0] == PORT_WRAPPER_SGMII_CHANNEL4)
 		{
@@ -2773,7 +2768,7 @@ _adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id, a_bool_t force_switch)
 
 	return rv;
 }
-#ifndef IN_PORTCONTROL_MINI
+
 sw_error_t
 adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id)
 {
@@ -2795,7 +2790,7 @@ adpt_hppe_port_interface_mode_apply(a_uint32_t dev_id)
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 sw_error_t
 adpt_hppe_port_mac_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 				 a_bool_t * enable)
@@ -5004,6 +4999,8 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 			adpt_appe_port_tx_buff_thresh_set;
 		p_adpt_api->adpt_port_tx_buff_thresh_get =
 			adpt_appe_port_tx_buff_thresh_get;
+		p_adpt_api->adpt_port_erp_power_mode_set =
+			adpt_appe_port_erp_power_mode_set;
 	}
 #endif
 	p_adpt_api->adpt_port_cnt_cfg_set = adpt_ppe_port_cnt_cfg_set;

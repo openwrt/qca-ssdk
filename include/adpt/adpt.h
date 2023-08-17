@@ -218,7 +218,6 @@ typedef sw_error_t (*adpt_port_phy_id_get_func)(a_uint32_t dev_id, fal_port_t po
 			  a_uint16_t * org_id, a_uint16_t * rev_id);
 typedef sw_error_t (*adpt_port_mru_get_func)(a_uint32_t dev_id, fal_port_t port_id,
 		fal_mru_ctrl_t *ctrl);
-typedef sw_error_t (*adpt_port_power_on_func)(a_uint32_t dev_id, fal_port_t port_id);
 typedef sw_error_t (*adpt_port_speed_set_func)(a_uint32_t dev_id, fal_port_t port_id,
 				   fal_port_speed_t speed);
 typedef sw_error_t (*adpt_port_interface_mode_get_func)(a_uint32_t dev_id, fal_port_t port_id,
@@ -246,7 +245,6 @@ typedef sw_error_t (*adpt_port_max_frame_size_get_func)(a_uint32_t dev_id, fal_p
 typedef sw_error_t (*adpt_port_combo_prefer_medium_set_func)(a_uint32_t dev_id,
 						 a_uint32_t port_id,
 						 fal_port_medium_t medium);
-typedef sw_error_t (*adpt_port_power_off_func)(a_uint32_t dev_id, fal_port_t port_id);
 typedef sw_error_t (*adpt_port_txfc_status_set_func)(a_uint32_t dev_id, fal_port_t port_id,
 					 a_bool_t enable);
 typedef sw_error_t (*adpt_port_counter_set_func)(a_uint32_t dev_id, fal_port_t port_id,
@@ -362,6 +360,8 @@ typedef sw_error_t (*adpt_port_rx_buff_thresh_set_func)(a_uint32_t dev_id,
 		a_uint32_t port, a_uint16_t thresh);
 typedef sw_error_t (*adpt_port_rx_buff_thresh_get_func)(a_uint32_t dev_id,
 		a_uint32_t port, a_uint16_t *thresh);
+typedef sw_error_t (*adpt_port_erp_power_mode_set_func)(a_uint32_t dev_id,
+		a_uint32_t port, fal_port_erp_power_mode_t power_mode);
 
 // mirror
 typedef sw_error_t (*adpt_mirr_port_in_set_func)(a_uint32_t dev_id, fal_port_t port_id,
@@ -1555,7 +1555,6 @@ typedef struct
 	adpt_port_mac_loopback_set_func adpt_port_mac_loopback_set;
 	adpt_port_phy_id_get_func adpt_port_phy_id_get;
 	adpt_port_mru_get_func adpt_port_mru_get;
-	adpt_port_power_on_func adpt_port_power_on;
 	adpt_port_speed_set_func adpt_port_speed_set;
 	adpt_port_interface_mode_get_func adpt_port_interface_mode_get;
 	adpt_port_duplex_get_func adpt_port_duplex_get;
@@ -1568,7 +1567,6 @@ typedef struct
 	adpt_port_combo_prefer_medium_get_func adpt_port_combo_prefer_medium_get;
 	adpt_port_max_frame_size_set_func adpt_port_max_frame_size_set;
 	adpt_port_combo_prefer_medium_set_func adpt_port_combo_prefer_medium_set;
-	adpt_port_power_off_func adpt_port_power_off;
 	adpt_port_txfc_status_set_func adpt_port_txfc_status_set;
 	adpt_port_counter_set_func adpt_port_counter_set;
 	adpt_port_combo_fiber_mode_get_func adpt_port_combo_fiber_mode_get;
@@ -1628,6 +1626,7 @@ typedef struct
 	adpt_port_tx_buff_thresh_get_func adpt_port_tx_buff_thresh_get;
 	adpt_port_rx_buff_thresh_set_func adpt_port_rx_buff_thresh_set;
 	adpt_port_rx_buff_thresh_get_func adpt_port_rx_buff_thresh_get;
+	adpt_port_erp_power_mode_set_func adpt_port_erp_power_mode_set;
 // mirror
 	adpt_mirr_port_in_set_func adpt_mirr_port_in_set;
 	adpt_mirr_port_in_get_func adpt_mirr_port_in_get;

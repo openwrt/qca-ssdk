@@ -2056,6 +2056,7 @@ isisc_port_ctrl_init(a_uint32_t dev_id)
 	p_api->ring_flow_ctrl_set = mht_ring_flow_ctrl_config_set;
 	p_api->ring_flow_ctrl_get = mht_ring_flow_ctrl_config_get;
 #endif
+	p_api->port_erp_power_mode_set= mht_port_erp_power_mode_set;
 #endif
 
     }

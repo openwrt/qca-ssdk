@@ -1611,15 +1611,25 @@ void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	{
 		rst_type[index++] = uniphy_soft_rst[uniphy_index];
 #if defined(APPE)
-		if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx") &&
-				uniphy_index == SSDK_UNIPHY_INSTANCE1) {
+		if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq95xx")) {
 			a_uint32_t mode0, mode1;
 
 			mode0 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
 			mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
-			if ((mode0 == PORT_WRAPPER_PSGMII) && (mode1 == PORT_WRAPPER_MAX)) {
-				SSDK_INFO("Uniphy instance %d unavailable\n", uniphy_index);
+			if ((uniphy_index == SSDK_UNIPHY_INSTANCE1) &&
+				(mode0 == PORT_WRAPPER_PSGMII) && (mode1 == PORT_WRAPPER_MAX)) {
+				/* can not reset uniphy port5 as it is used by uniphy0 psgmii */
 				index--;
+			}
+			if ((uniphy_index == SSDK_UNIPHY_INSTANCE0) &&
+				(mode0 == PORT_WRAPPER_MAX) && (mode1 != PORT_WRAPPER_MAX)) {
+				/* can not reset uniphy port5 as it is used by uniphy1, instead
+				 * only reset uniphy port1 to port4 */
+				index--;
+				rst_type[index++] = UNIPHY0_PORT1_DISABLE_E;
+				rst_type[index++] = UNIPHY0_PORT2_DISABLE_E;
+				rst_type[index++] = UNIPHY0_PORT3_DISABLE_E;
+				rst_type[index++] = UNIPHY0_PORT4_DISABLE_E;
 			}
 		}
 #endif

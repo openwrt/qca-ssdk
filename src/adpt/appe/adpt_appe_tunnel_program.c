@@ -506,7 +506,7 @@ sw_error_t
 adpt_appe_tunnel_program_entry_add(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_entry_t * entry)
 {
-	a_uint32_t idx, entry_idx, entry_sign;
+	a_uint32_t idx, entry_idx=0, entry_sign;
 	a_int32_t program_port_bitmap, program_id;
 	fal_tunnel_program_entry_t temp_entry = {0};
 
@@ -751,7 +751,7 @@ sw_error_t
 adpt_appe_tunnel_program_udf_add(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf)
 {
-	a_uint32_t idx, entry_idx;
+	a_uint32_t idx, entry_idx=0;
 	a_int32_t program_id, temp_program_id;
 	fal_tunnel_program_udf_t temp_udf = {0};
 	a_bool_t entry_sign = A_FALSE;

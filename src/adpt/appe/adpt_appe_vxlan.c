@@ -151,7 +151,7 @@ sw_error_t
 adpt_appe_vxlan_entry_add(a_uint32_t dev_id, fal_vxlan_type_t type,
 						fal_tunnel_udp_entry_t * entry)
 {
-	a_uint32_t idx, entry_idx, entry_sign;
+	a_uint32_t idx, entry_idx=0, entry_sign;
 	a_bool_t entry_inuse;
 	a_int32_t vxlan_port_bitmap;
 	fal_tunnel_udp_entry_t temp_entry;

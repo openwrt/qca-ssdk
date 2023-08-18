@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -58,6 +58,7 @@
 #ifdef MHT
 #include "ssdk_mht.h"
 #endif
+#include "ref_fdb.h"
 
 extern void qca_ar8327_sw_mac_polling_task(struct qca_phy_priv *priv);
 
@@ -75,17 +76,27 @@ static int qca_phy_disable_intr(struct qca_phy_priv *priv)
 	return 0;
 }
 
-static int qca_mac_disable_intr(struct qca_phy_priv *priv)
+static int qca_switch_disable_intr(struct qca_phy_priv *priv, a_uint32_t intr_mask)
 {
-	a_uint32_t port_id = 0;
+	a_uint32_t port_id = 0, intr_mask_tmp = 0;
 
-	for(port_id = SSDK_PHYSICAL_PORT1; port_id < priv->ports;  port_id++)
+	fal_intr_mask_get(priv->device_id, &intr_mask_tmp);
+	if(intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
 	{
-		fal_intr_mask_mac_linkchg_set(priv->device_id, port_id, A_FALSE);
+		for(port_id = SSDK_PHYSICAL_PORT1; port_id < priv->ports;  port_id++)
+		{
+			fal_intr_mask_mac_linkchg_set(priv->device_id, port_id, A_FALSE);
+		}
+		intr_mask_tmp &= (~FAL_SWITCH_INTR_LINK_STATUS);
+		fal_intr_mask_set(priv->device_id, intr_mask_tmp);
+		fal_intr_status_mac_linkchg_clear(priv->device_id);
 	}
-
-	fal_intr_mask_set(priv->device_id, 0);
-	fal_intr_status_mac_linkchg_clear(priv->device_id);
+	if(intr_mask & FAL_SWITCH_INTR_FDB_CHANGE)
+	{
+		intr_mask_tmp &= (~FAL_SWITCH_INTR_FDB_CHANGE);
+		fal_intr_mask_set(priv->device_id, intr_mask_tmp);
+		fal_intr_status_clear(priv->device_id, FAL_SWITCH_INTR_FDB_CHANGE);
+	}
 
 	return 0;
 }
@@ -106,17 +117,21 @@ static int qca_phy_enable_intr(struct qca_phy_priv *priv)
 	return 0;
 }
 
-int qca_mac_enable_intr(struct qca_phy_priv *priv)
+int qca_switch_enable_intr(struct qca_phy_priv *priv, a_uint32_t intr_mask)
 {
-	a_uint32_t port_id = 0;
+	a_uint32_t port_id = 0, intr_mask_tmp = 0;
 
-	/*enable link change intr*/
-	for(port_id = SSDK_PHYSICAL_PORT1; port_id < priv->ports;  port_id++)
+	fal_intr_mask_get(priv->device_id, &intr_mask_tmp);
+	if(intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
 	{
-		fal_intr_mask_mac_linkchg_set(priv->device_id, port_id, A_TRUE);
+		/*enable link change intr*/
+		for(port_id = SSDK_PHYSICAL_PORT1; port_id < priv->ports;  port_id++)
+		{
+			fal_intr_mask_mac_linkchg_set(priv->device_id, port_id, A_TRUE);
+		}
 	}
 
-	fal_intr_mask_set(priv->device_id, FAL_SWITCH_INTR_LINK_STATUS);
+	fal_intr_mask_set(priv->device_id, intr_mask | intr_mask_tmp);
 
 	return 0;
 }
@@ -134,9 +149,12 @@ static int qca_phy_clean_intr(struct qca_phy_priv *priv)
 	return 0;
 }
 
-static int qca_mac_clean_intr(struct qca_phy_priv *priv)
+static int qca_switch_clean_intr(struct qca_phy_priv *priv, a_uint32_t intr_mask)
 {
-	fal_intr_status_mac_linkchg_clear(priv->device_id);
+	if(intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
+		fal_intr_status_mac_linkchg_clear(priv->device_id);
+	if(intr_mask & FAL_SWITCH_INTR_FDB_CHANGE)
+		fal_intr_status_clear(priv->device_id, FAL_SWITCH_INTR_FDB_CHANGE);
 
 	return 0;
 }
@@ -171,19 +189,29 @@ qca_link_change_task(struct qca_phy_priv *priv)
 static void
 qca_intr_workqueue_task(struct work_struct *work)
 {
-	a_uint32_t intr_mask;
+	a_uint32_t intr_status;
 	struct qca_phy_priv *priv = container_of(work, struct qca_phy_priv,  intr_workqueue);
 
-	fal_intr_mask_get(priv->device_id, &intr_mask);
-	qca_phy_clean_intr(priv);
-	qca_mac_clean_intr(priv);
-	SSDK_DEBUG("intr_mask:%x, priv->version:%x\n", intr_mask, priv->version);
-	if((intr_mask & FAL_SWITCH_INTR_LINK_STATUS))
+	fal_intr_status_get(priv->device_id, &intr_status);
+	SSDK_DEBUG("intr_status:%x, priv->version:%x\n", intr_status, priv->version);
+	if(intr_status & FAL_SWITCH_INTR_LINK_STATUS)
+	{
+		qca_phy_clean_intr(priv);
+		qca_switch_clean_intr(priv, FAL_SWITCH_INTR_LINK_STATUS);
 		qca_link_change_task(priv);
-	enable_irq(priv->link_interrupt_no);
+	}
+	if(intr_status & FAL_SWITCH_INTR_FDB_CHANGE)
+	{
+		qca_switch_clean_intr(priv, FAL_SWITCH_INTR_FDB_CHANGE);
+#ifdef IN_FDB
+		ref_fdb_sw_sync_task(priv);
+#endif
+	}
+
+	enable_irq(priv->interrupt_no);
 }
 
- static irqreturn_t  qca_link_intr_handle(int irq, void *phy_priv)
+ static irqreturn_t  qca_intr_handle(int irq, void *phy_priv)
  {
 	struct qca_phy_priv *priv = (struct qca_phy_priv *)phy_priv;
 
@@ -199,12 +227,25 @@ qca_intr_workqueue_task(struct work_struct *work)
 	SSDK_DEBUG("start to  init the interrupt!\n");
 	mutex_init(&priv->qm_lock);
 	INIT_WORK(&priv->intr_workqueue, qca_intr_workqueue_task);
-	qca_phy_disable_intr(priv);
-	qca_mac_disable_intr(priv);
-	if(request_irq(priv->link_interrupt_no, qca_link_intr_handle, priv->interrupt_flag, priv->link_intr_name, priv))
+	if(priv->link_polling_required == A_FALSE)
+	{
+		qca_phy_disable_intr(priv);
+		qca_switch_disable_intr(priv, FAL_SWITCH_INTR_LINK_STATUS);
+	}
+
+	if(priv->fdb_sync == FDB_SYNC_INTR)
+		qca_switch_disable_intr(priv, FAL_SWITCH_INTR_FDB_CHANGE);
+
+	if(request_irq(priv->interrupt_no, qca_intr_handle, priv->interrupt_flag,
+		priv->intr_name, priv))
 		return -1;
-	qca_phy_enable_intr(priv);
-	qca_mac_enable_intr(priv);
+	if(priv->link_polling_required == A_FALSE)
+	{
+		qca_phy_enable_intr(priv);
+		qca_switch_enable_intr(priv, FAL_SWITCH_INTR_LINK_STATUS);
+	}
+	if(priv->fdb_sync == FDB_SYNC_INTR)
+		qca_switch_enable_intr(priv, FAL_SWITCH_INTR_FDB_CHANGE);
 
 	return 0;
 }

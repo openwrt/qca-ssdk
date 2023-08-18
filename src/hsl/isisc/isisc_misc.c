@@ -44,6 +44,7 @@
 
 #define ISISC_SWITCH_INT_PHY_INT   0x8000
 
+#define SWITCH_FDB_LEARN_INT   0x000f00
 
 static sw_error_t
 _isisc_port_misc_property_set(a_uint32_t dev_id, fal_port_t port_id,
@@ -1004,25 +1005,44 @@ _isisc_ripv1_status_get(a_uint32_t dev_id, a_bool_t * enable)
 static sw_error_t
 _isisc_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
 {
-    sw_error_t rv;
-    a_uint32_t reg = 0;
+    sw_error_t rv = SW_OK;
+    a_uint32_t reg = 0, mask = 0;
 
-    HSL_REG_ENTRY_GET(rv, dev_id, GBL_INT_MASK1, 0, (a_uint8_t *) (&reg),
-                      sizeof (a_uint32_t));
-    SW_RTN_ON_ERROR(rv);
-
-    if (intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
-    {
-        reg |= ISISC_SWITCH_INT_PHY_INT;
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+        mask = MHT_SWITCH_INT_PHY_INT;
+        if (intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
+            reg |= MHT_SWITCH_INT_PHY_INT;
     }
     else
+#endif
     {
-        reg &= (~ISISC_SWITCH_INT_PHY_INT);
+        mask = ISISC_SWITCH_INT_PHY_INT;
+        if (intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
+            reg |= ISISC_SWITCH_INT_PHY_INT;
     }
+    rv = hsl_reg_modify(dev_id, GBL_INT_MASK1_OFFSET, mask, reg);
+    SW_RTN_ON_ERROR(rv);
 
-    HSL_REG_ENTRY_SET(rv, dev_id, GBL_INT_MASK1, 0, (a_uint8_t *) (&reg),
-                      sizeof (a_uint32_t));
-    return rv;
+    reg = 0;
+    if(intr_mask & FAL_SWITCH_INTR_FDB_CHANGE)
+        reg |= SWITCH_FDB_LEARN_INT;
+    rv = hsl_reg_modify(dev_id, GBL_INT_MASK0_OFFSET, SWITCH_FDB_LEARN_INT, reg);
+    SW_RTN_ON_ERROR(rv);
+
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+        if(intr_mask) {
+            rv = qca_mht_switch_intr_set(dev_id, A_TRUE);
+            SW_RTN_ON_ERROR(rv);
+        } else {
+            rv = qca_mht_switch_intr_set(dev_id, A_FALSE);
+            SW_RTN_ON_ERROR(rv);
+        }
+    }
+#endif
+
+    return SW_OK;
 }
 
 static sw_error_t
@@ -1033,13 +1053,25 @@ _isisc_intr_mask_get(a_uint32_t dev_id, a_uint32_t * intr_mask)
 
     *intr_mask = 0;
     HSL_REG_ENTRY_GET(rv, dev_id, GBL_INT_MASK1, 0, (a_uint8_t *) (&reg),
-                      sizeof (a_uint32_t));
+        sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
-
-    if (reg & ISISC_SWITCH_INT_PHY_INT)
-    {
-        *intr_mask |= FAL_SWITCH_INTR_LINK_STATUS;
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+        if(reg & MHT_SWITCH_INT_PHY_INT)
+            *intr_mask |= FAL_SWITCH_INTR_LINK_STATUS;
     }
+    else
+#endif
+    {
+        if (reg & ISISC_SWITCH_INT_PHY_INT)
+            *intr_mask |= FAL_SWITCH_INTR_LINK_STATUS;
+    }
+
+    HSL_REG_ENTRY_GET(rv, dev_id, GBL_INT_MASK0, 0, (a_uint8_t *) (&reg),
+        sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+    if (reg & SWITCH_FDB_LEARN_INT)
+        *intr_mask |= FAL_SWITCH_INTR_FDB_CHANGE;
 
     return SW_OK;
 }
@@ -1052,13 +1084,25 @@ _isisc_intr_status_get(a_uint32_t dev_id, a_uint32_t * intr_status)
 
     *intr_status = 0;
     HSL_REG_ENTRY_GET(rv, dev_id, GBL_INT_STATUS1, 0, (a_uint8_t *) (&reg),
-                      sizeof (a_uint32_t));
+        sizeof (a_uint32_t));
     SW_RTN_ON_ERROR(rv);
-
-    if (reg & ISISC_SWITCH_INT_PHY_INT)
-    {
-        *intr_status |= FAL_SWITCH_INTR_LINK_STATUS;
+#if defined(MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+        if (reg & MHT_SWITCH_INT_PHY_INT)
+            *intr_status |= FAL_SWITCH_INTR_LINK_STATUS;
     }
+    else
+#endif
+    {
+        if (reg & ISISC_SWITCH_INT_PHY_INT)
+            *intr_status |= FAL_SWITCH_INTR_LINK_STATUS;
+    }
+
+    HSL_REG_ENTRY_GET(rv, dev_id, GBL_INT_STATUS0, 0, (a_uint8_t *) (&reg),
+        sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+    if (reg & SWITCH_FDB_LEARN_INT)
+        *intr_status |= FAL_SWITCH_INTR_FDB_CHANGE;
 
     return SW_OK;
 }
@@ -1070,18 +1114,26 @@ _isisc_intr_status_clear(a_uint32_t dev_id, a_uint32_t intr_status)
     a_uint32_t reg;
 
     reg = 0;
-    if (intr_status & FAL_SWITCH_INTR_LINK_STATUS)
-    {
 #if defined(MHT)
-        if (hsl_get_current_chip_type(dev_id) == CHIP_MHT)
+    if (hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+        if (intr_status & FAL_SWITCH_INTR_LINK_STATUS)
             reg |= MHT_SWITCH_INT_PHY_INT;
-        else
+    }
+    else
 #endif
+    {
+        if (intr_status & FAL_SWITCH_INTR_LINK_STATUS)
             reg |= ISISC_SWITCH_INT_PHY_INT;
     }
-
     HSL_REG_ENTRY_SET(rv, dev_id, GBL_INT_STATUS1, 0, (a_uint8_t *) (&reg),
-                      sizeof (a_uint32_t));
+        sizeof (a_uint32_t));
+
+    reg = 0;
+    if (intr_status & FAL_SWITCH_INTR_FDB_CHANGE)
+        reg |= SWITCH_FDB_LEARN_INT;
+    HSL_REG_ENTRY_SET(rv, dev_id, GBL_INT_STATUS0, 0, (a_uint8_t *) (&reg),
+        sizeof (a_uint32_t));
+
     return rv;
 }
 
@@ -2263,20 +2315,9 @@ isisc_misc_init(a_uint32_t dev_id)
         p_api->port_arp_ack_status_set = isisc_port_arp_ack_status_set;
         p_api->port_arp_ack_status_get = isisc_port_arp_ack_status_get;
 #endif
-#if defined(MHT)
-        if(hsl_get_current_chip_type(dev_id) == CHIP_MHT)
-        {
-            p_api->intr_mask_set = qca_mht_intr_mask_set;
-            p_api->intr_mask_get = qca_mht_intr_mask_get;
-            p_api->intr_status_get = qca_mht_intr_status_get;
-        }
-        else
-#endif
-        {
-            p_api->intr_mask_set = isisc_intr_mask_set;
-            p_api->intr_mask_get = isisc_intr_mask_get;
-            p_api->intr_status_get = isisc_intr_status_get;
-        }
+        p_api->intr_mask_set = isisc_intr_mask_set;
+        p_api->intr_mask_get = isisc_intr_mask_get;
+        p_api->intr_status_get = isisc_intr_status_get;
         p_api->intr_status_clear = isisc_intr_status_clear;
         p_api->intr_port_link_mask_set = isisc_intr_port_link_mask_set;
         p_api->intr_port_link_mask_get = isisc_intr_port_link_mask_get;

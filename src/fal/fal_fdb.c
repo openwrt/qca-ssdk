@@ -23,9 +23,127 @@
 #include "fal_fdb.h"
 #include "hsl_api.h"
 #include "adpt.h"
+#include "ref_fdb.h"
 
 #include <linux/kernel.h>
 #include <linux/module.h>
+
+#define FDB_FIRST_ENTRY 0
+#define FDB_NEXT_ENTRY  1
+
+static sw_error_t
+_fal_fdb_sw_sync(a_uint32_t dev_id)
+{
+	struct qca_phy_priv *priv = NULL;
+
+	priv = ssdk_phy_priv_data_get(dev_id);
+	SW_RTN_ON_NULL(priv);
+
+	if(!list_empty(&priv->sw_fdb_tbl))
+		return ref_fdb_sw_sync_task(priv);
+
+	return SW_OK;
+}
+
+static sw_error_t
+_fal_fdb_sw_entry_get_first_next(a_uint32_t dev_id, fal_fdb_op_t * option,
+	a_uint32_t fn_sel, fal_fdb_entry_t * entry)
+{
+	ref_fdb_info_t *pfdb = NULL, *pfdb_next = NULL;
+	struct qca_phy_priv *priv = NULL;
+	a_bool_t entry_exist = A_FALSE;
+	fal_fdb_entry_t entry_tmp = {0};
+
+	SSDK_DEBUG("software fdb table get %s entry\n",
+		fn_sel == FDB_FIRST_ENTRY?"first":"next");
+	priv = ssdk_phy_priv_data_get(dev_id);
+	SW_RTN_ON_NULL(priv);
+
+	aos_lock_bh(&priv->fdb_sw_sync_lock);
+	list_for_each_entry_safe(pfdb, pfdb_next, &priv->sw_fdb_tbl, list)
+	{
+		if(!entry_exist)
+		{
+			if(option->fid_en && (entry->fid != pfdb->entry.fid))
+				continue;
+			if(option->port_en && (entry->port.id != pfdb->entry.port.id))
+				continue;
+			if(fn_sel == FDB_FIRST_ENTRY) {
+				aos_mem_copy(&entry_tmp, &pfdb->entry, sizeof(fal_fdb_entry_t));
+				entry_exist = A_TRUE;
+			}
+			else
+			{
+				if(&pfdb_next->list != &priv->sw_fdb_tbl)
+				{
+					aos_mem_copy(&entry_tmp, &pfdb_next->entry,
+						sizeof(fal_fdb_entry_t));
+					entry_exist = A_TRUE;
+				}
+				else
+				{
+					aos_unlock_bh(&priv->fdb_sw_sync_lock);
+					return SW_NO_MORE;
+				}
+			}
+		}
+
+		if(aos_mem_cmp(entry->addr.uc, pfdb->entry.addr.uc, ETH_ALEN))
+			continue;
+		if(fn_sel == FDB_FIRST_ENTRY)
+		{
+			aos_mem_copy(entry, &pfdb->entry, sizeof(fal_fdb_entry_t));
+			aos_unlock_bh(&priv->fdb_sw_sync_lock);
+			return SW_OK;
+		}
+		else
+		{
+			if(&pfdb_next->list != &priv->sw_fdb_tbl)
+			{
+				aos_mem_copy(entry, &pfdb_next->entry, sizeof(fal_fdb_entry_t));
+				aos_unlock_bh(&priv->fdb_sw_sync_lock);
+				return SW_OK;
+			}
+			else
+			{
+				aos_unlock_bh(&priv->fdb_sw_sync_lock);
+				return SW_NO_MORE;
+			}
+		}
+	}
+	aos_unlock_bh(&priv->fdb_sw_sync_lock);
+
+	if(!entry_exist)
+		return SW_NO_MORE;
+
+	aos_mem_copy(entry, &entry_tmp, sizeof(fal_fdb_entry_t));
+
+	return SW_OK;
+}
+
+static sw_error_t
+_fal_fdb_sw_entry_search(a_uint32_t dev_id, fal_fdb_entry_t *entry)
+{
+	struct qca_phy_priv *priv = NULL;
+	ref_fdb_info_t *pfdb = NULL;
+
+	priv = ssdk_phy_priv_data_get(dev_id);
+	SW_RTN_ON_NULL(priv);
+	SSDK_DEBUG("software fdb table is used\n");
+	aos_lock_bh(&priv->fdb_sw_sync_lock);
+	list_for_each_entry(pfdb, &(priv->sw_fdb_tbl), list)
+	{
+		if (!aos_mem_cmp(entry->addr.uc, pfdb->entry.addr.uc, ETH_ALEN) &&
+			entry->fid == pfdb->entry.fid) {
+			aos_mem_copy(entry, &pfdb->entry, sizeof(fal_fdb_entry_t));
+			aos_unlock_bh(&priv->fdb_sw_sync_lock);
+			return SW_OK;
+		}
+	}
+	aos_unlock_bh(&priv->fdb_sw_sync_lock);
+
+	return SW_NOT_FOUND;
+}
 
 static sw_error_t
 _fal_fdb_entry_add(a_uint32_t dev_id, const fal_fdb_entry_t * entry)
@@ -48,7 +166,9 @@ _fal_fdb_entry_add(a_uint32_t dev_id, const fal_fdb_entry_t * entry)
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_add(dev_id, entry);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 static sw_error_t
@@ -72,7 +192,9 @@ _fal_fdb_entry_flush(a_uint32_t dev_id, a_uint32_t flag)
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_del_all(dev_id, flag);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 static sw_error_t
@@ -96,7 +218,9 @@ _fal_fdb_entry_del_byport(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t flag
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_del_by_port(dev_id, port_id, flag);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 
@@ -121,7 +245,9 @@ _fal_fdb_entry_del_bymac(a_uint32_t dev_id, const fal_fdb_entry_t * entry)
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_del_by_mac(dev_id, entry);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 static sw_error_t
@@ -188,6 +314,9 @@ _fal_fdb_entry_search(a_uint32_t dev_id, fal_fdb_entry_t * entry)
         rv = p_adpt_api->adpt_fdb_find(dev_id, entry);
         return rv;
     }
+
+    if(entry->type == SW_ENTRY)
+        return _fal_fdb_sw_entry_search(dev_id, entry);
 
     SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
 
@@ -475,6 +604,10 @@ _fal_fdb_entry_extend_getnext(a_uint32_t dev_id, fal_fdb_op_t * option,
         return rv;
     }
 
+    if(entry->type == SW_ENTRY)
+        return _fal_fdb_sw_entry_get_first_next(dev_id, option, FDB_NEXT_ENTRY,
+            entry);
+
     SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
 
     if (NULL == p_api->fdb_extend_next)
@@ -499,6 +632,10 @@ _fal_fdb_entry_extend_getfirst(a_uint32_t dev_id, fal_fdb_op_t * option,
         rv = p_adpt_api->adpt_fdb_extend_first(dev_id, option, entry);
         return rv;
     }
+
+    if(entry->type == SW_ENTRY)
+        return _fal_fdb_sw_entry_get_first_next(dev_id, option, FDB_FIRST_ENTRY,
+            entry);
 
     SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
 
@@ -532,7 +669,9 @@ _fal_fdb_entry_update_byport(a_uint32_t dev_id, fal_port_t old_port, fal_port_t 
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_transfer(dev_id, old_port, new_port, fid, option);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 #endif
 static sw_error_t
@@ -769,7 +908,9 @@ _fal_fdb_port_learn_static_set(a_uint32_t dev_id, fal_port_t port_id,
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_port_learn_static_set(dev_id, port_id, enable);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 static sw_error_t
@@ -809,7 +950,9 @@ _fal_fdb_port_add(a_uint32_t dev_id, a_uint32_t fid, fal_mac_addr_t * addr, fal_
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_port_add(dev_id, fid, addr, port_id);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 static sw_error_t
@@ -833,7 +976,9 @@ _fal_fdb_port_del(a_uint32_t dev_id, a_uint32_t fid, fal_mac_addr_t * addr, fal_
         return SW_NOT_SUPPORTED;
 
     rv = p_api->fdb_port_del(dev_id, fid, addr, port_id);
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+    /*triger sw fdb table sync*/
+    return _fal_fdb_sw_sync(dev_id);
 }
 
 #if defined(IN_RFS)

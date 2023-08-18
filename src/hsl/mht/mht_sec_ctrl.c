@@ -169,7 +169,7 @@ qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
 }
 
 sw_error_t
-qca_mht_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
+qca_mht_switch_intr_set(a_uint32_t dev_id, a_bool_t enable)
 {
 	a_uint32_t data = 0;
 
@@ -177,7 +177,7 @@ qca_mht_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
 
 	data = qca_mht_mii_read(dev_id, GLOBAL_INTR_ENABLE_OFFSET);
 
-	if(intr_mask & FAL_SWITCH_INTR_LINK_STATUS)
+	if(enable)
 		data |= BIT(GLOBAL_INTR_ENABLE_SWITCH_BOFFSET);
 	else
 		data &= ~(BIT(GLOBAL_INTR_ENABLE_SWITCH_BOFFSET));
@@ -188,34 +188,34 @@ qca_mht_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask)
 }
 
 sw_error_t
-qca_mht_intr_mask_get(a_uint32_t dev_id, a_uint32_t *intr_mask)
+qca_mht_switch_intr_get(a_uint32_t dev_id, a_bool_t *enable)
 {
 	a_uint32_t data = 0;
 
 	HSL_DEV_ID_CHECK(dev_id);
 
-	*intr_mask = 0;
+	*enable = A_FALSE;
 	data = qca_mht_mii_read(dev_id, GLOBAL_INTR_ENABLE_OFFSET);
 
 	if(data & BIT(GLOBAL_INTR_ENABLE_SWITCH_BOFFSET))
-		*intr_mask |= FAL_SWITCH_INTR_LINK_STATUS;
+		*enable = A_TRUE;
 
 	return SW_OK;
 }
 
 sw_error_t
-qca_mht_intr_status_get(a_uint32_t dev_id, a_uint32_t *intr_status)
+qca_mht_switch_intr_status_get(a_uint32_t dev_id, a_bool_t *enable)
 
 {
 	a_uint32_t data = 0;
 
 	HSL_DEV_ID_CHECK(dev_id);
 
-	*intr_status = 0;
+	*enable = A_FALSE;
 	data = qca_mht_mii_read(dev_id, GLOBAL_INTR_STATUS_OFFSET);
 
 	if(data & BIT(GLOBAL_INTR_STATUS_SWITCH_BOFFSET))
-		*intr_status |= FAL_SWITCH_INTR_LINK_STATUS;
+		*enable = A_TRUE;
 
 	return SW_OK;
 }

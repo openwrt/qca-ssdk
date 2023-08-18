@@ -49,6 +49,18 @@ extern "C" {
     @brief This structure defines the Fdb entry.
 
     */
+    typedef enum
+    {
+        HW_ENTRY = 0,
+        SW_ENTRY,
+    } fal_fdb_entry_type_t;
+
+    typedef enum
+    {
+        ENTRY_VER0 = 0,/*the fields from load_balance_en are invalid*/
+        ENTRY_VER1 = 1,
+    } fal_fdb_entry_ver_t;
+
     typedef struct
     {
         fal_mac_addr_t addr; /* mac address of fdb entry */
@@ -65,7 +77,7 @@ extern "C" {
         a_bool_t static_en; /* enable static or not */
         a_bool_t leaky_en; /* enable leaky or not */
         a_bool_t mirror_en; /* enable mirror or not */
-        a_bool_t clone_en; /* enable clone or not */
+        fal_fdb_entry_ver_t entry_ver; /* entry version*/
         a_bool_t cross_pt_state; /* cross port state */
         a_bool_t da_pri_en; /* enable da pri or not */
         a_uint8_t da_queue; /* da queue value */
@@ -74,6 +86,7 @@ extern "C" {
         a_uint8_t load_balance; /* load balance value */
         a_bool_t entry_valid; /* check if entry is value */
         a_bool_t lookup_valid; /* check if entry is lookup */
+        fal_fdb_entry_type_t type;/*sortware entry or hardware entry*/
     } fal_fdb_entry_t;
 
     typedef struct

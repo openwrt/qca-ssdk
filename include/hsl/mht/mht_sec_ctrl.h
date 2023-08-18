@@ -91,13 +91,13 @@ qca_mht_phy_intr_enable(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t intr_bmp);
 
 sw_error_t
-qca_mht_intr_mask_set(a_uint32_t dev_id, a_uint32_t intr_mask);
+qca_mht_switch_intr_set(a_uint32_t dev_id, a_bool_t enable);
 
 sw_error_t
-qca_mht_intr_mask_get(a_uint32_t dev_id, a_uint32_t *intr_mask);
+qca_mht_switch_intr_get(a_uint32_t dev_id, a_bool_t *enable);
 
 sw_error_t
-qca_mht_intr_status_get(a_uint32_t dev_id, a_uint32_t *intr_status);
+qca_mht_switch_intr_status_get(a_uint32_t dev_id, a_bool_t *enable);
 
 #if defined(IN_PTP)
 sw_error_t

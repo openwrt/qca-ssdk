@@ -686,8 +686,43 @@ extern "C" {
 #define POWER_STRIP_PAD_CTRL_BLEN                              2
 #define POWER_STRIP_PAD_CTRL_FLAG                              HSL_RW
 
+    /* Global Interrupt Status Register0 */
+#define GBL_INT_STATUS0
+#define GBL_INT_STATUS0_ID                                     1
+#define GBL_INT_STATUS0_OFFSET                                 0x0020
+#define GBL_INT_STATUS0_E_LENGTH                               4
+#define GBL_INT_STATUS0_E_OFFSET                               0
+#define GBL_INT_STATUS0_NR_E                                   1
 
+#define ARL_LEARN_FULL_INT
+#define GBL_INT_STATUS0_ARL_LEARN_FULL_INT_M_BOFFSET           8
+#define GBL_INT_STATUS0_ARL_LEARN_FULL_INT_M_BLEN              1
+#define GBL_INT_STATUS0_ARL_LEARN_FULL_INT_M_FLAG              HSL_RW
 
+#define ARL_DELETE_INT
+#define GBL_INT_STATUS0_ARL_DELETE_INT_M_BOFFSET               9
+#define GBL_INT_STATUS0_ARL_DELETE_INT_M_BLEN                  1
+#define GBL_INT_STATUS0_ARL_DELETE_INT_M_FLAG                  HSL_RW
+
+#define ARL_LEARN_CHANGE_INT
+#define GBL_INT_STATUS0_ARL_LEARN_CHANGE_INT_M_BOFFSET         10
+#define GBL_INT_STATUS0_ARL_LEARN_CHANGE_INT_M_BLEN            1
+#define GBL_INT_STATUS0_ARL_LEARN_CHANGE_INT_M_FLAG            HSL_RW
+
+#define ARL_LEARN_CREATE_INT
+#define GBL_INT_STATUS0_ARL_LEARN_CREATE_INT_M_BOFFSET         11
+#define GBL_INT_STATUS0_ARL_LEARN_CREATE_INT_M_BLEN            1
+#define GBL_INT_STATUS0_ARL_LEARN_CREATE_INT_M_FLAG            HSL_RW
+
+#define ARL_CPU_FULL_INT
+#define GBL_INT_STATUS0_ARL_CPU_FULL_INT_M_BOFFSET             21
+#define GBL_INT_STATUS0_ARL_CPU_FULL_INT_M_BLEN                1
+#define GBL_INT_STATUS0_ARL_CPU_FULL_INT_M_FLAG                HSL_RW
+
+#define ARL_DONE_INT
+#define GBL_INT_STATUS0_ARL_DONE_INT_M_BOFFSET                 22
+#define GBL_INT_STATUS0_ARL_DONE_INT_M_BLEN                    1
+#define GBL_INT_STATUS0_ARL_DONE_INT_M_FLAG                    HSL_RW
 
     /* Global Interrupt Status Register1 */
 #define GBL_INT_STATUS1
@@ -706,6 +741,44 @@ extern "C" {
 #define GBL_INT_STATUS1_PHY_INT_S_BOFFSET         15
 #define GBL_INT_STATUS1_PHY_INT_S_BLEN            1
 #define GBL_INT_STATUS1_PHY_INT_S_FLAG            HSL_RO
+
+    /* Global Interrupt Mask Register0 */
+#define GBL_INT_MASK0
+#define GBL_INT_MASK0_ID                                       1
+#define GBL_INT_MASK0_OFFSET                                   0x0028
+#define GBL_INT_MASK0_E_LENGTH                                 4
+#define GBL_INT_MASK0_E_OFFSET                                 0
+#define GBL_INT_MASK0_NR_E                                     1
+
+#define ARL_LEARN_FULL_INT_EN
+#define GBL_INT_MASK0_ARL_LEARN_FULL_INT_EN_M_BOFFSET          8
+#define GBL_INT_MASK0_ARL_LEARN_FULL_INT_EN_M_BLEN             1
+#define GBL_INT_MASK0_ARL_LEARN_FULL_INT_EN_M_FLAG             HSL_RW
+
+#define ARL_DELETE_INT_EN
+#define GBL_INT_MASK0_ARL_DELETE_INT_EN_M_BOFFSET              9
+#define GBL_INT_MASK0_ARL_DELETE_INT_EN_M_BLEN                 1
+#define GBL_INT_MASK0_ARL_DELETE_INT_EN_M_FLAG                 HSL_RW
+
+#define ARL_LEARN_CHANGE_INT_EN
+#define GBL_INT_MASK0_ARL_LEARN_CHANGE_INT_EN_M_BOFFSET        10
+#define GBL_INT_MASK0_ARL_LEARN_CHANGE_INT_EN_M_BLEN           1
+#define GBL_INT_MASK0_ARL_LEARN_CHANGE_INT_EN_M_FLAG           HSL_RW
+
+#define ARL_LEARN_CREATE_INT_EN
+#define GBL_INT_MASK0_ARL_LEARN_CREATE_INT_EN_M_BOFFSET        11
+#define GBL_INT_MASK0_ARL_LEARN_CREATE_INT_EN_M_BLEN           1
+#define GBL_INT_MASK0_ARL_LEARN_CREATE_INT_EN_M_FLAG           HSL_RW
+
+#define ARL_CPU_FULL_INT_EN
+#define GBL_INT_MASK0_ARL_CPU_FULL_INT_EN_M_BOFFSET            21
+#define GBL_INT_MASK0_ARL_CPU_FULL_INT_EN_M_BLEN               1
+#define GBL_INT_MASK0_ARL_CPU_FULL_INT_EN_M_FLAG               HSL_RW
+
+#define ARL_DONE_INT_EN
+#define GBL_INT_MASK0_ARL_DONE_INT_EN_M_BOFFSET                22
+#define GBL_INT_MASK0_ARL_DONE_INT_EN_M_BLEN                   1
+#define GBL_INT_MASK0_ARL_DONE_INT_EN_M_FLAG                   HSL_RW
 
     /* Global Interrupt Mask Register1 */
 #define GBL_INT_MASK1

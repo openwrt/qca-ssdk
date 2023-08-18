@@ -2875,12 +2875,12 @@ cmd_data_check_fdbentry(char *info, void *val, a_uint32_t size)
     if (rv)
         return rv;
 
-    rv = __cmd_data_check_boolean("clone", "no",
-                        "usage: <yes/no/y/n>\n",
-                        cmd_data_check_confirm, A_FALSE, &entry.clone_en,
-                        sizeof (a_bool_t));
+    rv = __cmd_data_check_complex("entry_ver", "1",
+                        "usage: input number such as <0/1>\n",
+                        (param_check_t)cmd_data_check_uint32, &tmp, sizeof (a_uint32_t));
     if (rv)
         return rv;
+    entry.entry_ver = tmp & 0xffff;
 
     rv = __cmd_data_check_boolean("queue override", "no",
                         "usage: <yes/no/y/n>\n",
@@ -2930,6 +2930,13 @@ cmd_data_check_fdbentry(char *info, void *val, a_uint32_t size)
             return rv;
         entry.load_balance = tmp;
     }
+
+    rv = __cmd_data_check_complex("type", "0",
+                        "usage: the range is 0 or 1\n",
+                        (param_check_t)cmd_data_check_uint8, &tmp, sizeof (a_uint32_t));
+    if (rv)
+        return rv;
+    entry.type = tmp;
 
     *(fal_fdb_entry_t *) val = entry;
 

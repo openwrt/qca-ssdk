@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017, 2019-2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -6820,6 +6820,36 @@ mppe_uniphy_clkout_50m_ctrl_set(
 				dev_id,
 				NSS_UNIPHY_BASE_ADDR + UNIPHY_CLKOUT_50M_CTRL_ADDRESS,
 				index * UNIPHY_CLKOUT_50M_CTRL_INC,
+				value->val);
+}
+
+sw_error_t
+mppe_uniphy_calib_ctrl_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_vco_cal_control_u *value)
+{
+	if (index >= UNIPHY_VCO_CALIBRATION_CONTROL_NUM)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_get(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR +UNIPHY_VCO_CALIBRATION_CONTROL_ADDRESS,
+				index * UNIPHY_VCO_CALIBRATION_CONTROL_INC,
+				&value->val);
+}
+
+sw_error_t
+mppe_uniphy_calib_ctrl_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union uniphy_vco_cal_control_u *value)
+{
+	if (index >= UNIPHY_VCO_CALIBRATION_CONTROL_NUM)
+		return SW_OUT_OF_RANGE;
+	return hppe_uniphy_reg_set(
+				dev_id,
+				NSS_UNIPHY_BASE_ADDR +UNIPHY_VCO_CALIBRATION_CONTROL_ADDRESS,
+				index * UNIPHY_VCO_CALIBRATION_CONTROL_INC,
 				value->val);
 }
 #endif

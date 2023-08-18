@@ -100,22 +100,36 @@ extern "C" {
 #define QCAPHY_TX_FLOWCTRL_STATUS                                  0x8
 
 /*MMD number*/
+#define QCAPHY_MMD1_NUM                                            0x1
 #define QCAPHY_MMD3_NUM                                            0x3
 #define QCAPHY_MMD7_NUM                                            0x7
+#define QCAPHY_MMD31_NUM                                           0x1e
 /*MMD register*/
-#define QCAPHY_MMD7_ADDR_8023AZ_EEE_CTRL                           0x3c
-#define QCAPHY_MMD7_ADDR_8023AZ_EEE_PARTNER                        0x3d
-#define QCAPHY_MMD7_ADDR_8023AZ_EEE_STATUS                         0x8000
-#define QCAPHY_MMD3_ADDR_8023AZ_EEE_CAPABILITY                     0x14
-
+#define QCAPHY_MMD7_8023AZ_EEE_CTRL                                0x3c
+#define QCAPHY_MMD7_8023AZ_EEE_PARTNER                             0x3d
+#define QCAPHY_MMD7_8023AZ_EEE_PARTNER1                            0x3e
+#define QCAPHY_MMD7_8023AZ_EEE_CTRL1                               0x3f
+#define QCAPHY_MMD7_8023AZ_EEE_STATUS                              0x8000
+#define QCAPHY_MMD3_8023AZ_EEE_CAPABILITY                          0x14
+#define QCAPHY_MMD3_8023AZ_EEE_CAPABILITY1                         0x15
 /*MMD registers field*/
-#define QCAPHY_EEE_MASK                                            0X0006
+#define QCAPHY_EEE_MASK                                            0x000e
 #define QCAPHY_EEE_ADV_100M                                        0x0002
 #define QCAPHY_EEE_ADV_1000M                                       0x0004
+#define QCAPHY_EEE_ADV_10000M                                      0x0008
+#define QCAPHY_EEE_MASK1                                           0x0003
+#define QCAPHY_EEE_ADV_2500M                                       0x0001
+#define QCAPHY_EEE_ADV_5000M                                       0x0002
 #define QCAPHY_EEE_PARTNER_ADV_100M                                0x0002
 #define QCAPHY_EEE_PARTNER_ADV_1000M                               0x0004
+#define QCAPHY_EEE_PARTNER_ADV_10000M                              0x0008
+#define QCAPHY_EEE_PARTNER_ADV_2500M                               0x0001
+#define QCAPHY_EEE_PARTNER_ADV_5000M                               0x0002
 #define QCAPHY_EEE_CAPABILITY_100M                                 0x0002
 #define QCAPHY_EEE_CAPABILITY_1000M                                0x0004
+#define QCAPHY_EEE_CAPABILITY_10000M                               0x0008
+#define QCAPHY_EEE_CAPABILITY_2500M                                0x0001
+#define QCAPHY_EEE_CAPABILITY_5000M                                0x0002
 #define QCAPHY_EEE_STATUS_100M                                     0x0002
 #define QCAPHY_EEE_STATUS_1000M                                    0x0004
 

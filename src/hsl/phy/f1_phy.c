@@ -20,6 +20,7 @@
 #include "hsl.h"
 #include "f1_phy.h"
 #include "hsl_phy.h"
+#include "qcaphy_common.h"
 #include "ssdk_plat.h"
 
 /******************************************************************************
@@ -179,11 +180,11 @@ f1_phy_cdt_get(a_uint32_t dev_id, a_uint32_t phy_addr, fal_port_cdt_t *port_cdt)
         (port_cdt->pair_c_len > 0) && (port_cdt->pair_c_len <= 20))
     {
         hsl_phy_modify_mmd(dev_id, phy_addr, A_FALSE, 3, 0x806e, BIT(15), 0);
-        hsl_phy_sw_reset(dev_id, phy_addr);
+        qcaphy_sw_reset(dev_id, phy_addr);
         f1_phy_reset_done(dev_id, phy_addr);
         do
         {
-            link_st = hsl_phy_get_link_status(dev_id, phy_addr);
+            link_st = qcaphy_get_link_status(dev_id, phy_addr);
             aos_mdelay(100);
         } while ((A_FALSE == link_st) && (--ii));
 
@@ -428,9 +429,9 @@ f1_phy_get_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
     a_uint16_t phy_data;
     a_bool_t auto_neg;
 
-    auto_neg = hsl_phy_autoneg_status(dev_id, phy_addr);
+    auto_neg = qcaphy_autoneg_status(dev_id, phy_addr);
     if (A_TRUE == auto_neg ) {
-        hsl_phy_get_speed(dev_id, phy_addr, speed);
+        qcaphy_get_speed(dev_id, phy_addr, speed);
     } else {
         phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, F1_PHY_CONTROL);
         switch (phy_data & F1_CTRL_SPEED_MASK)
@@ -484,11 +485,11 @@ f1_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
         return SW_BAD_PARAM;
     }
 
-    hsl_phy_get_autoneg_adv(dev_id, phy_addr, &autoneg);
+    qcaphy_get_autoneg_adv(dev_id, phy_addr, &autoneg);
     oldneg = autoneg;
     autoneg &= ~FAL_PHY_ADV_GE_SPEED_ALL;
 
-    hsl_phy_get_duplex(dev_id, phy_addr, &old_duplex);
+    qcaphy_get_duplex(dev_id, phy_addr, &old_duplex);
 
     if (old_duplex == FAL_FULL_DUPLEX)
     {
@@ -525,15 +526,15 @@ f1_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
         return SW_FAIL;
     }
 
-    hsl_phy_set_autoneg_adv(dev_id, phy_addr, autoneg);
-    hsl_phy_autoneg_restart(dev_id, phy_addr);
-    if(hsl_phy_get_link_status(dev_id, phy_addr))
+    qcaphy_set_autoneg_adv(dev_id, phy_addr, autoneg);
+    qcaphy_autoneg_restart(dev_id, phy_addr);
+    if(qcaphy_get_link_status(dev_id, phy_addr))
     {
         f1_autoneg_done(dev_id, phy_addr);
     }
 
     hsl_phy_mii_reg_write(dev_id, phy_addr, F1_PHY_CONTROL, phy_data);
-    hsl_phy_set_autoneg_adv(dev_id, phy_addr, oldneg);
+    qcaphy_set_autoneg_adv(dev_id, phy_addr, oldneg);
 
     return SW_OK;
 
@@ -551,9 +552,9 @@ f1_phy_get_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
     a_uint16_t phy_data;
     a_bool_t auto_neg;
 
-    auto_neg = hsl_phy_autoneg_status(dev_id, phy_addr);
+    auto_neg = qcaphy_autoneg_status(dev_id, phy_addr);
     if (A_TRUE == auto_neg ) {
-        hsl_phy_get_duplex(dev_id, phy_addr, duplex);
+        qcaphy_get_duplex(dev_id, phy_addr, duplex);
     } else {
         phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, F1_PHY_CONTROL);
         //read duplex
@@ -578,10 +579,10 @@ f1_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
     fal_port_speed_t old_speed = FAL_SPEED_10;
     a_uint32_t oldneg, autoneg;
 
-    if (A_TRUE == hsl_phy_autoneg_status(dev_id, phy_addr))
+    if (A_TRUE == qcaphy_autoneg_status(dev_id, phy_addr))
         phy_data &= ~F1_CTRL_AUTONEGOTIATION_ENABLE;
 
-    hsl_phy_get_autoneg_adv(dev_id, phy_addr, &autoneg);
+    qcaphy_get_autoneg_adv(dev_id, phy_addr, &autoneg);
     oldneg = autoneg;
     autoneg &= ~FAL_PHY_ADV_GE_SPEED_ALL;
     f1_phy_get_speed(dev_id, phy_addr, &old_speed);
@@ -639,15 +640,15 @@ f1_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
         return SW_BAD_PARAM;
     }
 
-    hsl_phy_set_autoneg_adv(dev_id, phy_addr, autoneg);
-    hsl_phy_autoneg_restart(dev_id, phy_addr);
-    if(hsl_phy_get_link_status(dev_id, phy_addr))
+    qcaphy_set_autoneg_adv(dev_id, phy_addr, autoneg);
+    qcaphy_autoneg_restart(dev_id, phy_addr);
+    if(qcaphy_get_link_status(dev_id, phy_addr))
     {
        f1_autoneg_done(dev_id, phy_addr);
     }
 
     hsl_phy_mii_reg_write(dev_id, phy_addr, F1_PHY_CONTROL, phy_data);
-    hsl_phy_set_autoneg_adv(dev_id, phy_addr, oldneg);
+    qcaphy_set_autoneg_adv(dev_id, phy_addr, oldneg);
 
     return SW_OK;
 }
@@ -834,36 +835,36 @@ static int f1_phy_api_ops_init(void)
 	f1_phy_api_ops->phy_speed_set = f1_phy_set_speed;
 	f1_phy_api_ops->phy_duplex_get = f1_phy_get_duplex;
 	f1_phy_api_ops->phy_duplex_set = f1_phy_set_duplex;
-	f1_phy_api_ops->phy_autoneg_enable_set = hsl_phy_autoneg_enable;
-	f1_phy_api_ops->phy_restart_autoneg = hsl_phy_autoneg_restart;
-	f1_phy_api_ops->phy_autoneg_status_get = hsl_phy_autoneg_status;
-	f1_phy_api_ops->phy_autoneg_adv_set = hsl_phy_set_autoneg_adv;
-	f1_phy_api_ops->phy_autoneg_adv_get = hsl_phy_get_autoneg_adv;
+	f1_phy_api_ops->phy_autoneg_enable_set = qcaphy_autoneg_enable;
+	f1_phy_api_ops->phy_restart_autoneg = qcaphy_autoneg_restart;
+	f1_phy_api_ops->phy_autoneg_status_get = qcaphy_autoneg_status;
+	f1_phy_api_ops->phy_autoneg_adv_set = qcaphy_set_autoneg_adv;
+	f1_phy_api_ops->phy_autoneg_adv_get = qcaphy_get_autoneg_adv;
 	f1_phy_api_ops->phy_powersave_set = f1_phy_set_powersave;
 	f1_phy_api_ops->phy_powersave_get = f1_phy_get_powersave;
 	f1_phy_api_ops->phy_cdt = f1_phy_cdt;
-	f1_phy_api_ops->phy_link_status_get = hsl_phy_get_link_status;
-	f1_phy_api_ops->phy_reset = hsl_phy_sw_reset;
-	f1_phy_api_ops->phy_power_off = hsl_phy_poweroff;
-	f1_phy_api_ops->phy_power_on = hsl_phy_poweron;
-	f1_phy_api_ops->phy_id_get = hsl_phy_get_phy_id;
-	f1_phy_api_ops->phy_local_loopback_set = hsl_phy_set_local_loopback;
-	f1_phy_api_ops->phy_local_loopback_get = hsl_phy_get_local_loopback;
+	f1_phy_api_ops->phy_link_status_get = qcaphy_get_link_status;
+	f1_phy_api_ops->phy_reset = qcaphy_sw_reset;
+	f1_phy_api_ops->phy_power_off = qcaphy_poweroff;
+	f1_phy_api_ops->phy_power_on = qcaphy_poweron;
+	f1_phy_api_ops->phy_id_get = qcaphy_get_phy_id;
+	f1_phy_api_ops->phy_local_loopback_set = qcaphy_set_local_loopback;
+	f1_phy_api_ops->phy_local_loopback_get = qcaphy_get_local_loopback;
 	f1_phy_api_ops->phy_remote_loopback_set = f1_phy_set_remote_loopback;
 	f1_phy_api_ops->phy_remote_loopback_get = f1_phy_get_remote_loopback;
 	f1_phy_api_ops->phy_intr_mask_set = f1_phy_intr_mask_set;
 	f1_phy_api_ops->phy_intr_mask_get = f1_phy_intr_mask_get;
 	f1_phy_api_ops->phy_intr_status_get = f1_phy_intr_status_get;
-	f1_phy_api_ops->phy_8023az_set = hsl_phy_set_8023az;
-	f1_phy_api_ops->phy_8023az_get = hsl_phy_get_8023az;
-	f1_phy_api_ops->phy_mdix_set = hsl_phy_set_mdix;
-	f1_phy_api_ops->phy_mdix_get = hsl_phy_get_mdix;
-	f1_phy_api_ops->phy_mdix_status_get = hsl_phy_get_mdix_status;
-	f1_phy_api_ops->phy_eee_adv_set = hsl_phy_set_eee_adv;
-	f1_phy_api_ops->phy_eee_adv_get = hsl_phy_get_eee_adv;
-	f1_phy_api_ops->phy_eee_partner_adv_get = hsl_phy_get_eee_partner_adv;
-	f1_phy_api_ops->phy_eee_cap_get = hsl_phy_get_eee_cap;
-	f1_phy_api_ops->phy_eee_status_get = hsl_phy_get_eee_status;
+	f1_phy_api_ops->phy_8023az_set = qcaphy_set_8023az;
+	f1_phy_api_ops->phy_8023az_get = qcaphy_get_8023az;
+	f1_phy_api_ops->phy_mdix_set = qcaphy_set_mdix;
+	f1_phy_api_ops->phy_mdix_get = qcaphy_get_mdix;
+	f1_phy_api_ops->phy_mdix_status_get = qcaphy_get_mdix_status;
+	f1_phy_api_ops->phy_eee_adv_set = qcaphy_set_eee_adv;
+	f1_phy_api_ops->phy_eee_adv_get = qcaphy_get_eee_adv;
+	f1_phy_api_ops->phy_eee_partner_adv_get = qcaphy_get_eee_partner_adv;
+	f1_phy_api_ops->phy_eee_cap_get = qcaphy_get_eee_cap;
+	f1_phy_api_ops->phy_eee_status_get = qcaphy_get_eee_status;
 
 	ret = hsl_phy_api_ops_register(F1_PHY_CHIP, f1_phy_api_ops);
 

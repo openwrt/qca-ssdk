@@ -20,6 +20,7 @@
 #include "hsl.h"
 #include "qca803x_phy.h"
 #include "hsl_phy.h"
+#include "qcaphy_common.h"
 #include "ssdk_plat.h"
 
 #define QCA803X_PHY_DELAYED_INIT_TICKS msecs_to_jiffies(1000)
@@ -247,7 +248,7 @@ qca803x_phy_set_powersave(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enabl
 	rv = hsl_phy_modify_mii(dev_id, phy_addr, QCA803X_PWR_SAVE,
 		QCA803X_PWR_SAVE_EN, phy_data);
 	PHY_RTN_ON_ERROR(rv);
-	return hsl_phy_autoneg_restart(dev_id, phy_addr);
+	return qcaphy_autoneg_restart(dev_id, phy_addr);
 }
 
 /******************************************************************************
@@ -758,7 +759,7 @@ qca803x_phy_set_combo_prefer_medium(a_uint32_t dev_id, a_uint32_t phy_addr,
 	QCA803X_REG_UNLOCK;
 
 	/* soft reset after switching combo medium*/
-	return hsl_phy_sw_reset(dev_id, phy_addr);
+	return qcaphy_sw_reset(dev_id, phy_addr);
 }
 
 /******************************************************************************
@@ -996,7 +997,7 @@ qca803x_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
-	rv = hsl_phy_status_get(dev_id, phy_addr, phy_status);
+	rv = qcaphy_status_get(dev_id, phy_addr, phy_status);
 	PHY_RTN_ON_ERROR(rv);
 	if(phy_status->link_status) {
 		phy_data |= QCA803X_PHY_MSE_THRESH_LINK_UP;
@@ -1020,37 +1021,37 @@ static sw_error_t qca803x_phy_api_ops_init(void)
 
 	phy_api_ops_init(QCA803X_PHY_CHIP);
 
-	qca803x_phy_api_ops->phy_speed_get = hsl_phy_get_speed;
-	qca803x_phy_api_ops->phy_speed_set = hsl_phy_set_speed;
-	qca803x_phy_api_ops->phy_duplex_get = hsl_phy_get_duplex;
-	qca803x_phy_api_ops->phy_duplex_set = hsl_phy_set_duplex;
-	qca803x_phy_api_ops->phy_autoneg_enable_set = hsl_phy_autoneg_enable;
-	qca803x_phy_api_ops->phy_restart_autoneg = hsl_phy_autoneg_restart;
-	qca803x_phy_api_ops->phy_autoneg_status_get = hsl_phy_autoneg_status;
-	qca803x_phy_api_ops->phy_autoneg_adv_set = hsl_phy_set_autoneg_adv;
-	qca803x_phy_api_ops->phy_autoneg_adv_get = hsl_phy_get_autoneg_adv;
-	qca803x_phy_api_ops->phy_link_status_get = hsl_phy_get_link_status;
-	qca803x_phy_api_ops->phy_reset = hsl_phy_sw_reset;
+	qca803x_phy_api_ops->phy_speed_get = qcaphy_get_speed;
+	qca803x_phy_api_ops->phy_speed_set = qcaphy_set_speed;
+	qca803x_phy_api_ops->phy_duplex_get = qcaphy_get_duplex;
+	qca803x_phy_api_ops->phy_duplex_set = qcaphy_set_duplex;
+	qca803x_phy_api_ops->phy_autoneg_enable_set = qcaphy_autoneg_enable;
+	qca803x_phy_api_ops->phy_restart_autoneg = qcaphy_autoneg_restart;
+	qca803x_phy_api_ops->phy_autoneg_status_get = qcaphy_autoneg_status;
+	qca803x_phy_api_ops->phy_autoneg_adv_set = qcaphy_set_autoneg_adv;
+	qca803x_phy_api_ops->phy_autoneg_adv_get = qcaphy_get_autoneg_adv;
+	qca803x_phy_api_ops->phy_link_status_get = qcaphy_get_link_status;
+	qca803x_phy_api_ops->phy_reset = qcaphy_sw_reset;
 #ifndef IN_PORTCONTROL_MINI
 	qca803x_phy_api_ops->phy_powersave_set = qca803x_phy_set_powersave;
 	qca803x_phy_api_ops->phy_powersave_get = qca803x_phy_get_powersave;
 #endif
 	qca803x_phy_api_ops->phy_cdt = qca803x_phy_cdt;
 #ifndef IN_PORTCONTROL_MINI
-	qca803x_phy_api_ops->phy_mdix_set = hsl_phy_set_mdix;
-	qca803x_phy_api_ops->phy_mdix_get = hsl_phy_get_mdix;
-	qca803x_phy_api_ops->phy_mdix_status_get = hsl_phy_get_mdix_status;
-	qca803x_phy_api_ops->phy_local_loopback_set = hsl_phy_set_local_loopback;
-	qca803x_phy_api_ops->phy_local_loopback_get = hsl_phy_get_local_loopback;
+	qca803x_phy_api_ops->phy_mdix_set = qcaphy_set_mdix;
+	qca803x_phy_api_ops->phy_mdix_get = qcaphy_get_mdix;
+	qca803x_phy_api_ops->phy_mdix_status_get = qcaphy_get_mdix_status;
+	qca803x_phy_api_ops->phy_local_loopback_set = qcaphy_set_local_loopback;
+	qca803x_phy_api_ops->phy_local_loopback_get = qcaphy_get_local_loopback;
 	qca803x_phy_api_ops->phy_remote_loopback_set = qca803x_phy_set_remote_loopback;
 	qca803x_phy_api_ops->phy_remote_loopback_get = qca803x_phy_get_remote_loopback;
 #endif
-	qca803x_phy_api_ops->phy_id_get = hsl_phy_get_phy_id;
-	qca803x_phy_api_ops->phy_power_off = hsl_phy_poweroff;
-	qca803x_phy_api_ops->phy_power_on = hsl_phy_poweron;
+	qca803x_phy_api_ops->phy_id_get = qcaphy_get_phy_id;
+	qca803x_phy_api_ops->phy_power_off = qcaphy_poweroff;
+	qca803x_phy_api_ops->phy_power_on = qcaphy_poweron;
 #ifndef IN_PORTCONTROL_MINI
-	qca803x_phy_api_ops->phy_8023az_set = hsl_phy_set_8023az;
-	qca803x_phy_api_ops->phy_8023az_get = hsl_phy_get_8023az;
+	qca803x_phy_api_ops->phy_8023az_set = qcaphy_set_8023az;
+	qca803x_phy_api_ops->phy_8023az_get = qcaphy_get_8023az;
 	qca803x_phy_api_ops->phy_hibernation_set = qca803x_phy_set_hibernate;
 	qca803x_phy_api_ops->phy_hibernation_get = qca803x_phy_get_hibernate;
 	qca803x_phy_api_ops->phy_magic_frame_mac_set = qca803x_phy_set_magic_frame_mac;
@@ -1075,11 +1076,11 @@ static sw_error_t qca803x_phy_api_ops_init(void)
 	qca803x_phy_api_ops->phy_counter_show = qca803x_phy_show_counter;
 #endif
 	qca803x_phy_api_ops->phy_get_status = qca803x_phy_get_status;
-	qca803x_phy_api_ops->phy_eee_adv_set = hsl_phy_set_eee_adv;
-	qca803x_phy_api_ops->phy_eee_adv_get = hsl_phy_get_eee_adv;
-	qca803x_phy_api_ops->phy_eee_partner_adv_get = hsl_phy_get_eee_partner_adv;
-	qca803x_phy_api_ops->phy_eee_cap_get = hsl_phy_get_eee_cap;
-	qca803x_phy_api_ops->phy_eee_status_get = hsl_phy_get_eee_status;
+	qca803x_phy_api_ops->phy_eee_adv_set = qcaphy_set_eee_adv;
+	qca803x_phy_api_ops->phy_eee_adv_get = qcaphy_get_eee_adv;
+	qca803x_phy_api_ops->phy_eee_partner_adv_get = qcaphy_get_eee_partner_adv;
+	qca803x_phy_api_ops->phy_eee_cap_get = qcaphy_get_eee_cap;
+	qca803x_phy_api_ops->phy_eee_status_get = qcaphy_get_eee_status;
 
 	ret = hsl_phy_api_ops_register(QCA803X_PHY_CHIP, qca803x_phy_api_ops);
 

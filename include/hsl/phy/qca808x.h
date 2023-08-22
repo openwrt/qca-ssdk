@@ -23,6 +23,7 @@
 #include "hsl.h"
 #include "ssdk_plat.h"
 #include "hsl_phy.h"
+#include "qcaphy_common.h"
 #include "hsl_ptp.h"
 #include "qca808x_phy.h"
 

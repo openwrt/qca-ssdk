@@ -646,7 +646,7 @@ sw_error_t hsl_port_phy_hw_init(a_uint32_t dev_id, a_uint32_t port_id)
 
 	return SW_OK;
 }
-
+/*qca808x_start*/
 a_uint32_t
 hsl_port_phyid_get(a_uint32_t dev_id, fal_port_t port_id)
 {
@@ -674,7 +674,7 @@ hsl_port_phyid_get(a_uint32_t dev_id, fal_port_t port_id)
 
 	return phy_id;
 }
-
+/*qca808x_end*/
 sw_error_t
 hsl_port_phy_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_port_interface_mode_t mode)
@@ -1369,11 +1369,1010 @@ hsl_port_phy_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 }
 
 sw_error_t
+hsl_port_phy_autoadv_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *autoadv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_autoneg_adv_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	*autoadv = 0;
+	return phy_drv->phy_autoneg_adv_get(dev_id, phy_addr, autoadv);
+}
+
+sw_error_t
+hsl_port_phy_autoadv_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t autoadv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv  = NULL;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_autoneg_adv_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+	return phy_drv->phy_autoneg_adv_set(dev_id, phy_addr, autoadv);
+}
+
+sw_error_t
+hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
+	if (NULL == phy_drv->phy_restart_autoneg)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_restart_autoneg(dev_id, phy_addr);
+}
+
+sw_error_t
+hsl_port_phy_autoneg_status_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * status)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(status);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_autoneg_status_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	*status = phy_drv->phy_autoneg_status_get (dev_id, phy_addr);
+
+	return SW_OK;
+}
+
+sw_error_t
+hsl_port_phy_autoneg_enable(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_autoneg_enable_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_autoneg_enable_set (dev_id, phy_addr);
+}
+
+sw_error_t
+hsl_port_phy_duplex_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t duplex)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_duplex_set)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_duplex_set (dev_id, phy_addr, duplex);
+}
+
+sw_error_t
+hsl_port_phy_duplex_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_duplex_t *duplex)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_duplex_get)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_duplex_get (dev_id, phy_addr, duplex);
+}
+
+sw_error_t
+hsl_port_phy_cdt(a_uint32_t dev_id, fal_port_t port_id, a_uint32_t mdi_pair,
+	fal_cable_status_t * cable_status, a_uint32_t * cable_len)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(cable_status);
+	SW_RTN_ON_NULL(cable_len);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	  {
+		return SW_BAD_PARAM;
+	  }
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_cdt)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_cdt (dev_id, phy_addr, mdi_pair, cable_status, cable_len);
+}
+
+sw_error_t
+hsl_port_phy_link_status_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * status)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(status);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_link_status_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	*status = phy_drv->phy_link_status_get (dev_id, phy_addr);
+
+	return SW_OK;
+
+}
+
+sw_error_t
+hsl_port_phy_power_on(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_power_on)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_power_on(dev_id, phy_addr);
+}
+
+sw_error_t
+hsl_port_phy_power_off(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_power_off)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_power_off(dev_id, phy_addr);
+
+}
+
+sw_error_t
+hsl_port_phy_speed_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t speed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_speed_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_speed_set (dev_id, phy_addr, speed);
+}
+
+sw_error_t
+hsl_port_phy_speed_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_speed_t * pspeed)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(pspeed);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_INCL_CPU))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_speed_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+	return phy_drv->phy_speed_get (dev_id, phy_addr, pspeed);
+}
+/*qca808x_end*/
+sw_error_t
+hsl_port_phy_combo_prefer_medium_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_medium_t medium)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_combo_prefer_medium_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_combo_prefer_medium_set (dev_id, phy_addr, medium);
+}
+
+sw_error_t
+hsl_port_phy_combo_prefer_medium_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_medium_t *medium)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(medium);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_combo_prefer_medium_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_combo_prefer_medium_get (dev_id, phy_addr, medium);
+}
+/*qca808x_start*/
+sw_error_t
+hsl_port_phy_reset(a_uint32_t dev_id, fal_port_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_reset)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_reset(dev_id, phy_addr);
+}
+
+sw_error_t
+hsl_port_phy_eee_adv_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t adv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_eee_adv_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_eee_adv_set (dev_id, phy_addr, adv);
+}
+
+sw_error_t
+hsl_port_phy_eee_adv_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *adv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_eee_adv_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_eee_adv_get (dev_id, phy_addr, adv);
+}
+
+sw_error_t
+hsl_port_phy_eee_partner_adv_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *adv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_eee_partner_adv_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_eee_partner_adv_get (dev_id, phy_addr, adv);
+}
+
+sw_error_t
+hsl_port_phy_eee_cap_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *cap)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_eee_cap_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_eee_cap_get (dev_id, phy_addr, cap);
+}
+
+sw_error_t
+hsl_port_phy_eee_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t *status)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_eee_status_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_eee_status_get (dev_id, phy_addr, status);
+}
+/*qca808x_end*/
+#ifndef IN_PORTCONTROL_MINI
+/*qca808x_start*/
+sw_error_t
+hsl_port_phy_local_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_local_loopback_set)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_local_loopback_set (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_local_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(enable);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_local_loopback_get)
+		return SW_NOT_SUPPORTED;
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_local_loopback_get (dev_id, phy_addr, enable);
+}
+/*qca808x_end*/
+sw_error_t
+hsl_port_phy_combo_fiber_mode_set(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_fiber_mode_t mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_combo_fiber_mode_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_combo_fiber_mode_set (dev_id, phy_addr, mode);
+
+}
+
+sw_error_t
+hsl_port_phy_combo_fiber_mode_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_fiber_mode_t * mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(mode);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_combo_fiber_mode_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	rv = phy_drv->phy_combo_fiber_mode_get (dev_id, phy_addr, mode);
+
+	return rv;
+
+}
+
+sw_error_t
+hsl_port_phy_combo_medium_status_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_medium_t *medium)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(medium);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_combo_medium_status_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_combo_medium_status_get (dev_id, phy_addr, medium);
+}
+
+sw_error_t
+hsl_port_phy_powersave_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_powersave_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_powersave_set (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_powersave_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(enable);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_powersave_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_powersave_get (dev_id, phy_addr, enable);
+}
+/*qca808x_start*/
+sw_error_t
+hsl_port_phy_magic_frame_mac_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_mac_addr_t * mac)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(mac);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_magic_frame_mac_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_magic_frame_mac_set (dev_id, phy_addr, mac);
+}
+
+sw_error_t
+hsl_port_phy_magic_frame_mac_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_mac_addr_t * mac)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(mac);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_magic_frame_mac_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_magic_frame_mac_get (dev_id, phy_addr, mac);
+}
+
+sw_error_t
+hsl_port_phy_hibernate_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_hibernation_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_hibernation_set (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_hibernate_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(enable);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_hibernation_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_hibernation_get (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_8023az_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_8023az_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_8023az_set (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_8023az_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(enable);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_8023az_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_8023az_get (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_remote_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_remote_loopback_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_remote_loopback_set (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_remote_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
+	a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(enable);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_remote_loopback_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_remote_loopback_get (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_mdix_set(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_mdix_mode_t mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_mdix_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_mdix_set (dev_id, phy_addr, mode);
+}
+
+sw_error_t
+hsl_port_phy_mdix_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_mdix_mode_t * mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(mode);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_mdix_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_mdix_get (dev_id, phy_addr, mode);
+}
+
+sw_error_t
+hsl_port_phy_mdix_status_get(a_uint32_t dev_id, fal_port_t port_id,
+	fal_port_mdix_status_t * mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(mode);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_mdix_status_get)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_mdix_status_get (dev_id, phy_addr, mode);
+}
+
+sw_error_t
+hsl_port_phy_phyid_get(a_uint32_t dev_id, fal_port_t port_id, a_uint16_t * org_id,
+	a_uint16_t * rev_id)
+{
+	a_uint32_t phy_id = 0;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(org_id);
+	SW_RTN_ON_NULL(rev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	phy_id = hsl_port_phyid_get(dev_id, port_id);
+
+	*org_id = (phy_id >> 16) & 0xffff;
+	*rev_id = phy_id & 0xffff;
+
+	return SW_OK;
+
+}
+
+sw_error_t
 hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
 {
-	sw_error_t rv;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
 
 	HSL_DEV_ID_CHECK(dev_id);
 	if(A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
@@ -1385,20 +2384,18 @@ hsl_port_phy_counter_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
 	if(NULL == phy_drv->phy_counter_set)
 		return SW_NOT_SUPPORTED;
 
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = phy_drv->phy_counter_set(dev_id, phy_id, enable);
-
-	return rv;
+	return phy_drv->phy_counter_set(dev_id, phy_addr, enable);
 }
 
 sw_error_t
 hsl_port_phy_counter_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
 {
-	sw_error_t rv;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
 
 	HSL_DEV_ID_CHECK(dev_id);
 
@@ -1411,21 +2408,19 @@ hsl_port_phy_counter_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable
 	if(NULL == phy_drv->phy_counter_get)
 		return SW_NOT_SUPPORTED;
 
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = phy_drv->phy_counter_get(dev_id, phy_id, enable);
-
-	return rv;
+	return phy_drv->phy_counter_get(dev_id, phy_addr, enable);
 }
 
 sw_error_t
 hsl_port_phy_counter_show(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_counter_info_t *counter_info)
 {
-	sw_error_t rv;
-	a_uint32_t phy_id = 0;
-	hsl_phy_ops_t *phy_drv;
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
 
 	HSL_DEV_ID_CHECK (dev_id);
 
@@ -1438,14 +2433,77 @@ hsl_port_phy_counter_show(a_uint32_t dev_id, fal_port_t port_id,
 	if (NULL == phy_drv->phy_counter_show)
 		return SW_NOT_SUPPORTED;
 
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_id);
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = phy_drv->phy_counter_show(dev_id, phy_id, counter_info);
-
-	return rv;
+	return phy_drv->phy_counter_show(dev_id, phy_addr, counter_info);
 }
 
+sw_error_t
+hsl_port_phy_wol_status_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_wol_status_set)
+		return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_wol_status_set (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_wol_status_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t * enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+	SW_RTN_ON_NULL(enable);
+	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	if (NULL == phy_drv->phy_wol_status_get)
+	  return SW_NOT_SUPPORTED;
+
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_wol_status_get (dev_id, phy_addr, enable);
+}
+
+sw_error_t
+hsl_port_phy_mode_get(a_uint32_t dev_id, a_uint32_t port_id,
+	fal_port_interface_mode_t *mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv;
+
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	rv = hsl_port_prop_get_phyid (dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR (rv);
+
+	return phy_drv->phy_interface_mode_get(dev_id, phy_addr, mode);
+}
+/*qca808x_end*/
+#endif
+/*qca808x_start*/
 sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)
 {
 	a_uint32_t i = 0;
@@ -1468,54 +2526,6 @@ sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)
 		phy_info[dev_id] = NULL;
 	}
 	return SW_OK;
-}
-
-sw_error_t
-hsl_port_phy_autoadv_get(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t *autoadv)
-{
-	sw_error_t rv = SW_OK;
-	a_uint32_t phy_addr = 0;
-	hsl_phy_ops_t *phy_drv = NULL;
-
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
-	if (NULL == phy_drv->phy_autoneg_adv_get)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR (rv);
-
-	*autoadv = 0;
-	rv = phy_drv->phy_autoneg_adv_get(dev_id, phy_addr, autoadv);
-
-	return rv;
-}
-
-sw_error_t
-hsl_port_phy_autoadv_set(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t autoadv)
-{
-	sw_error_t rv = SW_OK;
-	a_uint32_t phy_addr = 0;
-	hsl_phy_ops_t *phy_drv  = NULL;
-
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
-	if (NULL == phy_drv->phy_autoneg_adv_set)
-		return SW_NOT_SUPPORTED;
-
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR (rv);
-	rv = phy_drv->phy_autoneg_adv_set(dev_id, phy_addr, autoadv);
-
-	return rv;
 }
 /*qca808x_end*/
 
@@ -1576,31 +2586,7 @@ hsl_port_phy_rxfc_set(a_uint32_t dev_id, a_uint32_t port_id, a_bool_t enable)
 
 	return SW_OK;
 }
-/*qca808x_start*/
-sw_error_t
-hsl_port_phy_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id)
-{
-	sw_error_t rv = SW_OK;
-	a_uint32_t phy_addr = 0;
-	hsl_phy_ops_t *phy_drv = NULL;
 
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id, port_id));
-	if (NULL == phy_drv->phy_restart_autoneg)
-		return SW_NOT_SUPPORTED;
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR (rv);
-
-	rv = phy_drv->phy_restart_autoneg(dev_id, phy_addr);
-	SW_RTN_ON_ERROR(rv);
-
-	return SW_OK;
-}
-/*qca808x_end*/
 sw_error_t hsl_port_combo_phy_link_status_get(a_uint32_t dev_id,
 	a_uint32_t port_id, fal_port_combo_link_status_t * status)
 {

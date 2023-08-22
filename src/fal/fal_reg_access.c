@@ -30,40 +30,16 @@ static sw_error_t
 _fal_phy_get(a_uint32_t dev_id, a_uint32_t phy_addr,
              a_uint32_t reg, a_uint16_t * value)
 {
-    hsl_api_t *p_api;
-    hsl_phy_get phy_get_func;
+    *value = hsl_phy_mii_reg_read(dev_id, phy_addr, reg);
 
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    /* the 24th bit of phy_addr marks the type of
-     * phy address, 1 is for I2C and 0 is for MDIO*/
-    if(IS_I2C_PHY_ADDR(phy_addr))
-        phy_get_func = p_api->phy_i2c_get;
-    else
-        phy_get_func = p_api->phy_get;
-    SW_RTN_ON_NULL(phy_get_func);
-
-    return phy_get_func(dev_id, phy_addr, reg, value);
+    return SW_OK;
 }
 
 static sw_error_t
 _fal_phy_set(a_uint32_t dev_id, a_uint32_t phy_addr,
              a_uint32_t reg, a_uint16_t value)
 {
-    hsl_api_t *p_api;
-    hsl_phy_set phy_set_func;
-
-    SW_RTN_ON_NULL(p_api = hsl_api_ptr_get(dev_id));
-
-    /* the 24th bit of phy_addr marks the type of
-     * phy address, 1 is for I2C and 0 is for MDIO*/
-    if(IS_I2C_PHY_ADDR(phy_addr))
-        phy_set_func = p_api->phy_i2c_set;
-    else
-        phy_set_func = p_api->phy_set;
-    SW_RTN_ON_NULL(phy_set_func);
-
-    return phy_set_func(dev_id, phy_addr, reg, value);
+    return hsl_phy_mii_reg_write(dev_id, phy_addr, reg, value);
 }
 /*qca808x_end*/
 static sw_error_t

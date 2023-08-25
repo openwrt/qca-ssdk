@@ -241,13 +241,13 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 		SSDK_ERROR("MHT switch core is not enabled on the SKU\n");
 		return SW_NOT_SUPPORTED;
 	}
-	qca_mht_switch_reset(dev_id);
-
 	ret = qca_mht_work_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
 	SW_RTN_ON_ERROR(ret);
 
 	ret = qca_mht_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1);
 	SW_RTN_ON_ERROR(ret);
+
+	qca_mht_switch_reset(dev_id);
 
 	ret = qca_switch_init(dev_id);
 	SW_RTN_ON_ERROR(ret);

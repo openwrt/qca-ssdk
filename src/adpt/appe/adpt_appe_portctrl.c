@@ -517,8 +517,11 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 					SSDK_PHYSICAL_PORT5 : SSDK_PHYSICAL_PORT4;
 			for (i = SSDK_PHYSICAL_PORT1; i<= port_end; i++) {
 				/* there is active channel port, only powr off current phy */
-				if (!hsl_port_feature_get(dev_id, i, PHY_F_ERP_LOW_POWER))
+				if (!hsl_port_feature_get(dev_id, i, PHY_F_ERP_LOW_POWER)) {
+					/* off LDO */
+					hsl_port_phy_ldo_set(dev_id, port_id, A_FALSE);
 					return SW_OK;
+				}
 			}
 		}
 
@@ -554,12 +557,16 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 			}
 		}
 #endif
+		/* off LDO */
+		hsl_port_phy_ldo_set(dev_id, port_id, A_FALSE);
 		break;
 	case FAL_ERP_ACTIVE:
 		if (!hsl_port_feature_get(dev_id, port_id, PHY_F_ERP_LOW_POWER)) {
 			SSDK_INFO("port %d is already in active mode\n", port_id);
 			return SW_OK;
 		}
+		/* on LDO */
+		hsl_port_phy_ldo_set(dev_id, port_id, A_TRUE);
 #if defined(MHT)
 		/* resume manhattan serdes */
 		if (hsl_port_phyid_get(dev_id, port_id) == QCA8084_PHY) {

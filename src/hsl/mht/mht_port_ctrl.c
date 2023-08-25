@@ -1143,8 +1143,11 @@ _mht_port_erp_power_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 		while (pbmp) {
 			if (pbmp & 1) {
 				/* there is active channel port, only powr off current phy */
-				if (!hsl_port_feature_get(dev_id, i, PHY_F_ERP_LOW_POWER))
+				if (!hsl_port_feature_get(dev_id, i, PHY_F_ERP_LOW_POWER)) {
+					/* off LDO */
+					hsl_port_phy_ldo_set(dev_id, port_id, A_FALSE);
 					return SW_OK;
+				}
 			}
 			pbmp >>= 1;
 			i++;
@@ -1166,12 +1169,16 @@ _mht_port_erp_power_mode_set(a_uint32_t dev_id, fal_port_t port_id,
 		SW_RTN_ON_ERROR(ssdk_mht_clk_rate_set(dev_id, MHT_AHB_CLK, MHT_XO_CLK_RATE_50M));
 		/* assert serdes1 */
 		SW_RTN_ON_ERROR(ssdk_mht_clk_assert(dev_id, MHT_SRDS1_SYS_CLK));
+		/* off LDO */
+		hsl_port_phy_ldo_set(dev_id, port_id, A_FALSE);
 		break;
 	case FAL_ERP_ACTIVE:
 		if (!hsl_port_feature_get(dev_id, port_id, PHY_F_ERP_LOW_POWER)) {
 			SSDK_INFO("port %d is already in active mode\n", port_id);
 			return SW_OK;
 		}
+		/* on LDO */
+		hsl_port_phy_ldo_set(dev_id, port_id, A_TRUE);
 		/* resume serdes and switch core */
 		if (ssdk_mht_clk_is_asserted(dev_id, MHT_SRDS1_SYS_CLK)) {
 			SSDK_DEBUG("configure manhattan serdes1 and enable switch core\n");

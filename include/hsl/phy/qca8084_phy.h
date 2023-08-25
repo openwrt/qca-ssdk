@@ -63,6 +63,8 @@
 #define QCA8084_PHY_AFE25_PLL_EN                                         0x8000
 #define QCA8084_PHY_DEBUG_ANA_ICC                                        0x280
 #define QCA8084_PHY_DEBUG_ANA_ICC_MASK                                   0x1f
+#define QCA8084_PHY_AFE25_CMN_2_MII                                      0x180
+#define QCA8084_PHY_AFE25_LDO_EN                                         0x2000
 
 typedef enum {
 	ADC_RISING = 0,
@@ -123,3 +125,5 @@ sw_error_t
 qca8084_phy_pll_on(a_uint32_t dev_id, a_uint32_t phy_addr);
 sw_error_t
 qca8084_phy_pll_off(a_uint32_t dev_id, a_uint32_t phy_addr);
+sw_error_t
+qca8084_phy_ldo_set(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);

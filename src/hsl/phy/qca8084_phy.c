@@ -256,6 +256,23 @@ qca8084_phy_pll_off(a_uint32_t dev_id, a_uint32_t phy_addr)
 	return rv;
 }
 
+/******************************************************************************
+*
+* qca8084_phy_pll_status_get get phy pll status
+*
+* RETURNS:
+*    A_TRUE  --> pll is on
+*    A_FALSE --> pll is off
+*/
+static a_bool_t
+qca8084_phy_pll_status_get(a_uint32_t dev_id, a_uint32_t phy_addr)
+{
+	a_uint16_t phy_data = 0;
+	phy_data = hsl_phy_debug_reg_read(dev_id, phy_addr,
+		QCA8084_PHY_AFE25_CMN_6_MII);
+	return !!(phy_data & QCA8084_PHY_AFE25_PLL_EN);
+}
+
 sw_error_t
 qca8084_phy_interface_set_mode(a_uint32_t dev_id, a_uint32_t phy_addr,
 		fal_port_interface_mode_t interface_mode)
@@ -733,5 +750,52 @@ qca8084_phy_fixup_ability(a_uint32_t dev_id, a_uint32_t phy_addr,
 		PHY_RTN_ON_ERROR(rv);
 	}
 
+	return SW_OK;
+}
+
+sw_error_t
+qca8084_phy_ldo_set(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mht_port_id = 0, ephy_addr[SSDK_PHYSICAL_PORT4] = {0};
+	a_bool_t other_phy_status = A_TRUE, ephy_status[SSDK_PHYSICAL_PORT4] = {A_FALSE};
+
+	for (mht_port_id = SSDK_PHYSICAL_PORT1;
+			mht_port_id <= SSDK_PHYSICAL_PORT4; mht_port_id ++) {
+		rv = qca_mht_ephy_addr_get(dev_id, mht_port_id, &ephy_addr[mht_port_id - 1]);
+		SW_RTN_ON_ERROR (rv);
+		ephy_status[mht_port_id - 1] =
+			qca8084_phy_pll_status_get(dev_id, ephy_addr[mht_port_id - 1]);
+		if (phy_addr != ephy_addr[mht_port_id - 1])
+			other_phy_status &= ephy_status[mht_port_id - 1];
+	}
+
+	/* LDO1 LDO2 ctrl */
+	if (A_TRUE == other_phy_status) {
+		if (enable) {
+			/* going to active current phy and all other 3 phys are all on
+			 * current phy is the last active phy, we still on LDO2 and
+			 * LDO3 to back to the default LDO configurations */
+			SSDK_DEBUG("On LDO1 and LDO2\n");
+			rv = hsl_phy_modify_debug(dev_id, ephy_addr[SSDK_PHYSICAL_PORT1],
+				QCA8084_PHY_AFE25_CMN_2_MII,
+				QCA8084_PHY_AFE25_LDO_EN, QCA8084_PHY_AFE25_LDO_EN);
+			SW_RTN_ON_ERROR(rv);
+			rv = hsl_phy_modify_debug(dev_id, ephy_addr[SSDK_PHYSICAL_PORT2],
+				QCA8084_PHY_AFE25_CMN_2_MII,
+				QCA8084_PHY_AFE25_LDO_EN, QCA8084_PHY_AFE25_LDO_EN);
+			SW_RTN_ON_ERROR(rv);
+		} else {
+			/* current phy has been off and all other 3 phys are on
+			 * this is the fist off phy, we will off LDO2 and LDO3 */
+			SSDK_DEBUG("Off LDO1 and LDO2\n");
+			rv = hsl_phy_modify_debug(dev_id, ephy_addr[SSDK_PHYSICAL_PORT1],
+				QCA8084_PHY_AFE25_CMN_2_MII, QCA8084_PHY_AFE25_LDO_EN, 0);
+			SW_RTN_ON_ERROR(rv);
+			rv = hsl_phy_modify_debug(dev_id, ephy_addr[SSDK_PHYSICAL_PORT2],
+				QCA8084_PHY_AFE25_CMN_2_MII, QCA8084_PHY_AFE25_LDO_EN, 0);
+			SW_RTN_ON_ERROR(rv);
+		}
+	}
 	return SW_OK;
 }

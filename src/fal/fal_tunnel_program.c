@@ -121,7 +121,6 @@ _fal_tunnel_program_cfg_get(a_uint32_t dev_id,
     return rv;
 }
 
-#ifndef IN_TUNNEL_PROGRAM_MINI
 sw_error_t
 _fal_tunnel_program_udf_add(a_uint32_t dev_id,
 		fal_tunnel_program_type_t type, fal_tunnel_program_udf_t * udf)
@@ -185,7 +184,6 @@ _fal_tunnel_program_udf_getnext(a_uint32_t dev_id,
     rv = p_api->adpt_tunnel_program_udf_getnext(dev_id, type, udf);
     return rv;
 }
-#endif
 
 /**
  * @brief Add one tunnel program entry
@@ -301,7 +299,6 @@ fal_tunnel_program_cfg_get(a_uint32_t dev_id,
     return rv;
 }
 
-#ifndef IN_TUNNEL_PROGRAM_MINI
 /**
  * @brief Add one tunnel program udf entry
  * @param[in] dev_id device id
@@ -377,7 +374,6 @@ fal_tunnel_program_udf_getnext(a_uint32_t dev_id,
     FAL_API_UNLOCK;
     return rv;
 }
-#endif
 
 EXPORT_SYMBOL(fal_tunnel_program_entry_add);
 EXPORT_SYMBOL(fal_tunnel_program_entry_del);
@@ -385,9 +381,7 @@ EXPORT_SYMBOL(fal_tunnel_program_entry_getfirst);
 EXPORT_SYMBOL(fal_tunnel_program_entry_getnext);
 EXPORT_SYMBOL(fal_tunnel_program_cfg_set);
 EXPORT_SYMBOL(fal_tunnel_program_cfg_get);
-#ifndef IN_TUNNEL_PROGRAM_MINI
 EXPORT_SYMBOL(fal_tunnel_program_udf_add);
 EXPORT_SYMBOL(fal_tunnel_program_udf_del);
 EXPORT_SYMBOL(fal_tunnel_program_udf_getfirst);
 EXPORT_SYMBOL(fal_tunnel_program_udf_getnext);
-#endif

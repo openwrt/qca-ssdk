@@ -25,7 +25,6 @@
 #ifndef APPE_TUNNEL_REG_H
 #define APPE_TUNNEL_REG_H
 
-#ifndef IN_TUNNEL_MINI
 /*[register] TPR_UDF_CTRL_0*/
 #define TPR_UDF_CTRL_0
 #define TPR_UDF_CTRL_0_ADDRESS 0x400
@@ -193,7 +192,6 @@ union tpr_udf_profile_offset_u {
 	a_uint32_t val;
 	struct tpr_udf_profile_offset bf;
 };
-#endif
 
 /*[register] TL_TBL_OP*/
 #define TL_TBL_OP

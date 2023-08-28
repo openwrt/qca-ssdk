@@ -691,7 +691,6 @@ _fal_tunnel_decap_entry_flush(a_uint32_t dev_id)
     return rv;
 }
 
-#ifndef IN_TUNNEL_MINI
 sw_error_t
 _fal_tunnel_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
 		fal_tunnel_udf_profile_entry_t * entry)
@@ -787,7 +786,6 @@ _fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
     rv = p_api->adpt_tunnel_udf_profile_cfg_get(dev_id, profile_id, udf_idx, udf_type, offset);
     return rv;
 }
-#endif
 
 /**
  * @brief Add the decapsulation entry
@@ -1291,7 +1289,6 @@ fal_tunnel_encap_rule_entry_del(a_uint32_t dev_id, a_uint32_t rule_id,
     return rv;
 }
 
-#ifndef IN_TUNNEL_MINI
 /**
  * @brief add one udf profile entry
  * @param[in] dev_id device id
@@ -1410,6 +1407,7 @@ fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
     return rv;
 }
 
+#ifndef IN_TUNNEL_MINI
 /**
  * @brief Set decap ECN mode
  * @param[in] dev_id device id
@@ -1657,13 +1655,13 @@ EXPORT_SYMBOL(fal_tunnel_encap_entry_getnext);
 EXPORT_SYMBOL(fal_tunnel_encap_rule_entry_set);
 EXPORT_SYMBOL(fal_tunnel_encap_rule_entry_get);
 EXPORT_SYMBOL(fal_tunnel_encap_rule_entry_del);
-#ifndef IN_TUNNEL_MINI
 EXPORT_SYMBOL(fal_tunnel_udf_profile_entry_add);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_entry_del);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_entry_getfirst);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_entry_getnext);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_cfg_set);
 EXPORT_SYMBOL(fal_tunnel_udf_profile_cfg_get);
+#ifndef IN_TUNNEL_MINI
 EXPORT_SYMBOL(fal_tunnel_decap_ecn_mode_set);
 EXPORT_SYMBOL(fal_tunnel_decap_ecn_mode_get);
 EXPORT_SYMBOL(fal_tunnel_encap_ecn_mode_set);

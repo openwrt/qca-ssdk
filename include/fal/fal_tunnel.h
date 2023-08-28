@@ -694,7 +694,6 @@ sw_error_t
 fal_tunnel_encap_rule_entry_del(a_uint32_t dev_id, a_uint32_t rule_id,
 		fal_tunnel_encap_rule_t *rule_entry);
 
-#ifndef IN_TUNNEL_MINI
 sw_error_t
 fal_tunnel_udf_profile_entry_add(a_uint32_t dev_id, a_uint32_t profile_id,
 		fal_tunnel_udf_profile_entry_t * entry);
@@ -713,7 +712,6 @@ fal_tunnel_udf_profile_cfg_set(a_uint32_t dev_id, a_uint32_t profile_id,
 sw_error_t
 fal_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
 		a_uint32_t udf_idx, fal_tunnel_udf_type_t * udf_type, a_uint32_t * offset);
-#endif
 
 sw_error_t
 fal_tunnel_encap_header_ctrl_set(a_uint32_t dev_id, fal_tunnel_encap_header_ctrl_t *header_ctrl);

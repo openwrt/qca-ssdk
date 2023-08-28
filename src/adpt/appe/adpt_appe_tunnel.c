@@ -2132,7 +2132,6 @@ adpt_appe_tunnel_encap_rule_entry_del(a_uint32_t dev_id,
 	return rv;
 }
 
-#ifndef IN_TUNNEL_MINI
 static a_bool_t
 _adpt_appe_is_udf_profile_entry_equal(a_uint32_t dev_id,
 		fal_tunnel_udf_profile_entry_t * entry1, fal_tunnel_udf_profile_entry_t * entry2)
@@ -2606,7 +2605,6 @@ adpt_appe_tunnel_udf_profile_cfg_get(a_uint32_t dev_id, a_uint32_t profile_id,
 
 	return SW_OK;
 }
-#endif
 
 sw_error_t
 adpt_appe_tunnel_exp_decap_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t *enable)
@@ -2892,6 +2890,7 @@ adpt_appe_tunnel_init(a_uint32_t dev_id)
 		adpt_appe_tunnel_encap_ecn_mode_set;
 	p_adpt_api->adpt_tunnel_encap_ecn_mode_get=
 		adpt_appe_tunnel_encap_ecn_mode_get;
+#endif
 	p_adpt_api->adpt_tunnel_udf_profile_entry_add =
 		adpt_appe_tunnel_udf_profile_entry_add;
 	p_adpt_api->adpt_tunnel_udf_profile_entry_del =
@@ -2904,7 +2903,6 @@ adpt_appe_tunnel_init(a_uint32_t dev_id)
 		adpt_appe_tunnel_udf_profile_cfg_set;
 	p_adpt_api->adpt_tunnel_udf_profile_cfg_get =
 		adpt_appe_tunnel_udf_profile_cfg_get;
-#endif
 	p_adpt_api->adpt_tunnel_exp_decap_set=
 		adpt_appe_tunnel_exp_decap_set;
 	p_adpt_api->adpt_tunnel_exp_decap_get=

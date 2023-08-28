@@ -1359,9 +1359,7 @@ struct sub_cmd_des_t g_tunnelprogram_des[] =
 {
     {"entry", "set", SW_API_TUNNEL_PROGRAM_ENTRY_ADD, NULL},
     {"cfg", "set", SW_API_TUNNEL_PROGRAM_CFG_SET, NULL},
-#ifndef IN_TUNNEL_PROGRAM_MINI
     {"udf", "set", SW_API_TUNNEL_PROGRAM_UDF_ADD, NULL},
-#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif
@@ -1370,10 +1368,8 @@ struct sub_cmd_des_t g_tunnelprogram_des[] =
 #ifdef IN_TUNNEL
 struct sub_cmd_des_t g_tunnel_des[] =
 {
-#ifndef IN_TUNNEL_MINI
     {"udfprofileEntry", "set", SW_API_TUNNEL_UDF_PROFILE_ENTRY_ADD, NULL},
     {"udfprofilecfg", "set", SW_API_TUNNEL_UDF_PROFILE_CFG_SET, NULL},
-#endif
     {"Globalcfg", "set", SW_API_TUNNEL_GLOBAL_CFG_SET, NULL},
     {"Portintf", "set", SW_API_TUNNEL_PORT_INTF_SET, NULL},
     {"Intf", "set", SW_API_TUNNEL_INTF_SET, NULL},

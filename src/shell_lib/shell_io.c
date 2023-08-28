@@ -872,10 +872,8 @@ static sw_data_type_t sw_data_type[] =
 #endif
 #ifdef IN_TUNNEL
 	SW_TYPE_DEF(SW_TUNNEL_UDP_ENTRY, (param_check_t)cmd_data_check_tunnel_udp_entry, NULL),
-#ifndef IN_TUNNEL_MINI
     SW_TYPE_DEF(SW_TUNNEL_UDF_TYPE,
 		    (param_check_t)cmd_data_check_tunnel_udf_type, NULL),
-#endif
     SW_TYPE_DEF(SW_TUNNEL_INTF,
 		    (param_check_t)cmd_data_check_tunnel_intf, NULL),
     SW_TYPE_DEF(SW_TUNNEL_PORT_INTF,
@@ -11738,7 +11736,6 @@ cmd_data_check_tunnel_program_cfg(char * cmd_str, void * val, a_uint32_t size)
 #endif
 
 #ifdef IN_TUNNEL
-#ifndef IN_TUNNEL_MINI
 sw_error_t
 cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
 {
@@ -11746,7 +11743,6 @@ cmd_data_check_tunnel_udf_type(char *cmd_str, a_uint32_t * arg_val, a_uint32_t s
     return cmd_data_check_attr("tunnel_udf_type", cmd_str,
                     arg_val, sizeof(*arg_val));
 }
-#endif
 
 sw_error_t
 cmd_data_check_tunnel_intf(char *cmd_str, fal_tunnel_intf_t *arg_val, a_uint32_t size)

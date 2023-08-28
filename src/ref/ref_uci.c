@@ -13518,7 +13518,6 @@ parse_tunnelprogram_cfg(struct switch_val *val)
 	return rv;
 }
 
-#ifndef IN_TUNNEL_PROGRAM_MINI
 static int
 parse_tunnelprogram_udf(a_uint32_t dev_id, struct switch_val *val)
 {
@@ -13609,7 +13608,6 @@ parse_tunnelprogram_udf(a_uint32_t dev_id, struct switch_val *val)
 	SSDK_DEBUG("uci set tunnelprogram udf rv %d\n", rv);
 	return rv;
 }
-#endif
 
 static int
 parse_tunnelprogram(a_uint32_t dev_id, const char *command_name, struct switch_val *val)
@@ -13619,17 +13617,14 @@ parse_tunnelprogram(a_uint32_t dev_id, const char *command_name, struct switch_v
 		rv = parse_tunnelprogram_entry(val);
 	} else if (!strcmp(command_name, "Cfg")) {
 		rv = parse_tunnelprogram_cfg(val);
-#ifndef IN_TUNNEL_PROGRAM_MINI
 	} else if (!strcmp(command_name, "Udf")) {
 		rv = parse_tunnelprogram_udf(dev_id, val);
-#endif
 	}
 	return rv;
 }
 #endif
 
 #ifdef IN_TUNNEL
-#ifndef IN_TUNNEL_MINI
 int parse_tunnel_udfprofileentry(a_uint32_t dev_id, struct switch_val *val)
 {
 	struct switch_ext *switch_ext_p, *ext_value_p;
@@ -13711,7 +13706,6 @@ int parse_tunnel_udfprofilecfg(struct switch_val *val)
 
 	return rv;
 }
-#endif
 #endif
 
 static int name_transfer(char *name, char *module, char *cmd)

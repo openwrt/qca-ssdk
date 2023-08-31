@@ -1209,7 +1209,7 @@ void ssdk_mht_gcc_port_clk_parent_set(a_uint32_t dev_id,
 				case MHT_PHY_UQXGMII_MODE:
 					if(clk_mode == MHT_SWITCH_MODE) {
 						port_tx_parent = MHT_P_UNIPHY1_TX;
-						port_rx_parent = MHT_P_UNIPHY1_TX;
+						port_rx_parent = MHT_P_UNIPHY0_RX;
 					}
 					ssdk_mht_port5_uniphy0_clk_src_set(dev_id, A_FALSE);
 					break;

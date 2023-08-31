@@ -257,11 +257,11 @@ int parse_tunnel(a_uint32_t dev_id, const char *command_name, struct switch_val 
 	} else if (!strcmp(command_name, "Vlanintf")) {
 		rv = parse_uci_option(val, tunnel_vlanintf,
 				ARRAY_SIZE(tunnel_vlanintf));
+#endif
 	} else if (!strcmp(command_name, "UdfprofileEntry")) {
 		rv = parse_tunnel_udfprofileentry(dev_id, val);
 	} else if (!strcmp(command_name, "UdfprofileCfg")) {
 		rv = parse_tunnel_udfprofilecfg(val);
-#endif
 	} else if (!strcmp(command_name, "Encapporttunnelid")) {
 		rv = parse_uci_option(val, tunnel_encapporttunnelid,
 				ARRAY_SIZE(tunnel_encapporttunnelid));

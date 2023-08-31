@@ -211,7 +211,6 @@ union tpr_program_udf_ctrl_u {
 	struct tpr_program_udf_ctrl bf;
 };
 
-#ifndef IN_TUNNEL_PROGRAM_MINI
 /*[register] TPR_PROGRAM_UDF_DATA_0*/
 #define TPR_PROGRAM_UDF_DATA_0
 #define TPR_PROGRAM_UDF_DATA_0_ADDRESS 0x560
@@ -410,7 +409,6 @@ union tpr_program_udf_action_u {
 	a_uint32_t val;
 	struct tpr_program_udf_action bf;
 };
-#endif
 
 #endif
 #endif

@@ -26,7 +26,6 @@
 #include "appe_tunnel_reg.h"
 #include "appe_tunnel.h"
 
-#ifndef IN_TUNNEL_MINI
 sw_error_t
 appe_tpr_udf_ctrl_0_get(
 		a_uint32_t dev_id,
@@ -110,7 +109,6 @@ appe_tpr_udf_profile_offset_set(
 				index * TPR_UDF_PROFILE_OFFSET_INC,
 				value->val);
 }
-#endif
 
 sw_error_t
 appe_tl_tbl_op_get(

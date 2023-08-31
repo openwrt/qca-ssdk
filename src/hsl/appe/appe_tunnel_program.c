@@ -194,7 +194,6 @@ appe_tpr_program_udf_ctrl_set(
 				value->val);
 }
 
-#ifndef IN_TUNNEL_PROGRAM_MINI
 sw_error_t
 appe_tpr_program_udf_data_0_get(
 		a_uint32_t dev_id,
@@ -334,7 +333,6 @@ appe_tpr_program_udf_action_set(
 				index * TPR_PROGRAM_UDF_ACTION_INC,
 				value->val);
 }
-#endif
 
 #if 0
 sw_error_t

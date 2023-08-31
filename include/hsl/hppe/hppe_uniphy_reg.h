@@ -1932,6 +1932,59 @@ union uniphy_clkout_50m_ctrl_u {
 	a_uint32_t val;
 	struct uniphy_clkout_50m_ctrl bf;
 };
+/*[register] UNIPHY_VCO_CALIBRATION_CONTROL_REGISTER*/
+#define UNIPHY_VCO_CALIBRATION_CONTROL
+#define UNIPHY_VCO_CALIBRATION_CONTROL_ADDRESS 0xb4
+#define UNIPHY_VCO_CALIBRATION_CONTROL_NUM     2
+#define UNIPHY_VCO_CALIBRATION_CONTROL_INC     0x1
+#define UNIPHY_VCO_CALIBRATION_CONTROL_TYPE    REG_TYPE_RW
+#define UNIPHY_VCO_CALIBRATION_CONTROL_DEFAULT 0x281a
+	/*[field] MMD1_REG_PLL_VCO_CALIB_MANU_CAL*/
+	#define UNIPHY_PLL_VCO_CALIB_MANU_CAL
+	#define UNIPHY_PLL_VCO_CALIB_MANU_CAL_OFFSET  0
+	#define UNIPHY_PLL_VCO_CALIB_MANU_CAL_LEN     6
+	#define UNIPHY_PLL_VCO_CALIB_MANU_CAL_DEFAULT 0x1a
+	/*[field] MMD1_REG_PLL_VCO_CALIB_AUTO*/
+	#define UNIPHY_PLL_VCO_CALIB_AUTO
+	#define UNIPHY_PLL_VCO_CALIB_AUTO_OFFSET  6
+	#define UNIPHY_PLL_VCO_CALIB_AUTO_LEN     6
+	#define UNIPHY_PLL_VCO_CALIB_AUTO_DEFAULT 0x20
+	/*[field] MMD1_REG_PLL_VCO_CALIB_MANU_EN*/
+	#define UNIPHY_PLL_VCO_CALIB_MANU_EN
+	#define UNIPHY_PLL_VCO_CALIB_MANU_EN_OFFSET  12
+	#define UNIPHY_PLL_VCO_CALIB_MANU_EN_LEN     1
+	#define UNIPHY_PLL_VCO_CALIB_MANU_EN_DEFAULT 0
+	/*[field] MMD1_REG_SPEED_MODE*/
+	#define UNIPHY_PLL_SPEED_MODE
+	#define UNIPHY_PLL_SPEED_MODE_OFFSET  13
+	#define UNIPHY_PLL_SPEED_MODE_LEN     1
+	#define UNIPHY_PLL_SPEED_MODE_DEFAULT 1
+	/*[field] MMD1_REG_PLL_VCO_CALIB_RESTART*/
+	#define UNIPHY_PLL_VCO_CALIB_RESTART
+	#define UNIPHY_PLL_VCO_CALIB_RESTART_OFFSET  14
+	#define UNIPHY_PLL_VCO_CALIB_RESTART_LEN     1
+	#define UNIPHY_PLL_VCO_CALIB_RESTART_DEFAULT 0
+	/*[field] MMD1_REG_PLL_VCO_CALIB_FREQ_COEFF*/
+	#define UNIPHY_PLL_VCO_CALIB_FREQ_COEFF
+	#define UNIPHY_PLL_VCO_CALIB_FREQ_COEFF_OFFSET  15
+	#define UNIPHY_PLL_VCO_CALIB_FREQ_COEFF_LEN     1
+	#define UNIPHY_PLL_VCO_CALIB_FREQ_COEFF_DEFAULT 0
+
+
+struct uniphy_vco_cal_control {
+	a_uint32_t  calib_manu:6;
+	a_uint32_t  calib_auto:6;
+	a_uint32_t  calib_manu_en:1;
+	a_uint32_t  speed_mode : 1;
+	a_uint32_t  calib_restart:1;
+	a_uint32_t  calib_freq:1;
+	a_uint32_t  _reserved0:16;
+};
+
+union uniphy_vco_cal_control_u {
+	a_uint32_t val;
+	struct uniphy_vco_cal_control bf;
+};
 #endif
 #endif
 #endif

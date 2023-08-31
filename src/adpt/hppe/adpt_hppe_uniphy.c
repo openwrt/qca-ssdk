@@ -742,7 +742,28 @@ __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 
 	return rv;
 }
+#ifdef MPPE
+static sw_error_t
+__qca_mppe_uniphy_cal_restart(a_uint32_t dev_id, a_uint32_t uniphy_index)
+{
+	sw_error_t rv = SW_OK;
+	union uniphy_vco_cal_control_u cal_control = {0};
 
+	SSDK_DEBUG("uniphy %d do calibration restart\n", uniphy_index);
+	rv = mppe_uniphy_calib_ctrl_get(dev_id, uniphy_index, &cal_control);
+	SW_RTN_ON_ERROR(rv);
+	cal_control.bf.calib_restart = 1;
+	rv = mppe_uniphy_calib_ctrl_set(dev_id, uniphy_index, &cal_control);
+	SW_RTN_ON_ERROR(rv);
+	msleep(10);
+	cal_control.bf.calib_restart = 0;
+	rv = mppe_uniphy_calib_ctrl_set(dev_id, uniphy_index, &cal_control);
+	SW_RTN_ON_ERROR(rv);
+	msleep(10);
+
+	return SW_OK;
+}
+#endif
 static sw_error_t
 __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
@@ -832,7 +853,12 @@ __adpt_hppe_uniphy_sgmiiplus_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
 
 	/* configure uniphy gcc software reset */
-	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
+#ifdef MPPE
+	if (adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+		__qca_mppe_uniphy_cal_restart(dev_id, uniphy_index);
+	else
+#endif
+		__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
 
 	/* wait uniphy calibration done */
 	rv = __adpt_hppe_uniphy_calibrate(dev_id, uniphy_index);
@@ -874,14 +900,15 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	/*set the PHY mode to SGMII*/
 	hppe_uniphy_reg_set(dev_id, UNIPHY_MISC2_REG_OFFSET,
 		uniphy_index, UNIPHY_MISC2_REG_SGMII_MODE);
-	/*reset uniphy*/
-	hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
-		uniphy_index, UNIPHY_PLL_RESET_REG_VALUE);
-	msleep(100);
-	hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
-		uniphy_index, UNIPHY_PLL_RESET_REG_DEFAULT_VALUE);
-	msleep(100);
-
+	if (adpt_ppe_type_get(dev_id) != MPPE_TYPE) {
+		/*reset uniphy*/
+		hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
+			uniphy_index, UNIPHY_PLL_RESET_REG_VALUE);
+		msleep(100);
+		hppe_uniphy_reg_set(dev_id, UNIPHY_PLL_RESET_REG_OFFSET,
+			uniphy_index, UNIPHY_PLL_RESET_REG_DEFAULT_VALUE);
+		msleep(100);
+	}
 	/* keep xpcs to reset status */
 	__adpt_hppe_gcc_uniphy_xpcs_reset(dev_id, uniphy_index, A_TRUE);
 
@@ -985,7 +1012,12 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 		SW_RTN_ON_ERROR (rv);
 	}
 	/* configure uniphy gcc software reset */
-	__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
+#ifdef MPPE
+	if (adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+		__qca_mppe_uniphy_cal_restart(dev_id, uniphy_index);
+	else
+#endif
+		__adpt_ppe_gcc_uniphy_software_reset(dev_id, uniphy_index);
 
 	/* wait uniphy calibration done */
 	rv = __adpt_hppe_uniphy_calibrate(dev_id, uniphy_index);
@@ -1195,6 +1227,7 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 			/* modify the uniphy clock as 25M for s17c connected. */
 			_adpt_mppe_uniphy_clk_output_set(dev_id, index, UNIPHY_CLK_RATE_25M);
 		} else if (force_speed == FAL_SPEED_2500) {
+#if 0
 			struct mii_bus *mdio_bus = NULL;
 			struct qca_mdio_data *mdio_priv = NULL;
 			static bool mht_preinit_done = false;
@@ -1240,6 +1273,17 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 
 				mht_preinit_done = true;
 			}
+#endif
+			static bool mht_clock_enable = false;
+
+			/* when P0 and P5 are both connected to mppe, the mht 50M clock should
+			 * come from the mppe uniphy that was confiured firstly, then need to
+			 * disable the clock output of another uniphy.
+			 */
+			if (mht_clock_enable && 2 == ssdk_switch_device_num_get()) {
+				 _adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
+			}
+			mht_clock_enable = true;
 		}
 
 		return;

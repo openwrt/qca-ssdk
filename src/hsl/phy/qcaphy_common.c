@@ -268,14 +268,9 @@ qcaphy_poweroff(a_uint32_t dev_id, a_uint32_t phy_addr)
 sw_error_t
 qcaphy_poweron(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
-	sw_error_t rv = SW_OK;
 
-	rv = hsl_phy_modify_mii(dev_id, phy_addr, QCAPHY_CONTROL,
+	return hsl_phy_modify_mii(dev_id, phy_addr, QCAPHY_CONTROL,
 		QCAPHY_CTRL_POWER_MASK, QCAPHY_CTRL_POWER_UP);
-	PHY_RTN_ON_ERROR(rv);
-	aos_mdelay(200);
-
-	return SW_OK;
 }
 /*
  * @brief restart autoneg

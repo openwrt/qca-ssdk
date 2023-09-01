@@ -918,8 +918,6 @@ sw_error_t malibu_phy_poweron(a_uint32_t dev_id, a_uint32_t phy_addr)
 		PHY_RTN_ON_ERROR(rv);
 	}
 
-	aos_mdelay(200);
-
 	return SW_OK;
 }
 /******************************************************************************

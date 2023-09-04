@@ -77,12 +77,6 @@
 #include <linux/of_address.h>
 #include <linux/reset.h>
 /*qca808x_end*/
-#ifdef BOARD_AR71XX
-#ifdef CONFIG_AR8216_PHY
-#include "drivers/net/phy/ar8327.h"
-#endif
-#include "drivers/net/ethernet/atheros/ag71xx/ag71xx.h"
-#endif
 #elif defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 #include <linux/of.h>
 #include <linux/of_platform.h>
@@ -107,9 +101,6 @@
 #include "ref_uci.h"
 #include "ref_vsi.h"
 #include "shell.h"
-#ifdef BOARD_AR71XX
-#include "ssdk_uci.h"
-#endif
 /*qca808x_start*/
 #if defined(IN_PHY_I2C_MODE)
 #include "ssdk_phy_i2c.h"
@@ -240,7 +231,6 @@ ssdk_port_to_ifname(a_uint32_t dev_id, a_uint32_t port_id)
 	}
 }
 
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 static void
 ssdk_phy_rgmii_set(struct qca_phy_priv *priv)
@@ -323,7 +313,6 @@ ssdk_phy_rgmii_set(struct qca_phy_priv *priv)
 		}
 	}
 }
-#endif
 #endif
 
 
@@ -727,9 +716,8 @@ void
 qca_ar8327_phy_enable(struct qca_phy_priv *priv)
 {
 	int i = 0;
-#ifndef BOARD_AR71XX
+
         ssdk_phy_rgmii_set(priv);
-#endif
 	for (i = 0; i < AR8327_NUM_PHYS; i++) {
 		a_uint16_t value = 0;
 
@@ -914,7 +902,6 @@ qca_ar8327_get_pad_cfg(struct ar8327_pad_cfg *pad_cfg)
 	return value;
 }
 
-#ifndef BOARD_AR71XX
 static a_uint32_t
 qca_ar8327_get_pwr_sel(struct qca_phy_priv *priv,
                                 struct ar8327_platform_data *plat_data)
@@ -949,7 +936,6 @@ qca_ar8327_get_pwr_sel(struct qca_phy_priv *priv,
 
 	return value;
 }
-#endif
 
 static a_uint32_t
 qca_ar8327_set_led_cfg(struct qca_phy_priv *priv,
@@ -977,7 +963,7 @@ qca_ar8327_set_led_cfg(struct qca_phy_priv *priv,
 	}
 	return new_pos;
 }
-#ifndef BOARD_AR71XX
+
 static int
 qca_ar8327_set_sgmii_cfg(struct qca_phy_priv *priv,
                               struct ar8327_platform_data *plat_data,
@@ -1011,7 +997,6 @@ qca_ar8327_set_sgmii_cfg(struct qca_phy_priv *priv,
 	}
 	return 0;
 }
-#endif
 
 static int
 qca_ar8327_set_plat_data_cfg(struct qca_phy_priv *priv,
@@ -1023,12 +1008,10 @@ qca_ar8327_set_plat_data_cfg(struct qca_phy_priv *priv,
 
 	new_pos = qca_ar8327_set_led_cfg(priv, plat_data, pos);
 
-#ifndef BOARD_AR71XX
 	/*configure the SGMII*/
 	if (plat_data->sgmii_cfg) {
 		qca_ar8327_set_sgmii_cfg(priv, plat_data, &new_pos);
 	}
-#endif
 
 	priv->mii_write(priv->device_id, AR8327_REG_POS, new_pos);
 
@@ -1154,10 +1137,8 @@ qca_ar8327_hw_init(struct qca_phy_priv *priv)
 
 	qca_switch_init(priv->device_id);
 
-#ifndef BOARD_AR71XX
 	value = qca_ar8327_get_pwr_sel(priv, plat_data);
 	priv->mii_write(priv->device_id, AR8327_REG_PAD_MAC_PWR_SEL, value);
-#endif
 
 	msleep(1000);
 
@@ -1172,7 +1153,6 @@ qca_ar8327_hw_init(struct qca_phy_priv *priv)
 #endif
 
 #if defined(IN_SWCONFIG)
-#ifndef BOARD_AR71XX
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 static int
 qca_ar8327_sw_get_reg_val(struct switch_dev *dev,
@@ -1188,7 +1168,7 @@ qca_ar8327_sw_set_reg_val(struct switch_dev *dev,
 	return 0;
 }
 #endif
-#endif
+
 static struct switch_attr qca_ar8327_globals[] = {
 #if defined(IN_VLAN)
 	{
@@ -1307,11 +1287,9 @@ const struct switch_dev_ops qca_ar8327_sw_ops = {
 #if defined(IN_PORTCONTROL)
 	.get_port_link = qca_ar8327_sw_get_port_link,
 #endif
-#ifndef BOARD_AR71XX
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 	.get_reg_val = qca_ar8327_sw_get_reg_val,
 	.set_reg_val = qca_ar8327_sw_set_reg_val,
-#endif
 #endif
 };
 #endif
@@ -1925,7 +1903,6 @@ static int ssdk_switch_unregister(a_uint32_t dev_id)
 }
 #endif
 
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 char ssdk_driver_name[] = "ess_ssdk";
 
@@ -1958,7 +1935,6 @@ static struct platform_driver ssdk_driver = {
         },
         .probe    = ssdk_probe,
 };
-#endif
 #endif
 /*qca808x_start*/
 sw_error_t
@@ -2125,10 +2101,8 @@ static void ssdk_driver_register(a_uint32_t dev_id)
 
 	reg_mode = ssdk_switch_reg_access_mode_get(dev_id);
 	if(reg_mode == HSL_REG_LOCAL_BUS) {
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 		platform_driver_register(&ssdk_driver);
-#endif
 #endif
 	}
 }
@@ -2139,10 +2113,8 @@ static void ssdk_driver_unregister(a_uint32_t dev_id)
 
 	reg_mode= ssdk_switch_reg_access_mode_get(dev_id);
 	if (reg_mode == HSL_REG_LOCAL_BUS) {
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 		platform_driver_unregister(&ssdk_driver);
-#endif
 #endif
 	}
 }
@@ -2510,13 +2482,11 @@ static int __init regi_init(void)
 	for (num = 0; num < dev_num; num++) {
 		ssdk_cfg_default_init(&cfg);
 /*qca808x_end*/
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 		if(SW_DISABLE == ssdk_dt_parse(&cfg, num, &dev_id)) {
 			SSDK_INFO("ess-switch node is unavalilable\n");
 			continue;
 		}
-#endif
 #endif
 
 		/* device id is the array index */

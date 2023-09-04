@@ -272,7 +272,6 @@ struct clk *ssdk_dts_cmnclk_get(a_uint32_t dev_id)
 	return cfg->cmnblk_clk;
 }
 
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 		struct device_node *switch_node, ssdk_init_cfg *cfg)
@@ -1373,7 +1372,6 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 
 	return SW_OK;
 }
-#endif
 #endif
 
 int ssdk_switch_device_num_init(void)

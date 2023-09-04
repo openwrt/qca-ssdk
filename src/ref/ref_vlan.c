@@ -49,9 +49,6 @@
 #include <linux/netdevice.h>
 #include "ssdk_plat.h"
 #include "ref_vlan.h"
-#ifdef BOARD_AR71XX
-#include "ssdk_uci.h"
-#endif
 
 #if !defined(IN_VLAN_MINI)
 sw_error_t
@@ -319,12 +316,6 @@ qca_ar8327_sw_set_vlan(struct switch_dev *dev,
 
     priv->vlan = !!val->value.i;
 
-    #ifdef BOARD_AR71XX
-    if(priv->version == CHIP_SHIVA) {
-		ssdk_uci_sw_set_vlan(attr, val);
-    }
-    #endif
-
     return 0;
 }
 
@@ -348,12 +339,6 @@ qca_ar8327_sw_set_vid(struct switch_dev *dev,
     struct qca_phy_priv *priv = qca_phy_priv_get(dev);
 
     priv->vlan_id[val->port_vlan] = val->value.i;
-
-#ifdef BOARD_AR71XX
-    if(priv->version == CHIP_SHIVA) {
-		ssdk_uci_sw_set_vid(attr, val);
-    }
-#endif
 
     return 0;
 }
@@ -390,12 +375,6 @@ qca_ar8327_sw_set_pvid(struct switch_dev *dev, int port, int vlan)
         return -1;
 
     priv->pvid[port] = vlan;
-
-#ifdef BOARD_AR71XX
-		if(priv->version == CHIP_SHIVA) {
-			ssdk_uci_sw_set_pvid(port, vlan);
-		}
-#endif
 
     return 0;
 }
@@ -435,12 +414,6 @@ qca_ar8327_sw_set_ports(struct switch_dev *dev, struct switch_val *val)
     struct qca_phy_priv *priv = qca_phy_priv_get(dev);
     a_uint8_t *vt = &priv->vlan_table[val->port_vlan];
     int i;
-
-#ifdef BOARD_AR71XX
-	if(priv->version == CHIP_SHIVA) {
-		ssdk_uci_sw_set_ports(val);
-	}
-#endif
 
     /*Handle for VLAN 0*/
     if (val->port_vlan == 0) {

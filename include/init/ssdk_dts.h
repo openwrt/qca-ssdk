@@ -22,9 +22,7 @@
 extern "C" {
 #endif
 
-#ifndef BOARD_AR71XX
 #include <linux/version.h>
-#endif
 #include "ssdk_init.h"
 #include <linux/phy.h>
 
@@ -174,10 +172,8 @@ a_uint32_t ssdk_emu_chip_ver_get(a_uint32_t dev_id);
 mht_work_mode_t ssdk_clk_mode_get(a_uint32_t dev_id);
 #endif
 
-#ifndef BOARD_AR71XX
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id);
-#endif
 #endif
 
 #ifdef __cplusplus

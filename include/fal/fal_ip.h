@@ -467,6 +467,7 @@ fal_ip_wcmp_entry_get(a_uint32_t dev_id, a_uint32_t wcmp_id, fal_ip_wcmp_t * wcm
 sw_error_t
 fal_ip_wcmp_hash_mode_set(a_uint32_t dev_id, a_uint32_t hash_mode);
 
+#if defined(IN_RFS)
 sw_error_t
 fal_ip_rfs_ip4_rule_set(a_uint32_t dev_id, fal_ip4_rfs_t * rfs);
 
@@ -478,6 +479,7 @@ fal_ip_rfs_ip4_rule_del(a_uint32_t dev_id, fal_ip4_rfs_t * rfs);
 
 sw_error_t
 fal_ip_rfs_ip6_rule_del(a_uint32_t dev_id, fal_ip6_rfs_t * rfs);
+#endif
 
 sw_error_t
 fal_ip_wcmp_hash_mode_get(a_uint32_t dev_id, a_uint32_t * hash_mode);

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -1630,6 +1632,8 @@ _dess_fdb_port_update(a_uint32_t dev_id, a_uint32_t fid, fal_mac_addr_t * addr, 
     rv = _dess_fdb_commit(dev_id, ARL_LOAD_ENTRY);
     return rv;
 }
+#if defined(IN_RFS)
+
 #define FDB_RFS_ADD  1
 #define FDB_RFS_DEL  2
 static sw_error_t
@@ -1693,8 +1697,7 @@ _dess_fdb_rfs_del(a_uint32_t dev_id, const fal_fdb_rfs_t *rfs)
 		return ret;
 	}
 }
-
-
+#endif
 
 sw_error_t
 inter_dess_fdb_flush(a_uint32_t dev_id, a_uint32_t flag)
@@ -2333,6 +2336,7 @@ dess_fdb_port_del(a_uint32_t dev_id, a_uint32_t fid, fal_mac_addr_t * addr, fal_
     return rv;
 }
 
+#if defined(IN_RFS)
 /**
  * @brief set a fdb rfs entry
  * @param[in] dev_id device id
@@ -2370,7 +2374,7 @@ dess_fdb_rfs_del(a_uint32_t dev_id, const fal_fdb_rfs_t *rfs)
     HSL_API_UNLOCK;
     return rv;
 }
-
+#endif
 
 sw_error_t
 dess_fdb_init(a_uint32_t dev_id)
@@ -2415,8 +2419,10 @@ dess_fdb_init(a_uint32_t dev_id)
         p_api->fdb_port_learn_static_get = dess_fdb_port_learn_static_get;
         p_api->fdb_port_add = dess_fdb_port_add;
         p_api->fdb_port_del = dess_fdb_port_del;
+#if defined(IN_RFS)
 		p_api->fdb_rfs_set = dess_fdb_rfs_set;
 		p_api->fdb_rfs_del = dess_fdb_rfs_del;
+#endif
     }
 #endif
 

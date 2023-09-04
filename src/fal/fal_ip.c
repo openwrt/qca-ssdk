@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2012, 2015, 2017, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -799,6 +801,7 @@ _fal_ip_wcmp_entry_get(a_uint32_t dev_id,
     return rv;
 }
 
+#if defined(IN_RFS)
 static sw_error_t
 _fal_ip_rfs_ip4_rule_set(a_uint32_t dev_id, fal_ip4_rfs_t * rfs)
 {
@@ -858,6 +861,7 @@ _fal_ip_rfs_ip6_rule_del(a_uint32_t dev_id, fal_ip6_rfs_t * rfs)
     rv = p_api->ip_rfs_ip6_del(dev_id, rfs);
     return rv;
 }
+#endif
 
 static sw_error_t
 _fal_default_flow_cmd_set(a_uint32_t dev_id, a_uint32_t vrf_id,
@@ -2005,6 +2009,7 @@ fal_ip_wcmp_entry_get(a_uint32_t dev_id, a_uint32_t wcmp_id,
     return rv;
 }
 
+#if defined(IN_RFS)
 sw_error_t
 fal_ip_rfs_ip4_rule_set(a_uint32_t dev_id, fal_ip4_rfs_t * rfs)
 {
@@ -2074,7 +2079,7 @@ int ssdk_rfs_ip6_rule_set(u16 vid, u8* ip, u8* mac, u8 ldb, int is_set)
 	else
 		return fal_ip_rfs_ip6_rule_del(0, &entry);
 }
-
+#endif
 
 #if 0
 int

@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -2319,6 +2321,8 @@ _dess_ip_host_route_get(a_uint32_t dev_id, a_uint32_t hroute_id, fal_host_route_
     return SW_OK;
 }
 
+#if defined(IN_RFS)
+
 #define RFS_ADD_OP  1
 #define RFS_DEL_OP  2
 static sw_error_t
@@ -2438,6 +2442,7 @@ _dess_ip_rfs_ip6_del(a_uint32_t dev_id, fal_ip6_rfs_t * rfs)
 	}
 	return ret;
 }
+#endif
 
 static sw_error_t
 _dess_default_flow_cmd_set(a_uint32_t dev_id, a_uint32_t vrf_id, fal_flow_type_t type, fal_default_flow_cmd_t cmd)
@@ -3415,6 +3420,7 @@ dess_ip_host_route_get(a_uint32_t dev_id, a_uint32_t hroute_id, fal_host_route_t
     return rv;
 }
 
+#if defined(IN_RFS)
 /**
  * @brief Set IP host route load balance.
  * @param[in] dev_id device id
@@ -3500,6 +3506,7 @@ dess_ip_rfs_ip6_del(a_uint32_t dev_id, fal_ip6_rfs_t * rfs)
     HSL_API_UNLOCK;
     return rv;
 }
+#endif
 
 /**
  * @brief Set flow type traffic default forward command.
@@ -3647,10 +3654,12 @@ dess_ip_init(a_uint32_t dev_id)
         p_api->ip_host_route_get = dess_ip_host_route_get;
 		p_api->ip_wcmp_entry_set = dess_ip_wcmp_entry_set;
         p_api->ip_wcmp_entry_get = dess_ip_wcmp_entry_get;
+#if defined(IN_RFS)
 		p_api->ip_rfs_ip4_set = dess_ip_rfs_ip4_set;
 		p_api->ip_rfs_ip6_set = dess_ip_rfs_ip6_set;
 		p_api->ip_rfs_ip4_del = dess_ip_rfs_ip4_del;
 		p_api->ip_rfs_ip6_del = dess_ip_rfs_ip6_del;
+#endif
         p_api->ip_default_flow_cmd_set = dess_default_flow_cmd_set;
         p_api->ip_default_flow_cmd_get = dess_default_flow_cmd_get;
         p_api->ip_default_rt_flow_cmd_set = dess_default_rt_flow_cmd_set;

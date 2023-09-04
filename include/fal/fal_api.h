@@ -731,8 +731,6 @@ extern "C" {
     SW_API_DEF(SW_API_FDB_PT_LEARN_STATIC_GET,   fal_fdb_port_learn_static_get), \
     SW_API_DEF(SW_API_FDB_PORT_ADD,   fal_fdb_port_add), \
     SW_API_DEF(SW_API_FDB_PORT_DEL,   fal_fdb_port_del), \
-    SW_API_DEF(SW_API_FDB_RFS_SET,   fal_fdb_rfs_set),   \
-    SW_API_DEF(SW_API_FDB_RFS_DEL,   fal_fdb_rfs_del),   \
     SW_API_DEF(SW_API_FDB_PT_MACLIMIT_CTRL_SET, fal_fdb_port_maclimit_ctrl_set), \
     SW_API_DEF(SW_API_FDB_PT_MACLIMIT_CTRL_GET, fal_fdb_port_maclimit_ctrl_get), \
     SW_API_DEF(SW_API_FDB_DEL_BY_FID, fal_fdb_entry_del_byfid),
@@ -780,8 +778,6 @@ extern "C" {
     SW_API_DESC(SW_API_FDB_PT_LEARN_STATIC_GET) \
     SW_API_DESC(SW_API_FDB_PORT_ADD)  \
     SW_API_DESC(SW_API_FDB_PORT_DEL)  \
-    SW_API_DESC(SW_API_FDB_RFS_SET)   \
-    SW_API_DESC(SW_API_FDB_RFS_DEL)   \
     SW_API_DESC(SW_API_FDB_PT_MACLIMIT_CTRL_SET) \
     SW_API_DESC(SW_API_FDB_PT_MACLIMIT_CTRL_GET) \
     SW_API_DESC(SW_API_FDB_DEL_BY_FID)
@@ -1589,6 +1585,27 @@ extern "C" {
 #define SEC_API_PARAM
 #endif
 
+#ifdef IN_RFS
+#define RFS_API \
+	SW_API_DEF(SW_API_IP_RFS_IP4_SET, fal_ip_rfs_ip4_rule_set), \
+	SW_API_DEF(SW_API_IP_RFS_IP6_SET, fal_ip_rfs_ip6_rule_set), \
+	SW_API_DEF(SW_API_IP_RFS_IP4_DEL, fal_ip_rfs_ip4_rule_del), \
+	SW_API_DEF(SW_API_IP_RFS_IP6_DEL, fal_ip_rfs_ip6_rule_del), \
+	SW_API_DEF(SW_API_FDB_RFS_SET, fal_fdb_rfs_set), \
+	SW_API_DEF(SW_API_FDB_RFS_DEL, fal_fdb_rfs_del),
+
+#define RFS_API_PARAM \
+	SW_API_DESC(SW_API_IP_RFS_IP4_SET) \
+	SW_API_DESC(SW_API_IP_RFS_IP6_SET) \
+	SW_API_DESC(SW_API_IP_RFS_IP4_DEL) \
+	SW_API_DESC(SW_API_IP_RFS_IP6_DEL) \
+	SW_API_DESC(SW_API_FDB_RFS_SET) \
+	SW_API_DESC(SW_API_FDB_RFS_DEL)
+#else
+#define RFS_API
+#define RFS_API_PARAM
+#endif
+
 #ifdef IN_IP
 #if !defined(IN_IP_MINI)
 #define IP_API \
@@ -1629,10 +1646,6 @@ extern "C" {
     SW_API_DEF(SW_API_IP_HOST_ROUTE_GET, fal_ip_host_route_get), \
     SW_API_DEF(SW_API_IP_WCMP_ENTRY_SET, fal_ip_wcmp_entry_set), \
     SW_API_DEF(SW_API_IP_WCMP_ENTRY_GET, fal_ip_wcmp_entry_get), \
-    SW_API_DEF(SW_API_IP_RFS_IP4_SET,    fal_ip_rfs_ip4_rule_set), \
-	SW_API_DEF(SW_API_IP_RFS_IP6_SET,    fal_ip_rfs_ip6_rule_set), \
-	SW_API_DEF(SW_API_IP_RFS_IP4_DEL,    fal_ip_rfs_ip4_rule_del), \
-	SW_API_DEF(SW_API_IP_RFS_IP6_DEL,    fal_ip_rfs_ip6_rule_del), \
     SW_API_DEF(SW_API_IP_DEFAULT_FLOW_CMD_SET, fal_default_flow_cmd_set), \
     SW_API_DEF(SW_API_IP_DEFAULT_FLOW_CMD_GET, fal_default_flow_cmd_get), \
     SW_API_DEF(SW_API_IP_DEFAULT_RT_FLOW_CMD_SET, fal_default_rt_flow_cmd_set), \
@@ -1715,10 +1728,6 @@ extern "C" {
     SW_API_DESC(SW_API_IP_HOST_ROUTE_GET) \
     SW_API_DESC(SW_API_IP_WCMP_ENTRY_SET) \
     SW_API_DESC(SW_API_IP_WCMP_ENTRY_GET) \
-    SW_API_DESC(SW_API_IP_RFS_IP4_SET)  \
-    SW_API_DESC(SW_API_IP_RFS_IP6_SET)  \
-    SW_API_DESC(SW_API_IP_RFS_IP4_DEL)  \
-    SW_API_DESC(SW_API_IP_RFS_IP6_DEL)  \
     SW_API_DESC(SW_API_IP_DEFAULT_FLOW_CMD_SET) \
     SW_API_DESC(SW_API_IP_DEFAULT_FLOW_CMD_GET) \
     SW_API_DESC(SW_API_IP_DEFAULT_RT_FLOW_CMD_SET) \
@@ -3200,6 +3209,7 @@ extern "C" {
     COSMAP_API \
     SEC_API  \
     IP_API \
+    RFS_API \
     NAT_API \
     FLOW_API \
     TRUNK_API \
@@ -3258,6 +3268,7 @@ extern "C" {
     COSMAP_API_PARAM \
     SEC_API_PARAM \
     IP_API_PARAM \
+    RFS_API_PARAM \
     NAT_API_PARAM \
     FLOW_API_PARAM \
     TRUNK_API_PARAM \

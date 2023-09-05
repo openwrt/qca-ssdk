@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017, 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -46,6 +46,8 @@ extern "C" {
 #define UNIPHY_PORT1_TX_RESET_ID	"uniphy_port1_tx_rst"
 #define UNIPHY_PORT2_RX_RESET_ID	"uniphy_port2_rx_rst"
 #define UNIPHY_PORT2_TX_RESET_ID	"uniphy_port2_tx_rst"
+#define UNIPHY_PORT3_RX_RESET_ID	"uniphy_port3_rx_rst"
+#define UNIPHY_PORT3_TX_RESET_ID	"uniphy_port3_tx_rst"
 
 #define SSDK_PORT1_RESET_ID	"nss_port1_rst"
 #define SSDK_PORT2_RESET_ID	"nss_port2_rst"
@@ -57,6 +59,8 @@ extern "C" {
 #define SSDK_PORT1_TX_RESET_ID	"nss_port1_tx_rst"
 #define SSDK_PORT2_RX_RESET_ID	"nss_port2_rx_rst"
 #define SSDK_PORT2_TX_RESET_ID	"nss_port2_tx_rst"
+#define SSDK_PORT3_RX_RESET_ID	"nss_port3_rx_rst"
+#define SSDK_PORT3_TX_RESET_ID	"nss_port3_tx_rst"
 
 #define SSDK_PORT1_MAC_RESET_ID	"nss_port1_mac_rst"
 #define SSDK_PORT2_MAC_RESET_ID	"nss_port2_mac_rst"
@@ -94,6 +98,8 @@ enum unphy_rst_type {
 	UNIPHY0_PORT1_TX_DISABLE_E,
 	UNIPHY1_PORT5_RX_DISABLE_E,
 	UNIPHY1_PORT5_TX_DISABLE_E,
+	UNIPHY2_PORT6_RX_DISABLE_E,
+	UNIPHY2_PORT6_TX_DISABLE_E,
 	UNIPHY_RST_MAX
 };
 
@@ -131,6 +137,12 @@ enum unphy_rst_type {
 #define NSSCC_CLK	"gcc_nsscc_clk"
 #define NSSNOC_NSSCC_CLK	"gcc_nssnoc_nsscc_clk"
 #define NSSNOC_SNOC_1_CLK	"gcc_nssnoc_snoc_1_clk"
+#define NSS_CSR			"nss_csr_clk"
+#define NSSNOC_NSS_CSR		"nssnoc_nss_csr_clk"
+#define NSSCC_CE_APB		"nsscc_ce_apb_clk"
+#define NSSCC_CE_AXI		"nsscc_ce_axi_clk"
+#define NSSCC_NSSNOC_CE_APB	"nsscc_nssnoc_ce_apb_clk"
+#define NSSCC_NSSNOC_CE_AXI	"nsscc_nssnoc_ce_axi_clk"
 
 #define UNIPHY_AHB_CLK	"uniphy_ahb_clk"
 #define UNIPHY_SYS_CLK	"uniphy_sys_clk"
@@ -307,6 +319,7 @@ enum mp_bcr_rst_type {
 #define APPE_UNIPHY_SYS_CLK_RATE    24000000
 #define APPE_CLK_RATE               353000000
 #define MPPE_CLK_RATE               200000000
+#define MRPPE_CLK_RATE              375000000
 
 enum {
 	UNIPHY_RX = 0,

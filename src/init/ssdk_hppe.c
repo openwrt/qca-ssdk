@@ -1463,7 +1463,8 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id)
 	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode[1]);
 	SW_RTN_ON_ERROR(rv);
 
-	if ((ppe_type == HPPE_TYPE) || (ppe_type == APPE_TYPE)) {
+	if ((ppe_type == HPPE_TYPE) || (ppe_type == APPE_TYPE) ||
+		(ppe_type == MRPPE_TYPE)) {
 
 		rv = p_api->adpt_uniphy_mode_set(dev_id,
 				SSDK_UNIPHY_INSTANCE2, mode[2]);

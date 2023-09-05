@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
 *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -44,7 +44,14 @@ adpt_hppe_uniphy_usxgmii_autoneg_status_get(a_uint32_t dev_id, a_uint32_t uniphy
 sw_error_t
 adpt_hppe_uniphy_usxgmii_autoneg_status_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		a_uint32_t port_id, union vr_mii_an_intr_sts_u *vr_mii_an_intr_sts);
-
+a_uint32_t
+adpt_hppe_port_get_by_uniphy(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t channel);
+a_bool_t
+adpt_hppe_uniphy_usxgmii_port_check(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id);
+a_uint32_t
+adpt_ppe_uniphy_number_get(a_uint32_t dev_id);
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

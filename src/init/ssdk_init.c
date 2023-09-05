@@ -1581,7 +1581,7 @@ int
 qca_fdb_sw_sync_work_init(struct qca_phy_priv *priv)
 {
 	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE) &&
-		(priv->version != QCA_VER_MHT))
+		(priv->version != QCA_VER_MRPPE) && (priv->version != QCA_VER_MHT))
 	{
 		return 0;
 	}
@@ -1598,7 +1598,7 @@ int
 qca_fdb_sw_sync_work_start(struct qca_phy_priv *priv, fal_pbmp_t port_map)
 {
 	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE) &&
-		(priv->version != QCA_VER_MHT))
+		(priv->version != QCA_VER_MRPPE) && (priv->version != QCA_VER_MHT))
 	{
 		return 0;
 	}
@@ -1626,7 +1626,8 @@ qca_fdb_sw_sync_work_start(struct qca_phy_priv *priv, fal_pbmp_t port_map)
 void
 qca_fdb_sw_sync_work_stop(struct qca_phy_priv *priv, fal_pbmp_t port_map)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE))
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE) &&
+		(priv->version != QCA_VER_MRPPE))
 	{
 		return;
 	}
@@ -1794,7 +1795,7 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	priv->phy_dbg_write = qca_ar8327_phy_dbg_write;
 	priv->phy_dbg_read = qca_ar8327_phy_dbg_read;
 	priv->phy_mmd_write = qca_ar8327_mmd_write;
-
+#if 0
 	if (chip_type == CHIP_DESS || chip_type == CHIP_MHT) {
 		priv->ports = 6;
 	} else if ((chip_type == CHIP_ISIS) || (chip_type == CHIP_ISISC)) {
@@ -1817,7 +1818,7 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 #endif
 			priv->ports = SSDK_MAX_PORT_NUM;
 	}
-
+#endif
 #ifdef MP
 	if(chip_type == CHIP_SCOMPHY)
 	{
@@ -2519,6 +2520,7 @@ static int __init regi_init(void)
 		qca_phy_priv_global[dev_id]->ess_switch_flag = ssdk_ess_switch_flag_get(dev_id);
 		qca_phy_priv_global[dev_id]->of_node = ssdk_dts_node_get(dev_id);
 		INIT_LIST_HEAD(&(qca_phy_priv_global[dev_id]->sw_fdb_tbl));
+		qca_phy_priv_global[dev_id]->ports = SSDK_PHYSICAL_PORT7;
 /*qca808x_start*/
 		rv = ssdk_plat_init(&cfg, dev_id);
 		SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
@@ -2555,6 +2557,7 @@ static int __init regi_init(void)
 				break;
 			case CHIP_MHT:
 #if defined(MHT)
+				qca_phy_priv_global[dev_id]->ports = SSDK_PHYSICAL_PORT6;
 				rv = qca_mht_hw_init(&cfg, dev_id);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
@@ -2565,6 +2568,10 @@ static int __init regi_init(void)
 			case CHIP_MRPPE:
 			case CHIP_APPE:
 #if defined(APPE)
+				if(adpt_ppe_type_get(dev_id) == MRPPE_TYPE)
+					qca_phy_priv_global[dev_id]->ports = SSDK_PHYSICAL_PORT4;
+				else if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+					qca_phy_priv_global[dev_id]->ports = SSDK_PHYSICAL_PORT3;
 				qca_appe_hw_init(dev_id);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
@@ -2593,6 +2600,8 @@ static int __init regi_init(void)
 #if defined(MP)
 					if(cfg.phy_id == MP_GEPHY)
 					{
+						qca_phy_priv_global[dev_id]->ports =
+							SSDK_PHYSICAL_PORT3;
 						rv = ssdk_switch_register(dev_id, cfg.chip_type);
 						SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 					}

@@ -398,9 +398,10 @@ sw_error_t ppe_port_vlan_vsi_get(a_uint32_t dev_id, fal_port_t port_id,
 		{
 			if((ctag_vid== p_vsi_info->ctag_vid) && (stag_vid== p_vsi_info->stag_vid))
 			{
-				if((FAL_IS_PPORT(port_id) && p_vsi_info->vlan_port_bitmap &
-					(1 << port_id)) || ((FAL_IS_VPORT(port_id) &&
-					(p_vsi_info->vlan_port_bitmap == port_id))))
+				if((FAL_IS_PPORT(port_id) && FAL_IS_PPORT(p_vsi_info->vlan_port_bitmap) &&
+					(p_vsi_info->vlan_port_bitmap & (1 << port_id))) || 
+					(FAL_IS_VPORT(port_id) && FAL_IS_VPORT(p_vsi_info->vlan_port_bitmap) &&
+					(p_vsi_info->vlan_port_bitmap == port_id)))
 				{
 					*vsi_id = i;
 					SSDK_DEBUG("Returned port 0x%x svlan %d cvlan %d vsi %d\n",

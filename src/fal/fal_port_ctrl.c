@@ -26,7 +26,7 @@
 #include "hsl_api.h"
 /*qca808x_end*/
 #include "adpt.h"
-
+#include "ssdk_dts.h"
 #include <linux/kernel.h>
 #include <linux/module.h>
 /*qca808x_start*/
@@ -3691,6 +3691,44 @@ fal_port_erp_power_mode_set (a_uint32_t dev_id, fal_port_t port_id,
 	return rv;
 }
 
+sw_error_t
+fal_erp_standby_enter (a_uint32_t dev_id, a_uint32_t active_pbmap)
+{
+	a_uint32_t port_id = 0, pbmp = 0;
+	pbmp = ssdk_wan_bmp_get(dev_id) | ssdk_lan_bmp_get(dev_id);
+	while (pbmp) {
+		if (pbmp & 1) {
+			if (!SW_IS_PBMP_MEMBER(active_pbmap, port_id)) {
+				if (!hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE)) {
+					SW_RTN_ON_ERROR(fal_port_erp_power_mode_set(dev_id,
+						port_id, FAL_ERP_LOW_POWER));
+				}
+			}
+		}
+		pbmp >>= 1;
+		port_id ++;
+	}
+	return SW_OK;
+}
+
+sw_error_t
+fal_erp_standby_exit (a_uint32_t dev_id)
+{
+	a_uint32_t port_id = 0, pbmp = 0;
+	pbmp = ssdk_wan_bmp_get(dev_id) | ssdk_lan_bmp_get(dev_id);
+	while (pbmp) {
+		if (pbmp & 1) {
+			if (hsl_port_feature_get(dev_id, port_id, PHY_F_ERP_LOW_POWER)) {
+				SW_RTN_ON_ERROR(fal_port_erp_power_mode_set(dev_id,
+					port_id, FAL_ERP_ACTIVE));
+			}
+		}
+		pbmp >>= 1;
+		port_id ++;
+	}
+	return SW_OK;
+}
+
 /*insert flag for outter fal, don't remove it*/
 /**
  * @}
@@ -3813,3 +3851,5 @@ EXPORT_SYMBOL(fal_port_cnt_get);
 EXPORT_SYMBOL(fal_port_cnt_flush);
 EXPORT_SYMBOL(fal_port_combo_link_status_get);
 EXPORT_SYMBOL(fal_port_erp_power_mode_set);
+EXPORT_SYMBOL(fal_erp_standby_enter);
+EXPORT_SYMBOL(fal_erp_standby_exit);

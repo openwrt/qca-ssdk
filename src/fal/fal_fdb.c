@@ -836,6 +836,7 @@ _fal_fdb_port_del(a_uint32_t dev_id, a_uint32_t fid, fal_mac_addr_t * addr, fal_
     return rv;
 }
 
+#if defined(IN_RFS)
 sw_error_t
 _fal_fdb_rfs_set(a_uint32_t dev_id, const fal_fdb_rfs_t * entry)
 {
@@ -865,6 +866,7 @@ _fal_fdb_rfs_del(a_uint32_t dev_id, const fal_fdb_rfs_t * entry)
 	rv = p_api->fdb_rfs_del(dev_id, entry);
 	return rv;
 }
+#endif
 #endif
 
 sw_error_t
@@ -1683,6 +1685,7 @@ fal_fdb_port_del(a_uint32_t dev_id, a_uint32_t fid, fal_mac_addr_t * addr, fal_p
     return rv;
 }
 
+#if defined(IN_RFS)
 /**
  * @brief Add a Fdb rfs entry
  * @param[in] dev_id device id
@@ -1728,6 +1731,7 @@ int ssdk_rfs_mac_rule_set(u16 vid, u8* mac, u8 ldb, int is_set)
 	else
 		return fal_fdb_rfs_del(0, &entry);
 }
+#endif
 #endif
 
 #if 0

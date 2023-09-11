@@ -2560,10 +2560,12 @@ isisc_ip_init(a_uint32_t dev_id)
 	p_api->ip_host_route_get = mht_ip_host_route_get;
 	p_api->ip_wcmp_entry_set = mht_ip_wcmp_entry_set;
 	p_api->ip_wcmp_entry_get = mht_ip_wcmp_entry_get;
+#if defined(IN_RFS)
 	p_api->ip_rfs_ip4_set = mht_ip_rfs_ip4_set;
 	p_api->ip_rfs_ip6_set = mht_ip_rfs_ip6_set;
 	p_api->ip_rfs_ip4_del = mht_ip_rfs_ip4_del;
 	p_api->ip_rfs_ip6_del = mht_ip_rfs_ip6_del;
+#endif
 	p_api->ip_default_flow_cmd_set = mht_default_flow_cmd_set;
 	p_api->ip_default_flow_cmd_get = mht_default_flow_cmd_get;
 	p_api->ip_default_rt_flow_cmd_set = mht_default_rt_flow_cmd_set;

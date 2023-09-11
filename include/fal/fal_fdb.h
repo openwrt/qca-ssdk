@@ -107,7 +107,7 @@ extern "C" {
 
     sw_error_t
     fal_fdb_entry_add(a_uint32_t dev_id, const fal_fdb_entry_t * entry);
-#ifndef IN_FDB_MINI
+#if defined(IN_RFS)
     sw_error_t
     fal_fdb_rfs_set(a_uint32_t dev_id, const fal_fdb_rfs_t * entry);
 

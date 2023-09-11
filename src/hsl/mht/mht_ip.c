@@ -54,10 +54,31 @@
 #define MHT_IP4_HOST_ROUTE_TBL0_ADDR                 0x5b000
 #define MHT_IP6_HOST_ROUTE_TBL0_ADDR                 0x5b100
 
+#if defined(IN_RFS)
 extern aos_mutex_lock_t mht_nat_lock;
 static a_uint32_t mht_mac_snap[SW_MAX_NR_DEV] = { 0 };
 static fal_intf_mac_entry_t mht_intf_snap[SW_MAX_NR_DEV][MHT_INTF_MAC_ADDR_NUM];
+#endif
 
+static sw_error_t
+_mht_ip_feature_check(a_uint32_t dev_id)
+{
+	sw_error_t rv;
+	a_uint32_t entry = 0;
+
+	HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
+			(a_uint8_t *) (&entry), sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+
+	switch (entry) {
+		case MHT_DEVICE_ID:
+			return SW_OK;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+}
+
+#if defined(IN_RFS)
 static void
 _mht_ip_pt_learn_save(a_uint32_t dev_id, a_uint32_t * status)
 {
@@ -98,24 +119,6 @@ _mht_ip_pt_learn_restore(a_uint32_t dev_id, a_uint32_t status)
 	HSL_REG_ENTRY_SET(rv, dev_id, ROUTER_PTCTRL2, 0,
 			(a_uint8_t *) (&data), sizeof (a_uint32_t));
 	return;
-}
-
-static sw_error_t
-_mht_ip_feature_check(a_uint32_t dev_id)
-{
-	sw_error_t rv;
-	a_uint32_t entry = 0;
-
-	HSL_REG_FIELD_GET(rv, dev_id, MASK_CTL, 0, DEVICE_ID,
-			(a_uint8_t *) (&entry), sizeof (a_uint32_t));
-	SW_RTN_ON_ERROR(rv);
-
-	switch (entry) {
-		case MHT_DEVICE_ID:
-			return SW_OK;
-		default:
-			return SW_NOT_SUPPORTED;
-	}
 }
 
 static sw_error_t
@@ -862,7 +865,7 @@ _mht_ip_intf_entry_add(a_uint32_t dev_id, fal_intf_mac_entry_t * entry)
 	entry->entry_id = i;
 	return SW_OK;
 }
-
+#endif
 
 #define MHT_WCMP_ENTRY_MAX_ID    3
 #define MHT_WCMP_HASH_MAX_NUM    16
@@ -1312,6 +1315,8 @@ _mht_ip_host_route_get(a_uint32_t dev_id, a_uint32_t hroute_id, fal_host_route_t
 	return SW_OK;
 }
 
+#if defined(IN_RFS)
+
 #define RFS_ADD_OP  1
 #define RFS_DEL_OP  2
 static sw_error_t
@@ -1431,6 +1436,7 @@ _mht_ip_rfs_ip6_del(a_uint32_t dev_id, fal_ip6_rfs_t * rfs)
 	}
 	return ret;
 }
+#endif
 
 static sw_error_t
 _mht_default_flow_cmd_set(a_uint32_t dev_id, a_uint32_t vrf_id, fal_flow_type_t type, fal_default_flow_cmd_t cmd)
@@ -1861,6 +1867,7 @@ mht_ip_host_route_get(a_uint32_t dev_id, a_uint32_t hroute_id, fal_host_route_t 
 	return rv;
 }
 
+#if defined(IN_RFS)
 /**
  * @brief Set IP host route load balance.
  * @param[in] dev_id device id
@@ -1946,6 +1953,7 @@ mht_ip_rfs_ip6_del(a_uint32_t dev_id, fal_ip6_rfs_t * rfs)
 	HSL_API_UNLOCK;
 	return rv;
 }
+#endif
 
 /**
  * @brief Set flow type traffic default forward command.

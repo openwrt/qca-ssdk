@@ -1274,7 +1274,7 @@ adpt_hppe_ip_port_macaddr_get(a_uint32_t dev_id, fal_port_t port_id,
 #if defined(APPE)
 	macaddr->mac_addr.uc[5] = l3_vp_port_tbl.bf.mac_da_0;
 	macaddr->mac_addr.uc[4] = l3_vp_port_tbl.bf.mac_da_0 >> 8 | \
-				  (l3_vp_port_tbl.bf.mac_da_1 & 0x1 << 7);
+				  ((l3_vp_port_tbl.bf.mac_da_1 & 0x1) << 7);
 	macaddr->mac_addr.uc[3] = l3_vp_port_tbl.bf.mac_da_1 >> 1;
 	macaddr->mac_addr.uc[2] = l3_vp_port_tbl.bf.mac_da_1 >> 9;
 	macaddr->mac_addr.uc[1] = l3_vp_port_tbl.bf.mac_da_1 >> 17;

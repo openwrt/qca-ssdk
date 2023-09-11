@@ -864,7 +864,7 @@ static void ssdk_dt_parse_mdio(a_uint32_t dev_id, struct device_node *switch_nod
 	}
 	return;
 }
-
+#if 0
 #if defined(MHT)
 void ssdk_clk_mode_set(a_uint32_t dev_id, mht_work_mode_t clk_mode)
 {
@@ -938,7 +938,7 @@ static void ssdk_dt_parse_clk(a_uint32_t dev_id, struct device_node *switch_node
 	return;
 }
 #endif
-
+#endif
 static void ssdk_dt_parse_port_bmp(a_uint32_t dev_id,
 		struct device_node *switch_node, ssdk_init_cfg *cfg)
 {
@@ -1213,10 +1213,11 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 	ssdk_dt_parse_mac_mode(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_mdio(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_port_bmp(*dev_id, switch_node, cfg);
+#if 0
 #if defined(MHT)
 	ssdk_dt_parse_clk(*dev_id, switch_node);
 #endif
-
+#endif
 	if (of_device_is_compatible(switch_node, "qcom,ess-switch")) {
 		/* DESS chip */
 #ifdef DESS

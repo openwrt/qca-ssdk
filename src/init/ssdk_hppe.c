@@ -118,6 +118,9 @@ sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 	 */
 	mac_id = 0;
 	mac_num = ssdk_intf_mac_num_get();
+	if (mac_num == 0)
+		return SW_OK;
+
 	while (mac_id < mac_num) {
 		/*
 		 * The MAC of all ports(ethx) should be involved, since the MAC

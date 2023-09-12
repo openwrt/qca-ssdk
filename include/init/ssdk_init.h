@@ -399,8 +399,6 @@ sw_error_t ssdk_dess_trunk_init(a_uint32_t dev_id, a_uint32_t wan_bitmap);
 
 void
 qca_mac_port_status_init(a_uint32_t dev_id, a_uint32_t port_id);
-void
-qca_mac_sw_sync_port_status_init(a_uint32_t dev_id);
 /*qca808x_start*/
 struct qca_phy_priv* ssdk_phy_priv_data_get(a_uint32_t dev_id);
 /*qca808x_end*/
@@ -412,6 +410,7 @@ int qca_fdb_sw_sync_work_start(struct qca_phy_priv *priv, fal_pbmp_t port_map);
 void qca_fdb_sw_sync_work_stop(struct qca_phy_priv *priv, fal_pbmp_t port_map);
 void qca_phy_mib_work_pause(struct qca_phy_priv *priv);
 int qca_phy_mib_work_resume(struct qca_phy_priv *priv);
+sw_error_t ssdk_ppe_hw_recover(a_uint32_t dev_id);
 
 /*qca808x_start*/
 #ifdef __cplusplus

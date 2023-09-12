@@ -188,6 +188,7 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 		port_eee_cfg.enable = A_FALSE;
 		port_eee_cfg.lpi_tx_enable = A_FALSE;
 		fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
+		qca_mac_port_status_init(dev_id, i);
 	}
 
 	for(i = SSDK_PHYSICAL_PORT5; i < port_max; i++) {
@@ -1429,31 +1430,34 @@ sw_error_t qca_hppe_acl_remark_ptp_servcode(a_uint32_t dev_id) {
 #endif
 
 sw_error_t
-qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mode1, a_uint32_t mode2)
+qca_hppe_interface_mode_init(a_uint32_t dev_id)
 {
 
 	adpt_api_t *p_api;
 	sw_error_t rv = SW_OK;
 	fal_port_t port_id;
 	a_uint32_t port_max = SSDK_PHYSICAL_PORT7;
-	a_uint32_t index = 0, mode[3] = {mode0, mode1, mode2};
+	a_uint32_t index = 0, mode[3] = {0};
 	adpt_ppe_type_t ppe_type = adpt_ppe_type_get(dev_id);
 
 	SW_RTN_ON_NULL(p_api = adpt_api_ptr_get(dev_id));
 	SW_RTN_ON_NULL(p_api->adpt_port_mux_mac_type_set);
-
 	SW_RTN_ON_NULL(p_api->adpt_uniphy_mode_set);
 
-	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE0, mode0);
+	for (index = SSDK_UNIPHY_INSTANCE0; index <= SSDK_UNIPHY_INSTANCE2; index ++) {
+		mode[index] = ssdk_dt_global_get_mac_mode(dev_id, index);
+	}
+
+	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE0, mode[0]);
 	SW_RTN_ON_ERROR(rv);
 
-	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode1);
+	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode[1]);
 	SW_RTN_ON_ERROR(rv);
 
 	if ((ppe_type == HPPE_TYPE) || (ppe_type == APPE_TYPE)) {
 
 		rv = p_api->adpt_uniphy_mode_set(dev_id,
-				SSDK_UNIPHY_INSTANCE2, mode2);
+				SSDK_UNIPHY_INSTANCE2, mode[2]);
 		SW_RTN_ON_ERROR(rv);
 	}
 
@@ -1472,20 +1476,19 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id, a_uint32_t mode0, a_uint32_t mod
 			break;
 		case APPE_TYPE:
 			port_max = SSDK_PHYSICAL_PORT7;
-			SSDK_INFO("appe interface mode initialization\n");
 			break;
 		case MPPE_TYPE:
 			port_max = SSDK_PHYSICAL_PORT3;
-			SSDK_INFO("mppe interface mode initialization\n");
 			break;
 		default:
 			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
 			break;
 	}
 	for(port_id = SSDK_PHYSICAL_PORT1; port_id < port_max; port_id++) {
-		rv = p_api->adpt_port_mux_mac_type_set(dev_id, port_id, mode0, mode1, mode2);
+		rv = p_api->adpt_port_mux_mac_type_set(dev_id, port_id, mode[0], mode[1], mode[2]);
 		if(rv != SW_OK) {
-			SSDK_ERROR("port_id:%d, mode0:%d, mode1:%d, mode2:%d\n", port_id, mode0, mode1, mode2);
+			SSDK_ERROR("port_id:%d, mode0:%d, mode1:%d, mode2:%d\n", port_id,
+				mode[0], mode[1], mode[2]);
 			break;
 		}
 	}
@@ -1517,7 +1520,7 @@ qca_hppe_flow_hw_init(a_uint32_t dev_id)
 }
 #endif
 
-sw_error_t qca_hppe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
+sw_error_t qca_hppe_hw_init(a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 
@@ -1579,8 +1582,7 @@ sw_error_t qca_hppe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 #endif
 #endif
-	rv = qca_hppe_interface_mode_init(dev_id, cfg->mac_mode, cfg->mac_mode1,
-				cfg->mac_mode2);
+	rv = qca_hppe_interface_mode_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #if defined(IN_CTRLPKT)
 	rv = qca_hppe_ctlpkt_hw_init(dev_id);

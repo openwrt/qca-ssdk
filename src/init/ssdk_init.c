@@ -152,6 +152,9 @@
 #include "ssdk_mht.h"
 #include "ssdk_mht_clk.h"
 #endif
+#ifdef IN_LED
+#include "ssdk_led.h"
+#endif
 
 #ifdef IN_RFS
 struct rfs_device rfs_dev;
@@ -2594,7 +2597,9 @@ static int __init regi_init(void)
 			default:
 				break;
 		}
-
+#ifdef IN_LED
+	ssdk_led_init(dev_id, &cfg);
+#endif
 /*qca808x_start*/
 
 	}

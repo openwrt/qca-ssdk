@@ -125,9 +125,5 @@ qca_mp_hw_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 #endif
 	rv = qca_mp_interface_mode_init(dev_id);
 	SW_RTN_ON_ERROR(rv)
-#ifdef IN_LED
-	/*init MP led*/
-	rv = ssdk_led_init(dev_id, cfg);
-#endif
 	return rv;
 }

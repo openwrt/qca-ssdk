@@ -265,12 +265,6 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 
 	ret = qca_mht_mdio_master_init(dev_id);
 	SW_RTN_ON_ERROR(ret);
-
-#ifdef IN_LED
-	ret = ssdk_led_init(dev_id, cfg);
-	SW_RTN_ON_ERROR(ret);
-#endif
-
 #ifdef IN_PORTCONTROL
 	ret = qca_mht_portctrl_hw_init(dev_id);
 #endif

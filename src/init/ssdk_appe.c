@@ -683,11 +683,6 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 #endif
 
-#if defined(IN_LED)
-	rv = ssdk_led_init(dev_id, cfg);
-	SW_RTN_ON_ERROR(rv);
-#endif
-
 #if defined(IN_RSS_HASH)
 	rv = qca_appe_rss_hash_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);

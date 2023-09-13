@@ -1202,12 +1202,24 @@ __adpt_hppe_uniphy_psgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 }
 
 #ifdef MPPE
+static a_uint32_t
+_adpt_mppe_uniphy_clk_output_get(a_uint32_t dev_id, a_uint32_t index)
+{
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	if(!priv)
+		return 0;
+
+	return priv->uniphy_clk_output[index];
+}
+
 static sw_error_t
 _adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index,
 	a_uint32_t clk_rate)
 {
 	sw_error_t rv = SW_OK;
 	union uniphy_clkout_50m_ctrl_u clkout_50m_ctrl = {0};
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
 
 	SSDK_DEBUG("uniphy %d will output clock as %dHz\n", index, clk_rate);
 	rv = mppe_uniphy_clkout_50m_ctrl_get(dev_id, index, &clkout_50m_ctrl);
@@ -1224,7 +1236,12 @@ _adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index,
 	}
 
 	rv = mppe_uniphy_clkout_50m_ctrl_set(dev_id, index, &clkout_50m_ctrl);
-	return rv;
+	SW_RTN_ON_ERROR(rv);
+
+	SW_RTN_ON_NULL(priv);
+	priv->uniphy_clk_output[index] = clk_rate;
+
+	return SW_OK;
 }
 
 static void
@@ -1287,16 +1304,17 @@ adpt_mppe_uniphy_clk_output_set(a_uint32_t dev_id, a_uint32_t index)
 				mht_preinit_done = true;
 			}
 #endif
-			static bool mht_clock_enable = false;
-
 			/* when P0 and P5 are both connected to mppe, the mht 50M clock should
 			 * come from the mppe uniphy that was confiured firstly, then need to
 			 * disable the clock output of another uniphy.
 			 */
-			if (mht_clock_enable && 2 == ssdk_switch_device_num_get()) {
-				 _adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
+			if (2 == ssdk_switch_device_num_get()) {
+				if(_adpt_mppe_uniphy_clk_output_get(dev_id, index ^ 1) == 0)
+					_adpt_mppe_uniphy_clk_output_set(dev_id, index,
+					UNIPHY_CLK_RATE_50M);
+				else
+					_adpt_mppe_uniphy_clk_output_set(dev_id, index, 0);
 			}
-			mht_clock_enable = true;
 		}
 
 		return;

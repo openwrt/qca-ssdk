@@ -658,6 +658,8 @@ int ssdk_phy_driver_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
 int qca_ssdk_phy_info_init(a_uint32_t dev_id);
 
 void qca_ssdk_port_bmp_init(a_uint32_t dev_id);
+a_bool_t
+qca_ssdk_gpio_is_invalid(a_uint32_t dev_id, a_uint32_t gpio_num);
 /*qca808x_end*/
 void hsl_phy_address_init(a_uint32_t dev_id, a_uint32_t i,
 				a_uint32_t value);

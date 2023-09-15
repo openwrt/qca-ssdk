@@ -140,9 +140,21 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 {
 	sw_error_t rv = SW_OK;
 	a_uint32_t reg_field = 0;
+	a_bool_t rx_los_status = A_TRUE;
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
+	if(hsl_port_is_sfp(dev_id, port_id))
+	{
+		rv = sfp_phy_rx_los_status_get(dev_id, port_id, &rx_los_status);
+		if(rv == SW_OK && rx_los_status)
+		{
+			phy_status->link_status = PORT_LINK_DOWN;
+			phy_status->speed = FAL_SPEED_BUTT;
+			phy_status->duplex = FAL_DUPLEX_BUTT;
+			return SW_OK;
+		}
+	}
 	if (port_id == SSDK_PHYSICAL_PORT5)
 	{
 #if defined(CPPE)
@@ -160,24 +172,6 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 			SW_RTN_ON_ERROR(rv);
 		}
 	} else if (port_id == SSDK_PHYSICAL_PORT1) {
-#if defined(MPPE)
-		/*MPPE need to check rx los by software when port 1 is SFP port*/
-		/*because hw only support one rx los function*/
-		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE && hsl_port_is_sfp(dev_id, port_id))
-		{
-			a_bool_t rx_los_status = A_TRUE;
-			rv = sfp_phy_rx_los_status_get(dev_id, port_id, &rx_los_status);
-			SW_RTN_ON_ERROR(rv);
-			if(rx_los_status)
-			{
-				phy_status->link_status = PORT_LINK_DOWN;
-				phy_status->speed = FAL_SPEED_BUTT;
-				phy_status->duplex = FAL_DUPLEX_BUTT;
-				return SW_OK;
-			}
-		}
-#endif
-		/*mac0 port1 as 1G sfp mode*/
 		rv = hppe_port_phy_status_0_port1_phy_status_get(dev_id,
 				&reg_field);
 		SW_RTN_ON_ERROR (rv);

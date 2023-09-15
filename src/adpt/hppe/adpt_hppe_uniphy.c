@@ -683,6 +683,21 @@ __adpt_hppe_uniphy_usxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 	return rv;
 }
 
+static a_bool_t
+__adpt_hppe_uniphy_rxlos_check(a_uint32_t dev_id, a_uint32_t uniphy_index)
+{
+	a_uint32_t port_id = 0;
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	SW_RTN_ON_NULL(priv);
+	port_id = adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,
+		SSDK_UNIPHY_CHANNEL0);
+	if(priv->sfp_rx_los_pin[port_id] == SSDK_INVALID_GPIO)
+		return A_TRUE;
+
+	return A_FALSE;
+}
+
 static sw_error_t
 __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 {
@@ -717,9 +732,7 @@ __adpt_hppe_uniphy_10g_r_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 		UNIPHY_XPCS_MODE_ENABLE;
 
 	hppe_uniphy_mode_ctrl_set(dev_id, uniphy_index, &uniphy_mode_ctrl);
-#ifdef MPPE
-	if (!(adpt_ppe_type_get(dev_id) == MPPE_TYPE && uniphy_index == SSDK_UNIPHY_INSTANCE0))
-#endif
+	if(__adpt_hppe_uniphy_rxlos_check(dev_id, uniphy_index))
 	{
 		hppe_uniphy_instance_link_detect_get(dev_id, uniphy_index,
 			&uniphy_instance_link_detect);

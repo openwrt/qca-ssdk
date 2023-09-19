@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -126,11 +126,12 @@ hppe_in_l2_service_tbl_get(
 {
 	if (index >= IN_L2_SERVICE_TBL_MAX_ENTRY)
 		return SW_OUT_OF_RANGE;
-	return hppe_reg_get(
+	return hppe_reg_tbl_get(
 				dev_id,
 				IPE_L2_BASE_ADDR + IN_L2_SERVICE_TBL_ADDRESS + \
 				index * IN_L2_SERVICE_TBL_INC,
-				&value->val);
+				value->val,
+				sizeof(union in_l2_service_tbl_u)/sizeof(a_uint32_t));
 }
 
 sw_error_t
@@ -139,11 +140,12 @@ hppe_in_l2_service_tbl_set(
 		a_uint32_t index,
 		union in_l2_service_tbl_u *value)
 {
-	return hppe_reg_set(
+	return hppe_reg_tbl_set(
 				dev_id,
 				IPE_L2_BASE_ADDR + IN_L2_SERVICE_TBL_ADDRESS + \
 				index * IN_L2_SERVICE_TBL_INC,
-				value->val);
+				value->val,
+				sizeof(union in_l2_service_tbl_u)/sizeof(a_uint32_t));
 }
 
 #if 0

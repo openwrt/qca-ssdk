@@ -65,7 +65,9 @@ enum {
 	FLD_UPDATE_FLOW_IDX,
 	FLD_UPDATE_CONTEXT_TYPE0 = 18, /*new add for IPQ53xx*/
 	FLD_UPDATE_CONTEXT_TYPE1, /*new add for IPQ53xx*/
-	FLD_UPDATE_FLOW_COOKIE, /*new add for IPQ53xx*/
+	FLD_UPDATE_FLOW_COOKIE_DIS, /*new add for IPQ53xx*/
+	FLD_UPDATE_DECAP_DIS, /*new add for IPQ54xx*/
+	FLD_UPDATE_ENCAP_DIS, /*new add for IPQ54xx*/
 	FLD_UPDATE_SRC_INFO_BYPASS = 24,
 	FLD_UPDATE_DST_INFO_BYPASS,
 	FLD_UPDATE_MAC_HDR_BYPASS,
@@ -140,6 +142,10 @@ enum {
 	TUNL_CONTEXT_BYP,
 	/* new add for IPQ53xx */
 	FLOW_POLICER_BYP,
+	/* new add for IPQ54xx */
+	SMAC_MC_DROP_BYP,
+	L2_FLOODING_BYP,
+	TUNNEL_EXP_CNT_CTRL,
 };
 
 /* bypss_bitmap_2 */

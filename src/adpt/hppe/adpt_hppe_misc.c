@@ -234,6 +234,7 @@ char *cpucode[] = {
 "TUNNEL PROGRAM3",
 "TUNNEL PROGRAM4",
 "TUNNEL PROGRAM5",/*index 193, cpu code 231*/
+"bypass l2 flooding and redirect to CPU",/*index 194, cpu code 232*/
 #endif
 };
 
@@ -999,7 +1000,7 @@ adpt_hppe_debug_cpu_code_counter_get(a_uint32_t dev_id, a_bool_t show_type)
 				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i + 49], i);
 			else if (i >= 181 && i <= 198)
 				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 27], i);
-			else if (i >= 210 && i <= 231)
+			else if (i >= 210 && i <= 232)
 				printk(KERN_CONT "%15llu(%s),cpucode:%d", value, cpucode[i - 38], i);
 #endif
 			else if (i >= 254 && i <= 255)

@@ -855,8 +855,17 @@ extern "C" {
 #define GLOBAL_MAC_ADDR1_GLB_BYTE3_BLEN            8
 #define GLOBAL_MAC_ADDR1_GLB_BYTE3_FLAG            HSL_RW
 
+    /*SWITCH MAC DBG CTRL*/
+#define SWITCH_MAC_DBG_CTRL
+#define SWITCH_MAC_DBG_CTRL_OFFSET                 0x00c8
+#define SWITCH_MAC_DBG_CTRL_E_LENGTH               4
+#define SWITCH_MAC_DBG_CTRL_E_OFFSET               0
+#define SWITCH_MAC_DBG_CTRL_NR_E                   1
 
-
+#define HIGH_IPG
+#define SWITCH_MAC_DBG_CTRL_HIGH_IPG_BOFFSET       8
+#define SWITCH_MAC_DBG_CTRL_HIGH_IPG_BLEN          8
+#define SWITCH_MAC_DBG_CTRL_HIGH_IPG_FLAG          HSL_RW
 
     /* Max Size Register */
 #define MAX_SIZE

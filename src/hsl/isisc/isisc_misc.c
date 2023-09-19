@@ -31,6 +31,7 @@
 #include "mht_sec_ctrl.h"
 #endif
 
+#define ISISC_RX_MIN_IPG_3        11
 #define ISISC_MAX_FRMAE_SIZE      9216
 
 #define ARP_REQ_EN_OFFSET    6
@@ -160,7 +161,17 @@ _isisc_frame_max_size_set(a_uint32_t dev_id, a_uint32_t size)
     data = size;
     HSL_REG_FIELD_SET(rv, dev_id, MAX_SIZE, 0, MAX_FRAME_SIZE,
                       (a_uint8_t *) (&data), sizeof (a_uint32_t));
-    return rv;
+    SW_RTN_ON_ERROR(rv);
+#ifdef MHT
+    if(hsl_get_current_chip_type(dev_id) == CHIP_MHT) {
+    data = ISISC_RX_MIN_IPG_3;
+    HSL_REG_FIELD_SET(rv, dev_id, SWITCH_MAC_DBG_CTRL, 0, HIGH_IPG,
+                      (a_uint8_t *) (&data), sizeof (a_uint32_t));
+    SW_RTN_ON_ERROR(rv);
+    }
+#endif
+
+    return SW_OK;
 }
 
 static sw_error_t

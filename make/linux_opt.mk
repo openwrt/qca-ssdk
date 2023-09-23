@@ -777,6 +777,6 @@ LOCAL_CFLAGS += $(CPU_CFLAG) -D"KBUILD_MODNAME=KBUILD_STR(qca-ssdk)"
 ####################################################################
 # 			cflags for LNX Modules-Style Makefile
 ####################################################################
-LNX_LOCAL_CFLAGS += $(MODULE_INC) $(MODULE_CFLAG) ${EXTRA_INC}
+LNX_LOCAL_CFLAGS += $(MODULE_INC) $(MODULE_CFLAG) ${EXTRA_INC} -DFALLTHROUGH
 export LNX_LOCAL_CFLAGS
 

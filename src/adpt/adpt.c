@@ -394,7 +394,7 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 #endif
 #endif
 #if defined(HPPE)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+#if defined(FALLTHROUGH)
 			fallthrough;
 #else
 			/* fall through */

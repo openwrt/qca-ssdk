@@ -1220,7 +1220,7 @@ void qca808x_txtstamp(struct phy_device *phydev, struct sk_buff *org_skb, int ty
 						*reserved2 = ptp_info->embeded_ts.reserved2;
 						*correction = ptp_info->embeded_ts.correction;
 					}
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+#if defined(FALLTHROUGH)
 					fallthrough;
 #else
 					/* fall through */

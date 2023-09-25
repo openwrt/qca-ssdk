@@ -1617,7 +1617,8 @@ void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 			mode0 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
 			mode1 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE1);
 			if ((uniphy_index == SSDK_UNIPHY_INSTANCE1) &&
-				(mode0 == PORT_WRAPPER_PSGMII) && (mode1 == PORT_WRAPPER_MAX)) {
+				(mode0 == PORT_WRAPPER_PSGMII || mode0 == PORT_WRAPPER_PSGMII_FIBER)
+				&& (mode1 == PORT_WRAPPER_MAX)) {
 				/* can not reset uniphy port5 as it is used by uniphy0 psgmii */
 				index--;
 			}

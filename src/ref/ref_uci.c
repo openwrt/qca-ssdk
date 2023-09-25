@@ -4129,7 +4129,7 @@ parse_fdb_entry(struct switch_val *val)
 			val_ptr[6] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "mirror")) {
 			val_ptr[7] = (char*)ext_value_p->option_value;
-		} else if(!strcmp(ext_value_p->option_name, "clone")) {
+		} else if(!strcmp(ext_value_p->option_name, "entry_ver")) {
 			val_ptr[8] = (char*)ext_value_p->option_value;
 		} else if(!strcmp(ext_value_p->option_name, "queue_override")) {
 			val_ptr[9] = (char*)ext_value_p->option_value;

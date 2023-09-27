@@ -213,8 +213,16 @@ sfp_read_status(struct phy_device *pdev)
 	pdev->duplex = phy_status.duplex;
 #else
 	pdev->link = priv->port_old_link[port - 1];
-	pdev->speed = priv->port_old_speed[port - 1];
-	pdev->duplex = priv->port_old_duplex[port - 1];
+	if(pdev->link == PORT_LINK_UP)
+	{
+		pdev->speed = priv->port_old_speed[port - 1];
+		pdev->duplex = priv->port_old_duplex[port - 1];
+	}
+	else
+	{
+		pdev->speed = FAL_SPEED_BUTT;
+		pdev->duplex = FAL_DUPLEX_BUTT;
+	}
 #endif
 	return 0;
 }

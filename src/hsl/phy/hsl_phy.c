@@ -549,6 +549,12 @@ qca_ssdk_phydev_to_port(a_uint32_t dev_id, struct phy_device *phydev)
 }
 
 a_bool_t
+qca_ssdk_gpio_is_invalid(a_uint32_t dev_id, a_uint32_t gpio_num)
+{
+	return ((gpio_num == SSDK_MAX_GPIO) || (gpio_num == SSDK_INVALID_GPIO));
+}
+
+a_bool_t
 hsl_port_phy_combo_capability_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	if (dev_id >= SW_MAX_NR_DEV)
@@ -726,7 +732,7 @@ void hsl_port_phy_gpio_reset(a_uint32_t dev_id, a_uint32_t port_id)
 
 	gpio_num = hsl_port_phy_reset_gpio_get(dev_id, port_id);
 
-	if(gpio_num == SSDK_INVALID_GPIO)
+	if(qca_ssdk_gpio_is_invalid(dev_id, gpio_num))
 	{
 		return;
 	}

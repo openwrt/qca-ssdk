@@ -179,7 +179,8 @@
 
 #define SSDK_GPIO_RESET                              0
 #define SSDK_GPIO_RELEASE                            1
-#define SSDK_INVALID_GPIO                            0
+#define SSDK_MAX_GPIO                                0xffff
+#define SSDK_INVALID_GPIO                            (SSDK_MAX_GPIO+1)
 
 enum {
     AR8327_PORT_SPEED_10M = 0,

@@ -659,6 +659,10 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 				hsl_port_phy_reset_gpio_set(dev_id, port_id,
 					(a_uint32_t)phy_reset_gpio);
 			}
+			else
+			{
+				hsl_port_phy_reset_gpio_set(dev_id, port_id, SSDK_INVALID_GPIO);
+			}
 		}
 		phy_addr = 0xff;
 		phy_features = 0;
@@ -734,12 +738,26 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 					{
 						priv->sfp_rx_los_pin[port_id] = sfp_rx_los_pin;
 					}
+					else if(sfp_rx_los_pin == -EPROBE_DEFER)
+					{
+						priv->sfp_rx_los_pin[port_id] = SSDK_MAX_GPIO;
+					}
+					else
+					{
+						priv->sfp_rx_los_pin[port_id] = SSDK_INVALID_GPIO;
+					}
+
 					sfp_tx_dis_pin = of_get_named_gpio(port_node,
 						"sfp_tx_dis_pin", 0);
 					if(sfp_tx_dis_pin > 0)
 					{
 						priv->sfp_tx_dis_pin[port_id] = sfp_tx_dis_pin;
 					}
+					else
+					{
+						priv->sfp_tx_dis_pin[port_id] = SSDK_INVALID_GPIO;
+					}
+
 					sfp_mod_present_pin = of_get_named_gpio(port_node,
 						"sfp_mod_present_pin", 0);
 					if(sfp_mod_present_pin > 0)
@@ -747,11 +765,21 @@ static sw_error_t ssdk_dt_parse_phy_info(struct device_node *switch_node, a_uint
 						priv->sfp_mod_present_pin[port_id] =
 							sfp_mod_present_pin;
 					}
+					else
+					{
+						priv->sfp_mod_present_pin[port_id] =
+							SSDK_INVALID_GPIO;
+					}
+
 					sfp_medium_pin = of_get_named_gpio(port_node,
 						"sfp_medium_pin", 0);
 					if(sfp_medium_pin > 0)
 					{
 						priv->sfp_medium_pin[port_id] = sfp_medium_pin;
+					}
+					else
+					{
+						priv->sfp_medium_pin[port_id] = SSDK_INVALID_GPIO;
 					}
 				}
 			}

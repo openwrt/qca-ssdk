@@ -469,7 +469,7 @@ sfp_phy_present_status_check(a_uint32_t dev_id, a_uint32_t port_id)
 	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
 
 	/*if sfp_mode_present_pin is available, then need to check it*/
-	if(priv && priv->sfp_mod_present_pin[port_id] != SSDK_INVALID_GPIO)
+	if(priv && !qca_ssdk_gpio_is_invalid(dev_id, priv->sfp_mod_present_pin[port_id]))
 	{
 		rv = sfp_phy_mod_present_status_get(dev_id, port_id,
 			&mod_present_status);
@@ -614,9 +614,9 @@ sfp_phy_rx_los_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	if(!priv)
 		return SW_NOT_INITIALIZED;
 	rx_los_pin = priv->sfp_rx_los_pin[port_id];
-	if(rx_los_pin == SSDK_INVALID_GPIO)
+	if(qca_ssdk_gpio_is_invalid(dev_id, rx_los_pin))
 	{
-		return SW_NOT_FOUND;
+		return SW_NOT_SUPPORTED;
 	}
 	*rx_los_status = gpio_get_value(rx_los_pin);
 	SSDK_DEBUG("port%d sfp rx_los_pin is %d, the rx_los_status is %d",
@@ -636,9 +636,9 @@ sfp_phy_tx_dis_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 	if(!priv)
 		return SW_NOT_INITIALIZED;
 	tx_dis_pin = priv->sfp_tx_dis_pin[port_id];
-	if(tx_dis_pin == SSDK_INVALID_GPIO)
+	if(qca_ssdk_gpio_is_invalid(dev_id, tx_dis_pin))
 	{
-		return SW_NOT_FOUND;
+		return SW_NOT_SUPPORTED;
 	}
 	ret = gpio_request(tx_dis_pin, "sfp_tx_dis_pin");
 	if(ret)
@@ -667,9 +667,9 @@ sfp_phy_tx_dis_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	if(!priv)
 		return SW_NOT_INITIALIZED;
 	tx_dis_pin = priv->sfp_tx_dis_pin[port_id];
-	if(tx_dis_pin == SSDK_INVALID_GPIO)
+	if(qca_ssdk_gpio_is_invalid(dev_id, tx_dis_pin))
 	{
-		return SW_NOT_FOUND;
+		return SW_NOT_SUPPORTED;
 	}
 	*tx_dis_status = gpio_get_value(tx_dis_pin);
 	SSDK_DEBUG("port%d sfp tx_dis_pin is %d, the tx_dis_status is %d",
@@ -689,9 +689,9 @@ sfp_phy_mod_present_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 	if(!priv)
 		return SW_NOT_INITIALIZED;
 	mod_present_pin = priv->sfp_mod_present_pin[port_id];
-	if(mod_present_pin == SSDK_INVALID_GPIO)
+	if(qca_ssdk_gpio_is_invalid(dev_id, mod_present_pin))
 	{
-		return SW_NOT_FOUND;
+		return SW_NOT_SUPPORTED;
 	}
 	mod_present_pin_status = gpio_get_value(mod_present_pin);
 	SSDK_DEBUG("port%d sfp mod_present_pin is %d, mod_present_pin_status is %d",
@@ -714,9 +714,9 @@ sfp_phy_medium_status_set(a_uint32_t dev_id, a_uint32_t port_id,
 	SW_RTN_ON_NULL(priv);
 
 	sfp_medium_pin = priv->sfp_medium_pin[port_id];
-	if(sfp_medium_pin == SSDK_INVALID_GPIO)
+	if(qca_ssdk_gpio_is_invalid(dev_id, sfp_medium_pin))
 	{
-		return SW_NOT_FOUND;
+		return SW_NOT_SUPPORTED;
 	}
 	ret = gpio_request(sfp_medium_pin, "sfp_medium_pin");
 	if(ret)

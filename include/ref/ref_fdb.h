@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012,2018, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -34,6 +34,24 @@ extern "C" {
 #include <linux/notifier.h>
 #include "sw.h"
 #include "fal/fal_type.h"
+#include "fal/fal_fdb.h"
+#include "init/ssdk_init.h"
+#include "init/ssdk_plat.h"
+
+#define MAX_PORT 6
+
+#define REF_FDB_MAC_INVALID 0
+#define REF_FDB_MAC_NEW 1
+#define REF_FDB_MAC_OLD 2
+#define REF_FDB_MAC_EXPIRE 3
+
+typedef struct
+{
+	struct list_head list;
+	a_uint8_t state;
+	a_bool_t notified;
+	fal_fdb_entry_t entry;
+} ref_fdb_info_t;
 
 #if defined(IN_SWCONFIG)
 int
@@ -51,9 +69,9 @@ fal_port_t
 ref_fdb_get_port_by_mac(unsigned int vid, const char * addr);
 
 sw_error_t
-ref_fdb_sw_sync_task(a_uint32_t dev_id, fal_pbmp_t port_map);
+ref_fdb_sw_sync_task(struct qca_phy_priv *priv);
 sw_error_t
-ref_fdb_sw_sync_reset(a_uint32_t dev_id, fal_pbmp_t port_map);
+ref_fdb_sw_sync_reset(struct qca_phy_priv *priv, fal_pbmp_t port_map);
 
 #ifdef __cplusplus
 }

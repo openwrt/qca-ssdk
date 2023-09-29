@@ -278,6 +278,12 @@ extern a_uint32_t ssdk_log_level;
 #define SSDK_INFO(fmt, ...)  __SSDK_LOG_FUN(INFO, fmt, ##__VA_ARGS__)
 #define SSDK_DEBUG(fmt, ...) __SSDK_LOG_FUN(DEBUG, fmt, ##__VA_ARGS__)
 
+typedef enum {
+	FDB_SYNC_DIS = 0,
+	FDB_SYNC_INTR,
+	FDB_SYNC_POLLING,
+} fdb_sync_t;
+
 struct qca_phy_priv {
 	struct phy_device *phy;
 #if defined(IN_SWCONFIG)
@@ -334,9 +340,11 @@ struct qca_phy_priv {
 	struct delayed_work mac_sw_sync_dwork;
 	/*hppe_mac_sw_sync end*/
 	/*hppe_fdb_sw_sync*/
-	struct mutex fdb_sw_sync_lock;
+	aos_lock_t fdb_sw_sync_lock;
 	struct delayed_work fdb_sw_sync_dwork;
 	fal_pbmp_t fdb_sw_sync_port_map;
+	struct list_head sw_fdb_tbl;
+	a_bool_t fdb_polling_started;
 	/*hppe_fdb_sw_sync end*/
 /*qca808x_start*/
 	struct mii_bus *miibus[SSDK_MII_BUS_MAX];
@@ -346,10 +354,10 @@ struct qca_phy_priv {
 	/* dump buf */
 	a_uint8_t  buf[2048];
 	a_uint32_t link_polling_required;
-	/* it is valid only when link_polling_required is false*/
-	a_uint32_t link_interrupt_no;
+	fdb_sync_t fdb_sync;
+	a_uint32_t interrupt_no;
 	a_uint32_t interrupt_flag;
-	char link_intr_name[IFNAMSIZ];
+	char intr_name[IFNAMSIZ];
 	/* VLAN database */
 	bool       vlan;  /* True: 1q vlan mode, False: port vlan mode */
 	a_uint16_t vlan_id[AR8327_MAX_VLANS];

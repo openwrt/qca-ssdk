@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2017-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -535,6 +535,23 @@ hsl_access_mode_set(a_uint32_t dev_id, hsl_access_mode reg_mode)
     }
 
     return rv;
+}
+
+sw_error_t
+hsl_reg_modify(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask,
+	a_uint32_t value)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t reg_data = 0;
+
+	rv = reduce_hsl_reg_entry_get(dev_id, reg, (a_uint8_t *)(&reg_data),
+		sizeof (a_uint32_t));
+	SW_RTN_ON_ERROR(rv);
+	reg_data = (reg_data & ~mask) | value;
+	rv = reduce_hsl_reg_entry_set(dev_id, reg, (a_uint8_t *) (&reg_data),
+		sizeof (a_uint32_t));
+
+	return rv;
 }
 
 sw_error_t reduce_hsl_reg_entry_get(a_uint32_t dev,a_uint32_t reg,a_uint8_t* value,a_uint8_t val_len)

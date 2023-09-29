@@ -866,7 +866,7 @@ int qca_ar8327_hw_init(struct qca_phy_priv *priv)
 #ifdef IN_PORTVLAN
 	ssdk_portvlan_init(priv->device_id);
 #endif
-	qca_mac_enable_intr(priv);
+	qca_switch_enable_intr(priv, FAL_SWITCH_INTR_LINK_STATUS);
 	qca_ar8327_phy_enable(priv);
 
 	return 0;
@@ -1463,85 +1463,6 @@ qm_err_check_work_task_polling(struct work_struct *work)
 #endif
 }
 
-static int config_gpio(a_uint32_t  gpio_num)
-{
-	int  error;
-
-	if (gpio_is_valid(gpio_num))
-	{
-		error = gpio_request_one(gpio_num, GPIOF_IN, "linkchange");
-		if (error < 0) {
-			SSDK_ERROR("gpio request faild \n");
-			return -1;
-		}
-		gpio_set_debounce(gpio_num, 60000);
-	}
-	else
-	{
-		SSDK_ERROR("gpio is invalid\n");
-		return -1;
-	}
-
-	return 0;
-}
-static int qca_link_polling_select(struct qca_phy_priv *priv)
-{
-	struct device_node *np = NULL;
-	const __be32 *link_polling_required;
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
-	const __be32 *link_intr_gpio;
-#endif
-	a_int32_t len = 0, intr_gpio_num = 0;
-
-	if (priv->ess_switch_flag == A_TRUE)
-		np = priv->of_node;
-	else if(priv->version == QCA_VER_AR8337 || priv->version == QCA_VER_AR8327)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0))
-		np = priv->phy->mdio.dev.of_node;
-#else
-		np = priv->phy->dev.of_node;
-#endif
-	else
-		SSDK_ERROR("cannot find np node!\n");
-
-	if(!np)
-	{
-		SSDK_ERROR("np is null !\n");
-		return -1;
-	}
-
-	link_polling_required = of_get_property(np, "link-polling-required", &len);
-	if (!link_polling_required )
-	{
-		return -1;
-	}
-	priv->link_polling_required  = be32_to_cpup(link_polling_required);
-	if(!priv->link_polling_required)
-	{
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
-		link_intr_gpio = of_get_property(np, "link-intr-gpio", &len);
-		if (!link_intr_gpio )
-		{
-			SSDK_ERROR("cannot find link-intr-gpio node\n");
-			return -1;
-		}
-		intr_gpio_num = be32_to_cpup(link_intr_gpio);
-#else
-		intr_gpio_num = of_get_named_gpio(np, "link-intr-gpio", 0);
-		if(intr_gpio_num < 0)
-		{
-			SSDK_ERROR("cannot find link-intr-gpio node\n");
-			return -1;
-		}
-#endif
-		if(config_gpio(intr_gpio_num))
-			return -1;
-		priv->link_interrupt_no = gpio_to_irq (intr_gpio_num);
-	}
-
-	return 0;
-}
-
 int
 qm_err_check_work_start(struct qca_phy_priv *priv)
 {
@@ -1752,27 +1673,25 @@ void
 qca_fdb_sw_sync_work_task(struct work_struct *work)
 {
 	struct qca_phy_priv *priv = container_of(work, struct qca_phy_priv,
-					fdb_sw_sync_dwork.work);
+		fdb_sw_sync_dwork.work);
 
-	mutex_lock(&priv->fdb_sw_sync_lock);
 #ifdef IN_FDB
-	ref_fdb_sw_sync_task(priv->device_id, priv->fdb_sw_sync_port_map);
+	ref_fdb_sw_sync_task(priv);
 #endif
-	mutex_unlock(&priv->fdb_sw_sync_lock);
-
 	schedule_delayed_work(&priv->fdb_sw_sync_dwork,
-					msecs_to_jiffies(QCA_FDB_SW_SYNC_WORK_DELAY));
+		msecs_to_jiffies(QCA_FDB_SW_SYNC_WORK_DELAY));
 }
 
 int
 qca_fdb_sw_sync_work_init(struct qca_phy_priv *priv)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE))
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE) &&
+		(priv->version != QCA_VER_MHT))
 	{
 		return 0;
 	}
 
-	mutex_init(&priv->fdb_sw_sync_lock);
+	aos_lock_init(&priv->fdb_sw_sync_lock);
 
 	return 0;
 }
@@ -1783,27 +1702,25 @@ qca_fdb_sw_sync_work_init(struct qca_phy_priv *priv)
 int
 qca_fdb_sw_sync_work_start(struct qca_phy_priv *priv, fal_pbmp_t port_map)
 {
-	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE))
-	{
-		return 0;
-	}
-	if (port_map == 0)
+	if ((priv->version != QCA_VER_HPPE) && (priv->version != QCA_VER_APPE) &&
+		(priv->version != QCA_VER_MHT))
 	{
 		return 0;
 	}
 
-	mutex_lock(&priv->fdb_sw_sync_lock);
+	aos_lock_bh(&priv->fdb_sw_sync_lock);
 	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
-	if (priv->fdb_sw_sync_port_map == 0)
+	if (priv->fdb_sw_sync_port_map == 0 && priv->fdb_polling_started == A_FALSE)
 	{
 		INIT_DELAYED_WORK(&priv->fdb_sw_sync_dwork,
 						qca_fdb_sw_sync_work_task);
 		schedule_delayed_work(&priv->fdb_sw_sync_dwork,
 						msecs_to_jiffies(QCA_FDB_SW_SYNC_WORK_DELAY));
+		priv->fdb_polling_started = A_TRUE;
 	}
 	SW_PBMP_OR(priv->fdb_sw_sync_port_map, port_map);
 	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
-	mutex_unlock(&priv->fdb_sw_sync_lock);
+	aos_unlock_bh(&priv->fdb_sw_sync_lock);
 
 	return 0;
 }
@@ -1818,23 +1735,22 @@ qca_fdb_sw_sync_work_stop(struct qca_phy_priv *priv, fal_pbmp_t port_map)
 	{
 		return;
 	}
-	if (port_map == 0)
-	{
-		return;
-	}
 
-	mutex_lock(&priv->fdb_sw_sync_lock);
+	aos_lock_bh(&priv->fdb_sw_sync_lock);
 	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
 	SW_PBMP_AND(priv->fdb_sw_sync_port_map, ~port_map);
-	if (priv->fdb_sw_sync_port_map == 0)
+	if (priv->fdb_sw_sync_port_map == 0 && priv->fdb_polling_started == A_TRUE)
 	{
+		aos_unlock_bh(&priv->fdb_sw_sync_lock);
 		cancel_delayed_work_sync(&priv->fdb_sw_sync_dwork);
+		priv->fdb_polling_started = A_FALSE;
 	}
+	else
+		aos_unlock_bh(&priv->fdb_sw_sync_lock);
 #ifdef IN_FDB
-	ref_fdb_sw_sync_reset(priv->device_id, port_map);
+	ref_fdb_sw_sync_reset(priv, port_map);
 #endif
 	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
-	mutex_unlock(&priv->fdb_sw_sync_lock);
 }
 
 int
@@ -1985,18 +1901,13 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 		return ret;
 	}
 #endif
-
-	snprintf(priv->link_intr_name, IFNAMSIZ, "switch%d", dev_id);
-
 	priv->qca_ssdk_sw_dev_registered = A_TRUE;
 	ret = qca_phy_mib_work_start(qca_phy_priv_global[dev_id]);
 	if (ret != 0) {
 			SSDK_ERROR("qca_phy_mib_work_start failed for chip 0x%02x%02x\n", priv->version, priv->revision);
 			return ret;
 	}
-	ret = qca_link_polling_select(priv);
-	if(ret)
-		priv->link_polling_required = 1;
+
 	if(priv->link_polling_required)
 	{
 		ret = qm_err_check_work_start(priv);
@@ -2005,10 +1916,34 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 			SSDK_ERROR("qm_err_check_work_start failed for chip 0x%02x%02x\n", priv->version, priv->revision);
 			return ret;
 		}
+#ifdef HPPE
+		if (_ssdk_mac_sw_sync_chip_check(priv) != SW_OK) {
+			SSDK_INFO("mac_sw_sync is not enabled on chip 0x%02x%02x\n",
+				priv->version, priv->revision);
+			return 0;
+		}
+
+		if (!ssdk_is_emulation(dev_id)) {
+			ret = qca_mac_sw_sync_work_init(priv);
+			if (ret != 0) {
+				SSDK_ERROR("qca_mac_sw_sync_work_init failed on chip 0x%02x%02x\n",
+						priv->version, priv->revision);
+				return ret;
+			}
+		}
+#endif
 	}
-	else
+#if defined(HPPE) || defined(MHT)
+	ret = qca_fdb_sw_sync_work_init(priv);
+	if (ret != 0) {
+		SSDK_ERROR("qca_fdb_sw_sync_work_init failed on chip 0x%02x%02x\n",
+				priv->version, priv->revision);
+		return ret;
+	}
+#endif
+	if(priv->interrupt_no > 0)
 	{
-		SSDK_INFO("interrupt is selected\n");
+		snprintf(priv->intr_name, IFNAMSIZ, "switch%d", dev_id);
 		switch(priv->version)
 		{
 #ifdef MHT
@@ -2025,6 +1960,8 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 				priv->interrupt_flag = IRQF_TRIGGER_NONE;
 				break;
 		}
+		SSDK_INFO("intr_number:%d, intr_name:%s, intr_flag:%d\n",
+			priv->interrupt_no, priv->intr_name, priv->interrupt_flag);
 		ret = qca_intr_init(priv);
 		if(ret)
 		{
@@ -2048,29 +1985,6 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 	}
 #endif
 #endif
-#ifdef HPPE
-	if (_ssdk_mac_sw_sync_chip_check(priv) != SW_OK) {
-		SSDK_INFO("mac_sw_sync is not enabled on chip 0x%02x%02x\n",
-			priv->version, priv->revision);
-		return 0;
-	}
-
-	if (!ssdk_is_emulation(dev_id)) {
-		ret = qca_mac_sw_sync_work_init(priv);
-		if (ret != 0) {
-			SSDK_ERROR("qca_mac_sw_sync_work_init failed on chip 0x%02x%02x\n",
-					priv->version, priv->revision);
-			return ret;
-		}
-		ret = qca_fdb_sw_sync_work_init(priv);
-		if (ret != 0) {
-			SSDK_ERROR("qca_fdb_sw_sync_work_init failed on chip 0x%02x%02x\n",
-					priv->version, priv->revision);
-			return ret;
-		}
-	}
-#endif
-
 	return 0;
 }
 
@@ -3629,6 +3543,7 @@ static int __init regi_init(void)
 		qca_phy_priv_global[dev_id]->device_id = ssdk_device_id_get(dev_id);
 		qca_phy_priv_global[dev_id]->ess_switch_flag = ssdk_ess_switch_flag_get(dev_id);
 		qca_phy_priv_global[dev_id]->of_node = ssdk_dts_node_get(dev_id);
+		INIT_LIST_HEAD(&(qca_phy_priv_global[dev_id]->sw_fdb_tbl));
 /*qca808x_start*/
 		rv = ssdk_plat_init(&cfg, dev_id);
 		SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);

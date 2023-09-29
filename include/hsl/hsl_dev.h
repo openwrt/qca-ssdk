@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -72,7 +72,8 @@ sw_error_t
 hsl_access_mode_set(a_uint32_t dev_id, hsl_access_mode reg_mode);
 
 a_uint32_t hsl_dev_inner_ports_get(a_uint32_t dev_id);
-
+sw_error_t hsl_reg_modify(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask,
+	a_uint32_t value);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

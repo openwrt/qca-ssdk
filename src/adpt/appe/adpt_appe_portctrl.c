@@ -610,11 +610,9 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 		}
 #endif
 		/* set port interface mode as auto */
-		if (port_mode == PORT_INTERFACE_MODE_MAX) {
-			SW_RTN_ON_ERROR(adpt_hppe_port_interface_mode_set(dev_id,
-					port_id, PORT_INTERFACE_MODE_AUTO));
-			SW_RTN_ON_ERROR(adpt_hppe_port_interface_mode_apply(dev_id));
-		}
+		SW_RTN_ON_ERROR(adpt_hppe_port_interface_mode_set(dev_id,
+				port_id, PORT_INTERFACE_MODE_AUTO));
+		SW_RTN_ON_ERROR(adpt_hppe_port_interface_mode_apply(dev_id));
 		/* power on phy */
 		hsl_port_phy_pll_on(dev_id, port_id);
 		hsl_port_phy_power_on(dev_id, port_id);

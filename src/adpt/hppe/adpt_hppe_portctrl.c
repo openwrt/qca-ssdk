@@ -2558,9 +2558,11 @@ _adpt_hppe_sfp_copper_phydriver_switch(a_uint32_t dev_id, a_uint32_t port_id,
 	sw_error_t rv = SW_OK;
 
 	if (A_TRUE == hsl_port_phy_combo_capability_get(dev_id, port_id))
-	{
 		return rv;
-	}
+
+	if (mode == PORT_INTERFACE_MODE_MAX)
+		return rv;
+
 	rv = _adpt_hppe_port_phyaddr_update(dev_id, port_id, mode);
 	SW_RTN_ON_ERROR(rv);
 	rv = hsl_phydriver_update(dev_id, port_id, mode);

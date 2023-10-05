@@ -605,18 +605,20 @@ qcaphy_status_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	sw_error_t rv = SW_OK;
 
 	rv = hsl_phy_phydev_get(dev_id, phy_addr, &phydev);
-	PHY_RTN_ON_ERROR(rv);
-	SSDK_DEBUG("phy_addr:0x%x, phydev->drv->name:%s", phy_addr,
-		phydev->drv->name);
-	if(phydev->drv && !strcmp(phydev->drv->name, "Generic PHY") &&
-		(phydev->autoneg == AUTONEG_ENABLE)) {
-		rv = hsl_phy_linkmode_adv_to_adv(phydev->advertising, &old_adv);
-		SW_RTN_ON_ERROR (rv);
-		rv = qcaphy_get_autoneg_adv(dev_id, phy_addr, &new_adv);
-		PHY_RTN_ON_ERROR(rv);
-		if(new_adv != old_adv) {
-			rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr, A_TRUE, new_adv);
+	if (rv == SW_OK) {
+		SSDK_DEBUG("phy_addr:0x%x, phydev->drv->name:%s", phy_addr,
+				phydev->drv->name);
+		if(phydev->drv && !strcmp(phydev->drv->name, "Generic PHY") &&
+				(phydev->autoneg == AUTONEG_ENABLE)) {
+			rv = hsl_phy_linkmode_adv_to_adv(phydev->advertising, &old_adv);
+			PHY_RTN_ON_ERROR (rv);
+			rv = qcaphy_get_autoneg_adv(dev_id, phy_addr, &new_adv);
 			PHY_RTN_ON_ERROR(rv);
+			if(new_adv != old_adv) {
+				rv = hsl_phy_phydev_autoneg_update(dev_id, phy_addr,
+						A_TRUE, new_adv);
+				PHY_RTN_ON_ERROR(rv);
+			}
 		}
 	}
 /*qca808x_start*/

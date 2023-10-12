@@ -4512,7 +4512,8 @@ _adpt_hppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 	}
 
 #if defined(APPE) && defined(IN_TUNNEL)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
 		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
@@ -4571,7 +4572,8 @@ _adpt_hppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 	}
 
 #if defined(APPE) && defined(IN_TUNNEL)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
 		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
@@ -4613,7 +4615,8 @@ adpt_ppe_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cf
 
 	/* set counter mode configs */
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		rv = adpt_appe_port_cnt_mode_set(dev_id, port_id, cnt_cfg);
 		SW_RTN_ON_ERROR(rv);
@@ -4652,7 +4655,8 @@ adpt_ppe_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cf
 
 	/* get counter mode configs */
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		rv = adpt_appe_port_cnt_mode_get(dev_id, port_id, cnt_cfg);
 		SW_RTN_ON_ERROR(rv);
@@ -4831,7 +4835,8 @@ adpt_ppe_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *por
 	}
 
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		rv = adpt_appe_port_rx_cnt_get(dev_id, port_id, port_cnt);
 		SW_RTN_ON_ERROR(rv);
@@ -4857,7 +4862,8 @@ adpt_ppe_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 	}
 
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		rv = adpt_appe_port_rx_cnt_flush(dev_id, port_id);
 		SW_RTN_ON_ERROR(rv);

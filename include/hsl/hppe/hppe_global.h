@@ -986,6 +986,12 @@ sw_error_t
 hppe_port_phy_status_0_port2_phy_status_get(
 		a_uint32_t dev_id,
 		unsigned int *value);
+
+sw_error_t
+hppe_port_phy_status_0_port3_phy_status_get(
+		a_uint32_t dev_id,
+		a_uint32_t *value);
+
 #if 0
 sw_error_t
 hppe_port_phy_status_0_port2_phy_status_set(

@@ -2615,6 +2615,20 @@ hppe_port_phy_status_0_port2_phy_status_get(
 	*value = reg_val.bf.port2_phy_status;
 	return ret;
 }
+
+sw_error_t
+hppe_port_phy_status_0_port3_phy_status_get(
+		a_uint32_t dev_id,
+		a_uint32_t *value)
+{
+	union port_phy_status_0_u reg_val;
+	sw_error_t ret = SW_OK;
+
+	ret = hppe_port_phy_status_0_get(dev_id, &reg_val);
+	*value = reg_val.bf.port3_phy_status;
+	return ret;
+}
+
 #if 0
 sw_error_t
 hppe_port_phy_status_0_port2_phy_status_set(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -931,6 +931,152 @@ qcaphy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable)
 	if ((eee_adv & QCAPHY_EEE_ADV_100M) &&
 		(eee_adv & QCAPHY_EEE_ADV_1000M))
 		*enable = A_TRUE;
+
+	return SW_OK;
+}
+
+sw_error_t
+qcaphy_led_pattern_map_from_phy(a_uint32_t dev_id, a_uint32_t *map,
+	a_uint16_t phy_data)
+{
+	if(phy_data & QCAPHY_PHY_LINK_1000M_LIGHT_EN)
+		*map |= BIT(LINK_1000M_LIGHT_EN);
+	if(phy_data & QCAPHY_PHY_LINK_100M_LIGHT_EN)
+		*map |= BIT(LINK_100M_LIGHT_EN);
+	if(phy_data & QCAPHY_PHY_LINK_10M_LIGHT_EN)
+		*map |= BIT(LINK_10M_LIGHT_EN);
+	if (phy_data & QCAPHY_PHY_RX_TRAFFIC_BLINK_EN)
+		*map |= BIT(RX_TRAFFIC_BLINK_EN);
+	if (phy_data & QCAPHY_PHY_TX_TRAFFIC_BLINK_EN)
+		*map |= BIT(TX_TRAFFIC_BLINK_EN);
+
+	return SW_OK;
+}
+
+sw_error_t
+qcaphy_led_pattern_map_to_phy(a_uint32_t dev_id, a_uint32_t map,
+	a_uint16_t *phy_data)
+{
+	if (map & BIT(LINK_1000M_LIGHT_EN))
+		*phy_data |=  QCAPHY_PHY_LINK_1000M_LIGHT_EN;
+	if (map & BIT(LINK_100M_LIGHT_EN))
+		*phy_data |=  QCAPHY_PHY_LINK_100M_LIGHT_EN;
+	if (map & BIT(LINK_10M_LIGHT_EN))
+		*phy_data |=  QCAPHY_PHY_LINK_10M_LIGHT_EN;
+	if (map & BIT(RX_TRAFFIC_BLINK_EN))
+		*phy_data |=  QCAPHY_PHY_RX_TRAFFIC_BLINK_EN;
+	if (map & BIT(TX_TRAFFIC_BLINK_EN))
+		*phy_data |=  QCAPHY_PHY_TX_TRAFFIC_BLINK_EN;
+
+	return SW_OK;
+}
+
+sw_error_t
+qcaphy_led_pattern_force_from_phy(a_uint32_t dev_id, a_uint32_t *force_mode,
+	a_uint16_t phy_data)
+{
+	if(!(phy_data & QCAPHY_PHY_LED_FORCE_EN))
+		return SW_BAD_PARAM;
+
+	switch (phy_data & QCAPHY_PHY_LED_FORCE_MASK) {
+		case QCAPHY_PHY_LED_FORCE_ALWAYS_OFF:
+			*force_mode = LED_ALWAYS_OFF;
+			break;
+		case QCAPHY_PHY_LED_FORCE_ALWAYS_ON:
+			*force_mode = LED_ALWAYS_ON;
+			break;
+		case QCAPHY_PHY_LED_FORCE_ALWAYS_BLINK:
+			*force_mode = LED_ALWAYS_BLINK;
+			break;
+		default:
+			return SW_NOT_SUPPORTED;
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+qcaphy_led_pattern_force_to_phy(a_uint32_t dev_id, a_uint32_t force_mode,
+	a_uint16_t *phy_data)
+{
+	*phy_data |= QCAPHY_PHY_LED_FORCE_EN;
+
+	if (force_mode == LED_ALWAYS_OFF)
+		*phy_data |= QCAPHY_PHY_LED_FORCE_ALWAYS_OFF;
+	else if (force_mode == LED_ALWAYS_ON)
+		*phy_data |= QCAPHY_PHY_LED_FORCE_ALWAYS_ON;
+	else if (force_mode == LED_ALWAYS_BLINK)
+		*phy_data |= QCAPHY_PHY_LED_FORCE_ALWAYS_BLINK;
+	else
+		return SW_NOT_SUPPORTED;
+
+	return SW_OK;
+}
+
+sw_error_t
+qcaphy_led_active_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t active_level)
+{
+	a_uint16_t phy_data = 0;
+
+	if(active_level == LED_ACTIVE_HIGH)
+		phy_data |= QCAPHY_MMD7_LED_POLARITY_MASK;
+
+	return hsl_phy_modify_mmd(dev_id, phy_addr, A_TRUE, QCAPHY_MMD7_NUM,
+		QCAPHY_MMD7_LED_POLARITY_CTRL, QCAPHY_MMD7_LED_POLARITY_MASK,
+		phy_data);
+}
+
+sw_error_t
+qcaphy_led_active_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *active_level)
+{
+	a_uint16_t phy_data = 0;
+
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE, QCAPHY_MMD7_NUM,
+		QCAPHY_MMD7_LED_POLARITY_CTRL);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(phy_data & QCAPHY_MMD7_LED_POLARITY_MASK)
+	{
+		*active_level = LED_ACTIVE_HIGH;
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+qcaphy_led_blink_freq_set(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mode,
+	a_uint32_t freq)
+{
+	a_uint16_t blink_freq = 0, blink_freq_mask = 0;
+
+	if(mode == LED_ALWAYS_BLINK) {
+		blink_freq_mask = QCAPHY_PHY_ALWAYS_BLINK_FREQ_MASK;
+		blink_freq = freq << 3;
+	} else if(mode == LED_PATTERN_MAP_EN) {
+		blink_freq_mask = QCAPHY_PHY_MAP_BLINK_FREQ_MASK;
+		blink_freq = freq << 9;
+	}
+
+	return hsl_phy_modify_mmd(dev_id, phy_addr, A_TRUE, QCAPHY_MMD7_NUM,
+		QCAPHY_MMD7_LED_BLINK_FREQ_CTRL, blink_freq_mask,
+		blink_freq);
+}
+
+sw_error_t
+qcaphy_led_blink_freq_get(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mode,
+	a_uint32_t *freq)
+{
+	a_uint16_t phy_data = 0;
+
+	phy_data =  hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE, QCAPHY_MMD7_NUM,
+		QCAPHY_MMD7_LED_BLINK_FREQ_CTRL);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(mode == LED_ALWAYS_BLINK)
+		*freq = ((phy_data & QCAPHY_PHY_ALWAYS_BLINK_FREQ_MASK) >> 3);
+	else if(mode == LED_PATTERN_MAP_EN) {
+		*freq = ((phy_data & QCAPHY_PHY_MAP_BLINK_FREQ_MASK) >> 9);
+	}
 
 	return SW_OK;
 }

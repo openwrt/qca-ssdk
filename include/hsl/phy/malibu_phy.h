@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, 2017, 2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -551,14 +551,20 @@ extern "C"
 #define MALIBU_INTR_DUPLEX_CHANGE             0x2000
 #define MALIBU_INTR_STATUS_UP_CHANGE          0x0400
 #define MALIBU_INTR_STATUS_DOWN_CHANGE        0x0800
-#define MALIBU_INTR_BX_FX_STATUS_DOWN_CHANGE        0x0100
-#define MALIBU_INTR_BX_FX_STATUS_UP_CHANGE        0x0080
-#define MALIBU_INTR_MEDIA_STATUS_CHANGE             0x1000
-#define MALIBU_INTR_WOL             0x0001
-#define MALIBU_INTR_POE             0x0002
+#define MALIBU_INTR_BX_FX_STATUS_DOWN_CHANGE  0x0100
+#define MALIBU_INTR_BX_FX_STATUS_UP_CHANGE    0x0080
+#define MALIBU_INTR_MEDIA_STATUS_CHANGE       0x1000
+#define MALIBU_INTR_WOL                       0x0001
+#define MALIBU_INTR_POE                       0x0002
 
-#define RUN_CDT 0x8000
-#define CABLE_LENGTH_UNIT 0x0400
+#define RUN_CDT                               0x8000
+#define CABLE_LENGTH_UNIT                     0x0400
+
+#define MALIBU_PHY_MMD7_LED_100_N_MAP_CTRL    0x8074
+#define MALIBU_PHY_MMD7_LED_1000_N_MAP_CTRL   0x8076
+
+#define MALIBU_PHY_MMD7_LED_100_N_FORCE_CTRL  0x8075
+#define MALIBU_PHY_MMD7_LED_1000_N_FORCE_CTRL 0x8077
 
 /** Phy pages */
   typedef enum

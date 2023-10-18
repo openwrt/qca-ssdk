@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2014-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,6 +24,9 @@
 #include "ssdk_clk.h"
 #include "hsl_phy.h"
 #include <linux/in.h>
+#ifdef IN_LED
+#include "ssdk_led.h"
+#endif
 
 #if defined(IN_VSI)
 sw_error_t qca_hppe_vsi_hw_init(a_uint32_t dev_id)
@@ -190,6 +193,9 @@ qca_hppe_portctrl_hw_init(a_uint32_t dev_id)
 		port_eee_cfg.lpi_tx_enable = A_FALSE;
 		fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
 		qca_mac_port_status_init(dev_id, i);
+#ifdef IN_LED
+		ssdk_led_init(dev_id, i);
+#endif
 	}
 
 	for(i = SSDK_PHYSICAL_PORT5; i < port_max; i++) {

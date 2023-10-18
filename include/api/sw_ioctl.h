@@ -573,6 +573,8 @@ extern "C" {
 #define SW_API_LED_OFFSET             1300
 #define SW_API_LED_PATTERN_SET        (0  + SW_API_LED_OFFSET)
 #define SW_API_LED_PATTERN_GET        (1  + SW_API_LED_OFFSET)
+#define SW_API_LED_PT_SRC_PATTERN_SET (2  + SW_API_LED_OFFSET)
+#define SW_API_LED_PT_SRC_PATTERN_GET (3  + SW_API_LED_OFFSET)
 
     /* cosmap */
 #define SW_API_COSMAP_OFFSET              1400

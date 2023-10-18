@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012, 2015-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -199,13 +199,6 @@ enum ssdk_port_wrapper_cfg {
 		a_uint32_t inner_bmp;
 	} ssdk_port_cfg;
 
-	typedef struct
-	{
-		a_uint32_t led_num;
-		a_uint32_t led_source_id;
-		led_ctrl_pattern_t led_pattern;
-
-	} led_source_cfg_t;
 /*qca808x_start*/
 enum {
 	QCA_PHY_F_CLAUSE45_BIT,
@@ -259,8 +252,6 @@ typedef struct
 	/* port cfg */
 	ssdk_port_cfg   port_cfg;
 	a_uint32_t      mac_mode;
-	a_uint32_t led_source_num;
-	led_source_cfg_t led_source_cfg[15];
 /*qca808x_start*/
 	a_uint32_t      phy_id;
 	a_uint32_t      mac_mode1;

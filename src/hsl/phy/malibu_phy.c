@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1776,6 +1776,152 @@ malibu_phy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	return qcaphy_get_eee_status(dev_id, phy_addr, status);
 }
+#ifdef IN_LED
+a_uint32_t
+malibu_phy_led_source_map_mmd_reg_get(a_uint32_t dev_id, a_uint32_t source_id)
+{
+	a_uint16_t mmd_reg = 0;
+
+	switch(source_id)
+	{
+		case QCAPHY_LED_SOURCE0:
+			mmd_reg = MALIBU_PHY_MMD7_LED_100_N_MAP_CTRL;
+			break;
+		case QCAPHY_LED_SOURCE1:
+			mmd_reg = MALIBU_PHY_MMD7_LED_1000_N_MAP_CTRL;
+			break;
+		default:
+			SSDK_ERROR("source %d is not support\n", source_id);
+			break;
+	}
+
+	return mmd_reg;
+}
+
+a_uint32_t
+malibu_phy_led_source_force_mmd_reg_get(a_uint32_t dev_id, a_uint32_t source_id)
+{
+	a_uint16_t mmd_reg = 0;
+
+	switch(source_id)
+	{
+		case QCAPHY_LED_SOURCE0:
+			mmd_reg = MALIBU_PHY_MMD7_LED_100_N_FORCE_CTRL;
+			break;
+		case QCAPHY_LED_SOURCE1:
+			mmd_reg = MALIBU_PHY_MMD7_LED_1000_N_FORCE_CTRL;
+			break;
+		default:
+			SSDK_ERROR("source %d is not support\n", source_id);
+			break;
+	}
+
+	return mmd_reg;
+}
+
+static sw_error_t
+malibu_phy_led_force_pattern_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id, a_bool_t enable, a_uint32_t force_mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+
+	mmd_reg = malibu_phy_led_source_force_mmd_reg_get(dev_id, source_id);
+	if(enable) {
+		rv = qcaphy_led_pattern_force_to_phy(dev_id, force_mode, &phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	return hsl_phy_modify_mmd(dev_id, phy_addr, A_FALSE, MALIBU_PHY_MMD7_NUM,
+		mmd_reg, QCAPHY_PHY_LED_FORCE_EN | QCAPHY_PHY_LED_FORCE_MASK, phy_data);
+}
+
+static sw_error_t
+malibu_phy_led_force_pattern_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id, a_bool_t *enable, a_uint32_t *force_mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+
+	mmd_reg = malibu_phy_led_source_force_mmd_reg_get(dev_id, source_id);
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE, MALIBU_PHY_MMD7_NUM,
+		mmd_reg);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(phy_data  & QCAPHY_PHY_LED_FORCE_EN) {
+		*enable = A_TRUE;
+		rv = qcaphy_led_pattern_force_from_phy(dev_id, force_mode, phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	else
+		*enable = A_FALSE;
+
+	return SW_OK;
+}
+
+sw_error_t
+malibu_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+
+	if(pattern->mode == LED_PATTERN_MODE_BUTT || source_id > QCAPHY_LED_SOURCE1)
+		return SW_NOT_SUPPORTED;
+
+	rv = qcaphy_led_blink_freq_set(dev_id, phy_addr, pattern->mode, pattern->freq);
+	PHY_RTN_ON_ERROR(rv);
+
+	if(pattern->mode == LED_PATTERN_MAP_EN) {
+		rv = malibu_phy_led_force_pattern_set(dev_id, phy_addr, source_id, A_FALSE,
+			pattern->mode);
+		PHY_RTN_ON_ERROR(rv);
+		rv = qcaphy_led_pattern_map_to_phy(dev_id, pattern->map, &phy_data);
+		PHY_RTN_ON_ERROR(rv);
+		mmd_reg = malibu_phy_led_source_map_mmd_reg_get(dev_id, source_id);
+		rv = hsl_phy_mmd_reg_write(dev_id, phy_addr, A_FALSE, MALIBU_PHY_MMD7_NUM,
+			mmd_reg, phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	} else {
+		rv = malibu_phy_led_force_pattern_set(dev_id, phy_addr, source_id, A_TRUE,
+			pattern->mode);
+		PHY_RTN_ON_ERROR(rv);
+	}
+
+	return SW_OK;
+}
+
+sw_error_t
+malibu_phy_led_ctrl_source_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+	a_bool_t force_enable = A_FALSE;
+
+	if(source_id > QCAPHY_LED_SOURCE1)
+		return SW_NOT_SUPPORTED;
+	pattern->map = 0;
+	rv = malibu_phy_led_force_pattern_get(dev_id, phy_addr, source_id, &force_enable,
+		&(pattern->mode));
+	PHY_RTN_ON_ERROR(rv);
+	if(!force_enable) {
+		pattern->mode = LED_PATTERN_MAP_EN;
+		mmd_reg = malibu_phy_led_source_map_mmd_reg_get(dev_id, source_id);
+		phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
+			MALIBU_PHY_MMD7_NUM, mmd_reg);
+		PHY_RTN_ON_READ_ERROR(phy_data);
+		rv = qcaphy_led_pattern_map_from_phy(dev_id, &(pattern->map), phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	rv = qcaphy_led_blink_freq_get(dev_id, phy_addr, pattern->mode, &(pattern->freq));
+	PHY_RTN_ON_ERROR(rv);
+
+	return SW_OK;
+}
+#endif
 /******************************************************************************
 *
 * malibu_phy_hw_register init
@@ -1917,7 +2063,10 @@ static int malibu_phy_api_ops_init(void)
 	malibu_phy_api_ops->phy_eee_partner_adv_get = malibu_phy_get_eee_partner_adv;
 	malibu_phy_api_ops->phy_eee_cap_get = malibu_phy_get_eee_cap;
 	malibu_phy_api_ops->phy_eee_status_get = malibu_phy_get_eee_status;
-
+#ifdef IN_LED
+	malibu_phy_api_ops->phy_led_ctrl_source_set = malibu_phy_led_ctrl_source_set;
+	malibu_phy_api_ops->phy_led_ctrl_source_get = malibu_phy_led_ctrl_source_get;
+#endif
 	ret = hsl_phy_api_ops_register(MALIBU_PHY_CHIP, malibu_phy_api_ops);
 
 	if (ret == 0)

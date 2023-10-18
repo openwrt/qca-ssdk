@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,161 +20,90 @@
 #include "ssdk_plat.h"
 #include "qca808x_phy.h"
 #include "qca808x_led.h"
+#include "qcaphy_common.h"
 #ifdef MHT
 #include "ssdk_mht_pinctrl.h"
 #include "mht_sec_ctrl.h"
 #endif
 
 static sw_error_t
-_qca808x_phy_led_active_set(a_uint32_t dev_id, a_uint32_t phy_addr,
-	led_ctrl_pattern_t *pattern)
-{
-	a_uint16_t phy_data = 0;
-
-	if(pattern->map & BIT(LED_ACTIVE_HIGH))
-	{
-		phy_data |= QCA808X_PHY_MMD7_LED_POLARITY_MASK;
-	}
-
-	return hsl_phy_modify_mmd(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
-		QCA808X_PHY_MMD7_LED_POLARITY_CTRL, QCA808X_PHY_MMD7_LED_POLARITY_MASK,
-		phy_data);
-}
-
-static sw_error_t
-_qca808x_phy_led_active_get(a_uint32_t dev_id, a_uint32_t phy_addr,
-	led_ctrl_pattern_t *pattern)
-{
-	a_uint16_t phy_data = 0;
-
-	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
-		QCA808X_PHY_MMD7_LED_POLARITY_CTRL);
-	PHY_RTN_ON_READ_ERROR(phy_data);
-	if(phy_data & QCA808X_PHY_MMD7_LED_POLARITY_MASK)
-	{
-		pattern->map |= BIT(LED_ACTIVE_HIGH);
-	}
-
-	return SW_OK;
-}
-
-static sw_error_t
 _qca808x_phy_led_pattern_map_from_phy(a_uint32_t dev_id, a_uint32_t phy_addr,
-	led_ctrl_pattern_t *pattern, a_uint16_t *phy_data)
+	a_uint32_t *map, a_uint16_t phy_data)
 {
 	if (qca808x_phy_2500caps(dev_id, phy_addr) == A_TRUE)
 	{
-		if(*phy_data & QCA808X_PHY_LINK_2500M_LIGHT_EN)
+		if(phy_data & QCA808X_PHY_LINK_2500M_LIGHT_EN)
 		{
-			pattern->map |= BIT(LINK_2500M_LIGHT_EN);
+			*map |= BIT(LINK_2500M_LIGHT_EN);
 		}
 	}
-	if(*phy_data & QCA808X_PHY_LINK_1000M_LIGHT_EN)
-	{
-		pattern->map |= BIT(LINK_1000M_LIGHT_EN);
-	}
-	if(*phy_data & QCA808X_PHY_LINK_100M_LIGHT_EN)
-	{
-		pattern->map |= BIT(LINK_100M_LIGHT_EN);
-	}
-	if(*phy_data & QCA808X_PHY_LINK_10M_LIGHT_EN)
-	{
-		pattern->map |= BIT(LINK_10M_LIGHT_EN);
-	}
-	if (*phy_data & QCA808X_PHY_RX_TRAFFIC_BLINK_EN)
-	{
-		pattern->map |= BIT(RX_TRAFFIC_BLINK_EN);
-	}
-	if (*phy_data & QCA808X_PHY_TX_TRAFFIC_BLINK_EN)
-	{
-		pattern->map |= BIT(TX_TRAFFIC_BLINK_EN);
-	}
 
-	return SW_OK;
+	return qcaphy_led_pattern_map_from_phy(dev_id, map, phy_data);
 }
 
 static sw_error_t
 _qca808x_phy_led_pattern_map_to_phy(a_uint32_t dev_id, a_uint32_t phy_addr,
-	led_ctrl_pattern_t *pattern, a_uint32_t *led_map)
+	a_uint32_t map, a_uint16_t *phy_data)
 {
 	if (qca808x_phy_2500caps(dev_id, phy_addr) == A_TRUE)
 	{
-		if (pattern->map & BIT(LINK_2500M_LIGHT_EN))
+		if (map & BIT(LINK_2500M_LIGHT_EN))
 		{
-			*led_map |=  QCA808X_PHY_LINK_2500M_LIGHT_EN;
+			*phy_data |=  QCA808X_PHY_LINK_2500M_LIGHT_EN;
 		}
 	}
-	if (pattern->map & BIT(LINK_1000M_LIGHT_EN))
-	{
-		*led_map |=  QCA808X_PHY_LINK_1000M_LIGHT_EN;
-	}
-	if (pattern->map & BIT(LINK_100M_LIGHT_EN))
-	{
-		*led_map |=  QCA808X_PHY_LINK_100M_LIGHT_EN;
-	}
-	if (pattern->map & BIT(LINK_10M_LIGHT_EN))
-	{
-		*led_map |=  QCA808X_PHY_LINK_10M_LIGHT_EN;
-	}
-	if (pattern->map & BIT(RX_TRAFFIC_BLINK_EN))
-	{
-		*led_map |=  QCA808X_PHY_RX_TRAFFIC_BLINK_EN;
-	}
-	if (pattern->map & BIT(TX_TRAFFIC_BLINK_EN))
-	{
-		*led_map |=  QCA808X_PHY_TX_TRAFFIC_BLINK_EN;
-	}
 
-	return SW_OK;
+	return qcaphy_led_pattern_map_to_phy(dev_id, map, phy_data);
 }
 
-/******************************************************************************
-*
-* qca808x_phy_led_ctrl_pattern_set
-*
-*/
-sw_error_t
-qca808x_phy_led_ctrl_pattern_set(a_uint32_t dev_id, a_uint32_t phy_addr,
-	led_ctrl_pattern_t *pattern)
+a_uint32_t
+qca808x_phy_led_source_map_mmd_reg_get(a_uint32_t dev_id, a_uint32_t source_id)
 {
-	sw_error_t rv = SW_OK;
-	a_uint32_t source_id = 0;
+	a_uint16_t mmd_reg = 0;
 
-	if(LED_PATTERN_MAP_EN != pattern->mode)
+	switch(source_id)
 	{
-		SSDK_ERROR("led mode %d is not supported\n", pattern->mode);
-		return SW_NOT_SUPPORTED;
-	}
-	for(source_id = QCA808X_PHY_LED_SOURCE0; source_id <= QCA808X_PHY_LED_SOURCE2;
-		source_id++)
-	{
-		/*three source use the same pattern*/
-		rv = qca808x_phy_led_ctrl_source_set (dev_id, phy_addr, source_id, pattern);
-		PHY_RTN_ON_ERROR(rv);
+		case QCAPHY_LED_SOURCE0:
+			mmd_reg = QCA808X_PHY_MMD7_LED0_MAP_CTRL;
+			break;
+		case QCAPHY_LED_SOURCE1:
+			mmd_reg = QCA808X_PHY_MMD7_LED1_MAP_CTRL;
+			break;
+		case QCAPHY_LED_SOURCE2:
+			mmd_reg = QCA808X_PHY_MMD7_LED2_MAP_CTRL;
+			break;
+		default:
+			SSDK_ERROR("source %d is not support\n", source_id);
+			break;
 	}
 
-	return rv;
+	return mmd_reg;
 }
 
-/******************************************************************************
-*
-* qca808x_phy_led_ctrl_pattern_get
-*
-*/
-sw_error_t
-qca808x_phy_led_ctrl_pattern_get(a_uint32_t dev_id, a_uint32_t phy_addr,
-	led_ctrl_pattern_t *pattern)
+a_uint32_t
+qca808x_phy_led_source_force_mmd_reg_get(a_uint32_t dev_id, a_uint32_t source_id)
 {
-	/*three source use the same pattern*/
-	return qca808x_phy_led_ctrl_source_get(dev_id, phy_addr,
-		QCA808X_PHY_LED_SOURCE0, pattern);
+	a_uint16_t mmd_reg = 0;
+
+	switch(source_id)
+	{
+		case QCAPHY_LED_SOURCE0:
+			mmd_reg = QCA808X_PHY_MMD7_LED0_FORCE_CTRL;
+			break;
+		case QCAPHY_LED_SOURCE1:
+			mmd_reg = QCA808X_PHY_MMD7_LED1_FORCE_CTRL;
+			break;
+		case QCAPHY_LED_SOURCE2:
+			mmd_reg = QCA808X_PHY_MMD7_LED2_FORCE_CTRL;
+			break;
+		default:
+			SSDK_ERROR("source %d is not support\n", source_id);
+			break;
+	}
+
+	return mmd_reg;
 }
 
-/******************************************************************************
-*
-* qca808x_phy_led_source_pattern_set
-*
-*/
 #ifdef MHT
 #define QCA8084_LED_FUNC(lend_func, mht_port_id, source_id) \
 {                                                           \
@@ -198,12 +127,12 @@ qca8084_phy_led_ctrl_source_pin_cfg(a_uint32_t dev_id, a_uint32_t phy_addr,
 	/*get the led pin and led func for mht port*/
 	rv = qca_mht_port_id_get(dev_id, phy_addr, &mht_port_id);
 	PHY_RTN_ON_ERROR(rv);
-	if(source_id == QCA808X_PHY_LED_SOURCE0)
+	if(source_id == QCAPHY_LED_SOURCE0)
 	{
 		led_start_pin = 2;
 		QCA8084_LED_FUNC(led_func, mht_port_id, 0)
 	}
-	else if(source_id == QCA808X_PHY_LED_SOURCE1)
+	else if(source_id == QCAPHY_LED_SOURCE1)
 	{
 		led_start_pin = 16;
 		QCA8084_LED_FUNC(led_func, mht_port_id, 1)
@@ -221,42 +150,79 @@ qca8084_phy_led_ctrl_source_pin_cfg(a_uint32_t dev_id, a_uint32_t phy_addr,
 	return rv;
 }
 #endif
+
+static sw_error_t
+qca808x_phy_led_force_pattern_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id, a_bool_t enable, a_uint32_t force_mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+
+	mmd_reg = qca808x_phy_led_source_force_mmd_reg_get(dev_id, source_id);
+	if(enable) {
+		rv = qcaphy_led_pattern_force_to_phy(dev_id, force_mode, &phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	return hsl_phy_modify_mmd(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
+		mmd_reg, QCAPHY_PHY_LED_FORCE_EN | QCAPHY_PHY_LED_FORCE_MASK, phy_data);
+}
+
+static sw_error_t
+qca808x_phy_led_force_pattern_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t source_id, a_bool_t *enable, a_uint32_t *force_mode)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+
+	mmd_reg = qca808x_phy_led_source_force_mmd_reg_get(dev_id, source_id);
+	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
+		mmd_reg);
+	PHY_RTN_ON_READ_ERROR(phy_data);
+	if(phy_data  & QCAPHY_PHY_LED_FORCE_EN) {
+		*enable = A_TRUE;
+		rv = qcaphy_led_pattern_force_from_phy(dev_id, force_mode, phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	}
+	else
+		*enable = A_FALSE;
+
+	return SW_OK;
+}
+
 sw_error_t
 qca808x_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
 {
 	sw_error_t rv = SW_OK;
-	a_uint32_t led_map = 0;
-	a_uint16_t led_mmd_addr = 0;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
 
-	if(LED_PATTERN_MAP_EN != pattern->mode)
-	{
+	if(pattern->mode == LED_PATTERN_MODE_BUTT || source_id > QCAPHY_LED_SOURCE2)
 		return SW_NOT_SUPPORTED;
-	}
 
-	rv = _qca808x_phy_led_active_set(dev_id,  phy_addr, pattern);
+	rv = qcaphy_led_active_set(dev_id,  phy_addr, pattern->active_level);
 	PHY_RTN_ON_ERROR(rv);
-	rv = _qca808x_phy_led_pattern_map_to_phy(dev_id, phy_addr, pattern,
-		&led_map);
+	/*set blink frequency*/
+	rv = qcaphy_led_blink_freq_set(dev_id, phy_addr, pattern->mode, pattern->freq);
 	PHY_RTN_ON_ERROR(rv);
-	switch(source_id)
-	{
-		case QCA808X_PHY_LED_SOURCE0:
-			led_mmd_addr = QCA808X_PHY_MMD7_LED0_CTRL;
-			break;
-		case QCA808X_PHY_LED_SOURCE1:
-			led_mmd_addr = QCA808X_PHY_MMD7_LED1_CTRL;
-			break;
-		case QCA808X_PHY_LED_SOURCE2:
-			led_mmd_addr = QCA808X_PHY_MMD7_LED2_CTRL;
-			break;
-		default:
-			SSDK_ERROR("source %d is not support\n", source_id);
-			break;
+	if(pattern->mode == LED_PATTERN_MAP_EN) {
+		rv = qca808x_phy_led_force_pattern_set(dev_id, phy_addr, source_id, A_FALSE,
+			pattern->mode);
+		PHY_RTN_ON_ERROR(rv);
+		rv = _qca808x_phy_led_pattern_map_to_phy(dev_id, phy_addr, pattern->map,
+			&phy_data);
+		PHY_RTN_ON_ERROR(rv);
+		mmd_reg = qca808x_phy_led_source_map_mmd_reg_get(dev_id, source_id);
+		rv = hsl_phy_mmd_reg_write(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
+			mmd_reg, phy_data);
+		PHY_RTN_ON_ERROR(rv);
+	} else {
+		rv = qca808x_phy_led_force_pattern_set(dev_id, phy_addr, source_id, A_TRUE,
+			pattern->mode);
+		PHY_RTN_ON_ERROR(rv);
 	}
-	rv = hsl_phy_mmd_reg_write(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
-		led_mmd_addr, led_map);
-	PHY_RTN_ON_ERROR(rv);
 #ifdef MHT
 	if(qca808x_phy_id_check(dev_id, phy_addr, QCA8084_PHY))
 	{
@@ -276,32 +242,33 @@ qca808x_phy_led_ctrl_source_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
 {
 	sw_error_t rv = SW_OK;
-	a_uint16_t phy_data = 0, led_mmd_addr = 0;
+	a_uint32_t mmd_reg = 0;
+	a_uint16_t phy_data = 0;
+	a_bool_t force_enable = A_FALSE;
 
-	pattern->map = 0;
-	pattern->mode = LED_PATTERN_MAP_EN;
-	rv = _qca808x_phy_led_active_get(dev_id, phy_addr, pattern);
+	if(source_id > QCAPHY_LED_SOURCE2)
+		return SW_NOT_SUPPORTED;
+
+	rv = qcaphy_led_active_get(dev_id, phy_addr, &(pattern->active_level));
 	PHY_RTN_ON_ERROR(rv);
-	switch(source_id)
-	{
-		case QCA808X_PHY_LED_SOURCE0:
-			led_mmd_addr = QCA808X_PHY_MMD7_LED0_CTRL;
-			break;
-		case QCA808X_PHY_LED_SOURCE1:
-			led_mmd_addr = QCA808X_PHY_MMD7_LED1_CTRL;
-			break;
-		case QCA808X_PHY_LED_SOURCE2:
-			led_mmd_addr = QCA808X_PHY_MMD7_LED2_CTRL;
-			break;
-		default:
-			SSDK_ERROR("source %d is not support\n", source_id);
-			break;
+	pattern->map = 0;
+	rv = qca808x_phy_led_force_pattern_get(dev_id, phy_addr, source_id,
+		&force_enable, &(pattern->mode));
+	PHY_RTN_ON_ERROR(rv);
+	if(!force_enable) {
+		pattern->mode = LED_PATTERN_MAP_EN;
+		mmd_reg = qca808x_phy_led_source_map_mmd_reg_get(dev_id, source_id);
+		phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE,
+			QCA808X_PHY_MMD7_NUM, mmd_reg);
+		PHY_RTN_ON_READ_ERROR(phy_data);
+		rv = _qca808x_phy_led_pattern_map_from_phy(dev_id, phy_addr, &(pattern->map),
+			phy_data);
+		PHY_RTN_ON_ERROR(rv);
 	}
-	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_TRUE, QCA808X_PHY_MMD7_NUM,
-		led_mmd_addr);
-	PHY_RTN_ON_READ_ERROR(phy_data);
-	return _qca808x_phy_led_pattern_map_from_phy(dev_id, phy_addr, pattern,
-		&phy_data);
+	rv = qcaphy_led_blink_freq_get(dev_id, phy_addr, pattern->mode, &(pattern->freq));
+	PHY_RTN_ON_ERROR(rv);
+
+	return SW_OK;
 }
 
 void qca808x_phy_led_api_ops_init(hsl_phy_ops_t *qca808x_phy_led_api_ops)
@@ -309,9 +276,8 @@ void qca808x_phy_led_api_ops_init(hsl_phy_ops_t *qca808x_phy_led_api_ops)
 	if (!qca808x_phy_led_api_ops) {
 		return;
 	}
-	qca808x_phy_led_api_ops->phy_led_ctrl_pattern_get = qca808x_phy_led_ctrl_pattern_get;
-	qca808x_phy_led_api_ops->phy_led_ctrl_pattern_set = qca808x_phy_led_ctrl_pattern_set;
 	qca808x_phy_led_api_ops->phy_led_ctrl_source_set = qca808x_phy_led_ctrl_source_set;
+	qca808x_phy_led_api_ops->phy_led_ctrl_source_get = qca808x_phy_led_ctrl_source_get;
 
 	return;
 }

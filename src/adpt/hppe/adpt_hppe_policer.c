@@ -537,7 +537,8 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 	hppe_ebs = in_acl_meter_cfg_tbl.bf.ebs;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		appe_cir_max = (in_acl_meter_cfg_tbl.bf.cir_max_1 << 7) |
 					in_acl_meter_cfg_tbl.bf.cir_max_0;
 		appe_eir_max = in_acl_meter_cfg_tbl.bf.eir_max;
@@ -553,7 +554,8 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 				in_acl_meter_cfg_tbl.bf.meter_unit,
 				in_acl_meter_cfg_tbl.bf.token_unit);
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		__adpt_hppe_policer_refresh_to_rate(appe_cir_max,
 				&policer->cir_max,
 				in_acl_meter_cfg_tbl.bf.meter_unit,
@@ -602,7 +604,8 @@ adpt_hppe_acl_policer_entry_get(a_uint32_t dev_id, a_uint32_t index,
 	action->red_dei = in_acl_meter_cfg_tbl.bf.violate_dei;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		policer->meter_type = appe_policer_type[dev_id][index];
 		policer->grp_end = in_acl_meter_cfg_tbl.bf.grp_end;
 		policer->grp_couple_en = in_acl_meter_cfg_tbl.bf.grp_cf;
@@ -687,7 +690,8 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 	temp_ebs = ((a_uint64_t)policer->ebs) * 1000;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		if (policer->meter_type == FAL_POLICER_METER_MEF10_3) {
 			temp_cir_max = ((a_uint64_t)policer->cir_max) * 1000;
 			temp_eir_max = ((a_uint64_t)policer->eir_max) * 1000;
@@ -723,7 +727,8 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 				policer->meter_unit,
 				token_unit);
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		if (policer->meter_type == FAL_POLICER_METER_MEF10_3) {
 			__adpt_hppe_policer_rate_to_refresh(policer->cir_max,
 				&appe_cir_max,
@@ -793,7 +798,8 @@ adpt_hppe_acl_policer_entry_set(a_uint32_t dev_id, a_uint32_t index,
 	in_acl_meter_cfg_tbl.bf.violate_dei = action->red_dei;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		in_acl_meter_cfg_tbl.bf.cir_max_0 = appe_cir_max & 0x7f;
 		in_acl_meter_cfg_tbl.bf.cir_max_1 = appe_cir_max >> 7;
 		in_acl_meter_cfg_tbl.bf.eir_max = appe_eir_max;
@@ -838,7 +844,8 @@ adpt_hppe_port_policer_entry_get(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_NULL_POINT_CHECK(action);
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		if (ADPT_IS_VPORT(port_id)) {
 			port_id = FAL_PORT_ID_VALUE(port_id);
 			rv = appe_l2_vp_port_tbl_get(dev_id, port_id, &l2_vp_port_tbl);
@@ -956,7 +963,8 @@ adpt_hppe_port_policer_entry_set(a_uint32_t dev_id, fal_port_t port_id,
 	ADPT_NULL_POINT_CHECK(action);
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		if (ADPT_IS_VPORT(port_id)) {
 			port_id = FAL_PORT_ID_VALUE(port_id);
 			rv = appe_l2_vp_port_tbl_get(dev_id, port_id, &l2_vp_port_tbl);
@@ -1106,7 +1114,8 @@ adpt_hppe_policer_time_slot_set(a_uint32_t dev_id, a_uint32_t time_slot)
 	memset(&time_slot_reg, 0, sizeof(time_slot_reg));
 	ADPT_DEV_ID_CHECK(dev_id);
 
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 #ifdef APPE
 		if ((time_slot > APPE_POLICER_TIME_SLOT_MAX) ||
 			(time_slot < APPE_POLICER_TIME_SLOT_MIN))
@@ -1219,7 +1228,8 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_port_policer_counter_get = adpt_hppe_port_policer_counter_get;
 	p_adpt_api->adpt_policer_global_counter_get = adpt_hppe_policer_global_counter_get;
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		p_adpt_api->adpt_policer_priority_remap_get = adpt_appe_policer_priority_remap_get;
 		p_adpt_api->adpt_policer_priority_remap_set = adpt_appe_policer_priority_remap_set;
 	}
@@ -1236,7 +1246,8 @@ sw_error_t adpt_hppe_policer_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_policer_time_slot_set = adpt_hppe_policer_time_slot_set;
 	p_adpt_api->adpt_policer_bypass_en_set = adpt_hppe_policer_bypass_en_set;
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+	    adpt_chip_type_get(dev_id) == CHIP_MRPPE){
 		p_adpt_api->adpt_policer_ctrl_get = adpt_appe_policer_ctrl_get;
 		p_adpt_api->adpt_policer_ctrl_set = adpt_appe_policer_ctrl_set;
 	}

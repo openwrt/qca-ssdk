@@ -489,7 +489,7 @@ sw_error_t adpt_appe_port_tx_buff_thresh_set(a_uint32_t dev_id,
 sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 		a_uint32_t port_id, fal_port_erp_power_mode_t power_mode)
 {
-	fal_port_interface_mode_t port_mode, port5_mode;
+	fal_port_interface_mode_t port_mode, port5_mode = PORT_INTERFACE_MODE_MAX;
 	fal_mac_config_t mac_config= {0};
 	a_uint32_t i = 0, port_end = port_id;
 	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
@@ -511,8 +511,8 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 		hsl_port_feature_set(dev_id, port_id, PHY_F_ERP_LOW_POWER);
 
 		if (port_mode == PHY_PSGMII_BASET || port_mode == PORT_UQXGMII) {
-			SW_RTN_ON_ERROR(adpt_hppe_port_interface_mode_get(dev_id,
-					SSDK_PHYSICAL_PORT5, &port5_mode));
+			adpt_hppe_port_interface_mode_get(dev_id,
+					SSDK_PHYSICAL_PORT5, &port5_mode);
 			port_end = (port5_mode == PHY_PSGMII_BASET) ?
 					SSDK_PHYSICAL_PORT5 : SSDK_PHYSICAL_PORT4;
 			for (i = SSDK_PHYSICAL_PORT1; i<= port_end; i++) {

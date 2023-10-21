@@ -476,7 +476,6 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 		if (tm_tick_mode == 0) {
 			num = ARRAY_SIZE(ppe_port_scheduler0_tbl);
 			scheduler_cfg = ppe_port_scheduler0_tbl;
-			SSDK_INFO("mppe scheduler tdm mode = %d, num = %d\n", tm_tick_mode, num);
 		} else {
 			SSDK_ERROR("mppe invalid tdm mode %d\n", tm_tick_mode);
 			return SW_BAD_VALUE;
@@ -499,7 +498,6 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 				SSDK_ERROR("appe invalid scheduler tdm mode %d\n", tm_tick_mode);
 				return SW_BAD_VALUE;
 		}
-		SSDK_INFO("appe scheduler tdm mode =%d\n", tm_tick_mode);
 	}
 #endif
 	if (scheduler_cfg != NULL) {
@@ -522,7 +520,6 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 		if (bm_tick_mode == 0) {
 			bm_cfg = ppe_port_tdm0_tbl;
 			num = ARRAY_SIZE(ppe_port_tdm0_tbl);
-			SSDK_INFO("mppe bm mode = %d setup num= %d\n", bm_tick_mode, num);
 		} else {
 			SSDK_ERROR("mppe invalid BM tick mode %d\n", bm_tick_mode);
 			return SW_BAD_VALUE;
@@ -545,7 +542,6 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 				SSDK_ERROR("Ivalid bm_tick_mode %d\n", bm_tick_mode);
 				return SW_BAD_VALUE;
 		}
-		SSDK_INFO("appe tdm setup num=%d\n", num);
 	}
 #endif
 
@@ -602,6 +598,7 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 			fal_port_interface_eee_cfg_set(dev_id, i, &port_eee_cfg);
 		}
 		qca_hppe_port_mac_type_set(dev_id, i, mac_type_org);
+		qca_mac_port_status_init(dev_id, i);
 	}
 
 	aos_mem_zero(&init_cnt_cfg, sizeof(init_cnt_cfg));
@@ -612,8 +609,6 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 	for(i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT6; i++) {
 		fal_port_cnt_cfg_set(dev_id, FAL_PORT_ID(FAL_PORT_TYPE_PPORT, i), &init_cnt_cfg);
 	}
-
-	SSDK_INFO("appe portctrl initialization\n");
 
 	return SW_OK;
 }
@@ -801,12 +796,12 @@ qca_appe_rss_hash_hw_init(a_uint32_t dev_id)
 	config.hash_sip_mix[3] = RSS_HASH_SIPV6_MIX_3;
 	config.hash_dip_mix[3] = RSS_HASH_DIPV6_MIX_3;
 	rv = fal_rss_hash_config_set(dev_id, FAL_RSS_HASH_IPV6ONLY, &config);
-	SSDK_INFO("appe rss hash initialization: hash_seed 0x%x\n",config.hash_seed);
+
 	return rv;
 }
 #endif
 
-sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
+sw_error_t qca_appe_hw_init(a_uint32_t dev_id)
 {
 	sw_error_t rv = SW_OK;
 
@@ -849,8 +844,7 @@ sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	SW_RTN_ON_ERROR(rv);
 #endif
 
-	rv = qca_hppe_interface_mode_init(dev_id, cfg->mac_mode,
-		cfg->mac_mode1, cfg->mac_mode2);
+	rv = qca_hppe_interface_mode_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 
 #if defined(IN_PORTCONTROL)

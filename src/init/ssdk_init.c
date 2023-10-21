@@ -1463,15 +1463,6 @@ qca_mac_port_status_init(a_uint32_t dev_id, a_uint32_t port_id)
 }
 
 void
-qca_mac_sw_sync_port_status_init(a_uint32_t dev_id)
-{
-	a_uint32_t port_id;
-
-	for (port_id = SSDK_PHYSICAL_PORT1; port_id < SW_MAX_NR_PORT; port_id ++) {
-		qca_mac_port_status_init(dev_id, port_id);
-	}
-}
-void
 qca_mac_sw_sync_work_task(struct work_struct *work)
 {
 	adpt_api_t *p_adpt_api;
@@ -1496,10 +1487,6 @@ qca_mac_sw_sync_work_task(struct work_struct *work)
 int
 qca_mac_sw_sync_work_init(struct qca_phy_priv *priv)
 {
-	if ((priv->version == QCA_VER_HPPE) || (priv->version == QCA_VER_APPE)) {
-		qca_mac_sw_sync_port_status_init(priv->device_id);
-	}
-
 	mutex_init(&priv->mac_sw_sync_lock);
 
 	INIT_DELAYED_WORK(&priv->mac_sw_sync_dwork,
@@ -1660,6 +1647,44 @@ qca_fdb_sw_sync_work_stop(struct qca_phy_priv *priv, fal_pbmp_t port_map)
 #endif
 	SSDK_DEBUG("fdb_sw_sync_port_map 0x%x\n", priv->fdb_sw_sync_port_map);
 }
+
+#if defined(APPE)
+static sw_error_t
+qca_ppe_port_reset(a_uint32_t dev_id)
+{
+#if 0
+	a_uint32_t i = 0, port_max = SSDK_PHYSICAL_PORT7;
+
+#if defined(MPPE)
+	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION)
+		port_max = SSDK_PHYSICAL_PORT3;
+#endif
+	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
+#ifdef IN_PORTCONTROL
+		fal_port_rxmac_status_set(dev_id, i, A_FALSE);
+#endif
+		ssdk_port_mac_clock_reset(dev_id, i);
+	}
+#endif
+	return SW_OK;
+}
+
+sw_error_t ssdk_ppe_hw_recover(a_uint32_t dev_id)
+{
+	sw_error_t rv = SW_OK;
+
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+		rv = qca_ppe_port_reset(dev_id);
+		SW_RTN_ON_ERROR(rv);
+		rv = qca_appe_hw_init(dev_id);
+		SW_RTN_ON_ERROR(rv);
+	}
+	SSDK_INFO("ssdk ppe hw recover successfully!\n");
+
+	return rv;
+}
+EXPORT_SYMBOL(ssdk_ppe_hw_recover);
+#endif
 
 int
 qca_phy_id_chip(struct qca_phy_priv *priv)
@@ -2540,7 +2565,7 @@ static int __init regi_init(void)
 			case CHIP_MRPPE:
 			case CHIP_APPE:
 #if defined(APPE)
-				qca_appe_hw_init(&cfg, dev_id);
+				qca_appe_hw_init(dev_id);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				SSDK_INFO("Initializing APPE Done!!\n");
@@ -2548,7 +2573,7 @@ static int __init regi_init(void)
 				break;
 			case CHIP_HPPE:
 #if defined(HPPE)
-				qca_hppe_hw_init(&cfg, dev_id);
+				qca_hppe_hw_init(dev_id);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
 				SSDK_INFO("Initializing HPPE Done!!\n");

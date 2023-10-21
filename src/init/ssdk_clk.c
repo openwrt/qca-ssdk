@@ -1226,60 +1226,6 @@ void ssdk_mp_raw_clock_set(
 #endif
 
 #if defined(HPPE) || defined(MP)
-void ssdk_gcc_clock_init(void)
-{
-#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
-	enum cmnblk_clk_type cmnblk_clk_mode = INTERNAL_48MHZ;
-	a_uint8_t *mode = NULL;
-
-	clock_node = of_find_node_by_name(NULL, "ess-switch");
-	if (of_property_read_string(clock_node, "cmnblk_clk",
-				    (const char **)&mode)) {
-		cmnblk_clk_mode = INTERNAL_48MHZ;
-	} else {
-		if (!strcmp(mode, "external_50MHz")) {
-			cmnblk_clk_mode = EXTERNAL_50MHZ;
-		} else if (!strcmp(mode, "external_25MHz")) {
-			cmnblk_clk_mode = EXTERNAL_25MHZ;
-		} else if (!strcmp(mode, "external_31250KHz")) {
-			cmnblk_clk_mode = EXTERNAL_31250KHZ;
-		} else if (!strcmp(mode, "external_40MHz")) {
-			cmnblk_clk_mode = EXTERNAL_40MHZ;
-		} else if (!strcmp(mode, "external_48MHz")) {
-			cmnblk_clk_mode = EXTERNAL_48MHZ;
-		} else if (!strcmp(mode, "internal_96MHz")) {
-			cmnblk_clk_mode = INTERNAL_96MHZ;
-		}
-	}
-
-	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq807x")) {
-#if defined(HPPE)
-		ssdk_gcc_ppe_clock_init(HPPE_REVISION, cmnblk_clk_mode);
-#endif
-	} else if (of_device_is_compatible(clock_node,
-			"qcom,ess-switch-ipq60xx")) {
-#if defined(HPPE)
-		ssdk_gcc_ppe_clock_init(CPPE_REVISION, cmnblk_clk_mode);
-#endif
-	} else if (of_device_is_compatible(clock_node,
-			"qcom,ess-switch-ipq50xx")) {
-#if defined(MP)
-		ssdk_gcc_mp_clock_init(cmnblk_clk_mode);
-#endif
-	} else if (of_device_is_compatible(clock_node,
-			"qcom,ess-switch-ipq95xx")) {
-#if defined(APPE)
-		ssdk_gcc_appe_clock_init(cmnblk_clk_mode);
-#endif
-	} else if (of_device_is_compatible(clock_node,
-			"qcom,ess-switch-ipq53xx")) {
-#if defined(MPPE)
-		ssdk_gcc_mppe_clock_init(cmnblk_clk_mode);
-#endif
-	}
-#endif
-}
-
 void
 qca_gcc_uniphy_port_clock_set(
 	a_uint32_t dev_id, a_uint32_t uniphy_index,
@@ -1534,7 +1480,6 @@ void ssdk_ppe_reset_init(a_uint32_t dev_id)
 {
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	struct reset_control *rst;
-	a_uint32_t i;
 
 	rst_node = of_find_node_by_name(NULL, "ess-switch");
 	rst = of_reset_control_get(rst_node, PPE_RESET_ID);
@@ -1549,12 +1494,21 @@ void ssdk_ppe_reset_init(a_uint32_t dev_id)
 	msleep(100);
 	reset_control_put(rst);
 
+#endif
+}
+
+void ssdk_gcc_reset_ids_init(void)
+{
+#if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+	a_uint32_t i;
+	rst_node = of_find_node_by_name(NULL, "ess-switch");
+
 	for (i = 0; i < ARRAY_SIZE(ppe_rst_ids); i++)
 		uniphy_rsts[i] = of_reset_control_get(rst_node, ppe_rst_ids[i]);
-
+	
 	for (i = 0; i < ARRAY_SIZE(port_rst_ids); i++)
 		port_rsts[i] = of_reset_control_get(rst_node, port_rst_ids[i]);
-
+	
 #if defined(APPE)
 	for (i = 0; i < ARRAY_SIZE(port_mac_rst_ids); i++)
 		port_mac_rsts[i] = of_reset_control_get(rst_node, port_mac_rst_ids[i]);
@@ -1649,5 +1603,62 @@ void ssdk_gcc_uniphy_sys_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	}
 
 	return;
+}
+#endif
+
+#if defined(HPPE) || defined(MP)
+void ssdk_gcc_clock_init(void)
+{
+	enum cmnblk_clk_type cmnblk_clk_mode = INTERNAL_48MHZ;
+	a_uint8_t *mode = NULL;
+
+	clock_node = of_find_node_by_name(NULL, "ess-switch");
+	if (of_property_read_string(clock_node, "cmnblk_clk",
+				    (const char **)&mode)) {
+		cmnblk_clk_mode = INTERNAL_48MHZ;
+	} else {
+		if (!strcmp(mode, "external_50MHz")) {
+			cmnblk_clk_mode = EXTERNAL_50MHZ;
+		} else if (!strcmp(mode, "external_25MHz")) {
+			cmnblk_clk_mode = EXTERNAL_25MHZ;
+		} else if (!strcmp(mode, "external_31250KHz")) {
+			cmnblk_clk_mode = EXTERNAL_31250KHZ;
+		} else if (!strcmp(mode, "external_40MHz")) {
+			cmnblk_clk_mode = EXTERNAL_40MHZ;
+		} else if (!strcmp(mode, "external_48MHz")) {
+			cmnblk_clk_mode = EXTERNAL_48MHZ;
+		} else if (!strcmp(mode, "internal_96MHz")) {
+			cmnblk_clk_mode = INTERNAL_96MHZ;
+		}
+	}
+
+	if (of_device_is_compatible(clock_node, "qcom,ess-switch-ipq807x")) {
+#if defined(HPPE)
+		ssdk_gcc_ppe_clock_init(HPPE_REVISION, cmnblk_clk_mode);
+#endif
+	} else if (of_device_is_compatible(clock_node,
+			"qcom,ess-switch-ipq60xx")) {
+#if defined(HPPE)
+		ssdk_gcc_ppe_clock_init(CPPE_REVISION, cmnblk_clk_mode);
+#endif
+	} else if (of_device_is_compatible(clock_node,
+			"qcom,ess-switch-ipq50xx")) {
+#if defined(MP)
+		ssdk_gcc_mp_clock_init(cmnblk_clk_mode);
+#endif
+	} else if (of_device_is_compatible(clock_node,
+			"qcom,ess-switch-ipq95xx")) {
+#if defined(APPE)
+		ssdk_gcc_appe_clock_init(cmnblk_clk_mode);
+#endif
+	} else if (of_device_is_compatible(clock_node,
+			"qcom,ess-switch-ipq53xx")) {
+#if defined(MPPE)
+		ssdk_gcc_mppe_clock_init(cmnblk_clk_mode);
+#endif
+	}
+#if defined(HPPE)
+	ssdk_gcc_reset_ids_init();
+#endif
 }
 #endif

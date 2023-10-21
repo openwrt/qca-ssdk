@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,7 @@ extern "C" {
 
 #include "ssdk_init.h"
 
-sw_error_t qca_appe_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
+sw_error_t qca_appe_hw_init(a_uint32_t dev_id);
 
 #define APPE_MAX_C_TOKEN_NUM                0x3fffffff
 #define APPE_MAX_E_TOKEN_NUM                0x3fffffff

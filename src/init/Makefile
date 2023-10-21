@@ -33,10 +33,6 @@ ifneq (,$(filter MHT, $(SUPPORT_CHIP)))
 	SRC_LIST += ssdk_mht.c ssdk_mht_clk.c ssdk_mht_pinctrl.c
 endif
 
-ifeq (TRUE, $(SWCONFIG))
-	SRC_LIST += ssdk_uci.c
-endif
-
 ifeq (TRUE, $(IN_NETLINK))
 	SRC_LIST += ssdk_netlink.c
 endif

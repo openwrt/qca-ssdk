@@ -1572,9 +1572,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 	ssdk_reg_map_info map;
 	struct clk *  ess_clk;
 	struct clk *  cmn_clk;
-	#ifdef BOARD_AR71XX
-	int rv = 0;
-	#endif
 
 #ifdef IN_UNIPHY
 	reg_mode = ssdk_uniphy_reg_access_mode_get(dev_id);

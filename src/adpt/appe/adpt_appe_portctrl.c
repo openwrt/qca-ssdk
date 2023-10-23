@@ -490,7 +490,6 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 		a_uint32_t port_id, fal_port_erp_power_mode_t power_mode)
 {
 	fal_port_interface_mode_t port_mode, port5_mode = PORT_INTERFACE_MODE_MAX;
-	fal_mac_config_t mac_config= {0};
 	a_uint32_t i = 0, port_end = port_id;
 	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
 	SW_RTN_ON_NULL(priv);
@@ -573,6 +572,7 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 			if (hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT1, PHY_F_FORCE)) {
 				/* switch bypass mode */
 				if (ssdk_mht_clk_is_asserted(dev_id, MHT_SRDS0_SYS_CLK)) {
+					fal_mac_config_t mac_config = {0};
 					SSDK_DEBUG("configure manhattan serdes0\n");
 					mac_config.mac_mode = FAL_MAC_MODE_SGMII;
 					mac_config.config.sgmii.clock_mode =

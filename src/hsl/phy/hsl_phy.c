@@ -1452,6 +1452,11 @@ hsl_port_phy_autoneg_status_get(a_uint32_t dev_id, fal_port_t port_id,
 		return SW_BAD_PARAM;
 	}
 
+	if (hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE) == A_TRUE) {
+		*status = A_FALSE;
+		return SW_OK;
+	}
+
 	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
 	if (NULL == phy_drv->phy_autoneg_status_get)
 		return SW_NOT_SUPPORTED;

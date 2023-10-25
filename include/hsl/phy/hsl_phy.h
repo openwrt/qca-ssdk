@@ -741,8 +741,7 @@ a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id);
 sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id);
 /*qca808x_end*/
 sw_error_t
-hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t mode);
+hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id);
 
 void
 qca_ssdk_phy_address_set(a_uint32_t dev_id, a_uint32_t port_id,

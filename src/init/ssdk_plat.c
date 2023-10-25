@@ -1071,7 +1071,7 @@ void ssdk_dts_phyinfo_dump(a_uint32_t dev_id)
 	for (i = 0; i <= SSDK_MAX_PORT_NUM; i++) {
 		if (A_TRUE == hsl_port_prop_check(dev_id, i, HSL_PP_PHY)) {
 			printk("%6d%13d%*s", i,
-					phy_info->phy_address[i], 5, "");
+					TO_PHY_ADDR(phy_info->phy_address[i]), 5, "");
 			for (j = 0; j < QCA_PHY_FEATURE_MAX; j++) {
 				if (phy_info->phy_features[i] & BIT(j) && BIT(j) != PHY_F_INIT) {
 					printk(KERN_CONT "%s ", qca_phy_feature_str[j]);

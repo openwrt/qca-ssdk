@@ -305,26 +305,12 @@ phy_type_t hsl_phytype_get_by_phyid(a_uint32_t dev_id, a_uint32_t phy_id)
 	return phytype;
 }
 /*qca808x_end*/
-sw_error_t hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t mode)
+sw_error_t hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	a_uint32_t phy_id;
 	phy_type_t phytype;
-	ssdk_init_cfg cfg;
+	ssdk_init_cfg cfg = {0};
 
-	cfg.chip_type = CHIP_HPPE;
-	if(port_id == SSDK_PHYSICAL_PORT5)
-	{
-		cfg.mac_mode1 = mode;
-	}
-	else if(port_id == SSDK_PHYSICAL_PORT6)
-	{
-		cfg.mac_mode2 = mode;
-	}
-	else
-	{
-		return SW_NOT_SUPPORTED;
-	}
 	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS)
 	{
 		cfg.reg_func.i2c_get = hsl_phy_i2c_get;
@@ -340,7 +326,7 @@ sw_error_t hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id,
 	if (MAX_PHY_CHIP != phytype)
 	{
 		phy_info[dev_id]->phy_type[port_id] = phytype;
-		ssdk_phy_driver[phytype].port_bmp[dev_id] |= (0x1 << port_id);
+		ssdk_phy_driver[phytype].port_bmp[dev_id] |= BIT(port_id);
 	}
 
 	return SW_OK;

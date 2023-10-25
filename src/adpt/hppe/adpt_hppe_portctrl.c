@@ -2520,33 +2520,21 @@ static sw_error_t _adpt_hppe_port_mac_set(a_uint32_t dev_id, a_uint32_t port_id,
 
 static sw_error_t
 _adpt_hppe_port_phyaddr_update(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t mode)
+	a_uint32_t port_mode)
 {
 	sw_error_t rv = SW_OK;
-	a_uint32_t phy_addr = 0, mode0 = PORT_WRAPPER_MAX;
+	a_uint32_t phy_addr = 0;
 
-	if(port_id != SSDK_PHYSICAL_PORT5)
-	{
-		return rv;
-	}
-	if(mode == PORT_WRAPPER_10GBASE_R)
-	{
+	if(port_mode == PORT_10GBASE_R) {
 		/*SFP port no need to update phy address*/
 		hsl_port_feature_set(dev_id, port_id, PHY_F_SFP | PHY_F_I2C);
-	}
-	else
-	{
-		mode0 = ssdk_dt_global_get_mac_mode(dev_id, SSDK_UNIPHY_INSTANCE0);
-		if((mode0 == PORT_WRAPPER_PSGMII || mode0 == PORT_WRAPPER_PSGMII_FIBER) &&
-			mode == PORT_WRAPPER_MAX)
-		{
-			rv = hsl_port_prop_get_phyid (dev_id, SSDK_PHYSICAL_PORT4, &phy_addr);
-			SW_RTN_ON_ERROR (rv);
-			phy_addr++;
-			qca_ssdk_phy_address_set(dev_id, port_id, phy_addr);
-			hsl_port_feature_clear(dev_id, port_id, PHY_F_SFP | PHY_F_I2C);
-			SSDK_DEBUG("port %x phy_addr is %x\n", port_id, phy_addr);
-		}
+	} else if (port_mode == PHY_PSGMII_BASET) {
+		rv = hsl_port_prop_get_phyid (dev_id, port_id - 1, &phy_addr);
+		SW_RTN_ON_ERROR (rv);
+		phy_addr++;
+		qca_ssdk_phy_address_set(dev_id, port_id, phy_addr);
+		hsl_port_feature_clear(dev_id, port_id, PHY_F_SFP | PHY_F_I2C);
+		SSDK_DEBUG("port %x phy_addr is %x\n", port_id, phy_addr);
 	}
 
 	return rv;
@@ -2554,19 +2542,16 @@ _adpt_hppe_port_phyaddr_update(a_uint32_t dev_id, a_uint32_t port_id,
 
 static sw_error_t
 _adpt_hppe_sfp_copper_phydriver_switch(a_uint32_t dev_id, a_uint32_t port_id,
-	a_uint32_t mode)
+	a_uint32_t port_mode)
 {
 	sw_error_t rv = SW_OK;
 
 	if (A_TRUE == hsl_port_phy_combo_capability_get(dev_id, port_id))
 		return rv;
 
-	if (mode == PORT_INTERFACE_MODE_MAX)
-		return rv;
-
-	rv = _adpt_hppe_port_phyaddr_update(dev_id, port_id, mode);
+	rv = _adpt_hppe_port_phyaddr_update(dev_id, port_id, port_mode);
 	SW_RTN_ON_ERROR(rv);
-	rv = hsl_phydriver_update(dev_id, port_id, mode);
+	rv = hsl_phydriver_update(dev_id, port_id);
 
 	return rv;
 }
@@ -2673,37 +2658,38 @@ adpt_hppe_port_mac_uniphy_phy_config(a_uint32_t dev_id, a_uint32_t mode_index,
 		mode_index, mode[mode_index], rv);
 	SW_RTN_ON_ERROR(rv);
 
-	/*configure the mac mux and phy mode*/
 	for(port_id = port_id_from; port_id <= port_id_end; port_id++)
 	{
-		rv = adpt_hppe_port_mux_mac_type_set(dev_id, port_id, mode[SSDK_UNIPHY_INSTANCE0],
-			mode[SSDK_UNIPHY_INSTANCE1], mode[SSDK_UNIPHY_INSTANCE2]);
-		SSDK_DEBUG("configure mac, port_id is %x,mode0:%x,mode1:%x,mode2:%x, rv:%x\n",
-			port_id, mode[SSDK_UNIPHY_INSTANCE0], mode[SSDK_UNIPHY_INSTANCE1],
-			mode[SSDK_UNIPHY_INSTANCE2], rv);
+		rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode);
 		SW_RTN_ON_ERROR(rv);
-		if (force_switch != A_FALSE)
-		{
-			rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode);
+		if (!(force_switch && (port_mode == PORT_INTERFACE_MODE_MAX))) {
+			/* configure mac mux */
+			rv = adpt_hppe_port_mux_mac_type_set(dev_id, port_id,
+					mode[SSDK_UNIPHY_INSTANCE0],
+					mode[SSDK_UNIPHY_INSTANCE1], mode[SSDK_UNIPHY_INSTANCE2]);
+			SSDK_DEBUG("configure mac, port_id %d, mode0 0x%x, mode1 0x%x, "
+					"mode2 0x%x, rv 0x%x\n", port_id,
+					mode[SSDK_UNIPHY_INSTANCE0], mode[SSDK_UNIPHY_INSTANCE1],
+					mode[SSDK_UNIPHY_INSTANCE2], rv);
 			SW_RTN_ON_ERROR(rv);
+		}
+		/* force switch phy driver and set phy mode */
+		if (force_switch) {
 			if (port_mode != PORT_INTERFACE_MODE_MAX) {
+				/* port5 psgmii copper and 10gbase-r sfp phy driver switch */
+				if (port_id == SSDK_PHYSICAL_PORT5) {
+					rv = _adpt_hppe_sfp_copper_phydriver_switch(dev_id,
+							port_id, port_mode);
+					SW_RTN_ON_ERROR(rv);
+				}
+				/* set phy mode */
 				rv = hsl_port_phy_mode_set(dev_id, port_id, port_mode);
 				SW_RTN_ON_ERROR(rv);
 				SSDK_DEBUG("port_id:%d is configured as port_mode:0x%x\n",
 					port_id, port_mode);
 			}
 		}
-	}
-	/*swith PHY driver if need*/
-	if(SSDK_PHYSICAL_PORT5 >= port_id_from && SSDK_PHYSICAL_PORT5 <= port_id_end)
-	{
-		rv = _adpt_hppe_sfp_copper_phydriver_switch(dev_id, SSDK_PHYSICAL_PORT5,
-			mode[SSDK_UNIPHY_INSTANCE1]);
-		SW_RTN_ON_ERROR(rv);
-	}
-	/*init port status for special ports to triger polling*/
-	for(port_id = port_id_from; port_id <= port_id_end; port_id++)
-	{
+		/* init port status to trigger polling */
 		qca_mac_port_status_init(dev_id, port_id);
 	}
 
@@ -4213,7 +4199,10 @@ adpt_hppe_port_interface_mode_switch(a_uint32_t dev_id, a_uint32_t port_id)
 	fal_port_interface_mode_t port_mode_old = PORT_INTERFACE_MODE_MAX;
 	fal_port_interface_mode_t port_mode_new = PORT_INTERFACE_MODE_MAX;
 
-	port_mode_old = ssdk_dt_get_port_mode(dev_id, port_id);
+	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &port_mode_old);
+	SW_RTN_ON_ERROR(rv);
+	if (port_mode_old != PORT_INTERFACE_MODE_MAX)
+		port_mode_old = ssdk_dt_get_port_mode(dev_id, port_id);
 	port_mode_new = port_mode_old;
 	rv = adpt_hppe_port_interface_mode_status_get(dev_id, port_id,
 				&port_mode_new);

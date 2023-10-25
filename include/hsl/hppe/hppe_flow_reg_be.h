@@ -1835,7 +1835,9 @@ union in_flow_ipv6_5tuple_tbl_u {
 /*[table] IN_FLOW_TBL*/
 #define IN_FLOW_TBL
 #define IN_FLOW_TBL_ADDRESS 0x40000
-#if defined(MPPE) || defined(CPPE)
+#if defined(MRPPE)
+#define IN_FLOW_TBL_NUM     4096
+#elif defined(MPPE) || defined(CPPE)
 #define IN_FLOW_TBL_NUM     2048
 #else
 #define IN_FLOW_TBL_NUM     4096

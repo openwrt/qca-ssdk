@@ -68,7 +68,8 @@ _get_mgmtctrl_ctrlpkt_profile_by_index(a_uint32_t dev_id, a_uint32_t index, fal_
 		ctrlpkt->protocol_types.mgt_na = (entry.bf.protocol_bitmap & (0x1 << 8))?1:0;
 		ctrlpkt->protocol_types.mgt_dhcp6 = (entry.bf.protocol_bitmap & (0x1 << 9))?1:0;
 #ifdef APPE
-		if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+		if(adpt_chip_type_get (dev_id) == CHIP_APPE ||
+			adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 		{
 			ctrlpkt->protocol_types.mgt_8023ah_oam =
 				(entry.bf.protocol_bitmap & (0x1 << 10))?1:0;
@@ -239,7 +240,8 @@ adpt_hppe_mgmtctrl_ctrlpkt_profile_add(a_uint32_t dev_id, fal_ctrlpkt_profile_t 
 	if (ctrlpkt->protocol_types.mgt_dhcp6)
 		entry.bf.protocol_bitmap |= (0x1 << 9);
 #ifdef APPE
-	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if (ctrlpkt->protocol_types.mgt_8023ah_oam)
 			entry.bf.protocol_bitmap |= (0x1 << 10);
@@ -357,7 +359,8 @@ sw_error_t adpt_hppe_ctrlpkt_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getfirst = adpt_hppe_mgmtctrl_ctrlpkt_profile_getfirst;
 	p_adpt_api->adpt_mgmtctrl_ctrlpkt_profile_getnext = adpt_hppe_mgmtctrl_ctrlpkt_profile_getnext;
 #ifdef APPE
-	if(adpt_chip_type_get (dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get (dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		p_adpt_api->adpt_mgmtctrl_vpgroup_set =
 			adpt_appe_mgmtctrl_vpgroup_set;

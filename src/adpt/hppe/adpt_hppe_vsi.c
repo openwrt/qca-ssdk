@@ -642,7 +642,8 @@ sw_error_t adpt_hppe_vsi_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_vsi_member_get = adpt_hppe_vsi_member_get;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		p_adpt_api->adpt_vsi_bridge_vsi_get = adpt_appe_vsi_bridge_vsi_get;
 		p_adpt_api->adpt_vsi_bridge_vsi_set = adpt_appe_vsi_bridge_vsi_set;
 		p_adpt_api->adpt_vsi_invalidvsi_ctrl_get = adpt_appe_vsi_invalidvsi_ctrl_get;

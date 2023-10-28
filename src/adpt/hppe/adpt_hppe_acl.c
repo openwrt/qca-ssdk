@@ -1831,7 +1831,8 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 		rule->dscp = hw_act->bf.dscp_tc;
 #if defined(CPPE) || defined(APPE)
 		if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-			adpt_chip_type_get(dev_id) == CHIP_APPE)
+			adpt_chip_type_get(dev_id) == CHIP_APPE ||
+			adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 		{
 			rule->dscp_mask = hw_act->bf.dscp_tc_mask;
 		}
@@ -1884,7 +1885,8 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 	}
 #if defined(CPPE) || defined(APPE)
 	if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE)
+		adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		rule->qos_res_prec = hw_act->bf.qos_res_prec;
 	}
@@ -2325,7 +2327,8 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		}
 	}
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
 		{
@@ -2347,7 +2350,8 @@ static sw_error_t _adpt_hppe_acl_rule_range_match(a_uint32_t dev_id, a_uint32_t 
 
 	rangecount = _adpt_hppe_acl_rule_range_count(dev_id, rule_id, rule_nr, rule);
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if(hw_list_index >= ADPT_ACL_HW_LIST_NUM)
 		{
@@ -3566,7 +3570,8 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 		hw_act->bf.dscp_tc = rule->dscp;
 #if defined(CPPE) || defined(APPE)
 		if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-			adpt_chip_type_get(dev_id) == CHIP_APPE)
+			adpt_chip_type_get(dev_id) == CHIP_APPE ||
+			adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 		{
 			hw_act->bf.dscp_tc_mask = rule->dscp_mask;
 		}
@@ -3620,7 +3625,8 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 	}
 #if defined(CPPE) || defined(APPE)
 	if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE)
+		adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		hw_act->bf.qos_res_prec = rule->qos_res_prec;
 	}
@@ -4302,7 +4308,8 @@ _adpt_hppe_acl_rule_type_map(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t r
 	}
 	_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
 
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 #if defined(APPE)
 		_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
@@ -4925,7 +4932,8 @@ sw_error_t
 adpt_ppe_acl_udf_profile_set(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type, a_uint32_t udf_idx,
 			fal_acl_udf_type_t udf_type, a_uint32_t offset)
 {
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 #if defined(APPE)
 		return adpt_appe_acl_udf_profile_set(dev_id, pkt_type, udf_idx, udf_type, offset);
@@ -4942,7 +4950,8 @@ sw_error_t
 adpt_ppe_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type, a_uint32_t udf_idx,
 			fal_acl_udf_type_t * udf_type, a_uint32_t * offset)
 {
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 #if defined(APPE)
 		return adpt_appe_acl_udf_profile_get(dev_id, pkt_type, udf_idx, udf_type, offset);
@@ -5017,7 +5026,8 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 
 	_adpt_hppe_acl_hw_list_init(dev_id, 0, ADPT_ACL_HW_LIST_NUM);
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		_adpt_hppe_acl_hw_list_init(dev_id, ADPT_ACL_HW_LIST_NUM,
 			ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM);
@@ -5035,7 +5045,8 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_acl_udf_profile_set = adpt_ppe_acl_udf_profile_set;
 	p_adpt_api->adpt_acl_udf_profile_get = adpt_ppe_acl_udf_profile_get;
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		p_adpt_api->adpt_acl_udf_profile_entry_add =
 				adpt_appe_acl_udf_profile_entry_add;

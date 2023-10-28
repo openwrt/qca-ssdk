@@ -82,7 +82,8 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	SW_RTN_ON_ERROR(hppe_eg_service_tbl_set(dev_id, servcode_index, &eg_service_tbl));
 
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_set(dev_id, servcode_index, entry));
 	}
@@ -123,7 +124,8 @@ sw_error_t adpt_hppe_servcode_config_get(a_uint32_t dev_id, a_uint32_t servcode_
 	entry->bypass_bitmap[2] |= eg_service_tbl.bf.tx_counting_en << 2;
 
 #if defined (APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_get(dev_id, servcode_index, entry));
 	}
@@ -164,7 +166,8 @@ sw_error_t adpt_hppe_servcode_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_servcode_loopcheck_en = adpt_hppe_servcode_loopcheck_en;
 	p_adpt_api->adpt_servcode_loopcheck_status_get = adpt_hppe_servcode_loopcheck_status_get;
 #if defined(MPPE)
-	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
+	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
+		adpt_ppe_type_get(dev_id) == MRPPE_TYPE)
 	{
 		p_adpt_api->adpt_port_servcode_set = adpt_mppe_port_servcode_set;
 		p_adpt_api->adpt_port_servcode_get = adpt_mppe_port_servcode_get;

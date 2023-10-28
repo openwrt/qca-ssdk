@@ -1394,7 +1394,8 @@ adpt_hppe_portvlan_member_update(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp
 	ADPT_DEV_ID_CHECK(dev_id);
 
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if(ADPT_IS_VPORT(port_id))
 		{
@@ -1424,7 +1425,8 @@ adpt_hppe_portvlan_member_get(a_uint32_t dev_id, fal_port_t port_id, fal_pbmp_t 
 	ADPT_DEV_ID_CHECK(dev_id);
 
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if(ADPT_IS_VPORT(port_id))
 		{
@@ -1779,7 +1781,8 @@ adpt_hppe_portvlan_member_add(a_uint32_t dev_id, fal_port_t port_id, fal_port_t 
 	ADPT_DEV_ID_CHECK(dev_id);
 
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if(ADPT_IS_VPORT(port_id))
 		{
@@ -1811,7 +1814,8 @@ adpt_hppe_portvlan_member_del(a_uint32_t dev_id, fal_port_t port_id, fal_port_t 
 	ADPT_DEV_ID_CHECK(dev_id);
 
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		if(ADPT_IS_VPORT(port_id))
 		{

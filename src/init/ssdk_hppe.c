@@ -82,7 +82,8 @@ sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 #if defined(APPE)
 	a_uint32_t cpu_code = 0;
 
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		while (cpu_code < APPE_CPU_CODE_CTRL_NUM) {
 			rv = fal_mgmtctrl_tunnel_decap_set(dev_id, cpu_code, A_TRUE);
 			SW_RTN_ON_ERROR(rv);

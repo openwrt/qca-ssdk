@@ -239,7 +239,8 @@ adpt_ppe_pppoe_session_table_add(a_uint32_t dev_id, fal_pppoe_session_t *session
 	sw_error_t rv = SW_OK;
 
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		rv = adpt_appe_pppoe_session_table_add(dev_id, session_tbl);
 	} else
 #endif
@@ -255,7 +256,8 @@ adpt_ppe_pppoe_session_table_del(a_uint32_t dev_id, fal_pppoe_session_t *session
 	sw_error_t rv = SW_OK;
 
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		rv = adpt_appe_pppoe_session_table_del(dev_id, session_tbl);
 	} else
 #endif
@@ -271,7 +273,8 @@ adpt_ppe_pppoe_session_table_get(a_uint32_t dev_id, fal_pppoe_session_t *session
 	sw_error_t rv = SW_OK;
 
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
 		rv = adpt_appe_pppoe_session_table_get(dev_id, session_tbl);
 	} else
 #endif

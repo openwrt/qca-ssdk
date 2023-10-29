@@ -292,7 +292,7 @@ hppe_port_cnt_get(
 		a_uint32_t index,
 		union port_cnt_u *value)
 {
-	if (index >= PORT_CNT_MAX_ENTRY)
+	if (index >= PORT_CNT_NUM)
 		return SW_OUT_OF_RANGE;
 	return hppe_reg_get(
 				dev_id,
@@ -307,7 +307,7 @@ hppe_port_reacted_cnt_get(
 		a_uint32_t index,
 		union port_reacted_cnt_u *value)
 {
-	if (index >= PORT_REACTED_CNT_MAX_ENTRY)
+	if (index >= PORT_REACTED_CNT_NUM)
 		return SW_OUT_OF_RANGE;
 	return hppe_reg_get(
 				dev_id,

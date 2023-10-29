@@ -520,11 +520,11 @@ adpt_hppe_debug_counter_set(a_uint32_t dev_id)
 	a_uint32_t i;
 
 	/* clear PRX DROP_CNT */
-	for (i = 0; i < DROP_CNT_MAX_ENTRY; i++)
+	for (i = 0; i < PPE_BM_PHY_PORT_OFFSET; i++)
 		hppe_drop_cnt_drop_cnt_set(dev_id, i, 0);
 
 	/* clear PRX DROP_PKT_STAT */
-	for (i = 0; i < DROP_PKT_STAT_MAX_ENTRY; i++) {
+	for (i = 0; i < DROP_STAT_NUM; i++) {
 		hppe_drop_stat_pkts_set(dev_id, i, 0);
 		hppe_drop_stat_bytes_set(dev_id, i, 0);
 	}
@@ -599,7 +599,7 @@ adpt_hppe_debug_prx_drop_cnt_get(a_uint32_t dev_id)
 
 	sign = tags = 0;
 	printk("%-35s", "PRX_DROP_CNT RX:");
-	for (i = 0; i < DROP_CNT_MAX_ENTRY; i++)
+	for (i = 0; i < PPE_BM_PHY_PORT_OFFSET; i++)
 	{
 		hppe_drop_cnt_drop_cnt_get(dev_id, i, &value);
 		if (value > 0)
@@ -626,7 +626,7 @@ adpt_hppe_debug_prx_drop_pkt_stat_get(a_uint32_t dev_id, a_bool_t show_type)
 
 	sign = tags = 0;
 	printk("%-35s", "PRX_DROP_PKT_STAT RX:");
-	for (i = 0; i < DROP_PKT_STAT_MAX_ENTRY; i++)
+	for (i = 0; i < DROP_STAT_NUM; i++)
 	{
 		if (show_type == A_FALSE)
 		{

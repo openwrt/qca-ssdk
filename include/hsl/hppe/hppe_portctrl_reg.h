@@ -861,7 +861,11 @@ union tdm_cfg_u {
 /*[table] DROP_STAT*/
 #define DROP_STAT
 #define DROP_STAT_ADDRESS 0x3000
+#if defined(MRPPE)
+#define DROP_STAT_NUM     38
+#else
 #define DROP_STAT_NUM     30
+#endif
 #define DROP_STAT_INC     0x10
 #define DROP_STAT_TYPE    REG_TYPE_RW
 #define DROP_STAT_DEFAULT 0x0
@@ -1152,7 +1156,12 @@ union lpi_cnt_u {
 /*[register] DROP_CNT*/
 #define DROP_CNT
 #define DROP_CNT_ADDRESS 0x24
+#if defined(MRPPE)
+#define DROP_CNT_NUM     16
+#else
 #define DROP_CNT_NUM     8
+#endif
+
 #define DROP_CNT_INC     0x4
 #define DROP_CNT_TYPE    REG_TYPE_RW
 #define DROP_CNT_DEFAULT 0x0

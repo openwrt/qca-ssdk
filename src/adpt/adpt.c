@@ -329,7 +329,8 @@ sw_error_t adpt_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capa
 
 #if defined(HPPE)
 	if (adpt_chip_type_get(dev_id) == CHIP_HPPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE)
+		adpt_chip_type_get(dev_id) == CHIP_APPE ||
+		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 		ppe_capacity->flow_caps = IN_FLOW_TBL_NUM;
 		ppe_capacity->host_caps = HOST_TBL_NUM;

@@ -1814,7 +1814,9 @@ union host_ipv4_mcast_tbl_u {
 /*[table] HOST_TBL*/
 #define HOST_TBL
 #define HOST_TBL_ADDRESS 0x20000
-#if defined(MPPE) || defined(CPPE)
+#if defined(MRPPE)
+#define HOST_TBL_NUM     6144
+#elif defined(MPPE) || defined(CPPE)
 #define HOST_TBL_NUM     768
 #else
 #define HOST_TBL_NUM     6144
@@ -1945,7 +1947,9 @@ union host_ipv6_tbl_u {
 /*[table] IN_NEXTHOP_TBL*/
 #define IN_NEXTHOP_TBL
 #define IN_NEXTHOP_TBL_ADDRESS 0x60000
-#if defined(MPPE) || defined(CPPE)
+#if defined(MRPPE)
+#define IN_NEXTHOP_TBL_NUM     2560
+#elif defined(MPPE) || defined(CPPE)
 #define IN_NEXTHOP_TBL_NUM     768
 #else
 #define IN_NEXTHOP_TBL_NUM     2560

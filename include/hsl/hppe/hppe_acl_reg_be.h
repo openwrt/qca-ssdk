@@ -255,7 +255,9 @@ union udf_ctrl_reg_u {
 /*[table] IPO_RULE_REG*/
 #define IPO_RULE_REG
 #define IPO_RULE_REG_ADDRESS 0x0
-#if defined(MPPE)
+#if defined(MRPPE)
+#define IPO_RULE_REG_NUM     512
+#elif defined(MPPE)
 #define IPO_RULE_REG_NUM     128
 #else
 #define IPO_RULE_REG_NUM     512
@@ -415,7 +417,9 @@ union ipo_rule_reg_u {
 /*[table] IPO_MASK_REG*/
 #define IPO_MASK_REG
 #define IPO_MASK_REG_ADDRESS 0x2000
-#if defined(MPPE)
+#if defined(MRPPE)
+#define IPO_MASK_REG_NUM     512
+#elif defined(MPPE)
 #define IPO_MASK_REG_NUM     128
 #else
 #define IPO_MASK_REG_NUM     512
@@ -443,7 +447,9 @@ union ipo_mask_reg_u {
 /*[register] RULE_EXT_1_REG*/
 #define RULE_EXT_1_REG
 #define RULE_EXT_1_REG_ADDRESS 0x4000
-#if defined(MPPE)
+#if defined(MRPPE)
+#define RULE_EXT_1_REG_NUM     64
+#elif defined(MPPE)
 #define RULE_EXT_1_REG_NUM     16
 #else
 #define RULE_EXT_1_REG_NUM     64
@@ -488,7 +494,9 @@ union rule_ext_1_reg_u {
 /*[register] RULE_EXT_2_REG*/
 #define RULE_EXT_2_REG
 #define RULE_EXT_2_REG_ADDRESS 0x4100
-#if defined(MPPE)
+#if defined(MRPPE)
+#define RULE_EXT_2_REG_NUM     64
+#elif defined(MPPE)
 #define RULE_EXT_2_REG_NUM     16
 #else
 #define RULE_EXT_2_REG_NUM     64
@@ -521,7 +529,9 @@ union rule_ext_2_reg_u {
 /*[register] RULE_EXT_4_REG*/
 #define RULE_EXT_4_REG
 #define RULE_EXT_4_REG_ADDRESS 0x4200
-#if defined(MPPE)
+#if defined(MRPPE)
+#define RULE_EXT_4_REG_NUM     64
+#elif defined(MPPE)
 #define RULE_EXT_4_REG_NUM     16
 #else
 #define RULE_EXT_4_REG_NUM     64
@@ -680,7 +690,9 @@ union ipo_glb_bypass_counter_reg_u {
 /*[table] IPO_CNT_TBL*/
 #define IPO_CNT_TBL
 #define IPO_CNT_TBL_ADDRESS 0x74000
-#if defined(MPPE)
+#if defined(MRPPE)
+#define IPO_CNT_TBL_NUM     512
+#elif defined(MPPE)
 #define IPO_CNT_TBL_NUM     128
 #else
 #define IPO_CNT_TBL_NUM     512
@@ -714,7 +726,9 @@ union ipo_cnt_tbl_u {
 /*[table] IPO_ACTION*/
 #define IPO_ACTION
 #define IPO_ACTION_ADDRESS 0x8000
-#if defined(MPPE)
+#if defined(MRPPE)
+#define IPO_ACTION_NUM     512
+#elif defined(MPPE)
 #define IPO_ACTION_NUM     128
 #else
 #define IPO_ACTION_NUM     512

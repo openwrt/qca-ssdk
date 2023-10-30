@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,22 +23,30 @@
 #ifndef _HPPE_ACL_H_
 #define _HPPE_ACL_H_
 
-#if defined(MPPE)
-#define IPO_RULE_REG_MAX_ENTRY	128
-#define IPO_MASK_REG_MAX_ENTRY	128
+#if defined(MRPPE)
+#define IPO_RULE_REG_MAX_ENTRY		512
+#define IPO_MASK_REG_MAX_ENTRY		512
+#define RULE_EXT_1_REG_MAX_ENTRY        64
+#define RULE_EXT_2_REG_MAX_ENTRY        64
+#define RULE_EXT_4_REG_MAX_ENTRY        64
+#define IPO_ACTION_MAX_ENTRY		512
+#define IPO_CNT_TBL_MAX_ENTRY		512
+#elif defined(MPPE)
+#define IPO_RULE_REG_MAX_ENTRY		128
+#define IPO_MASK_REG_MAX_ENTRY		128
 #define RULE_EXT_1_REG_MAX_ENTRY	16
 #define RULE_EXT_2_REG_MAX_ENTRY	16
 #define RULE_EXT_4_REG_MAX_ENTRY	16
-#define IPO_ACTION_MAX_ENTRY	128
-#define IPO_CNT_TBL_MAX_ENTRY	128
+#define IPO_ACTION_MAX_ENTRY		128
+#define IPO_CNT_TBL_MAX_ENTRY		128
 #else
-#define IPO_RULE_REG_MAX_ENTRY	512
-#define IPO_MASK_REG_MAX_ENTRY	512
+#define IPO_RULE_REG_MAX_ENTRY		512
+#define IPO_MASK_REG_MAX_ENTRY		512
 #define RULE_EXT_1_REG_MAX_ENTRY	64
 #define RULE_EXT_2_REG_MAX_ENTRY	64
 #define RULE_EXT_4_REG_MAX_ENTRY	64
-#define IPO_ACTION_MAX_ENTRY	512
-#define IPO_CNT_TBL_MAX_ENTRY	512
+#define IPO_ACTION_MAX_ENTRY		512
+#define IPO_CNT_TBL_MAX_ENTRY		512
 #endif
 
 sw_error_t

@@ -45,19 +45,21 @@
 #define ADPT_ACL_HPPE_IPV6_SIP2_RULE 11
 #define ADPT_ACL_HPPE_IPMISC_RULE 12
 
-#if defined(MPPE)
-#define ADPT_ACL_HW_LIST_NUM 16 /* hw list number */
+#if defined(MRPPE)
+#define ADPT_ACL_HW_LIST_NUM 64 /* hw list number */
+#elif defined(MPPE)
+#define ADPT_ACL_HW_LIST_NUM 16
 #else
 #define ADPT_ACL_HW_LIST_NUM 64
 #endif
 #define ADPT_ACL_ENTRY_NUM_PER_LIST 8 /* hw rule entries number per hw list */
 
-#if defined(APPE)
-#if defined(MPPE)
-#define ADPT_ACL_SW_LIST_NUM 256
-#else
+#if defined(MRPPE)
 #define ADPT_ACL_SW_LIST_NUM 1024
-#endif
+#elif defined(MPPE)
+#define ADPT_ACL_SW_LIST_NUM 256
+#elif defined(APPE)
+#define ADPT_ACL_SW_LIST_NUM 1024
 #else
 #define ADPT_ACL_SW_LIST_NUM 512
 #endif
@@ -1876,11 +1878,8 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 	{
 		FAL_ACTION_FLG_SET(rule->action_flg, FAL_ACL_ACTION_METADATA_EN);
 #if defined(MPPE)
-		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
-		{
-			rule->metadata_pri =
-				(hw_act->bf.metadata_pri_1<<3)|hw_act->bf.metadata_pri_0;
-		}
+		rule->metadata_pri =
+			(hw_act->bf.metadata_pri_1<<3)|hw_act->bf.metadata_pri_0;
 #endif
 	}
 #if defined(CPPE) || defined(APPE)
@@ -3616,11 +3615,8 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 	{
 		hw_act->bf.metadata_en = 1;
 #if defined(MPPE)
-		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
-		{
-			hw_act->bf.metadata_pri_0 = rule->metadata_pri&0x7;
-			hw_act->bf.metadata_pri_1 = (rule->metadata_pri>>3)&0x1;
-		}
+		hw_act->bf.metadata_pri_0 = rule->metadata_pri&0x7;
+		hw_act->bf.metadata_pri_1 = (rule->metadata_pri>>3)&0x1;
 #endif
 	}
 #if defined(CPPE) || defined(APPE)

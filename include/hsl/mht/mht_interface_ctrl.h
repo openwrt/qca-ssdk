@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -118,6 +118,7 @@
 #define MHT_UNIPHY_MMD_XPC_SPEED_100                                     0x2000
 #define MHT_UNIPHY_MMD_XPC_SPEED_10                                      0
 #define MHT_UNIPHY_MMD_TX_IPG_CHECK_DISABLE                              0x1
+#define MHT_UNIPHY_MMD_PHY_MODE_CTRL_EN                                  0x1
 
 typedef enum {
 	MHT_UNIPHY_MAC = MHT_UNIPHY_MMD1_SGMII_MAC_MODE,
@@ -132,11 +133,11 @@ a_bool_t mht_uniphy_mode_check(a_uint32_t dev_id, a_uint32_t uniphy_index,
 
 sw_error_t
 mht_uniphy_xpcs_autoneg_restart(a_uint32_t dev_id, a_uint32_t port_id);
-
+#if 0
 sw_error_t
 mht_uniphy_xpcs_speed_set(a_uint32_t dev_id, a_uint32_t port_id,
 	fal_port_speed_t speed);
-
+#endif
 sw_error_t
 mht_uniphy_uqxgmii_function_reset(a_uint32_t dev_id, a_uint32_t port_id);
 

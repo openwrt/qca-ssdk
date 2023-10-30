@@ -541,11 +541,12 @@ _qca8084_phy_uqxgmii_speed_fixup(a_uint32_t dev_id, a_uint32_t phy_addr,
 	SSDK_DEBUG("set gmii,xgmii clock to uniphy and gmii to ethphy\n");
 	rv = mht_port_speed_clock_set(dev_id, mht_port_id, new_speed);
 	PHY_RTN_ON_ERROR(rv);
+#if 0
 	/*set xpcs speed*/
 	SSDK_DEBUG("set xpcs speed\n");
 	rv = mht_uniphy_xpcs_speed_set(dev_id, mht_port_id, new_speed);
 	PHY_RTN_ON_ERROR(rv);
-
+#endif
 	/*GMII/XGMII clock and ETHPHY GMII clock enable/disable*/
 	SSDK_DEBUG("GMII/XGMII clock and ETHPHY GMII clock enable/disable\n");
 	if(link)

@@ -275,6 +275,7 @@ mht_uniphy_xpcs_soft_reset(a_uint32_t dev_id)
 	return rv;
 }
 
+#if 0
 sw_error_t
 mht_uniphy_xpcs_speed_set(a_uint32_t dev_id, a_uint32_t mht_port_id,
 	fal_port_speed_t speed)
@@ -305,7 +306,7 @@ mht_uniphy_xpcs_speed_set(a_uint32_t dev_id, a_uint32_t mht_port_id,
 
 	return rv;
 }
-
+#endif
 sw_error_t
 mht_uniphy_uqxgmii_function_reset(a_uint32_t dev_id, a_uint32_t mht_port_id)
 {
@@ -566,6 +567,11 @@ mht_interface_uqxgmii_mode_set(a_uint32_t dev_id)
 		rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
 			MHT_UNIPHY_MMD_MII_XAUI_MODE_CTRL, 0x1,
 			MHT_UNIPHY_MMD_TX_IPG_CHECK_DISABLE);
+		PHY_RTN_ON_ERROR (rv);
+
+		/*enable phy mode control to sync phy link information to xpcs*/
+		rv = mht_uniphy_xpcs_modify_port_mmd(dev_id, mht_port_id,
+			MHT_UNIPHY_MMD_MII_DIG_CTRL, BIT(0), MHT_UNIPHY_MMD_PHY_MODE_CTRL_EN);
 		PHY_RTN_ON_ERROR (rv);
 	}
 

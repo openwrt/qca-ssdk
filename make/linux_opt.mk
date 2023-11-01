@@ -518,6 +518,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 	    GCC_VERSION ?= $(shell echo "$(CONFIG_GCC_VERSION)" | sed 's/\([0-9]\)\([0-9]\)\([0-9]\)\([0-9]\)\([0-9]\)/\1.\3.\5/')
 	    SYS_INC += -I$(SYS_PATH) \
               -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/$(GCC_VERSION)/include/ \
+	      -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/12.3.0/include/ \
 	      -I$(TOOL_PATH)/../lib/gcc/$(TARGET_NAME)/7.5.0/include/ \
               -I$(TOOL_PATH)/../../lib/armv7a-vfp-neon-rdk-linux-gnueabi/gcc/arm-rdk-linux-gnueabi/4.8.4/include/ \
 	      -I$(TOOL_PATH)/../../lib/arm-rdk-linux-musleabi/gcc/arm-rdk-linux-musleabi/6.4.0/include/ \

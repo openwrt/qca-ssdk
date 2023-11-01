@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -882,6 +882,14 @@ extern "C" {
 #define SW_API_RSS_HASH_OFFSET		2400
 #define SW_API_RSS_HASH_CONFIG_SET	(0 + SW_API_RSS_HASH_OFFSET)
 #define SW_API_RSS_HASH_CONFIG_GET	(1 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_SECRET_KEY_SET		(2 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_SECRET_KEY_GET		(3 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_RSS_ALGM_SET		(4 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_RSS_ALGM_GET		(5 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_CONFIG_ADD			(6 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_CONFIG_DEL			(7 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_CONFIG_GETFIRST	(8 + SW_API_RSS_HASH_OFFSET)
+#define SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT		(9 + SW_API_RSS_HASH_OFFSET)
 
     /* Ctrlpkt Control */
 #define SW_API_CTRLPKT_OFFSET        2500

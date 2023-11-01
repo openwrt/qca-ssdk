@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -115,6 +115,90 @@ hppe_rss_hash_fin_ipv4_reg_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union rss_hash_fin_ipv4_reg_u *value);
+
+#if defined(MRPPE)
+#define TOEPLITZ_HASH_TYPE_SEL_0_MAX_ENTRY	12
+#define TOEPLITZ_HASH_TYPE_SEL_1_MAX_ENTRY	12
+#define TOEPLITZ_HASH_TYPE_TUPLE_MAX_ENTRY	12
+
+sw_error_t
+mrppe_toeplitz_secret_key_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_secret_key_u *value);
+
+sw_error_t
+mrppe_toeplitz_secret_key_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_secret_key_u *value);
+
+sw_error_t
+mrppe_rss_hash_type_sel_get(
+		a_uint32_t dev_id,
+		union rss_hash_type_sel_u *value);
+
+sw_error_t
+mrppe_rss_hash_type_sel_set(
+		a_uint32_t dev_id,
+		union rss_hash_type_sel_u *value);
+
+sw_error_t
+mrppe_toeplitz_hash_type_sel_0_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_hash_type_sel_0_u *value);
+
+sw_error_t
+mrppe_toeplitz_hash_type_sel_0_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_hash_type_sel_0_u *value);
+
+sw_error_t
+mrppe_toeplitz_hash_type_sel_1_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_hash_type_sel_1_u *value);
+
+sw_error_t
+mrppe_toeplitz_hash_type_sel_1_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_hash_type_sel_1_u *value);
+
+sw_error_t
+mrppe_toeplitz_hash_type_tuple_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_hash_type_tuple_u *value);
+
+sw_error_t
+mrppe_toeplitz_hash_type_tuple_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union toeplitz_hash_type_tuple_u *value);
+
+sw_error_t
+mrppe_rss_hash_type_sel_toeplitz_enable_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+mrppe_rss_hash_type_sel_toeplitz_enable_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+
+sw_error_t
+mrppe_rss_hash_type_sel_extract_bit_pos_get(
+		a_uint32_t dev_id,
+		unsigned int *value);
+
+sw_error_t
+mrppe_rss_hash_type_sel_extract_bit_pos_set(
+		a_uint32_t dev_id,
+		unsigned int value);
+#endif
 
 #if 0
 sw_error_t

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1454,6 +1454,23 @@ typedef sw_error_t (*adpt_port_athtag_tx_set_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_athtag_tx_cfg_t *cfg);
 typedef sw_error_t (*adpt_port_athtag_tx_get_func)(a_uint32_t dev_id,
 		fal_port_t port_id, fal_athtag_tx_cfg_t *cfg);
+
+/* toeplitz hash */
+typedef sw_error_t (*adpt_toeplitz_hash_secret_key_set_func)(a_uint32_t dev_id,
+		fal_toeplitz_secret_key_t *secret_key);
+typedef sw_error_t (*adpt_toeplitz_hash_secret_key_get_func)(a_uint32_t dev_id,
+		fal_toeplitz_secret_key_t *secret_key);
+typedef sw_error_t (*adpt_rsshash_algm_set_func)(a_uint32_t dev_id, fal_rss_hash_algm_t *rsshash_algm);
+typedef sw_error_t (*adpt_rsshash_algm_get_func)(a_uint32_t dev_id, fal_rss_hash_algm_t *rsshash_algm);
+typedef sw_error_t (*adpt_toeplitz_hash_config_add_func)(a_uint32_t dev_id,
+		fal_toeplitz_hash_config_t *toeplitz_cfg);
+typedef sw_error_t (*adpt_toeplitz_hash_config_del_func)(a_uint32_t dev_id,
+		fal_toeplitz_hash_config_t *toeplitz_cfg);
+typedef sw_error_t (*adpt_toeplitz_hash_config_getfirst_func)(a_uint32_t dev_id,
+		fal_toeplitz_hash_config_t *toeplitz_cfg);
+typedef sw_error_t (*adpt_toeplitz_hash_config_getnext_func)(a_uint32_t dev_id,
+		fal_toeplitz_hash_config_t *toeplitz_cfg);
+
 /* auto_insert_flag */
 typedef struct
 {
@@ -2153,6 +2170,15 @@ typedef struct
 	adpt_port_athtag_rx_get_func adpt_port_athtag_rx_get;
 	adpt_port_athtag_tx_set_func adpt_port_athtag_tx_set;
 	adpt_port_athtag_tx_get_func adpt_port_athtag_tx_get;
+	/* toeplitz hash */
+	adpt_toeplitz_hash_secret_key_set_func adpt_toeplitz_hash_secret_key_set;
+	adpt_toeplitz_hash_secret_key_get_func adpt_toeplitz_hash_secret_key_get;
+	adpt_rsshash_algm_set_func adpt_rsshash_algm_set;
+	adpt_rsshash_algm_get_func adpt_rsshash_algm_get;
+	adpt_toeplitz_hash_config_add_func adpt_toeplitz_hash_config_add;
+	adpt_toeplitz_hash_config_del_func adpt_toeplitz_hash_config_del;
+	adpt_toeplitz_hash_config_getfirst_func adpt_toeplitz_hash_config_getfirst;
+	adpt_toeplitz_hash_config_getnext_func adpt_toeplitz_hash_config_getnext;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

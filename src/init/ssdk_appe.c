@@ -562,15 +562,16 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 static sw_error_t
 qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 {
-	a_uint32_t i = 0, port_max = SSDK_PHYSICAL_PORT7, mac_type_org = 0, mac_type = 0;
+	a_uint32_t i = 0, mac_type_org = 0, mac_type = 0;
 	fal_port_cnt_cfg_t init_cnt_cfg = {0};
 	fal_port_eee_cfg_t port_eee_cfg = {0};
+	struct qca_phy_priv *priv = ssdk_phy_priv_data_get(dev_id);
+
+	SW_RTN_ON_NULL(priv);
 
 #if defined(MPPE)
 	if (adpt_chip_revision_get(dev_id) == MPPE_REVISION) {
-		port_max = SSDK_PHYSICAL_PORT3;
-
-		for(i = SSDK_PHYSICAL_PORT0; i < port_max; i++) {
+		for(i = SSDK_PHYSICAL_PORT0; i < priv->ports; i++) {
 			/* PTX buffer threshold need to be updated to 3 on MPPE
 			 * for fixing tunnel perfomance issue where MAPT inbound case,
 			 * only the buffer size >= 48 can be transmitted out.
@@ -583,7 +584,7 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 		}
 	}
 #endif
-	for(i = SSDK_PHYSICAL_PORT1; i < port_max; i++) {
+	for(i = SSDK_PHYSICAL_PORT1; i < priv->ports; i++) {
 		mac_type_org = qca_hppe_port_mac_type_get(dev_id, i);
 		for(mac_type = PORT_GMAC_TYPE; mac_type <= PORT_XGMAC_TYPE; mac_type++) {
 			qca_hppe_port_mac_type_set(dev_id, i, mac_type);
@@ -606,7 +607,7 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 	init_cnt_cfg.mc_tx_cnt_en = FAL_ENABLE;
 	init_cnt_cfg.tl_rx_cnt_en = FAL_ENABLE;
 	init_cnt_cfg.rx_cnt_en    = FAL_ENABLE;
-	for(i = SSDK_PHYSICAL_PORT0; i <= SSDK_PHYSICAL_PORT6; i++) {
+	for(i = SSDK_PHYSICAL_PORT0; i < priv->ports; i++) {
 		fal_port_cnt_cfg_set(dev_id, FAL_PORT_ID(FAL_PORT_TYPE_PPORT, i), &init_cnt_cfg);
 	}
 

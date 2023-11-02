@@ -42,13 +42,16 @@
 extern void adpt_hppe_gcc_port_speed_clock_set(a_uint32_t dev_id,
 				a_uint32_t port_id, fal_port_speed_t phy_speed);
 
-static a_uint32_t
+a_uint32_t
 adpt_hppe_port_get_by_uniphy(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		a_uint32_t channel)
 {
 	a_uint32_t ssdk_port = 0;
 
 	if (uniphy_index == SSDK_UNIPHY_INSTANCE0) {
+#ifdef MPPE
+		ssdk_port = SSDK_PHYSICAL_PORT1;
+#else
 		if (channel == SSDK_UNIPHY_CHANNEL0) {
 			ssdk_port = SSDK_PHYSICAL_PORT1;
 		} else if (channel == SSDK_UNIPHY_CHANNEL1) {
@@ -58,13 +61,42 @@ adpt_hppe_port_get_by_uniphy(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		} else if (channel == SSDK_UNIPHY_CHANNEL3) {
 			ssdk_port = SSDK_PHYSICAL_PORT4;
 		}
+#endif
 	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE1) {
-		ssdk_port = HPPE_UNIPHY1_PORT;
+#ifdef MPPE
+		ssdk_port = SSDK_PHYSICAL_PORT2;
+#else
+		ssdk_port = SSDK_PHYSICAL_PORT5;
+#endif
 	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE2) {
+#ifdef MRPPE
+		ssdk_port = SSDK_PHYSICAL_PORT3;
+#else
 		ssdk_port = SSDK_PHYSICAL_PORT6;
+#endif
 	}
 
 	return ssdk_port;
+}
+
+a_bool_t
+adpt_hppe_uniphy_usxgmii_port_check(a_uint32_t dev_id, a_uint32_t uniphy_index,
+		a_uint32_t port_id)
+{
+	return (port_id == adpt_hppe_port_get_by_uniphy(dev_id, uniphy_index,
+		SSDK_UNIPHY_CHANNEL0));
+}
+
+a_uint32_t
+adpt_ppe_uniphy_number_get(a_uint32_t dev_id)
+{
+#if defined(MPPE) || defined (CPPE)
+	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
+		adpt_ppe_type_get(dev_id) == CPPE_TYPE)
+		return (SSDK_UNIPHY_INSTANCE1+1);
+#endif
+
+	return (SSDK_UNIPHY_INSTANCE2+1);
 }
 
 sw_error_t
@@ -74,8 +106,7 @@ adpt_hppe_uniphy_usxgmii_status_get(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(sr_mii_ctrl);
 
-	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == HPPE_UNIPHY1_PORT) ||
-		(port_id == SSDK_PHYSICAL_PORT6)) {
+	if (adpt_hppe_uniphy_usxgmii_port_check(dev_id, uniphy_index, port_id)) {
 		hppe_sr_mii_ctrl_get(dev_id, uniphy_index, sr_mii_ctrl);
 	}
 #if defined(APPE)
@@ -104,8 +135,7 @@ adpt_hppe_uniphy_usxgmii_status_set(a_uint32_t dev_id, a_uint32_t uniphy_index,
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(sr_mii_ctrl);
 
-	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == HPPE_UNIPHY1_PORT) ||
-		(port_id == SSDK_PHYSICAL_PORT6)) {
+	if (adpt_hppe_uniphy_usxgmii_port_check(dev_id, uniphy_index, port_id)) {
 		hppe_sr_mii_ctrl_set(dev_id, uniphy_index, sr_mii_ctrl);
 	}
 #if defined(APPE)
@@ -135,8 +165,7 @@ adpt_hppe_uniphy_usxgmii_autoneg_status_get(a_uint32_t dev_id, a_uint32_t uniphy
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(vr_mii_an_intr_sts);
 
-	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == HPPE_UNIPHY1_PORT) ||
-		(port_id == SSDK_PHYSICAL_PORT6)) {
+	if (adpt_hppe_uniphy_usxgmii_port_check(dev_id, uniphy_index, port_id)) {
 		hppe_vr_mii_an_intr_sts_get(dev_id, uniphy_index, vr_mii_an_intr_sts);
 	}
 #if defined(APPE)
@@ -169,8 +198,7 @@ adpt_hppe_uniphy_usxgmii_autoneg_status_set(a_uint32_t dev_id, a_uint32_t uniphy
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(vr_mii_an_intr_sts);
 
-	if ((port_id == SSDK_PHYSICAL_PORT1) || (port_id == HPPE_UNIPHY1_PORT) ||
-		(port_id == SSDK_PHYSICAL_PORT6)) {
+	if (adpt_hppe_uniphy_usxgmii_port_check(dev_id, uniphy_index, port_id)) {
 		hppe_vr_mii_an_intr_sts_set(dev_id, uniphy_index, vr_mii_an_intr_sts);
 	}
 #if defined(APPE)
@@ -927,7 +955,8 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 
 	/* disable instance clock */
 	if (uniphy_index == SSDK_UNIPHY_INSTANCE0)
-		max_port = HPPE_UNIPHY0_PORT_MAX;
+		max_port = adpt_hppe_port_get_by_uniphy(dev_id, SSDK_UNIPHY_INSTANCE0,
+			SSDK_UNIPHY_CHANNEL4);
 	else
 		max_port = SSDK_PHYSICAL_PORT1;
 
@@ -1037,7 +1066,8 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 
 	/* enable instance clock */
 	if (uniphy_index == SSDK_UNIPHY_INSTANCE0)
-		max_port = HPPE_UNIPHY0_PORT_MAX;
+		max_port = adpt_hppe_port_get_by_uniphy (dev_id, SSDK_UNIPHY_INSTANCE0,
+			SSDK_UNIPHY_CHANNEL4);
 	else
 		max_port = SSDK_PHYSICAL_PORT1;
 
@@ -1054,7 +1084,7 @@ __adpt_hppe_uniphy_sgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index, a_
 	}
 #endif
 
-	return rv;
+	return SW_OK;
 }
 
 static sw_error_t
@@ -1360,7 +1390,8 @@ adpt_hppe_uniphy_mode_set(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode)
 	}
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
-	if (ssdk_uniphy_valid_check(dev_id, index, mode) == A_FALSE) {
+	if ((ssdk_uniphy_valid_check(dev_id, index, mode)) == A_FALSE &&
+		(ssdk_is_emulation(dev_id) == A_FALSE)) {
 		SSDK_INFO("ssdk doesn't support mode:%d in uniphy:%d on platform!\n",
 			mode, index);
 		return SW_OK;

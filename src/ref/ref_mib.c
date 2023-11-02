@@ -294,7 +294,8 @@ qca_ar8327_sw_get_port_mib(struct switch_dev *dev,
     if (port >= dev->ports)
         return -EINVAL;
 #ifdef HPPE
-    if ((priv->version == QCA_VER_HPPE || priv->version == QCA_VER_APPE) &&
+    if ((priv->version == QCA_VER_HPPE || priv->version == QCA_VER_APPE ||
+        priv->version == QCA_VER_MRPPE) &&
         qca_hppe_port_mac_type_get(priv->device_id, port) == PORT_XGMAC_TYPE)
     {
         qca_ar8327_sw_print_xgport_mib(dev, attr, val);

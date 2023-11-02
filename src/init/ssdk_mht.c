@@ -306,7 +306,6 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 			rv = mht_port_link_update(priv, port_id, phy_status);
 			SW_RTN_ON_ERROR(rv);
 			priv->port_old_link[port_id] = phy_status.link_status;
-			ssdk_port_link_notify(port_id, 0, 0, 0);
 #ifdef IN_FDB
 			/* flush all dynamic fdb of this port */
 			fal_fdb_del_by_port(priv->device_id, port_id, 0);
@@ -326,11 +325,16 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 			SW_RTN_ON_ERROR(rv);
 			/* save the current link status */
 			priv->port_old_link[port_id] = phy_status.link_status;
-			ssdk_port_link_notify(port_id, phy_status.link_status,
-					phy_status.speed, phy_status.duplex);
 		}
 		SSDK_DEBUG("mht port %d old link status is %d\n",
 				port_id, priv->port_old_link[port_id]);
+		if (phy_status.link_status != priv->port_old_link[port_id]) {
+			unsigned char link_notify_speed = 0;
+
+			link_notify_speed = ssdk_to_link_notify_speed(phy_status.speed);
+			ssdk_port_link_notify(port_id, phy_status.link_status,
+				link_notify_speed, phy_status.duplex);
+		}
 	}
 
 	return rv;

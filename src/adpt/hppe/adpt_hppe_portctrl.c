@@ -4310,8 +4310,6 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 				SSDK_DEBUG("Port %d the interface mode switched\n",
 						port_id);
 			}
-			ssdk_port_link_notify(port_id, phy_status.link_status,
-		 						phy_status.speed, phy_status.duplex);
 #ifdef IN_FDB
 			adpt_hppe_fdb_del_by_port(priv->device_id, port_id, !(FAL_FDB_DEL_STATIC));
 #endif
@@ -4434,12 +4432,17 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 			adpt_hppe_port_rxmac_status_set(priv->device_id, port_id, A_TRUE);
 			adpt_hppe_port_bridge_txmac_set(priv->device_id, port_id, A_TRUE);
 			priv->port_old_link[port_id - 1] = phy_status.link_status;
-			ssdk_port_link_notify(port_id, phy_status.link_status,
-		 						phy_status.speed, phy_status.duplex);
 		}
 		SSDK_DEBUG("polling task PPE port %d link status is %d and speed is %d\n",
 				port_id, priv->port_old_link[port_id - 1],
 				priv->port_old_speed[port_id - 1]);
+		if (phy_status.link_status != priv->port_old_link[port_id]) {
+			unsigned char link_notify_speed = 0;
+
+			link_notify_speed  = ssdk_to_link_notify_speed(phy_status.speed);
+			ssdk_port_link_notify(port_id, phy_status.link_status,
+				link_notify_speed, phy_status.duplex);
+		}
 	}
 	return 0;
 }

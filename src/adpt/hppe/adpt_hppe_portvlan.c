@@ -572,7 +572,8 @@ adpt_hppe_port_qinq_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 
 			vp_parsing_reg.bf.port_role = mode->ingress_port_role;
 #if defined(MPPE)
-			if(adpt_ppe_type_get(dev_id) == MPPE_TYPE) {
+			if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
+				adpt_ppe_type_get(dev_id) == MRPPE_TYPE) {
 				vp_parsing_reg.bf.src_port_sel =
 					mode->ingress_port_sel == FAL_QINQ_SEL_TNL_DECAP_SRC_VP ? 0 : 1;
 			}
@@ -598,7 +599,8 @@ adpt_hppe_port_qinq_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 
 			port_parsing_reg.bf.port_role = mode->ingress_port_role;
 #if defined(MPPE)
-			if(adpt_ppe_type_get(dev_id) == MPPE_TYPE) {
+			if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
+				adpt_ppe_type_get(dev_id) == MRPPE_TYPE) {
 				port_parsing_reg.bf.src_port_sel =
 					mode->ingress_port_sel == FAL_QINQ_SEL_TNL_DECAP_SRC_VP ? 0 : 1;
 			}
@@ -641,7 +643,8 @@ adpt_hppe_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 
 		mode->ingress_port_role = (fal_qinq_port_role_t)vp_parsing_reg.bf.port_role;
 #if defined(MPPE)
-		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE) {
+		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
+			adpt_ppe_type_get(dev_id) == MRPPE_TYPE) {
 			mode->ingress_port_sel =
 				vp_parsing_reg.bf.src_port_sel ? FAL_QINQ_SEL_ORG_SRC_PORT : FAL_QINQ_SEL_TNL_DECAP_SRC_VP;
 		}
@@ -661,7 +664,8 @@ adpt_hppe_port_qinq_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_qin
 
 		mode->ingress_port_role = (fal_qinq_port_role_t)port_parsing_reg.bf.port_role;
 #if defined(MPPE)
-		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE) {
+		if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
+			adpt_ppe_type_get(dev_id) == MRPPE_TYPE) {
 			mode->ingress_port_sel =
 				port_parsing_reg.bf.src_port_sel ? FAL_QINQ_SEL_ORG_SRC_PORT : FAL_QINQ_SEL_TNL_DECAP_SRC_VP;
 		}

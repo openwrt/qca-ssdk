@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,7 +27,16 @@
 #define IPR_UDF_PROFILE_BASE_MAX_ENTRY	8
 #define IPR_UDF_PROFILE_OFFSET_MAX_ENTRY	8
 
-#if defined(MPPE)
+#if defined(MRPPE)
+#define EG_IPO_EXT_TBL_MAX_ENTRY	1024
+#define PRE_IPO_RULE_REG_MAX_ENTRY	512
+#define PRE_IPO_MASK_REG_MAX_ENTRY	512
+#define PRE_IPO_RULE_EXT_1_MAX_ENTRY	64
+#define PRE_IPO_RULE_EXT_2_MAX_ENTRY	64
+#define PRE_IPO_RULE_EXT_4_MAX_ENTRY	64
+#define PRE_IPO_ACTION_MAX_ENTRY	512
+#define PRE_IPO_CNT_TBL_MAX_ENTRY	512
+#elif defined(MPPE)
 #define EG_IPO_EXT_TBL_MAX_ENTRY	256
 #define PRE_IPO_RULE_REG_MAX_ENTRY	128
 #define PRE_IPO_MASK_REG_MAX_ENTRY	128

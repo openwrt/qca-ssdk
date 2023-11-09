@@ -349,6 +349,8 @@ _get_fdb_table_entryindex_by_entry(a_uint32_t dev_id, fal_fdb_entry_t * entry,
 		return rv;
 	}
 
+	aos_udelay(1);
+
 	rv = _adpt_hppe_fdb_tbl_rd_op_rslt_data_reg_get(dev_id, &temp_entry);
 
 	rv = _adpt_hppe_fdb_tbl_rd_op_rslt_reg_get(dev_id, cmd_id, entry_index);
@@ -396,6 +398,8 @@ _get_fdb_table_entry_by_entryindex(a_uint32_t dev_id, fal_fdb_entry_t * entry,
 		aos_unlock_bh(&hppe_fdb_lock);
 		return rv;
 	}
+
+	aos_udelay(1);
 
 	rv = _adpt_hppe_fdb_tbl_rd_op_rslt_data_reg_get(dev_id, entry);
 	if (rv != SW_OK && rv != SW_NOT_FOUND)

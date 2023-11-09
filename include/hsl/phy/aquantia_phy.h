@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2017, The Linux Foundation. All rights reserved.
+ *
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -25,9 +28,6 @@ extern "C"
 #define PHY_ID_AQR405	0x03a1b4b0
 #define PHY_ID_AQR107	0x03a1b4e1
 
-#define AQUANTIA_MII_ADDR_C45  (1<<30)
-#define AQUANTIA_REG_ADDRESS(dev_ad, reg_num) (AQUANTIA_MII_ADDR_C45 |\
-			((dev_ad & 0x1f) << 16) | (reg_num & 0xFFFF))
 #define AQUANTIA_MMD_AUTONEG 0x7
 #define AQUANTIA_MMD_PHY_XS_REGISTERS 4
 #define AQUANTIA_MMD_GLOBAL_REGISTERS 0x1E
@@ -378,21 +378,12 @@ sw_error_t
    aquantia_phy_restart_autoneg (a_uint32_t dev_id, a_uint32_t phy_id);
 
 sw_error_t
-   aquantia_phy_enable_autoneg (a_uint32_t dev_id, a_uint32_t phy_id);
-
-a_bool_t
-   aquantia_phy_get_link_status (a_uint32_t dev_id, a_uint32_t phy_id);
-
-sw_error_t
    aquantia_phy_set_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
 				a_uint32_t autoneg);
 
 sw_error_t
    aquantia_phy_get_autoneg_adv (a_uint32_t dev_id, a_uint32_t phy_id,
 				a_uint32_t * autoneg);
-
-a_bool_t
-   aquantia_phy_autoneg_status (a_uint32_t dev_id, a_uint32_t phy_id);
 #ifndef IN_PORTCONTROL_MINI
 sw_error_t
    aquantia_phy_intr_mask_set (a_uint32_t dev_id, a_uint32_t phy_id,
@@ -403,7 +394,9 @@ sw_error_t
 			      a_uint32_t * intr_mask_flag);
 #endif
 int aquantia_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp);
-
+sw_error_t
+aquantia_phy_get_status(a_uint32_t dev_id, a_uint32_t phy_addr,
+	struct port_phy_status *phy_status);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

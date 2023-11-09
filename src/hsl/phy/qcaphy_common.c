@@ -229,7 +229,7 @@ qcaphy_autoneg_enable(a_uint32_t dev_id, a_uint32_t phy_addr)
 	return rv;
 }
 /*
- * @brief power off the phy
+ * @brief get the phy autoneg status
  * @param[in] dev_id device id
  * @param[in] phy_addr phy address
  * @return SW_OK or error code
@@ -783,7 +783,7 @@ qcaphy_set_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 		phy_data |= QCAPHY_EEE_ADV_1000M;
 	}
 	rv = hsl_phy_modify_mmd(dev_id, phy_addr, A_FALSE, QCAPHY_MMD7_NUM,
-		QCAPHY_MMD7_ADDR_8023AZ_EEE_CTRL, QCAPHY_EEE_MASK, phy_data);
+		QCAPHY_MMD7_8023AZ_EEE_CTRL, QCAPHY_EEE_MASK, phy_data);
 	PHY_RTN_ON_ERROR(rv);
 	return qcaphy_autoneg_restart(dev_id, phy_addr);
 }
@@ -803,7 +803,7 @@ qcaphy_get_eee_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	*adv = 0;
 	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
-		QCAPHY_MMD7_NUM, QCAPHY_MMD7_ADDR_8023AZ_EEE_CTRL);
+		QCAPHY_MMD7_NUM, QCAPHY_MMD7_8023AZ_EEE_CTRL);
 
 	if (phy_data & QCAPHY_EEE_ADV_100M) {
 		*adv |= FAL_PHY_EEE_100BASE_T;
@@ -829,7 +829,7 @@ qcaphy_get_eee_partner_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	*adv = 0;
 	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
-		QCAPHY_MMD7_NUM, QCAPHY_MMD7_ADDR_8023AZ_EEE_PARTNER);
+		QCAPHY_MMD7_NUM, QCAPHY_MMD7_8023AZ_EEE_PARTNER);
 
 	if (phy_data & QCAPHY_EEE_PARTNER_ADV_100M) {
 		*adv |= FAL_PHY_EEE_100BASE_T;
@@ -855,7 +855,7 @@ qcaphy_get_eee_cap(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	*cap = 0;
 	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
-		QCAPHY_MMD3_NUM, QCAPHY_MMD3_ADDR_8023AZ_EEE_CAPABILITY);
+		QCAPHY_MMD3_NUM, QCAPHY_MMD3_8023AZ_EEE_CAPABILITY);
 
 	if (phy_data & QCAPHY_EEE_CAPABILITY_100M) {
 		*cap |= FAL_PHY_EEE_100BASE_T;
@@ -882,7 +882,7 @@ qcaphy_get_eee_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 
 	*status = 0;
 	phy_data = hsl_phy_mmd_reg_read(dev_id, phy_addr, A_FALSE,
-		QCAPHY_MMD7_NUM, QCAPHY_MMD7_ADDR_8023AZ_EEE_STATUS);
+		QCAPHY_MMD7_NUM, QCAPHY_MMD7_8023AZ_EEE_STATUS);
 
 	if (phy_data & QCAPHY_EEE_STATUS_100M) {
 		*status |= FAL_PHY_EEE_100BASE_T;

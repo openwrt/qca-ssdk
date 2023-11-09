@@ -313,34 +313,147 @@ qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 	mutex_unlock(&bus->mdio_lock);
 }
 
-a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+static void qca_mii_reg_convert(a_uint32_t dev_id, a_uint32_t *reg)
 {
-	a_uint32_t val = 0xffffffff;
 	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	switch (chip_type) {
 		case CHIP_MHT:
-			val = qca_mht_mii_read(dev_id, reg);
+			*reg |= SSDK_SWITCH_REG_TYPE_QCA8386;
 			break;
 		default:
-			val = qca_ar8216_mii_read(dev_id, reg);
+			*reg |= SSDK_SWITCH_REG_TYPE_QCA8337;
 			break;
 	}
+}
+
+sw_error_t qca_mii_raw_read(struct mii_bus *bus, a_uint32_t reg, a_uint32_t *val)
+{
+	struct qca_mdio_data *mdio_priv = bus->priv;
+
+	if (mdio_priv && mdio_priv->sw_read) {
+		*val = mdio_priv->sw_read(bus, reg);
+		return SW_OK;
+	}
+
+	return SW_FAIL;
+}
+
+sw_error_t qca_mii_raw_write(struct mii_bus *bus, a_uint32_t reg, a_uint32_t val)
+{
+	struct qca_mdio_data *mdio_priv = bus->priv;
+
+	if (mdio_priv && mdio_priv->sw_write) {
+		mdio_priv->sw_write(bus, reg, val);
+		return SW_OK;
+	}
+
+	return SW_FAIL;
+}
+
+sw_error_t qca_mii_raw_update(struct mii_bus *bus, a_uint32_t reg,
+		a_uint32_t clear, a_uint32_t set)
+{
+	struct qca_mdio_data *mdio_priv = bus->priv;
+
+	if (mdio_priv && mdio_priv->sw_read && mdio_priv->sw_write) {
+		a_uint32_t val;
+
+		val = mdio_priv->sw_read(bus, reg);
+		val &= ~clear;
+		val |= set;
+		mdio_priv->sw_write(bus, reg, val);
+
+		return SW_OK;
+	}
+
+	return SW_FAIL;
+}
+
+a_uint32_t __qca_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+{
+	a_uint32_t val = 0xffffffff;
+	struct mii_bus *bus = NULL;
+
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	if (!bus)
+		return val;
+
+	qca_mii_reg_convert(dev_id, &reg);
+	qca_mii_raw_read(bus, reg, &val);
+	return val;
+}
+
+void __qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
+{
+	struct mii_bus *bus = NULL;
+
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	if (!bus)
+		return;
+
+	qca_mii_reg_convert(dev_id, &reg);
+	qca_mii_raw_write(bus, reg, val);
+}
+
+int __qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val)
+{
+	struct mii_bus *bus = NULL;
+
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	if (!bus)
+		return -1;
+
+	qca_mii_reg_convert(dev_id, &reg);
+	qca_mii_raw_update(bus, reg, mask, val);
+	return 0;
+}
+
+a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+{
+	a_uint32_t val = 0xffffffff;
+	struct mii_bus *bus = NULL;
+
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	if (!bus)
+		return val;
+
+	mutex_lock(&bus->mdio_lock);
+	qca_mii_reg_convert(dev_id, &reg);
+	qca_mii_raw_read(bus, reg, &val);
+	mutex_unlock(&bus->mdio_lock);
+
 	return val;
 }
 
 void qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
 {
-	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
+	struct mii_bus *bus = NULL;
 
-	switch (chip_type) {
-		case CHIP_MHT:
-			qca_mht_mii_write(dev_id, reg, val);
-			break;
-		default:
-			qca_ar8216_mii_write(dev_id, reg, val);
-			break;
-	}
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	if (!bus)
+		return;
+
+	mutex_lock(&bus->mdio_lock);
+	qca_mii_reg_convert(dev_id, &reg);
+	qca_mii_raw_write(bus, reg, val);
+	mutex_unlock(&bus->mdio_lock);
+}
+
+int qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val)
+{
+	struct mii_bus *bus = NULL;
+
+	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	if (!bus)
+		return -1;
+
+	mutex_lock(&bus->mdio_lock);
+	qca_mii_reg_convert(dev_id, &reg);
+	qca_mii_raw_update(bus, reg, mask, val);
+	mutex_unlock(&bus->mdio_lock);
+
+	return 0;
 }
 
 /*qca808x_start*/

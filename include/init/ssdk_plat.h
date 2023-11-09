@@ -43,6 +43,7 @@
 
 /*qca808x_start*/
 #include <linux/phy.h>
+#include <linux/bitfield.h>
 
 #ifndef BIT
 #define BIT(_n)                                      (1UL << (_n))
@@ -384,14 +385,21 @@ struct qca_phy_priv {
 /*qca808x_start*/
 };
 
+#define SSDK_SWITCH_REG_TYPE_MASK		GENMASK(31, 28)
+#define SSDK_SWITCH_REG_TYPE_QCA8337		FIELD_PREP(SSDK_SWITCH_REG_TYPE_MASK, 1)
+#define SSDK_SWITCH_REG_TYPE_QCA8386		FIELD_PREP(SSDK_SWITCH_REG_TYPE_MASK, 0)
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
 #define ETH_LDO_RDY_CNT		3
 struct qca_mdio_data{
 	void __iomem	*membase[2];
 	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
 	int clk_div;
+	bool force_c22;
 	struct gpio_descs *reset_gpios;
 	void (*preinit)(struct mii_bus *bus);
+	u32 (*sw_read)(struct mii_bus *bus, u32 reg);
+	void (*sw_write)(struct mii_bus *bus, u32 reg, u32 val);
 	struct clk *clk[];
 };
 #else
@@ -401,7 +409,10 @@ struct qca_mdio_data {
 	void __iomem *membase;
 	int phy_irq[PHY_MAX_ADDR];
 	int clk_div;
+	bool force_c22;
 	void (*preinit)(struct mii_bus *bus);
+	u32 (*sw_read)(struct mii_bus *bus, u32 reg);
+	void (*sw_write)(struct mii_bus *bus, u32 reg, u32 val);
 };
 #endif
 
@@ -440,10 +451,14 @@ qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 		reg##_##field##_BOFFSET, \
 		reg##_##field##_BLEN, value, val_len);
 
-a_uint32_t
-qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
-void
-qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
+void qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+int qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
+
+a_uint32_t __qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
+void __qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
+int __qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
+
 /*qca808x_start*/
 sw_error_t
 qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,

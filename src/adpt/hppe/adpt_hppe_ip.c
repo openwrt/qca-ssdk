@@ -70,17 +70,13 @@ a_uint8_t adpt_ppe_l3_mac_bitmap_alloc(a_uint32_t dev_id, fal_mac_addr_t mac_add
 	return mac_index;
 }
 
-a_uint8_t adpt_ppe_l3_mac_bitmap_free(a_uint32_t dev_id,
-		a_uint8_t mac_bitmap, fal_mac_addr_t mac_addr)
+a_uint32_t adpt_ppe_l3_mac_bitmap_free(a_uint32_t dev_id,
+		a_uint32_t mac_bitmap, fal_mac_addr_t mac_addr,
+		a_uint32_t *l3_mac_bitmap_del, bool free_all_mac)
 {
 	a_uint8_t mac_index = 0, bitmap_del = 0;
 	struct ppe_ip_intf_mac *mac_ints = NULL;
-	a_bool_t free_all_mac = A_FALSE;
 	struct ppe_ip_mac *ip_mac_p = &ppe_l3_mac_g[dev_id];
-
-	/* the parameter mac_addr is 0, release all mac address for the mac_bitmap */
-	if (is_zero_ether_addr(mac_addr.uc))
-		free_all_mac = A_TRUE;
 
 	spin_lock_bh(&ip_mac_p->lock);
 	while (mac_bitmap) {
@@ -88,6 +84,10 @@ a_uint8_t adpt_ppe_l3_mac_bitmap_free(a_uint32_t dev_id,
 			mac_ints = &ip_mac_p->intf_mac_entry[mac_index];
 			if (free_all_mac == A_TRUE ||
 					ether_addr_equal(mac_ints->mac.mac_addr.uc, mac_addr.uc)) {
+
+				/* for deleting mac bitmap value of L3 table */
+				*l3_mac_bitmap_del |= BIT(mac_index);
+
 				mac_ints->refcount--;
 				if (mac_ints->refcount == 0) {
 					eth_zero_addr(mac_ints->mac.mac_addr.uc);
@@ -107,6 +107,29 @@ a_uint8_t adpt_ppe_l3_mac_bitmap_free(a_uint32_t dev_id,
 
 	/* return the bit map of the released mac address */
 	return bitmap_del;
+}
+
+a_uint8_t adpt_ppe_l3_mac_addr_check(a_uint32_t dev_id, fal_mac_addr_t mac_addr)
+{
+	a_uint8_t mac_index = 0;
+	struct ppe_ip_intf_mac *mac_ints = NULL;
+	struct ppe_ip_mac *ip_mac_p = &ppe_l3_mac_g[dev_id];
+
+	spin_lock_bh(&ip_mac_p->lock);
+
+	while (mac_index < MY_MAC_TBL_NUM) {
+		mac_ints = &ip_mac_p->intf_mac_entry[mac_index];
+
+		if (mac_ints->mac.valid == A_TRUE &&
+				ether_addr_equal(mac_addr.uc, mac_ints->mac.mac_addr.uc)) {
+			break;
+		}
+
+		mac_index++;
+	}
+	spin_unlock_bh(&ip_mac_p->lock);
+
+	return mac_index;
 }
 
 void adpt_ppe_l3_mac_addr_get(a_uint32_t dev_id, a_uint8_t mac_bitmap, fal_mac_addr_t *mac_addr)
@@ -1626,8 +1649,14 @@ adpt_hppe_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_maca
 	adpt_ip_macaddr_convert(&mac_entry->mac_addr, &mac_0, &mac_1, A_TRUE);
 
 	if (mac_entry->direction == FAL_IP_INGRESS || mac_entry->direction == FAL_IP_BOTH) {
-		a_uint8_t mac_index = adpt_ppe_l3_mac_bitmap_alloc(dev_id, mac_entry->mac_addr);
+		a_uint8_t mac_index;
+		mac_index = adpt_ppe_l3_mac_addr_check(dev_id, mac_entry->mac_addr);
 
+		/* Adding the same mac on the same L3 interface */
+		if (mac_index < MY_MAC_TBL_NUM && (in_l3_if_tbl.bf.mac_bitmap & BIT(mac_index)))
+			return SW_ALREADY_EXIST;
+
+		mac_index = adpt_ppe_l3_mac_bitmap_alloc(dev_id, mac_entry->mac_addr);
 		if (mac_index < MY_MAC_TBL_NUM) {
 			/* update the my_mac_tbl for the valid mac_index */
 			union my_mac_tbl_u mymac;
@@ -1678,23 +1707,23 @@ adpt_hppe_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_maca
 	SW_RTN_ON_ERROR(rv);
 
 	if (mac_entry->direction == FAL_IP_INGRESS || mac_entry->direction == FAL_IP_BOTH) {
-		a_uint8_t mac_bitmap_del = 0;
+		a_uint32_t mac_bitmap_del = 0, l3_mac_bitmap_del = 0;
 		mac_bitmap_del = adpt_ppe_l3_mac_bitmap_free(dev_id,
-				in_l3_if_tbl.bf.mac_bitmap, mac_entry->mac_addr);
+				in_l3_if_tbl.bf.mac_bitmap, mac_entry->mac_addr,
+				&l3_mac_bitmap_del, false);
 
 		/* only delete the valid mac bit map */
 		mac_bitmap_del &= in_l3_if_tbl.bf.mac_bitmap;
+		l3_mac_bitmap_del &= in_l3_if_tbl.bf.mac_bitmap;
+
+		/* update the mac bit map of L3 intf table */
+		if (l3_mac_bitmap_del)
+			in_l3_if_tbl.bf.mac_bitmap &= ~l3_mac_bitmap_del;
+
 		if (mac_bitmap_del) {
 			union my_mac_tbl_u mymac;
 			a_uint8_t mac_index;
 			aos_mem_zero(&mymac, sizeof(mymac));
-
-			/* update the mac bit map of L3 intf table */
-			in_l3_if_tbl.bf.mac_bitmap &= ~mac_bitmap_del;
-
-			mymac.bf.valid = 0;
-			mymac.bf.mac_da_0 = 0;
-			mymac.bf.mac_da_1 = 0;
 
 			mac_index = 0;
 			while (mac_bitmap_del) {

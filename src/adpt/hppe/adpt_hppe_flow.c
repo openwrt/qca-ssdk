@@ -497,6 +497,13 @@ adpt_hppe_flow_entry_host_op_add(
 #endif
 		eg_treemap.bf.tree_id = flow_qos->tree_id;
 #if defined(APPE)
+#if defined(MRPPE)
+		if(flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE) {
+			eg_treemap.bf.tree_id |= (flow_qos->flow_cookie_ext&0xff)<<16;
+			eg_treemap.bf.flow_cookie_ext_0 = (flow_qos->flow_cookie_ext>>8)&0xff;
+			eg_treemap.bf.flow_cookie_ext_1 = (flow_qos->flow_cookie_ext>>16)&0xff;
+		}
+#endif
 		eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
 		eg_treemap.bf.wifi_qos = flow_qos->wifi_qos;
 #endif
@@ -797,6 +804,13 @@ adpt_hppe_flow_entry_host_op_get(
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
 		flow_qos->tree_id = eg_treemap.bf.tree_id;
 #if defined(APPE)
+#if defined(MRPPE)
+		if(eg_treemap.bf.type == FAL_FLOW_QOS_TYPE_COOKIE) {
+			flow_qos->flow_cookie_ext = (eg_treemap.bf.flow_cookie_ext_1<<16) | 
+										(eg_treemap.bf.flow_cookie_ext_0<<8) | 
+										((eg_treemap.bf.tree_id>>16)&0xff) ;
+		}
+#endif
 		flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
 		flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
 #endif
@@ -1442,6 +1456,13 @@ adpt_hppe_flow_entry_get(
 		rv = hppe_eg_flow_tree_map_tbl_get(dev_id, flow_entry->entry_id, &eg_treemap);
 		flow_qos->tree_id = eg_treemap.bf.tree_id;
 #if defined(APPE)
+#if defined(MRPPE)
+		if(eg_treemap.bf.type == FAL_FLOW_QOS_TYPE_COOKIE) {
+			flow_qos->flow_cookie_ext = (eg_treemap.bf.flow_cookie_ext_1<<16) | 
+										(eg_treemap.bf.flow_cookie_ext_0<<8) | 
+										((eg_treemap.bf.tree_id>>16)&0xff) ;
+		}
+#endif
 		flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
 		flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
 #endif
@@ -2167,6 +2188,13 @@ adpt_hppe_flow_entry_add(
 #endif
 		eg_treemap.bf.tree_id = flow_qos->tree_id;
 #if defined(APPE)
+#if defined(MRPPE)
+		if(flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE) {
+			eg_treemap.bf.tree_id |= (flow_qos->flow_cookie_ext&0xff)<<16;
+			eg_treemap.bf.flow_cookie_ext_0 = (flow_qos->flow_cookie_ext>>8)&0xff;
+			eg_treemap.bf.flow_cookie_ext_1 = (flow_qos->flow_cookie_ext>>16)&0xff;
+		}
+#endif
 		eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
 		eg_treemap.bf.wifi_qos = flow_qos->wifi_qos;
 #endif
@@ -2286,6 +2314,13 @@ adpt_hppe_flow_qos_set(a_uint32_t dev_id, a_uint32_t flow_index, fal_flow_qos_t 
 #endif
 	eg_treemap.bf.tree_id = flow_qos->tree_id;
 #if defined(APPE)
+#if defined(MRPPE)
+	if(flow_qos->qos_type == FAL_FLOW_QOS_TYPE_COOKIE) {
+		eg_treemap.bf.tree_id |= (flow_qos->flow_cookie_ext&0xff)<<16;
+		eg_treemap.bf.flow_cookie_ext_0 = (flow_qos->flow_cookie_ext>>8)&0xff;
+		eg_treemap.bf.flow_cookie_ext_1 = (flow_qos->flow_cookie_ext>>16)&0xff;
+	}
+#endif
 	eg_treemap.bf.wifi_qos_flag = flow_qos->wifi_qos_en;
 	eg_treemap.bf.wifi_qos = flow_qos->wifi_qos;
 #endif
@@ -2313,6 +2348,14 @@ adpt_hppe_flow_qos_get(a_uint32_t dev_id, a_uint32_t flow_index, fal_flow_qos_t 
 
 	flow_qos->tree_id = eg_treemap.bf.tree_id;
 #if defined(APPE)
+#if defined(MRPPE)
+	if(eg_treemap.bf.type == FAL_FLOW_QOS_TYPE_COOKIE) {
+		flow_qos->flow_cookie_ext = (eg_treemap.bf.flow_cookie_ext_1<<16) | 
+									(eg_treemap.bf.flow_cookie_ext_0<<8) | 
+									((eg_treemap.bf.tree_id>>16)&0xff) ;
+	}
+
+#endif
 	flow_qos->wifi_qos_en = eg_treemap.bf.wifi_qos_flag;
 	flow_qos->wifi_qos = eg_treemap.bf.wifi_qos;
 #endif

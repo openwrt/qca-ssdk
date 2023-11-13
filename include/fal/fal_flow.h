@@ -75,6 +75,7 @@ typedef enum {
 #define FAL_FLOW_QOS_TYPE_COOKIE	1
 typedef struct {
 	a_uint32_t tree_id; /*for qos for flow cookie */
+	a_uint32_t flow_cookie_ext; /* flow_cookie_ext, added for ipq54xx */
 	a_bool_t wifi_qos_en; /* enable wifi qos or not, added for ipq95xx */
 	a_uint32_t wifi_qos; /* wifi qos value, added for ipq95xx */
 	a_uint8_t qos_type; /* wifi qos value, added for ipq53xx */

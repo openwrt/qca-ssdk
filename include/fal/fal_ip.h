@@ -269,6 +269,8 @@ typedef struct {
 	a_uint16_t ip6_mru; /* IPv6 Maximum Receive Unit, added for ipq95xx*/
 	a_uint16_t ip6_mtu; /* IPv6 Maximum Transmission Unit, added for ipq95xx*/
 	a_uint16_t vpn_id; /* vpn id, added for ipq95xx */
+	fal_mac_addr_t in_mac_addr; /* MAC address for routing decision, added for ipq54xx */
+	a_bool_t in_mac_valid; /* MAC address valid or not, added for ipq54xx */
 } fal_intf_entry_t;
 
 typedef enum

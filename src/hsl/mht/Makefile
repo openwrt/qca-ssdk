@@ -25,10 +25,6 @@ ifeq (TRUE, $(IN_INTERFACECONTROL))
 	SRC_LIST += mht_interface_ctrl.c
 endif
 
-ifeq (TRUE, $(IN_LED))
-	SRC_LIST += mht_led.c
-endif
-
 ifeq (, $(findstring MHT, $(SUPPORT_CHIP)))
 	SRC_LIST=
 endif

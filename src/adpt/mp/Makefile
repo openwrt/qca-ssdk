@@ -17,10 +17,6 @@ ifeq (TRUE, $(IN_UNIPHY))
   SRC_LIST += adpt_mp_uniphy.c
 endif
 
-ifeq (TRUE, $(IN_LED))
-  SRC_LIST += adpt_mp_led.c
-endif
-
 ifeq (, $(filter MP, $(SUPPORT_CHIP)))
   SRC_LIST=
 endif

@@ -1,15 +1,18 @@
 /*
  * Copyright (c) 2012, 2016-2017,  The Linux Foundation. All rights reserved.
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "sw.h"
@@ -504,6 +507,38 @@ qca_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *speed_stat
 
 /* Initialize notifier list for QCA SSDK */
 static BLOCKING_NOTIFIER_HEAD(ssdk_port_link_notifier_list);
+
+unsigned char
+ssdk_to_link_notify_speed(fal_port_speed_t speed)
+{
+	unsigned char link_notify_speed = 0;
+
+	switch(speed) {
+		case FAL_SPEED_10:
+			link_notify_speed = 0;
+			break;
+		case FAL_SPEED_100:
+			link_notify_speed = 1;
+			break;
+		case FAL_SPEED_1000:
+			link_notify_speed = 2;
+			break;
+		case FAL_SPEED_2500:
+			link_notify_speed = 3;
+			break;
+		case FAL_SPEED_5000:
+			link_notify_speed = 4;
+			break;
+		case FAL_SPEED_10000:
+			link_notify_speed = 5;
+			break;
+		default:
+			link_notify_speed = 0xff;
+			break;
+	}
+
+	return link_notify_speed;
+}
 
 int ssdk_port_link_notify(unsigned char port_id,
             unsigned char link, unsigned char speed, unsigned char duplex)

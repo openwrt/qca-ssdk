@@ -1256,6 +1256,55 @@ hppe_drop_stat_pkts_set(
 		a_uint32_t index,
 		a_uint32_t value);
 
+#ifdef MRPPE
+sw_error_t
+mrppe_lpi_port_enable_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_port_enable_u *value);
+
+sw_error_t
+mrppe_lpi_port_enable_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_port_enable_u *value);
+
+sw_error_t
+mrppe_lpi_wakeup_timer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_port_wakeup_timer_u *value);
+
+sw_error_t
+mrppe_lpi_wakeup_timer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_port_wakeup_timer_u *value);
+
+sw_error_t
+mrppe_lpi_sleep_timer_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_port_sleep_timer_u *value);
+
+sw_error_t
+mrppe_lpi_sleep_timer_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_port_sleep_timer_u *value);
+
+sw_error_t
+mrppe_lpi_1us_cnt_get(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_1us_cnt_u *value);
+
+sw_error_t
+mrppe_lpi_1us_cnt_set(
+		a_uint32_t dev_id,
+		a_uint32_t index,
+		union lpi_1us_cnt_u *value);
+#else
 sw_error_t
 hppe_lpi_enable_get(
 		a_uint32_t dev_id,
@@ -1315,7 +1364,7 @@ hppe_lpi_cnt_set(
 		a_uint32_t dev_id,
 		a_uint32_t index,
 		union lpi_cnt_u *value);
-
+#endif
 sw_error_t
 hppe_drop_cnt_get(
 		a_uint32_t dev_id,

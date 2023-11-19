@@ -565,7 +565,7 @@ static sw_data_type_t sw_data_type[] =
     SW_TYPE_DEF(SW_INT16, NULL, NULL),
     SW_TYPE_DEF(SW_UINT32, cmd_data_check_uint32, NULL),
     SW_TYPE_DEF(SW_INT32, NULL, NULL),
-    SW_TYPE_DEF(SW_UINT64, cmd_data_check_uint64, NULL),
+    SW_TYPE_DEF(SW_UINT64, (param_check_t)cmd_data_check_uint64, NULL),
     SW_TYPE_DEF(SW_INT64, NULL, NULL),
 #ifdef IN_PORTCONTROL
     SW_TYPE_DEF(SW_DUPLEX, cmd_data_check_duplex, NULL),
@@ -1064,7 +1064,7 @@ cmd_data_check_uint8(char *cmd_str, a_uint32_t *arg_val, a_uint32_t size)
 }
 
 sw_error_t
-cmd_data_check_uint64(char *cmd_str, a_uint32_t * arg_val, a_uint32_t size)
+cmd_data_check_uint64(char *cmd_str, a_uint64_t * arg_val, a_uint32_t size)
 {
     if (cmd_str == NULL)
         return SW_BAD_PARAM;

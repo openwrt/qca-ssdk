@@ -177,8 +177,11 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 				&reg_field);
 		SW_RTN_ON_ERROR (rv);
 	} else if (port_id == SSDK_PHYSICAL_PORT2) {
-		/*mac1 port2 as 1G sfp mode*/
 		rv = hppe_port_phy_status_0_port2_phy_status_get(dev_id,
+				&reg_field);
+		SW_RTN_ON_ERROR (rv);
+	} else if (port_id == SSDK_PHYSICAL_PORT3) {
+		rv = hppe_port_phy_status_0_port3_phy_status_get(dev_id,
 				&reg_field);
 		SW_RTN_ON_ERROR (rv);
 	} else if (port_id == SSDK_PHYSICAL_PORT6) {

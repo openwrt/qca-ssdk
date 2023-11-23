@@ -461,8 +461,8 @@ mpge_phy_dac_set(a_uint32_t dev_id, a_uint32_t phy_addr, phy_dac_t phy_dac)
 	{
 		SSDK_INFO("phy edac is set as 0x%x\n", phy_dac.edac);
 		/*set edac value*/
-		rv = hsl_phy_modify_mmd(dev_id, phy_addr, A_TRUE, MPGE_PHY_MMD1_NUM,
-			MPGE_PHY_DEBUG_EDAC, BITS(8,8), PHY_DAC(phy_dac.edac));
+		rv = hsl_phy_modify_debug(dev_id, phy_addr, MPGE_PHY_DEBUG_EDAC,
+			BITS(8,8), PHY_DAC(phy_dac.edac));
 		PHY_RTN_ON_ERROR(rv);
 	}
 

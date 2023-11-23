@@ -25,11 +25,6 @@
 /*[table] QOS_MAPPING_TBL*/
 #define QOS_MAPPING_TBL
 #define QOS_MAPPING_TBL_ADDRESS 0x20000
-#if defined(APPE)
-#define QOS_MAPPING_TBL_NUM     4640
-#else
-#define QOS_MAPPING_TBL_NUM     2592
-#endif
 #define QOS_MAPPING_TBL_INC     0x10
 #define QOS_MAPPING_TBL_TYPE    REG_TYPE_RW
 #define QOS_MAPPING_TBL_DEFAULT 0x0
@@ -107,26 +102,30 @@
 #endif
 
 struct qos_mapping_tbl {
-#if defined(MPPE)
-	a_uint32_t  _reserved0:22;
-	a_uint32_t  flow_policy_id:7;
-	a_uint32_t  flow_policy_valid:1;
+#if defined(MRPPE)
+	a_uint32_t	_reserved0:20;
+	a_uint32_t	flow_policy_id:9;
+	a_uint32_t	flow_policy_valid:1;
+#elif defined(MPPE)
+	a_uint32_t	_reserved0:22;
+	a_uint32_t	flow_policy_id:7;
+	a_uint32_t	flow_policy_valid:1;
 #else
-	a_uint32_t  _reserved0:30;
+	a_uint32_t	_reserved0:30;
 #endif
-        a_uint32_t  qos_res_prec_1:2;
+	a_uint32_t  qos_res_prec_1:2;
 	a_uint32_t  qos_res_prec_0:1;
-        a_uint32_t  int_dp:2;
-        a_uint32_t  int_dp_en:1;
-        a_uint32_t  int_pri:4;
-        a_uint32_t  int_pri_en:1;
-        a_uint32_t  int_dei:1;
-        a_uint32_t  int_dei_en:1;
-        a_uint32_t  int_pcp:3;
-        a_uint32_t  int_pcp_en:1;
-        a_uint32_t  int_dscp_en:1;
-        a_uint32_t  dscp_tc_mask:8;
-        a_uint32_t  int_dscp_tc:8;
+	a_uint32_t  int_dp:2;
+	a_uint32_t  int_dp_en:1;
+	a_uint32_t  int_pri:4;
+	a_uint32_t  int_pri_en:1;
+	a_uint32_t  int_dei:1;
+	a_uint32_t  int_dei_en:1;
+	a_uint32_t  int_pcp:3;
+	a_uint32_t  int_pcp_en:1;
+	a_uint32_t  int_dscp_en:1;
+	a_uint32_t  dscp_tc_mask:8;
+	a_uint32_t  int_dscp_tc:8;
 };
 
 union qos_mapping_tbl_u {

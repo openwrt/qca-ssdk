@@ -28,11 +28,6 @@
 /*[table] QOS_MAPPING_TBL*/
 #define QOS_MAPPING_TBL
 #define QOS_MAPPING_TBL_ADDRESS 0x20000
-#if defined(APPE)
-#define QOS_MAPPING_TBL_NUM     4640
-#else
-#define QOS_MAPPING_TBL_NUM     2592
-#endif
 #define QOS_MAPPING_TBL_INC     0x10
 #define QOS_MAPPING_TBL_TYPE    REG_TYPE_RW
 #define QOS_MAPPING_TBL_DEFAULT 0x0
@@ -123,10 +118,14 @@ struct qos_mapping_tbl {
 	a_uint32_t  int_dp:2;
 	a_uint32_t  qos_res_prec_0:1;
 	a_uint32_t  qos_res_prec_1:2;
-#if defined(MPPE)
+#if defined(MRPPE)
 	a_uint32_t  flow_policy_valid:1;
-	a_uint32_t  flow_policy_id:7;
-	a_uint32_t  _reserved0:22;
+	a_uint32_t  flow_policy_id:9;
+	a_uint32_t  _reserved0:20;
+#elif defined(MPPE)
+	a_uint32_t	flow_policy_valid:1;
+	a_uint32_t	flow_policy_id:7;
+	a_uint32_t	_reserved0:22;
 #else
 	a_uint32_t  _reserved0:30;
 #endif

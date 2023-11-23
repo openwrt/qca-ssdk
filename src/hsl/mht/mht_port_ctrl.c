@@ -1452,6 +1452,11 @@ mht_port_link_update(struct qca_phy_priv *priv, a_uint32_t port_id,
 		rv = mht_port_interface_mode_switch(priv->device_id, port_id);
 		SW_RTN_ON_ERROR (rv);
 	}
+	if (phy_status.link_status == PORT_LINK_DOWN) {
+		/* configure speed to 1G to avoid qm issue */
+		phy_status.speed = FAL_SPEED_1000;
+		phy_status.duplex = FAL_FULL_DUPLEX;
+	}
 	/* configure gcc uniphy and mac speed frequency*/
 	rv = mht_port_speed_clock_set(priv->device_id, port_id, phy_status.speed);
 	SW_RTN_ON_ERROR (rv);

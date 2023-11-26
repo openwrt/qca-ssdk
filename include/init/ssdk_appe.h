@@ -43,6 +43,7 @@ sw_error_t qca_appe_hw_init(a_uint32_t dev_id);
 #define MPPE_POLICER_TAIL                   127
 #define APPE_ACL_POLICER_CFG_MAX            512
 #define MPPE_ACL_POLICER_CFG_MAX            128
+#define MRPPE_POLICER_TIMESLOT_DFT          375*2
 
 #ifdef __cplusplus
 }

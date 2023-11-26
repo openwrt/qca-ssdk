@@ -2131,7 +2131,25 @@ union in_flow_ipv6_3tuple_tbl_u {
 	#define EG_FLOW_TREE_MAP_TBL_TREE_ID_OFFSET  0
 	#define EG_FLOW_TREE_MAP_TBL_TREE_ID_LEN     24
 	#define EG_FLOW_TREE_MAP_TBL_TREE_ID_DEFAULT 0x0
+
 #if defined(APPE)
+#if defined(MRPPE)
+	/*[field] FLOW_COOKIE_EXT*/
+	#define EG_FLOW_TREE_MAP_TBL_FLOW_COOKIE_EXT
+	#define EG_FLOW_TREE_MAP_TBL_FLOW_COOKIE_EXT_OFFSET  24
+	#define EG_FLOW_TREE_MAP_TBL_FLOW_COOKIE_EXT_LEN	 24
+	#define EG_FLOW_TREE_MAP_TBL_FLOW_COOKIE_EXT_DEFAULT 0x0
+	/*[field] WIFI_QOS*/
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_OFFSET  48
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_LEN	  8
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_DEFAULT 0x0
+	/*[field] WIFI_QOS_FLAG*/
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_FLAG
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_FLAG_OFFSET  56
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_FLAG_LEN	   1
+	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_FLAG_DEFAULT 0x0
+#else
 	/*[field] WIFI_QOS*/
 	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS
 	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_OFFSET  24
@@ -2143,10 +2161,19 @@ union in_flow_ipv6_3tuple_tbl_u {
 	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_FLAG_LEN     1
 	#define EG_FLOW_TREE_MAP_TBL_WIFI_QOS_FLAG_DEFAULT 0x0
 #endif
+#endif
 
 struct eg_flow_tree_map_tbl {
-	a_uint32_t  tree_id:24;
+	a_uint32_t  tree_id:24;//TYPE==1 flow_cookie 16bits + flow_cookie_ext:8bits
 #if defined(APPE)
+#if defined(MRPPE)
+	a_uint32_t	flow_cookie_ext_0:8;
+	a_uint32_t	flow_cookie_ext_1:8;
+	a_uint32_t  wifi_qos:8;
+	a_uint32_t  wifi_qos_flag:1;
+	a_uint32_t  type:2;
+	a_uint32_t  _reserved0:13;
+#else
 	a_uint32_t  wifi_qos:8;
 	a_uint32_t  wifi_qos_flag:1;
 #if defined(MPPE)
@@ -2154,6 +2181,7 @@ struct eg_flow_tree_map_tbl {
 	a_uint32_t  _reserved0:29;
 #else
 	a_uint32_t  _reserved0:31;
+#endif
 #endif
 #else
 	a_uint32_t  _reserved0:8;

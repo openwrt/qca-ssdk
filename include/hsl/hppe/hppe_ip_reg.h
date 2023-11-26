@@ -1457,7 +1457,10 @@ union l3_vp_port_tbl_u {
 
 /*[table] IN_L3_IF_TBL*/
 #define IN_L3_IF_TBL
-#if defined(APPE)
+#if defined(MRPPE)
+#define IN_L3_IF_TBL_ADDRESS 0x6000
+#define IN_L3_IF_TBL_INC     0x20
+#elif defined(APPE)
 #define IN_L3_IF_TBL_ADDRESS 0x6000
 #define IN_L3_IF_TBL_INC     0x10
 #else
@@ -1544,6 +1547,18 @@ union l3_vp_port_tbl_u {
 	#define IN_L3_IF_TBL_UDP_CSM0_CMD_LEN     2
 	#define IN_L3_IF_TBL_UDP_CSM0_CMD_DEFAULT 0x0
 #endif
+#if defined(MRPPE)
+	/*[field] MAC_DA*/
+	#define IN_L3_IF_TBL_MAC_DA
+	#define IN_L3_IF_TBL_MAC_DA_OFFSET	80
+	#define IN_L3_IF_TBL_MAC_DA_LEN   48
+	#define IN_L3_IF_TBL_MAC_DA_DEFAULT 0x0
+	/*[field] MAC_VALID*/
+	#define IN_L3_IF_TBL_MAC_VALID
+	#define IN_L3_IF_TBL_MAC_VALID_OFFSET  128
+	#define IN_L3_IF_TBL_MAC_VALID_LEN	  1
+	#define IN_L3_IF_TBL_MAC_VALID_DEFAULT 0x0
+#endif
 
 struct in_l3_if_tbl {
 	a_uint32_t  mru:14;
@@ -1556,7 +1571,17 @@ struct in_l3_if_tbl {
 	a_uint32_t  ttl_exceed_de_acce:1;
 	a_uint32_t  mac_bitmap:8;
 	a_uint32_t  pppoe_en:1;
-#if defined(APPE)
+#if defined(MRPPE)
+	a_uint32_t	dmac_check_dis:1;
+	a_uint32_t	vpn_id:5;
+	a_uint32_t	mru_ipv6:14;
+	a_uint32_t	mtu_ipv6:14;
+	a_uint32_t	udp_csm0_cmd:2;
+	a_uint32_t	mac_da_1:16;
+	a_uint32_t	mac_da_0:32;
+	a_uint32_t	mac_valid:1;
+	a_uint32_t	_reserved0:31;
+#elif defined(APPE)
 	a_uint32_t  dmac_check_dis:1;
 	a_uint32_t  vpn_id:5;
 	a_uint32_t  mru_ipv6:14;
@@ -1569,7 +1594,9 @@ struct in_l3_if_tbl {
 };
 
 union in_l3_if_tbl_u {
-#if defined(APPE)
+#if defined(MRPPE)
+	a_uint32_t val[5];
+#elif defined(APPE)
 	a_uint32_t val[3];
 #else
 	a_uint32_t val[2];

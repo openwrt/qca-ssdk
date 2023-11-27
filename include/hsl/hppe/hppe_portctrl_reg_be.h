@@ -863,9 +863,27 @@ union rx_fifo_cfg_u {
 	#define TDM_CFG_VALID_OFFSET  5
 	#define TDM_CFG_VALID_LEN     1
 	#define TDM_CFG_VALID_DEFAULT 0x0
+	/*[field] VALID*/
+	#define TDM_CFG_SEC_VALID
+	#define TDM_CFG_SEC_VALID_OFFSET  6
+	#define TDM_CFG_SEC_VALID_LEN     1
+	#define TDM_CFG_SEC_VALID_DEFAULT 0x0
+	/*[field] RESV*/
+	#define TDM_CFG_RESV
+	#define TDM_CFG_RESV_OFFSET  7
+	#define TDM_CFG_RESV_LEN     1
+	#define TDM_CFG_RESV_DEFAULT 0x0
+	/*[field] PORT_NUM*/
+	#define TDM_CFG_SEC_PORT_NUM
+	#define TDM_CFG_SEC_PORT_NUM_OFFSET  8
+	#define TDM_CFG_SEC_PORT_NUM_LEN     4
+	#define TDM_CFG_SEC_PORT_NUM_DEFAULT 0x0
 
 struct tdm_cfg {
-	a_uint32_t  _reserved0:26;
+	a_uint32_t  _reserved0:20;
+	a_uint32_t  sec_port_num:4;
+	a_uint32_t  resv:1;
+	a_uint32_t  sec_valid:1;
         a_uint32_t  valid:1;
         a_uint32_t  dir:1;
         a_uint32_t  port_num:4;

@@ -253,7 +253,11 @@ union dbg_data_u {
 /*[register] PORT_FC_MODE*/
 #define PORT_FC_MODE
 #define PORT_FC_MODE_ADDRESS 0x100
+#if defined(MRPPE)
+#define PORT_FC_MODE_NUM     19
+#else
 #define PORT_FC_MODE_NUM     15
+#endif
 #define PORT_FC_MODE_INC     0x4
 #define PORT_FC_MODE_TYPE    REG_TYPE_RW
 #define PORT_FC_MODE_DEFAULT 0x0
@@ -306,7 +310,11 @@ union port_fc_status_u {
 /*[register] PORT_GROUP_ID*/
 #define PORT_GROUP_ID
 #define PORT_GROUP_ID_ADDRESS 0x180
+#if defined(MRPPE)
+#define PORT_GROUP_ID_NUM     19
+#else
 #define PORT_GROUP_ID_NUM     15
+#endif
 #define PORT_GROUP_ID_INC     0x4
 #define PORT_GROUP_ID_TYPE    REG_TYPE_RW
 #define PORT_GROUP_ID_DEFAULT 0x0
@@ -329,7 +337,11 @@ union port_group_id_u {
 /*[register] PORT_CNT*/
 #define PORT_CNT
 #define PORT_CNT_ADDRESS 0x1c0
+#if defined(MRPPE)
+#define PORT_CNT_NUM     19
+#else
 #define PORT_CNT_NUM     15
+#endif
 #define PORT_CNT_INC     0x4
 #define PORT_CNT_TYPE    REG_TYPE_RO
 #define PORT_CNT_DEFAULT 0x0
@@ -352,7 +364,11 @@ union port_cnt_u {
 /*[register] PORT_REACTED_CNT*/
 #define PORT_REACTED_CNT
 #define PORT_REACTED_CNT_ADDRESS 0x240
+#if defined(MRPPE)
+#define PORT_REACTED_CNT_NUM     19
+#else
 #define PORT_REACTED_CNT_NUM     15
+#endif
 #define PORT_REACTED_CNT_INC     0x4
 #define PORT_REACTED_CNT_TYPE    REG_TYPE_RO
 #define PORT_REACTED_CNT_DEFAULT 0x0
@@ -934,7 +950,11 @@ union tot_react_in_profile_cnt_u {
 /*[table] PORT_FC_CFG*/
 #define PORT_FC_CFG
 #define PORT_FC_CFG_ADDRESS 0x1000
+#if defined(MRPPE)
+#define PORT_FC_CFG_NUM     19
+#else
 #define PORT_FC_CFG_NUM     15
+#endif
 #define PORT_FC_CFG_INC     0x10
 #define PORT_FC_CFG_TYPE    REG_TYPE_RW
 #define PORT_FC_CFG_DEFAULT 0x0

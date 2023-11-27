@@ -67,6 +67,8 @@ typedef struct
 	a_uint8_t valid; /* 0 for invalid and 1 for valid*/
 	a_uint8_t direction; /* 0 for ingreee and 1 for egress */
 	fal_port_t port;
+	a_uint8_t sec_valid; /* added for ipq54xx */
+	fal_port_t sec_port; /* added for ipq54xx */
 } fal_port_tdm_tick_cfg_t;
 
 sw_error_t

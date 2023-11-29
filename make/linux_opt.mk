@@ -455,7 +455,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
       KASAN_SHADOW_SCALE_SHIFT := 3
   endif
 
-  ifeq ($(OS_VER),$(filter 5_4 6_1, $(OS_VER)))
+  ifeq ($(OS_VER),$(filter 5_4 6_1 6_6, $(OS_VER)))
       ifeq ($(ARCH), arm64)
           KASAN_OPTION += -DKASAN_SHADOW_SCALE_SHIFT=$(KASAN_SHADOW_SCALE_SHIFT)
        endif
@@ -486,7 +486,7 @@ ifeq (KSLIB, $(MODULE_TYPE))
 
   endif
 
-  ifeq ($(OS_VER),$(filter 4_4 5_4 6_1, $(OS_VER)))
+  ifeq ($(OS_VER),$(filter 4_4 5_4 6_1 6_6, $(OS_VER)))
                 MODULE_CFLAG += -DKVER34
                 MODULE_CFLAG += -DKVER32
             MODULE_CFLAG += -DLNX26_22

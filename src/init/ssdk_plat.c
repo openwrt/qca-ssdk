@@ -372,7 +372,14 @@ qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_NOT_SUPPORTED;
 	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
-	*data = __mdiobus_read(bus, phy_addr, reg);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+	if (reg & SSDK_ADDR_C45)
+		*data = __mdiobus_c45_read(bus, phy_addr,
+				FIELD_GET(SSDK_DEVADDR_C45_MASK, reg),
+				FIELD_GET(SSDK_REGADDR_C45_MASK, reg));
+	else
+#endif
+		*data = __mdiobus_read(bus, phy_addr, reg);
 	mutex_unlock(&bus->mdio_lock);
 
 	return 0;
@@ -394,7 +401,15 @@ qca_ar8327_phy_write(a_uint32_t dev_id, a_uint32_t phy_addr,
 		return SW_NOT_SUPPORTED;
 	phy_addr = TO_PHY_ADDR(phy_addr);
 	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, phy_addr, reg, data);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+	if (reg & SSDK_ADDR_C45)
+		__mdiobus_c45_write(bus, phy_addr,
+				FIELD_GET(SSDK_DEVADDR_C45_MASK, reg),
+				FIELD_GET(SSDK_REGADDR_C45_MASK, reg),
+				data);
+	else
+#endif
+		__mdiobus_write(bus, phy_addr, reg, data);
 	mutex_unlock(&bus->mdio_lock);
 
 	return 0;

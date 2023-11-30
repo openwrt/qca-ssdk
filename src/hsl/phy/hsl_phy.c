@@ -2937,7 +2937,14 @@ __hsl_phy_mii_reg_read(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_re
 		miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
 		if(!miibus)
 			return PHY_INVALID_DATA;
-		phy_data = __mdiobus_read(miibus, phy_addr, mii_reg);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+		if (mii_reg & SSDK_ADDR_C45)
+			phy_data = __mdiobus_c45_read(miibus, phy_addr,
+					FIELD_GET(SSDK_DEVADDR_C45_MASK, mii_reg),
+					FIELD_GET(SSDK_REGADDR_C45_MASK, mii_reg));
+		else
+#endif
+			phy_data = __mdiobus_read(miibus, phy_addr, mii_reg);
 	}
 
 	return phy_data;
@@ -2955,6 +2962,7 @@ __hsl_phy_mii_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_r
 	a_uint16_t reg_val)
 {
 	struct mii_bus *miibus = NULL;
+	int ret;
 
 #if defined(IN_PHY_I2C_MODE)
 	if(IS_I2C_PHY_ADDR(phy_addr))
@@ -2967,8 +2975,18 @@ __hsl_phy_mii_reg_write(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mii_r
 	{
 		miibus = ssdk_phy_miibus_get(dev_id, phy_addr);
 		SW_RTN_ON_NULL(miibus);
-		if(__mdiobus_write(miibus, phy_addr, mii_reg, reg_val))
-			return SW_WRITE_ERROR;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+		if (mii_reg & SSDK_ADDR_C45)
+			ret = __mdiobus_c45_write(miibus, phy_addr,
+					FIELD_GET(SSDK_DEVADDR_C45_MASK, mii_reg),
+					FIELD_GET(SSDK_REGADDR_C45_MASK, mii_reg),
+					reg_val);
+		else
+#endif
+			ret = __mdiobus_write(miibus, phy_addr, mii_reg, reg_val);
+
+		if (ret)
+			return ret;
 	}
 
 	return SW_OK;

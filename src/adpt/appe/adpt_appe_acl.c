@@ -1385,8 +1385,12 @@ _adpt_appe_get_udf_profile_entry_by_index(a_uint32_t dev_id,
 		a_uint32_t index, fal_acl_udf_profile_entry_t * entry, a_uint32_t * profile_id)
 {
 	union ipr_udf_ctrl_u udf_ctrl = {0};
+	sw_error_t rv = SW_OK;
 
-	SW_RTN_ON_ERROR(appe_ipr_udf_ctrl_get(dev_id, index, &udf_ctrl));
+	rv = appe_ipr_udf_ctrl_get(dev_id, index, &udf_ctrl);
+	if (rv != SW_OK)
+		return A_FALSE;
+
 	if (!udf_ctrl.bf.valid)
 	{
 		aos_mem_zero(&udf_ctrl, sizeof (udf_ctrl));
@@ -1488,11 +1492,10 @@ _adpt_appe_is_udf_profile_entry_exist(a_uint32_t dev_id,
 	a_bool_t entry_valid;
 	fal_acl_udf_profile_entry_t temp_entry;
 
-	ADPT_DEV_ID_CHECK(dev_id);
 
-	if (profile_id >= IPR_UDF_PROFILE_BASE_MAX_ENTRY)
+	if (dev_id >= SW_MAX_NR_DEV || profile_id >= IPR_UDF_PROFILE_BASE_MAX_ENTRY)
 	{
-		return SW_OUT_OF_RANGE;
+		return A_FALSE;
 	}
 
 	for (idx = 0; idx < IPR_UDF_CTRL_MAX_ENTRY; idx++)

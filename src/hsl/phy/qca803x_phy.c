@@ -1,18 +1,19 @@
 /*
  * Copyright (c) 2017, 2019, The Linux Foundation. All rights reserved.
  *
-  * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software for
- * any purpose with or without fee is hereby granted, provided that the
- * above copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include "sw.h"
 #include "fal_port_ctrl.h"
@@ -28,7 +29,7 @@
 typedef struct {
 	a_uint32_t dev_id;
 	a_uint32_t combo_phy_bmp;
-	qca803x_phy_medium_t combo_cfg[SW_MAX_NR_PORT];
+	fal_port_medium_t combo_cfg[SW_MAX_NR_PORT];
 	struct delayed_work phy_sync_dwork;
 } qca803x_priv_t;
 
@@ -790,24 +791,27 @@ qca803x_phy_get_combo_prefer_medium(a_uint32_t dev_id, a_uint32_t phy_addr,
 *
 *  get qca803x phy current active medium, fiber or copper;
 */
-static qca803x_phy_medium_t __phy_active_medium_get(a_uint32_t dev_id,
+static fal_port_medium_t __phy_active_medium_get(a_uint32_t dev_id,
 	a_uint32_t phy_addr)
 {
 	qca803x_cfg_t cfg_value;
+	sw_error_t rv = SW_OK;
 
-	PHY_RTN_ON_ERROR(__phy_chip_config_get(dev_id, phy_addr,
-		QCA803X_CHIP_CFG_STAT, &cfg_value));
+	rv = __phy_chip_config_get(dev_id, phy_addr,
+			QCA803X_CHIP_CFG_STAT, &cfg_value);
+	if (rv != SW_OK)
+		return PHY_MEDIUM_MAX;
 
 	switch (cfg_value) {
 		case QCA803X_PHY_RGMII_BASET:
 		case QCA803X_PHY_SGMII_BASET:
-			return QCA803X_PHY_MEDIUM_COPPER;
+			return PHY_MEDIUM_COPPER;
 		case QCA803X_PHY_BX1000_RGMII_50:
 		case QCA803X_PHY_FX100_RGMII_50:
-			return QCA803X_PHY_MEDIUM_FIBER;
+			return PHY_MEDIUM_FIBER;
 		case QCA803X_PHY_RGMII_AMDET:
 		default:
-			return QCA803X_PHY_MEDIUM_MAX;
+			return PHY_MEDIUM_MAX;
 	}
 }
 
@@ -821,11 +825,11 @@ sw_error_t
 qca803x_phy_get_combo_current_medium_type(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_medium_t * phy_medium)
 {
-	qca803x_phy_medium_t phy_cur_meduim = __phy_active_medium_get(dev_id, phy_addr);
+	fal_port_medium_t phy_cur_meduim = __phy_active_medium_get(dev_id, phy_addr);
 
 	/* auto media select is not done
 	 * or link down, then return prefer medium */
-	if (phy_cur_meduim == QCA803X_PHY_MEDIUM_MAX)
+	if (phy_cur_meduim == PHY_MEDIUM_MAX)
 		qca803x_phy_get_combo_prefer_medium(dev_id, phy_addr, phy_medium);
 	else
 		*phy_medium = phy_cur_meduim;
@@ -1094,14 +1098,14 @@ static sw_error_t qca803x_phy_api_ops_init(void)
 
 static sw_error_t
 _qca803x_phy_set_combo_page_regs(a_uint32_t dev_id, a_uint32_t phy_id,
-	qca803x_phy_medium_t phy_medium)
+	fal_port_medium_t phy_medium)
 {
 	a_uint16_t phy_data = 0;
 
-	if (phy_medium == QCA803X_PHY_MEDIUM_FIBER) {
+	if (phy_medium == PHY_MEDIUM_FIBER) {
 		phy_data &= ~QCA803X_PHY_COPPER_PAGE_SEL;
 	}
-	else if (phy_medium == QCA803X_PHY_MEDIUM_COPPER) {
+	else if (phy_medium == PHY_MEDIUM_COPPER) {
 		phy_data |= QCA803X_PHY_COPPER_PAGE_SEL;
 	}
 	else {
@@ -1118,7 +1122,7 @@ void qca803x_combo_phy_polling(qca803x_priv_t *priv)
 	qca803x_cfg_t cfg_value;
 	a_uint32_t combo_phy_addr = 0;
 	a_uint32_t combo_bits = priv->combo_phy_bmp;
-	qca803x_phy_medium_t combo_cfg_new = QCA803X_PHY_MEDIUM_COPPER;
+	fal_port_medium_t combo_cfg_new = PHY_MEDIUM_COPPER;
 
 	while (combo_bits) {
 		if (combo_bits & 1) {
@@ -1129,14 +1133,14 @@ void qca803x_combo_phy_polling(qca803x_priv_t *priv)
 			switch (cfg_value) {
 				case QCA803X_PHY_RGMII_BASET:
 				case QCA803X_PHY_SGMII_BASET:
-					combo_cfg_new = QCA803X_PHY_MEDIUM_COPPER;
+					combo_cfg_new = PHY_MEDIUM_COPPER;
 					break;
 				case QCA803X_PHY_BX1000_RGMII_50:
 				case QCA803X_PHY_FX100_RGMII_50:
-					combo_cfg_new = QCA803X_PHY_MEDIUM_FIBER;
+					combo_cfg_new = PHY_MEDIUM_FIBER;
 					break;
 				default:
-					combo_cfg_new = QCA803X_PHY_MEDIUM_COPPER;
+					combo_cfg_new = PHY_MEDIUM_COPPER;
 			}
 
 			if (priv->combo_cfg[combo_phy_addr] != combo_cfg_new) {

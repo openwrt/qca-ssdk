@@ -362,13 +362,6 @@ extern "C"
 	  QCA803X_CHIP_CFG_STAT
   } qca803x_cfg_type_t;
 
-/** Phy preferred medium type */
-  typedef enum
-  {
-	  QCA803X_PHY_MEDIUM_COPPER = 0,	/* Copper */
-	  QCA803X_PHY_MEDIUM_FIBER = 1,		/* Fiber */
-	  QCA803X_PHY_MEDIUM_MAX
-  } qca803x_phy_medium_t;
 int qca803x_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp);
 
 #ifdef __cplusplus

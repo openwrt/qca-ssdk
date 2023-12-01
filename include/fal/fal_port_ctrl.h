@@ -189,6 +189,7 @@ FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE)
 				/**< Copper */
 		PHY_MEDIUM_FIBER = 1,
 				/**< Fiber */
+		PHY_MEDIUM_MAX
 
 	} fal_port_medium_t;
 

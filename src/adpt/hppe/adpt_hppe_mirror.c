@@ -27,6 +27,52 @@
 #include "adpt.h"
 
 sw_error_t
+adpt_hppe_mirr_analysis_config_get(a_uint32_t dev_id, fal_mirr_direction_t direction, fal_mirr_analysis_config_t * config)
+{
+	union mirror_analyzer_u mirror_analyzer;
+	union in_mirror_priority_ctrl_u in_mirror_priority_ctrl;
+	union eg_mirror_priority_ctrl_u eg_mirror_priority_ctrl;
+
+	memset(&mirror_analyzer, 0, sizeof(mirror_analyzer));
+	memset(&in_mirror_priority_ctrl, 0, sizeof(in_mirror_priority_ctrl));
+	memset(&eg_mirror_priority_ctrl, 0, sizeof(eg_mirror_priority_ctrl));
+
+	ADPT_DEV_ID_CHECK(dev_id);
+	ADPT_NULL_POINT_CHECK(config);
+
+	hppe_mirror_analyzer_get(dev_id, &mirror_analyzer);
+	hppe_in_mirror_priority_ctrl_get(dev_id, &in_mirror_priority_ctrl);
+	hppe_eg_mirror_priority_ctrl_get(dev_id, &eg_mirror_priority_ctrl);
+
+	if (direction == FAL_MIRR_BOTH)
+	{
+		if ((mirror_analyzer.bf.in_analyzer_port != mirror_analyzer.bf.eg_analyzer_port) ||
+			(in_mirror_priority_ctrl.bf.priority != eg_mirror_priority_ctrl.bf.priority))
+			return SW_FAIL;
+
+		config->port_id = mirror_analyzer.bf.in_analyzer_port;
+		config->priority = in_mirror_priority_ctrl.bf.priority;
+	}
+	else if (direction == FAL_MIRR_INGRESS)
+	{
+		config->port_id = mirror_analyzer.bf.in_analyzer_port;
+		config->priority = in_mirror_priority_ctrl.bf.priority;
+	}
+	else if (direction == FAL_MIRR_EGRESS)
+	{
+		config->port_id = mirror_analyzer.bf.eg_analyzer_port;
+		config->priority = eg_mirror_priority_ctrl.bf.priority;
+	}
+	else
+		return SW_NOT_SUPPORTED;
+
+	if (config->port_id == 32 || config->port_id == 33)
+		config->port_id = FAL_PORT_ID(FAL_PORT_TYPE_TRUNK, config->port_id);
+
+	return SW_OK;
+}
+
+sw_error_t
 adpt_hppe_mirr_port_in_get(a_uint32_t dev_id, fal_port_t port_id,
                          a_bool_t * enable)
 {
@@ -86,10 +132,6 @@ adpt_hppe_mirr_analysis_port_get(a_uint32_t dev_id, fal_port_t * port_id)
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(port_id);
 
-	/* analysis port just support physical port and trunk port, not support virtual port */
-	if (FAL_PORT_ID_TYPE(*port_id) != 0 && FAL_PORT_ID_TYPE(*port_id) != 1)
-		return SW_BAD_PARAM;
-
 	rv = hppe_mirror_analyzer_get(dev_id, &mirror_analyzer);
 
 	if( rv != SW_OK )
@@ -111,6 +153,7 @@ adpt_hppe_mirr_port_in_set(a_uint32_t dev_id, fal_port_t port_id,
                          a_bool_t enable)
 {
 	union port_mirror_u port_mirror;
+	fal_mirr_analysis_config_t analysis_cfg = {0};
 
 	memset(&port_mirror, 0, sizeof(port_mirror));
 	ADPT_DEV_ID_CHECK(dev_id);
@@ -118,6 +161,11 @@ adpt_hppe_mirr_port_in_set(a_uint32_t dev_id, fal_port_t port_id,
 	/* mirror port just support physical port, not support trunk and virtual port */
 	if (FAL_PORT_ID_TYPE(port_id) != 0)
 		return SW_BAD_PARAM;
+
+	SW_RTN_ON_ERROR(adpt_hppe_mirr_analysis_config_get(dev_id, FAL_MIRR_INGRESS,
+		&analysis_cfg));
+	if(!(ADPT_IS_PPORT(analysis_cfg.port_id) || ADPT_IS_TRUNK(analysis_cfg.port_id)))
+		return SW_BAD_VALUE;
 
 	hppe_port_mirror_get(dev_id, port_id, &port_mirror);
 	port_mirror.bf.in_mirr_en = enable;
@@ -131,6 +179,7 @@ adpt_hppe_mirr_port_eg_set(a_uint32_t dev_id, fal_port_t port_id,
                          a_bool_t enable)
 {
 	union port_mirror_u port_mirror;
+	fal_mirr_analysis_config_t analysis_cfg = {0};
 
 	memset(&port_mirror, 0, sizeof(port_mirror));
 	ADPT_DEV_ID_CHECK(dev_id);
@@ -138,6 +187,11 @@ adpt_hppe_mirr_port_eg_set(a_uint32_t dev_id, fal_port_t port_id,
 	/* mirror port just support physical port, not support trunk and virtual port */
 	if (FAL_PORT_ID_TYPE(port_id) != 0)
 		return SW_BAD_PARAM;
+
+	SW_RTN_ON_ERROR(adpt_hppe_mirr_analysis_config_get(dev_id, FAL_MIRR_EGRESS,
+		&analysis_cfg));
+	if(!(ADPT_IS_PPORT(analysis_cfg.port_id) || ADPT_IS_TRUNK(analysis_cfg.port_id)))
+		return SW_BAD_VALUE;
 
 	hppe_port_mirror_get(dev_id, port_id, &port_mirror);
 	port_mirror.bf.eg_mirr_en = enable;
@@ -221,55 +275,6 @@ adpt_hppe_mirr_analysis_config_set(a_uint32_t dev_id, fal_mirr_direction_t direc
 	return SW_OK;
 }
 
-sw_error_t
-adpt_hppe_mirr_analysis_config_get(a_uint32_t dev_id, fal_mirr_direction_t direction, fal_mirr_analysis_config_t * config)
-{
-	union mirror_analyzer_u mirror_analyzer;
-	union in_mirror_priority_ctrl_u in_mirror_priority_ctrl;
-	union eg_mirror_priority_ctrl_u eg_mirror_priority_ctrl;
-
-	memset(&mirror_analyzer, 0, sizeof(mirror_analyzer));
-	memset(&in_mirror_priority_ctrl, 0, sizeof(in_mirror_priority_ctrl));
-	memset(&eg_mirror_priority_ctrl, 0, sizeof(eg_mirror_priority_ctrl));
-
-	ADPT_DEV_ID_CHECK(dev_id);
-	ADPT_NULL_POINT_CHECK(config);
-	/* analysis port just support physical port and trunk port, not support virtual port */
-	if (FAL_PORT_ID_TYPE(config->port_id) != 0 && FAL_PORT_ID_TYPE(config->port_id) != 1)
-		return SW_BAD_PARAM;
-
-	hppe_mirror_analyzer_get(dev_id, &mirror_analyzer);
-	hppe_in_mirror_priority_ctrl_get(dev_id, &in_mirror_priority_ctrl);
-	hppe_eg_mirror_priority_ctrl_get(dev_id, &eg_mirror_priority_ctrl);
-
-	if (direction == FAL_MIRR_BOTH)
-	{
-		if ((mirror_analyzer.bf.in_analyzer_port != mirror_analyzer.bf.eg_analyzer_port) ||
-			(in_mirror_priority_ctrl.bf.priority != eg_mirror_priority_ctrl.bf.priority))
-			return SW_FAIL;
-
-		config->port_id = mirror_analyzer.bf.in_analyzer_port;
-		config->priority = in_mirror_priority_ctrl.bf.priority;
-	}
-	else if (direction == FAL_MIRR_INGRESS)
-	{
-		config->port_id = mirror_analyzer.bf.in_analyzer_port;
-		config->priority = in_mirror_priority_ctrl.bf.priority;
-	}
-	else if (direction == FAL_MIRR_EGRESS)
-	{
-		config->port_id = mirror_analyzer.bf.eg_analyzer_port;
-		config->priority = eg_mirror_priority_ctrl.bf.priority;
-	}
-	else
-		return SW_NOT_SUPPORTED;
-
-	if (config->port_id == 32 || config->port_id == 33)
-		config->port_id = FAL_PORT_ID(FAL_PORT_TYPE_TRUNK, config->port_id);
-
-	return SW_OK;
-}
-
 sw_error_t adpt_hppe_mirror_init(a_uint32_t dev_id)
 {
 	adpt_api_t *p_adpt_api = NULL;
@@ -290,7 +295,6 @@ sw_error_t adpt_hppe_mirror_init(a_uint32_t dev_id)
 
 	return SW_OK;
 }
-
 /**
  * @}
  */

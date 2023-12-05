@@ -305,6 +305,8 @@ adpt_hppe_port_tdm_tick_cfg_set(a_uint32_t dev_id, a_uint32_t tick_index,
 	tdm_cfg.bf.valid = cfg->valid;
 	tdm_cfg.bf.dir = cfg->direction;
 	tdm_cfg.bf.port_num = cfg->port;
+	tdm_cfg.bf.sec_valid = cfg->sec_valid;
+	tdm_cfg.bf.sec_port_num = cfg->sec_port;
 	return hppe_tdm_cfg_set(dev_id, tick_index, &tdm_cfg);
 }
 

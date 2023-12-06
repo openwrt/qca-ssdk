@@ -456,173 +456,6 @@ int qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_
 	return 0;
 }
 
-/*qca808x_start*/
-a_bool_t
-phy_addr_validation_check(a_uint32_t phy_addr)
-{
-	if(TO_MIIBUS_INDEX(phy_addr) >= SSDK_MII_BUS_MAX)
-		return A_FALSE;
-	if ((TO_PHY_ADDR(phy_addr) > SSDK_PHY_BCAST_ID) ||
-		(TO_PHY_ADDR(phy_addr) < SSDK_PHY_MIN_ID))
-		return A_FALSE;
-	else
-		return A_TRUE;
-}
-
-sw_error_t
-qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
-                           a_uint32_t reg, a_uint16_t* data)
-{
-	struct mii_bus *bus = NULL;
-
-	if (A_TRUE != phy_addr_validation_check (phy_addr))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
-	if (!bus)
-		return SW_NOT_SUPPORTED;
-	phy_addr = TO_PHY_ADDR(phy_addr);
-	mutex_lock(&bus->mdio_lock);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
-	if (reg & SSDK_ADDR_C45)
-		*data = __mdiobus_c45_read(bus, phy_addr,
-				FIELD_GET(SSDK_DEVADDR_C45_MASK, reg),
-				FIELD_GET(SSDK_REGADDR_C45_MASK, reg));
-	else
-#endif
-		*data = __mdiobus_read(bus, phy_addr, reg);
-	mutex_unlock(&bus->mdio_lock);
-
-	return 0;
-}
-
-sw_error_t
-qca_ar8327_phy_write(a_uint32_t dev_id, a_uint32_t phy_addr,
-                            a_uint32_t reg, a_uint16_t data)
-{
-	struct mii_bus *bus = NULL;
-
-	if (A_TRUE != phy_addr_validation_check (phy_addr))
-	{
-		return SW_BAD_PARAM;
-	}
-
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
-	if (!bus)
-		return SW_NOT_SUPPORTED;
-	phy_addr = TO_PHY_ADDR(phy_addr);
-	mutex_lock(&bus->mdio_lock);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
-	if (reg & SSDK_ADDR_C45)
-		__mdiobus_c45_write(bus, phy_addr,
-				FIELD_GET(SSDK_DEVADDR_C45_MASK, reg),
-				FIELD_GET(SSDK_REGADDR_C45_MASK, reg),
-				data);
-	else
-#endif
-		__mdiobus_write(bus, phy_addr, reg, data);
-	mutex_unlock(&bus->mdio_lock);
-
-	return 0;
-}
-
-void
-qca_ar8327_phy_dbg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
-                                a_uint16_t dbg_addr, a_uint16_t dbg_data)
-{
-	struct mii_bus *bus = NULL;
-
-	if (A_TRUE != phy_addr_validation_check (phy_addr))
-	{
-		return;
-	}
-
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
-	if (!bus)
-		return;
-	phy_addr = TO_PHY_ADDR(phy_addr);
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
-	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_DATA, dbg_data);
-	mutex_unlock(&bus->mdio_lock);
-}
-
-void
-qca_ar8327_phy_dbg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
-		                a_uint16_t dbg_addr, a_uint16_t *dbg_data)
-{
-	struct mii_bus *bus = NULL;
-
-	if (A_TRUE != phy_addr_validation_check (phy_addr))
-	{
-		return;
-	}
-
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
-	if (!bus)
-		return;
-	phy_addr = TO_PHY_ADDR(phy_addr);
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, phy_addr, QCA_MII_DBG_ADDR, dbg_addr);
-	*dbg_data = __mdiobus_read(bus, phy_addr, QCA_MII_DBG_DATA);
-	mutex_unlock(&bus->mdio_lock);
-}
-
-
-void
-qca_ar8327_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr,
-                          a_uint16_t addr, a_uint16_t data)
-{
-	struct mii_bus *bus = NULL;
-
-	if (A_TRUE != phy_addr_validation_check (phy_addr))
-	{
-		return;
-	}
-
-	bus = ssdk_phy_miibus_get(dev_id, phy_addr);
-	if (!bus)
-		return;
-	phy_addr = TO_PHY_ADDR(phy_addr);
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, phy_addr, QCA_MII_MMD_ADDR, addr);
-	__mdiobus_write(bus, phy_addr, QCA_MII_MMD_DATA, data);
-	mutex_unlock(&bus->mdio_lock);
-}
-
-void qca_phy_mmd_write(u32 dev_id, u32 phy_id,
-                     u16 mmd_num, u16 reg_id, u16 reg_val)
-{
-	qca_ar8327_phy_write(dev_id, phy_id,
-			QCA_MII_MMD_ADDR, mmd_num);
-	qca_ar8327_phy_write(dev_id, phy_id,
-			QCA_MII_MMD_DATA, reg_id);
-	qca_ar8327_phy_write(dev_id, phy_id,
-			QCA_MII_MMD_ADDR,
-			0x4000 | mmd_num);
-	qca_ar8327_phy_write(dev_id, phy_id,
-		QCA_MII_MMD_DATA, reg_val);
-}
-
-u16 qca_phy_mmd_read(u32 dev_id, u32 phy_id,
-		u16 mmd_num, u16 reg_id)
-{
-	u16 value = 0;
-	qca_ar8327_phy_write(dev_id, phy_id,
-			QCA_MII_MMD_ADDR, mmd_num);
-	qca_ar8327_phy_write(dev_id, phy_id,
-			QCA_MII_MMD_DATA, reg_id);
-	qca_ar8327_phy_write(dev_id, phy_id,
-			QCA_MII_MMD_ADDR,
-			0x4000 | mmd_num);
-	qca_ar8327_phy_read(dev_id, phy_id,
-			QCA_MII_MMD_DATA, &value);
-	return value;
-}
-/*qca808x_end*/
-
 #if defined(SSDK_PCIE_BUS)
 extern u32 ppe_mem_read(u32 reg);
 extern void ppe_mem_write(u32 reg, u32 val);
@@ -1345,7 +1178,7 @@ static ssize_t ssdk_phy_write_reg_set(struct device *dev,
 	if (ret)
 		goto fail;
 
-	qca_ar8327_phy_write(0, phy_addr, reg_addr, reg_value);
+	hsl_phy_mii_reg_write(0, phy_addr, reg_addr, reg_value);
 
 	return count;
 
@@ -1398,7 +1231,7 @@ static ssize_t ssdk_phy_read_reg_set(struct device *dev,
 	if (ret)
 		goto fail;
 
-	qca_ar8327_phy_read(0, phy_addr, reg_addr, &phy_reg_val);
+	phy_reg_val = hsl_phy_mii_reg_read(0, phy_addr, reg_addr);
 
 	return count;
 

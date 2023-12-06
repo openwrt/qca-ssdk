@@ -499,7 +499,7 @@ qca_phy_status_get(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t *speed_stat
 	if (qca_ar8327_sw_rgmii_mode_valid(dev_id, port_id) == A_TRUE)
 		phy_addr = 4;
 
-	qca_ar8327_phy_read(dev_id, phy_addr, F1_PHY_SPEC_STATUS, &port_phy_status);
+	port_phy_status = hsl_phy_mii_reg_read(dev_id, phy_addr, F1_PHY_SPEC_STATUS);
 	*speed_status = (a_uint32_t)((port_phy_status >> 14) & 0x03);
 	*link_status = (a_uint32_t)((port_phy_status & BIT(10)) >> 10);
 	*duplex_status = (a_uint32_t)((port_phy_status & BIT(13)) >> 13);
@@ -634,7 +634,6 @@ qca_ar8327_sw_mac_polling_task(struct qca_phy_priv *priv)
 #endif
 				if(priv->version != 0x14){
 					/* Check queue buffer */
-					a_uint16_t value = 0;
 					qm_err_cnt[i] = 0;
 					qca_switch_get_qm_status(priv, i, &qm_buffer_err);
 
@@ -649,9 +648,7 @@ qca_ar8327_sw_mac_polling_task(struct qca_phy_priv *priv)
 						mdelay(10);
 						SSDK_DEBUG("%s, %d, port %d link down\n",__FUNCTION__,__LINE__,i);
 					}
-					qca_ar8327_phy_dbg_read(dev_id, phy_addr, 0, &value);
-					value &= (~(1<<12));
-					qca_ar8327_phy_dbg_write(dev_id, phy_addr, 0, value);
+					hsl_phy_modify_debug(dev_id, phy_addr, 0, BIT(12), 0);
 				}
 			}
 			/* Down --> Up */
@@ -685,10 +682,8 @@ qca_ar8327_sw_mac_polling_task(struct qca_phy_priv *priv)
 					ssdk_port_link_notify(i, 1, speed, duplex);
 					if((speed == 0x01) && (priv->version != 0x14))/*PHY is link up 100M*/
 					{
-						a_uint16_t value = 0;
-						qca_ar8327_phy_dbg_read(dev_id, phy_addr, 0, &value);
-						value |= (1<<12);
-						qca_ar8327_phy_dbg_write(dev_id, phy_addr, 0, value);
+						hsl_phy_modify_debug(dev_id, phy_addr, 0, BIT(12),
+							BIT(12));
 					}
 				}
 			}
@@ -735,7 +730,7 @@ dess_rgmii_sw_mac_polling_task(struct qca_phy_priv *priv)
 		||(mac_mode == PORT_WRAPPER_SGMII0_RGMII4)
 		||(mac_mode == PORT_WRAPPER_SGMII1_RGMII4)
 		||(mac_mode == PORT_WRAPPER_SGMII4_RGMII4)) {
-		qca_ar8327_phy_read(priv->device_id, 4, 0x11, &phy_spec_status);
+		phy_spec_status = hsl_phy_mii_reg_read(priv->device_id, 4, 0x11);
 		phy_link_status = (a_uint16_t)((phy_spec_status & BIT(10)) >> 10);
 		if (phy_link_status == 1) {
 			speed = (a_uint32_t)((phy_spec_status >> 14) & 0x03);

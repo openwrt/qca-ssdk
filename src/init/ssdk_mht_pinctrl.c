@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -288,16 +288,16 @@ static sw_error_t mht_gpio_pin_cfg_set(a_uint32_t dev_id, a_uint32_t pin,
                 break;
 
             case PIN_CONFIG_OUTPUT:
-                rv = mht_gpio_pin_cfg_set_oe(dev_id, pin, true);
+                rv = mht_gpio_pin_cfg_set_oe(dev_id, pin, A_TRUE);
                 rv = mht_gpio_set_bit(dev_id, pin, arg);
                 break;
 
             case PIN_CONFIG_INPUT_ENABLE:
-                rv = mht_gpio_pin_cfg_set_oe(dev_id, pin, false);
+                rv = mht_gpio_pin_cfg_set_oe(dev_id, pin, A_FALSE);
                 break;
 
             case PIN_CONFIG_OUTPUT_ENABLE:
-                rv = mht_gpio_pin_cfg_set_oe(dev_id, pin, true);
+                rv = mht_gpio_pin_cfg_set_oe(dev_id, pin, A_TRUE);
                 break;
 
             default:

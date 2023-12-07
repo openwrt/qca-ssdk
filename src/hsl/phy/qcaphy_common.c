@@ -706,8 +706,8 @@ qcaphy_get_link_status(a_uint32_t dev_id, a_uint32_t phy_addr)
 	sw_error_t rv = SW_OK;
 
 	rv = qcaphy_status_get(dev_id, phy_addr, &phy_status);
-	PHY_RTN_ON_ERROR(rv);
-	if(phy_status.link_status == PORT_LINK_UP)
+
+	if(rv == SW_OK && phy_status.link_status == PORT_LINK_UP)
 		return A_TRUE;
 	else
 		return A_FALSE;

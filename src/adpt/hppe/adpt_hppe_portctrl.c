@@ -111,7 +111,8 @@ _adpt_hppe_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 {
 	a_bool_t force_port = 0;
 
-	ADPT_DEV_ID_CHECK(dev_id);
+	if (dev_id >= SW_MAX_NR_DEV)
+		return A_FALSE;
 
 	/* force port which connect s17c or other device chip*/
 	force_port = hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE);

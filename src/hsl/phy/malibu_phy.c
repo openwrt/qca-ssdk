@@ -65,7 +65,7 @@ static a_bool_t __medium_is_fiber_100fx(a_uint32_t dev_id, a_uint32_t phy_addr)
 *
 *  get phy4 prefer medum, fiber or copper;
 */
-static malibu_phy_medium_t __phy_prefer_medium_get(a_uint32_t dev_id,
+static fal_port_medium_t __phy_prefer_medium_get(a_uint32_t dev_id,
 	a_uint32_t phy_addr)
 {
 	a_uint16_t phy_medium = 0;
@@ -74,7 +74,7 @@ static malibu_phy_medium_t __phy_prefer_medium_get(a_uint32_t dev_id,
 		hsl_phy_mii_reg_read(dev_id, phy_addr, MALIBU_PHY_CHIP_CONFIG);
 
 	return ((phy_medium & MALIBU_PHY4_PREFER_FIBER) ?
-		MALIBU_PHY_MEDIUM_FIBER : MALIBU_PHY_MEDIUM_COPPER);
+		PHY_MEDIUM_FIBER : PHY_MEDIUM_COPPER);
 }
 
 /******************************************************************************
@@ -83,7 +83,7 @@ static malibu_phy_medium_t __phy_prefer_medium_get(a_uint32_t dev_id,
 *
 *  get phy4 current active medium, fiber or copper;
 */
-static malibu_phy_medium_t __phy_active_medium_get(a_uint32_t dev_id,
+static fal_port_medium_t __phy_active_medium_get(a_uint32_t dev_id,
 	a_uint32_t phy_addr)
 {
 	a_uint16_t phy_data = 0;
@@ -95,20 +95,20 @@ static malibu_phy_medium_t __phy_active_medium_get(a_uint32_t dev_id,
 	if (phy_mode == MALIBU_PHY_PSGMII_AMDET) {
 		phy_data = hsl_phy_mii_reg_read(dev_id, phy_addr, MALIBU_PHY_SGMII_STATUS);
 		if ((phy_data & MALIBU_PHY4_AUTO_COPPER_SELECT)) {
-			return MALIBU_PHY_MEDIUM_COPPER;
+			return PHY_MEDIUM_COPPER;
 		} else if ((phy_data & MALIBU_PHY4_AUTO_BX1000_SELECT)) {
-			return MALIBU_PHY_MEDIUM_FIBER;	/*PHY_MEDIUM_FIBER_BX1000 */
+			return PHY_MEDIUM_FIBER;	/*PHY_MEDIUM_FIBER_BX1000 */
 		} else if ((phy_data & MALIBU_PHY4_AUTO_FX100_SELECT)) {
-			return MALIBU_PHY_MEDIUM_FIBER;	/*PHY_MEDIUM_FIBER_FX100 */
+			return PHY_MEDIUM_FIBER;	/*PHY_MEDIUM_FIBER_FX100 */
 		}
 		/* link down */
 		return __phy_prefer_medium_get(dev_id, phy_addr);
 	} else if ((phy_mode == MALIBU_PHY_PSGMII_BASET) ||(phy_mode == MALIBU_PHY_SGMII_BASET) ) {
-		return MALIBU_PHY_MEDIUM_COPPER;
+		return PHY_MEDIUM_COPPER;
 	} else if ((phy_mode == MALIBU_PHY_PSGMII_BX1000) ||(phy_mode == MALIBU_PHY_PSGMII_FX100)) {
-		return MALIBU_PHY_MEDIUM_FIBER;
+		return PHY_MEDIUM_FIBER;
 	} else {
-		return MALIBU_PHY_MEDIUM_COPPER;
+		return PHY_MEDIUM_COPPER;
 	}
 }
 
@@ -145,13 +145,13 @@ static sw_error_t __phy_reg_pages_sel(a_uint32_t dev_id, a_uint32_t phy_addr,
 static sw_error_t __phy_reg_pages_sel_by_active_medium(a_uint32_t dev_id,
 	a_uint32_t phy_addr)
 {
-	malibu_phy_medium_t phy_medium = 0;
+	fal_port_medium_t phy_medium = 0;
 	malibu_phy_reg_pages_t reg_pages = 0;
 
 	phy_medium = __phy_active_medium_get(dev_id, phy_addr);
-	if (phy_medium == MALIBU_PHY_MEDIUM_FIBER) {
+	if (phy_medium == PHY_MEDIUM_FIBER) {
 		reg_pages = MALIBU_PHY_SGBX_PAGES;
-	} else if (phy_medium == MALIBU_PHY_MEDIUM_COPPER) {
+	} else if (phy_medium == PHY_MEDIUM_COPPER) {
 		reg_pages = MALIBU_PHY_COPPER_PAGES;
 	} else
 		return SW_BAD_VALUE;
@@ -194,7 +194,7 @@ static a_bool_t
 malibu_phy_is_copper(a_uint32_t dev_id, a_uint32_t phy_addr)
 {
 	if (phy_addr == COMBO_PHY_ID) {
-		if (MALIBU_PHY_MEDIUM_COPPER !=
+		if (PHY_MEDIUM_COPPER !=
 			__phy_active_medium_get(dev_id, phy_addr))
 			return A_FALSE;
 	}
@@ -520,7 +520,7 @@ malibu_phy_get_mdix_status(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_mdix_status_t * mode)
 {
 	if (phy_addr == COMBO_PHY_ID) {
-		if (MALIBU_PHY_MEDIUM_COPPER !=
+		if (PHY_MEDIUM_COPPER !=
 			__phy_active_medium_get(dev_id, phy_addr))
 			return SW_NOT_SUPPORTED;
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
@@ -542,7 +542,7 @@ malibu_phy_set_local_loopback(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint16_t phy_data = 0;
 
 	if (phy_addr == COMBO_PHY_ID) {
-		if(MALIBU_PHY_MEDIUM_COPPER != __phy_active_medium_get(dev_id, phy_addr)) {
+		if(PHY_MEDIUM_COPPER != __phy_active_medium_get(dev_id, phy_addr)) {
 			__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_SGBX_PAGES);
 			if(enable) {
 				if (__medium_is_fiber_100fx(dev_id, phy_addr))
@@ -651,7 +651,7 @@ static sw_error_t malibu_phy_cdt_start(a_uint32_t dev_id, a_uint32_t phy_addr)
 	a_uint16_t ii = 100;
 
 	if (phy_addr == COMBO_PHY_ID) {
-		if (MALIBU_PHY_MEDIUM_COPPER !=
+		if (PHY_MEDIUM_COPPER !=
 			__phy_active_medium_get(dev_id, phy_addr))
 			return SW_NOT_SUPPORTED;
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
@@ -742,7 +742,7 @@ malibu_phy_cdt(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mdi_pair,
 
 	if (phy_addr == COMBO_PHY_ID) {
 
-		if (MALIBU_PHY_MEDIUM_COPPER !=
+		if (PHY_MEDIUM_COPPER !=
 			__phy_active_medium_get(dev_id, phy_addr))
 			return SW_NOT_SUPPORTED;
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
@@ -951,7 +951,7 @@ malibu_phy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 		if (__medium_is_fiber_100fx(dev_id, phy_addr))
 			return SW_NOT_SUPPORTED;
 
-		if (MALIBU_PHY_MEDIUM_COPPER ==
+		if (PHY_MEDIUM_COPPER ==
 			__phy_active_medium_get(dev_id, phy_addr)) {
 				__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
 		} else {
@@ -994,7 +994,7 @@ malibu_phy_get_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 		if (__medium_is_fiber_100fx(dev_id, phy_addr))
 			return SW_NOT_SUPPORTED;
 
-		if (MALIBU_PHY_MEDIUM_COPPER ==
+		if (PHY_MEDIUM_COPPER ==
 			__phy_active_medium_get(dev_id, phy_addr)) {
 			__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
 		} else {
@@ -1078,7 +1078,7 @@ malibu_phy_set_speed(a_uint32_t dev_id, a_uint32_t phy_addr,
 	fal_port_speed_t speed)
 {
 	if (phy_addr == COMBO_PHY_ID) {
-		if (MALIBU_PHY_MEDIUM_COPPER !=
+		if (PHY_MEDIUM_COPPER !=
 			__phy_active_medium_get(dev_id, phy_addr))
 			return SW_NOT_SUPPORTED;
 		__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_COPPER_PAGES);
@@ -1100,7 +1100,7 @@ malibu_phy_set_duplex(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint32_t mask = 0;
 
 	if (phy_addr == COMBO_PHY_ID) {
-		if (MALIBU_PHY_MEDIUM_COPPER !=
+		if (PHY_MEDIUM_COPPER !=
 			__phy_active_medium_get(dev_id, phy_addr)) {
 				__phy_reg_pages_sel(dev_id, phy_addr, MALIBU_PHY_SGBX_PAGES);
 			mask |= MALIBU_CTRL_FULL_DUPLEX;

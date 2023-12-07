@@ -2155,8 +2155,12 @@ _adpt_appe_get_udf_profile_entry_by_index(a_uint32_t dev_id,
 		a_uint32_t index, fal_tunnel_udf_profile_entry_t * entry, a_uint32_t * profile_id)
 {
 	union tpr_udf_ctrl_0_u udf_ctrl = {0};
+	sw_error_t rv = SW_OK;
 
-	SW_RTN_ON_ERROR(appe_tpr_udf_ctrl_0_get(dev_id, index, &udf_ctrl));
+	rv = appe_tpr_udf_ctrl_0_get(dev_id, index, &udf_ctrl);
+	if (rv != SW_OK)
+		return A_FALSE;
+
 	if (!udf_ctrl.bf.valid)
 	{
 		aos_mem_zero(&udf_ctrl, sizeof (udf_ctrl));

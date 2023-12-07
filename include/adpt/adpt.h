@@ -2301,6 +2301,7 @@ adpt_forward_action_convert(fal_fwd_cmd_t *fwd_cmd, a_uint32_t *value, a_bool_t 
 #define ADPT_MPPE_FREQUENCY      200  /*MHZ*/
 #define ADPT_APPE_FREQUENCY      353  /*MHZ*/
 #define ADPT_HPPE_FREQUENCY      300  /*MHZ*/
+#define ADPT_MRPPE_FREQUENCY     375  /*MHZ*/
 
 adpt_api_t *adpt_api_ptr_get(a_uint32_t dev_id);
 sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);

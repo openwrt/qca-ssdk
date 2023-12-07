@@ -123,6 +123,9 @@ a_uint32_t adpt_chip_freq_get(a_uint32_t dev_id)
 		case MPPE_TYPE:
 			ppe_freq = ADPT_MPPE_FREQUENCY;
 			break;
+		case MRPPE_TYPE:
+			ppe_freq = ADPT_MRPPE_FREQUENCY;
+			break;
 		default:
 			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
 			break;

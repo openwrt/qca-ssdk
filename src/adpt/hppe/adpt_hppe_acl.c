@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -970,8 +970,10 @@ adpt_hppe_acl_list_bind(a_uint32_t dev_id, a_uint32_t list_id, fal_acl_direc_t d
 
 sw_error_t _adpt_hppe_acl_mac_rule_hw_2_sw(a_uint32_t is_mac_da,
 	ADPT_HPPE_ACL_MAC_RULE * macrule, ADPT_HPPE_ACL_MAC_RULE_MASK * macrule_mask,
-	fal_acl_rule_t * rule)
+	a_uint8_t inverse_en, fal_acl_rule_t * rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	if(is_mac_da)
 	{
 		rule->dest_mac_val.uc[5] = macrule->mac_addr_0;
@@ -1006,97 +1008,106 @@ sw_error_t _adpt_hppe_acl_mac_rule_hw_2_sw(a_uint32_t is_mac_da,
 	}
 	if(A_FALSE == _adpt_acl_zero_addr(rule->dest_mac_mask))
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_DA);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_DA);
 	}
 	if(A_FALSE == _adpt_acl_zero_addr(rule->src_mac_mask))
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_SA);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_SA);
 	}
 
 	if(macrule_mask->is_ip_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP);
 		rule->is_ip_val = macrule->is_ip;
 	}
 
 	if(macrule_mask->is_ipv6_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV6);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IPV6);
 		rule->is_ipv6_val = macrule->is_ipv6;
 	}
 
 	if(macrule_mask->is_ethernet_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_ETHERNET);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_ETHERNET);
 		rule->is_ethernet_val = macrule->is_ethernet;
 	}
 
 	if(macrule_mask->is_snap_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_SNAP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_SNAP);
 		rule->is_snap_val = macrule->is_snap;
 	}
 
 	if(macrule_mask->is_fake_mac_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER);
 		rule->is_fake_mac_header_val = macrule->is_fake_mac_header;
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
 
 	return SW_OK;
 }
 
 sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(ADPT_HPPE_ACL_VLAN_RULE * vlanrule,
-	ADPT_HPPE_ACL_VLAN_RULE_MASK * vlanrule_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
+	ADPT_HPPE_ACL_VLAN_RULE_MASK * vlanrule_mask, a_uint8_t range_en,
+	a_uint8_t inverse_en, fal_acl_rule_t * rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	/*ctag*/
 	if(vlanrule_mask->cvid_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_VID);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_CTAG_VID);
 		rule->ctag_vid_mask = vlanrule_mask->cvid_mask;
-	}
-	if(range_en)
-	{
-		if(vlanrule->cvid == 0)
+		if(range_en)
 		{
-			rule->ctag_vid_op = FAL_ACL_FIELD_LE;
-			rule->ctag_vid_val = vlanrule_mask->cvid_mask;
-		}
-		else if(vlanrule_mask->cvid_mask == 0xfff)
-		{
-			rule->ctag_vid_op = FAL_ACL_FIELD_GE;
-			rule->ctag_vid_val = vlanrule->cvid;
+			if(vlanrule->cvid == 0)
+			{
+				rule->ctag_vid_op = FAL_ACL_FIELD_LE;
+				rule->ctag_vid_val = vlanrule_mask->cvid_mask;
+			}
+			else if(vlanrule_mask->cvid_mask == 0xfff)
+			{
+				rule->ctag_vid_op = FAL_ACL_FIELD_GE;
+				rule->ctag_vid_val = vlanrule->cvid;
+			}
+			else
+			{
+				rule->ctag_vid_op = FAL_ACL_FIELD_RANGE;
+				rule->ctag_vid_val = vlanrule->cvid;
+			}
+
 		}
 		else
 		{
-			rule->ctag_vid_op = FAL_ACL_FIELD_RANGE;
+			rule->ctag_vid_op = FAL_ACL_FIELD_MASK;
 			rule->ctag_vid_val = vlanrule->cvid;
 		}
-
-	}
-	else
-	{
-		rule->ctag_vid_op = FAL_ACL_FIELD_MASK;
-		rule->ctag_vid_val = vlanrule->cvid;
 	}
 
 	if(vlanrule_mask->cpcp_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI);
+
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI);
 		rule->ctag_pri_val = vlanrule->cpcp;
 		rule->ctag_pri_mask = vlanrule_mask->cpcp_mask;
 	}
 
 	if(vlanrule_mask->cdei_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_CFI);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_CTAG_CFI);
 		rule->ctag_cfi_val = vlanrule->cdei;
 		rule->ctag_cfi_mask = vlanrule_mask->cdei_mask;
 	}
 
 	if(vlanrule_mask->ctag_fmt_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_CTAGGED);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_CTAGGED);
 		rule->ctagged_val = vlanrule->ctag_fmt;
 		rule->ctagged_mask = vlanrule_mask->ctag_fmt_mask;
 	}
@@ -1104,14 +1115,14 @@ sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(ADPT_HPPE_ACL_VLAN_RULE * vlanrule,
 	/*stag*/
 	if(vlanrule_mask->svid_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
 		rule->stag_vid_val = vlanrule->svid;
 		rule->stag_vid_mask = vlanrule_mask->svid_mask;
 	}
 #if defined(APPE)
 	if(vlanrule_mask->spcp_mask_0 || vlanrule_mask->spcp_mask_1)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
 		rule->stag_pri_val = (vlanrule->spcp_1<<VLAN_RULE_SPCP_0_LEN)
 						|vlanrule->spcp_0;
 		rule->stag_pri_mask = (vlanrule_mask->spcp_mask_1<<VLAN_RULE_SPCP_MASK_0_LEN)
@@ -1120,165 +1131,180 @@ sw_error_t _adpt_hppe_acl_vlan_rule_hw_2_sw(ADPT_HPPE_ACL_VLAN_RULE * vlanrule,
 #else
 	if(vlanrule_mask->spcp_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
 		rule->stag_pri_val = vlanrule->spcp;
 		rule->stag_pri_mask = vlanrule_mask->spcp_mask;
 	}
 #endif
 	if(vlanrule_mask->sdei_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_DEI);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_STAG_DEI);
 		rule->stag_dei_val = vlanrule->sdei;
 		rule->stag_dei_mask = vlanrule_mask->sdei_mask;
 	}
 	if(vlanrule_mask->stag_fmt_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAGGED);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_STAGGED);
 		rule->stagged_val = vlanrule->stag_fmt;
 		rule->stagged_mask = vlanrule_mask->stag_fmt_mask;
 	}
 	/*vsi*/
 	if(vlanrule_mask->vsi_valid_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_VSI_VALID);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_VSI_VALID);
 		rule->vsi_valid = vlanrule->vsi_valid;
 		rule->vsi_valid_mask = vlanrule_mask->vsi_valid_mask;
 	}
 	if(vlanrule_mask->vsi_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_VSI);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_VSI);
 		rule->vsi = vlanrule->vsi;
 		rule->vsi_mask = vlanrule_mask->vsi_mask;
 	}
 
 	if(vlanrule_mask->is_ip_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP);
 		rule->is_ip_val = vlanrule->is_ip;
 	}
 
 	if(vlanrule_mask->is_ipv6_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV6);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IPV6);
 		rule->is_ipv6_val = vlanrule->is_ipv6;
 	}
 
 	if(vlanrule_mask->is_ethernet_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_ETHERNET);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_ETHERNET);
 		rule->is_ethernet_val = vlanrule->is_ethernet;
 	}
 
 	if(vlanrule_mask->is_snap_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_SNAP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_SNAP);
 		rule->is_snap_val = vlanrule->is_snap;
 	}
 
 	if(vlanrule_mask->is_fake_mac_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER);
 		rule->is_fake_mac_header_val = vlanrule->is_fake_mac_header;
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
 
 	return SW_OK;
 }
 sw_error_t _adpt_hppe_acl_l2_misc_rule_hw_2_sw(ADPT_HPPE_ACL_L2MISC_RULE * l2misc_rule,
-	ADPT_HPPE_ACL_L2MISC_RULE_MASK * l2misc_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
+	ADPT_HPPE_ACL_L2MISC_RULE_MASK * l2misc_mask, a_uint8_t range_en,
+	a_uint8_t inverse_en, fal_acl_rule_t * rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	/*stag*/
 	if(l2misc_mask->svid_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
 		rule->stag_vid_mask = l2misc_mask->svid_mask;
-	}
-	if(range_en)
-	{
-		if(l2misc_rule->svid == 0)
+		if(range_en)
 		{
-			rule->stag_vid_op = FAL_ACL_FIELD_LE;
-			rule->stag_vid_val = l2misc_mask->svid_mask;
-		}
-		else if(l2misc_mask->svid_mask == 0xfff)
-		{
-			rule->stag_vid_op = FAL_ACL_FIELD_GE;
-			rule->stag_vid_val = l2misc_rule->svid;
+			if(l2misc_rule->svid == 0)
+			{
+				rule->stag_vid_op = FAL_ACL_FIELD_LE;
+				rule->stag_vid_val = l2misc_mask->svid_mask;
+			}
+			else if(l2misc_mask->svid_mask == 0xfff)
+			{
+				rule->stag_vid_op = FAL_ACL_FIELD_GE;
+				rule->stag_vid_val = l2misc_rule->svid;
+			}
+			else
+			{
+				rule->stag_vid_op = FAL_ACL_FIELD_RANGE;
+				rule->stag_vid_val = l2misc_rule->svid;
+			}
+
 		}
 		else
 		{
-			rule->stag_vid_op = FAL_ACL_FIELD_RANGE;
+			rule->stag_vid_op = FAL_ACL_FIELD_MASK;
 			rule->stag_vid_val = l2misc_rule->svid;
 		}
-
-	}
-	else
-	{
-		rule->stag_vid_op = FAL_ACL_FIELD_MASK;
-		rule->stag_vid_val = l2misc_rule->svid;
 	}
 
 	if(l2misc_mask->l2prot_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MAC_ETHTYPE);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MAC_ETHTYPE);
 		rule->ethtype_val = l2misc_rule->l2prot;
 		rule->ethtype_mask = l2misc_mask->l2prot_mask;
 	}
 
 	if(l2misc_mask->pppoe_sessionid_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID);
 		rule->pppoe_sessionid = l2misc_rule->pppoe_sessionid;
 		rule->pppoe_sessionid_mask = l2misc_mask->pppoe_sessionid_mask;
 	}
 
 	if(l2misc_mask->is_ip_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP);
 		rule->is_ip_val = l2misc_rule->is_ip;
 	}
 
 	if(l2misc_mask->is_ipv6_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV6);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IPV6);
 		rule->is_ipv6_val = l2misc_rule->is_ipv6;
 	}
 
 	if(l2misc_mask->is_ethernet_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_ETHERNET);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_ETHERNET);
 		rule->is_ethernet_val = l2misc_rule->is_ethernet;
 	}
 
 	if(l2misc_mask->is_snap_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_SNAP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_SNAP);
 		rule->is_snap_val = l2misc_rule->is_snap;
 	}
 
 	if(l2misc_mask->is_fake_mac_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER);
 		rule->is_fake_mac_header_val = l2misc_rule->is_fake_mac_header;
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
 
 	return SW_OK;
 }
 
 sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 	ADPT_HPPE_ACL_IPV4_RULE * ipv4rule, ADPT_HPPE_ACL_IPV4_RULE_MASK * ipv4rule_mask,
-	a_uint8_t range_en, fal_acl_rule_t *rule)
+	a_uint8_t range_en, a_uint8_t inverse_en, fal_acl_rule_t *rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	if(is_ip_da)
 	{
 		if(ipv4rule_mask->ip_mask_0 || ipv4rule_mask->ip_mask_1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP4_DIP);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP4_DIP);
 			rule->dest_ip4_val = ipv4rule->ip_1<<16|ipv4rule->ip_0;
 			rule->dest_ip4_mask = (ipv4rule_mask->ip_mask_1<<16)|ipv4rule_mask->ip_mask_0;
 		}
 		if(ipv4rule_mask->l4_port_mask)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_DPORT);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L4_DPORT);
 			rule->dest_l4port_mask = ipv4rule_mask->l4_port_mask;
 		}
 		if(range_en)
@@ -1309,13 +1335,13 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 	{
 		if(ipv4rule_mask->ip_mask_0 || ipv4rule_mask->ip_mask_1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP4_SIP);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP4_SIP);
 			rule->src_ip4_val = ipv4rule->ip_1<<16|ipv4rule->ip_0;
 			rule->src_ip4_mask = ipv4rule_mask->ip_mask_1<<16|ipv4rule_mask->ip_mask_0;
 		}
 		if(ipv4rule_mask->l4_port_mask)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_SPORT);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L4_SPORT);
 			rule->src_l4port_mask = ipv4rule_mask->l4_port_mask;
 		}
 		if(range_en)
@@ -1345,21 +1371,26 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 
 	if(ipv4rule_mask->is_ip_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP);
 		rule->is_ip_val = ipv4rule->is_ip;
 	}
 	if(ipv4rule_mask->l3_fragment_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L3_FRAGMENT);
 		rule->is_fragement_val = ipv4rule->l3_fragment;
 		rule->is_fragement_mask = ipv4rule_mask->l3_fragment_mask;
 	}
 	if(ipv4rule_mask->l3_packet_type_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP_PKT_TYPE);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP_PKT_TYPE);
 		rule->l3_pkt_type = ipv4rule->l3_packet_type;
 		rule->l3_pkt_type_mask = ipv4rule_mask->l3_packet_type_mask;
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
 
 	return SW_OK;
 }
@@ -1367,8 +1398,10 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_hw_2_sw(a_uint32_t is_ip_da,
 /*ip_bit_range: 0 mean DIP0 or SIP0, 1 mean DIP1 or SIP1, 2 mean DIP2 or SIP2,*/
 sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_bit_range,
 	ADPT_HPPE_ACL_IPV6_RULE * ipv6rule, ADPT_HPPE_ACL_IPV6_RULE_MASK * ipv6rule_mask,
-	a_uint8_t range_en, fal_acl_rule_t *rule)
+	a_uint8_t range_en, a_uint8_t inverse_en, fal_acl_rule_t *rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	if(is_ip_da)
 	{
 		if(ip_bit_range == 0)
@@ -1377,7 +1410,7 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 				|| ipv6rule_mask->ip_ext_1_mask
 				|| ipv6rule_mask->ip_ext_2_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP6_DIP);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP6_DIP);
 			}
 
 			rule->dest_ip6_val.ul[3] = ipv6rule->ip_ext_1<<16|ipv6rule->ip_port;
@@ -1392,7 +1425,7 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 				|| ipv6rule_mask->ip_ext_1_mask
 				|| ipv6rule_mask->ip_ext_2_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP6_DIP);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP6_DIP);
 			}
 			rule->dest_ip6_val.ul[2] |= (ipv6rule->ip_port<<16)&0xffff0000;
 			rule->dest_ip6_val.ul[1] = ipv6rule->ip_ext_2<<16|ipv6rule->ip_ext_1;
@@ -1405,7 +1438,7 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 			if(ipv6rule_mask->ip_ext_1_mask
 				|| ipv6rule_mask->ip_ext_2_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP6_DIP);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP6_DIP);
 				rule->dest_ip6_val.ul[0] =
 					ipv6rule->ip_ext_2<<16|ipv6rule->ip_ext_1;
 				rule->dest_ip6_mask.ul[0] = ipv6rule_mask->ip_ext_2_mask<<16|
@@ -1413,7 +1446,7 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 			}
 			if(ipv6rule_mask->ip_port_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_DPORT);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L4_DPORT);
 				rule->dest_l4port_mask = ipv6rule_mask->ip_port_mask;
 			}
 			if(range_en)
@@ -1450,7 +1483,7 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 				|| ipv6rule_mask->ip_ext_1_mask
 				|| ipv6rule_mask->ip_ext_2_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP6_SIP);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP6_SIP);
 			}
 			rule->src_ip6_val.ul[3] = ipv6rule->ip_ext_1<<16|ipv6rule->ip_port;
 			rule->src_ip6_val.ul[2] |= (ipv6rule->ip_ext_2)&0xffff;
@@ -1464,7 +1497,7 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 				|| ipv6rule_mask->ip_ext_1_mask
 				|| ipv6rule_mask->ip_ext_2_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP6_SIP);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP6_SIP);
 			}
 			rule->src_ip6_val.ul[2] |= (ipv6rule->ip_port<<16)&0xffff0000;
 			rule->src_ip6_val.ul[1] = ipv6rule->ip_ext_2<<16|ipv6rule->ip_ext_1;
@@ -1477,14 +1510,14 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 			if(ipv6rule_mask->ip_ext_1_mask
 				|| ipv6rule_mask->ip_ext_2_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP6_SIP);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP6_SIP);
 				rule->src_ip6_val.ul[0] = ipv6rule->ip_ext_2<<16|ipv6rule->ip_ext_1;
 				rule->src_ip6_mask.ul[0] = ipv6rule_mask->ip_ext_2_mask<<16|
 					ipv6rule_mask->ip_ext_1_mask;
 			}
 			if(ipv6rule_mask->ip_port_mask)
 			{
-				FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L4_SPORT);
+				FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L4_SPORT);
 				rule->src_l4port_mask = ipv6rule_mask->ip_port_mask;
 			}
 			if(range_en)
@@ -1516,25 +1549,34 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_hw_2_sw(a_uint32_t is_ip_da, a_uint32_t ip_b
 
 	if(ipv6rule_mask->l3_fragment_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L3_FRAGMENT);
 		rule->is_fragement_val = ipv6rule->l3_fragment;
 		rule->is_fragement_mask = ipv6rule_mask->l3_fragment_mask;
 	}
 	if(ipv6rule_mask->l3_packet_type_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP_PKT_TYPE);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP_PKT_TYPE);
 		rule->l3_pkt_type = ipv6rule->l3_packet_type;
 		rule->l3_pkt_type_mask = ipv6rule_mask->l3_packet_type_mask;
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
+
 	return SW_OK;
 }
 
 sw_error_t _adpt_hppe_acl_ipmisc_rule_hw_2_sw(ADPT_HPPE_ACL_IPMISC_RULE * ipmisc_rule,
-	ADPT_HPPE_ACL_IPMISC_RULE_MASK * ipmisc_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
+	ADPT_HPPE_ACL_IPMISC_RULE_MASK * ipmisc_mask, a_uint8_t range_en,
+	a_uint8_t inverse_en, fal_acl_rule_t * rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	if(ipmisc_mask->l3_length_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L3_LENGTH);
 		rule->l3_length_mask = ipmisc_mask->l3_length_mask;
 	}
 	if(range_en)
@@ -1563,97 +1605,106 @@ sw_error_t _adpt_hppe_acl_ipmisc_rule_hw_2_sw(ADPT_HPPE_ACL_IPMISC_RULE * ipmisc
 
 	if(ipmisc_mask->l3_prot_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP_PROTO);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP_PROTO);
 		rule->ip_proto_val = ipmisc_rule->l3_prot;
 		rule->ip_proto_mask = ipmisc_mask->l3_prot_mask;
 	}
 	if(ipmisc_mask->l3_dscp_tc_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP_DSCP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP_DSCP);
 		rule->ip_dscp_val = ipmisc_rule->l3_dscp_tc;
 		rule->ip_dscp_mask = ipmisc_mask->l3_dscp_tc_mask;
 	}
 
 	if(ipmisc_mask->first_fragment_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_FIRST_FRAGMENT);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_FIRST_FRAGMENT);
 		rule->is_first_frag_val = ipmisc_rule->first_fragment;
 	}
 	if(ipmisc_mask->tcp_flags_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_TCP_FLAG);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_TCP_FLAG);
 		rule->tcp_flag_val = ipmisc_rule->tcp_flags;
 		rule->tcp_flag_mask = ipmisc_mask->tcp_flags_mask;
 	}
 	if(ipmisc_mask->ipv4_option_state_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV4_OPTION);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IPV4_OPTION);
 		rule->is_ipv4_option_val = ipmisc_rule->ipv4_option_state;
 	}
 	if(ipmisc_mask->l3_ttl_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L3_TTL);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L3_TTL);
 		rule->l3_ttl = ipmisc_rule->l3_ttl;
 		rule->l3_ttl_mask = ipmisc_mask->l3_ttl_mask;
 	}
 	if(ipmisc_mask->ah_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_AH_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_AH_HEADER);
 		rule->is_ah_header_val = ipmisc_rule->ah_header;
 	}
 	if(ipmisc_mask->esp_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_ESP_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_ESP_HEADER);
 		rule->is_esp_header_val = ipmisc_rule->esp_header;
 	}
 	if(ipmisc_mask->mobility_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_MOBILITY_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_MOBILITY_HEADER);
 		rule->is_mobility_header_val = ipmisc_rule->mobility_header;
 	}
 	if(ipmisc_mask->fragment_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_FRAGMENT_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_FRAGMENT_HEADER);
 		rule->is_fragment_header_val = ipmisc_rule->fragment_header;
 	}
 	if(ipmisc_mask->other_header_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_OTHER_EXT_HEADER);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_OTHER_EXT_HEADER);
 		rule->is_other_header_val = ipmisc_rule->other_header;
 	}
 	if(ipmisc_mask->is_ipv6_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV6);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IPV6);
 		rule->is_ipv6_val = ipmisc_rule->is_ipv6;
 	}
 	if(ipmisc_mask->l3_fragment_mask)
 	{
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_L3_FRAGMENT);
 		rule->is_fragement_val = ipmisc_rule->l3_fragment;
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
+
 	return SW_OK;
 }
 
-sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(a_uint32_t is_win1, ADPT_HPPE_ACL_UDF_RULE * udfrule, 
-	ADPT_HPPE_ACL_UDF_RULE_MASK * udfrule_mask, a_uint8_t range_en, fal_acl_rule_t * rule)
+sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(a_uint32_t is_win1, ADPT_HPPE_ACL_UDF_RULE * udfrule,
+	ADPT_HPPE_ACL_UDF_RULE_MASK * udfrule_mask, a_uint8_t range_en,
+	a_uint8_t inverse_en, fal_acl_rule_t * rule)
 {
+	fal_acl_field_map_t field_flg = {0};
+
 	if(is_win1)
 	{
 		if(udfrule->udf2_valid == 1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF3);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_UDF3);
 			rule->udf3_val = udfrule->udf2;
 			rule->udf3_mask = udfrule_mask->udf2_mask;
 		}
 		if(udfrule->udf1_valid == 1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF2);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_UDF2);
 			rule->udf2_val = udfrule->udf1;
 			rule->udf2_mask = udfrule_mask->udf1_mask;
 		}
 		if(udfrule->udf0_valid == 1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF1);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_UDF1);
 			if(range_en == 1)
 			{
 				if(udfrule->udf0 == 0)
@@ -1686,19 +1737,19 @@ sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(a_uint32_t is_win1, ADPT_HPPE_ACL_UDF
 	{
 		if(udfrule->udf2_valid == 1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF2);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_UDF2);
 			rule->udf2_val = udfrule->udf2;
 			rule->udf2_mask = udfrule_mask->udf2_mask;
 		}
 		if(udfrule->udf1_valid == 1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF1);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_UDF1);
 			rule->udf1_val = udfrule->udf1;
 			rule->udf1_mask = udfrule_mask->udf1_mask;
 		}
 		if(udfrule->udf0_valid == 1)
 		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_UDF0);
+			FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_UDF0);
 			if(range_en == 1)
 			{
 				if(udfrule->udf0 == 0)
@@ -1731,13 +1782,19 @@ sw_error_t _adpt_hppe_acl_udf_rule_hw_2_sw(a_uint32_t is_win1, ADPT_HPPE_ACL_UDF
 	if(udfrule_mask->is_ip)
 	{
 		rule->is_ip_val = udfrule->is_ip;
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IP);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IP);
 	}
 	if(udfrule_mask->is_ipv6)
 	{
 		rule->is_ipv6_val = udfrule->is_ipv6;
-		FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_IPV6);
+		FAL_FIELD_FLG_SET(field_flg, FAL_ACL_FIELD_IPV6);
 	}
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(rule->inverse_field_flg, field_flg);
+	else
+		FAL_FIELD_FLG_CPY(rule->field_flg, field_flg);
+
 	return SW_OK;
 }
 
@@ -1895,83 +1952,83 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 
 sw_error_t
 _adpt_hppe_acl_rule_hw_2_sw(a_uint32_t dev_id, a_uint32_t rule_type,
-	a_uint8_t range_en, void * hw_rule,
+	a_uint8_t range_en, a_uint8_t inverse_en, void * hw_rule,
 	void * hw_rule_mask, fal_acl_rule_t * rule)
 {
 	if(rule_type == ADPT_ACL_HPPE_MAC_DA_RULE)
 	{
 		_adpt_hppe_acl_mac_rule_hw_2_sw(1, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, rule);
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_MAC_SA_RULE)
 	{
 		_adpt_hppe_acl_mac_rule_hw_2_sw(0, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, rule);
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_VLAN_RULE)
 	{
 		_adpt_hppe_acl_vlan_rule_hw_2_sw((ADPT_HPPE_ACL_VLAN_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_L2_MISC_RULE)
 	{
 		_adpt_hppe_acl_l2_misc_rule_hw_2_sw((ADPT_HPPE_ACL_L2MISC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV4_DIP_RULE)
 	{
 		_adpt_hppe_acl_ipv4_rule_hw_2_sw(1, (ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV4_SIP_RULE)
 	{
 		_adpt_hppe_acl_ipv4_rule_hw_2_sw(0, (ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV6_DIP0_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 0, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV6_DIP1_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 1, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV6_DIP2_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_hw_2_sw(1, 2, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV6_SIP0_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 0, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV6_SIP1_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 1, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPV6_SIP2_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_hw_2_sw(0, 2, (ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_IPMISC_RULE)
 	{
 		_adpt_hppe_acl_ipmisc_rule_hw_2_sw((ADPT_HPPE_ACL_IPMISC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_UDF0_RULE)
 	{
 		_adpt_hppe_acl_udf_rule_hw_2_sw(0, (ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 	if(rule_type == ADPT_ACL_HPPE_UDF1_RULE)
 	{
 		_adpt_hppe_acl_udf_rule_hw_2_sw(1, (ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, rule);
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, inverse_en, rule);
 	}
 #if defined(APPE)
 	if(rule_type == ADPT_ACL_APPE_EXT_UDF0_RULE)
@@ -2027,12 +2084,7 @@ _adpt_hppe_acl_rule_sw_query(a_uint32_t dev_id,
 
 		/*get sw rule info from first 53bit hw rule reg fields*/
 		_adpt_hppe_acl_rule_hw_2_sw(dev_id, hw_reg.bf.rule_type,
-			hw_reg.bf.range_en, &hw_reg, &hw_mask, rule);
-
-		if(hw_reg.bf.inverse_en == 1)
-		{
-			FAL_FIELD_FLG_SET(rule->field_flg, FAL_ACL_FIELD_INVERSE_ALL);
-		}
+			hw_reg.bf.range_en, hw_reg.bf.inverse_en, &hw_reg, &hw_mask, rule);
 
 		_adpt_hppe_acl_action_hw_2_sw(dev_id, &hw_act, rule);
 
@@ -2265,28 +2317,32 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule)
 {
 	a_uint8_t rangecount = 0;
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->stag_vid_op)
 		{
 			rangecount++;
 		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_VID))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_VID) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_CTAG_VID))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->ctag_vid_op)
 		{
 			rangecount++;
 		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_DPORT))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_DPORT) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L4_DPORT))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->dest_l4port_op)
 		{
 			rangecount++;
 		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_SPORT))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_SPORT) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L4_SPORT))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->src_l4port_op)
 		{
@@ -2294,7 +2350,8 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L3_LENGTH))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->l3_length_op)
 		{
@@ -2302,7 +2359,8 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF0))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->udf0_op)
 		{
@@ -2310,7 +2368,8 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF1))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->udf1_op)
 		{
@@ -2318,7 +2377,8 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_TYPE))
+	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_TYPE) ||
+		FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_TYPE))
 	{
 		if (FAL_ACL_FIELD_MASK != rule->icmp_type_code_op)
 		{
@@ -2329,7 +2389,8 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
 		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2))
+		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) ||
+			FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF2))
 		{
 			if (FAL_ACL_FIELD_MASK != rule->udf2_op)
 			{
@@ -2425,19 +2486,15 @@ sw_error_t _adpt_hppe_acl_alloc_entries(a_uint32_t dev_id, a_uint32_t *hw_list_i
 
 static sw_error_t
 _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
+				fal_acl_rule_t * rule, ADPT_HPPE_ACL_RULE_MAP *rule_map)
 {
 	a_uint32_t l2_rule_type_map = 0;
-	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n", rule->field_flg[0], rule->field_flg[1]);
-
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_DA))
 	{
-		SSDK_DEBUG("select MAC DA rule\n");
 		l2_rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_SA))
 	{
-		SSDK_DEBUG("select MAC SA rule\n");
 		l2_rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_SA_RULE);
 	}
 	if((FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI)) ||
@@ -2450,7 +2507,6 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t
 		(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_VSI)) ||
 		(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_VSI_VALID)))
 	{
-		SSDK_DEBUG("select VLAN rule\n");
 		l2_rule_type_map |= (1<<ADPT_ACL_HPPE_VLAN_RULE);
 	}
 
@@ -2459,7 +2515,6 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t
 		((FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID)) &&
 		(rule->stag_vid_op != FAL_ACL_FIELD_MASK)))
 	{
-		SSDK_DEBUG("select L2 MISC rule\n");
 		l2_rule_type_map |= (1<<ADPT_ACL_HPPE_L2_MISC_RULE);
 	}
 
@@ -2468,7 +2523,6 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 		{
-			SSDK_DEBUG("select VLAN rule\n");
 			l2_rule_type_map |= (1<<ADPT_ACL_HPPE_VLAN_RULE);
 		}
 	}
@@ -2479,35 +2533,56 @@ _adpt_hppe_acl_l2_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t
 			(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ETHERNET)) ||
 			(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER)))
 		{
-			SSDK_DEBUG("select MAC DA rule\n");
 			l2_rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
 		}
 	}
 
-	*rule_type_map |= l2_rule_type_map;
-	SSDK_DEBUG("rule_type_map = 0x%x\n", *rule_type_map);
+	rule_map->rule_type_map |= l2_rule_type_map;
+
+	/* inverse MAC_DA rule count */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_DA))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_MAC_DA_RULE] ++;
+
+	/* inverse MAC_SA rule count */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_SA))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_MAC_SA_RULE] ++;
+
+	/* inverse L2_MISC rule count */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_ETHTYPE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_L2_MISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_L2_MISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_L2_MISC_RULE] ++;
+
+	/* inverse VLAN rule count */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_STAG_PRI))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_VLAN_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_CTAG_VID))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_VLAN_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_VLAN_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_VSI))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_VLAN_RULE] ++;
 
 	return SW_OK;
 }
 static sw_error_t
 _adpt_hppe_acl_ipv4_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
+				fal_acl_rule_t * rule, ADPT_HPPE_ACL_RULE_MAP *rule_map)
 {
-	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
-				rule->field_flg[0], rule->field_flg[1]);
-
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_SPORT) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP4_SIP) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_TYPE) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_CODE))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_SIP_RULE);
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_SIP_RULE);
 	}
 
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_DPORT) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP4_DIP))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE);
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE);
 	}
 
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH) ||
@@ -2521,63 +2596,89 @@ _adpt_hppe_acl_ipv4_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ESP_HEADER) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PROTO))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_IPMISC_RULE);
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPMISC_RULE);
 	}
-	if((!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE))) &&
-		(!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV4_SIP_RULE))))
+	if((!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE))) &&
+		(!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV4_SIP_RULE))))
 	{/*both dip and sip rule are not selected, but ip_pkt_type field selected*/
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE);
 		}
 	}
-	if(*rule_type_map == 0)
+	if(rule_map->rule_type_map == 0)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV4_DIP_RULE);
 		}
 	}
 
-	SSDK_DEBUG("rule_type_map = 0x%x\n", *rule_type_map);
+	/* inverse IPV4_SIP rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L4_SPORT))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_SIP_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP4_SIP))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_SIP_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_TYPE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_SIP_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_CODE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_SIP_RULE] ++;
+
+	/* inverse IPV4_DIP rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L4_DPORT))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_DIP_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP4_DIP))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_DIP_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV4_DIP_RULE] ++;
+
+	/* inverse IPMISC rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L3_LENGTH))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP_DSCP))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_TCP_FLAG))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L3_TTL))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PROTO))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+
 	return SW_OK;
 }
 
 static sw_error_t
 _adpt_hppe_acl_ipv6_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
+				fal_acl_rule_t * rule, ADPT_HPPE_ACL_RULE_MAP *rule_map)
 {
-	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
-				rule->field_flg[0], rule->field_flg[1]);
-
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_SPORT) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_TYPE) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_CODE))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP2_RULE);
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP2_RULE);
 	}
 
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP6_SIP))
 	{
 		if(rule->src_ip6_mask.ul[3] != 0 || rule->src_ip6_mask.ul[2]&0x0000ffff)
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP0_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP0_RULE);
 		if(rule->src_ip6_mask.ul[1] != 0 || rule->src_ip6_mask.ul[2]&0xffff0000)
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP1_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP1_RULE);
 		if(rule->src_ip6_mask.ul[0] != 0 )
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP2_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_SIP2_RULE);
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_DPORT))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP2_RULE);
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP2_RULE);
 	}
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP6_DIP))
 	{
 		if(rule->dest_ip6_mask.ul[3] != 0 || rule->dest_ip6_mask.ul[2]&0x0000ffff)
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE);
 		if(rule->dest_ip6_mask.ul[1] != 0 || rule->dest_ip6_mask.ul[2]&0xffff0000)
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP1_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP1_RULE);
 		if(rule->dest_ip6_mask.ul[0] != 0 )
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP2_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP2_RULE);
 	}
 
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH) ||
@@ -2593,42 +2694,85 @@ _adpt_hppe_acl_ipv6_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_AH_HEADER) ||
 		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PROTO))
 	{
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_IPMISC_RULE);
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPMISC_RULE);
 	}
 
-	if((!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE))) &&
-		(!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_DIP1_RULE))) &&
-		(!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_DIP2_RULE))) &&
-		(!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_SIP0_RULE))) &&
-		(!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_SIP1_RULE))) &&
-		(!(*rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_SIP2_RULE))))
+	if((!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE))) &&
+		(!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_DIP1_RULE))) &&
+		(!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_DIP2_RULE))) &&
+		(!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_SIP0_RULE))) &&
+		(!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_SIP1_RULE))) &&
+		(!(rule_map->rule_type_map & (1<<ADPT_ACL_HPPE_IPV6_SIP2_RULE))))
 	{/*both dip and sip rule are not selected, but ip_pkt_type field selected*/
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE);
 		}
 	}
 
-	if(*rule_type_map == 0)
+	if(rule_map->rule_type_map == 0)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_IPV6_DIP0_RULE);
 		}
 	}
 
-	SSDK_DEBUG("rule_type_map = 0x%x\n", *rule_type_map);
+	/* inverse IPV6 SIP rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L4_SPORT))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_SIP2_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_TYPE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_SIP2_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_CODE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_SIP2_RULE] ++;
+
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP6_SIP))
+	{
+		if(rule->src_ip6_mask.ul[3] != 0 || rule->src_ip6_mask.ul[2]&0x0000ffff)
+			rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_SIP0_RULE] ++;
+		if(rule->src_ip6_mask.ul[1] != 0 || rule->src_ip6_mask.ul[2]&0xffff0000)
+			rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_SIP1_RULE] ++;
+		if(rule->src_ip6_mask.ul[0] != 0 )
+			rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_SIP2_RULE] ++;
+	}
+
+	/* inverse IPV6 DIP rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L4_DPORT))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_DIP2_RULE] ++;
+
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_DIP0_RULE] ++;
+
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP6_DIP))
+	{
+		if(rule->dest_ip6_mask.ul[3] != 0 || rule->dest_ip6_mask.ul[2]&0x0000ffff)
+			rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_DIP0_RULE] ++;
+		if(rule->dest_ip6_mask.ul[1] != 0 || rule->dest_ip6_mask.ul[2]&0xffff0000)
+			rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_DIP1_RULE] ++;
+		if(rule->dest_ip6_mask.ul[0] != 0 )
+			rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPV6_DIP2_RULE] ++;
+	}
+
+	/* inverse IPMISC rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L3_LENGTH))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP_DSCP))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_TCP_FLAG))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_L3_TTL))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PROTO))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_IPMISC_RULE] ++;
 
 	return SW_OK;
 }
 
 static sw_error_t
 _adpt_hppe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-				fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
+				fal_acl_rule_t * rule, ADPT_HPPE_ACL_RULE_MAP *rule_map)
 {
 	a_uint32_t udf_rule_type_map = 0;
-	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
-				rule->field_flg[0], rule->field_flg[1]);
 
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0))
 	{
@@ -2652,18 +2796,35 @@ _adpt_hppe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_
 			udf_rule_type_map |= (1<<ADPT_ACL_HPPE_UDF0_RULE);
 		}
 	}
-	*rule_type_map |= udf_rule_type_map;
-	SSDK_DEBUG("rule_type_map = 0x%x\n", *rule_type_map);
+	rule_map->rule_type_map |= udf_rule_type_map;
+
+	/* inverse UDF rule */
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF0))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_UDF0_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF3))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_UDF1_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF1))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_UDF1_RULE] ++;
+	if(FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF2))
+		rule_map->inverse_rule_type_count[ADPT_ACL_HPPE_UDF1_RULE] ++;
 
 	return SW_OK;
 }
 
 sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_mac_da,
-		ADPT_HPPE_ACL_MAC_RULE * macrule, ADPT_HPPE_ACL_MAC_RULE_MASK *macrule_mask)
+		ADPT_HPPE_ACL_MAC_RULE * macrule, ADPT_HPPE_ACL_MAC_RULE_MASK *macrule_mask,
+		a_uint8_t inverse_en)
 {
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
 	if(is_mac_da)
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_DA))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_DA))
 		{
 			macrule->mac_addr_0 = rule->dest_mac_val.uc[5] | \
 							rule->dest_mac_val.uc[4] << 8 | \
@@ -2678,11 +2839,16 @@ sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_m
 							rule->dest_mac_mask.uc[2] << 24;
 			macrule_mask->mac_addr_mask_1 = rule->dest_mac_mask.uc[1] | \
 							rule->dest_mac_mask.uc[0] << 8;
+
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_DA);
+				return SW_OK;
+			}
 		}
 	}
 	else
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_SA))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_SA))
 		{
 			macrule->mac_addr_0 = rule->src_mac_val.uc[5] | \
 							rule->src_mac_val.uc[4] << 8 | \
@@ -2697,30 +2863,35 @@ sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_m
 							rule->src_mac_mask.uc[2] << 24;
 			macrule_mask->mac_addr_mask_1 = rule->src_mac_mask.uc[1] | \
 							rule->src_mac_mask.uc[0] << 8;
+
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_SA);
+				return SW_OK;
+			}
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP))
 	{
 		macrule->is_ip = rule->is_ip_val;
 		macrule_mask->is_ip_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IPV6))
 	{
 		macrule->is_ipv6 = rule->is_ipv6_val;
 		macrule_mask->is_ipv6_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ETHERNET))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ETHERNET))
 	{
 		macrule->is_ethernet = rule->is_ethernet_val;
 		macrule_mask->is_ethernet_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_SNAP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_SNAP))
 	{
 		macrule->is_snap = rule->is_snap_val;
 		macrule_mask->is_snap_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER))
 	{
 		macrule->is_fake_mac_header = rule->is_fake_mac_header_val;
 		macrule_mask->is_fake_mac_header_mask = 1;
@@ -2731,10 +2902,17 @@ sw_error_t _adpt_hppe_acl_mac_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_m
 
 sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 	ADPT_HPPE_ACL_VLAN_RULE * vlanrule, ADPT_HPPE_ACL_VLAN_RULE_MASK *vlanrule_mask,
-	a_uint8_t *range_en)
+	a_uint8_t *range_en, a_uint8_t inverse_en)
 {
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
 	/*ctag*/
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_VID))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_CTAG_VID))
 	{
 		if(FAL_ACL_FIELD_MASK == rule->ctag_vid_op)
 		{
@@ -2765,31 +2943,43 @@ sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 			vlanrule_mask->cvid_mask = max;
 			*range_en = 1;
 		}
+		if (inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_CTAG_VID);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI))
 	{
 		vlanrule->cpcp = rule->ctag_pri_val;
 		vlanrule_mask->cpcp_mask = rule->ctag_pri_mask;
+		if (inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_CTAG_PRI);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAG_CFI))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_CTAG_CFI))
 	{
 		vlanrule->cdei = rule->ctag_cfi_val;
 		vlanrule_mask->cdei_mask = rule->ctag_cfi_mask;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_CTAGGED))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_CTAGGED))
 	{
 		vlanrule->ctag_fmt = rule->ctagged_val;
 		vlanrule_mask->ctag_fmt_mask = rule->ctagged_mask;
 	}
 	/*stag*/
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID) &&
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_STAG_VID) &&
 		(rule->stag_vid_op == FAL_ACL_FIELD_MASK))
 	{
 		vlanrule->svid = rule->stag_vid_val;
 		vlanrule_mask->svid_mask = rule->stag_vid_mask;
+		if (inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_PRI))
-        {
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_STAG_PRI))
+	{
 #if defined(APPE)
 		vlanrule->spcp_0 = rule->stag_pri_val;
 		vlanrule->spcp_1 = rule->stag_pri_val>>VLAN_RULE_SPCP_0_LEN;
@@ -2799,49 +2989,57 @@ sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 		vlanrule->spcp = rule->stag_pri_val;
 		vlanrule_mask->spcp_mask = rule->stag_pri_mask;
 #endif
+		if (inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_STAG_PRI);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_DEI))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_STAG_DEI))
 	{
 		vlanrule->sdei = rule->stag_dei_val;
 		vlanrule_mask->sdei_mask = rule->stag_dei_mask;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAGGED))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_STAGGED))
 	{
 		vlanrule->stag_fmt = rule->stagged_val;
 		vlanrule_mask->stag_fmt_mask = rule->stagged_mask;
 	}
 	/*vsi*/
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_VSI_VALID))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_VSI_VALID))
 	{
 		vlanrule->vsi_valid= rule->vsi_valid;
 		vlanrule_mask->vsi_valid_mask = rule->vsi_valid_mask;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_VSI))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_VSI))
 	{
 		vlanrule->vsi= rule->vsi;
 		vlanrule_mask->vsi_mask = rule->vsi_mask;
+		if (inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_VSI);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP))
 	{
 		vlanrule->is_ip = rule->is_ip_val;
 		vlanrule_mask->is_ip_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IPV6))
 	{
 		vlanrule->is_ipv6 = rule->is_ipv6_val;
 		vlanrule_mask->is_ipv6_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ETHERNET))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ETHERNET))
 	{
 		vlanrule->is_ethernet = rule->is_ethernet_val;
 		vlanrule_mask->is_ethernet_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_SNAP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_SNAP))
 	{
 		vlanrule->is_snap = rule->is_snap_val;
 		vlanrule_mask->is_snap_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER))
 	{
 		vlanrule->is_fake_mac_header = rule->is_fake_mac_header_val;
 		vlanrule_mask->is_fake_mac_header_mask = 1;
@@ -2853,10 +3051,17 @@ sw_error_t _adpt_hppe_acl_vlan_rule_sw_2_hw(fal_acl_rule_t *rule,
 
 sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
 	ADPT_HPPE_ACL_L2MISC_RULE * l2misc_rule, ADPT_HPPE_ACL_L2MISC_RULE_MASK * l2misc_mask,
-	a_uint8_t *range_en)
+	a_uint8_t *range_en, a_uint8_t inverse_en)
 {
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
 	/*stag*/
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_STAG_VID))
 	{
 		if(FAL_ACL_FIELD_MASK == rule->stag_vid_op)
 		{
@@ -2889,38 +3094,50 @@ sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
 			l2misc_mask->svid_mask = max;
 			*range_en = 1;
 		}
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_STAG_VID);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MAC_ETHTYPE))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MAC_ETHTYPE))
 	{
 		l2misc_rule->l2prot = rule->ethtype_val;
 		l2misc_mask->l2prot_mask = rule->ethtype_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_MAC_ETHTYPE);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID))
 	{
 		l2misc_rule->pppoe_sessionid = rule->pppoe_sessionid;
 		l2misc_mask->pppoe_sessionid_mask = rule->pppoe_sessionid_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_PPPOE_SESSIONID);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP))
 	{
 		l2misc_rule->is_ip = rule->is_ip_val;
 		l2misc_mask->is_ip_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IPV6))
 	{
 		l2misc_rule->is_ipv6 = rule->is_ipv6_val;
 		l2misc_mask->is_ipv6_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ETHERNET))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ETHERNET))
 	{
 		l2misc_rule->is_ethernet = rule->is_ethernet_val;
 		l2misc_mask->is_ethernet_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_SNAP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_SNAP))
 	{
 		l2misc_rule->is_snap = rule->is_snap_val;
 		l2misc_mask->is_snap_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_FAKE_MAC_HEADER))
 	{
 		l2misc_rule->is_fake_mac_header = rule->is_fake_mac_header_val;
 		l2misc_mask->is_fake_mac_header_mask = 1;
@@ -2931,18 +3148,29 @@ sw_error_t _adpt_hppe_acl_l2_misc_rule_sw_2_hw(fal_acl_rule_t *rule,
 
 sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_ip_da,
 	ADPT_HPPE_ACL_IPV4_RULE * ipv4rule, ADPT_HPPE_ACL_IPV4_RULE_MASK *ipv4rule_mask,
-	a_uint8_t *range_en)
+	a_uint8_t *range_en, a_uint8_t inverse_en)
 {
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
 	if(is_ip_da)
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP4_DIP))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP4_DIP))
 		{
 			ipv4rule->ip_0 = rule->dest_ip4_val&0xffff;
 			ipv4rule->ip_1 = (rule->dest_ip4_val>>16)&0xffff;
 			ipv4rule_mask->ip_mask_0 = rule->dest_ip4_mask&0xffff;
 			ipv4rule_mask->ip_mask_1 = (rule->dest_ip4_mask)>>16&0xffff;
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP4_DIP);
+				return SW_OK;
+			}
 		}
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_DPORT))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L4_DPORT))
 		{
 			if(FAL_ACL_FIELD_MASK == rule->dest_l4port_op)
 			{
@@ -2973,18 +3201,26 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 				ipv4rule_mask->l4_port_mask = max;
 				*range_en = 1;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_L4_DPORT);
+				return SW_OK;
+			}
 		}
 	}
 	else
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP4_SIP))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP4_SIP))
 		{
 			ipv4rule->ip_0 = rule->src_ip4_val&0xffff;
 			ipv4rule->ip_1 = (rule->src_ip4_val>>16)&0xffff;
 			ipv4rule_mask->ip_mask_0 = rule->src_ip4_mask&0xffff;
 			ipv4rule_mask->ip_mask_1 = (rule->src_ip4_mask>>16)&0xffff;
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP4_SIP);
+				return SW_OK;
+			}
 		}
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_SPORT))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L4_SPORT))
 		{
 			if(FAL_ACL_FIELD_MASK == rule->src_l4port_op)
 			{
@@ -3015,11 +3251,15 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 				ipv4rule_mask->l4_port_mask = max;
 				*range_en = 1;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_L4_SPORT);
+				return SW_OK;
+			}
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_CODE) ||
-		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_TYPE))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ICMP_CODE) ||
+		FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ICMP_TYPE))
 	{
 		if(FAL_ACL_FIELD_MASK == rule->icmp_type_code_op)
 		{
@@ -3050,22 +3290,31 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 			ipv4rule_mask->l4_port_mask = max;
 			*range_en = 1;
 		}
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_CODE);
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_TYPE);
+			return SW_OK;
+		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP))
 	{
 		ipv4rule->is_ip = rule->is_ip_val;
 		ipv4rule_mask->is_ip_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
 	{
 		ipv4rule->l3_fragment = rule->is_fragement_val;
 		ipv4rule_mask->l3_fragment_mask = rule->is_fragement_mask;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
 	{
 		ipv4rule->l3_packet_type = rule->l3_pkt_type;
 		ipv4rule_mask->l3_packet_type_mask = rule->l3_pkt_type_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PKT_TYPE);
+			return SW_OK;
+		}
 	}
 
 	return SW_OK;
@@ -3074,11 +3323,18 @@ sw_error_t _adpt_hppe_acl_ipv4_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 /*ip_bit_range: 0 mean DIP0 or SIP0, 1 mean DIP1 or SIP1, 2 mean DIP2 or SIP2,*/
 sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_ip_da,
 	a_uint32_t ip_bit_range, ADPT_HPPE_ACL_IPV6_RULE *ipv6rule,
-	ADPT_HPPE_ACL_IPV6_RULE_MASK *ipv6rule_mask, a_uint8_t *range_en)
+	ADPT_HPPE_ACL_IPV6_RULE_MASK *ipv6rule_mask, a_uint8_t *range_en, a_uint8_t inverse_en)
 {
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
 	if(is_ip_da)
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP6_DIP))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP6_DIP))
 		{
 			if(ip_bit_range == 0)
 			{
@@ -3105,8 +3361,12 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 				ipv6rule_mask->ip_ext_1_mask = (rule->dest_ip6_mask.ul[0])&0xffff;
 				ipv6rule_mask->ip_ext_2_mask = (rule->dest_ip6_mask.ul[0]>>16)&0xffff;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP6_DIP);
+				return SW_OK;
+			}
 		}
-		if((ip_bit_range == 2) && (FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_DPORT)))
+		if((ip_bit_range == 2) && (FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L4_DPORT)))
 		{
 			if(FAL_ACL_FIELD_MASK == rule->dest_l4port_op)
 			{
@@ -3137,11 +3397,15 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 				ipv6rule_mask->ip_port_mask = max;
 				*range_en = 1;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_L4_DPORT);
+				return SW_OK;
+			}
 		}
 	}
 	else
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP6_SIP))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP6_SIP))
 		{
 			if(ip_bit_range == 0)
 			{
@@ -3168,8 +3432,12 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 				ipv6rule_mask->ip_ext_1_mask = (rule->src_ip6_mask.ul[0])&0xffff;
 				ipv6rule_mask->ip_ext_2_mask = (rule->src_ip6_mask.ul[0]>>16)&0xffff;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP6_SIP);
+				return SW_OK;
+			}
 		}
-		if((ip_bit_range == 2) && (FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L4_SPORT)))
+		if((ip_bit_range == 2) && (FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L4_SPORT)))
 		{
 			if(FAL_ACL_FIELD_MASK == rule->src_l4port_op)
 			{
@@ -3200,11 +3468,15 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 				ipv6rule_mask->ip_port_mask = max;
 				*range_en = 1;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_L4_SPORT);
+				return SW_OK;
+			}
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_CODE) ||
-		FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ICMP_TYPE))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ICMP_CODE) ||
+		FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ICMP_TYPE))
 	{
 		if(FAL_ACL_FIELD_MASK == rule->icmp_type_code_op)
 		{
@@ -3235,25 +3507,41 @@ sw_error_t _adpt_hppe_acl_ipv6_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_
 			ipv6rule_mask->ip_port_mask = max;
 			*range_en = 1;
 		}
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_CODE);
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_ICMP_TYPE);
+			return SW_OK;
+		}	
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
 	{
 		ipv6rule->l3_fragment = rule->is_fragement_val;
 		ipv6rule_mask->l3_fragment_mask = rule->is_fragement_mask;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP_PKT_TYPE))
 	{
 		ipv6rule->l3_packet_type = rule->l3_pkt_type;
 		ipv6rule_mask->l3_packet_type_mask = rule->l3_pkt_type_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PKT_TYPE);
+			return SW_OK;
+		}
 	}
 	return SW_OK;
 }
 
 sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
 	ADPT_HPPE_ACL_IPMISC_RULE * ipmisc_rule, ADPT_HPPE_ACL_IPMISC_RULE_MASK *ipmisc_mask,
-	a_uint8_t *range_en)
+	a_uint8_t *range_en, a_uint8_t inverse_en)
 {
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_LENGTH))
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L3_LENGTH))
 	{
 		if(FAL_ACL_FIELD_MASK == rule->l3_length_op)
 		{
@@ -3284,68 +3572,84 @@ sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
 			ipmisc_mask->l3_length_mask = max;
 			*range_en = 1;
 		}
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_L3_LENGTH);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_PROTO))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP_PROTO))
 	{
 		ipmisc_rule->l3_prot = rule->ip_proto_val;
 		ipmisc_mask->l3_prot_mask = rule->ip_proto_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP_PROTO);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP_DSCP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP_DSCP))
 	{
 		ipmisc_rule->l3_dscp_tc = rule->ip_dscp_val;
 		ipmisc_mask->l3_dscp_tc_mask = rule->ip_dscp_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_IP_DSCP);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_FIRST_FRAGMENT))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_FIRST_FRAGMENT))
 	{
 		ipmisc_rule->first_fragment = rule->is_first_frag_val;
 		ipmisc_mask->first_fragment_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_TCP_FLAG))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_TCP_FLAG))
 	{
 		ipmisc_rule->tcp_flags = rule->tcp_flag_val;
 		ipmisc_mask->tcp_flags_mask = rule->tcp_flag_mask;
+		if(inverse_en) {
+			FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_TCP_FLAG);
+			return SW_OK;
+		}
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV4_OPTION))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IPV4_OPTION))
 	{
 		ipmisc_rule->ipv4_option_state = rule->is_ipv4_option_val;
 		ipmisc_mask->ipv4_option_state_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_TTL))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L3_TTL))
 	{
 		ipmisc_rule->l3_ttl = rule->l3_ttl;
 		ipmisc_mask->l3_ttl_mask = rule->l3_ttl_mask;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_AH_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_AH_HEADER))
 	{
 		ipmisc_rule->ah_header = rule->is_ah_header_val;
 		ipmisc_mask->ah_header_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_ESP_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_ESP_HEADER))
 	{
 		ipmisc_rule->esp_header = rule->is_esp_header_val;
 		ipmisc_mask->esp_header_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_MOBILITY_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_MOBILITY_HEADER))
 	{
 		ipmisc_rule->mobility_header = rule->is_mobility_header_val;
 		ipmisc_mask->mobility_header_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_FRAGMENT_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_FRAGMENT_HEADER))
 	{
 		ipmisc_rule->fragment_header = rule->is_fragment_header_val;
 		ipmisc_mask->fragment_header_mask= 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_OTHER_EXT_HEADER))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_OTHER_EXT_HEADER))
 	{
 		ipmisc_rule->other_header = rule->is_other_header_val;
 		ipmisc_mask->other_header_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IPV6))
 	{
 		ipmisc_rule->is_ipv6 = rule->is_ipv6_val;
 		ipmisc_mask->is_ipv6_mask = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_L3_FRAGMENT))
 	{
 		ipmisc_rule->l3_fragment = rule->is_fragement_val;
 		ipmisc_mask->l3_fragment_mask = 1;
@@ -3355,27 +3659,42 @@ sw_error_t _adpt_hppe_acl_ipmisc_rule_sw_2_hw(fal_acl_rule_t *rule,
 
 sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_win1,
 	ADPT_HPPE_ACL_UDF_RULE * udfrule, ADPT_HPPE_ACL_UDF_RULE_MASK *udfrule_mask,
-	a_uint8_t *range_en)
+	a_uint8_t *range_en, a_uint8_t inverse_en)
 {
+	fal_acl_field_map_t field_flg = {0};
+
+	if (inverse_en)
+		FAL_FIELD_FLG_CPY(field_flg, rule->inverse_field_flg);
+	else
+		FAL_FIELD_FLG_CPY(field_flg, rule->field_flg);
+
 	if(is_win1)
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF3))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_UDF3))
 		{
 			udfrule->udf2_valid = 1;
 			udfrule->udf2 = rule->udf3_val;
 			udfrule_mask->udf2_valid = 1;
 			udfrule_mask->udf2_mask = rule->udf3_mask;
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_UDF3);
+				return SW_OK;
+			}
 		}
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) &&
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_UDF2) &&
 			FAL_ACL_FIELD_MASK == rule->udf2_op)
 		{
 			udfrule->udf1_valid = 1;
 			udfrule->udf1 = rule->udf2_val;
 			udfrule_mask->udf1_valid = 1;
 			udfrule_mask->udf1_mask = rule->udf2_mask;
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_UDF2);
+				return SW_OK;
+			}
 		}
 
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_UDF1))
 		{
 			udfrule->udf0_valid = 1;
 			udfrule_mask->udf0_valid = 1;
@@ -3408,28 +3727,40 @@ sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_w
 				udfrule_mask->udf0_mask = max;
 				*range_en = 1;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_UDF1);
+				return SW_OK;
+			}
 		}
 	}
 	else
 	{
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF1) &&
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_UDF1) &&
 			FAL_ACL_FIELD_MASK == rule->udf1_op)
 		{
 			udfrule->udf1_valid = 1;
 			udfrule->udf1 = rule->udf1_val;
 			udfrule_mask->udf1_valid = 1;
 			udfrule_mask->udf1_mask = rule->udf1_mask;
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_UDF1);
+				return SW_OK;
+			}
 		}
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) &&
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_UDF2) &&
 			FAL_ACL_FIELD_MASK == rule->udf2_op)
 		{
 			udfrule->udf2_valid = 1;
 			udfrule->udf2 = rule->udf2_val;
 			udfrule_mask->udf2_valid = 1;
 			udfrule_mask->udf2_mask = rule->udf2_mask;
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_UDF2);
+				return SW_OK;
+			}
 		}
 
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF0))
+		if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_UDF0))
 		{
 			udfrule->udf0_valid = 1;
 			udfrule_mask->udf0_valid = 1;
@@ -3462,15 +3793,19 @@ sw_error_t _adpt_hppe_acl_udf_rule_sw_2_hw(fal_acl_rule_t *rule, a_uint32_t is_w
 				udfrule_mask->udf0_mask = max;
 				*range_en = 1;
 			}
+			if(inverse_en) {
+				FAL_FIELD_FLG_CLR(rule->inverse_field_flg, FAL_ACL_FIELD_UDF0);
+				return SW_OK;
+			}
 		}
 	}
 
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IP))
 	{
 		udfrule->is_ip = rule->is_ip_val;
 		udfrule_mask->is_ip = 1;
 	}
-	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6))
+	if(FAL_FIELD_FLG_TST(field_flg, FAL_ACL_FIELD_IPV6))
 	{
 		udfrule->is_ipv6= rule->is_ipv6_val;
 		udfrule_mask->is_ipv6 = 1;
@@ -3633,95 +3968,95 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 sw_error_t
 _adpt_hppe_acl_rule_sw_2_hw(a_uint32_t dev_id, fal_acl_rule_t * rule, a_uint32_t rule_type,
 	a_uint32_t *hw_entry, a_uint32_t *allocated_entries, a_uint8_t *range_en,
-	void *hw_rule, void *hw_rule_mask)
+	void *hw_rule, void *hw_rule_mask, a_uint8_t inverse_en)
 {
 	*range_en = 0;
 	if(rule_type == ADPT_ACL_HPPE_VLAN_RULE)
 	{
 		_adpt_hppe_acl_vlan_rule_sw_2_hw(rule, (ADPT_HPPE_ACL_VLAN_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_VLAN_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_MAC_DA_RULE)
 	{
 		_adpt_hppe_acl_mac_rule_sw_2_hw(rule, 1, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask);
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_MAC_SA_RULE)
 	{
 		_adpt_hppe_acl_mac_rule_sw_2_hw(rule, 0, (ADPT_HPPE_ACL_MAC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask);
+		(ADPT_HPPE_ACL_MAC_RULE_MASK *)hw_rule_mask, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_L2_MISC_RULE)
 	{
 		_adpt_hppe_acl_l2_misc_rule_sw_2_hw(rule,
 		(ADPT_HPPE_ACL_L2MISC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_L2MISC_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV4_DIP_RULE)
 	{
 		_adpt_hppe_acl_ipv4_rule_sw_2_hw(rule, 1,
 		(ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV4_SIP_RULE)
 	{
 		_adpt_hppe_acl_ipv4_rule_sw_2_hw(rule, 0,
 		(ADPT_HPPE_ACL_IPV4_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV4_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV6_DIP0_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 0,
 		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV6_DIP1_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 1,
 		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV6_DIP2_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 1, 2,
 		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV6_SIP0_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 0,
 		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV6_SIP1_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 1,
 		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPV6_SIP2_RULE)
 	{
 		_adpt_hppe_acl_ipv6_rule_sw_2_hw(rule, 0, 2,
 		(ADPT_HPPE_ACL_IPV6_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPV6_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_IPMISC_RULE)
 	{
 		_adpt_hppe_acl_ipmisc_rule_sw_2_hw(rule,
 		(ADPT_HPPE_ACL_IPMISC_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_IPMISC_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_UDF0_RULE)
 	{
 		_adpt_hppe_acl_udf_rule_sw_2_hw(rule, 0,
 		(ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 	else if(rule_type == ADPT_ACL_HPPE_UDF1_RULE)
 	{
 		_adpt_hppe_acl_udf_rule_sw_2_hw(rule, 1,
 		(ADPT_HPPE_ACL_UDF_RULE *)hw_rule,
-		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en);
+		(ADPT_HPPE_ACL_UDF_RULE_MASK *)hw_rule_mask, range_en, inverse_en);
 	}
 #if defined(APPE)
 	else if(rule_type == ADPT_ACL_APPE_EXT_UDF0_RULE)
@@ -3766,7 +4101,8 @@ _adpt_hppe_acl_rule_sw_2_hw(a_uint32_t dev_id, fal_acl_rule_t * rule, a_uint32_t
 sw_error_t
 _adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		a_uint32_t hw_list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-		fal_acl_rule_t * rule, a_uint32_t rule_type_map, a_uint32_t allocated_entries)
+		fal_acl_rule_t * rule, ADPT_HPPE_ACL_RULE_MAP *rule_map,
+		a_uint32_t allocated_entries)
 {
 	union ipo_rule_reg_u hw_reg = {0};
 	union ipo_mask_reg_u hw_mask = {0};
@@ -3781,49 +4117,78 @@ _adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 
 	for(rule_type = 0; rule_type < ADPT_ACL_HPPE_RULE_TYPE_NUM; rule_type++)
 	{
-		if(!((1<<rule_type)&rule_type_map))
-		{
-			continue;
-		}
-		hw_reg.bf.rule_field_0 = 0;
-		hw_reg.bf.rule_field_1 = 0;
-		memset(&hw_mask, 0, sizeof(hw_mask));
-		memset(&hw_act, 0, sizeof(hw_act));
+		if ((BIT(rule_type)) & rule_map->rule_type_map) {
+			hw_reg.bf.rule_field_0 = 0;
+			hw_reg.bf.rule_field_1 = 0;
+			memset(&hw_mask, 0, sizeof(hw_mask));
+			memset(&hw_act, 0, sizeof(hw_act));
 
-		/*set 53bit rule fields of hw rule reg*/
-		_adpt_hppe_acl_rule_sw_2_hw(dev_id, rule, rule_type,
-			&hw_entry, &allocated_entries, &range_en,
-			&hw_reg, &hw_mask);
-		/*set rule_type, range_en, inverse_en fields of hw rule reg*/
-		hw_reg.bf.rule_type = rule_type;
-		hw_reg.bf.range_en = range_en;
-		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_INVERSE_ALL))
-		{
+			/*set 53bit rule fields of hw rule reg*/
+			_adpt_hppe_acl_rule_sw_2_hw(dev_id, rule, rule_type,
+				&hw_entry, &allocated_entries, &range_en,
+				&hw_reg, &hw_mask, 0);
+			/*set rule_type, range_en, inverse_en fields of hw rule reg*/
+			hw_reg.bf.rule_type = rule_type;
+			hw_reg.bf.range_en = range_en;
+			hw_reg.bf.inverse_en = 0;
+			if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_INVERSE_ALL))
+				hw_reg.bf.inverse_en = 1;
+
+			SSDK_DEBUG("post_route %d, chain %d, pri %d, src_1 %d, src_0 %d, src_type %d"
+				" rule_type %d, inverse %d, range %d\n", hw_reg.bf.post_routing_en,
+				hw_reg.bf.res_chain, hw_reg.bf.pri, hw_reg.bf.src_1,
+				hw_reg.bf.src_0, hw_reg.bf.src_type, hw_reg.bf.rule_type,
+				hw_reg.bf.inverse_en, hw_reg.bf.range_en);
+			SSDK_DEBUG("rule and mask set hw_entry = %d\n",
+					hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry);
+
+			_adpt_hppe_acl_action_sw_2_hw(dev_id,rule, &hw_act);
+			/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
+			rv |= hppe_ipo_action_set(dev_id,
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry, &hw_act);
+			/*_adpt_acl_reg_dump((a_uint8_t *)&hw_reg, sizeof(hw_reg));*/
+			rv |= hppe_ipo_rule_reg_set(dev_id,
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry, &hw_reg);
+			/*_adpt_acl_reg_dump((a_uint8_t *)&hw_mask, sizeof(hw_mask));*/
+			rv |= hppe_ipo_mask_reg_set(dev_id,
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry, &hw_mask);
+			SW_RTN_ON_ERROR(rv);
+		}
+
+		/* inverse rule */
+		for (; rule_map->inverse_rule_type_count[rule_type] > 0;
+				rule_map->inverse_rule_type_count[rule_type] --) {
+			hw_reg.bf.rule_field_0 = 0;
+			hw_reg.bf.rule_field_1 = 0;
+			memset(&hw_mask, 0, sizeof(hw_mask));
+			memset(&hw_act, 0, sizeof(hw_act));
+
+			/*set 53bit rule fields of hw rule reg*/
+			_adpt_hppe_acl_rule_sw_2_hw(dev_id, rule, rule_type,
+				&hw_entry, &allocated_entries, &range_en,
+				&hw_reg, &hw_mask, 1);
+
+			/*set rule_type, range_en, inverse_en fields of hw rule reg*/
+			hw_reg.bf.rule_type = rule_type;
+			hw_reg.bf.range_en = range_en;
 			hw_reg.bf.inverse_en = 1;
-		}
 
-		SSDK_DEBUG("post_route %d, chain %d, pri %d, src_1 %d, src_0 %d, src_type %d "
-			"rule_type %d, inverse %d, range %d\n", hw_reg.bf.post_routing_en,
-			hw_reg.bf.res_chain, hw_reg.bf.pri, hw_reg.bf.src_1, hw_reg.bf.src_0,
-			hw_reg.bf.src_type, hw_reg.bf.rule_type, hw_reg.bf.inverse_en,
-			hw_reg.bf.range_en);
-		SSDK_DEBUG("rule and mask set hw_entry = %d\n",
-				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry);
+			SSDK_DEBUG("rule_type %d inverse_rule_type_count %d rule_hw_entry %d\n",
+				rule_type, rule_map->inverse_rule_type_count[rule_type],
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry);
 
-		_adpt_hppe_acl_action_sw_2_hw(dev_id,rule, &hw_act);
-		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
-		rv |= hppe_ipo_action_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
-			&hw_act);
-		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_reg, sizeof(hw_reg));*/
-		rv |= hppe_ipo_rule_reg_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
-			&hw_reg);
-		/*_adpt_acl_reg_dump((a_uint8_t *)&hw_mask, sizeof(hw_mask));*/
-		rv |= hppe_ipo_mask_reg_set(dev_id, hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST+hw_entry,
-			&hw_mask);
+			_adpt_hppe_acl_action_sw_2_hw(dev_id, rule, &hw_act);
 
-		if(rv != SW_OK)
-		{
-			return rv;
+			/*_adpt_acl_reg_dump((a_uint8_t *)&hw_act, sizeof(hw_act));*/
+			rv |= hppe_ipo_action_set(dev_id,
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry, &hw_act);
+			/*_adpt_acl_reg_dump((a_uint8_t *)&hw_reg, sizeof(hw_reg));*/
+			rv |= hppe_ipo_rule_reg_set(dev_id,
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry, &hw_reg);
+			/*_adpt_acl_reg_dump((a_uint8_t *)&hw_mask, sizeof(hw_mask));*/
+			rv |= hppe_ipo_mask_reg_set(dev_id,
+				hw_list_id*ADPT_ACL_ENTRY_NUM_PER_LIST + hw_entry, &hw_mask);
+			SW_RTN_ON_ERROR(rv);
 		}
 	}
 
@@ -3833,15 +4198,17 @@ _adpt_hppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 static sw_error_t
 _adpt_ppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		a_uint32_t hw_list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-		fal_acl_rule_t * rule, fal_acl_rule_t *inner_rule, a_uint32_t rule_type_map,
-		a_uint32_t inner_rule_type_map, a_uint32_t allocated_entries)
+		fal_acl_rule_t * rule, fal_acl_rule_t *inner_rule,
+		ADPT_HPPE_ACL_RULE_MAP *rule_map,
+		ADPT_HPPE_ACL_RULE_MAP *inner_rule_map,
+		a_uint32_t allocated_entries)
 {
 	sw_error_t rv = SW_OK;
 
 	if (hw_list_id < ADPT_ACL_HW_LIST_NUM)
 	{
 		rv = _adpt_hppe_acl_rule_hw_add(dev_id, list_pri, hw_list_id,
-			rule_id, rule_nr, rule, rule_type_map, allocated_entries);
+			rule_id, rule_nr, rule, rule_map, allocated_entries);
 		SW_RTN_ON_ERROR(rv);
 	}
 #if defined(APPE)
@@ -3849,7 +4216,7 @@ _adpt_ppe_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 	{
 		rv = _adpt_appe_pre_acl_rule_hw_add(dev_id, list_pri,
 			hw_list_id - ADPT_ACL_HW_LIST_NUM, rule_id, rule_nr, rule, inner_rule,
-			rule_type_map, inner_rule_type_map, allocated_entries);
+			rule_map, inner_rule_map, allocated_entries);
 		SW_RTN_ON_ERROR(rv);
 	}
 	rv = _adpt_appe_acl_ext_set(dev_id, rule, hw_list_id, allocated_entries);
@@ -4284,31 +4651,66 @@ void acl_rule_field_convert(fal_acl_rule_t * rule,
     return;
 }
 
+static a_uint32_t _adpt_hppe_rule_type_count(ADPT_HPPE_ACL_RULE_MAP *rule_map,
+			ADPT_HPPE_ACL_RULE_MAP *inner_rule_map)
+{
+	a_uint32_t rule_type_count = 0;
+	a_int32_t i = 0;
+
+	rule_type_count = _acl_bits_count(rule_map->rule_type_map,
+			ADPT_ACL_HPPE_RULE_TYPE_NUM, 0);
+	rule_type_count += _acl_bits_count(inner_rule_map->rule_type_map,
+			ADPT_ACL_HPPE_RULE_TYPE_NUM, 0);
+	for (i = 0; i < ADPT_ACL_HPPE_RULE_TYPE_NUM; i++) {
+		SSDK_DEBUG("rule_type %d inverse_rule_type_count 0x%x-0x%x\n",
+				i,
+				rule_map->inverse_rule_type_count[i],
+				inner_rule_map->inverse_rule_type_count[i]);
+		rule_type_count += rule_map->inverse_rule_type_count[i];
+		rule_type_count += inner_rule_map->inverse_rule_type_count[i];
+	}
+
+	SSDK_DEBUG("rule_type_map 0x%x-0x%x rule_type_count 0x%x\n",
+			rule_map->rule_type_map,
+			inner_rule_map->rule_type_map,
+			rule_type_count);
+
+	return rule_type_count;
+}
+
 sw_error_t
 _adpt_hppe_acl_rule_type_map(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t rule_nr,
 		fal_acl_rule_t * rule, fal_acl_rule_t * inner_rule,
-		a_uint32_t * rule_type_map, a_uint32_t * inner_rule_type_map)
+		ADPT_HPPE_ACL_RULE_MAP *rule_map,
+		ADPT_HPPE_ACL_RULE_MAP *inner_rule_map)
 {
 	a_uint32_t tunnel_rule_type_map = 0;
+
+	SSDK_DEBUG("fields 0x%x:0x%x-0x%x:0x%x, inverse_fileds 0x%x:0x%x-0x%x:0x%x\n",
+		   rule->field_flg[0], rule->field_flg[1],
+		   inner_rule->field_flg[0], inner_rule->field_flg[1],
+		   rule->inverse_field_flg[0], rule->inverse_field_flg[1],
+		   inner_rule->inverse_field_flg[0], inner_rule->inverse_field_flg[1]);
+
 	if(rule->rule_type == FAL_ACL_RULE_IP4 ||
 		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4)
 	{
 		_adpt_hppe_acl_ipv4_fields_check(dev_id, rule_id, rule_nr, rule,
-			rule_type_map);
+			rule_map);
 	}
 	else if(rule->rule_type == FAL_ACL_RULE_IP6 ||
 		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP6)
 	{
 		_adpt_hppe_acl_ipv6_fields_check(dev_id, rule_id, rule_nr, rule,
-			rule_type_map);
+			rule_map);
 	}
-	_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
+	_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, rule, rule_map);
 
 	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
 		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
 	{
 #if defined(APPE)
-		_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
+		_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, &rule_map->rule_type_map);
 
 		if(rule->rule_type == FAL_ACL_RULE_TUNNEL_MAC ||
 			rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4 ||
@@ -4318,25 +4720,25 @@ _adpt_hppe_acl_rule_type_map(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t r
 			if(rule->inner_rule_field.rule_type == FAL_ACL_RULE_IP4)
 			{
 				_adpt_hppe_acl_ipv4_fields_check(dev_id, rule_id, rule_nr,
-					inner_rule, inner_rule_type_map);
+					inner_rule, inner_rule_map);
 			}
 			if(rule->inner_rule_field.rule_type == FAL_ACL_RULE_IP6)
 			{
 				_adpt_hppe_acl_ipv6_fields_check(dev_id, rule_id, rule_nr,
-					inner_rule, inner_rule_type_map);
+					inner_rule, inner_rule_map);
 			}
 			_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, inner_rule,
-					inner_rule_type_map);
+					inner_rule_map);
 			_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, inner_rule,
-					inner_rule_type_map);
+					&inner_rule_map->rule_type_map);
 			_adpt_appe_pre_acl_tunnel_info_fields_check(dev_id, rule_id, rule_nr,
 					&rule->tunnel_info, &tunnel_rule_type_map);
-			if(*inner_rule_type_map == 0)
+			if(inner_rule_map->rule_type_map == 0)
 			{ /*inner ip_nonip/ip_ver*/
 				if((FAL_FIELD_FLG_TST(inner_rule->field_flg, FAL_ACL_FIELD_IP)) ||
 				(FAL_FIELD_FLG_TST(inner_rule->field_flg, FAL_ACL_FIELD_IPV6)))
 				{
-					*inner_rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
+					inner_rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
 				}
 			}
 		}
@@ -4344,25 +4746,24 @@ _adpt_hppe_acl_rule_type_map(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t r
 	}
 	else
 	{
-		_adpt_hppe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_type_map);
+		_adpt_hppe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_map);
 	}
 
-	if(*rule_type_map == 0)
+	if(rule_map->rule_type_map == 0)
 	{/*outer ip_nonip/ip_ver*/
 		if((FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IP)) ||
 			(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_IPV6)))
 		{
-			*rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
+			rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
 		}
 	}
+
 	if(tunnel_rule_type_map != 0)
-	{
-		*rule_type_map |= tunnel_rule_type_map;
-	}
-	if(*rule_type_map == 0 && *inner_rule_type_map == 0)
-	{ /*match all*/
-		*rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
-	}
+		rule_map->rule_type_map |= tunnel_rule_type_map;
+
+	/* select one rule type to match all if none is slected */
+	if (_adpt_hppe_rule_type_count(rule_map, inner_rule_map) == 0)
+		rule_map->rule_type_map |= (1<<ADPT_ACL_HPPE_MAC_DA_RULE);
 
 	return SW_OK;
 }
@@ -4371,7 +4772,6 @@ sw_error_t
 adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		a_uint32_t rule_id, a_uint32_t rule_nr, fal_acl_rule_t * rule)
 {
-	a_uint32_t rule_type_map = 0, inner_rule_type_map = 0;
 	a_uint32_t rule_type_count = 0;
 	a_uint32_t index = 0, hw_list_index = 0, hw_list_id = 0;
 	sw_error_t rv = 0;
@@ -4379,7 +4779,11 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	ADPT_HPPE_ACL_SW_RULE *rule_exist_entry = NULL, *rule_add_entry = NULL;
 	ADPT_HPPE_ACL_SW_LIST *list_find_entry = NULL;
 	fal_acl_rule_t inner_rule;
+	ADPT_HPPE_ACL_RULE_MAP rule_map, inner_rule_map;
 	aos_mem_zero(&inner_rule, sizeof(fal_acl_rule_t));
+	aos_mem_zero(&rule_map, sizeof(ADPT_HPPE_ACL_RULE_MAP));
+	aos_mem_zero(&inner_rule_map, sizeof(ADPT_HPPE_ACL_RULE_MAP));
+
 
 	ADPT_DEV_ID_CHECK(dev_id);
 	ADPT_NULL_POINT_CHECK(rule);
@@ -4420,15 +4824,12 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		}
 	}
 
-	/*caculate rule_type_map and inner_rule_type_map*/
+	/*caculate rule map*/
 	_adpt_hppe_acl_rule_type_map(dev_id, rule_id, rule_nr, rule, &inner_rule,
-					&rule_type_map, &inner_rule_type_map);
+					&rule_map, &inner_rule_map);
 
-	/*caculate rule type counts */
-	rule_type_count = _acl_bits_count(rule_type_map, ADPT_ACL_HPPE_RULE_TYPE_NUM, 0);
-	rule_type_count += _acl_bits_count(inner_rule_type_map, ADPT_ACL_HPPE_RULE_TYPE_NUM, 0);
-	SSDK_DEBUG("rule_type_map = 0x%x, inner_rule_type_map = 0x%x, rule_type_count = %d\n",
-				rule_type_map, inner_rule_type_map, rule_type_count);
+	/*caculate rule map counts */
+	rule_type_count = _adpt_hppe_rule_type_count(&rule_map, &inner_rule_map);
 
 	if(rule_type_count == 0 || rule_type_count > ADPT_ACL_ENTRY_NUM_PER_LIST)
 	{
@@ -4456,7 +4857,7 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	hw_list_id = g_acl_hw_list[dev_id][hw_list_index].hw_list_id;
 	/* set hw acl rule and action reg*/
 	rv = _adpt_ppe_acl_rule_hw_add(dev_id, list_find_entry->list_pri, hw_list_id,
-		rule_id, rule_nr, rule, &inner_rule, rule_type_map, inner_rule_type_map,
+		rule_id, rule_nr, rule, &inner_rule, &rule_map, &inner_rule_map,
 		s_acl_entries[index].entries);
 	if(rv != SW_OK)
 	{

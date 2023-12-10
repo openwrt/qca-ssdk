@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,8 +25,8 @@
 #include "adpt_hppe.h"
 #include "appe_acl_reg.h"
 #include "appe_acl.h"
-#include "adpt_appe_acl.h"
 #include "adpt_hppe_acl.h"
+#include "adpt_appe_acl.h"
 #include "hppe_ip_reg.h"
 #include "hppe_ip.h"
 #include "appe_tunnel_reg.h"
@@ -79,8 +79,6 @@ _adpt_appe_acl_udf_fields_check(a_uint32_t dev_id, a_uint32_t rule_id,
 		a_uint32_t rule_nr, fal_acl_rule_t * rule, a_uint32_t *rule_type_map)
 {
 	a_uint32_t udf_rule_type_map = 0;
-	SSDK_DEBUG("fields[0] = 0x%x, fields[1] = 0x%x\n",
-				rule->field_flg[0], rule->field_flg[1]);
 
 	/* with udfprofile field */
 	if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDFPROFILE))
@@ -1061,7 +1059,7 @@ _adpt_appe_pre_acl_rule_sw_query(a_uint32_t dev_id,
 
 		/*get sw rule info from first 53bit hw rule reg fields*/
 		_adpt_hppe_acl_rule_hw_2_sw(dev_id, hw_reg.bf.rule_type,
-			hw_reg.bf.range_en, &hw_reg, &hw_mask, sw_rule);
+			hw_reg.bf.range_en, hw_reg.bf.inverse_en, &hw_reg, &hw_mask, sw_rule);
 
 		if(hw_reg.bf.inverse_en == 1)
 		{
@@ -1094,8 +1092,10 @@ _adpt_appe_pre_acl_rule_sw_query(a_uint32_t dev_id,
 sw_error_t
 _adpt_appe_pre_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		a_uint32_t hw_list_id, a_uint32_t rule_id, a_uint32_t rule_nr,
-		fal_acl_rule_t * rule, fal_acl_rule_t *inner_rule, a_uint32_t rule_type_map,
-		a_uint32_t inner_rule_type_map, a_uint32_t allocated_entries)
+		fal_acl_rule_t * rule, fal_acl_rule_t *inner_rule,
+		ADPT_HPPE_ACL_RULE_MAP *rule_map,
+		ADPT_HPPE_ACL_RULE_MAP *inner_rule_map,
+		a_uint32_t allocated_entries)
 {
 	union pre_ipo_rule_reg_u hw_reg = {0};
 	union pre_ipo_mask_reg_u hw_mask = {0};
@@ -1114,12 +1114,12 @@ _adpt_appe_pre_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 		hw_reg.bf.inner_outer_sel = inner_outer_sel;
 		if(inner_outer_sel == 0)
 		{ /*outer*/
-			rule_type_bmap = rule_type_map;
+			rule_type_bmap = rule_map->rule_type_map;
 			sw_rule = rule;
 		}
 		else
 		{ /*inner*/
-			rule_type_bmap = inner_rule_type_map;
+			rule_type_bmap = inner_rule_map->rule_type_map;
 			sw_rule = inner_rule;
 		}
 		for( rule_type = 0; rule_type < ADPT_ACL_HPPE_RULE_TYPE_NUM; rule_type++)
@@ -1137,7 +1137,7 @@ _adpt_appe_pre_acl_rule_hw_add(a_uint32_t dev_id, a_uint32_t list_pri,
 			/*set 53bit rule fields of hw rule reg*/
 			_adpt_hppe_acl_rule_sw_2_hw(dev_id, sw_rule, rule_type,
 				&hw_entry, &allocated_entries, &range_en,
-				&hw_reg, &hw_mask);
+				&hw_reg, &hw_mask, 0);
 			/*set rule_type, range_en, inverse_en fields of hw rule reg*/
 			hw_reg.bf.rule_type = rule_type;
 			hw_reg.bf.range_en = range_en;

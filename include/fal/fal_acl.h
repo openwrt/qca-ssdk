@@ -731,8 +731,12 @@ typedef struct
 
 	/*new add acl action for IPQ53xx*/
 	a_uint8_t metadata_pri; /*metadata priority*/
-	a_uint16_t cookie_val; /*cookie vaule*/
+	a_uint64_t cookie_val; /*cookie vaule*/
 	a_uint8_t cookie_pri; /*cookie priority */
+
+	/*new add for IPQ54xx*/
+	a_bool_t wifi_qos_en;
+	a_uint8_t wifi_qos_val;
 
 	/*returned info*/
 	fal_acl_rule_hw_info_t hw_info;

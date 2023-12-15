@@ -8826,13 +8826,25 @@ parse_acl_action_field(struct switch_ext *ext_value_p, fal_acl_rule_t *rule)
 			&tmpdata, sizeof(tmpdata));
 		rule->metadata_pri = tmpdata & 0xf;
 	} else if(!strcmp(ext_value_p->option_name, "cookie_val")) {
-		cmd_data_check_uint16((char*)ext_value_p->option_value,
-			&(tmpdata), sizeof(tmpdata));
+		cmd_data_check_uint64((char*)ext_value_p->option_value,
+			&(rule->cookie_val), sizeof(a_uint64_t));
+#if defined(MRPPE)
+		rule->cookie_val = rule->cookie_val & 0xffffffffff;
+#else
 		rule->cookie_val = tmpdata & 0xffff;
+#endif
 	} else if(!strcmp(ext_value_p->option_name, "cookie_pri")) {
 		cmd_data_check_uint8((char*)ext_value_p->option_value,
 			&tmpdata, sizeof(tmpdata));
 		rule->cookie_pri = tmpdata & 0xf;
+	}
+#endif
+#if defined(MRPPE)
+	else if(!strcmp(ext_value_p->option_name, "wifi_qos_val")) {
+		cmd_data_check_uint8((char*)ext_value_p->option_value,
+			&tmpdata, sizeof(tmpdata));
+		rule->wifi_qos_en = A_TRUE;
+		rule->wifi_qos_val = tmpdata & 0xff;
 	}
 #endif
 	return SW_OK;

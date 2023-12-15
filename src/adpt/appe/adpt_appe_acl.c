@@ -182,6 +182,12 @@ _adpt_appe_acl_ext_set(a_uint32_t dev_id, fal_acl_rule_t * rule,
 			reg_val.bf.cookie = rule->cookie_val;
 			reg_val.bf.cookie_pri = rule->cookie_pri;
 #endif
+#if defined(MRPPE)
+			reg_val.bf.cookie_ext = (rule->cookie_val >> 16) & 0xffffff;
+			reg_val.bf.wifi_qos_0 = rule->wifi_qos_val & 0xf;
+			reg_val.bf.wifi_qos_1 = (rule->wifi_qos_val >> 4) & 0xf;
+			reg_val.bf.wifi_qos_flag = rule->wifi_qos_en ? 1 : 0;
+#endif
 			rv = appe_eg_ipo_ext_tbl_set(dev_id,
 				hw_list_id*ADPT_PRE_ACL_ENTRY_NUM_PER_LIST+hw_index,
 				&reg_val);
@@ -207,6 +213,11 @@ _adpt_appe_acl_ext_get(a_uint32_t dev_id,
 #if defined(MPPE)
 	rule->cookie_val = reg_val.bf.cookie;
 	rule->cookie_pri = reg_val.bf.cookie_pri;
+#endif
+#if defined(MRPPE)
+	rule->cookie_val |= (a_uint64_t)(reg_val.bf.cookie_ext) << 16;
+	rule->wifi_qos_val = (reg_val.bf.wifi_qos_1 << 4) | reg_val.bf.wifi_qos_0;
+	rule->wifi_qos_en = reg_val.bf.wifi_qos_flag ? A_TRUE : A_FALSE;
 #endif
 	return rv;
 }

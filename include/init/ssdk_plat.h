@@ -255,6 +255,10 @@ enum {
 #define SSDK_MII_INVALID_BUS_ID    SSDK_MII_BUS_MAX
 #define SSDK_MII_DEFAULT_BUS_ID    0
 
+#define SSDK_ADDR_C45            (1<<30)
+#define SSDK_DEVADDR_C45_MASK    GENMASK(20, 16)
+#define SSDK_REGADDR_C45_MASK    GENMASK(15, 0)
+
 extern a_uint32_t ssdk_log_level;
 
 #define __SSDK_LOG_FUN(lev, fmt, ...) \

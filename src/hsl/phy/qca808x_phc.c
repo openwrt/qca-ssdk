@@ -789,16 +789,22 @@ static void qca808x_ptp_adjfreq_sync(a_uint32_t phy_addr,
 * ppb:  parts per billion adjustment from master
 *
 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+static int qca808x_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+#else
 static int qca808x_ptp_adjfreq(struct ptp_clock_info *ptp, s32 ppb)
+#endif
 {
 	const struct qca808x_phy_info *pdata;
 	struct qca808x_ptp_clock *clock =
 		container_of(ptp, struct qca808x_ptp_clock, caps);
-
 	fal_ptp_time_t ptp_time = {0};
-
 	qca808x_priv *priv = clock->priv;
 	struct phy_device *phydev = priv->phydev;
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+	s32 ppb = scaled_ppm_to_ppb(scaled_ppm);
+#endif
 	pdata = priv->phy_info;
 
 	if (!pdata || !phydev) {
@@ -1322,7 +1328,11 @@ static int qca808x_ptp_register(struct phy_device *phydev)
 	clock->caps.gettime	= qca808x_ptp_gettime;
 	clock->caps.settime	= qca808x_ptp_settime;
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+	clock->caps.adjfine =	qca808x_ptp_adjfine;
+#else
 	clock->caps.adjfreq	= qca808x_ptp_adjfreq;
+#endif
 	clock->caps.adjtime	= qca808x_ptp_adjtime;
 	clock->caps.enable	= qca808x_ptp_enable;
 

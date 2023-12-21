@@ -251,28 +251,21 @@ ssdk_phy_rgmii_set(struct qca_phy_priv *priv)
 		return;
 
 	if (!of_property_read_u32(np, "phy_rgmii_en", &rgmii_en)) {
-		a_uint16_t val = 0;
 		/*enable RGMII  mode */
-		qca_ar8327_phy_dbg_read(0, AR8327_PORT5_PHY_ADDR,
-				AR8327_PHY_REG_MODE_SEL, &val);
-		val |= AR8327_PHY_RGMII_MODE;
-		qca_ar8327_phy_dbg_write(0, AR8327_PORT5_PHY_ADDR,
-				AR8327_PHY_REG_MODE_SEL, val);
+		hsl_phy_modify_debug(0, AR8327_PORT5_PHY_ADDR,
+			AR8327_PHY_REG_MODE_SEL, AR8327_PHY_RGMII_MODE,
+			AR8327_PHY_RGMII_MODE);
 		if (!of_property_read_u32(np, "txclk_delay_en", &tx_delay)
 				&& tx_delay == 1) {
-			qca_ar8327_phy_dbg_read(0, AR8327_PORT5_PHY_ADDR,
-					AR8327_PHY_REG_SYS_CTRL, &val);
-			val |= AR8327_PHY_RGMII_TX_DELAY;
-			qca_ar8327_phy_dbg_write(0, AR8327_PORT5_PHY_ADDR,
-					AR8327_PHY_REG_SYS_CTRL, val);
+			hsl_phy_modify_debug(0, AR8327_PORT5_PHY_ADDR,
+				AR8327_PHY_REG_SYS_CTRL, AR8327_PHY_RGMII_TX_DELAY,
+				AR8327_PHY_RGMII_TX_DELAY);
 		}
 		if (!of_property_read_u32(np, "rxclk_delay_en", &rx_delay)
 				&& rx_delay == 1) {
-			qca_ar8327_phy_dbg_read(0, AR8327_PORT5_PHY_ADDR,
-					AR8327_PHY_REG_TEST_CTRL, &val);
-			val |= AR8327_PHY_RGMII_RX_DELAY;
-			qca_ar8327_phy_dbg_write(0, AR8327_PORT5_PHY_ADDR,
-					AR8327_PHY_REG_TEST_CTRL, val);
+			hsl_phy_modify_debug(0, AR8327_PORT5_PHY_ADDR,
+				AR8327_PHY_REG_TEST_CTRL, AR8327_PHY_RGMII_RX_DELAY,
+				AR8327_PHY_RGMII_RX_DELAY);
 		}
 	}
 }
@@ -291,24 +284,18 @@ ssdk_phy_rgmii_set(struct qca_phy_priv *priv)
 		if(plat_data->pad5_cfg->mode == AR8327_PAD_PHY_RGMII) {
 			a_uint16_t val = 0;
 			/*enable RGMII  mode */
-			priv->phy_dbg_read(0, AR8327_PORT5_PHY_ADDR,
-					AR8327_PHY_REG_MODE_SEL, &val);
-			val |= AR8327_PHY_RGMII_MODE;
-			priv->phy_dbg_write(0, AR8327_PORT5_PHY_ADDR,
-					AR8327_PHY_REG_MODE_SEL, val);
+			hsl_phy_modify_debug(0, AR8327_PORT5_PHY_ADDR,
+				AR8327_PHY_REG_MODE_SEL, AR8327_PHY_RGMII_MODE,
+				AR8327_PHY_RGMII_MODE);
 			if(plat_data->pad5_cfg->txclk_delay_en) {
-				priv->phy_dbg_read(0, AR8327_PORT5_PHY_ADDR,
-						AR8327_PHY_REG_SYS_CTRL, &val);
-				val |= AR8327_PHY_RGMII_TX_DELAY;
-				priv->phy_dbg_write(0, AR8327_PORT5_PHY_ADDR,
-						AR8327_PHY_REG_SYS_CTRL, val);
+				hsl_phy_modify_debug(0, AR8327_PORT5_PHY_ADDR,
+					AR8327_PHY_REG_SYS_CTRL, AR8327_PHY_RGMII_TX_DELAY,
+					AR8327_PHY_RGMII_TX_DELAY);
 			}
 			if(plat_data->pad5_cfg->rxclk_delay_en) {
-				priv->phy_dbg_read(0, AR8327_PORT5_PHY_ADDR,
-						AR8327_PHY_REG_TEST_CTRL, &val);
-				val |= AR8327_PHY_RGMII_RX_DELAY;
-				priv->phy_dbg_write(0, AR8327_PORT5_PHY_ADDR,
-						AR8327_PHY_REG_TEST_CTRL, val);
+				hsl_phy_modify_debug(0, AR8327_PORT5_PHY_ADDR,
+					AR8327_PHY_REG_TEST_CTRL, AR8327_PHY_RGMII_RX_DELAY,
+					AR8327_PHY_RGMII_RX_DELAY);
 			}
 		}
 	}
@@ -322,14 +309,14 @@ qca_ar8327_phy_fixup(struct qca_phy_priv *priv, int phy)
 	switch (priv->revision) {
 	case 1:
 		/* 100m waveform */
-		priv->phy_dbg_write(priv->device_id, phy, 0, 0x02ea);
+		hsl_phy_debug_reg_write(priv->device_id, phy, 0, 0x02ea);
 		/* turn on giga clock */
-		priv->phy_dbg_write(priv->device_id, phy, 0x3d, 0x68a0);
+		hsl_phy_debug_reg_write(priv->device_id, phy, 0x3d, 0x68a0);
 		break;
 
 	case 2:
-		priv->phy_mmd_write(priv->device_id, phy, 0x7, 0x3c);
-		priv->phy_mmd_write(priv->device_id, phy, 0x4007, 0x0);
+		hsl_phy_mmd_reg_write(priv->device_id, phy, A_FALSE,
+			0x7, 0x3c, 0);
 #if defined(FALLTHROUGH)
 		fallthrough;
 #else
@@ -338,12 +325,11 @@ qca_ar8327_phy_fixup(struct qca_phy_priv *priv, int phy)
 	case 4:
 		if(priv->version == QCA_VER_AR8327)
 		{
-			priv->phy_mmd_write(priv->device_id, phy, 0x3, 0x800d);
-			priv->phy_mmd_write(priv->device_id, phy, 0x4003, 0x803f);
-
-			priv->phy_dbg_write(priv->device_id, phy, 0x3d, 0x6860);
-			priv->phy_dbg_write(priv->device_id, phy, 0x5, 0x2c46);
-			priv->phy_dbg_write(priv->device_id, phy, 0x3c, 0x6000);
+			hsl_phy_mmd_reg_write(priv->device_id, phy, A_FALSE,
+				0x3, 0x800d, 0x803f);
+			hsl_phy_debug_reg_write(priv->device_id, phy, 0x3d, 0x6860);
+			hsl_phy_debug_reg_write(priv->device_id, phy, 0x5, 0x2c46);
+			hsl_phy_debug_reg_write(priv->device_id, phy, 0x3c, 0x6000);
 		}
 		break;
 	}
@@ -646,22 +632,16 @@ qca_switch_init(a_uint32_t dev_id)
 void qca_ar8327_phy_linkdown(a_uint32_t dev_id)
 {
 	int i;
-	a_uint16_t phy_val;
 
 	for (i = 0; i < AR8327_NUM_PHYS; i++) {
-		qca_ar8327_phy_write(dev_id, i, 0x0, 0x0800);	// phy powerdown
+		hsl_phy_mii_reg_write(dev_id, i, 0x0, 0x0800);	// phy powerdown
 
-		qca_ar8327_phy_dbg_read(dev_id, i, 0x3d, &phy_val);
-		phy_val &= ~0x0040;
-		qca_ar8327_phy_dbg_write(dev_id, i, 0x3d, phy_val);
-
+		hsl_phy_modify_debug(dev_id, i, 0x3d, 0x0040, 0);
 		/*PHY will stop the tx clock for a while when link is down
 			1. en_anychange  debug port 0xb bit13 = 0  //speed up link down tx_clk
 			2. sel_rst_80us  debug port 0xb bit10 = 0  //speed up speed mode change to 2'b10 tx_clk
 		*/
-		qca_ar8327_phy_dbg_read(dev_id, i, 0xb, &phy_val);
-		phy_val &= ~0x2400;
-		qca_ar8327_phy_dbg_write(dev_id, i, 0xb, phy_val);
+		hsl_phy_modify_debug(dev_id, i, 0xb, 0x2400, 0);
 	}
 }
 
@@ -719,23 +699,18 @@ qca_ar8327_phy_enable(struct qca_phy_priv *priv)
 
         ssdk_phy_rgmii_set(priv);
 	for (i = 0; i < AR8327_NUM_PHYS; i++) {
-		a_uint16_t value = 0;
-
 		if (priv->version == QCA_VER_AR8327 || priv->version == QCA_VER_AR8337)
 			qca_ar8327_phy_fixup(priv, i);
 
 		/* start autoneg*/
-		priv->phy_write(priv->device_id, i, MII_ADVERTISE, ADVERTISE_ALL |
+		hsl_phy_mii_reg_write(priv->device_id, i, MII_ADVERTISE, ADVERTISE_ALL |
 						     ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM);
 		//phy reg 0x9, b10,1 = Prefer multi-port device (master)
-		priv->phy_write(priv->device_id, i, MII_CTRL1000, (0x0400|ADVERTISE_1000FULL));
+		hsl_phy_mii_reg_write(priv->device_id, i, MII_CTRL1000, (0x0400|ADVERTISE_1000FULL));
 
-		priv->phy_write(priv->device_id, i, MII_BMCR, BMCR_RESET | BMCR_ANENABLE);
+		hsl_phy_mii_reg_write(priv->device_id, i, MII_BMCR, BMCR_RESET | BMCR_ANENABLE);
 
-		priv->phy_dbg_read(priv->device_id, i, 0, &value);
-		value &= (~(1<<12));
-		priv->phy_dbg_write(priv->device_id, i, 0, value);
-
+		hsl_phy_modify_debug(priv->device_id, i, 0, BIT(12), 0);
 		msleep(100);
 	}
 }
@@ -1790,11 +1765,6 @@ static int ssdk_switch_register(a_uint32_t dev_id, ssdk_chip_type  chip_type)
 
 	priv->mii_read = qca_mii_read;
 	priv->mii_write = qca_mii_write;
-	priv->phy_write = qca_ar8327_phy_write;
-	priv->phy_read = qca_ar8327_phy_read;
-	priv->phy_dbg_write = qca_ar8327_phy_dbg_write;
-	priv->phy_dbg_read = qca_ar8327_phy_dbg_read;
-	priv->phy_mmd_write = qca_ar8327_mmd_write;
 #if 0
 	if (chip_type == CHIP_DESS || chip_type == CHIP_MHT) {
 		priv->ports = 6;
@@ -2058,16 +2028,14 @@ static const struct net_device_ops ssdk_netdev_ops = {
 #ifdef CONFIG_MDIO
 static int ssdk_miireg_ioctl_read(struct net_device *netdev, int phy_addr, int mmd, uint16_t addr)
 {
-	a_uint32_t reg = 0;
 	a_uint16_t val = 0;
 
 	if (MDIO_DEVAD_NONE == mmd) {
-		qca_ar8327_phy_read(0, phy_addr, addr, &val);
+		val = hsl_phy_mii_reg_read(0, phy_addr, addr);
 		return (int)val;
 	}
 
-	reg = MII_ADDR_C45 | mmd << 16 | addr;
-	qca_ar8327_phy_read(0, phy_addr, reg, &val);
+	val = hsl_phy_mmd_reg_read(0, phy_addr, A_TRUE, mmd, addr);
 
 	return (int)val;
 }
@@ -2075,15 +2043,12 @@ static int ssdk_miireg_ioctl_read(struct net_device *netdev, int phy_addr, int m
 static int ssdk_miireg_ioctl_write(struct net_device *netdev, int phy_addr, int mmd,
 				uint16_t addr, uint16_t value)
 {
-	a_uint32_t reg = 0;
-
 	if (MDIO_DEVAD_NONE == mmd) {
-		qca_ar8327_phy_write(0, phy_addr, addr, value);
+		hsl_phy_mii_reg_write(0, phy_addr, addr, value);
 		return 0;
 	}
 
-	reg = MII_ADDR_C45 | mmd << 16 | addr;
-	qca_ar8327_phy_write(0, phy_addr, reg, value);
+	hsl_phy_mmd_reg_write(0, phy_addr, A_TRUE, mmd, addr, value);
 
 	return 0;
 }
@@ -2262,8 +2227,6 @@ static void ssdk_cfg_default_init(ssdk_init_cfg *cfg)
 	memset(cfg, 0, sizeof(ssdk_init_cfg));
 	cfg->cpu_mode = HSL_CPU_1;
 	cfg->nl_prot = 30;
-	cfg->reg_func.mdio_set = qca_ar8327_phy_write;
-	cfg->reg_func.mdio_get = qca_ar8327_phy_read;
 #if defined(IN_PHY_I2C_MODE)
 	cfg->reg_func.i2c_set = qca_phy_i2c_write;
 	cfg->reg_func.i2c_get = qca_phy_i2c_read;

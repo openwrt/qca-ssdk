@@ -238,10 +238,10 @@ a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 	else
 #endif
 	{
-		cfg->reg_func.mdio_get(dev_id,
-				phy_info[dev_id]->phy_address[port_id], reg_pad | 2, &org_id);
-		cfg->reg_func.mdio_get(dev_id,
-				phy_info[dev_id]->phy_address[port_id], reg_pad | 3, &rev_id);
+		org_id = hsl_phy_mii_reg_read(dev_id,
+			phy_info[dev_id]->phy_address[port_id], reg_pad | 2);
+		rev_id = hsl_phy_mii_reg_read(dev_id,
+			phy_info[dev_id]->phy_address[port_id], reg_pad | 3);
 	}
 
 	phy_id = (org_id<<16) | rev_id;

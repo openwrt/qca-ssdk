@@ -459,31 +459,6 @@ a_uint32_t __qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
 void __qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
 int __qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
 
-/*qca808x_start*/
-sw_error_t
-qca_ar8327_phy_read(a_uint32_t dev_id, a_uint32_t phy_addr,
-			a_uint32_t reg, a_uint16_t* data);
-sw_error_t
-qca_ar8327_phy_write(a_uint32_t dev_id, a_uint32_t phy_addr,
-                            a_uint32_t reg, a_uint16_t data);
-void
-qca_ar8327_mmd_write(a_uint32_t dev_id, a_uint32_t phy_addr,
-                              a_uint16_t addr, a_uint16_t data);
-void
-qca_ar8327_phy_dbg_write(a_uint32_t dev_id, a_uint32_t phy_addr,
-		                          a_uint16_t dbg_addr, a_uint16_t dbg_data);
-void
-qca_ar8327_phy_dbg_read(a_uint32_t dev_id, a_uint32_t phy_addr,
-		                          a_uint16_t dbg_addr, a_uint16_t *dbg_data);
-
-void
-qca_phy_mmd_write(u32 dev_id, u32 phy_id,
-                     u16 mmd_num, u16 reg_id, u16 reg_val);
-
-u16
-qca_phy_mmd_read(u32 dev_id, u32 phy_id,
-		u16 mmd_num, u16 reg_id);
-/*qca808x_end*/
 sw_error_t
 qca_switch_reg_read(a_uint32_t dev_id, a_uint32_t reg_addr,
 			a_uint8_t * reg_data, a_uint32_t len);

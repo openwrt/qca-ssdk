@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -524,6 +524,7 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 			}
 		}
 
+		msleep(1);
 		/* manually excute polling task to finish all ports up to down sequence */
 		mutex_lock(&priv->mac_sw_sync_lock);
 		qca_hppe_mac_sw_sync_task(priv);

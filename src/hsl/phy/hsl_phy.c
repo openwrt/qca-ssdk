@@ -207,8 +207,7 @@ a_bool_t hsl_port_phy_connected(a_uint32_t dev_id, fal_port_t port_id)
 }
 
 /*qca808x_start*/
-a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
-		a_uint32_t port_id, ssdk_init_cfg *cfg)
+a_uint32_t hsl_phyid_get(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	a_uint16_t org_id = 0, rev_id = 0;
 	a_uint32_t reg_pad = 0, phy_id = 0;
@@ -225,26 +224,18 @@ a_uint32_t hsl_phyid_get(a_uint32_t dev_id,
 		reg_pad = BIT(30) | BIT(16);
 	}
 
-#if defined(IN_PHY_I2C_MODE)
-	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
-		cfg->reg_func.i2c_get(dev_id,
-				phy_info[dev_id]->phy_address[port_id], reg_pad | 2, &org_id);
-		cfg->reg_func.i2c_get(dev_id,
-				phy_info[dev_id]->phy_address[port_id], reg_pad | 3, &rev_id);
-		if(((org_id << 16) | rev_id) == INVALID_PHY_ID) {
-			return QCA8081_PHY_V1_1;
-		}
-	}
-	else
-#endif
-	{
-		org_id = hsl_phy_mii_reg_read(dev_id,
-			phy_info[dev_id]->phy_address[port_id], reg_pad | 2);
-		rev_id = hsl_phy_mii_reg_read(dev_id,
-			phy_info[dev_id]->phy_address[port_id], reg_pad | 3);
-	}
+	org_id = hsl_phy_mii_reg_read(dev_id,
+		phy_info[dev_id]->phy_address[port_id], reg_pad | 2);
+	rev_id = hsl_phy_mii_reg_read(dev_id,
+		phy_info[dev_id]->phy_address[port_id], reg_pad | 3);
 
 	phy_id = (org_id<<16) | rev_id;
+#if defined(IN_PHY_I2C_MODE)
+	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS) {
+		if(phy_id == INVALID_PHY_ID)
+			phy_id = QCA8081_PHY_V1_1;
+	}
+#endif
 
 	return phy_id;
 }
@@ -310,17 +301,8 @@ sw_error_t hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	a_uint32_t phy_id;
 	phy_type_t phytype;
-	ssdk_init_cfg cfg = {0};
 
-	if (hsl_port_phy_access_type_get(dev_id, port_id) == PHY_I2C_ACCESS)
-	{
-		cfg.reg_func.i2c_get = hsl_phy_i2c_get;
-	}
-	else
-	{
-		cfg.reg_func.mdio_get = reduce_hsl_phy_get;
-	}
-	phy_id = hsl_phyid_get(dev_id, port_id, &cfg);
+	phy_id = hsl_phyid_get(dev_id, port_id);
 	phytype = hsl_phytype_get_by_phyid(dev_id, phy_id);
 	SSDK_DEBUG("port_id is %x, phy_id is %x, phy_type is:%x\n",
 		port_id, phy_id, phytype);
@@ -333,7 +315,7 @@ sw_error_t hsl_phydriver_update(a_uint32_t dev_id, a_uint32_t port_id)
 	return SW_OK;
 }
 /*qca808x_start*/
-int ssdk_phy_driver_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
+int ssdk_phy_driver_init(a_uint32_t dev_id)
 {
 
 	int i = 0;
@@ -349,7 +331,7 @@ int ssdk_phy_driver_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 				continue;
 			}
 /*qca808x_start*/
-			phy_id = hsl_phyid_get(dev_id, i, cfg);
+			phy_id = hsl_phyid_get(dev_id, i);
 			phytype = hsl_phytype_get_by_phyid(dev_id, phy_id);
 			if (MAX_PHY_CHIP != phytype) {
 				phy_info[dev_id]->phy_type[i] = phytype;

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2017-2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -76,10 +76,6 @@ extern "C" {
 	sw_error_t
 		sd_reg_mii_mdio_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 				a_uint8_t value[], a_uint32_t value_len);
-
-	sw_error_t
-		sd_mii_update(a_uint32_t dev_id, ssdk_init_cfg *cfg);
-
 	/*qca808x_start*/
 	sw_error_t sd_init(a_uint32_t dev_id, ssdk_init_cfg * cfg);
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -118,115 +118,82 @@ extern struct qca_phy_priv **qca_phy_priv_global;
 #define SHIVA_CHIP_REG 0x10
 #define HIGH_ADDR_DFLT	0x200
 
-/*
- * Using ISIS's address as default
-  */
-static int switch_chip_id = ISIS_CHIP_ID;
-static int switch_chip_reg = ISIS_CHIP_REG;
-
 static int ssdk_dev_id = 0;
 /*qca808x_start*/
 a_uint32_t ssdk_log_level = SSDK_LOG_LEVEL_DEFAULT;
 /*qca808x_end*/
 
-static inline void
-mht_split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page,
-		uint16_t *switch_phy_id)
+sw_error_t qca_mii_bus_lock(a_uint32_t dev_id, a_bool_t enable)
 {
-	*r1 = regaddr & 0x1c;
+	struct mii_bus *miibus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
 
-	regaddr >>= 5;
-	*r2 = regaddr & 0x7;
+	SW_RTN_ON_NULL(miibus);
+	if(enable)
+		mutex_lock(&miibus->mdio_lock);
+	else
+		mutex_unlock(&miibus->mdio_lock);
 
-	regaddr >>= 3;
-	*page = regaddr & 0xffff;
-
-	regaddr >>= 16;
-	*switch_phy_id = regaddr & 0xff;
-}
-
-a_uint32_t
-qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg)
-{
-	struct mii_bus *bus;
-	uint16_t r1, r2, page, switch_phy_id;
-	uint16_t lo, hi;
-
-	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
-
-	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
-	udelay(100);
-	lo = __mdiobus_read(bus, 0x10 | r2, r1);
-	hi = __mdiobus_read(bus, 0x10 | r2, r1 + 2);
-	mutex_unlock(&bus->mdio_lock);
-	return (hi << 16) | lo;
-}
-
-void
-qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
-{
-	struct mii_bus *bus;
-	uint16_t r1, r2, page, switch_phy_id;
-	uint16_t lo, hi;
-
-	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
-
-	mht_split_addr((uint32_t) reg, &r1, &r2, &page, &switch_phy_id);
-	lo = val & 0xffff;
-	hi = (a_uint16_t) (val >> 16);
-
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, 0x18 | (switch_phy_id >> 5), switch_phy_id & 0x1f, page);
-	udelay(100);
-	__mdiobus_write(bus, 0x10 | r2, r1, lo);
-	__mdiobus_write(bus, 0x10 | r2, r1 + 2, hi);
-	mutex_unlock(&bus->mdio_lock);
-}
-
-void
-qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val)
-{
-	a_uint32_t new_val = 0, org_val = 0;
-
-	org_val = qca_mht_mii_read(dev_id, reg);
-
-	new_val = org_val & ~mask;
-	new_val |= val & mask;
-
-	if (new_val != org_val)
-		qca_mht_mii_write(dev_id, reg, new_val);
-
-	return;
+	return SW_OK;
 }
 
 sw_error_t
-qca_mht_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+__qca_mii_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint8_t value[], a_uint32_t value_len)
+{
+	a_uint32_t reg_val = 0;
+
+	if (value_len != sizeof (a_uint32_t))
+		return SW_BAD_LEN;
+
+	reg_val = __qca_mii_read(dev_id, reg_addr);
+
+	aos_mem_copy(value, &reg_val, sizeof (a_uint32_t));
+
+	return SW_OK;
+}
+
+sw_error_t
+__qca_mii_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
+                   a_uint32_t value_len)
+{
+	a_uint32_t reg_val = 0;
+
+	if (value_len != sizeof (a_uint32_t))
+		return SW_BAD_LEN;
+
+	aos_mem_copy(&reg_val, value, sizeof (a_uint32_t));
+
+	__qca_mii_write(dev_id, reg_addr, reg_val);
+
+	return SW_OK;
+}
+
+sw_error_t
+__qca_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
                     a_uint32_t bit_offset, a_uint32_t field_len,
                     a_uint8_t value[], a_uint32_t value_len)
 {
-    a_uint32_t reg_val = 0;
+	a_uint32_t reg_val = 0;
 
-    if ((bit_offset >= 32 || (field_len > 32)) || (field_len == 0))
-        return SW_OUT_OF_RANGE;
+	if ((bit_offset >= 32 || (field_len > 32)) || (field_len == 0))
+		return SW_OUT_OF_RANGE;
 
-    if (value_len != sizeof (a_uint32_t))
-        return SW_BAD_LEN;
+	if (value_len != sizeof (a_uint32_t))
+		return SW_BAD_LEN;
 
-    reg_val = qca_mht_mii_read(dev_id, reg_addr);
+	reg_val = __qca_mii_read(dev_id, reg_addr);
 
-    if(32 == field_len) {
-        *((a_uint32_t *) value) = reg_val;
-    } else  {
-        *((a_uint32_t *) value) = SW_REG_2_FIELD(reg_val, bit_offset, field_len);
-    }
+	if(32 == field_len) {
+		*((a_uint32_t *) value) = reg_val;
+	} else  {
+		*((a_uint32_t *) value) = SW_REG_2_FIELD(reg_val, bit_offset, field_len);
+	}
 
-    return SW_OK;
+	return SW_OK;
 }
 
 sw_error_t
-qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
+__qca_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
                    a_uint32_t bit_offset, a_uint32_t field_len,
                    const a_uint8_t value[], a_uint32_t value_len)
 {
@@ -239,7 +206,7 @@ qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 	if (value_len != sizeof (a_uint32_t))
 		return SW_BAD_LEN;
 
-	reg_val = qca_mht_mii_read(dev_id, reg_addr);
+	reg_val = __qca_mii_read(dev_id, reg_addr);
 
 	if(32 == field_len) {
 		reg_val = field_val;
@@ -247,70 +214,63 @@ qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 		SW_REG_SET_BY_FIELD_U32(reg_val, field_val, bit_offset, field_len);
 	}
 
-	qca_mht_mii_write(dev_id, reg_addr, reg_val);
+	__qca_mii_write(dev_id, reg_addr, reg_val);
 
 	return SW_OK;
 }
 
-static inline void
-split_addr(uint32_t regaddr, uint16_t *r1, uint16_t *r2, uint16_t *page)
+sw_error_t
+qca_mii_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint8_t value[], a_uint32_t value_len)
 {
-	regaddr >>= 1;
-	*r1 = regaddr & 0x1e;
+	sw_error_t rv = SW_OK;
 
-	regaddr >>= 5;
-	*r2 = regaddr & 0x7;
+	qca_mii_bus_lock(dev_id, A_TRUE);
+	rv = __qca_mii_reg_get(dev_id, reg_addr, value, value_len);
+	qca_mii_bus_lock(dev_id, A_FALSE);
 
-	regaddr >>= 3;
-	*page = regaddr & 0x3ff;
+	return rv;
 }
 
-a_uint32_t
-qca_ar8216_mii_read(a_uint32_t dev_id, a_uint32_t reg)
+sw_error_t
+qca_mii_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
+                   a_uint32_t value_len)
 {
-	struct mii_bus *bus;
-	uint16_t r1, r2, page;
-	uint16_t lo, hi;
+	sw_error_t rv = SW_OK;
 
-	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	qca_mii_bus_lock(dev_id, A_TRUE);
+	rv = __qca_mii_reg_set(dev_id, reg_addr, value, value_len);
+	qca_mii_bus_lock(dev_id, A_FALSE);
 
-	split_addr((uint32_t) reg, &r1, &r2, &page);
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, page);
-	udelay(100);
-	lo = __mdiobus_read(bus, 0x10 | r2, r1);
-	hi = __mdiobus_read(bus, 0x10 | r2, r1 + 1);
-	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
-	mutex_unlock(&bus->mdio_lock);
-	return (hi << 16) | lo;
+	return rv;
 }
 
-void
-qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val)
+sw_error_t
+qca_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                    a_uint32_t bit_offset, a_uint32_t field_len,
+                    a_uint8_t value[], a_uint32_t value_len)
 {
-	struct mii_bus *bus;
-	uint16_t r1, r2, r3;
-	uint16_t lo, hi;
-	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
+	sw_error_t rv = SW_OK;
 
-	bus = ssdk_miibus_get(dev_id, SSDK_MII_DEFAULT_BUS_ID);
+	qca_mii_bus_lock(dev_id, A_TRUE);
+	rv = __qca_mii_field_get(dev_id, reg_addr, bit_offset, field_len, value, value_len);
+	qca_mii_bus_lock(dev_id, A_FALSE);
 
-	split_addr((a_uint32_t) reg, &r1, &r2, &r3);
-	lo = val & 0xffff;
-	hi = (a_uint16_t) (val >> 16);
+	return rv;
+}
 
-	mutex_lock(&bus->mdio_lock);
-	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, r3);
-	udelay(100);
-	if(chip_type != CHIP_SHIVA) {
-		__mdiobus_write(bus, 0x10 | r2, r1, lo);
-		__mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
-	} else {
-		__mdiobus_write(bus, 0x10 | r2, r1 + 1, hi);
-		__mdiobus_write(bus, 0x10 | r2, r1, lo);
-	}
-	__mdiobus_write(bus, switch_chip_id, switch_chip_reg, HIGH_ADDR_DFLT);
-	mutex_unlock(&bus->mdio_lock);
+sw_error_t
+qca_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint32_t bit_offset, a_uint32_t field_len,
+                   const a_uint8_t value[], a_uint32_t value_len)
+{
+	sw_error_t rv = SW_OK;
+
+	qca_mii_bus_lock(dev_id, A_TRUE);
+	rv = __qca_mii_field_set(dev_id, reg_addr, bit_offset, field_len, value, value_len);
+	qca_mii_bus_lock(dev_id, A_FALSE);
+
+	return rv;
 }
 
 static void qca_mii_reg_convert(a_uint32_t dev_id, a_uint32_t *reg)
@@ -318,11 +278,11 @@ static void qca_mii_reg_convert(a_uint32_t dev_id, a_uint32_t *reg)
 	ssdk_chip_type chip_type = hsl_get_current_chip_type(dev_id);
 
 	switch (chip_type) {
-		case CHIP_MHT:
-			*reg |= SSDK_SWITCH_REG_TYPE_QCA8386;
+		case CHIP_ISISC:
+			*reg |= SSDK_SWITCH_REG_TYPE_QCA8337;
 			break;
 		default:
-			*reg |= SSDK_SWITCH_REG_TYPE_QCA8337;
+			*reg |= SSDK_SWITCH_REG_TYPE_QCA8386;
 			break;
 	}
 }
@@ -1573,13 +1533,6 @@ ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 		}
 
 		cfg->reg_mode = HSL_HEADER;
-#if defined(MHT)
-		/* when manhattan works in PHY mode, the clock mode will be defined in dts,
-		 * the registers of manhattan need to be accessed, mii_reg_set/mii_reg_get
-		 * can be leveraged for this purpose. */
-		cfg->reg_func.mii_reg_set = qca_mht_mii_write;
-		cfg->reg_func.mii_reg_get = qca_mht_mii_read;
-#endif
 	} else if (reg_mode == HSL_REG_MDIO) {
 		cfg->reg_mode = HSL_MDIO;
 	}

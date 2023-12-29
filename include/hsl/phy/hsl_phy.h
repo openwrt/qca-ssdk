@@ -659,7 +659,7 @@ hsl_phy_ops_t *hsl_phy_api_ops_get(a_uint32_t dev_id, a_uint32_t port_id);
 
 sw_error_t phy_api_ops_init(phy_type_t phy_type);
 
-int ssdk_phy_driver_init(a_uint32_t dev_id, ssdk_init_cfg *cfg);
+int ssdk_phy_driver_init(a_uint32_t dev_id);
 
 int qca_ssdk_phy_info_init(a_uint32_t dev_id);
 
@@ -671,7 +671,7 @@ void hsl_phy_address_init(a_uint32_t dev_id, a_uint32_t i,
 				a_uint32_t value);
 /*qca808x_start*/
 a_uint32_t
-hsl_phyid_get(a_uint32_t dev_id, a_uint32_t port_id, ssdk_init_cfg *cfg);
+hsl_phyid_get(a_uint32_t dev_id, a_uint32_t port_id);
 
 a_uint32_t
 qca_ssdk_port_to_phy_addr(a_uint32_t dev_id, a_uint32_t port_id);

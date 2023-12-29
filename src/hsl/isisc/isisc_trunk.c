@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016, The Linux Foundation. All rights reserved.
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -36,7 +36,7 @@
 #define ISISC_TRUNK_MANIPULATE_DP_ON       1
 #define ISISC_TRUNK_MANIPULATE_HEADER_LEN 12
 #define MAC_LEN                           6
-#define HASH_SIZE                         4
+#define ISISC_HASH_SIZE                   4
 
 enum isisc_trunk_reg_id
 {
@@ -52,7 +52,7 @@ static a_uint32_t isisc_trunk_regs[ISISC_TRUNK_REG_MAX] =
     0xf, 0x0, 0x0, 0x0
 };
 
-static a_uint8_t sa_hash[HASH_SIZE][MAC_LEN] =
+static a_uint8_t sa_hash[ISISC_HASH_SIZE][MAC_LEN] =
 {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 },
@@ -334,7 +334,7 @@ _isisc_trunk_manipulate_sa_set(a_uint32_t dev_id, fal_mac_addr_t * addr)
 {
     a_uint32_t i;
 
-    for (i = 0; i < HASH_SIZE; i++)
+    for (i = 0; i < ISISC_HASH_SIZE; i++)
     {
         memcpy(sa_hash[i], addr->uc, MAC_LEN);
         sa_hash[i][MAC_LEN - 1] = BYTE_B2R(sa_hash[i][MAC_LEN - 1], i);
@@ -498,7 +498,7 @@ _isisc_trunk_sa_spoofing( a_uint32_t dev_id, a_uint8_t * header, a_uint32_t len,
 
     memcpy(ori_sa, &header[MAC_LEN], MAC_LEN);
 
-    for (i = 0; i < HASH_SIZE/*not HASH_SIZE, for RAD only*/; i++)
+    for (i = 0; i < ISISC_HASH_SIZE/*not ISISC_HASH_SIZE, for RAD only*/; i++)
     {
         memcpy(&header[MAC_LEN], sa_hash[i], MAC_LEN);
         rv = _isisc_trunk_hash_dp_get(dev_id, header, len, trunk_id,

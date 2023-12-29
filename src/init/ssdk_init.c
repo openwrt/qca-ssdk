@@ -1946,7 +1946,7 @@ ssdk_init(a_uint32_t dev_id, ssdk_init_cfg * cfg)
 	if(!ssdk_is_emulation(dev_id))
 /*qca808x_start*/
 	{
-		rv = ssdk_phy_driver_init(dev_id, cfg);
+		rv = ssdk_phy_driver_init(dev_id);
 		if (rv != SW_OK)
 			SSDK_ERROR("ssdk phy init failed: %d. \r\n", rv);
 	}
@@ -2110,13 +2110,13 @@ static void ssdk_driver_unregister(a_uint32_t dev_id)
 	}
 }
 /*qca808x_start*/
-static inline a_uint32_t qca_detect_phyid(a_uint32_t dev_id, ssdk_init_cfg* cfg)
+static inline a_uint32_t qca_detect_phyid(a_uint32_t dev_id)
 {
 	a_uint32_t phy_id = 0, port_id = 0;
 	a_uint32_t port_bmp = qca_ssdk_port_bmp_get(dev_id);
 	while (port_bmp) {
 		if (port_bmp & 0x1) {
-			phy_id = hsl_phyid_get(dev_id, port_id, cfg);
+			phy_id = hsl_phyid_get(dev_id, port_id);
 			if (INVALID_PHY_ID != phy_id)
 				break;
 		}
@@ -2129,7 +2129,7 @@ static inline a_uint32_t qca_detect_phyid(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 static int chip_is_scomphy(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 {
 	int rv = -ENODEV;
-	a_uint32_t phy_id = qca_detect_phyid(dev_id, cfg);
+	a_uint32_t phy_id = qca_detect_phyid(dev_id);
 
 	switch (phy_id) {
 		/*qca808x_end*/
@@ -2160,26 +2160,21 @@ static int chip_ver_get(a_uint32_t dev_id, ssdk_init_cfg* cfg)
 	a_uint8_t chip_revision = 0;
 /*qca808x_end*/
 	hsl_reg_mode reg_mode;
+	a_uint32_t reg_val = 0;
 
 	reg_mode= ssdk_switch_reg_access_mode_get(dev_id);
 	if(reg_mode == HSL_REG_MDIO) {
-		/**
-		 * For the Manhattan phy detected, the Manhattan MDIO read function
-		 * should be used, which is different from the other chips
-		 **/
-		a_uint32_t phy_id = qca_detect_phyid(dev_id, cfg);
-		a_uint16_t reg_val;
+		a_uint32_t phy_id = qca_detect_phyid(dev_id);
 		switch (phy_id) {
 			case QCA8084_PHY:
-				reg_val = qca_mht_mii_read(dev_id, 0);
+				chip_ver = QCA_VER_MHT;
 				break;
+			case F1V4_PHY:
+				chip_ver = QCA_VER_AR8337;
 			default:
-				reg_val = qca_ar8216_mii_read(dev_id, 0);
 				break;
 		}
-		chip_ver = (reg_val & BITS(8,8)) >> 8;
 	} else {
-		a_uint32_t reg_val = 0;
 		qca_switch_reg_read(dev_id,0,(a_uint8_t *)&reg_val, 4);
 		chip_ver = (reg_val&0xff00)>>8;
 		chip_revision = reg_val&0xff;
@@ -2227,10 +2222,6 @@ static void ssdk_cfg_default_init(ssdk_init_cfg *cfg)
 	memset(cfg, 0, sizeof(ssdk_init_cfg));
 	cfg->cpu_mode = HSL_CPU_1;
 	cfg->nl_prot = 30;
-#if defined(IN_PHY_I2C_MODE)
-	cfg->reg_func.i2c_set = qca_phy_i2c_write;
-	cfg->reg_func.i2c_get = qca_phy_i2c_read;
-#endif
 /*qca808x_end*/
 
 	cfg->reg_func.header_reg_set = qca_switch_reg_write;

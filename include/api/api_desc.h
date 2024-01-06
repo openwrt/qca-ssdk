@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -6069,6 +6069,54 @@ extern "C" {
 			sizeof(a_uint32_t), SW_PARAM_IN, "Port Id"), \
 	SW_PARAM_DEF(SW_API_PORT_ATHTAG_TX_GET, SW_ATHTAG_TX_CFG, \
 			sizeof(fal_athtag_tx_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "Tx Cfg"),
+
+#define SW_API_TOEPLITZ_HASH_SECRET_KEY_SET_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_SECRET_KEY_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_SECRET_KEY_SET, SW_TOEPLITZ_SECRET_KEY, \
+			sizeof(fal_toeplitz_secret_key_t), SW_PARAM_PTR|SW_PARAM_IN, "Secret key"),
+
+#define SW_API_TOEPLITZ_HASH_SECRET_KEY_GET_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_SECRET_KEY_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_SECRET_KEY_GET, SW_TOEPLITZ_SECRET_KEY, \
+			sizeof(fal_toeplitz_secret_key_t), SW_PARAM_PTR|SW_PARAM_OUT, "Secret key"),
+
+#define SW_API_TOEPLITZ_HASH_RSS_ALGM_SET_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_RSS_ALGM_SET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_RSS_ALGM_SET, SW_RSS_HASH_ALGM, \
+			sizeof(fal_rss_hash_algm_t), SW_PARAM_PTR|SW_PARAM_IN, "RSS hash algorithm"),
+
+#define SW_API_TOEPLITZ_HASH_RSS_ALGM_GET_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_RSS_ALGM_GET, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_RSS_ALGM_GET, SW_RSS_HASH_ALGM, \
+			sizeof(fal_rss_hash_algm_t), SW_PARAM_PTR|SW_PARAM_OUT, "RSS hash algorithm"),
+
+#define SW_API_TOEPLITZ_HASH_CONFIG_ADD_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_ADD, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_ADD, SW_TOEPLITZ_CONFIG, \
+			sizeof(fal_toeplitz_hash_config_t), SW_PARAM_PTR|SW_PARAM_IN, "Hash config"),
+
+#define SW_API_TOEPLITZ_HASH_CONFIG_DEL_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_DEL, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_DEL, SW_TOEPLITZ_CONFIG, \
+			sizeof(fal_toeplitz_hash_config_t), SW_PARAM_PTR|SW_PARAM_IN, "Hash config"),
+
+#define SW_API_TOEPLITZ_HASH_CONFIG_GETFIRST_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETFIRST, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETFIRST, SW_TOEPLITZ_CONFIG, \
+			sizeof(fal_toeplitz_hash_config_t), SW_PARAM_PTR|SW_PARAM_OUT, "Hash config"),
+
+#define SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT_DESC \
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT, SW_UINT32, \
+			sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id"),\
+	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT, SW_TOEPLITZ_CONFIG, \
+			sizeof(fal_toeplitz_hash_config_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Hash config"),
 
 /* auto_insert_flag */
 /*qca808x_start*/

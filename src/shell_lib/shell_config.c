@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1313,6 +1313,11 @@ struct sub_cmd_des_t g_servcode_des[] =
 struct sub_cmd_des_t g_rss_hash_des[] =
 {
     {"config", "set", SW_API_RSS_HASH_CONFIG_SET, NULL},
+#if defined(MRPPE)
+    {"hashalgm", "set", SW_API_TOEPLITZ_HASH_RSS_ALGM_SET, NULL},
+    {"toeplitzseckey", "set", SW_API_TOEPLITZ_HASH_SECRET_KEY_SET, NULL},
+    {"toeplitzconfig", "set", SW_API_TOEPLITZ_HASH_CONFIG_ADD, NULL},
+#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif

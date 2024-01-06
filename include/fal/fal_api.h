@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2015-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -2531,11 +2531,26 @@ extern "C" {
 #ifdef IN_RSS_HASH
 #define RSS_HASH_API \
     SW_API_DEF(SW_API_RSS_HASH_CONFIG_SET, fal_rss_hash_config_set), \
-    SW_API_DEF(SW_API_RSS_HASH_CONFIG_GET, fal_rss_hash_config_get),
-
+    SW_API_DEF(SW_API_RSS_HASH_CONFIG_GET, fal_rss_hash_config_get), \
+    SW_API_DEF(SW_API_TOEPLITZ_HASH_SECRET_KEY_SET, fal_toeplitz_hash_secret_key_set), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_SECRET_KEY_GET, fal_toeplitz_hash_secret_key_get), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_RSS_ALGM_SET, fal_rsshash_algm_set), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_RSS_ALGM_GET, fal_rsshash_algm_get), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_CONFIG_ADD, fal_toeplitz_hash_config_add), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_CONFIG_DEL, fal_toeplitz_hash_config_del), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETFIRST, fal_toeplitz_hash_config_getfirst), \
+	SW_API_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT, fal_toeplitz_hash_config_getnext),
 #define RSS_HASH_API_PARAM \
     SW_API_DESC(SW_API_RSS_HASH_CONFIG_SET) \
-    SW_API_DESC(SW_API_RSS_HASH_CONFIG_GET)
+    SW_API_DESC(SW_API_RSS_HASH_CONFIG_GET) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_SECRET_KEY_SET) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_SECRET_KEY_GET) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_RSS_ALGM_SET) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_RSS_ALGM_GET) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_CONFIG_ADD) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_CONFIG_DEL) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_CONFIG_GETFIRST) \
+	SW_API_DESC(SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT)
 #else
 #define RSS_HASH_API
 #define RSS_HASH_API_PARAM

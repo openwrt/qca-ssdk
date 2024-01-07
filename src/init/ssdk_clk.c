@@ -139,19 +139,18 @@ void __iomem *nsscc_clk_base_g = NULL;
 static struct rst_data_t mppe_rst_tbl[] = {
        RST_LOOKUP(0x17044, GCC_NODE_NAME, GCC_UNIPHY0_BCR, RST_BIT0),
        RST_LOOKUP(0x17054, GCC_NODE_NAME, GCC_UNIPHY1_BCR, RST_BIT0),
-       /*
        RST_LOOKUP(0x17064, GCC_NODE_NAME, GCC_UNIPHY2_BCR, RST_BIT0),
        RST_LOOKUP(0x17050, GCC_NODE_NAME, GCC_UNIPHY0_XPCS_ARES, RST_BIT0),
        RST_LOOKUP(0x17060, GCC_NODE_NAME, GCC_UNIPHY1_XPCS_ARES, RST_BIT0),
        RST_LOOKUP(0x17070, GCC_NODE_NAME, GCC_UNIPHY2_XPCS_ARES, RST_BIT0),
-       RST_LOOKUP(0x1704C, GCC_NODE_NAME, GCC_UNIPHY0_AHB_CLK_ARES, RST_BIT),
-       RST_LOOKUP(0x1705C, GCC_NODE_NAME, GCC_UNIPHY1_AHB_CLK_ARES, RST_BIT),
-       RST_LOOKUP(0x1706C, GCC_NODE_NAME, GCC_UNIPHY2_AHB_CLK_ARES, RST_BIT),
-       RST_LOOKUP(0x17048, GCC_NODE_NAME, GCC_UNIPHY0_SYS_CLK_ARES, RST_BIT),
-       RST_LOOKUP(0x17058, GCC_NODE_NAME, GCC_UNIPHY1_SYS_CLK_ARES, RST_BIT),
-       RST_LOOKUP(0x17068, GCC_NODE_NAME, GCC_UNIPHY2_SYS_CLK_ARES, RST_BIT),
-       */
+       RST_LOOKUP(0x1704C, GCC_NODE_NAME, GCC_UNIPHY0_AHB_ARES, RST_BIT),
+       RST_LOOKUP(0x1705C, GCC_NODE_NAME, GCC_UNIPHY1_AHB_ARES, RST_BIT),
+       RST_LOOKUP(0x1706C, GCC_NODE_NAME, GCC_UNIPHY2_AHB_ARES, RST_BIT),
+       RST_LOOKUP(0x17048, GCC_NODE_NAME, GCC_UNIPHY0_SYS_ARES, RST_BIT),
+       RST_LOOKUP(0x17058, GCC_NODE_NAME, GCC_UNIPHY1_SYS_ARES, RST_BIT),
+       RST_LOOKUP(0x17068, GCC_NODE_NAME, GCC_UNIPHY2_SYS_ARES, RST_BIT),
 
+#if 0
        RST_LOOKUP(0x3e8, NSSCC_NODE_NAME, NSS_CC_PPE_BCR, RST_BIT0),
        RST_LOOKUP(0x57c, NSSCC_NODE_NAME, NSS_CC_UNIPHY_PORT1_RX_CLK_ARES, RST_BIT),
        RST_LOOKUP(0x580, NSSCC_NODE_NAME, NSS_CC_UNIPHY_PORT1_TX_CLK_ARES, RST_BIT),
@@ -168,6 +167,7 @@ static struct rst_data_t mppe_rst_tbl[] = {
        RST_LOOKUP(0x428, NSSCC_NODE_NAME, NSS_CC_PORT1_MAC_CLK_ARES, RST_BIT),
        RST_LOOKUP(0x430, NSSCC_NODE_NAME, NSS_CC_PORT2_MAC_CLK_ARES, RST_BIT),
        RST_LOOKUP(0x438, NSSCC_NODE_NAME, NSS_CC_PORT3_MAC_CLK_ARES, RST_BIT),
+#endif
 };
 
 #define PPE_CLK_UNAWARE_RATE	0
@@ -201,6 +201,7 @@ static struct clk_data_t mppe_clk_tbl[] = {
 	CLK_LOOKUP(0x17094, 0x1, 0, 0, 0x17068, UNIPHY2_SYS_CLK, EN_BIT,
 			APPE_UNIPHY_SYS_CLK_RATE, PPE_CLK_UNAWARE_RATE, A_TRUE),
 
+#if 0
 	/* 100M */
 	CLK_LOOKUP(0x6AC, 0x505, 0, 0, 0x6B0, NSS_CSR, EN_BIT, NSS_NSSCC_CLK_RATE,
 			PPE_CLK_UNAWARE_RATE, A_FALSE),
@@ -550,6 +551,7 @@ static struct clk_data_t mppe_clk_tbl[] = {
 			SGMII_SPEED_10M_CLK, SGMII_SPEED_1000M_CLK, A_FALSE),
 	CLK_LOOKUP(0x4F4, 0x418, 0x4F8, 3, 0x590, UNIPHY2_PORT6_TX_CLK, EN_BIT,
 			SGMII_SPEED_10M_CLK, SGMII_SPEED_1000M_CLK, A_FALSE),
+#endif
 };
 
 struct clk_data_t *ssdk_clock_find(const char *clock_id, unsigned int rate, unsigned int prate)
@@ -577,7 +579,7 @@ a_bool_t ssdk_clock_en_set(const char *clock_id, a_bool_t enable)
 
 	clk_inst = ssdk_clock_find(clock_id, 0, PPE_CLK_UNAWARE_RATE);
 	if (!clk_inst) {
-		SSDK_ERROR("Cant find the clock %s\n", clock_id);
+		SSDK_DEBUG("Cant find the clock %s\n", clock_id);
 		return A_FALSE;
 	}
 
@@ -608,13 +610,15 @@ a_bool_t ssdk_clock_en_set(const char *clock_id, a_bool_t enable)
 		}
 		return A_TRUE;
 	}
-	SSDK_ERROR("CLK %s CBC REG or EN_BIT is not available\n", clock_id);
+	SSDK_DEBUG("CLK %s CBC REG or EN_BIT is not available\n", clock_id);
 
 	return A_FALSE;
 }
 
 a_bool_t ssdk_clock_rate_set(const char *clock_id, unsigned int rate);
 
+#if 0
+/* This funciton is for resetting the clock that is not defined in the DTS */
 a_bool_t ssdk_raw_reset_control(const char *node_name, unsigned int reset_index, a_uint32_t action)
 {
 	struct rst_data_t *rst_inst = NULL;
@@ -662,25 +666,21 @@ a_bool_t ssdk_raw_reset_control(const char *node_name, unsigned int reset_index,
 
 	return is_found;
 }
+#endif
 
-a_bool_t ssdk_reset_control(struct reset_control *rst, a_uint32_t action)
+a_bool_t ssdk_reset_find(struct reset_control *rst,
+			 struct rst_data_t *rst_inst,
+			 void __iomem *clk_base)
 {
-	int i = 0;
-	struct rst_data_t *rst_inst = NULL;
-	a_bool_t is_found = A_FALSE;
-	void __iomem *clk_base = NULL;
 	struct device_node *clk_node = NULL;
 	struct reset_controller_dev *rcdev = NULL;
-
-	if (!rst) {
-		SSDK_ERROR("reset_control is null\n");
-		return A_FALSE;
-	}
+	struct rst_data_t *rst_inst_tmp;
+	int i = 0;
 
 	rcdev = rst->rcdev;
 	clk_node = rcdev->of_node;
 	if (!clk_node) {
-		SSDK_ERROR("clock node is null\n");
+		SSDK_DEBUG("clock node is null\n");
 		return A_FALSE;
 	}
 
@@ -689,45 +689,74 @@ a_bool_t ssdk_reset_control(struct reset_control *rst, a_uint32_t action)
 	} else if (of_node_name_eq(clk_node, NSSCC_NODE_NAME)) {
 		clk_base = nsscc_clk_base_g;
 	} else {
-		SSDK_ERROR("Unknown Reset Name: %s\n", clk_node->full_name);
+		SSDK_DEBUG("Unknown Reset Name: %s\n", clk_node->full_name);
 		return A_FALSE;
 	}
 
 	if (!clk_base) {
-		SSDK_ERROR("clk_base is not ioremap_nocache on %s\n", clk_node->full_name);
+		SSDK_DEBUG("clk_base is not ioremap_nocache on %s\n", clk_node->full_name);
 		return A_FALSE;
 	}
 
 	for (i = 0; i < ARRAY_SIZE(mppe_rst_tbl); i++) {
-		rst_inst = &mppe_rst_tbl[i];
-		if (!of_node_name_eq(clk_node, rst_inst->node_name)) {
+		rst_inst_tmp = &mppe_rst_tbl[i];
+		if (!of_node_name_eq(clk_node, rst_inst_tmp->node_name)) {
 			continue;
 		}
 
-		if (rst->id == rst_inst->rst_index)
-			break;
+		if (rst->id == rst_inst->rst_index) {
+			rst_inst = rst_inst_tmp;
+			return A_TRUE;
+		}
 	}
 
-	if (i < ARRAY_SIZE(mppe_rst_tbl)) {
-		uint32_t reg_val = readl(clk_base + rst_inst->cbc);
+	return A_FALSE;
+}
 
-		if (action == SSDK_RESET_ASSERT)
-			reg_val |= rst_inst->rst_bits;
-		else
-			reg_val &= ~rst_inst->rst_bits;
+a_bool_t ssdk_reset_control(struct reset_control *rst, a_uint32_t action)
+{
+	struct rst_data_t *rst_inst = NULL;
+	void __iomem *clk_base = NULL;
+	uint32_t reg_val = 0;
 
-		writel(reg_val, clk_base + rst_inst->cbc);
-		SSDK_DEBUG("%s reset_id: %d CBC reg: 0x%x, val: 0x%x\n",
-				action == SSDK_RESET_ASSERT ? "Assert" : "Deassert",
-				rst->id, rst_inst->cbc, reg_val);
-
-		is_found = A_TRUE;
-	} else {
-		SSDK_ERROR("Can't find the reset ID %d\n", rst->id);
-		is_found = A_FALSE;
+	if (!rst) {
+		SSDK_DEBUG("reset_control is null\n");
+		return A_FALSE;
 	}
 
-	return is_found;
+	if (!ssdk_reset_find(rst, rst_inst, clk_base)) {
+		SSDK_DEBUG("Can't find the reset ID %d\n", rst->id);
+		return A_FALSE;
+	}
+
+	reg_val = readl(clk_base + rst_inst->cbc);
+
+	if (action == SSDK_RESET_ASSERT)
+		reg_val |= rst_inst->rst_bits;
+	else
+		reg_val &= ~rst_inst->rst_bits;
+
+	writel(reg_val, clk_base + rst_inst->cbc);
+	SSDK_DEBUG("%s reset_id: %d CBC reg: 0x%x, val: 0x%x\n",
+		   action == SSDK_RESET_ASSERT ? "Assert" : "Deassert",
+		   rst->id, rst_inst->cbc, reg_val);
+
+	return A_TRUE;;
+}
+
+static bool ssdk_raw_clock_rate_set_and_enable(a_uint8_t* clock_id,
+						   a_uint32_t rate)
+{
+	bool ret = A_TRUE;
+
+	if (rate)
+		ret = ssdk_clock_rate_set(clock_id, rate);
+
+	if (!ret)
+		return ret;
+
+	return ssdk_clock_en_set(clock_id, A_TRUE);
+
 }
 #endif
 /* below 3 routines to be used as common */
@@ -757,13 +786,8 @@ void ssdk_clock_rate_set_and_enable(
 	}
 #endif
 #if defined(SSDK_RAW_CLOCK)
-	if (ssdk_is_emulation(0)) {
-		if (rate)
-			ssdk_clock_rate_set(clock_id, rate);
-
-		ssdk_clock_en_set(clock_id, A_TRUE);
+	if (ssdk_raw_clock_rate_set_and_enable(clock_id, rate))
 		return;
-	}
 #endif
 	clk = of_clk_get_by_name(node, clock_id);
 	if (!IS_ERR(clk)) {
@@ -1185,7 +1209,7 @@ struct clk_data_t *ssdk_clk_to_clk_data(const char *clock_id, unsigned int rate)
 
 	if (clk_id != 0xff) {
 		prate = clk_get_rate(uniphy_raw_clks[clk_id]->clk);
-		SSDK_INFO("UNIPHY CLK %s prate: %d for the clock %s rate %d set\n",
+		SSDK_DEBUG("UNIPHY CLK %s prate: %d for the clock %s rate %d set\n",
 				__clk_get_name(uniphy_raw_clks[clk_id]->clk), prate,
 				clock_id, rate);
 	}
@@ -1199,7 +1223,7 @@ a_bool_t ssdk_raw_clock_rate_set(struct clk_data_t *clk_inst, unsigned int rate)
 	uint32_t reg_val = 0;
 
 	if (!clk_inst) {
-		SSDK_ERROR("clk_inst is NULL\n");
+		SSDK_DEBUG("clk_inst is NULL\n");
 		return A_FALSE;
 	}
 
@@ -2290,28 +2314,19 @@ void ssdk_ppe_reset_init(a_uint32_t dev_id)
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	struct reset_control *rst;
 
-	if (ssdk_is_emulation(dev_id)) {
-#if defined(SSDK_RAW_CLOCK)
-		ssdk_raw_reset_control(NSSCC_NODE_NAME, NSS_CC_PPE_BCR, SSDK_RESET_ASSERT);
-		msleep(100);
-		ssdk_raw_reset_control(NSSCC_NODE_NAME, NSS_CC_PPE_BCR, SSDK_RESET_DEASSERT);
-		msleep(100);
-#endif
-	} else {
-		rst_node = of_find_node_by_name(NULL, "ess-switch");
-		rst = of_reset_control_get(rst_node, PPE_RESET_ID);
-		if (IS_ERR(rst)) {
-			SSDK_ERROR("%s not exist!\n", PPE_RESET_ID);
-			return;
-		}
-
-		ssdk_gcc_reset(rst, SSDK_RESET_ASSERT);
-		msleep(100);
-		ssdk_gcc_reset(rst, SSDK_RESET_DEASSERT);
-		msleep(100);
-
-		reset_control_put(rst);
+	rst_node = of_find_node_by_name(NULL, "ess-switch");
+	rst = of_reset_control_get(rst_node, PPE_RESET_ID);
+	if (IS_ERR(rst)) {
+		SSDK_ERROR("%s not exist!\n", PPE_RESET_ID);
+		return;
 	}
+
+	ssdk_gcc_reset(rst, SSDK_RESET_ASSERT);
+	msleep(100);
+	ssdk_gcc_reset(rst, SSDK_RESET_DEASSERT);
+	msleep(100);
+
+	reset_control_put(rst);
 #endif
 }
 

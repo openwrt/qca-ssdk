@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1009,7 +1009,6 @@ hppe_mac_tx_configuration_jd_set(
 	ret = hppe_mac_tx_configuration_set(dev_id, index, &reg_val);
 	return ret;
 }
-#ifndef IN_PORTCONTROL_MINI
 
 sw_error_t
 hppe_mac_rx_configuration_lm_get(
@@ -1041,6 +1040,7 @@ hppe_mac_rx_configuration_lm_set(
 	ret = hppe_mac_rx_configuration_set(dev_id, index, &reg_val);
 	return ret;
 }
+#ifndef IN_PORTCONTROL_MINI
 #if 0
 sw_error_t
 hppe_mac_rx_configuration_je_get(

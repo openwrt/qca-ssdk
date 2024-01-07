@@ -231,7 +231,7 @@ _adpt_phy_status_get_from_ppe(a_uint32_t dev_id, a_uint32_t port_id,
 
 	return rv;
 }
-#ifndef IN_PORTCONTROL_MINI
+
 static sw_error_t
 _adpt_hppe_port_xgmac_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 				 a_bool_t * enable)
@@ -243,7 +243,7 @@ _adpt_hppe_port_xgmac_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _adpt_hppe_port_gmac_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 				 a_bool_t * enable)
@@ -255,7 +255,7 @@ _adpt_hppe_port_gmac_loopback_get(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-
+#endif
 static sw_error_t
 _adpt_hppe_port_xgmac_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
 				 a_bool_t enable)
@@ -267,7 +267,7 @@ _adpt_hppe_port_xgmac_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
 
 	return rv;
 }
-
+#ifndef IN_PORTCONTROL_MINI
 static sw_error_t
 _adpt_hppe_port_gmac_loopback_set(a_uint32_t dev_id, fal_port_t port_id,
 				 a_bool_t enable)
@@ -4379,6 +4379,29 @@ adpt_hppe_port_phy_status_change(struct qca_phy_priv *priv, a_uint32_t port_id,
 		return A_TRUE;
 	return A_FALSE;
 }
+
+static sw_error_t
+adpt_hppe_port_mac_loopback_reset(a_uint32_t dev_id, a_uint32_t port_id)
+{
+	sw_error_t rv = SW_OK;
+	a_bool_t lp_en = A_FALSE;
+
+	if (qca_hppe_port_mac_type_get(dev_id, port_id) == PORT_XGMAC_TYPE) {
+		rv = _adpt_hppe_port_xgmac_loopback_get(dev_id, port_id, &lp_en);
+		SW_RTN_ON_ERROR(rv);
+		if(!lp_en) {
+			rv = _adpt_hppe_port_xgmac_loopback_set( dev_id, port_id, A_TRUE);
+			SW_RTN_ON_ERROR(rv);
+			/* 1ms is enough to release all packets */
+			aos_mdelay(1);
+			rv = _adpt_hppe_port_xgmac_loopback_set( dev_id, port_id, A_FALSE);
+			SW_RTN_ON_ERROR(rv);
+		}
+	}
+
+	return SW_OK;
+}
+
 sw_error_t
 qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 {
@@ -4418,6 +4441,8 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 			aos_mdelay(10);
 			/* disable rx mac */
 			adpt_hppe_port_rxmac_status_set(priv->device_id, port_id, A_FALSE);
+			/* release ppe port egress packets when link down */
+			adpt_hppe_port_mac_loopback_reset(priv->device_id, port_id);
 			priv->port_old_link[port_id - 1] = phy_status.link_status;
 			/* switch interface mode if necessary */
 			if (adpt_hppe_phy_interface_mode_switch(priv->device_id,

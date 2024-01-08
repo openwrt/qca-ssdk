@@ -504,6 +504,10 @@ sw_error_t adpt_appe_port_erp_power_mode_set(a_uint32_t dev_id,
 			return SW_OK;
 		}
 
+		/* disable port bridge mac tx en */
+		adpt_hppe_port_bridge_txmac_set(dev_id, port_id, A_FALSE);
+		msleep(1);
+
 		/* off phy */
 		hsl_port_phy_pll_off(dev_id, port_id);
 		hsl_port_phy_power_off(dev_id, port_id);

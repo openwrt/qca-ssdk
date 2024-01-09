@@ -1526,6 +1526,10 @@ qca_hppe_flow_hw_init(a_uint32_t dev_id)
 	fal_flow_mgmt_t mgmt;
 	sw_error_t rv;
 
+#if defined(MRPPE)
+	fal_flow_npt66_status_set(dev_id, A_TRUE);
+#endif
+
 	memset(&mgmt, 0, sizeof(fal_flow_mgmt_t));
 	dir_max = FAL_FLOW_UNKOWN_DIR_DIR;
 

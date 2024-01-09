@@ -318,6 +318,8 @@ typedef enum
 	SW_TOEPLITZ_SECRET_KEY,
 	SW_RSS_HASH_ALGM,
 	SW_TOEPLITZ_CONFIG,
+	SW_FLOW_NPT66_IID_CAL,
+	SW_FLOW_NPT66_IID,
 /* auto_insert_flag */
 } sw_data_type_e;
 

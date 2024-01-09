@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018-2019, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
  * above copyright notice and this permission notice appear in all copies.
@@ -503,7 +503,7 @@ static int qca808x_read_status(struct phy_device *phydev)
 		phydev->duplex = DUPLEX_HALF;
 	}
 	/*get the link partner ability*/
-	SW_RTN_ON_ERROR(qca808x_phy_get_partner_ability(dev_id, phy_id, &lp_adv));
+	qca808x_phy_get_partner_ability(dev_id, phy_id, &lp_adv);
 	qca808x_lp_adv_to_ethtool_adv(phydev, lp_adv);
 	/*get the link partner pause*/
 	phy_resolve_aneg_pause(phydev);

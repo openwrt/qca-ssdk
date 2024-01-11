@@ -25,9 +25,7 @@
 #include "hsl_dev.h"
 #include "isisc_led.h"
 #include "isisc_reg.h"
-#ifdef MHT
-#include "mht_led.h"
-#endif
+
 #define MAX_LED_PATTERN_ID   2
 #define LED_PATTERN_ADDR     0x50
 

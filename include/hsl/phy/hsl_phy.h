@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, 2017-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -250,6 +250,10 @@ extern "C" {
 					      a_uint32_t phy_id,
 					      led_ctrl_pattern_t * pattern);
 	typedef sw_error_t(*hsl_phy_led_ctrl_source_set) (a_uint32_t dev_id,
+					      a_uint32_t phy_id,
+					      a_uint32_t source_id,
+					      led_ctrl_pattern_t * pattern);
+	typedef sw_error_t(*hsl_phy_led_ctrl_source_get) (a_uint32_t dev_id,
 					      a_uint32_t phy_id,
 					      a_uint32_t source_id,
 					      led_ctrl_pattern_t * pattern);
@@ -524,6 +528,7 @@ extern "C" {
 		hsl_phy_led_ctrl_pattern_set phy_led_ctrl_pattern_set;
 		hsl_phy_led_ctrl_pattern_get phy_led_ctrl_pattern_get;
 		hsl_phy_led_ctrl_source_set phy_led_ctrl_source_set;
+		hsl_phy_led_ctrl_source_get phy_led_ctrl_source_get;
 		hsl_phy_pll_on phy_pll_on;
 		hsl_phy_pll_off phy_pll_off;
 		hsl_phy_ldo_set phy_ldo_set;
@@ -757,15 +762,20 @@ hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct phy_device **phydev);
+#ifdef IN_LED
 sw_error_t
 hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
-	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern);
+	a_uint32_t port_id, led_ctrl_pattern_t * pattern);
 sw_error_t
 hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
-	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern);
+	a_uint32_t port_id, led_ctrl_pattern_t * pattern);
 sw_error_t
-hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
-	led_ctrl_pattern_t *pattern);
+hsl_port_phy_led_source_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t * pattern);
+sw_error_t
+hsl_port_phy_led_source_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t * pattern);
+#endif
 sw_error_t
 hsl_port_phy_pll_on(a_uint32_t dev_id, a_uint32_t port_id);
 sw_error_t

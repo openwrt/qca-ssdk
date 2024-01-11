@@ -112,6 +112,10 @@ extern "C" {
 #define QCAPHY_MMD7_8023AZ_EEE_STATUS                              0x8000
 #define QCAPHY_MMD3_8023AZ_EEE_CAPABILITY                          0x14
 #define QCAPHY_MMD3_8023AZ_EEE_CAPABILITY1                         0x15
+#define QCAPHY_MMD7_LED_BLINK_FREQ_CTRL                            0x8073
+#define QCAPHY_MMD7_LED_POLARITY_CTRL                              0x901a
+#define QCAPHY_MMD7_LED_POLARITY_MASK                              0x40
+
 /*MMD registers field*/
 #define QCAPHY_EEE_MASK                                            0x000e
 #define QCAPHY_EEE_ADV_100M                                        0x0002
@@ -132,6 +136,31 @@ extern "C" {
 #define QCAPHY_EEE_CAPABILITY_5000M                                0x0002
 #define QCAPHY_EEE_STATUS_100M                                     0x0002
 #define QCAPHY_EEE_STATUS_1000M                                    0x0004
+#define QCAPHY_PHY_LINK_1000M_LIGHT_EN                             0x40
+#define QCAPHY_PHY_LINK_100M_LIGHT_EN                              0x20
+#define QCAPHY_PHY_LINK_10M_LIGHT_EN                               0x10
+#define QCAPHY_PHY_RX_TRAFFIC_BLINK_EN                             0x200
+#define QCAPHY_PHY_TX_TRAFFIC_BLINK_EN                             0x400
+#define QCAPHY_PHY_MAP_BLINK_FREQ_MASK                             0xe00
+#define QCAPHY_PHY_ALWAYS_BLINK_FREQ_MASK                          0x38
+#define QCAPHY_PHY_BLINK_FREQ_2HZ                                  0x0
+#define QCAPHY_PHY_BLINK_FREQ_4HZ                                  0x200
+#define QCAPHY_PHY_BLINK_FREQ_8HZ                                  0x400
+#define QCAPHY_PHY_BLINK_FREQ_16HZ                                 0x600
+#define QCAPHY_PHY_BLINK_FREQ_32HZ                                 0x800
+#define QCAPHY_PHY_BLINK_FREQ_64HZ                                 0xa00
+#define QCAPHY_PHY_BLINK_FREQ_128HZ                                0xc00
+#define QCAPHY_PHY_BLINK_FREQ_256HZ                                0xe00
+
+#define QCAPHY_PHY_LED_FORCE_EN                                    0x8000
+#define QCAPHY_PHY_LED_FORCE_MASK                                  0x6000
+#define QCAPHY_PHY_LED_FORCE_ALWAYS_OFF                            0
+#define QCAPHY_PHY_LED_FORCE_ALWAYS_ON                             0x2000
+#define QCAPHY_PHY_LED_FORCE_ALWAYS_BLINK                          0x6000
+
+#define QCAPHY_LED_SOURCE0                                         0x0
+#define QCAPHY_LED_SOURCE1                                         0x1
+#define QCAPHY_LED_SOURCE2                                         0x2
 
 sw_error_t
 qcaphy_sw_reset(a_uint32_t dev_id, a_uint32_t phy_addr);
@@ -212,6 +241,30 @@ sw_error_t
 qcaphy_set_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t enable);
 sw_error_t
 qcaphy_get_8023az(a_uint32_t dev_id, a_uint32_t phy_addr, a_bool_t * enable);
+sw_error_t
+qcaphy_led_pattern_map_from_phy(a_uint32_t dev_id, a_uint32_t *map,
+	a_uint16_t phy_data);
+sw_error_t
+qcaphy_led_pattern_map_to_phy(a_uint32_t dev_id, a_uint32_t map,
+	a_uint16_t *phy_data);
+sw_error_t
+qcaphy_led_pattern_force_to_phy(a_uint32_t dev_id, a_uint32_t force_mode,
+	a_uint16_t *phy_data);
+sw_error_t
+qcaphy_led_pattern_force_from_phy(a_uint32_t dev_id, a_uint32_t *force_mode,
+	a_uint16_t phy_data);
+sw_error_t
+qcaphy_led_blink_freq_set(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mode,
+	a_uint32_t freq);
+sw_error_t
+qcaphy_led_blink_freq_get(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t mode,
+	a_uint32_t *freq);
+sw_error_t
+qcaphy_led_active_set(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t active_level);
+sw_error_t
+qcaphy_led_active_get(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t *active_level);
 #ifdef __cplusplus
 }
 #endif				/* __cplusplus */

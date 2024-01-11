@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -99,6 +99,7 @@ typedef struct
 	a_uint32_t emu_chip_ver; /*only valid when is_emulation is true*/
 	a_uint32_t clk_mode;
 	a_uint32_t pcie_hw_base;
+	led_ctrl_pattern_t source_pattern[SSDK_MAX_PORT_NUM][PORT_LED_SOURCE_MAX];
 } ssdk_dt_cfg;
 
 #define SSDK_MAX_NR_ETH 6
@@ -166,12 +167,10 @@ void ssdk_switch_device_num_exit(void);
 a_uint32_t ssdk_switch_device_num_get(void);
 a_bool_t ssdk_is_emulation(a_uint32_t dev_id);
 a_uint32_t ssdk_emu_chip_ver_get(a_uint32_t dev_id);
-
-#if defined(MHT)
-#include "mht_sec_ctrl.h"
-mht_work_mode_t ssdk_clk_mode_get(a_uint32_t dev_id);
+#ifdef IN_LED
+sw_error_t ssdk_dt_port_source_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t *pattern);
 #endif
-
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id);
 #endif

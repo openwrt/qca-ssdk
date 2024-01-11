@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,7 @@
 #include "ssdk_clk.h"
 #include "hsl_phy.h"
 
-#ifdef IN_PORTCONTROL
+#if (defined(IN_PORTCONTROL) || defined(IN_LED))
 sw_error_t
 qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 {
@@ -61,6 +61,9 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 		qca_mac_port_status_init(dev_id, i);
 		/*enable ICC efuse loading*/
 		ssdk_mp_gephy_icc_efuse_load_enable(A_TRUE);
+#ifdef IN_LED
+		ssdk_led_init(dev_id, i);
+#endif
 	}
 	return rv;
 }
@@ -115,7 +118,7 @@ qca_mp_hw_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 {
 	sw_error_t rv = SW_OK;
 
-#ifdef IN_PORTCONTROL
+#if (defined(IN_PORTCONTROL) || defined(IN_LED))
 	rv = qca_mp_portctrl_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif

@@ -460,6 +460,16 @@ struct attr_des_t g_attr_des[] =
 		}
 	},
 #endif
+#ifdef IN_LED
+	{
+		"led_active_level",
+		{
+			{"high", LED_ACTIVE_HIGH},
+			{"low", LED_ACTIVE_LOW},
+			{NULL, INVALID_ARRT_VALUE}
+		}
+	},
+#endif
 	{NULL, {{NULL, INVALID_ARRT_VALUE}}}
 };
 
@@ -3579,6 +3589,26 @@ cmd_data_check_blinkfreq(char *cmd_str, led_blink_freq_t * arg_val,
     {
         *arg_val = LED_BLINK_8HZ;
     }
+    else if (!strcasecmp(cmd_str, "16HZ"))
+    {
+        *arg_val = LED_BLINK_16HZ;
+    }
+    else if (!strcasecmp(cmd_str, "32HZ"))
+    {
+        *arg_val = LED_BLINK_32HZ;
+    }
+    else if (!strcasecmp(cmd_str, "64HZ"))
+    {
+        *arg_val = LED_BLINK_64HZ;
+    }
+    else if (!strcasecmp(cmd_str, "128HZ"))
+    {
+        *arg_val = LED_BLINK_128HZ;
+    }
+    else if (!strcasecmp(cmd_str, "256HZ"))
+    {
+        *arg_val = LED_BLINK_256HZ;
+    }
     else if (!strcasecmp(cmd_str, "TXRX"))
     {
         *arg_val = LED_BLINK_TXRX;
@@ -3594,6 +3624,7 @@ cmd_data_check_blinkfreq(char *cmd_str, led_blink_freq_t * arg_val,
 sw_error_t
 cmd_data_check_ledpattern(char *info, void * val, a_uint32_t size)
 {
+    char *cmd;
     led_ctrl_pattern_t pattern;
     a_uint32_t tmpdata;
     sw_error_t rv;
@@ -3601,6 +3632,10 @@ cmd_data_check_ledpattern(char *info, void * val, a_uint32_t size)
     memset(&pattern, 0, sizeof (led_ctrl_pattern_t));
 
     /* get pattern mode configuration */
+    cmd_data_check_element("active_level", "high",
+                         "usage:high or low, etc\n",
+                         cmd_data_check_attr, ("led_active_level", cmd,
+                         &(pattern.active_level), sizeof(pattern.active_level)));
     rv = __cmd_data_check_complex("pattern_mode", NULL,
                         "usage: <always_off/always_blink/always_on/map>\n",
                         (param_check_t)cmd_data_check_patternmode, &pattern.mode,
@@ -3645,7 +3680,16 @@ cmd_data_check_ledpattern(char *info, void * val, a_uint32_t size)
         {
             pattern.map |= (1 << POWER_ON_LIGHT_EN);
         }
-
+        rv = __cmd_data_check_boolean("link_2500m_light", "no",
+                        "usage: <yes/no/y/n>\n",
+                        cmd_data_check_confirm, A_FALSE, &tmpdata,
+                        sizeof (a_bool_t));
+        if (rv)
+            return rv;
+        if (1 == tmpdata)
+        {
+            pattern.map |= (1 << LINK_2500M_LIGHT_EN);
+        }
         rv = __cmd_data_check_boolean("link_1000m_light", "no",
                         "usage: <yes/no/y/n>\n",
                         cmd_data_check_confirm, A_FALSE, &tmpdata,
@@ -3729,9 +3773,10 @@ cmd_data_check_ledpattern(char *info, void * val, a_uint32_t size)
         {
             pattern.map |= (1 << LINKUP_OVERRIDE_EN);
         }
-
-        rv = __cmd_data_check_complex("blink freq", NULL,
-                        "usage: <2HZ/4HZ/8HZ/TXRX> \n",
+    }
+    if (LED_PATTERN_MAP_EN == pattern.mode || LED_ALWAYS_BLINK == pattern.mode) {
+        rv = __cmd_data_check_complex("blink freq", "4HZ",
+                        "usage: <2HZ/4HZ/8HZ/16HZ/32HZ/64HZ/128HZ/256HZ/TXRX> \n",
                         (param_check_t)cmd_data_check_blinkfreq, &pattern.freq,
                         sizeof (led_blink_freq_t));
         if (rv)

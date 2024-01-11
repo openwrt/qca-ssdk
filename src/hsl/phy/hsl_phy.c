@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, 2017-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -966,78 +966,52 @@ hsl_phy_speed_duplex_to_auto_adv(a_uint32_t dev_id,fal_port_speed_t speed,
 
 	return auto_adv;
 }
+#ifdef IN_LED
+sw_error_t
+hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
+	a_uint32_t port_id, led_ctrl_pattern_t * pattern)
+{
+	sw_error_t rv = SW_OK;
+
+	if(group != LED_MAC_PORT_GROUP)
+	{
+		SSDK_ERROR("group %x is not supported\n", group);
+		return SW_NOT_SUPPORTED;
+	}
+	rv = hsl_port_phy_led_source_pattern_get(dev_id, port_id, 0, pattern);
+
+	return rv;
+}
 
 sw_error_t
 hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
-	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern)
+	a_uint32_t port_id, led_ctrl_pattern_t * pattern)
 {
-	sw_error_t rv = SW_OK;
-	a_uint32_t port_id = 0, phy_addr = 0;
-	hsl_phy_ops_t *phy_drv = NULL;
+	a_uint32_t led_src = 0;
 
-	HSL_DEV_ID_CHECK(dev_id);
-
-	if(group != LED_LAN_PORT_GROUP && group != LED_WAN_PORT_GROUP)
+	if(group != LED_MAC_PORT_GROUP)
 	{
 		SSDK_ERROR("group %x is not supported\n", group);
 		return SW_NOT_SUPPORTED;
 	}
-	port_id = led_pattern_id;
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
+	for(led_src = 0; led_src < PORT_LED_SOURCE_MAX; led_src++) {
+		hsl_port_phy_led_source_pattern_set(dev_id, port_id, led_src,
+			pattern);
 	}
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	SW_RTN_ON_NULL (phy_drv->phy_led_ctrl_pattern_set);
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR(rv);
-	rv = phy_drv->phy_led_ctrl_pattern_set(dev_id, phy_addr, pattern);
 
-	return rv;
+	return SW_OK;
 }
 
 sw_error_t
-hsl_port_phy_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
-	led_pattern_id_t led_pattern_id, led_ctrl_pattern_t * pattern)
+hsl_port_phy_led_source_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t * pattern)
 {
 	sw_error_t rv = SW_OK;
-	a_uint32_t port_id = 0, phy_addr = 0;
+	a_uint32_t phy_addr = 0;
 	hsl_phy_ops_t *phy_drv = NULL;
 
 	HSL_DEV_ID_CHECK(dev_id);
 
-	if(group != LED_LAN_PORT_GROUP && group != LED_WAN_PORT_GROUP)
-	{
-		SSDK_ERROR("group %x is not supported\n", group);
-		return SW_NOT_SUPPORTED;
-	}
-	port_id = led_pattern_id;
-	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
-	{
-		return SW_BAD_PARAM;
-	}
-	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
-	SW_RTN_ON_NULL (phy_drv->phy_led_ctrl_pattern_get);
-	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
-	SW_RTN_ON_ERROR(rv);
-	rv = phy_drv->phy_led_ctrl_pattern_get(dev_id, phy_addr, pattern);
-
-	return rv;
-}
-
-sw_error_t
-hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
-	led_ctrl_pattern_t *pattern)
-{
-	sw_error_t rv = SW_OK;
-	a_uint32_t port_id = 0, phy_addr = 0;
-	hsl_phy_ops_t *phy_drv = NULL;
-
-	HSL_DEV_ID_CHECK(dev_id);
-
-	/*one port can support max three led source*/
-	port_id = source_id/PORT_LED_SOURCE_MAX+1;
-	source_id = source_id%PORT_LED_SOURCE_MAX;
 	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
 	{
 		return SW_BAD_PARAM;
@@ -1052,6 +1026,30 @@ hsl_port_phy_led_ctrl_source_set(a_uint32_t dev_id, a_uint32_t source_id,
 	return rv;
 }
 
+sw_error_t
+hsl_port_phy_led_source_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t * pattern)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t phy_addr = 0;
+	hsl_phy_ops_t *phy_drv = NULL;
+
+	HSL_DEV_ID_CHECK(dev_id);
+
+	if (A_TRUE != hsl_port_prop_check(dev_id, port_id, HSL_PP_PHY))
+	{
+		return SW_BAD_PARAM;
+	}
+	SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get (dev_id, port_id));
+	SW_RTN_ON_NULL (phy_drv->phy_led_ctrl_source_get);
+	rv = hsl_port_prop_get_phyid(dev_id, port_id, &phy_addr);
+	SW_RTN_ON_ERROR(rv);
+	rv = phy_drv->phy_led_ctrl_source_get(dev_id, phy_addr, source_id,
+		pattern);
+
+	return rv;
+}
+#endif
 sw_error_t
 hsl_port_phydev_get_status(a_uint32_t dev_id, a_uint32_t port_id,
 	struct port_phy_status *phy_status)

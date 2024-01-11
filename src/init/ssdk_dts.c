@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1160,73 +1160,129 @@ static sw_error_t ssdk_dt_parse_access_mode(struct device_node *switch_node,
 	return SW_OK;
 
 }
-#if (defined(DESS) || defined(MP) || defined(APPE) || defined(MHT))
+#if (defined(HPPE) || defined(MP) || defined(MHT))
 #ifdef IN_LED
-static void ssdk_dt_parse_led(struct device_node *switch_node,
-		ssdk_init_cfg *cfg)
+sw_error_t ssdk_dt_port_source_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
+	a_uint32_t source_id, led_ctrl_pattern_t *pattern)
+{
+	led_ctrl_pattern_t source_pattern = {0};
+
+	*pattern =
+		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->source_pattern[port_id][source_id];
+	if(!memcmp(pattern, &source_pattern, sizeof(led_ctrl_pattern_t)))
+		return SW_NOT_INITIALIZED;
+
+	return SW_OK;
+}
+
+static void ssdk_dt_parse_led_source(a_uint32_t dev_id,
+	struct device_node *led_device_node)
 {
 	struct device_node *child = NULL;
-	const __be32 *led_source, *led_number;
-	a_uint8_t *led_str;
-	a_uint32_t len = 0, i = 0;
+	a_uint8_t *led_str = NULL;
+	a_uint32_t led_speed_index = 0, source_id = 0, port_id = 0;
+	led_ctrl_pattern_t source_pattern = {0};
+	a_bool_t port_exist = A_FALSE;
 
-	for_each_available_child_of_node(switch_node, child) {
-
-		led_source = of_get_property(child, "source", &len);
-		if (!led_source) {
+	if(!of_property_read_u32(led_device_node, "port", &port_id)) {
+		if(port_id == SSDK_PHYSICAL_PORT0)
+			return;
+		port_exist = A_TRUE;
+	}
+	for_each_available_child_of_node(led_device_node, child) {
+		memset(&source_pattern, 0, sizeof(source_pattern));
+		if(of_property_read_u32(child, "source", &source_id))
 			continue;
-		}
-		cfg->led_source_cfg[i].led_source_id = be32_to_cpup(led_source);
-		led_number = of_get_property(child, "led", &len);
-		if (led_number)
-			cfg->led_source_cfg[i].led_num = be32_to_cpup(led_number);
 		if (!of_property_read_string(child, "mode", (const char **)&led_str)) {
 			if (!strcmp(led_str, "normal"))
-			cfg->led_source_cfg[i].led_pattern.mode = LED_PATTERN_MAP_EN;
+				source_pattern.mode = LED_PATTERN_MAP_EN;
 			if (!strcmp(led_str, "on"))
-			cfg->led_source_cfg[i].led_pattern.mode = LED_ALWAYS_ON;
+				source_pattern.mode = LED_ALWAYS_ON;
 			if (!strcmp(led_str, "blink"))
-			cfg->led_source_cfg[i].led_pattern.mode = LED_ALWAYS_BLINK;
+				source_pattern.mode = LED_ALWAYS_BLINK;
 			if (!strcmp(led_str, "off"))
-			cfg->led_source_cfg[i].led_pattern.mode = LED_ALWAYS_OFF;
+				source_pattern.mode = LED_ALWAYS_OFF;
 		}
-		if (!of_property_read_string(child, "speed", (const char **)&led_str)) {
+		led_speed_index = 0;
+		while(!of_property_read_string_index(child, "speed", led_speed_index,
+			(const char **)&led_str)) {
 			if (!strcmp(led_str, "10M"))
-			cfg->led_source_cfg[i].led_pattern.map = LED_MAP_10M_SPEED;
+				source_pattern.map |= LED_MAP_10M_SPEED;
 			if (!strcmp(led_str, "100M"))
-			cfg->led_source_cfg[i].led_pattern.map = LED_MAP_100M_SPEED;
+				source_pattern.map |= LED_MAP_100M_SPEED;
 			if (!strcmp(led_str, "1000M"))
-			cfg->led_source_cfg[i].led_pattern.map = LED_MAP_1000M_SPEED;
+				source_pattern.map |= LED_MAP_1000M_SPEED;
 			if (!strcmp(led_str, "2500M"))
-			cfg->led_source_cfg[i].led_pattern.map = LED_MAP_2500M_SPEED;
+				source_pattern.map |= LED_MAP_2500M_SPEED;
 			if (!strcmp(led_str, "all"))
-			cfg->led_source_cfg[i].led_pattern.map = LED_MAP_ALL_SPEED;
-		}
-		if (!of_property_read_string(child, "freq", (const char **)&led_str)) {
-			if (!strcmp(led_str, "2Hz"))
-			cfg->led_source_cfg[i].led_pattern.freq = LED_BLINK_2HZ;
-			if (!strcmp(led_str, "4Hz"))
-			cfg->led_source_cfg[i].led_pattern.freq = LED_BLINK_4HZ;
-			if (!strcmp(led_str, "8Hz"))
-			cfg->led_source_cfg[i].led_pattern.freq = LED_BLINK_8HZ;
-			if (!strcmp(led_str, "auto"))
-			cfg->led_source_cfg[i].led_pattern.freq = LED_BLINK_TXRX;
+				source_pattern.map |= LED_MAP_ALL_SPEED;
+
+			led_speed_index++;
 		}
 		if (!of_property_read_string(child, "active", (const char **)&led_str)) {
 			if (!strcmp(led_str, "high"))
-			cfg->led_source_cfg[i].led_pattern.map |= BIT(LED_ACTIVE_HIGH);
+				source_pattern.active_level = LED_ACTIVE_HIGH;
 		}
 		if (!of_property_read_string(child, "blink_en", (const char **)&led_str)) {
 			if (!strcmp(led_str, "disable"))
-			cfg->led_source_cfg[i].led_pattern.map &= ~(BIT(RX_TRAFFIC_BLINK_EN)|
-				BIT(TX_TRAFFIC_BLINK_EN));
+				source_pattern.map &= ~(BIT(RX_TRAFFIC_BLINK_EN)|
+					BIT(TX_TRAFFIC_BLINK_EN));
 		}
-		i++;
+		if (!of_property_read_string(child, "freq", (const char **)&led_str)) {
+			if (!strcmp(led_str, "2Hz"))
+				source_pattern.freq = LED_BLINK_2HZ;
+			if (!strcmp(led_str, "4Hz"))
+				source_pattern.freq = LED_BLINK_4HZ;
+			if (!strcmp(led_str, "8Hz"))
+				source_pattern.freq = LED_BLINK_8HZ;
+			if (!strcmp(led_str, "16Hz"))
+				source_pattern.freq = LED_BLINK_16HZ;
+			if (!strcmp(led_str, "32Hz"))
+				source_pattern.freq = LED_BLINK_32HZ;
+			if (!strcmp(led_str, "64Hz"))
+				source_pattern.freq = LED_BLINK_64HZ;
+			if (!strcmp(led_str, "128Hz"))
+				source_pattern.freq = LED_BLINK_128HZ;
+			if (!strcmp(led_str, "256Hz"))
+				source_pattern.freq = LED_BLINK_256HZ;
+			if (!strcmp(led_str, "auto"))
+				source_pattern.freq = LED_BLINK_TXRX;
+		} else {
+			source_pattern.freq = LED_BLINK_4HZ;
+		}
+		if(!port_exist) {
+			port_id = source_id/PORT_LED_SOURCE_MAX+1;
+			source_id = source_id%PORT_LED_SOURCE_MAX;
+		}
+		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->source_pattern[port_id][source_id]
+			= source_pattern;
 	}
-	cfg->led_source_num = i;
-	SSDK_INFO("current dts led_source_num is %d\n",cfg->led_source_num);
 
 	return;
+}
+
+static sw_error_t ssdk_dt_parse_port_ledinfo(a_uint32_t dev_id,
+	struct device_node *switch_node)
+{
+	struct device_node *port_ledinfo_node = NULL, *port_node = NULL;
+
+	port_ledinfo_node = of_get_child_by_name(switch_node, "qcom,port_ledinfo");
+	if (!port_ledinfo_node) {
+		return SW_NOT_FOUND;
+	}
+	for_each_available_child_of_node(port_ledinfo_node, port_node) {
+		ssdk_dt_parse_led_source(dev_id, port_node);
+	}
+
+	return SW_OK;
+}
+
+static void ssdk_dt_parse_led(a_uint32_t dev_id, struct device_node *switch_node)
+{
+	if(!ssdk_dt_parse_port_ledinfo(dev_id, switch_node))
+		return;
+
+	return ssdk_dt_parse_led_source(dev_id, switch_node);
 }
 #endif
 #endif
@@ -1299,12 +1355,12 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 	ssdk_dt_parse_clk(*dev_id, switch_node);
 #endif
 #endif
+#ifdef IN_LED
+	ssdk_dt_parse_led(*dev_id, switch_node);
+#endif
 	if (of_device_is_compatible(switch_node, "qcom,ess-switch")) {
 		/* DESS chip */
 #ifdef DESS
-#ifdef IN_LED
-		ssdk_dt_parse_led(switch_node, cfg);
-#endif
 		ssdk_dt_parse_psgmii(ssdk_dt_priv);
 
 		ssdk_dt_priv->ess_clk = of_clk_get_by_name(switch_node, "ess_clk");
@@ -1334,11 +1390,6 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 
 		if (!of_property_read_u32(switch_node, "bm_tick_mode", &mode))
 			ssdk_dt_priv->bm_tick_mode = mode;
-#ifdef APPE
-#ifdef IN_LED
-		ssdk_dt_parse_led(switch_node, cfg);
-#endif
-#endif
 #endif
 	}
 	else if (of_device_is_compatible(switch_node, "qcom,ess-switch-ipq50xx")) {
@@ -1346,9 +1397,6 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 		ssdk_dt_priv->emu_chip_ver = MP_GEPHY;
 #ifdef IN_UNIPHY
 		ssdk_dt_parse_uniphy(*dev_id);
-#endif
-#ifdef IN_LED
-		ssdk_dt_parse_led(switch_node, cfg);
 #endif
 		ssdk_dt_priv->cmnblk_clk = of_clk_get_by_name(switch_node, "cmn_ahb_clk");
 #endif
@@ -1361,9 +1409,6 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 #ifdef MHT
 		/* manhattan chip */
 		SSDK_INFO("switch node is qca8386!\n");
-#ifdef IN_LED
-		ssdk_dt_parse_led(switch_node, cfg);
-#endif
 #endif
 	}
 	else {

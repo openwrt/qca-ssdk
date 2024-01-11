@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -558,7 +558,7 @@ qca_appe_tdm_hw_init(a_uint32_t dev_id)
 }
 #endif
 
-#if defined(IN_PORTCONTROL)
+#if (defined(IN_PORTCONTROL) || defined(IN_LED))
 static sw_error_t
 qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 {
@@ -600,6 +600,9 @@ qca_appe_portctrl_hw_init(a_uint32_t dev_id)
 		}
 		qca_hppe_port_mac_type_set(dev_id, i, mac_type_org);
 		qca_mac_port_status_init(dev_id, i);
+#ifdef IN_LED
+		ssdk_led_init(dev_id, i);
+#endif
 	}
 
 	aos_mem_zero(&init_cnt_cfg, sizeof(init_cnt_cfg));
@@ -852,7 +855,7 @@ sw_error_t qca_appe_hw_init(a_uint32_t dev_id)
 	rv = qca_hppe_interface_mode_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 
-#if defined(IN_PORTCONTROL)
+#if (defined(IN_PORTCONTROL) || defined(IN_LED))
 	rv = qca_appe_portctrl_hw_init(dev_id);
 	SW_RTN_ON_ERROR(rv);
 #endif

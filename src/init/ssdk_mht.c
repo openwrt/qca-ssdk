@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -189,7 +189,7 @@ sw_error_t qca_mht_mdio_master_init(a_uint32_t dev_id)
 			MHT_MDIO_MASTER_TIMER_CNT, MHT_MDIO_MASTER_PREAMBLE_LEN);
 	return ret;
 }
-#ifdef IN_PORTCONTROL
+#if (defined(IN_PORTCONTROL) || defined(IN_LED))
 static sw_error_t
 qca_mht_portctrl_hw_init(a_uint32_t dev_id)
 {
@@ -224,6 +224,9 @@ qca_mht_portctrl_hw_init(a_uint32_t dev_id)
 			rv = fal_port_rxmac_status_set(dev_id, i, A_FALSE);
 			SW_RTN_ON_ERROR(rv);
 		}
+#ifdef IN_LED
+		ssdk_led_init(dev_id, i);
+#endif
 	}
 
 	return SW_OK;
@@ -265,7 +268,7 @@ int qca_mht_hw_init(ssdk_init_cfg *cfg, a_uint32_t dev_id)
 
 	ret = qca_mht_mdio_master_init(dev_id);
 	SW_RTN_ON_ERROR(ret);
-#ifdef IN_PORTCONTROL
+#if (defined(IN_PORTCONTROL) || defined(IN_LED))
 	ret = qca_mht_portctrl_hw_init(dev_id);
 #endif
 

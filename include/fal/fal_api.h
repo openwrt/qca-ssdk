@@ -1421,11 +1421,15 @@ extern "C" {
 #ifdef IN_LED
 #define LED_API \
     SW_API_DEF(SW_API_LED_PATTERN_SET, fal_led_ctrl_pattern_set), \
-    SW_API_DEF(SW_API_LED_PATTERN_GET, fal_led_ctrl_pattern_get),
+    SW_API_DEF(SW_API_LED_PATTERN_GET, fal_led_ctrl_pattern_get), \
+    SW_API_DEF(SW_API_LED_PT_SRC_PATTERN_SET, fal_port_led_source_pattern_set), \
+    SW_API_DEF(SW_API_LED_PT_SRC_PATTERN_GET, fal_port_led_source_pattern_get),
 
 #define LED_API_PARAM \
     SW_API_DESC(SW_API_LED_PATTERN_SET) \
-    SW_API_DESC(SW_API_LED_PATTERN_GET)
+    SW_API_DESC(SW_API_LED_PATTERN_GET) \
+    SW_API_DESC(SW_API_LED_PT_SRC_PATTERN_SET) \
+    SW_API_DESC(SW_API_LED_PT_SRC_PATTERN_GET)
 #else
 #define LED_API
 #define LED_API_PARAM

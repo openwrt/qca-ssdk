@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2012,2018,2020, The Linux Foundation. All rights reserved.
  *
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -71,8 +71,11 @@ extern "C" {
 #define     RX_TRAFFIC_BLINK_EN    7
 #define     TX_TRAFFIC_BLINK_EN    8
 #define     LINKUP_OVERRIDE_EN     9
-#define     LED_ACTIVE_HIGH        10
-#define     LINK_2500M_LIGHT_EN    11
+#define     LINK_2500M_LIGHT_EN    10
+
+#define     LED_ACTIVE_HIGH        1
+#define     LED_ACTIVE_LOW         0
+
 #define     LED_MAP_10M_SPEED \
     (BIT(POWER_ON_LIGHT_EN) | BIT(LINK_10M_LIGHT_EN) | BIT(COLLISION_BLINK_EN) |\
     BIT(RX_TRAFFIC_BLINK_EN) | BIT(TX_TRAFFIC_BLINK_EN) | BIT(LINKUP_OVERRIDE_EN))
@@ -105,6 +108,11 @@ extern "C" {
         LED_BLINK_2HZ = 0,
         LED_BLINK_4HZ,
         LED_BLINK_8HZ,
+        LED_BLINK_16HZ,
+        LED_BLINK_32HZ,
+        LED_BLINK_64HZ,
+        LED_BLINK_128HZ,
+        LED_BLINK_256HZ,
         LED_BLINK_TXRX,    /**< Frequency relates to speed, 1000M-8HZ,100M->4HZ,10M->2HZ,Others->4HZ */
         LED_BLINK_FREQ_BUTT
     } led_blink_freq_t;
@@ -115,22 +123,26 @@ extern "C" {
         led_pattern_mode_t  mode;
         led_pattern_map_t   map;
         led_blink_freq_t    freq;
+        a_uint32_t          active_level;
     } led_ctrl_pattern_t;
 
     sw_error_t
     fal_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,
                              led_pattern_id_t id, led_ctrl_pattern_t * pattern);
 
-
-
     sw_error_t
     fal_led_ctrl_pattern_get(a_uint32_t dev_id, led_pattern_group_t group,
                              led_pattern_id_t id, led_ctrl_pattern_t * pattern);
 
-	sw_error_t
-	fal_led_source_pattern_set(a_uint32_t dev_id, a_uint32_t source_id,
+    sw_error_t
+    fal_led_source_pattern_set(a_uint32_t dev_id, a_uint32_t source_id,
                             led_ctrl_pattern_t * pattern);
-
+    sw_error_t
+    fal_port_led_source_pattern_set(a_uint32_t dev_id, a_uint32_t port_id,
+                             a_uint32_t source_id, led_ctrl_pattern_t * pattern);
+    sw_error_t
+    fal_port_led_source_pattern_get(a_uint32_t dev_id, a_uint32_t port_id,
+                             a_uint32_t source_id, led_ctrl_pattern_t * pattern);
 #ifdef __cplusplus
 }
 #endif                          /* __cplusplus */

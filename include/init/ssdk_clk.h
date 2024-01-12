@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017, 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -103,7 +103,7 @@ enum unphy_rst_type {
 	UNIPHY_RST_MAX
 };
 
-#define GCC_IM_SLEEP_CLK	"gcc_im_sleep_clk"
+#define IM_SLEEP_CLK	"gcc_im_sleep_clk"
 #define CMN_AHB_CLK		"cmn_ahb_clk"
 #define CMN_SYS_CLK		"cmn_sys_clk"
 #define UNIPHY0_AHB_CLK	"uniphy0_ahb_clk"

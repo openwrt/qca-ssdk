@@ -1921,15 +1921,9 @@ adpt_hppe_port_interface_mode_switch_mac_reset(a_uint32_t dev_id,
 	a_uint32_t port_id)
 {
 	sw_error_t rv = 0;
-	phy_type_t phy_type;
 	a_uint32_t port_mac_type;
 	fal_port_interface_mode_t mode = PORT_INTERFACE_MODE_MAX;
 
-	phy_type = hsl_phy_type_get(dev_id, port_id);
-	if (phy_type != AQUANTIA_PHY_CHIP && phy_type != SFP_PHY_CHIP &&
-		phy_type != QCA808X_PHY_CHIP) {
-		return SW_OK;
-	}
 	rv = adpt_hppe_port_interface_mode_get(dev_id, port_id, &mode);
 	SW_RTN_ON_ERROR(rv);
 

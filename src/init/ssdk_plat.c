@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1663,6 +1663,9 @@ int ssdk_uniphy_valid_check(a_uint32_t dev_id,
 	a_uint32_t soc_id = 0;
 	int rv = 0;
 #endif
+	if (ssdk_is_emulation(dev_id))
+		return A_TRUE;
+
 	if (index > SSDK_UNIPHY_INSTANCE2)
 		return A_FALSE;
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))

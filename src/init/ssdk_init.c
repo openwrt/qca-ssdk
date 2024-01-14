@@ -1710,16 +1710,12 @@ static int qca_switchdev_register(struct qca_phy_priv *priv)
 			sw_dev->alias = "QCA DESS";
 			break;
 		case QCA_VER_APPE:
-			sw_dev->name = "QCA APPE";
-			sw_dev->alias = "QCA APPE";
-			break;
 		case QCA_VER_MRPPE:
-			sw_dev->name = "QCA MRPPE";
-			sw_dev->alias = "QCA MRPPE";
-			break;
 		case QCA_VER_HPPE:
-			sw_dev->name = "QCA HPPE";
-			sw_dev->alias = "QCA HPPE";
+#ifdef HPPE
+			sw_dev->name = "QCA "PPE_STR;
+			sw_dev->alias = "QCA "PPE_STR;
+#endif
 			break;
 		case QCA_VER_MHT:
 			sw_dev->name = "QCA MHT";
@@ -2538,7 +2534,7 @@ static int __init regi_init(void)
 				qca_appe_hw_init(dev_id);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
-				SSDK_INFO("Initializing APPE Done!!\n");
+				SSDK_INFO("Initializing %s Done!!\n", PPE_STR);
 #endif
 				break;
 			case CHIP_HPPE:
@@ -2546,7 +2542,7 @@ static int __init regi_init(void)
 				qca_hppe_hw_init(dev_id);
 				rv = ssdk_switch_register(dev_id, cfg.chip_type);
 				SW_CNTU_ON_ERROR_AND_COND1_OR_GOTO_OUT(rv, -ENODEV);
-				SSDK_INFO("Initializing HPPE Done!!\n");
+				SSDK_INFO("Initializing %s Done!!\n", PPE_STR);
 #endif
 				break;
 

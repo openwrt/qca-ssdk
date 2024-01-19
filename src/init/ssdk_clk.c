@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -173,7 +173,7 @@ static struct rst_data_t mppe_rst_tbl[] = {
 #define PPE_CLK_UNAWARE_RATE	0
 static struct clk_data_t mppe_clk_tbl[] = {
 	/* gcc clock */
-	CLK_LOOKUP(0, 0, 0, 0, 0x34020, GCC_IM_SLEEP_CLK, EN_BIT, 0, PPE_CLK_UNAWARE_RATE, A_TRUE),
+	CLK_LOOKUP(0, 0, 0, 0, 0x34020, IM_SLEEP_CLK, EN_BIT, 0, PPE_CLK_UNAWARE_RATE, A_TRUE),
 	CLK_LOOKUP(0, 0, 0, 0, 0x3A004, CMN_AHB_CLK, EN_BIT, 0, PPE_CLK_UNAWARE_RATE, A_TRUE),
 	CLK_LOOKUP(0, 0, 0, 0, 0x3A008, CMN_SYS_CLK, EN_BIT, 0, PPE_CLK_UNAWARE_RATE, A_TRUE),
 
@@ -1885,13 +1885,13 @@ static void ssdk_appe_fixed_clock_init(adpt_ppe_type_t chip_type)
 		case MPPE_TYPE:
 			noc_rate = MPPE_NSS_NSSNOC_SNOC_CLK_RATE;
 			ppe_rate = MPPE_CLK_RATE;
-			ssdk_clock_rate_set_and_enable(clock_node, GCC_IM_SLEEP_CLK, 0);
+			ssdk_clock_rate_set_and_enable(clock_node, IM_SLEEP_CLK, 0);
 			break;
 #if defined(MRPPE)
 		case MRPPE_TYPE:
 			noc_rate = MPPE_NSS_NSSNOC_SNOC_CLK_RATE;
 			ppe_rate = MRPPE_CLK_RATE;
-			ssdk_clock_rate_set_and_enable(clock_node, GCC_IM_SLEEP_CLK, 0);
+			ssdk_clock_rate_set_and_enable(clock_node, IM_SLEEP_CLK, 0);
 			ssdk_clock_rate_set_and_enable(clock_node, NSS_CSR, NSS_NSSCC_CLK_RATE);
 			ssdk_clock_rate_set_and_enable(clock_node, NSSNOC_NSS_CSR, NSS_NSSCC_CLK_RATE);
 			ssdk_clock_rate_set_and_enable(clock_node, NSSCC_CE_APB, ppe_rate);

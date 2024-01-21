@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2014-2015, 2017-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2021-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -422,35 +422,52 @@ struct qca_mdio_data {
 #endif
 
 /*qca808x_end*/
-a_uint32_t
-qca_ar8216_mii_read(a_uint32_t dev_id, a_uint32_t reg);
-void
-qca_ar8216_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
-a_uint32_t
-qca_mht_mii_read(a_uint32_t dev_id, a_uint32_t reg);
-void
-qca_mht_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
-void
-qca_mht_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
+
 sw_error_t
-qca_mht_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+qca_mii_bus_lock(a_uint32_t dev_id, a_bool_t enable);
+
+sw_error_t
+__qca_mii_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint8_t value[], a_uint32_t value_len);
+sw_error_t
+__qca_mii_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
+                   a_uint32_t value_len);
+sw_error_t
+__qca_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
                     a_uint32_t bit_offset, a_uint32_t field_len,
                     a_uint8_t value[], a_uint32_t value_len);
 sw_error_t
-qca_mht_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
+__qca_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint32_t bit_offset, a_uint32_t field_len,
+                   const a_uint8_t value[], a_uint32_t value_len);
+sw_error_t
+qca_mii_reg_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint8_t value[], a_uint32_t value_len);
+sw_error_t
+qca_mii_reg_set(a_uint32_t dev_id, a_uint32_t reg_addr, a_uint8_t value[],
+                   a_uint32_t value_len);
+sw_error_t
+qca_mii_field_get(a_uint32_t dev_id, a_uint32_t reg_addr,
+                   a_uint32_t bit_offset, a_uint32_t field_len,
+                   a_uint8_t value[], a_uint32_t value_len);
+sw_error_t
+qca_mii_field_set(a_uint32_t dev_id, a_uint32_t reg_addr,
                    a_uint32_t bit_offset, a_uint32_t field_len,
                    const a_uint8_t value[], a_uint32_t value_len);
 
 #define MHT_REG_FIELD_GET(rv, dev, reg, index, field, value, val_len) \
-	rv = qca_mht_mii_field_get(dev, reg##_OFFSET + ((a_uint32_t)index) * reg##_E_OFFSET,\
+	rv = qca_mii_field_get(dev, reg##_OFFSET + ((a_uint32_t)index) * reg##_E_OFFSET,\
 	reg##_##field##_BOFFSET, \
 	reg##_##field##_BLEN, value, val_len);
 
 #define MHT_REG_FIELD_SET(rv, dev, reg, index, field, value, val_len) \
-		rv = qca_mht_mii_field_set(dev, reg##_OFFSET + ((a_uint32_t)index) * reg##_E_OFFSET,\
+		rv = qca_mii_field_set(dev, reg##_OFFSET + ((a_uint32_t)index) * reg##_E_OFFSET,\
 		reg##_##field##_BOFFSET, \
 		reg##_##field##_BLEN, value, val_len);
-
+sw_error_t qca_mii_raw_read(struct mii_bus *bus, a_uint32_t reg, a_uint32_t *val);
+sw_error_t qca_mii_raw_write(struct mii_bus *bus, a_uint32_t reg, a_uint32_t val);
+sw_error_t qca_mii_raw_update(struct mii_bus *bus, a_uint32_t reg,
+		a_uint32_t clear, a_uint32_t set);
 a_uint32_t qca_mii_read(a_uint32_t dev_id, a_uint32_t reg);
 void qca_mii_write(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t val);
 int qca_mii_update(a_uint32_t dev_id, a_uint32_t reg, a_uint32_t mask, a_uint32_t val);
@@ -498,6 +515,8 @@ int ssdk_uniphy_valid_check(a_uint32_t dev_id, a_uint32_t index, a_uint32_t mode
 /*qca808x_start*/
 int ssdk_plat_init(ssdk_init_cfg *cfg, a_uint32_t dev_id);
 void ssdk_plat_exit(a_uint32_t dev_id);
-
+#define qca_mht_mii_read qca_mii_read
+#define qca_mht_mii_write qca_mii_write
+#define qca_mht_mii_update qca_mii_update
 #endif
 /*qca808x_end*/

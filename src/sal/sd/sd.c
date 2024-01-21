@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2017-2018, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -333,18 +333,6 @@ sd_reg_mii_mdio_set(a_uint32_t dev_id, a_uint32_t reg_addr,
 
 	aos_mem_copy(&reg_val, value, sizeof(a_uint32_t));
 	sd_reg_mii_set(dev_id, reg_addr, reg_val);
-
-	return SW_OK;
-}
-
-sw_error_t
-sd_mii_update(a_uint32_t dev_id, ssdk_init_cfg *cfg)
-{
-	if (NULL != cfg->reg_func.mii_reg_set)
-		ssdk_mii_reg_set = cfg->reg_func.mii_reg_set;
-
-	if (NULL != cfg->reg_func.mii_reg_get)
-		ssdk_mii_reg_get = cfg->reg_func.mii_reg_get;
 
 	return SW_OK;
 }

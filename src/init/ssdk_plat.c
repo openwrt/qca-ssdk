@@ -1616,6 +1616,9 @@ int ssdk_uniphy_valid_check(a_uint32_t dev_id,
 	a_uint32_t soc_id = 0;
 	int rv = 0;
 #endif
+	if (ssdk_is_emulation(dev_id))
+		return A_TRUE;
+
 	if (index > SSDK_UNIPHY_INSTANCE2)
 		return A_FALSE;
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))

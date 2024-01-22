@@ -50,8 +50,18 @@ extern "C" {
 
 #define PORT_GMAC_TYPE                  1
 #define PORT_XGMAC_TYPE                 2
-
 #define IOCTL_COMPAT
+#if defined(MRPPE)
+#define PPE_STR "MRPPE"
+#elif defined(MPPE)
+#define PPE_STR "MPPE"
+#elif defined(APPE)
+#define PPE_STR "APPE"
+#elif defined(CPPE)
+#define PPE_STR "CPPE"
+#elif defined(HPPE)
+#define PPE_STR "HPPE"
+#endif
 
 /*qca808x_start*/
     typedef enum {

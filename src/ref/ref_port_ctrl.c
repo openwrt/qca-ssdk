@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, 2016-2017,  The Linux Foundation. All rights reserved.
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -773,7 +773,7 @@ int qca_ar8327_sw_set_eee(struct switch_dev *dev,
 
 	if(port_eee_cfg.enable)
 	{
-		port_eee_cfg.advertisement = FAL_PHY_EEE_100BASE_T | FAL_PHY_EEE_1000BASE_T;
+		port_eee_cfg.advertisement = FAL_PHY_EEE_ALL_ADV;
 	}
 	rv = fal_port_interface_eee_cfg_set(priv->device_id, val->port_vlan, &port_eee_cfg);
 	if(rv != SW_OK)

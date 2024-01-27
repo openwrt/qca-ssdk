@@ -809,7 +809,7 @@ hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
 	return SW_OK;
 }
 
-static sw_error_t
+sw_error_t
 hsl_phy_adv_to_linkmode_adv(a_uint32_t autoadv, a_ulong_t *advertising)
 {
 	linkmode_mod_bit(ETHTOOL_LINK_MODE_Pause_BIT,

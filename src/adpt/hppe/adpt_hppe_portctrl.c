@@ -4384,7 +4384,7 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 {
 	a_uint32_t port_id;
 	struct port_phy_status phy_status = {0};
-	a_bool_t status;
+	a_bool_t status, link_changed;
 	a_uint32_t portbmp[SW_MAX_NR_DEV] = {0};
 	sw_error_t rv = SW_OK;
 
@@ -4406,12 +4406,14 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 					port_id, rv);
 			continue;
 		}
+		link_changed = A_FALSE;
 		SSDK_DEBUG("polling task external phy %d link status is %d and speed is %d\n",
 				port_id, phy_status.link_status, phy_status.speed);
 		/* link status from up to down */
 		if ((phy_status.link_status == PORT_LINK_DOWN) &&
 			(priv->port_old_link[port_id - 1] == PORT_LINK_UP))
 		{
+			link_changed = A_TRUE;
 			SSDK_DEBUG("Port %d change to link down status\n", port_id);
 			/* disable ppe port bridge txmac */
 			adpt_hppe_port_bridge_txmac_set(priv->device_id, port_id, A_FALSE);
@@ -4428,12 +4430,12 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 #ifdef IN_FDB
 			adpt_hppe_fdb_del_by_port(priv->device_id, port_id, !(FAL_FDB_DEL_STATIC));
 #endif
-			continue;
 		}
 		/* link status from down to up*/
 		if ((phy_status.link_status == PORT_LINK_UP) &&
 			(priv->port_old_link[port_id - 1] == PORT_LINK_DOWN))
 		{
+			link_changed = A_TRUE;
 			SSDK_DEBUG("Port %d change to link up status\n", port_id);
 			status = adpt_hppe_port_phy_status_change(priv, port_id, phy_status);
 			/*disable tx mac*/
@@ -4551,7 +4553,7 @@ qca_hppe_mac_sw_sync_task(struct qca_phy_priv *priv)
 		SSDK_DEBUG("polling task PPE port %d link status is %d and speed is %d\n",
 				port_id, priv->port_old_link[port_id - 1],
 				priv->port_old_speed[port_id - 1]);
-		if (phy_status.link_status != priv->port_old_link[port_id]) {
+		if (link_changed) {
 			unsigned char link_notify_speed = 0;
 
 			link_notify_speed  = ssdk_to_link_notify_speed(phy_status.speed);

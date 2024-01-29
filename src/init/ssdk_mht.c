@@ -281,6 +281,7 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 	sw_error_t rv = 0, port_id;
 	a_uint32_t portbmp = 0;
 	struct port_phy_status phy_status = {0};
+	a_bool_t link_changed = A_FALSE;
 
 	portbmp = qca_ssdk_port_bmp_get(priv->device_id);
 	SSDK_DEBUG("mht sw mac polling task portbmp value is 0x%x\n", portbmp);
@@ -294,11 +295,13 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 					port_id, rv);
 			continue;
 		}
+		link_changed = A_FALSE;
 		SSDK_DEBUG("mth port_id %d phy link status is %d and speed is %d\n",
 				port_id, phy_status.link_status, phy_status.speed);
 		/* Up --> Down */
 		if ((priv->port_old_link[port_id] == PORT_LINK_UP) &&
 			(phy_status.link_status == PORT_LINK_DOWN)) {
+			link_changed = A_TRUE;
 			/* disable mac rx function */
 			rv = fal_port_rxmac_status_set(priv->device_id, port_id, A_FALSE);
 			SW_RTN_ON_ERROR(rv);
@@ -317,6 +320,7 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 		/* Down --> Up */
 		if ((priv->port_old_link[port_id] == PORT_LINK_DOWN) &&
 			(phy_status.link_status == PORT_LINK_UP)) {
+			link_changed = A_TRUE;
 			/* update gcc, mac speed, mac duplex and phy stauts */
 			rv = mht_port_link_update(priv, port_id, phy_status);
 			SW_RTN_ON_ERROR(rv);
@@ -331,7 +335,7 @@ qca_mht_sw_mac_polling_task(struct qca_phy_priv *priv)
 		}
 		SSDK_DEBUG("mht port %d old link status is %d\n",
 				port_id, priv->port_old_link[port_id]);
-		if (phy_status.link_status != priv->port_old_link[port_id]) {
+		if (link_changed) {
 			unsigned char link_notify_speed = 0;
 
 			link_notify_speed = ssdk_to_link_notify_speed(phy_status.speed);

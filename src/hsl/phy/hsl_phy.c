@@ -878,6 +878,26 @@ hsl_phy_linkmode_adv_to_adv(a_ulong_t *advertising, a_uint32_t *autoadv)
 	return SW_OK;
 }
 
+a_bool_t
+hsl_phy_autoneg_adv_check(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t adv)
+{
+	sw_error_t rv = SW_OK;
+	a_uint32_t adv_supported = 0;
+	struct phy_device *phydev = NULL;
+
+	rv = hsl_phy_phydev_get(dev_id, phy_addr, &phydev);
+	if(rv == SW_OK) {
+		if(!phydev->drv)
+			return A_TRUE;
+		hsl_phy_linkmode_adv_to_adv(phydev->supported, &adv_supported);
+		if((adv & adv_supported) == adv)
+			return A_TRUE;
+	}
+
+	return A_FALSE;
+}
+
 sw_error_t
 hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_bool_t autoneg_en, a_uint32_t autoadv)

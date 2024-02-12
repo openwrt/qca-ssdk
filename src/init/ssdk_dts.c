@@ -272,6 +272,13 @@ struct clk *ssdk_dts_cmnclk_get(a_uint32_t dev_id)
 	return cfg->cmnblk_clk;
 }
 
+a_uint32_t ssdk_dts_port3_pcs_channel_get(a_uint32_t dev_id)
+{
+	ssdk_dt_cfg* cfg = ssdk_dt_global.ssdk_dt_switch_nodes[dev_id];
+
+	return cfg->port3_pcs_channel;
+}
+
 #if defined(CONFIG_OF) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0))
 static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 		struct device_node *switch_node, ssdk_init_cfg *cfg)
@@ -305,6 +312,25 @@ static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 
 	return;
 }
+
+static void ssdk_dt_parse_port3_pcs_channel(a_uint32_t dev_id,
+		struct device_node *switch_node, ssdk_init_cfg *cfg)
+{
+	const __be32 *port3_pcs_channel;
+	a_uint32_t len = 0;
+
+	port3_pcs_channel = of_get_property(switch_node, "port3_pcs_channel", &len);
+	if (!port3_pcs_channel) {
+		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port3_pcs_channel = 2;
+	}
+	else {
+		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->port3_pcs_channel =
+			be32_to_cpup(port3_pcs_channel);
+	}
+
+	return;
+}
+
 #ifdef IN_UNIPHY
 static void ssdk_dt_parse_uniphy(a_uint32_t dev_id)
 {
@@ -1354,6 +1380,7 @@ sw_error_t ssdk_dt_parse(ssdk_init_cfg *cfg, a_uint32_t num, a_uint32_t *dev_id)
 	rv = ssdk_dt_parse_access_mode(switch_node, ssdk_dt_priv);
 	SW_RTN_ON_ERROR(rv);
 	ssdk_dt_parse_mac_mode(*dev_id, switch_node, cfg);
+	ssdk_dt_parse_port3_pcs_channel(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_mdio(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_port_bmp(*dev_id, switch_node, cfg);
 	ssdk_dt_parse_interrupt(*dev_id, switch_node);

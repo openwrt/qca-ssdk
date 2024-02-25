@@ -762,6 +762,9 @@ hsl_port_phydev_get(a_uint32_t dev_id, a_uint32_t port_id,
 sw_error_t
 hsl_phy_phydev_get(a_uint32_t dev_id, a_uint32_t phy_addr,
 	struct phy_device **phydev);
+a_bool_t
+hsl_phy_autoneg_adv_check(a_uint32_t dev_id, a_uint32_t phy_addr,
+	a_uint32_t adv);
 #ifdef IN_LED
 sw_error_t
 hsl_port_phy_led_ctrl_pattern_set(a_uint32_t dev_id, led_pattern_group_t group,

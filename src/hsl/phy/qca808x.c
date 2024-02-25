@@ -66,7 +66,7 @@ static sw_error_t qca808x_phy_config_init(struct phy_device *phydev)
 #else
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
 #endif
-	a_uint32_t dev_id = 0, phy_id = 0, ability = 0;
+	a_uint32_t dev_id = 0, phy_addr = 0, ability = 0, autoneg = 0;
 	qca808x_priv *priv = phydev->priv;
 	struct qca808x_phy_info *pdata = priv->phy_info;
 
@@ -75,7 +75,7 @@ static sw_error_t qca808x_phy_config_init(struct phy_device *phydev)
 	}
 
 	dev_id = pdata->dev_id;
-	phy_id = pdata->phy_addr;
+	phy_addr = pdata->phy_addr;
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 	features = SUPPORTED_TP | SUPPORTED_MII |
@@ -86,8 +86,11 @@ static sw_error_t qca808x_phy_config_init(struct phy_device *phydev)
 	linkmode_set_bit(ETHTOOL_LINK_MODE_AUI_BIT, mask);
 	linkmode_set_bit(ETHTOOL_LINK_MODE_BNC_BIT, mask);
 #endif
-	rv = qca808x_phy_get_ability(dev_id, phy_id, &ability);
+	rv = qca808x_phy_get_ability(dev_id, phy_addr, &ability);
 	SW_RTN_ON_ERROR(rv);
+	rv = qca808x_phy_get_autoneg_adv(dev_id, phy_addr, &autoneg);
+	SW_RTN_ON_ERROR(rv);
+	ability &= autoneg;
 	if (ability & FAL_PHY_ADV_AUTONEG) {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 		features |= SUPPORTED_Autoneg;
@@ -600,6 +603,26 @@ int qca808x_match_phy_device(struct phy_device *phydev)
 	return false;
 }
 
+static int qca808x_phy_read_abilities(struct phy_device *pdev)
+{
+	int features[] = {
+		ETHTOOL_LINK_MODE_10baseT_Half_BIT,
+		ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+		ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+		ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+		ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+		ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+		ETHTOOL_LINK_MODE_Pause_BIT,
+		ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+		ETHTOOL_LINK_MODE_Autoneg_BIT,
+	};
+
+	linkmode_set_bit_array(features, ARRAY_SIZE(features),
+		pdev->supported);
+
+	return 0;
+}
+
 void qca808x_phy_remove(struct phy_device *phydev)
 {
 	qca808x_priv *priv = phydev->priv;
@@ -615,7 +638,7 @@ struct phy_driver qca808x_phy_driver = {
 	.phy_id		= QCA8081_PHY_V1_1,
 	.phy_id_mask    = 0xffffff00,
 	.name		= QCA808X_SSDK_PHY_DRIVER_NAME,
-	.features	= PHY_GBIT_FEATURES,
+	.get_features	= qca808x_phy_read_abilities,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0))
 	.flags		= PHY_HAS_INTERRUPT,
 #endif

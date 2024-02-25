@@ -372,6 +372,9 @@ qcaphy_set_autoneg_adv(a_uint32_t dev_id, a_uint32_t phy_addr,
 	a_uint16_t phy_data = 0;
 	sw_error_t rv = SW_OK;
 
+	if(!hsl_phy_autoneg_adv_check(dev_id, phy_addr, autoneg_adv))
+		return SW_NOT_SUPPORTED;
+
 	if (autoneg_adv & FAL_PHY_ADV_100TX_FD) {
 		phy_data |= QCAPHY_ADVERTISE_100FULL;
 	}

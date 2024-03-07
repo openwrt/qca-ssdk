@@ -325,7 +325,7 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 {
 	a_uint32_t advertise = 0, advertise_old = 0;
 	a_uint16_t phy_data = 0, mask = 0;
-	int err = 0;
+	sw_error_t err = 0;
 	a_uint32_t dev_id = 0, phy_id = 0;
 	qca808x_priv *priv = phydev->priv;
 	const struct qca808x_phy_info *pdata = priv->phy_info;
@@ -336,7 +336,7 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 	}
 
 	if (!pdata) {
-		return SW_FAIL;
+		return -EINVAL;
 	}
 
 	dev_id = pdata->dev_id;
@@ -357,9 +357,10 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 	} else {
 		/* autoneg enabled */
 		advertise = qca808x_negtiation_cap_get(phydev);
-		/*link would be down if there is no speed adv except for pause*/
+		/*link would be down if there is no speed adv except for pause,
+		 so needn't to configure adv*/
 		if(!(advertise & ~(FAL_PHY_ADV_PAUSE | FAL_PHY_ADV_ASY_PAUSE))) {
-			return SW_BAD_VALUE;
+			return 0;
 		}
 		err |= qca808x_phy_get_autoneg_adv(dev_id, phy_id, &advertise_old);
 		SSDK_DEBUG("advertise:0x%x, advertise_old:0x%x\n", advertise, advertise_old);
@@ -369,8 +370,12 @@ static int qca808x_config_aneg(struct phy_device *phydev)
 			err |= qca808x_phy_restart_autoneg(dev_id, phy_id);
 		}
 	}
+	if(err != SW_OK) {
+		SSDK_ERROR("qca808x phy configure failed\n");
+		return -EPERM;
+	}
 
-	return err;
+	return 0;
 }
 
 static int qca808x_aneg_done(struct phy_device *phydev)

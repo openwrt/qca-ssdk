@@ -717,6 +717,8 @@ __adpt_hppe_uniphy_usxgmii_mode_set(a_uint32_t dev_id, a_uint32_t uniphy_index)
 		hppe_qp_usxg_opiton1_get(dev_id, uniphy_index, &qp_usxg_opiton1);
 		qp_usxg_opiton1.bf.gmii_src_sel = 0x1;
 		hppe_qp_usxg_opiton1_set(dev_id, uniphy_index, &qp_usxg_opiton1);
+		/* enable uniphy eee transparent mode*/
+		__adpt_hppe_uniphy_uqxgmii_eee_set(dev_id, uniphy_index);
 	}
 #endif
 	return rv;

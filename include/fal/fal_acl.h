@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014, 2016-2018, 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -295,6 +295,13 @@ enum{
 
 #define FAL_FIELD_FLG_TST(flag, field) \
     (((flag[(field) / 32]) & (0x1UL << ((field) % 32))) ? 1 : 0)
+
+#define FAL_FIELD_FLG_CPY(dst, src) \
+({ \
+ 	int i; \
+	for (i = 0; i <= FAL_ACL_FIELD_NUM/32; i ++) \
+		dst[i] |= src[i]; \
+})
 
 #define FAL_ACL_UDF_MAX_LENGTH 16
 
@@ -740,6 +747,7 @@ typedef struct
 
 	/*returned info*/
 	fal_acl_rule_hw_info_t hw_info;
+	fal_acl_field_map_t inverse_field_flg;
 } fal_acl_rule_t;
 
 

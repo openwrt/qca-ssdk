@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -53,6 +54,11 @@ enum{
 };
 
 
+typedef struct {
+	a_uint32_t rule_type_map; /* rule type map */
+	a_uint8_t inverse_rule_type_count[ADPT_ACL_HPPE_RULE_TYPE_NUM]; /* inverse rule type count */
+} ADPT_HPPE_ACL_RULE_MAP;
+
 a_uint32_t _acl_bit_index(a_uint32_t bits, a_uint32_t max, a_uint32_t type);
 
 void _adpt_acl_reg_dump(a_uint8_t *reg, a_uint32_t len);
@@ -61,13 +67,14 @@ void acl_rule_field_convert(fal_acl_rule_t * rule,
 	fal_acl_rule_field_t * rule_field, a_bool_t to_inner);
 
 sw_error_t
-_adpt_hppe_acl_rule_sw_2_hw(a_uint32_t dev_id, fal_acl_rule_t * rule, a_uint32_t rule_type,
+_adpt_hppe_acl_rule_sw_2_hw(a_uint32_t dev_id, fal_acl_rule_t *rule, a_uint32_t rule_type,
 	a_uint32_t *hw_entry, a_uint32_t *allocated_entries, a_uint8_t *range_en,
-	void * hw_rule, void * hw_rule_mask);
+	void *hw_rule, void *hw_rule_mask, a_uint8_t inverse_en);
 
 sw_error_t
 _adpt_hppe_acl_rule_hw_2_sw(a_uint32_t dev_id, a_uint32_t rule_type,
-	a_uint8_t range_en, void * hw_rule, void * hw_rule_mask, fal_acl_rule_t * rule);
+	a_uint8_t range_en, a_uint8_t inverse_en,
+	void * hw_rule, void *hw_rule_mask, fal_acl_rule_t * rule);
 
 #ifdef __cplusplus
 }

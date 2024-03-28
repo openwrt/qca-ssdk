@@ -4774,13 +4774,12 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 {
 	a_uint32_t rule_type_count = 0;
 	a_uint32_t index = 0, hw_list_index = 0, hw_list_id = 0;
-	sw_error_t rv = 0;
+	sw_error_t rv = SW_OK;
 	struct list_head *rule_pos = NULL;
 	ADPT_HPPE_ACL_SW_RULE *rule_exist_entry = NULL, *rule_add_entry = NULL;
 	ADPT_HPPE_ACL_SW_LIST *list_find_entry = NULL;
-	fal_acl_rule_t inner_rule;
+	fal_acl_rule_t *inner_rule;
 	ADPT_HPPE_ACL_RULE_MAP rule_map, inner_rule_map;
-	aos_mem_zero(&inner_rule, sizeof(fal_acl_rule_t));
 	aos_mem_zero(&rule_map, sizeof(ADPT_HPPE_ACL_RULE_MAP));
 	aos_mem_zero(&inner_rule_map, sizeof(ADPT_HPPE_ACL_RULE_MAP));
 
@@ -4797,13 +4796,18 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	{
 		return SW_OUT_OF_RANGE;
 	}
+
+	inner_rule = (fal_acl_rule_t *)kzalloc(sizeof(fal_acl_rule_t), GFP_ATOMIC);
+	if (inner_rule == NULL)
+		return SW_FAIL;
+
 	/*convert inner_rule_field*/
 	if(rule->rule_type == FAL_ACL_RULE_TUNNEL_MAC ||
 		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP4 ||
 		rule->rule_type == FAL_ACL_RULE_TUNNEL_IP6 ||
 		rule->rule_type == FAL_ACL_RULE_TUNNEL_UDF)
 	{
-		acl_rule_field_convert(&inner_rule, &rule->inner_rule_field, A_FALSE);
+		acl_rule_field_convert(inner_rule, &rule->inner_rule_field, A_FALSE);
 	}
 	aos_lock_bh(&hppe_acl_lock[dev_id]);
 	list_find_entry = _adpt_hppe_acl_list_entry_get(dev_id, list_id);
@@ -4811,7 +4815,8 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	{
 		SSDK_ERROR("List %d not create, no resource to insert rules into it\n", list_id);
 		aos_unlock_bh(&hppe_acl_lock[dev_id]);
-		return SW_NO_RESOURCE;
+		rv = SW_NO_RESOURCE;
+		goto free_rule;
 	}
 
 	list_for_each(rule_pos, &list_find_entry->list_sw_rule)
@@ -4820,12 +4825,13 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		if((rule_exist_entry->rule_id == rule_id) && (rule_exist_entry->rule_hw_entry != 0))
 		{
 			aos_unlock_bh(&hppe_acl_lock[dev_id]);
-			return SW_ALREADY_EXIST;
+			rv = SW_ALREADY_EXIST;
+			goto free_rule;
 		}
 	}
 
 	/*caculate rule map*/
-	_adpt_hppe_acl_rule_type_map(dev_id, rule_id, rule_nr, rule, &inner_rule,
+	_adpt_hppe_acl_rule_type_map(dev_id, rule_id, rule_nr, rule, inner_rule,
 					&rule_map, &inner_rule_map);
 
 	/*caculate rule map counts */
@@ -4835,17 +4841,18 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	{
 		SSDK_ERROR("rule_type_count = %d\n", rule_type_count);
 		aos_unlock_bh(&hppe_acl_lock[dev_id]);
-		return SW_NOT_SUPPORTED;
+		rv = SW_NOT_SUPPORTED;
+		goto free_rule;
 	}
 
 	/*allocate hw entries */
 	rv = _adpt_hppe_acl_alloc_entries(dev_id, &hw_list_index, rule_id, rule_nr,
-			rule, &inner_rule, rule_type_count, &index);
+			rule, inner_rule, rule_type_count, &index);
 	if(rv != SW_OK)
 	{
 		SSDK_ERROR("Alloc hw entries fail for rule %d\n", rule_id);
 		aos_unlock_bh(&hppe_acl_lock[dev_id]);
-		return rv;
+		goto free_rule;
 	}
 	/* msg for debug */
 	SSDK_DEBUG("ACL rule add before:list_id=%d, hw_list_index=%d, hw_list_id=%d, "
@@ -4857,12 +4864,12 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	hw_list_id = g_acl_hw_list[dev_id][hw_list_index].hw_list_id;
 	/* set hw acl rule and action reg*/
 	rv = _adpt_ppe_acl_rule_hw_add(dev_id, list_find_entry->list_pri, hw_list_id,
-		rule_id, rule_nr, rule, &inner_rule, &rule_map, &inner_rule_map,
+		rule_id, rule_nr, rule, inner_rule, &rule_map, &inner_rule_map,
 		s_acl_entries[index].entries);
 	if(rv != SW_OK)
 	{
 		aos_unlock_bh(&hppe_acl_lock[dev_id]);
-		return rv;
+		goto free_rule;
 	}
 
 	/* set hw rule ext reg */
@@ -4872,7 +4879,7 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 		if(rv != SW_OK)
 		{
 			aos_unlock_bh(&hppe_acl_lock[dev_id]);
-			return rv;
+			goto free_rule;
 		}
 	}
 
@@ -4882,7 +4889,8 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	{
 		SSDK_ERROR("%s, %d:malloc fail for rule add entry\n", __FUNCTION__, __LINE__);
 		aos_unlock_bh(&hppe_acl_lock[dev_id]);
-		return SW_FAIL;
+		rv = SW_FAIL;
+		goto free_rule;
 	}
 	rule_add_entry->rule_id = rule_id;
 	rule_add_entry->rule_type[0] = rule->rule_type;
@@ -4916,7 +4924,12 @@ adpt_hppe_acl_rule_add(a_uint32_t dev_id, a_uint32_t list_id,
 	rule->hw_info.hw_entries = s_acl_entries[index].entries;
 
 	aos_unlock_bh(&hppe_acl_lock[dev_id]);
-	return SW_OK;
+
+free_rule:
+	kfree(inner_rule);
+	inner_rule = NULL;
+
+	return rv;
 }
 
 static sw_error_t

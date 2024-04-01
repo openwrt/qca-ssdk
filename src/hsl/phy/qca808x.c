@@ -216,8 +216,12 @@ static int qca808x_config_intr(struct phy_device *phydev)
 	a_uint16_t phy_data;
 	a_uint32_t dev_id = 0, phy_id = 0;
 	qca808x_priv *priv = phydev->priv;
-	const struct qca808x_phy_info *pdata = priv->phy_info;
+	struct qca808x_phy_info *pdata = NULL;
+	/*if priv is null, no need to configure the phy device*/
+	if(!priv)
+		return 0;
 
+	pdata = priv->phy_info;
 	if (!pdata) {
 		return SW_FAIL;
 	}

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017, 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for
  * any purpose with or without fee is hereby granted, provided that the
@@ -1577,8 +1577,8 @@ struct in_l3_if_tbl {
 	a_uint32_t	mru_ipv6:14;
 	a_uint32_t	mtu_ipv6:14;
 	a_uint32_t	udp_csm0_cmd:2;
-	a_uint32_t	mac_da_1:16;
-	a_uint32_t	mac_da_0:32;
+	a_uint32_t	mac_da_0:16;
+	a_uint32_t	mac_da_1:32;
 	a_uint32_t	mac_valid:1;
 	a_uint32_t	_reserved0:31;
 #elif defined(APPE)

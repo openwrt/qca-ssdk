@@ -8232,6 +8232,23 @@ cmd_data_check_intf(char *cmd_str, void * val, a_uint32_t size)
     } while (talk_mode && (SW_OK != rv));
 #endif
 
+#if defined(MRPPE)
+    do {
+	    cmd = get_sub_cmd("in_mac_valid", "no");
+	    SW_RTN_ON_NULL_PARAM(cmd);
+
+	    rv = cmd_data_check_confirm(cmd, A_FALSE,
+			    &(entry.in_mac_valid), sizeof(a_bool_t));
+    } while (talk_mode && (SW_OK != rv));
+
+    rv = __cmd_data_check_complex("in_mac_addr", NULL,
+		    "usage: the format is xx-xx-xx-xx-xx-xx \n",
+		    (param_check_t)cmd_data_check_macaddr, &(entry.in_mac_addr),
+		    sizeof (fal_mac_addr_t));
+    if (rv)
+	    return rv;
+#endif
+
     *(fal_intf_entry_t *)val = entry;
     return SW_OK;
 }

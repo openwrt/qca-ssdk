@@ -259,7 +259,7 @@ ifeq ($(SoC),$(filter $(SoC),ipq53xx ipq95xx ipq807x ipq60xx))
 	PTP_FEATURE=enable
 endif
 
-ifeq ($(SoC),$(filter $(SoC),ipq53xx ipq95xx))
+ifeq ($(SoC),$(filter $(SoC),ipq53xx ipq95xx ipq60xx))
 	MHT_ENABLE=enable
 endif
 

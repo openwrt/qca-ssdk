@@ -395,13 +395,13 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_ATHTAG);
 			SW_RTN_ON_ERROR(rv);
 #endif
-#endif
-#if defined(HPPE)
 #if defined(FALLTHROUGH)
 			fallthrough;
 #else
 			/* fall through */
 #endif
+#endif
+#if defined(HPPE)
 		case CHIP_HPPE:
 			if (g_adpt_api[dev_id] == NULL) {
 				g_adpt_api[dev_id] = aos_mem_alloc(sizeof(adpt_api_t));

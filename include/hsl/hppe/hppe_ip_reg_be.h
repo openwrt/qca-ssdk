@@ -1469,10 +1469,7 @@ union l3_vp_port_tbl_u {
 
 /*[table] IN_L3_IF_TBL*/
 #define IN_L3_IF_TBL
-#if defined(MRPPE)
-#define IN_L3_IF_TBL_ADDRESS 0x6000
-#define IN_L3_IF_TBL_INC     0x20
-#elif defined(APPE)
+#if defined(APPE)
 #define IN_L3_IF_TBL_ADDRESS 0x6000
 #define IN_L3_IF_TBL_INC     0x10
 #else
@@ -1559,45 +1556,9 @@ union l3_vp_port_tbl_u {
 	#define IN_L3_IF_TBL_UDP_CSM0_CMD_LEN     2
 	#define IN_L3_IF_TBL_UDP_CSM0_CMD_DEFAULT 0x0
 #endif
-#if defined(MRPPE)
-	/*[field] MAC_DA*/
-	#define IN_L3_IF_TBL_MAC_DA
-	#define IN_L3_IF_TBL_MAC_DA_OFFSET  80
-	#define IN_L3_IF_TBL_MAC_DA_LEN	  48
-	#define IN_L3_IF_TBL_MAC_DA_DEFAULT 0x0
-	/*[field] MAC_VALID*/
-	#define IN_L3_IF_TBL_MAC_VALID
-	#define IN_L3_IF_TBL_MAC_VALID_OFFSET  128
-	#define IN_L3_IF_TBL_MAC_VALID_LEN	  1
-	#define IN_L3_IF_TBL_MAC_VALID_DEFAULT 0x0
-#endif
 
 struct in_l3_if_tbl {
-#if defined(MRPPE)
-	a_uint32_t	icmp_trigger_en:1;
-	a_uint32_t	ipv6_uc_route_en:1;
-	a_uint32_t	ipv4_uc_route_en:1;
-	a_uint32_t	ttl_dec_bypass:1;
-	a_uint32_t	mtu:14;
-	a_uint32_t	mru:14;
-
-	a_uint32_t	mru_ipv6:14;
-	a_uint32_t	vpn_id:5;
-	a_uint32_t	dmac_check_dis:1;
-	a_uint32_t	pppoe_en:1;
-	a_uint32_t	mac_bitmap:8;
-	a_uint32_t	ttl_exceed_de_acce:1;
-	a_uint32_t	ttl_exceed_cmd:2;
-
-	a_uint32_t	mac_da_1:16;
-	a_uint32_t	udp_csm0_cmd:2;
-	a_uint32_t	mtu_ipv6:14;
-
-	a_uint32_t	mac_da_0:32;
-
-	a_uint32_t	_reserved0:31;
-	a_uint32_t	mac_valid:1;
-#elif defined(APPE)
+#if defined(APPE)
 	a_uint32_t  icmp_trigger_en:1;
 	a_uint32_t  ipv6_uc_route_en:1;
 	a_uint32_t  ipv4_uc_route_en:1;
@@ -1633,9 +1594,7 @@ struct in_l3_if_tbl {
 };
 
 union in_l3_if_tbl_u {
-#if defined(MRPPE)
-	a_uint32_t val[5];
-#elif defined(APPE)
+#if defined(APPE)
 	a_uint32_t val[3];
 #else
 	a_uint32_t val[2];
@@ -1855,9 +1814,7 @@ union host_ipv4_mcast_tbl_u {
 /*[table] HOST_TBL*/
 #define HOST_TBL
 #define HOST_TBL_ADDRESS 0x20000
-#if defined(MRPPE)
-#define HOST_TBL_NUM     6144
-#elif defined(MPPE) || defined(CPPE)
+#if defined(MPPE) || defined(CPPE)
 #define HOST_TBL_NUM     768
 #else
 #define HOST_TBL_NUM     6144
@@ -1988,9 +1945,7 @@ union host_ipv6_tbl_u {
 /*[table] IN_NEXTHOP_TBL*/
 #define IN_NEXTHOP_TBL
 #define IN_NEXTHOP_TBL_ADDRESS 0x60000
-#if defined(MRPPE)
-#define IN_NEXTHOP_TBL_NUM     2560
-#elif defined(MPPE) || defined(CPPE)
+#if defined(MPPE) || defined(CPPE)
 #define IN_NEXTHOP_TBL_NUM     768
 #else
 #define IN_NEXTHOP_TBL_NUM     2560

@@ -879,11 +879,7 @@ union tdm_cfg_u {
 /*[table] DROP_STAT*/
 #define DROP_STAT
 #define DROP_STAT_ADDRESS 0x3000
-#if defined(MRPPE)
-#define DROP_STAT_NUM     38
-#else
 #define DROP_STAT_NUM     30
-#endif
 #define DROP_STAT_INC     0x10
 #define DROP_STAT_TYPE    REG_TYPE_RW
 #define DROP_STAT_DEFAULT 0x0
@@ -1021,98 +1017,7 @@ union epe_dbg_out_cnt_reg_u {
 	a_uint32_t val;
 	struct epe_dbg_out_cnt_reg bf;
 };
-#ifdef MRPPE
-/*[register] LPI_ENABLE*/
-#define LPI_PORT_ENABLE
-#define LPI_PORT_ENABLE_ADDRESS 0xf4
-#define LPI_PORT_ENABLE_NUM     3
-#define LPI_PORT_ENABLE_INC     0x200
-#define LPI_PORT_ENABLE_TYPE    REG_TYPE_RW
-#define LPI_PORT_ENABLE_DEFAULT 0x0
-	/*[field] PORT_LPI_EN*/
-	#define LPI_PORT_EN
-	#define LPI_PORT_EN_OFFSET  0
-	#define LPI_PORT_EN_LEN     1
-	#define LPI_PORT_EN_DEFAULT 0x0
-struct lpi_port_enable {
-	a_uint32_t  lpi_port_en:1;
-	a_uint32_t  _reserved0:31;
-};
 
-union lpi_port_enable_u {
-	a_uint32_t val;
-	struct lpi_port_enable bf;
-};
-
-/*[register] LPI_PORT_WAKEUP_TIMER*/
-#define LPI_PORT_WAKEUP_TIMER_ENABLE
-#define LPI_PORT_WAKEUP_TIMER_ADDRESS 0xf8
-#define LPI_PORT_WAKEUP_TIMER_NUM     3
-#define LPI_PORT_WAKEUP_TIMER_INC     0x200
-#define LPI_PORT_WAKEUP_TIMER_TYPE    REG_TYPE_RW
-#define LPI_PORT_WAKEUP_TIMER_DEFAULT 0x20
-	/*[field] LPI_PORT_WAKEUP_TIMER*/
-	#define LPI_PORT_WAKEUP_TIMER
-	#define LPI_PORT_WAKEUP_TIMER_OFFSET  0
-	#define LPI_PORT_WAKEUP_TIMER_LEN     16
-	#define LPI_PORT_WAKEUP_TIMER_DEFAULT 0x20
-
-struct lpi_port_wakeup_timer {
-	a_uint32_t  lpi_port_wakeup_timer:16;
-	a_uint32_t  _reserved0:16;
-};
-
-union lpi_port_wakeup_timer_u {
-	a_uint32_t val;
-	struct lpi_port_wakeup_timer bf;
-};
-
-/*[register] LPI_PORT_SLEEP_TIMER*/
-#define LPI_PORT_SLEEP_TIMER_ENABLE
-#define LPI_PORT_SLEEP_TIMER_ADDRESS 0xfc
-#define LPI_PORT_SLEEP_TIMER_NUM     3
-#define LPI_PORT_SLEEP_TIMER_INC     0x200
-#define LPI_PORT_SLEEP_TIMER_TYPE    REG_TYPE_RW
-#define LPI_PORT_SLEEP_TIMER_DEFAULT 0x100
-	/*[field] LPI_PORT_SLEEP_TIMER*/
-	#define LPI_PORT_SLEEP_TIMER
-	#define LPI_PORT_SLEEP_TIMER_OFFSET  0
-	#define LPI_PORT_SLEEP_TIMER_LEN     16
-	#define LPI_PORT_SLEEP_TIMER_DEFAULT 0x100
-
-struct lpi_port_sleep_timer {
-	a_uint32_t  lpi_port_sleep_timer:16;
-	a_uint32_t  _reserved0:16;
-};
-
-union lpi_port_sleep_timer_u {
-	a_uint32_t val;
-	struct lpi_port_sleep_timer bf;
-};
-
-/*[register] LPI_1US_CNT*/
-#define LPI_1US_CNT
-#define LPI_1US_CNT_ADDRESS 0x104
-#define LPI_1US_CNT_NUM     3
-#define LPI_1US_CNT_INC     0x200
-#define LPI_1US_CNT_TYPE    REG_TYPE_RW
-#define LPI_1US_CNT_DEFAULT 0x177
-	/*[field] LPI_CNT*/
-	#define LPI_1US_CNT
-	#define LPI_1US_CNT_OFFSET  0
-	#define LPI_1US_CNTT_LEN     9
-	#define LPI_1US_CNT_DEFAULT 0x177
-
-struct lpi_1us_cnt {
-	a_uint32_t  lpi_1us_cnt_val:9;
-	a_uint32_t  _reserved0:23;
-};
-
-union lpi_1us_cnt_u {
-	a_uint32_t val;
-	struct lpi_1us_cnt bf;
-};
-#else
 /*[register] LPI_ENABLE*/
 #define LPI_ENABLE
 #define LPI_ENABLE_ADDRESS 0x0
@@ -1261,15 +1166,10 @@ union lpi_cnt_u {
 	a_uint32_t val;
 	struct lpi_cnt bf;
 };
-#endif
 /*[register] DROP_CNT*/
 #define DROP_CNT
 #define DROP_CNT_ADDRESS 0x24
-#if defined(MRPPE)
-#define DROP_CNT_NUM     16
-#else
 #define DROP_CNT_NUM     8
-#endif
 
 #define DROP_CNT_INC     0x4
 #define DROP_CNT_TYPE    REG_TYPE_RW

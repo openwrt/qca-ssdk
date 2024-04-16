@@ -1997,8 +1997,7 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id)
 			SW_RTN_ON_ERROR(rv);
 		}
 	}
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		xgmac_port = SSDK_PHYSICAL_PORT1;
 	} else {
 		xgmac_port = SSDK_PHYSICAL_PORT5;
@@ -2030,8 +2029,7 @@ _adpt_hppe_port_mux_set(a_uint32_t dev_id, fal_port_t port_id)
 		SW_RTN_ON_ERROR(rv);
 		rv = adpt_hppe_port_interface_mode_switch_mac_reset(dev_id, port_id);
 	}
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 #if defined(APPE)
 		rv = _adpt_appe_port_mux_mac_set(dev_id, port_id, port_type);
 #endif
@@ -3114,8 +3112,7 @@ adpt_ppe_port_source_filter_get(a_uint32_t dev_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 #if (defined(CPPE) || defined(APPE))
 	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE){
+		adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		return _adpt_ppe_port_source_filter_get(dev_id, port_id, enable);
 	}
 #endif
@@ -3130,8 +3127,7 @@ adpt_ppe_port_source_filter_set(a_uint32_t dev_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 #if (defined(CPPE) || defined(APPE))
 	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE){
+		adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		return _adpt_ppe_port_source_filter_set(dev_id, port_id, enable);
 	}
 #endif
@@ -3145,8 +3141,7 @@ adpt_ppe_port_source_filter_config_get(a_uint32_t dev_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 #if (defined(CPPE) || defined(APPE))
 	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE){
+		adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		return _adpt_ppe_port_source_filter_config_get(dev_id, port_id,
 				src_filter_config);
 	}
@@ -3162,8 +3157,7 @@ adpt_ppe_port_source_filter_config_set(a_uint32_t dev_id,
 	ADPT_DEV_ID_CHECK(dev_id);
 #if (defined(CPPE) || defined(APPE))
 	if (adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE){
+		adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		return _adpt_ppe_port_source_filter_config_set(dev_id, port_id, src_filter_config);
 	}
 #endif
@@ -3180,8 +3174,7 @@ adpt_hppe_port_promisc_mode_get(a_uint32_t dev_id, fal_port_t port_id, a_bool_t 
 	ADPT_NULL_POINT_CHECK(enable);
 
 #ifdef APPE
-	if((adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) &&
+	if((adpt_chip_type_get(dev_id) == CHIP_APPE) &&
 		ADPT_IS_VPORT(port_id))
 	{
 		a_uint32_t port_value = 0;
@@ -3208,8 +3201,7 @@ adpt_hppe_port_promisc_mode_set(a_uint32_t dev_id, fal_port_t port_id, a_bool_t 
 
 	ADPT_DEV_ID_CHECK(dev_id);
 #ifdef APPE
-	if((adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) &&
+	if((adpt_chip_type_get(dev_id) == CHIP_APPE) &&
 		ADPT_IS_VPORT(port_id))
 	{
 		a_uint32_t port_value = 0;
@@ -3324,77 +3316,6 @@ static a_uint32_t port_lpi_wakeup_timer[][SSDK_PHYSICAL_PORT6] = {
 	{27, 27, 27, 27, 27, 27},
 }; /* unit is us*/
 #endif
-#ifdef MRPPE
-static sw_error_t
-_adpt_mrppe_gmac_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
-	fal_port_eee_cfg_t *port_eee_cfg)
-{
-	sw_error_t rv = SW_OK;
-	union lpi_port_enable_u lpi_port_enable = {0};
-	union lpi_port_wakeup_timer_u lpi_port_wakeup_timer = {0};
-	union lpi_port_sleep_timer_u lpi_port_sleep_timer = {0};
-	union lpi_1us_cnt_u lpi_1us_cnt = {0};
-
-	port_id = HPPE_TO_GMAC_PORT_ID(port_id);
-	/*enable lpi*/
-	rv = mrppe_lpi_port_enable_get(dev_id, port_id, &lpi_port_enable);
-	SW_RTN_ON_ERROR (rv);
-	lpi_port_enable.bf.lpi_port_en = port_eee_cfg->lpi_tx_enable;
-	rv = mrppe_lpi_port_enable_set(dev_id, port_id, &lpi_port_enable);
-	SW_RTN_ON_ERROR (rv);
-	/*configure 1us cnt*/
-	rv = mrppe_lpi_1us_cnt_get(dev_id, port_id, &lpi_1us_cnt);
-	SW_RTN_ON_ERROR (rv);
-	lpi_1us_cnt.bf.lpi_1us_cnt_val = adpt_chip_freq_get(dev_id);
-	rv = mrppe_lpi_1us_cnt_set(dev_id, port_id, &lpi_1us_cnt);
-	SW_RTN_ON_ERROR (rv);
-	/*configure wakeup timer*/
-	if(port_eee_cfg->lpi_wakeup_timer != 0) {
-		rv = mrppe_lpi_wakeup_timer_get(dev_id, port_id, &lpi_port_wakeup_timer);
-		SW_RTN_ON_ERROR (rv);
-		lpi_port_wakeup_timer.bf.lpi_port_wakeup_timer = port_eee_cfg->lpi_wakeup_timer;
-		rv = mrppe_lpi_wakeup_timer_set(dev_id, port_id, &lpi_port_wakeup_timer);
-		SW_RTN_ON_ERROR (rv);
-	}
-	/*configure sleep timer*/
-	if(port_eee_cfg->lpi_sleep_timer != 0) {
-		rv = mrppe_lpi_sleep_timer_get(dev_id, port_id, &lpi_port_sleep_timer);
-		SW_RTN_ON_ERROR (rv);
-		lpi_port_sleep_timer.bf.lpi_port_sleep_timer = port_eee_cfg->lpi_sleep_timer;
-		rv = mrppe_lpi_sleep_timer_set(dev_id, port_id, &lpi_port_sleep_timer);
-		SW_RTN_ON_ERROR (rv);
-	}
-	return SW_OK;
-}
-
-static sw_error_t
-_adpt_mrppe_gmac_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
-	fal_port_eee_cfg_t *port_eee_cfg)
-{
-	sw_error_t rv = SW_OK;
-	union lpi_port_enable_u lpi_port_enable = {0};
-	union lpi_port_wakeup_timer_u lpi_port_wakeup_timer = {0};
-	union lpi_port_sleep_timer_u lpi_port_sleep_timer = {0};
-
-	port_id = HPPE_TO_GMAC_PORT_ID(port_id);
-	rv = mrppe_lpi_port_enable_get(dev_id, port_id, &lpi_port_enable);
-	SW_RTN_ON_ERROR (rv);
-	if(lpi_port_enable.bf.lpi_port_en)
-		port_eee_cfg->lpi_tx_enable = A_TRUE;
-	else
-		port_eee_cfg->lpi_tx_enable = A_FALSE;
-
-	rv = mrppe_lpi_wakeup_timer_get(dev_id, port_id, &lpi_port_wakeup_timer);
-	SW_RTN_ON_ERROR (rv);
-	port_eee_cfg->lpi_wakeup_timer = lpi_port_wakeup_timer.bf.lpi_port_wakeup_timer;
-
-	rv = mrppe_lpi_sleep_timer_get(dev_id, port_id, &lpi_port_sleep_timer);
-	SW_RTN_ON_ERROR (rv);
-	port_eee_cfg->lpi_sleep_timer = lpi_port_sleep_timer.bf.lpi_port_sleep_timer;
-
-	return SW_OK;
-}
-#else
 static sw_error_t
 _adpt_hppe_gmac_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
@@ -3455,7 +3376,6 @@ _adpt_hppe_gmac_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id
 	return SW_OK;
 
 }
-#endif
 static sw_error_t
 _adpt_ppe_gmac_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	fal_port_eee_cfg_t *port_eee_cfg)
@@ -3475,17 +3395,9 @@ _adpt_ppe_gmac_port_interface_eee_cfg_set(a_uint32_t dev_id, fal_port_t port_id,
 	}
 	rv = hsl_port_phy_eee_adv_set(dev_id, port_id, adv);
 	SW_RTN_ON_ERROR (rv);
-#ifdef MRPPE
-	if(adpt_ppe_type_get(dev_id) == MRPPE_TYPE) {
-		rv = _adpt_mrppe_gmac_port_interface_eee_cfg_set(dev_id,
-			port_id, port_eee_cfg);
-		SW_RTN_ON_ERROR (rv);
-	}
-#else
 	rv = _adpt_hppe_gmac_port_interface_eee_cfg_set(dev_id,
 			port_id, port_eee_cfg);
 	SW_RTN_ON_ERROR (rv);
-#endif
 
 	return SW_OK;
 }
@@ -3522,17 +3434,9 @@ _adpt_ppe_gmac_port_interface_eee_cfg_get(a_uint32_t dev_id, fal_port_t port_id,
 	} else {
 		port_eee_cfg->enable = A_FALSE;
 	}
-#ifdef MRPPE
-	if(adpt_ppe_type_get(dev_id) == MRPPE_TYPE) {
-		rv = _adpt_mrppe_gmac_port_interface_eee_cfg_get(dev_id,
-			port_id, port_eee_cfg);
-		SW_RTN_ON_ERROR (rv);
-	}
-#else
 	rv = _adpt_hppe_gmac_port_interface_eee_cfg_get(dev_id,
 			port_id, port_eee_cfg);
 	SW_RTN_ON_ERROR (rv);
-#endif
 
 	return SW_OK;
 }
@@ -4651,8 +4555,7 @@ _adpt_hppe_port_cnt_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 	}
 
 #if defined(APPE) && defined(IN_TUNNEL)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
 		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
@@ -4711,8 +4614,7 @@ _adpt_hppe_port_cnt_enable_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_c
 	}
 
 #if defined(APPE) && defined(IN_TUNNEL)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		aos_mem_zero(&tl_port_vp_tbl, sizeof(union tl_port_vp_tbl_u));
 		rv = appe_tl_port_vp_tbl_get(dev_id, port_value, &tl_port_vp_tbl);
@@ -4754,8 +4656,7 @@ adpt_ppe_port_cnt_cfg_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cf
 
 	/* set counter mode configs */
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rv = adpt_appe_port_cnt_mode_set(dev_id, port_id, cnt_cfg);
 		SW_RTN_ON_ERROR(rv);
@@ -4794,8 +4695,7 @@ adpt_ppe_port_cnt_cfg_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_cf
 
 	/* get counter mode configs */
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rv = adpt_appe_port_cnt_mode_get(dev_id, port_id, cnt_cfg);
 		SW_RTN_ON_ERROR(rv);
@@ -4974,8 +4874,7 @@ adpt_ppe_port_cnt_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_cnt_t *por
 	}
 
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rv = adpt_appe_port_rx_cnt_get(dev_id, port_id, port_cnt);
 		SW_RTN_ON_ERROR(rv);
@@ -5001,8 +4900,7 @@ adpt_ppe_port_cnt_flush(a_uint32_t dev_id, fal_port_t port_id)
 	}
 
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rv = adpt_appe_port_rx_cnt_flush(dev_id, port_id);
 		SW_RTN_ON_ERROR(rv);
@@ -5129,8 +5027,7 @@ sw_error_t adpt_hppe_port_ctrl_init(a_uint32_t dev_id)
 	}
 #endif
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 #ifndef IN_PORTCONTROL_MINI
 		p_adpt_api->adpt_port_8023ah_set = adpt_appe_port_8023ah_set;
 		p_adpt_api->adpt_port_8023ah_get = adpt_appe_port_8023ah_get;

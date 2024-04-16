@@ -39,9 +39,7 @@
 #define L0_ENS_Q_HEAD_TBL_MAX_ENTRY	8
 #define L0_ENS_Q_ENTRY_TBL_MAX_ENTRY	300
 #define L0_FLOW_STATUS_TBL_MAX_ENTRY	300
-#if defined(MRPPE)
-#define RING_Q_MAP_TBL_MAX_ENTRY	24
-#elif defined(MPPE)
+#if defined(MPPE)
 #define RING_Q_MAP_TBL_MAX_ENTRY	16
 #elif defined(APPE)
 #define RING_Q_MAP_TBL_MAX_ENTRY	24

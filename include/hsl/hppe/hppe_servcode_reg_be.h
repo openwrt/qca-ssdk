@@ -60,11 +60,7 @@ union service_tbl_u {
 #define IN_L2_SERVICE_TBL_ADDRESS 0x4000
 #endif
 #define IN_L2_SERVICE_TBL_NUM     256
-#if defined(MRPPE)
-#define IN_L2_SERVICE_TBL_INC     0x20
-#else
 #define IN_L2_SERVICE_TBL_INC     0x10
-#endif
 #define IN_L2_SERVICE_TBL_TYPE    REG_TYPE_RW
 #define IN_L2_SERVICE_TBL_DEFAULT 0x0
 	/*[field] DST_PORT_ID_VALID*/
@@ -97,13 +93,6 @@ union service_tbl_u {
 	#define IN_L2_SERVICE_TBL_TX_CNT_EN_OFFSET  31
 	#define IN_L2_SERVICE_TBL_TX_CNT_EN_LEN     1
 	#define IN_L2_SERVICE_TBL_TX_CNT_EN_DEFAULT 0x0
-#if defined(MRPPE)
-	/*[field] BYPASS_BITMAP_EXT*/
-	#define IN_L2_SERVICE_TBL_BYPASS_BITMAP_EXT
-	#define IN_L2_SERVICE_TBL_BYPASS_BITMAP_EXT_OFFSET  32
-	#define IN_L2_SERVICE_TBL_BYPASS_BITMAP_EXT_LEN     8
-	#define IN_L2_SERVICE_TBL_BYPASS_BITMAP_EXT_DEFAULT 0x0
-#endif
 
 struct in_l2_service_tbl {
 	a_uint32_t  tx_cnt_en:1;
@@ -112,18 +101,10 @@ struct in_l2_service_tbl {
 	a_uint32_t  direction:1;
 	a_uint32_t  dst_port_id:4;
 	a_uint32_t  dst_port_id_valid:1;
-#if defined(MRPPE)
-	a_uint32_t  _reserved0:24;
-	a_uint32_t  bypass_bitmap_ext:8;
-#endif
 };
 
 union in_l2_service_tbl_u {
-#if defined(MRPPE)
-	a_uint32_t val[2];
-#else
 	a_uint32_t val[1];
-#endif
 	struct in_l2_service_tbl bf;
 };
 

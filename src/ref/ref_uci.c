@@ -8828,23 +8828,11 @@ parse_acl_action_field(struct switch_ext *ext_value_p, fal_acl_rule_t *rule)
 	} else if(!strcmp(ext_value_p->option_name, "cookie_val")) {
 		cmd_data_check_uint64((char*)ext_value_p->option_value,
 			&(rule->cookie_val), sizeof(a_uint64_t));
-#if defined(MRPPE)
-		rule->cookie_val = rule->cookie_val & 0xffffffffff;
-#else
 		rule->cookie_val = tmpdata & 0xffff;
-#endif
 	} else if(!strcmp(ext_value_p->option_name, "cookie_pri")) {
 		cmd_data_check_uint8((char*)ext_value_p->option_value,
 			&tmpdata, sizeof(tmpdata));
 		rule->cookie_pri = tmpdata & 0xf;
-	}
-#endif
-#if defined(MRPPE)
-	else if(!strcmp(ext_value_p->option_name, "wifi_qos_val")) {
-		cmd_data_check_uint8((char*)ext_value_p->option_value,
-			&tmpdata, sizeof(tmpdata));
-		rule->wifi_qos_en = A_TRUE;
-		rule->wifi_qos_val = tmpdata & 0xff;
 	}
 #endif
 	return SW_OK;
@@ -12417,35 +12405,6 @@ parse_fdb(const char *command_name, struct switch_val *val)
 #endif
 
 #ifdef IN_RSS_HASH
-#if defined(MRPPE)
-static const char *toeplitz_seckey[] = {
-	"secret_key",
-};
-
-static const char *toeplitz_config[] = {
-	"ip_ver_flag",
-	"ip_frag_flag",
-	"security_flag",
-	"ip_prot_flag",
-	"ip_prot",
-	"l4_port_flag",
-	"l4_port",
-	"l4_type_flag",
-	"sip_en",
-	"dip_en",
-	"sport_en",
-	"dport_en",
-	"ip_prot_en",
-	"spi_en",
-	"udf_0_en",
-	"udf_1_en",
-};
-
-static const char *rss_hashalgm[] = {
-	"rsshash_algm",
-	"extract_bit",
-};
-#endif
 
 static int
 parse_rsshash(const char *command_name, struct switch_val *val)
@@ -12455,20 +12414,6 @@ parse_rsshash(const char *command_name, struct switch_val *val)
 		rv = parse_rsshash_config(val);
 	}
 
-#if defined(MRPPE)
-	if (!strcmp(command_name, "Hashalgm")) {
-		rv = parse_uci_option(val, rss_hashalgm,
-			ARRAY_SIZE(rss_hashalgm));
-	}
-	if (!strcmp(command_name, "Toeplitzseckey")) {
-		rv = parse_uci_option(val, toeplitz_seckey,
-			ARRAY_SIZE(toeplitz_seckey));
-	}
-	if (!strcmp(command_name, "Toeplitzconfig")) {
-		rv = parse_uci_option(val, toeplitz_config,
-			ARRAY_SIZE(toeplitz_config));
-	}
-#endif
 
 	return rv;
 }

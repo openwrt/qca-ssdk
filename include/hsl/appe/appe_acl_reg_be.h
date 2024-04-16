@@ -168,9 +168,7 @@ union ipr_udf_profile_offset_u {
 /*[table] EG_IPO_EXT_TBL*/
 #define EG_IPO_EXT_TBL
 #define EG_IPO_EXT_TBL_ADDRESS 0x2c000
-#if defined(MRPPE)
-#define EG_IPO_EXT_TBL_NUM     1024
-#elif defined(MPPE)
+#if defined(MPPE)
 #define EG_IPO_EXT_TBL_NUM     256
 #else
 #define EG_IPO_EXT_TBL_NUM     1024
@@ -195,23 +193,6 @@ union ipr_udf_profile_offset_u {
 	#define EG_IPO_EXT_TBL_COOKIE_PRI_LEN     4
 	#define EG_IPO_EXT_TBL_COOKIE_PRI_DEFAULT 0x0
 #endif
-#if defined(MRPPE)
-        /*[field] COOKIE_EXT*/
-        #define EG_IPO_EXT_TBL_COOKIE_EXT
-        #define EG_IPO_EXT_TBL_COOKIE_EXT_OFFSET  36
-        #define EG_IPO_EXT_TBL_COOKIE_EXT_LEN     24
-        #define EG_IPO_EXT_TBL_COOKIE_EXT_DEFAULT 0x0
-        /*[field] WIFI_QOS*/
-        #define EG_IPO_EXT_TBL_WIFI_QOS
-        #define EG_IPO_EXT_TBL_WIFI_QOS_OFFSET    60
-        #define EG_IPO_EXT_TBL_WIFI_QOS_LEN       8
-        #define EG_IPO_EXT_TBL_WIFI_QOS_DEFAULT   0x0
-        /*[field] WIFI_QOS_FLAG*/
-        #define EG_IPO_EXT_TBL_WIFI_QOS_FLAG
-        #define EG_IPO_EXT_TBL_WIFI_QOS_FLAG_OFFSET    68
-        #define EG_IPO_EXT_TBL_WIFI_QOS_FLAG_LEN       1
-        #define EG_IPO_EXT_TBL_WIFI_QOS_FLAG_DEFAULT   0x0
-#endif
 struct eg_ipo_ext_tbl {
 #if defined(MPPE)
 	a_uint32_t  cookie:16;
@@ -221,17 +202,8 @@ struct eg_ipo_ext_tbl {
 	a_uint32_t  policy_id:16;
 
 #if defined(MPPE)
-#if defined(MRPPE)
-	a_uint32_t  wifi_qos_0:4;
-	a_uint32_t  cookie_ext:24;
-	a_uint32_t  cookie_pri:4;
-	a_uint33_t  _reserved0:27;
-	a_uint32_t  wifi_qos_flag:1;
-	a_uint32_t  wifi_qos_1:4;
-#else
 	a_uint32_t  _reserved0:28;
 	a_uint32_t  cookie_pri:4;
-#endif
 #endif
 };
 
@@ -247,9 +219,7 @@ union eg_ipo_ext_tbl_u {
 /*[table] PRE_IPO_RULE_REG*/
 #define PRE_IPO_RULE_REG
 #define PRE_IPO_RULE_REG_ADDRESS 0x0
-#if defined(MRPPE)
-#define PRE_IPO_RULE_REG_NUM     512
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_RULE_REG_NUM     128
 #else
 #define PRE_IPO_RULE_REG_NUM     512
@@ -335,9 +305,7 @@ union pre_ipo_rule_reg_u {
 /*[table] PRE_IPO_MASK_REG*/
 #define PRE_IPO_MASK_REG
 #define PRE_IPO_MASK_REG_ADDRESS 0x2000
-#if defined(MRPPE)
-#define PRE_IPO_MASK_REG_NUM     512
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_MASK_REG_NUM     128
 #else
 #define PRE_IPO_MASK_REG_NUM     512
@@ -365,9 +333,7 @@ union pre_ipo_mask_reg_u {
 /*[register] PRE_IPO_RULE_EXT_1*/
 #define PRE_IPO_RULE_EXT_1
 #define PRE_IPO_RULE_EXT_1_ADDRESS 0x4000
-#if defined(MRPPE)
-#define PRE_IPO_RULE_EXT_1_NUM     64
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_RULE_EXT_1_NUM     16
 #else
 #define PRE_IPO_RULE_EXT_1_NUM     64
@@ -412,9 +378,7 @@ union pre_ipo_rule_ext_1_u {
 /*[register] PRE_IPO_RULE_EXT_2*/
 #define PRE_IPO_RULE_EXT_2
 #define PRE_IPO_RULE_EXT_2_ADDRESS 0x4100
-#if defined(MRPPE)
-#define PRE_IPO_RULE_EXT_2_NUM     64
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_RULE_EXT_2_NUM     16
 #else
 #define PRE_IPO_RULE_EXT_2_NUM     64
@@ -447,9 +411,7 @@ union pre_ipo_rule_ext_2_u {
 /*[register] PRE_IPO_RULE_EXT_4*/
 #define PRE_IPO_RULE_EXT_4
 #define PRE_IPO_RULE_EXT_4_ADDRESS 0x4200
-#if defined(MRPPE)
-#define PRE_IPO_RULE_EXT_4_NUM     64
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_RULE_EXT_4_NUM     16
 #else
 #define PRE_IPO_RULE_EXT_4_NUM     64
@@ -608,9 +570,7 @@ union pre_ipo_glb_bypass_counter_u {
 /*[table] PRE_IPO_CNT_TBL*/
 #define PRE_IPO_CNT_TBL
 #define PRE_IPO_CNT_TBL_ADDRESS 0x76000
-#if defined(MRPPE)
-#define PRE_IPO_CNT_TBL_NUM     512
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_CNT_TBL_NUM     128
 #else
 #define PRE_IPO_CNT_TBL_NUM     512
@@ -644,9 +604,7 @@ union pre_ipo_cnt_tbl_u {
 /*[table] PRE_IPO_ACTION*/
 #define PRE_IPO_ACTION
 #define PRE_IPO_ACTION_ADDRESS 0x8000
-#if defined(MRPPE)
-#define PRE_IPO_ACTION_NUM     512
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PRE_IPO_ACTION_NUM     128
 #else
 #define PRE_IPO_ACTION_NUM     512

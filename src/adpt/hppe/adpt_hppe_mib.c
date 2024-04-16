@@ -259,8 +259,7 @@ adpt_ppe_mib_status_set(a_uint32_t dev_id, a_bool_t enable)
 	}
 
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		xg_port_index = SSDK_PHYSICAL_PORT1;
 	}

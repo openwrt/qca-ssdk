@@ -714,16 +714,6 @@ adpt_hppe_ip_intf_get(
 	entry->ip6_mru = in_l3_if_tbl.bf.mru_ipv6;
 	entry->ip6_mtu = in_l3_if_tbl.bf.mtu_ipv6;
 	entry->udp_zero_csum_action = in_l3_if_tbl.bf.udp_csm0_cmd;
-#if defined(MRPPE)
-	entry->in_mac_addr.uc[5] = in_l3_if_tbl.bf.mac_da_0;
-	entry->in_mac_addr.uc[4] = in_l3_if_tbl.bf.mac_da_0 >> 8;
-
-	entry->in_mac_addr.uc[3] = in_l3_if_tbl.bf.mac_da_1;
-	entry->in_mac_addr.uc[2] = in_l3_if_tbl.bf.mac_da_1 >> 8;
-	entry->in_mac_addr.uc[1] = in_l3_if_tbl.bf.mac_da_1 >> 16;
-	entry->in_mac_addr.uc[0] = in_l3_if_tbl.bf.mac_da_1 >> 24;
-	entry->in_mac_valid = in_l3_if_tbl.bf.mac_valid;
-#endif
 #endif
 	entry->mac_addr.uc[5] = eg_l3_if_tbl.bf.mac_addr_0;
 	entry->mac_addr.uc[4] = eg_l3_if_tbl.bf.mac_addr_0 >> 8;
@@ -1238,18 +1228,6 @@ adpt_hppe_ip_intf_set(
 	in_l3_if_tbl.bf.mtu_ipv6 = entry->ip6_mtu;
 	in_l3_if_tbl.bf.udp_csm0_cmd = entry->udp_zero_csum_action;
 #endif
-#if defined(MRPPE)
-	in_l3_if_tbl.bf.mac_valid = entry->in_mac_valid;
-	/* Only update MAC of L3 intf when the mac_valid is true. */
-	if (in_l3_if_tbl.bf.mac_valid == 1) {
-		in_l3_if_tbl.bf.mac_da_0 = entry->in_mac_addr.uc[5] | \
-					   entry->in_mac_addr.uc[4] << 8;
-		in_l3_if_tbl.bf.mac_da_1 = entry->in_mac_addr.uc[3] | \
-					   entry->in_mac_addr.uc[2] << 8 | \
-					   entry->in_mac_addr.uc[1] << 16 | \
-					   entry->in_mac_addr.uc[0] << 24;
-	}
-#endif
 
 	eg_l3_if_tbl.bf.mac_addr_0 = entry->mac_addr.uc[5] | \
 							entry->mac_addr.uc[4] << 8 | \
@@ -1672,20 +1650,6 @@ adpt_hppe_ip_intf_macaddr_add(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_maca
 	adpt_ip_macaddr_convert(&mac_entry->mac_addr, &mac_0, &mac_1, A_TRUE);
 
 	if (mac_entry->direction == FAL_IP_INGRESS || mac_entry->direction == FAL_IP_BOTH) {
-#if defined(MRPPE)
-		/* L3 interface MAC is programed firstly, only when the L3 interface
-		 * MAC is already programed, then the MY MAC table will be used.
-		 */
-		if(!in_l3_if_tbl.bf.mac_valid) {
-			in_l3_if_tbl.bf.mac_valid = 1;
-			in_l3_if_tbl.bf.mac_da_0 = mac_entry->mac_addr.uc[5] | \
-						   mac_entry->mac_addr.uc[4] << 8;
-			in_l3_if_tbl.bf.mac_da_1 = mac_entry->mac_addr.uc[3] | \
-						   mac_entry->mac_addr.uc[2] << 8 | \
-						   mac_entry->mac_addr.uc[1] << 16 | \
-						   mac_entry->mac_addr.uc[0] << 24;
-		} else
-#endif
 		{
 			a_uint8_t mac_index;
 			mac_index = adpt_ppe_l3_mac_addr_check(dev_id, mac_entry->mac_addr);
@@ -1774,25 +1738,6 @@ adpt_hppe_ip_intf_macaddr_del(a_uint32_t dev_id, a_uint32_t l3_if, fal_intf_maca
 			}
 		}
 
-#if defined(MRPPE)
-		/* Delete the L3 interface MAC if matched. */
-		if (in_l3_if_tbl.bf.mac_valid == 1) {
-			fal_mac_addr_t intf_mac;
-
-			intf_mac.uc[5] = in_l3_if_tbl.bf.mac_da_0;
-			intf_mac.uc[4] = in_l3_if_tbl.bf.mac_da_0 >> 8;
-			intf_mac.uc[3] = in_l3_if_tbl.bf.mac_da_1;
-			intf_mac.uc[2] = in_l3_if_tbl.bf.mac_da_1 >> 8;
-			intf_mac.uc[1] = in_l3_if_tbl.bf.mac_da_1 >> 16;
-			intf_mac.uc[0] = in_l3_if_tbl.bf.mac_da_1 >> 24;
-
-			if (ether_addr_equal(intf_mac.uc, mac_entry->mac_addr.uc)) {
-				in_l3_if_tbl.bf.mac_valid = 0;
-				in_l3_if_tbl.bf.mac_da_0 = 0;
-				in_l3_if_tbl.bf.mac_da_1 = 0;
-			}
-		}
-#endif
 	}
 
 	if (mac_entry->direction == FAL_IP_EGRESS || mac_entry->direction == FAL_IP_BOTH) {

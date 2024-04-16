@@ -159,8 +159,7 @@ adpt_ppe_qos_port_pri_set(a_uint32_t dev_id, fal_port_t port_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_pri_set(dev_id, port_id, pri);
 #endif
@@ -207,8 +206,7 @@ adpt_ppe_qos_port_pri_get(a_uint32_t dev_id, fal_port_t port_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_pri_get(dev_id, port_id, pri);
 #endif
@@ -270,8 +268,7 @@ adpt_ppe_qos_cosmap_pcp_get(a_uint32_t dev_id, a_uint8_t group_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_pcp_get(dev_id, group_id,
 				pcp, cosmap);
@@ -433,8 +430,7 @@ adpt_ppe_qos_cosmap_pcp_set(a_uint32_t dev_id, a_uint8_t group_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_pcp_set(dev_id, group_id,
 				pcp, cosmap);
@@ -521,8 +517,7 @@ adpt_ppe_qos_cosmap_dscp_get(a_uint32_t dev_id, a_uint8_t group_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_dscp_get(dev_id, group_id,
 				dscp, cosmap);
@@ -581,8 +576,7 @@ adpt_ppe_qos_cosmap_flow_set(a_uint32_t dev_id, a_uint8_t group_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_flow_set(dev_id, group_id,
 				flow, cosmap);
@@ -626,8 +620,7 @@ adpt_ppe_qos_port_group_set(a_uint32_t dev_id, fal_port_t port_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_group_set(dev_id, port_id, group);
 #endif
@@ -700,8 +693,7 @@ adpt_ppe_qos_cosmap_dscp_set(a_uint32_t dev_id, a_uint8_t group_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_dscp_set(dev_id, group_id,
 				dscp, cosmap);
@@ -859,8 +851,7 @@ adpt_ppe_qos_cosmap_flow_get(a_uint32_t dev_id, a_uint8_t group_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_cosmap_flow_get(dev_id, group_id,
 				flow, cosmap);
@@ -907,8 +898,7 @@ adpt_ppe_qos_port_group_get(a_uint32_t dev_id, fal_port_t port_id,
 	chip_type = adpt_chip_type_get(dev_id);
 	chip_ver = adpt_chip_revision_get(dev_id);
 	if ((chip_type == CHIP_HPPE && chip_ver == CPPE_REVISION) ||
-			chip_type == CHIP_APPE ||
-			chip_type == CHIP_MRPPE) {
+			chip_type == CHIP_APPE) {
 #if defined(CPPE) || defined(APPE)
 		return adpt_cppe_qos_port_group_get(dev_id, port_id, group);
 #endif
@@ -1034,8 +1024,7 @@ adpt_hppe_port_scheduler_cfg_set(a_uint32_t dev_id,
 	psch_tdm_cfg.bf.ens_port = cfg->en_scheduler_port;
 	psch_tdm_cfg.bf.des_port = cfg->de_scheduler_port;
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		psch_tdm_cfg.bf.des_second_port_en = cfg->de_scheduler_2nd_port_en;
 		psch_tdm_cfg.bf.des_second_port = cfg->de_scheduler_2nd_port;
 	}
@@ -1059,8 +1048,7 @@ adpt_hppe_port_scheduler_cfg_get(a_uint32_t dev_id,
 	cfg->en_scheduler_port = psch_tdm_cfg.bf.ens_port;
 	cfg->de_scheduler_port = psch_tdm_cfg.bf.des_port;
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		cfg->de_scheduler_2nd_port_en = psch_tdm_cfg.bf.des_second_port_en;
 		cfg->de_scheduler_2nd_port = psch_tdm_cfg.bf.des_second_port;
 	}

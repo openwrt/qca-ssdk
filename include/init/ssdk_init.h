@@ -51,9 +51,7 @@ extern "C" {
 #define PORT_GMAC_TYPE                  1
 #define PORT_XGMAC_TYPE                 2
 #define IOCTL_COMPAT
-#if defined(MRPPE)
-#define PPE_STR "MRPPE"
-#elif defined(MPPE)
+#if defined(MPPE)
 #define PPE_STR "MPPE"
 #elif defined(APPE)
 #define PPE_STR "APPE"
@@ -198,7 +196,6 @@ enum ssdk_port_wrapper_cfg {
 	CHIP_SCOMPHY,
         CHIP_APPE,
 	CHIP_MHT,
-        CHIP_MRPPE,
     } ssdk_chip_type;
 /*qca808x_end*/
 	typedef struct

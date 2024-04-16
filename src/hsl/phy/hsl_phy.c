@@ -1288,10 +1288,6 @@ a_uint32_t hsl_port_to_uniphy(a_uint32_t dev_id, a_uint32_t port_id)
 		if(port_id == SSDK_PHYSICAL_PORT2)
 			uniphy_index = SSDK_UNIPHY_INSTANCE1;
 #endif
-#ifdef MRPPE
-		if(port_id == SSDK_PHYSICAL_PORT3)
-			uniphy_index = SSDK_UNIPHY_INSTANCE2;
-#endif
 	}
 	else if(port_id == SSDK_PHYSICAL_PORT5)
 	{

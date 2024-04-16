@@ -498,8 +498,7 @@ adpt_hppe_vsi_member_set(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_member_t 
 	if( rv != SW_OK )
 		return rv;
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE||
-	   adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rv = adpt_appe_vsi_vp_member_set(dev_id, vsi_id, vsi_member);
 		return rv;
@@ -532,8 +531,7 @@ adpt_hppe_vsi_member_get(a_uint32_t dev_id, a_uint32_t vsi_id, fal_vsi_member_t 
 		return rv;
 
 #ifdef APPE
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-	   adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rv = adpt_appe_vsi_vp_member_get(dev_id, vsi_id, vsi_member);
 		return rv;
@@ -642,8 +640,7 @@ sw_error_t adpt_hppe_vsi_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_vsi_member_get = adpt_hppe_vsi_member_get;
 
 #ifdef APPE
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		p_adpt_api->adpt_vsi_bridge_vsi_get = adpt_appe_vsi_bridge_vsi_get;
 		p_adpt_api->adpt_vsi_bridge_vsi_set = adpt_appe_vsi_bridge_vsi_set;
 		p_adpt_api->adpt_vsi_invalidvsi_ctrl_get = adpt_appe_vsi_invalidvsi_ctrl_get;

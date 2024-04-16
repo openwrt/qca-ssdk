@@ -23,10 +23,7 @@
 #ifndef _CPPE_QOS_H_
 #define _CPPE_QOS_H_
 
-#if defined(MRPPE)
-#define QOS_MAPPING_TBL_MAX_ENTRY	4640
-#define QOS_MAPPING_FLOW_TBL_MAX_ENTRY	4096
-#elif defined(MPPE)
+#if defined(MPPE)
 #define QOS_MAPPING_TBL_MAX_ENTRY	2592
 #define QOS_MAPPING_FLOW_TBL_MAX_ENTRY	2048
 #elif defined(APPE)

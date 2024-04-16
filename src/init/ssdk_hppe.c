@@ -85,8 +85,7 @@ sw_error_t qca_hppe_ctlpkt_hw_init(a_uint32_t dev_id)
 #if defined(APPE)
 	a_uint32_t cpu_code = 0;
 
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE) {
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE) {
 		while (cpu_code < APPE_CPU_CODE_CTRL_NUM) {
 			rv = fal_mgmtctrl_tunnel_decap_set(dev_id, cpu_code, A_TRUE);
 			SW_RTN_ON_ERROR(rv);
@@ -816,7 +815,6 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 			group_buf = 1024;
 			break;
 		case APPE_TYPE:
-		case MRPPE_TYPE:
 			group_buf = 1550;
 			break;
 		case MPPE_TYPE:
@@ -835,7 +833,6 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 		switch (chip_type) {
 			case HPPE_TYPE:
 			case APPE_TYPE:
-			case MRPPE_TYPE:
 				if (i < PPE_BM_PHY_PORT_OFFSET) {
 					prealloc_buf = 0;
 					react_buf = 100;
@@ -896,7 +893,6 @@ qca_hppe_bm_hw_init(a_uint32_t dev_id)
 				cfg.weight= 4;
 				break;
 			case APPE_TYPE:
-			case MRPPE_TYPE:
 				if (i == PPE_BM_PORT_MIN) {
 					share_ceiling = 1146;
 					cfg.resume_min_thresh = 0;
@@ -980,8 +976,7 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 	queue_dst.service_code = 7;
 #if defined(APPE)
-	if (adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if (adpt_chip_type_get(dev_id) == CHIP_APPE)
 		fal_ucast_queue_base_profile_set(dev_id, &queue_dst, 252, 0);
 	else
 #endif
@@ -1126,7 +1121,6 @@ qca_hppe_qm_hw_init(a_uint32_t dev_id)
 
 	switch (chip_type) {
 		case HPPE_TYPE:
-		case MRPPE_TYPE:
 		case APPE_TYPE:
 			total_buf = 2000;
 			ceiling = 400;
@@ -1199,11 +1193,7 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 		if (dt_cfg->l1cfg[i].valid) {
 			port_id = dt_cfg->l1cfg[i].port_id;
 #if defined(IN_ATHTAG)
-#if defined(MRPPE)
-			if (port_id >= SSDK_PHYSICAL_PORT4 &&
-#else
 			if (port_id >= SSDK_PHYSICAL_PORT3 &&
-#endif
 				port_id <= SSDK_PHYSICAL_PORT6) {
 				port_id = SSDK_PHYSICAL_PORT1;
 			}
@@ -1225,11 +1215,7 @@ qca_hppe_qos_scheduler_hw_init(a_uint32_t dev_id)
 		if (dt_cfg->l0cfg[i].valid) {
 			port_id = dt_cfg->l0cfg[i].port_id;
 #if defined(IN_ATHTAG)
-#if defined(MRPPE)
-			if (port_id >= SSDK_PHYSICAL_PORT4 &&
-#else
 			if (port_id >= SSDK_PHYSICAL_PORT3 &&
-#endif
 				port_id <= SSDK_PHYSICAL_PORT6) {
 				port_id = SSDK_PHYSICAL_PORT1;
 			}
@@ -1470,8 +1456,7 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id)
 	rv = p_api->adpt_uniphy_mode_set(dev_id, SSDK_UNIPHY_INSTANCE1, mode[1]);
 	SW_RTN_ON_ERROR(rv);
 
-	if ((ppe_type == HPPE_TYPE) || (ppe_type == APPE_TYPE) ||
-		(ppe_type == MRPPE_TYPE)) {
+	if ((ppe_type == HPPE_TYPE) || (ppe_type == APPE_TYPE)) {
 
 		rv = p_api->adpt_uniphy_mode_set(dev_id,
 				SSDK_UNIPHY_INSTANCE2, mode[2]);
@@ -1497,10 +1482,6 @@ qca_hppe_interface_mode_init(a_uint32_t dev_id)
 		case MPPE_TYPE:
 			port_max = SSDK_PHYSICAL_PORT3;
 			break;
-		case MRPPE_TYPE:
-			port_max = SSDK_PHYSICAL_PORT4;
-			SSDK_INFO("mrppe interface mode initialization\n");
-			break;
 		default:
 			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
 			break;
@@ -1525,10 +1506,6 @@ qca_hppe_flow_hw_init(a_uint32_t dev_id)
 	fal_flow_direction_t dir, dir_max;
 	fal_flow_mgmt_t mgmt;
 	sw_error_t rv;
-
-#if defined(MRPPE)
-	fal_flow_npt66_status_set(dev_id, A_TRUE);
-#endif
 
 	memset(&mgmt, 0, sizeof(fal_flow_mgmt_t));
 	dir_max = FAL_FLOW_UNKOWN_DIR_DIR;

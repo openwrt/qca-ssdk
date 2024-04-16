@@ -47,17 +47,7 @@ union eg_hdr_xmit_pri_mapping_u {
 #define EG_GEN_CTRL_DEFAULT 0x0
 
 struct eg_gen_ctrl {
-#if defined(MRPPE)
-	a_uint32_t  _reserved0:6;
-	a_uint32_t  strip_padding_data_en:1;
-	a_uint32_t  snap_len_update_en:1;
-	a_uint32_t  strip_inner_padding_en:1;
-	a_uint32_t  strip_padding_bridge_en:1;
-	a_uint32_t  strip_padding_route_en:1;
-	a_uint32_t  strip_padding_en:1;
-#else
 	a_uint32_t  _reserved0:12;
-#endif
 	a_uint32_t  flow_cookie_pri:4;
 	a_uint32_t  ath_hdr_type:16;
 };

@@ -3160,111 +3160,6 @@ hppe_epe_dbg_out_cnt_reg_counter_set(
 }
 #endif
 
-#ifdef MRPPE
-sw_error_t
-mrppe_lpi_port_enable_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_port_enable_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_PORT_ENABLE_ADDRESS + \
-				index * LPI_PORT_ENABLE_INC,
-				&value->val);
-}
-
-sw_error_t
-mrppe_lpi_port_enable_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_port_enable_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_PORT_ENABLE_ADDRESS + \
-				index * LPI_PORT_ENABLE_INC,
-				value->val);
-}
-
-sw_error_t
-mrppe_lpi_wakeup_timer_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_port_wakeup_timer_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_PORT_WAKEUP_TIMER_ADDRESS + \
-				index * LPI_PORT_WAKEUP_TIMER_INC,
-				&value->val);
-}
-
-sw_error_t
-mrppe_lpi_wakeup_timer_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_port_wakeup_timer_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_PORT_WAKEUP_TIMER_ADDRESS + \
-				index * LPI_PORT_WAKEUP_TIMER_INC,
-				value->val);
-}
-
-sw_error_t
-mrppe_lpi_sleep_timer_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_port_sleep_timer_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_PORT_SLEEP_TIMER_ADDRESS + \
-				index * LPI_PORT_SLEEP_TIMER_INC,
-				&value->val);
-}
-
-sw_error_t
-mrppe_lpi_sleep_timer_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_port_sleep_timer_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_PORT_SLEEP_TIMER_ADDRESS + \
-				index * LPI_PORT_SLEEP_TIMER_INC,
-				value->val);
-}
-
-sw_error_t
-mrppe_lpi_1us_cnt_get(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_1us_cnt_u *value)
-{
-	return hppe_reg_get(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_1US_CNT_ADDRESS + \
-				index * LPI_1US_CNT_INC,
-				&value->val);
-}
-
-sw_error_t
-mrppe_lpi_1us_cnt_set(
-		a_uint32_t dev_id,
-		a_uint32_t index,
-		union lpi_1us_cnt_u *value)
-{
-	return hppe_reg_set(
-				dev_id,
-				NSS_LPI_BASE_ADDR + LPI_1US_CNT_ADDRESS + \
-				index * LPI_1US_CNT_INC,
-				value->val);
-}
-#else
 sw_error_t
 hppe_lpi_enable_get(
 		a_uint32_t dev_id,
@@ -3394,7 +3289,6 @@ hppe_lpi_cnt_set(
 				index * LPI_CNT_INC,
 				value->val);
 }
-#endif
 
 sw_error_t
 hppe_drop_cnt_get(

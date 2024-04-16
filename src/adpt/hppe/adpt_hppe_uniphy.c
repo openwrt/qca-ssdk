@@ -69,11 +69,7 @@ adpt_hppe_port_get_by_uniphy(a_uint32_t dev_id, a_uint32_t uniphy_index,
 		ssdk_port = SSDK_PHYSICAL_PORT5;
 #endif
 	} else if (uniphy_index == SSDK_UNIPHY_INSTANCE2) {
-#ifdef MRPPE
-		ssdk_port = SSDK_PHYSICAL_PORT3;
-#else
 		ssdk_port = SSDK_PHYSICAL_PORT6;
-#endif
 	}
 
 	return ssdk_port;

@@ -23,15 +23,7 @@
 #ifndef _HPPE_ACL_H_
 #define _HPPE_ACL_H_
 
-#if defined(MRPPE)
-#define IPO_RULE_REG_MAX_ENTRY		512
-#define IPO_MASK_REG_MAX_ENTRY		512
-#define RULE_EXT_1_REG_MAX_ENTRY        64
-#define RULE_EXT_2_REG_MAX_ENTRY        64
-#define RULE_EXT_4_REG_MAX_ENTRY        64
-#define IPO_ACTION_MAX_ENTRY		512
-#define IPO_CNT_TBL_MAX_ENTRY		512
-#elif defined(MPPE)
+#if defined(MPPE)
 #define IPO_RULE_REG_MAX_ENTRY		128
 #define IPO_MASK_REG_MAX_ENTRY		128
 #define RULE_EXT_1_REG_MAX_ENTRY	16

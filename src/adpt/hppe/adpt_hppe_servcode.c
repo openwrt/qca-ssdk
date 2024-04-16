@@ -55,10 +55,6 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	in_l2_service_tbl.bf.bypass_bitmap = entry->bypass_bitmap[1];
 	in_l2_service_tbl.bf.rx_cnt_en = (entry->bypass_bitmap[2] >> 1) & 0x1;
 	in_l2_service_tbl.bf.tx_cnt_en = (entry->bypass_bitmap[2] >> 3) & 0x1;
-#if defined(MRPPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_MRPPE)
-		in_l2_service_tbl.bf.bypass_bitmap_ext = (entry->bypass_bitmap[1] >> 24) & 0xff;
-#endif
 #ifdef IN_PORTCONTROL
 	SW_RTN_ON_ERROR(adpt_ppe_port_tdm_resource_set(dev_id, A_FALSE));
 #endif
@@ -86,8 +82,7 @@ sw_error_t adpt_hppe_servcode_config_set(a_uint32_t dev_id, a_uint32_t servcode_
 	SW_RTN_ON_ERROR(hppe_eg_service_tbl_set(dev_id, servcode_index, &eg_service_tbl));
 
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_set(dev_id, servcode_index, entry));
 	}
@@ -113,10 +108,6 @@ sw_error_t adpt_hppe_servcode_config_get(a_uint32_t dev_id, a_uint32_t servcode_
 	entry->dest_port_id = in_l2_service_tbl.bf.dst_port_id;
 	entry->direction = in_l2_service_tbl.bf.direction;
 	entry->bypass_bitmap[1] = in_l2_service_tbl.bf.bypass_bitmap;
-#if defined(MRPPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_MRPPE)
-		entry->bypass_bitmap[1] |= (in_l2_service_tbl.bf.bypass_bitmap_ext & 0xff) << 24;
-#endif
 	entry->bypass_bitmap[2] |= in_l2_service_tbl.bf.rx_cnt_en << 1;
 	entry->bypass_bitmap[2] |= in_l2_service_tbl.bf.tx_cnt_en << 3;
 
@@ -132,8 +123,7 @@ sw_error_t adpt_hppe_servcode_config_get(a_uint32_t dev_id, a_uint32_t servcode_
 	entry->bypass_bitmap[2] |= eg_service_tbl.bf.tx_counting_en << 2;
 
 #if defined (APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		SW_RTN_ON_ERROR(adpt_appe_servcode_tl_config_get(dev_id, servcode_index, entry));
 	}
@@ -174,8 +164,7 @@ sw_error_t adpt_hppe_servcode_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_servcode_loopcheck_en = adpt_hppe_servcode_loopcheck_en;
 	p_adpt_api->adpt_servcode_loopcheck_status_get = adpt_hppe_servcode_loopcheck_status_get;
 #if defined(MPPE)
-	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE ||
-		adpt_ppe_type_get(dev_id) == MRPPE_TYPE)
+	if(adpt_ppe_type_get(dev_id) == MPPE_TYPE)
 	{
 		p_adpt_api->adpt_port_servcode_set = adpt_mppe_port_servcode_set;
 		p_adpt_api->adpt_port_servcode_get = adpt_mppe_port_servcode_get;

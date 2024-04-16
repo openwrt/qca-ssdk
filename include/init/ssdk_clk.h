@@ -319,7 +319,6 @@ enum mp_bcr_rst_type {
 #define APPE_UNIPHY_SYS_CLK_RATE    24000000
 #define APPE_CLK_RATE               353000000
 #define MPPE_CLK_RATE               200000000
-#define MRPPE_CLK_RATE              375000000
 
 enum {
 	UNIPHY_RX = 0,

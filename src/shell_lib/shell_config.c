@@ -1313,11 +1313,6 @@ struct sub_cmd_des_t g_servcode_des[] =
 struct sub_cmd_des_t g_rss_hash_des[] =
 {
     {"config", "set", SW_API_RSS_HASH_CONFIG_SET, NULL},
-#if defined(MRPPE)
-    {"hashalgm", "set", SW_API_TOEPLITZ_HASH_RSS_ALGM_SET, NULL},
-    {"toeplitzseckey", "set", SW_API_TOEPLITZ_HASH_SECRET_KEY_SET, NULL},
-    {"toeplitzconfig", "set", SW_API_TOEPLITZ_HASH_CONFIG_ADD, NULL},
-#endif
     {NULL, NULL, 0, NULL},/*end of desc*/
 };
 #endif

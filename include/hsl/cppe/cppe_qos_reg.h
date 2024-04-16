@@ -118,11 +118,7 @@ struct qos_mapping_tbl {
 	a_uint32_t  int_dp:2;
 	a_uint32_t  qos_res_prec_0:1;
 	a_uint32_t  qos_res_prec_1:2;
-#if defined(MRPPE)
-	a_uint32_t  flow_policy_valid:1;
-	a_uint32_t  flow_policy_id:9;
-	a_uint32_t  _reserved0:20;
-#elif defined(MPPE)
+#if defined(MPPE)
 	a_uint32_t	flow_policy_valid:1;
 	a_uint32_t	flow_policy_id:7;
 	a_uint32_t	_reserved0:22;

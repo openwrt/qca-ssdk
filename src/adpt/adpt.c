@@ -47,9 +47,6 @@
 #if defined(MPPE)
 #include "adpt_mppe.h"
 #endif
-#if defined(MRPPE)
-#include "adpt_mrppe.h"
-#endif
 #include "hsl_phy.h"
 #include "ssdk_dts.h"
 
@@ -89,9 +86,6 @@ adpt_ppe_type_t adpt_ppe_type_get(a_uint32_t dev_id)
 			if (revision == MPPE_REVISION)
 				ppe_type = MPPE_TYPE;
 			break;
-		case CHIP_MRPPE:
-			ppe_type = MRPPE_TYPE;
-			break;
 		default:
 			break;
 	}
@@ -125,9 +119,6 @@ a_uint32_t adpt_chip_freq_get(a_uint32_t dev_id)
 			break;
 		case MPPE_TYPE:
 			ppe_freq = ADPT_MPPE_FREQUENCY;
-			break;
-		case MRPPE_TYPE:
-			ppe_freq = ADPT_MRPPE_FREQUENCY;
 			break;
 		default:
 			SSDK_ERROR("Unknown chip type: %d\n", ppe_type);
@@ -179,11 +170,6 @@ static sw_error_t adpt_appe_module_func_register(a_uint32_t dev_id, a_uint32_t m
 #if defined(IN_ATHTAG)
 			rv = adpt_mppe_athtag_init(dev_id);
 #endif
-			break;
-#endif
-#if defined(IN_PKTEDIT)
-		case FAL_MODULE_PKTEDIT:
-			rv = adpt_mrppe_pktedit_init(dev_id);
 			break;
 #endif
 		default:
@@ -335,8 +321,7 @@ sw_error_t adpt_ppe_capacity_get(a_uint32_t dev_id, fal_ppe_tbl_caps_t *ppe_capa
 
 #if defined(HPPE)
 	if (adpt_chip_type_get(dev_id) == CHIP_HPPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+		adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		ppe_capacity->flow_caps = IN_FLOW_TBL_NUM;
 		ppe_capacity->host_caps = HOST_TBL_NUM;
@@ -366,7 +351,6 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 	switch (cfg->chip_type)
 	{
 #if defined(APPE)
-		case CHIP_MRPPE:
 		case CHIP_APPE:
 			/* APPE specific module initialization */
 			if (g_adpt_api[dev_id] == NULL) {
@@ -401,10 +385,6 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 #if defined(MPPE)
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_ATHTAG);
-			SW_RTN_ON_ERROR(rv);
-#endif
-#if defined(MRPPE)
-			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_PKTEDIT);
 			SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(FALLTHROUGH)

@@ -45,18 +45,14 @@
 #define ADPT_ACL_HPPE_IPV6_SIP2_RULE 11
 #define ADPT_ACL_HPPE_IPMISC_RULE 12
 
-#if defined(MRPPE)
-#define ADPT_ACL_HW_LIST_NUM 64 /* hw list number */
-#elif defined(MPPE)
+#if defined(MPPE)
 #define ADPT_ACL_HW_LIST_NUM 16
 #else
 #define ADPT_ACL_HW_LIST_NUM 64
 #endif
 #define ADPT_ACL_ENTRY_NUM_PER_LIST 8 /* hw rule entries number per hw list */
 
-#if defined(MRPPE)
-#define ADPT_ACL_SW_LIST_NUM 1024
-#elif defined(MPPE)
+#if defined(MPPE)
 #define ADPT_ACL_SW_LIST_NUM 256
 #elif defined(APPE)
 #define ADPT_ACL_SW_LIST_NUM 1024
@@ -1890,8 +1886,7 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 		rule->dscp = hw_act->bf.dscp_tc;
 #if defined(CPPE) || defined(APPE)
 		if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-			adpt_chip_type_get(dev_id) == CHIP_APPE ||
-			adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+			adpt_chip_type_get(dev_id) == CHIP_APPE)
 		{
 			rule->dscp_mask = hw_act->bf.dscp_tc_mask;
 		}
@@ -1941,8 +1936,7 @@ _adpt_hppe_acl_action_hw_2_sw(a_uint32_t dev_id,union ipo_action_u *hw_act, fal_
 	}
 #if defined(CPPE) || defined(APPE)
 	if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+		adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		rule->qos_res_prec = hw_act->bf.qos_res_prec;
 	}
@@ -2386,8 +2380,7 @@ _adpt_hppe_acl_rule_range_count(a_uint32_t dev_id,
 		}
 	}
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		if(FAL_FIELD_FLG_TST(rule->field_flg, FAL_ACL_FIELD_UDF2) ||
 			FAL_FIELD_FLG_TST(rule->inverse_field_flg, FAL_ACL_FIELD_UDF2))
@@ -2410,8 +2403,7 @@ static sw_error_t _adpt_hppe_acl_rule_range_match(a_uint32_t dev_id, a_uint32_t 
 
 	rangecount = _adpt_hppe_acl_rule_range_count(dev_id, rule_id, rule_nr, rule);
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		if(hw_list_index >= ADPT_ACL_HW_LIST_NUM)
 		{
@@ -3904,8 +3896,7 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 		hw_act->bf.dscp_tc = rule->dscp;
 #if defined(CPPE) || defined(APPE)
 		if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-			adpt_chip_type_get(dev_id) == CHIP_APPE ||
-			adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+			adpt_chip_type_get(dev_id) == CHIP_APPE)
 		{
 			hw_act->bf.dscp_tc_mask = rule->dscp_mask;
 		}
@@ -3956,8 +3947,7 @@ _adpt_hppe_acl_action_sw_2_hw(a_uint32_t dev_id,fal_acl_rule_t *rule, union ipo_
 	}
 #if defined(CPPE) || defined(APPE)
 	if(adpt_ppe_type_get(dev_id) == CPPE_TYPE ||
-		adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+		adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		hw_act->bf.qos_res_prec = rule->qos_res_prec;
 	}
@@ -4711,8 +4701,7 @@ _adpt_hppe_acl_rule_type_map(a_uint32_t dev_id, a_uint32_t rule_id, a_uint32_t r
 	}
 	_adpt_hppe_acl_l2_fields_check(dev_id, rule_id, rule_nr, rule, rule_map);
 
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 #if defined(APPE)
 		_adpt_appe_acl_udf_fields_check(dev_id, rule_id, rule_nr, rule, rule_map);
@@ -5353,8 +5342,7 @@ sw_error_t
 adpt_ppe_acl_udf_profile_set(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type, a_uint32_t udf_idx,
 			fal_acl_udf_type_t udf_type, a_uint32_t offset)
 {
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 #if defined(APPE)
 		return adpt_appe_acl_udf_profile_set(dev_id, pkt_type, udf_idx, udf_type, offset);
@@ -5371,8 +5359,7 @@ sw_error_t
 adpt_ppe_acl_udf_profile_get(a_uint32_t dev_id, fal_acl_udf_pkt_type_t pkt_type, a_uint32_t udf_idx,
 			fal_acl_udf_type_t * udf_type, a_uint32_t * offset)
 {
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 #if defined(APPE)
 		return adpt_appe_acl_udf_profile_get(dev_id, pkt_type, udf_idx, udf_type, offset);
@@ -5447,8 +5434,7 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 
 	_adpt_hppe_acl_hw_list_init(dev_id, 0, ADPT_ACL_HW_LIST_NUM);
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		_adpt_hppe_acl_hw_list_init(dev_id, ADPT_ACL_HW_LIST_NUM,
 			ADPT_ACL_HW_LIST_NUM + ADPT_PRE_ACL_HW_LIST_NUM);
@@ -5466,8 +5452,7 @@ sw_error_t adpt_hppe_acl_init(a_uint32_t dev_id)
 	p_adpt_api->adpt_acl_udf_profile_set = adpt_ppe_acl_udf_profile_set;
 	p_adpt_api->adpt_acl_udf_profile_get = adpt_ppe_acl_udf_profile_get;
 #if defined(APPE)
-	if(adpt_chip_type_get(dev_id) == CHIP_APPE ||
-		adpt_chip_type_get(dev_id) == CHIP_MRPPE)
+	if(adpt_chip_type_get(dev_id) == CHIP_APPE)
 	{
 		p_adpt_api->adpt_acl_udf_profile_entry_add =
 				adpt_appe_acl_udf_profile_entry_add;

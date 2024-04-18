@@ -1888,7 +1888,16 @@ extern "C" {
     SW_API_DEF(SW_API_FLOW_ENTRY_EN_SET, fal_flow_entry_en_set), \
     SW_API_DEF(SW_API_FLOW_ENTRY_EN_GET, fal_flow_entry_en_get), \
     SW_API_DEF(SW_API_FLOW_QOS_SET, fal_flow_qos_set), \
-    SW_API_DEF(SW_API_FLOW_QOS_GET, fal_flow_qos_get),
+    SW_API_DEF(SW_API_FLOW_QOS_GET, fal_flow_qos_get), \
+    SW_API_DEF(SW_API_FLOW_NPT66_PREFIX_ADD, fal_flow_npt66_prefix_add), \
+    SW_API_DEF(SW_API_FLOW_NPT66_PREFIX_GET, fal_flow_npt66_prefix_get), \
+    SW_API_DEF(SW_API_FLOW_NPT66_PREFIX_DEL, fal_flow_npt66_prefix_del), \
+    SW_API_DEF(SW_API_FLOW_NPT66_IID_CAL, fal_flow_npt66_iid_cal), \
+    SW_API_DEF(SW_API_FLOW_NPT66_IID_ADD, fal_flow_npt66_iid_add), \
+    SW_API_DEF(SW_API_FLOW_NPT66_IID_GET, fal_flow_npt66_iid_get), \
+    SW_API_DEF(SW_API_FLOW_NPT66_IID_DEL, fal_flow_npt66_iid_del), \
+    SW_API_DEF(SW_API_FLOW_NPT66_STATUS_GET, fal_flow_npt66_status_get), \
+    SW_API_DEF(SW_API_FLOW_NPT66_STATUS_SET, fal_flow_npt66_status_set),
 
 #define FLOW_API_PARAM \
     SW_API_DESC(SW_API_FLOW_STATUS_SET) \
@@ -1911,7 +1920,17 @@ extern "C" {
     SW_API_DESC(SW_API_FLOW_ENTRY_EN_SET) \
     SW_API_DESC(SW_API_FLOW_ENTRY_EN_GET) \
     SW_API_DESC(SW_API_FLOW_QOS_SET) \
-    SW_API_DESC(SW_API_FLOW_QOS_GET)
+    SW_API_DESC(SW_API_FLOW_QOS_GET) \
+    SW_API_DESC(SW_API_FLOW_NPT66_PREFIX_ADD) \
+    SW_API_DESC(SW_API_FLOW_NPT66_PREFIX_GET) \
+    SW_API_DESC(SW_API_FLOW_NPT66_PREFIX_DEL) \
+    SW_API_DESC(SW_API_FLOW_NPT66_IID_CAL) \
+    SW_API_DESC(SW_API_FLOW_NPT66_IID_ADD) \
+    SW_API_DESC(SW_API_FLOW_NPT66_IID_GET) \
+    SW_API_DESC(SW_API_FLOW_NPT66_IID_DEL) \
+    SW_API_DESC(SW_API_FLOW_NPT66_STATUS_GET) \
+    SW_API_DESC(SW_API_FLOW_NPT66_STATUS_SET)
+
 #else
 #define FLOW_API \
     SW_API_DEF(SW_API_FLOW_STATUS_SET, fal_flow_status_set), \

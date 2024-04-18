@@ -576,6 +576,33 @@ typedef sw_error_t (*adpt_flow_qos_set_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_flow_qos_get_func)(a_uint32_t dev_id,
 		a_uint32_t flow_index, fal_flow_qos_t *flow_qos);
 
+typedef sw_error_t (*adpt_flow_npt66_prefix_add_func)(a_uint32_t dev_id,
+		a_uint32_t l3_if_index, fal_ip6_addr_t *ip6, a_uint32_t prefix_len);
+
+typedef sw_error_t (*adpt_flow_npt66_prefix_get_func)(a_uint32_t dev_id,
+		a_uint32_t l3_if_index, fal_ip6_addr_t *ip6, a_uint32_t *prefix_len);
+
+typedef sw_error_t (*adpt_flow_npt66_prefix_del_func)(a_uint32_t dev_id,
+		a_uint32_t l3_if_index);
+
+typedef sw_error_t (*adpt_flow_npt66_iid_cal_func)(a_uint32_t dev_id,
+		fal_flow_npt66_iid_calc_t *iid_cal, fal_flow_npt66_iid_t *iid_result);
+
+typedef sw_error_t (*adpt_flow_npt66_iid_add_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_flow_npt66_iid_t *iid_entry);
+
+typedef sw_error_t (*adpt_flow_npt66_iid_get_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index, fal_flow_npt66_iid_t *iid_entry);
+
+typedef sw_error_t (*adpt_flow_npt66_iid_del_func)(a_uint32_t dev_id,
+		a_uint32_t flow_index);
+
+typedef sw_error_t (*adpt_flow_npt66_status_set_func)(a_uint32_t dev_id, 
+		a_bool_t enable);
+
+typedef sw_error_t (*adpt_flow_npt66_status_get_func)(a_uint32_t dev_id, 
+		a_bool_t *enable);
+
 typedef sw_error_t (*adpt_ucast_hash_map_set_func)(
 		a_uint32_t dev_id,
 		a_uint8_t profile,
@@ -1731,6 +1758,15 @@ typedef struct
 	adpt_flow_entry_en_get_func adpt_flow_entry_en_get;
 	adpt_flow_qos_set_func adpt_flow_qos_set;
 	adpt_flow_qos_get_func adpt_flow_qos_get;
+	adpt_flow_npt66_prefix_add_func adpt_flow_npt66_prefix_add;
+	adpt_flow_npt66_prefix_get_func adpt_flow_npt66_prefix_get;
+	adpt_flow_npt66_prefix_del_func adpt_flow_npt66_prefix_del;
+	adpt_flow_npt66_iid_cal_func adpt_flow_npt66_iid_cal;
+	adpt_flow_npt66_iid_add_func adpt_flow_npt66_iid_add;
+	adpt_flow_npt66_iid_get_func adpt_flow_npt66_iid_get;
+	adpt_flow_npt66_iid_del_func adpt_flow_npt66_iid_del;
+	adpt_flow_npt66_status_set_func adpt_flow_npt66_status_set;
+	adpt_flow_npt66_status_get_func adpt_flow_npt66_status_get;
 
 	/* qm */
 	adpt_ucast_hash_map_set_func adpt_ucast_hash_map_set;

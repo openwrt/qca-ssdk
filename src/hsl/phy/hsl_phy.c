@@ -1520,6 +1520,13 @@ hsl_port_phy_duplex_get(a_uint32_t dev_id, fal_port_t port_id,
 	sw_error_t rv = SW_OK;
 	a_uint32_t phy_addr = 0;
 	hsl_phy_ops_t *phy_drv = NULL;
+	a_bool_t link_status = A_FALSE;
+
+	*duplex = FAL_DUPLEX_BUTT;
+	rv = hsl_port_phy_link_status_get(dev_id, port_id, &link_status);
+	SW_RTN_ON_ERROR(rv);
+	if(!link_status)
+		return SW_OK;
 
 	HSL_DEV_ID_CHECK(dev_id);
 	if (A_TRUE != hsl_port_prop_check (dev_id, port_id, HSL_PP_PHY))
@@ -1672,6 +1679,13 @@ hsl_port_phy_speed_get(a_uint32_t dev_id, fal_port_t port_id,
 	sw_error_t rv = SW_OK;
 	a_uint32_t phy_addr = 0;
 	hsl_phy_ops_t *phy_drv = NULL;
+	a_bool_t link_status = A_FALSE;
+
+	*pspeed = FAL_SPEED_BUTT;
+	rv = hsl_port_phy_link_status_get(dev_id, port_id, &link_status);
+	SW_RTN_ON_ERROR(rv);
+	if(!link_status)
+		return SW_OK;
 
 	HSL_DEV_ID_CHECK(dev_id);
 	SW_RTN_ON_NULL(pspeed);

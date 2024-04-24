@@ -2546,23 +2546,44 @@ ip6_clear_low_bits(fal_ip6_addr_t ip6, a_uint32_t len)
 	return ip6;
 }
 
-/* Calculate 16-bit sum of ip6 address and then do complement code */
-a_uint16_t 
-ip6_csum(fal_ip6_addr_t ip6) 
+/* one's complement checksum of ip6 array*/
+a_uint16_t
+ip6_csum(fal_ip6_addr_t ip6)
 {
 	a_uint32_t *addr = ip6.ul;
 	a_uint32_t sum = 0;
-	int i;
+	a_uint8_t i;
 
 	for (i = 0; i < 4; i++) {
-		sum += addr[i];
+		sum += (addr[i] >> 16) & 0xFFFF;
+		sum += addr[i] & 0xFFFF;
 	}
 
-	while (sum >> 16) {
-		sum = (sum & 0xFFFF) + (sum >> 16);
+	while (0xFFFF < sum) {
+		sum += 1 - 0x10000;
 	}
 
-	return (a_uint16_t)(~sum);
+	return  (a_uint16_t)(~sum);
+}
+
+/* One's complement sum */
+a_uint16_t
+ip6_csum_add(a_uint16_t       csum1, a_uint16_t csum2)
+{
+	a_uint32_t result = csum1 + csum2;
+	
+	while (0xFFFF < result) {
+		result += 1 - 0x10000;
+	}
+
+	 return (a_uint16_t)result;
+}
+
+/* One's complement difference */
+a_uint16_t
+ip6_csum_sub(a_uint16_t       csum1, a_uint16_t csum2)
+{
+	return ip6_csum_add(csum1, ~csum2);
 }
 
 /*search first non-0xffff from ip6_prefix_len*/
@@ -2657,7 +2678,7 @@ adpt_hppe_flow_npt66_iid_cal(a_uint32_t dev_id,               fal_flow_npt66_iid
 	a_uint32_t tip_clear_len = IP6_MAX_LEN-tip_prefix_len;
 	fal_ip6_addr_t org_ip = (iid_cal->is_dnat)?iid_cal->dip:iid_cal->sip;
 	fal_ip6_addr_t tip = iid_cal->tip;
-	a_uint16_t tip_csum, org_csum, iid_org, iid_val;
+	a_uint16_t tip_csum, org_csum, iid_org, iid_val, csum_adj;
 	a_uint32_t iid_offset = ip6_offset_find(org_ip, max(prefix_len, tip_prefix_len));
 	
 	if(iid_offset == -1)
@@ -2666,7 +2687,8 @@ adpt_hppe_flow_npt66_iid_cal(a_uint32_t dev_id,               fal_flow_npt66_iid
 	tip_csum = ip6_csum(ip6_clear_low_bits(tip,tip_clear_len));
 	org_csum = ip6_csum(ip6_clear_low_bits(org_ip,clear_len));
 	iid_org = (org_ip.ul[iid_offset/32]>>(16-(iid_offset % 32)))&0xFFFF;
-	iid_val = tip_csum - org_csum + iid_org;
+	csum_adj = ip6_csum_sub(tip_csum, org_csum);
+	iid_val = ip6_csum_add(csum_adj, iid_org);
 
 	iid_result->iid = (a_uint32_t)((iid_val==0xFFFF)? 0 : iid_val);
 	iid_result->iid_offset = EG_FLOW_IPV6_IID_OFFSET_TO_FILED_VAL(iid_offset);

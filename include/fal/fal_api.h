@@ -2711,6 +2711,8 @@ extern "C" {
 #define POLICER_API \
     SW_API_DEF(SW_API_POLICER_TIMESLOT_SET, fal_policer_timeslot_set), \
     SW_API_DEF(SW_API_POLICER_TIMESLOT_GET, fal_policer_timeslot_get), \
+    SW_API_DEF(SW_API_POLICER_PORT_COUNTER_GET, fal_port_policer_counter_get), \
+    SW_API_DEF(SW_API_POLICER_ACL_COUNTER_GET, fal_acl_policer_counter_get), \
     SW_API_DEF(SW_API_POLICER_COMPENSATION_SET, fal_port_policer_compensation_byte_set), \
     SW_API_DEF(SW_API_POLICER_COMPENSATION_GET, fal_port_policer_compensation_byte_get), \
     SW_API_DEF(SW_API_POLICER_ACL_ENTRY_SET, fal_acl_policer_entry_set), \
@@ -2725,6 +2727,8 @@ extern "C" {
 #define POLICER_API_PARAM \
     SW_API_DESC(SW_API_POLICER_TIMESLOT_SET)  \
     SW_API_DESC(SW_API_POLICER_TIMESLOT_GET)  \
+    SW_API_DESC(SW_API_POLICER_PORT_COUNTER_GET) \
+    SW_API_DESC(SW_API_POLICER_ACL_COUNTER_GET) \
     SW_API_DESC(SW_API_POLICER_COMPENSATION_SET) \
     SW_API_DESC(SW_API_POLICER_COMPENSATION_GET) \
     SW_API_DESC(SW_API_POLICER_PORT_ENTRY_SET) \

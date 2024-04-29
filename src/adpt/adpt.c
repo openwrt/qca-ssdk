@@ -47,6 +47,9 @@
 #if defined(MPPE)
 #include "adpt_mppe.h"
 #endif
+#if defined(MRPPE)
+#include "adpt_mrppe.h"
+#endif
 #include "hsl_phy.h"
 #include "ssdk_dts.h"
 
@@ -176,6 +179,11 @@ static sw_error_t adpt_appe_module_func_register(a_uint32_t dev_id, a_uint32_t m
 #if defined(IN_ATHTAG)
 			rv = adpt_mppe_athtag_init(dev_id);
 #endif
+			break;
+#endif
+#if defined(IN_PKTEDIT)
+		case FAL_MODULE_PKTEDIT:
+			rv = adpt_mrppe_pktedit_init(dev_id);
 			break;
 #endif
 		default:
@@ -393,6 +401,10 @@ sw_error_t adpt_init(a_uint32_t dev_id, ssdk_init_cfg *cfg)
 
 #if defined(MPPE)
 			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_ATHTAG);
+			SW_RTN_ON_ERROR(rv);
+#endif
+#if defined(MRPPE)
+			rv = adpt_appe_module_func_register(dev_id, FAL_MODULE_PKTEDIT);
 			SW_RTN_ON_ERROR(rv);
 #endif
 #if defined(FALLTHROUGH)

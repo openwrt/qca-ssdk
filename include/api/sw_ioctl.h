@@ -1171,6 +1171,11 @@ extern "C" {
 #define SW_API_PORT_ATHTAG_TX_SET		(6 + SW_API_ATHTAG_OFFSET)
 #define SW_API_PORT_ATHTAG_TX_GET		(7 + SW_API_ATHTAG_OFFSET)
 
+/* pktedit */
+#define SW_API_PKTEDIT_OFFSET			4000
+#define SW_API_PKTEDIT_PADDING_SET		(0 + SW_API_PKTEDIT_OFFSET)
+#define SW_API_PKTEDIT_PADDING_GET		(1 + SW_API_PKTEDIT_OFFSET)
+
 /* auto_insert_flag */
 /*qca808x_start*/
     /*debug*/

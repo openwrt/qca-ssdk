@@ -271,6 +271,7 @@ phy_type_t hsl_phytype_get_by_phyid(a_uint32_t dev_id, a_uint32_t phy_id)
 		case AQUANTIA_PHY_113C_B0:
 		case AQUANTIA_PHY_113C_B1:
 		case AQUANTIA_PHY_112C:
+		case AQUANTIA_PHY_114C_B0:
 		case MVL_PHY_X3410:
 			phytype = AQUANTIA_PHY_CHIP;
 			break;

@@ -1166,6 +1166,16 @@ a_uint32_t hsl_port_mode_to_phydev_interface(a_uint32_t dev_id,
 		case PORT_QSGMII:
 			interface = PHY_INTERFACE_MODE_QSGMII;
 			break;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+		case PORT_UQXGMII:
+			interface = PHY_INTERFACE_MODE_QUSGMII;
+			break;
+#endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+		case PHY_PSGMII_BASET:
+			interface = PHY_INTERFACE_MODE_PSGMII;
+			break;
+#endif
 		default:
 			break;
 	}
@@ -1195,6 +1205,12 @@ a_uint32_t hsl_port_mode_to_uniphy_mode(a_uint32_t dev_id,
 			break;
 		case PORT_QSGMII:
 			uniphy_mode = PORT_WRAPPER_QSGMII;
+			break;
+		case PORT_UQXGMII:
+			uniphy_mode = PORT_WRAPPER_UQXGMII;
+			break;
+		case PHY_PSGMII_BASET:
+			uniphy_mode = PORT_WRAPPER_PSGMII;
 			break;
 		default:
 			break;
@@ -1329,6 +1345,16 @@ hsl_port_phydev_interface_mode_status_get(a_uint32_t dev_id, a_uint32_t port_id,
 		case PHY_INTERFACE_MODE_QSGMII:
 			*interface_mode_status = PORT_QSGMII;
 			break;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,1,0))
+		case PHY_INTERFACE_MODE_QUSGMII:
+			*interface_mode_status = PORT_UQXGMII;
+			break;
+#endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+		case PHY_INTERFACE_MODE_PSGMII:
+			*interface_mode_status = PHY_PSGMII_BASET;
+			break;
+#endif
 		default:
 			break;
 	}

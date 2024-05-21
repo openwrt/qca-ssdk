@@ -413,8 +413,13 @@ ifeq ($(MINI_SSDK), enable)
 	ifeq ($(MHT_ENABLE), enable)
 		IN_INTERFACECONTROL=TRUE
 		IN_NAT=TRUE
+		IN_IGMP=TRUE
 	endif
-	
+
+	ifeq ($(ISISC_ENABLE), enable)
+		IN_IGMP=TRUE
+	endif
+
 	ifeq ($(HNAT_FEATURE), enable)
 		IN_MISC_MINI=FALSE
 		IN_PORTVLAN_MINI=FALSE

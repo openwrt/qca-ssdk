@@ -2365,7 +2365,7 @@ union in_flow_cnt_tbl_u {
 	#define EG_IPV6_PREFIX_TBL_LENGTH_DEFAULT 0x0
 
 
-#define EG_FLOW_IPV6_IID_TBL_ADDRESS 0x3e000
+#define EG_FLOW_IPV6_IID_TBL_ADDRESS 0x30000
 #define EG_FLOW_IPV6_IID_TBL_INC     0x4
 
 
@@ -2401,6 +2401,19 @@ union in_flow_cnt_tbl_u {
 	#define EG_FLOW_IPV6_IID_TBL_SRC_DST_OFFSET			21
 	#define EG_FLOW_IPV6_IID_TBL_SRC_DST_LEN	 		1
 	#define EG_FLOW_IPV6_IID_TBL_SRC_DST_DEFAULT 		0x0
+
+/*[register] EG_GLOBAL_CTRL*/
+#define EG_GLOBAL_CTRL
+#define EG_GLOBAL_CTRL_ADDRESS 0xe0
+
+#define EG_GLOBAL_CTRL_NUM     1
+#define EG_GLOBAL_CTRL_INC     0x4
+#define EG_GLOBAL_CTRL_TYPE    REG_TYPE_RW
+	/*[field] PREFIX_XLT_EN*/
+	#define EG_GLOBAL_CTRL_PREFIX_XLT_EN
+	#define EG_GLOBAL_CTRL_PREFIX_XLT_EN_OFFSET  0
+	#define EG_GLOBAL_CTRL_PREFIX_XLT_EN_LEN     1
+	#define EG_GLOBAL_CTRL_PREFIX_XLT_EN_DEFAULT 0x0
 
 struct eg_ipv6_prefix_tbl {
 	a_uint32_t  _reserved0:25;

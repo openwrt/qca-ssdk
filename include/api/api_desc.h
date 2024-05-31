@@ -6198,6 +6198,18 @@ extern "C" {
 	SW_PARAM_DEF(SW_API_TOEPLITZ_HASH_CONFIG_GETNEXT, SW_TOEPLITZ_CONFIG, \
 			sizeof(fal_toeplitz_hash_config_t), SW_PARAM_PTR|SW_PARAM_IN|SW_PARAM_OUT, "Hash config"),
 
+#define SW_API_PKTEDIT_PADDING_SET_DESC \
+	SW_PARAM_DEF(SW_API_PKTEDIT_PADDING_SET, SW_UINT32, \
+		     sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_PKTEDIT_PADDING_SET, SW_PKTEDIT_PADDING, \
+		     sizeof(fal_pktedit_padding_t), SW_PARAM_PTR|SW_PARAM_IN, "Padding"),
+
+#define SW_API_PKTEDIT_PADDING_GET_DESC \
+	SW_PARAM_DEF(SW_API_PKTEDIT_PADDING_GET, SW_UINT32, \
+		     sizeof(a_uint32_t), SW_PARAM_IN, "Dev Id "),\
+	SW_PARAM_DEF(SW_API_PKTEDIT_PADDING_GET, SW_PKTEDIT_PADDING, \
+		     sizeof(fal_pktedit_padding_t), SW_PARAM_PTR|SW_PARAM_OUT, "Padding"),
+
 /* auto_insert_flag */
 /*qca808x_start*/
 

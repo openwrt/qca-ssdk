@@ -275,6 +275,10 @@ ifeq (TRUE, $(IN_ATHTAG))
   MODULE_CFLAG += -DIN_ATHTAG
 endif
 
+ifeq (TRUE, $(IN_PKTEDIT))
+  MODULE_CFLAG += -DIN_PKTEDIT
+endif
+
 ifneq (TRUE, $(FAL))
   MODULE_CFLAG += -DHSL_STANDALONG
 endif
@@ -396,6 +400,8 @@ ifneq (,$(findstring MPPE, $(SUPPORT_CHIP)))
 endif
 
 ifneq (,$(findstring MRPPE, $(SUPPORT_CHIP)))
+  MODULE_INC   += -I$(PRJ_PATH)/include/hsl/mrppe
+  MODULE_INC   += -I$(PRJ_PATH)/include/adpt/mrppe
   MODULE_CFLAG += -DMRPPE
   MODULE_CFLAG += -DSSDK_RAW_CLOCK
 endif

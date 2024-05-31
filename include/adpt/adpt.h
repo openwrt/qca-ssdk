@@ -62,6 +62,7 @@ extern "C" {
 #include "fal_mapt.h"
 #include "fal_vport.h"
 #include "fal_athtag.h"
+#include "fal_pktedit.h"
 #include "ssdk_plat.h"
 
 #define ADPT_DEV_ID_CHECK(dev_id) \
@@ -1498,6 +1499,10 @@ typedef sw_error_t (*adpt_toeplitz_hash_config_getfirst_func)(a_uint32_t dev_id,
 typedef sw_error_t (*adpt_toeplitz_hash_config_getnext_func)(a_uint32_t dev_id,
 		fal_toeplitz_hash_config_t *toeplitz_cfg);
 
+typedef sw_error_t (*adpt_pktedit_padding_set_func)(a_uint32_t dev_id,
+		fal_pktedit_padding_t *padding);
+typedef sw_error_t (*adpt_pktedit_padding_get_func)(a_uint32_t dev_id,
+		fal_pktedit_padding_t *padding);
 /* auto_insert_flag */
 typedef struct
 {
@@ -2215,6 +2220,9 @@ typedef struct
 	adpt_toeplitz_hash_config_del_func adpt_toeplitz_hash_config_del;
 	adpt_toeplitz_hash_config_getfirst_func adpt_toeplitz_hash_config_getfirst;
 	adpt_toeplitz_hash_config_getnext_func adpt_toeplitz_hash_config_getnext;
+	/* pktedit */
+	adpt_pktedit_padding_set_func adpt_pktedit_padding_set;
+	adpt_pktedit_padding_get_func adpt_pktedit_padding_get;
 /* auto_insert_flag_1 */
 }adpt_api_t;
 

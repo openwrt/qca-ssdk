@@ -485,4 +485,7 @@ ifneq (, $(filter MRPPE MPPE , $(CHIP_TYPE)))
 	IN_ATHTAG=TRUE
 endif
 
+ifneq (, $(filter MRPPE, $(CHIP_TYPE)))
+	IN_PKTEDIT=TRUE
+endif
 #auto_insert_flag

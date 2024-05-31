@@ -3225,6 +3225,18 @@ extern "C" {
 #define ATHTAG_API_PARAM
 #endif
 
+#ifdef IN_PKTEDIT
+#define PKTEDIT_API \
+        SW_API_DEF(SW_API_PKTEDIT_PADDING_SET, fal_pktedit_padding_set), \
+        SW_API_DEF(SW_API_PKTEDIT_PADDING_GET, fal_pktedit_padding_get),
+#define PKTEDIT_API_PARAM \
+        SW_API_DESC(SW_API_PKTEDIT_PADDING_SET) \
+        SW_API_DESC(SW_API_PKTEDIT_PADDING_GET)
+#else
+#define PKTEDIT_API
+#define PKTEDIT_API_PARAM
+#endif
+
 /* auto_insert_flag */
 /*qca808x_start*/
 #define SSDK_API \
@@ -3277,6 +3289,7 @@ extern "C" {
     TUNNEL_PROGRAM_API \
     MAPT_API \
     ATHTAG_API \
+    PKTEDIT_API \
 /* auto_insert_flag_1 */ \
 /*qca808x_start*/\
     SW_API_DEF(SW_API_MAX, NULL),
@@ -3336,6 +3349,7 @@ extern "C" {
     TUNNEL_PROGRAM_API_PARAM \
     MAPT_API_PARAM \
     ATHTAG_API_PARAM \
+    PKTEDIT_API_PARAM \
 /* auto_insert_flag_2 */ \
 /*qca808x_start*/\
     SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),

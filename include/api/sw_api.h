@@ -320,6 +320,7 @@ typedef enum
 	SW_TOEPLITZ_CONFIG,
 	SW_FLOW_NPT66_IID_CAL,
 	SW_FLOW_NPT66_IID,
+	SW_PKTEDIT_PADDING,
 /* auto_insert_flag */
 } sw_data_type_e;
 

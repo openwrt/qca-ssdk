@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -52,7 +52,17 @@ union eg_hdr_xmit_pri_mapping_u {
 struct eg_gen_ctrl {
 	a_uint32_t  ath_hdr_type:16;
 	a_uint32_t  flow_cookie_pri:4;
+#if defined(MRPPE)
+	a_uint32_t  strip_padding_en:1;
+	a_uint32_t  strip_padding_route_en:1;
+	a_uint32_t  strip_padding_bridge_en:1;
+	a_uint32_t  strip_inner_padding_en:1;
+	a_uint32_t  snap_len_update_en:1;
+	a_uint32_t  strip_padding_data_en:1;
+	a_uint32_t  _reserved0:6;
+#else
 	a_uint32_t  _reserved0:12;
+#endif
 };
 
 union eg_gen_ctrl_u {

@@ -1873,6 +1873,33 @@ hsl_port_phy_reset(a_uint32_t dev_id, fal_port_t port_id)
 	return phy_drv->phy_reset(dev_id, phy_addr);
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0))
+sw_error_t
+hsl_phydev_eee_update(a_uint32_t dev_id, a_uint32_t phy_addr, a_uint32_t adv)
+{
+	struct phy_device *phydev = NULL;
+	sw_error_t rv = SW_OK;
+
+	rv = hsl_phy_phydev_get(dev_id, phy_addr, &phydev);
+	SW_RTN_ON_ERROR(rv);
+
+	phydev->eee_enabled = (adv == 0 ? A_FALSE : A_TRUE);
+
+	linkmode_mod_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+		phydev->advertising_eee, adv & FAL_PHY_EEE_100BASE_T);
+	linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+		phydev->advertising_eee, adv & FAL_PHY_EEE_1000BASE_T);
+	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+		phydev->advertising_eee, adv & FAL_PHY_EEE_2500BASE_T);
+	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+		phydev->advertising_eee, adv & FAL_PHY_EEE_5000BASE_T);
+	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+		phydev->advertising_eee, adv & FAL_PHY_EEE_10000BASE_T);
+
+	return SW_OK;
+}
+#endif
+
 sw_error_t
 hsl_port_phy_eee_adv_set(a_uint32_t dev_id, a_uint32_t port_id, a_uint32_t adv)
 {

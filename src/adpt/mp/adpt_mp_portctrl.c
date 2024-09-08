@@ -45,7 +45,8 @@ _adpt_mp_gcc_mac_clock_set(a_uint32_t dev_id,
 static a_bool_t
 _adpt_mp_port_phy_connected (a_uint32_t dev_id, fal_port_t port_id)
 {
-	ADPT_DEV_ID_CHECK(dev_id);
+	if (dev_id >= SW_MAX_NR_DEV)
+		return A_FALSE;
 
 	/* force port which connect s17c or other device chip*/
 	if (hsl_port_feature_get(dev_id, port_id, PHY_F_FORCE | PHY_F_SFP)) {

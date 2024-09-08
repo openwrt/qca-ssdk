@@ -92,12 +92,15 @@ static sw_error_t
 adpt_mp_port_reset_set(a_uint32_t dev_id, a_uint32_t port_id)
 {
 	sw_error_t rv = 0;
+#ifdef IN_MP_PHY
 	a_uint32_t phy_addr;
 	hsl_phy_ops_t *phy_drv;
+#endif
 
 	ADPT_DEV_ID_CHECK(dev_id);
 
 	if (port_id == SSDK_PHYSICAL_PORT1) {
+#ifdef IN_MP_PHY
 		/*internal gephy reset*/
 		SW_RTN_ON_NULL (phy_drv = hsl_phy_api_ops_get(dev_id,
 				port_id));
@@ -107,6 +110,7 @@ adpt_mp_port_reset_set(a_uint32_t dev_id, a_uint32_t port_id)
 		SW_RTN_ON_ERROR (rv);
 		rv = phy_drv->phy_function_reset(dev_id, phy_addr, PHY_FIFO_RESET);
 		SW_RTN_ON_ERROR (rv);
+#endif
 	} else if (port_id == SSDK_PHYSICAL_PORT2) {
 		rv = adpt_mp_uniphy_adapter_port_reset(dev_id, port_id);
 	} else {

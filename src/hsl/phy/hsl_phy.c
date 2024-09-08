@@ -28,7 +28,7 @@
 #if defined(ATHENA) ||defined(SHIVA) ||defined(HORUS)
 #include <f2_phy.h>
 #endif
-#ifdef MP
+#ifdef IN_MP_PHY
 #include "mpge_phy.h"
 #endif
 #ifdef IN_MALIBU_PHY
@@ -94,7 +94,7 @@ phy_driver_instance_t ssdk_phy_driver[] =
 	#else
 	{SFP_PHY_CHIP, {0}, NULL, NULL, NULL},
 	#endif
-	#ifdef MP
+	#ifdef IN_MP_PHY
 	{MPGE_PHY_CHIP, {0}, NULL, mpge_phy_init, NULL},
 	#else
 	{MPGE_PHY_CHIP, {0}, NULL, NULL, NULL},

@@ -23,7 +23,7 @@ ifeq (ISIS, $(CHIP_TYPE))
   SRC_LIST = f1_phy.c
 endif
 
-ifeq (MP, $(CHIP_TYPE))
+ifeq (TRUE, $(IN_MP_PHY))
   SRC_LIST = mpge_phy.c
 ifeq (TRUE, $(IN_LED))
   SRC_LIST += mpge_led.c
@@ -40,12 +40,6 @@ endif
 
 ifeq (ALL_CHIP, $(CHIP_TYPE))
      SRC_LIST = f1_phy.c f2_phy.c malibu_phy.c
-ifneq (,$(filter MP, $(SUPPORT_CHIP)))
-     SRC_LIST += mpge_phy.c
-ifeq (TRUE, $(IN_LED))
-     SRC_LIST += mpge_led.c
-endif
-endif
 endif
 
 ifeq (NONHK_CHIP, $(CHIP_TYPE))

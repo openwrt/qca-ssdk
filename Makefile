@@ -1,16 +1,18 @@
-include ./config
-
 ifndef PRJ_PATH
   PRJ_PATH=$(shell pwd)
 endif
 export PRJ_PATH
 
-include ./make/config.mk
-include ./make/tools.mk
-include ./make/$(OS)_opt.mk
+include $(PRJ_PATH)/config
+
+include $(PRJ_PATH)/make/config.mk
+include $(PRJ_PATH)/make/tools.mk
+include $(PRJ_PATH)/make/$(OS)_opt.mk
 
 SUB_DIR=$(patsubst %/, %, $(dir $(wildcard src/*/Makefile)))
 SUB_LIB=$(subst src/, , $(SUB_DIR))
+
+include $(PRJ_PATH)/Makefile.modules
 
 ####################################################################
 # 			SSDK-Style Makefile
@@ -27,11 +29,7 @@ all: $(BIN_DIR) kslib
 # 			LNX Modules-Style Makefile
 ####################################################################
 modules: $(BIN_DIR) kslib_c
-	mkdir -p ./temp/;cp * ./temp -a;cd ./temp;cp ../Makefile.modules ./Makefile;
-	make -C $(SYS_PATH) M=$(PRJ_PATH)/temp $(LNX_MAKEOPTS) modules
-	cp $(PRJ_PATH)/temp/Module.symvers $(PRJ_PATH)/Module.symvers;
-	cp temp/*.ko build/bin;
-	rm -Rf ./temp/*.o ./temp/*.ko ./temp/*.a
+	@$(MAKE) -C $(SYS_PATH) M=$(PRJ_PATH) $(LNX_MAKEOPTS) modules
 	@echo "---Build [SSDK-$(VERSION)] at $(BUILD_DATE) finished."
 
 kslib_c:

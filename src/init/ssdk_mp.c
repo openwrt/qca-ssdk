@@ -59,10 +59,12 @@ qca_mp_portctrl_hw_init(a_uint32_t dev_id)
 		fal_port_promisc_mode_set(dev_id, i, A_TRUE);
 		/* init software level port status */
 		qca_mac_port_status_init(dev_id, i);
+#if defined(IN_MP_UNIPHY)
 		/*enable ICC efuse loading*/
 		ssdk_mp_gephy_icc_efuse_load_enable(A_TRUE);
 #ifdef IN_LED
 		ssdk_led_init(dev_id, i);
+#endif
 #endif
 	}
 	return rv;

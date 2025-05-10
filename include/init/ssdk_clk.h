@@ -241,19 +241,29 @@ enum cmnblk_pll_src_type {
 };
 
 enum mp_bcr_rst_type {
+#if defined(IN_MP_PHY)
 	GEPHY_BCR_RESET_E = 0,
 	UNIPHY_BCR_RESET_E,
+#else
+	UNIPHY_BCR_RESET_E = 0,
+#endif
 	GMAC0_BCR_RESET_E,
 	GMAC1_BCR_RESET_E,
+#if defined(IN_MP_PHY)
 	GEPHY_MISC_RESET_E,
+#endif
 	MP_BCR_RST_MAX
 };
 
+#if defined(IN_MP_PHY)
 #define GEHPY_BCR_RESET_ID	"gephy_bcr_rst"
+#endif
 #define UNIPHY_BCR_RESET_ID	"uniphy_bcr_rst"
 #define GMAC0_BCR_RESET_ID	"gmac0_bcr_rst"
 #define GMAC1_BCR_RESET_ID	"gmac1_bcr_rst"
+#if defined(IN_MP_PHY)
 #define GEPHY_MISC_RESET_ID	"gephy_misc_rst"
+#endif
 
 #define CMN_BLK_ADDR                0x0009B780
 #define CMN_BLK_PLL_SRC_ADDR        0x0009B028

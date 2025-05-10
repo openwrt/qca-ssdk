@@ -1027,24 +1027,31 @@ static void ssdk_ppe_fixed_clock_init(adpt_ppe_type_t chip_type)
 #if defined(MP)
 #define TCSR_ETH_ADDR               0x19475C0
 #define TCSR_ETH_SIZE               0x4
+#if defined(IN_MP_PHY)
 #define TCSR_GEPHY_LDO_BIAS_EN      0
 #define TCSR_ETH_LDO_RDY            0x4
 
 #define GEPHY_LDO_BIAS_EN           0x1
 #define ETH_LDO_RDY                 0x1
+#endif
 #define CMN_PLL_LOCKED_ADDR         0x9B064
 #define CMN_PLL_LOCKED_SIZE         0x4
 #define CMN_PLL_LOCKED              0x4
 #define MP_RAW_CLOCK_INSTANCE       0x2
 
 static char *mp_rst_ids[MP_BCR_RST_MAX] = {
+#if defined(IN_MP_PHY)
 	GEHPY_BCR_RESET_ID,
+#endif
 	UNIPHY_BCR_RESET_ID,
 	GMAC0_BCR_RESET_ID,
 	GMAC1_BCR_RESET_ID,
+#if defined(IN_MP_PHY)
 	GEPHY_MISC_RESET_ID
+#endif
 };
 
+#if defined(IN_MP_PHY)
 static struct clk_uniphy gephy_gcc_rx_clk = {
 	.hw.init = &(struct clk_init_data){
 	.name = "gephy_gcc_rx",
@@ -1070,6 +1077,7 @@ static struct clk_uniphy gephy_gcc_tx_clk = {
 	.dir = UNIPHY_TX,
 	.rate = UNIPHY_DEFAULT_RATE,
 };
+#endif
 
 static struct clk_uniphy uniphy_gcc_rx_clk = {
 	.hw.init = &(struct clk_init_data){
@@ -1097,8 +1105,12 @@ static struct clk_uniphy uniphy_gcc_tx_clk = {
 	.rate = UNIPHY_DEFAULT_RATE,
 };
 
+#if defined(IN_MP_PHY)
 static struct clk_hw *mp_raw_clks[MP_RAW_CLOCK_INSTANCE * 2] = {
 	&gephy_gcc_rx_clk.hw, &gephy_gcc_tx_clk.hw,
+#else
+static struct clk_hw *mp_raw_clks[MP_RAW_CLOCK_INSTANCE] = {
+#endif
 	&uniphy_gcc_rx_clk.hw, &uniphy_gcc_tx_clk.hw,
 };
 
@@ -1178,6 +1190,7 @@ static void ssdk_mp_uniphy_clock_enable(void)
 	ssdk_uniphy_clock_enable(0, UNIPHY1_PORT5_TX_CLK_E, A_TRUE);
 }
 
+#if defined(IN_MP_PHY)
 static void
 ssdk_mp_tcsr_get(a_uint32_t tcsr_offset, a_uint32_t *tcsr_val)
 {
@@ -1270,6 +1283,7 @@ ssdk_mp_cmnblk_stable_check(void)
 		return A_TRUE;
 	}
 }
+#endif
 
 static void
 ssdk_mp_reset_init(void)
@@ -1645,13 +1659,17 @@ void ssdk_gcc_mp_clock_init(enum cmnblk_clk_type mode)
 	ssdk_mp_uniphy_clock_init();
 	ssdk_cmnblk_init(mode);
 	msleep(200);
+#if defined(IN_MP_PHY)
 	ssdk_mp_cmnblk_enable();
 	if (ssdk_mp_cmnblk_stable_check()) {
+#endif
 		ssdk_mp_reset_init();
 		ssdk_mp_uniphy_clock_enable();
+#if defined(IN_MP_PHY)
 	} else {
 		SSDK_ERROR("Cmnblock is still not stable!\n");
 	}
+#endif
 #endif
 }
 
@@ -1675,7 +1693,14 @@ void ssdk_mp_raw_clock_set(
 		return;
 	}
 
+	/* in MP, there is only 1 uniphy and its index is always 1 */
+#if defined(IN_MP_PHY)
+	/* uniphy clocks have idx 2 and 3 in mp_raw_clks[] */
 	id = uniphy_index*2 + direction;
+#else
+	/* uniphy clocks have idx 0 and 1 in mp_raw_clks[] */
+	id = direction;
+#endif
 	old_clock = clk_get_rate(mp_raw_clks[id]->clk);
 
 	if (clock != old_clock) {

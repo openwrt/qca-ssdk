@@ -38,6 +38,7 @@
 #include <linux/of.h>
 #include <linux/of_mdio.h>
 #include <linux/of_platform.h>
+#include <linux/platform_device.h>
 
 static ssdk_dt_global_t ssdk_dt_global = {0};
 #ifdef HPPE

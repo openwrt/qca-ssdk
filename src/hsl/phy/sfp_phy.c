@@ -307,7 +307,7 @@ int sfp_phy_device_setup(a_uint32_t dev_id, a_uint32_t port, a_uint32_t phy_id,
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
 	struct phy_device *phydev;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,9,0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,9,0)) && defined(IN_PHY_I2C_MODE)
 	struct device_driver *drv;
 	struct phy_driver *phydrv;
 #endif

@@ -600,7 +600,7 @@ int qca808x_phy_probe(struct phy_device *phydev)
 	return err;
 }
 
-int qca808x_match_phy_device(struct phy_device *phydev)
+int qca808x_match_phy_device(struct phy_device *phydev, const struct phy_driver *phydrv)
 {
 	a_uint32_t phy_id = 0;
 

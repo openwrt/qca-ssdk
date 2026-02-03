@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,12 +14,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef _ADPT_APPE_QM_H_
-#define _ADPT_APPE_QM_H_
+#include "qca808x.h"
 
-sw_error_t
-adpt_appe_qm_enqueue_config_set(a_uint32_t dev_id, fal_enqueue_cfg_t *enqueue_cfg);
-
-sw_error_t
-adpt_appe_qm_enqueue_config_get(a_uint32_t dev_id, fal_enqueue_cfg_t *enqueue_cfg);
+struct qca808x_phy_info* qca808x_phy_info_get(a_uint32_t phy_addr);
+int qca808x_phy_info_add(struct qca808x_phy_info *pinfo);
+int qca808x_phy_info_remove(struct qca808x_phy_info *pinfo);
+void qca808x_phy_remove(struct phy_device *phydev);
+#if defined(IN_LINUX_STD_PTP)
+int qca808x_ptp_hook_init(void);
+void qca808x_ptp_hook_cleanup(void);
 #endif

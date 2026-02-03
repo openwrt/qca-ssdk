@@ -184,6 +184,11 @@ ifeq (TRUE, $(IN_QCA808X_PHY))
   MODULE_CFLAG += -DIN_QCA808X_PHY
 endif
 
+
+ifeq (TRUE, $(IN_QCA81XX_PHY))
+  MODULE_CFLAG += -DIN_QCA81XX_PHY
+endif
+
 ifeq (TRUE, $(IN_MP_PHY))
   MODULE_CFLAG += -DIN_MP_PHY
 endif

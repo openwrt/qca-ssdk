@@ -119,19 +119,10 @@ void
 adpt_mp_gcc_uniphy_port_set(a_uint32_t dev_id, a_uint32_t port_id,
 	a_bool_t enable)
 {
-	a_bool_t force_port = A_FALSE;
 	enum unphy_rst_type rst_type;
 
 	if (port_id == SSDK_PHYSICAL_PORT2) {
-		force_port = hsl_port_feature_get(dev_id, SSDK_PHYSICAL_PORT2, PHY_F_FORCE);
-		/*
-		 * for fixed-link: reset AHB only
-		 * for phy-to-phy: do soft reset (SYS, RX, and TX)
-		 */
-		if (force_port)
-			rst_type = UNIPHY1_AHB_RESET_E;
-		else
-			rst_type = UNIPHY1_SOFT_RESET_E;
+		rst_type = UNIPHY1_SOFT_RESET_E;
 	} else {
 		return;
 	}
